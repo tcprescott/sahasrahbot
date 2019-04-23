@@ -11,13 +11,16 @@ discordbot = commands.Bot(
     command_prefix="$",
 )
 
+discordbot.load_extension("alttprbot.cogs.admin")
+discordbot.load_extension("alttprbot.cogs.role")
+
 @discordbot.command()
 async def test(ctx, emoji):
-    await reactionrole.create_role(12345,123456,1234,'test',emoji)
+    await reactionrole.create_role(12345,1,1234,'test',emoji)
 
 @discordbot.command()
 async def test2(ctx):
-    roles = await reactionrole.get_group_roles(123456,12345)
+    roles = await reactionrole.get_group_roles(1,12345)
     print(roles)
 
 

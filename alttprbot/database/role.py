@@ -1,4 +1,4 @@
-from .util import orm
+from ..util import orm
 
 async def get_group(reaction_group_id, guild_id):
     messages = await orm.select(
@@ -40,11 +40,9 @@ async def create_role(guild_id, reaction_group_id, role_id, name, emoji):
         [reaction_group_id,guild_id]
     )
 
-    id = ids[0]
-
     existing_roles = await orm.select(
         'SELECT id from reaction_role WHERE emoji = %s and reaction_group_id = %s',
-        [emoji, id]
+        [emoji, ids[0]['id']]
     )
     # do something else if this already exists
     if len(existing_roles) > 0:
