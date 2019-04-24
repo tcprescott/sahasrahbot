@@ -1,4 +1,6 @@
-from config import Config
+
+import discord
+from discord.ext import commands
 
 class Role(commands.Cog):
     def __init__(self, bot):

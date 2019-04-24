@@ -2,7 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 
-from alttprbot import reactionrole
+# from alttprbot import reactionrole
 from alttprbot.util import orm
 
 from config import Config
@@ -14,14 +14,14 @@ discordbot = commands.Bot(
 discordbot.load_extension("alttprbot.cogs.admin")
 discordbot.load_extension("alttprbot.cogs.role")
 
-@discordbot.command()
-async def test(ctx, emoji):
-    await reactionrole.create_role(12345,1,1234,'test',emoji)
+# @discordbot.command()
+# async def test(ctx, emoji):
+#     await reactionrole.create_role(12345,1,1234,'test',emoji)
 
-@discordbot.command()
-async def test2(ctx):
-    roles = await reactionrole.get_group_roles(1,12345)
-    print(roles)
+# @discordbot.command()
+# async def test2(ctx):
+#     roles = await reactionrole.get_group_roles(1,12345)
+#     print(roles)
 
 
 # @discordbot.event
