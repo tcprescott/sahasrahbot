@@ -14,35 +14,34 @@ discordbot = commands.Bot(
 discordbot.load_extension("alttprbot.cogs.admin")
 discordbot.load_extension("alttprbot.cogs.role")
 
-# @discordbot.command()
-# async def test(ctx, emoji):
-#     await reactionrole.create_role(12345,1,1234,'test',emoji)
+@discordbot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.message.add_reaction('🚫')
+    if isinstance(error, commands.errors.MissingPermissions):
+        await ctx.message.add_reaction('🚫')
+    elif isinstance(error, commands.CommandNotFound):
+        pass
+    elif isinstance(error, commands.errors.MissingRequiredArgument):
+        await ctx.send(error)
+        await ctx.message.add_reaction('👎')
+    else:
+        await ctx.send(error)
+        await ctx.message.add_reaction('👎')
+    await ctx.message.remove_reaction('⌚',ctx.bot.user)
 
-# @discordbot.command()
-# async def test2(ctx):
-#     roles = await reactionrole.get_group_roles(1,12345)
-#     print(roles)
+@discordbot.event
+async def on_command(ctx):
+    await ctx.message.add_reaction('⌚')
 
-
-# @discordbot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CheckFailure):
-#         await ctx.message.add_reaction('🚫')
-#     elif isinstance(error, commands.errors.MissingRequiredArgument):
-#         await ctx.send(error)
-#         await ctx.message.add_reaction('👎')
-#     elif isinstance(error, commands.CommandNotFound):
-#         pass
-#     elif isinstance(error, commands.errors.CommandOnCooldown):
-#         pass
-#     else:
-#         await ctx.send(error)
-#         await ctx.message.add_reaction('👎')
-#     await ctx.message.remove_reaction('⌚',ctx.bot.user)
+@discordbot.event
+async def on_command_completion(ctx):
+    await ctx.message.add_reaction('👍')
+    await ctx.message.remove_reaction('⌚',ctx.bot.user)
 
 @discordbot.check
 async def globally_block_dms(ctx):
-    if ctx.guild is None and not ctx.invoked_with in ['practice']:
+    if ctx.guild is None:
         return False
     else:
         return True
