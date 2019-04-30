@@ -12,6 +12,11 @@ class Role(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_message(self, message):
+        for mention in message.role_mentions:
+            await role.increment_mention_count(mention.guild.id, mention.id)
+
+    @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         emoji = str(payload.emoji)
         roles = await role.get_role_by_group_emoji(payload.channel_id, payload.message_id, emoji, payload.guild_id)

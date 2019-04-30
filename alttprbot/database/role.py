@@ -103,3 +103,9 @@ async def update_role(guild_id, id, name, description, protect_mentions: int):
         'UPDATE reaction_role SET name=%s, description=%s, protect_mentions=%s WHERE guild_id=%s AND id=%s',
         [name, description, protect_mentions, guild_id, id]
     )
+
+async def increment_mention_count(guild_id, role_id):
+    await orm.execute(
+        'INSERT INTO mention_counters(guild_id,role_id) VALUES (%s,%s) ON DUPLICATE KEY UPDATE counter = counter+1;',
+        [guild_id, role_id]
+    )
