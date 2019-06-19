@@ -13,6 +13,7 @@ discordbot = commands.Bot(
 
 discordbot.load_extension("alttprbot.cogs.admin")
 discordbot.load_extension("alttprbot.cogs.role")
+discordbot.load_extension("alttprbot.cogs.misc")
 
 @discordbot.event
 async def on_command_error(ctx, error):
