@@ -7,6 +7,13 @@ async def get_parameter(guild_id, parameter):
     )
     return result[0]
 
+async def get_all_parameters_by_name(parameter):
+    result = await orm.select(
+        'SELECT * from config WHERE parameter=%s;',
+        [parameter]
+    )
+    return result
+
 async def get_parameters_by_guild(guild_id):
     result = await orm.select(
         'SELECT * from config WHERE guild_id=%s;',
