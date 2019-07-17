@@ -39,6 +39,13 @@ class Daily(commands.Cog):
         await update_daily(hash)
         await ctx.send(embed=embed)
 
+    @commands.command(
+        name='checkdailyannounce'
+    )
+    @commands.is_owner()
+    async def checkdailyannounce(self, ctx):
+        await ctx.send(self.announce_daily.failed())
+
     @tasks.loop(hours=1, reconnect=True)
     async def announce_daily(self):
         print("announcer running")
