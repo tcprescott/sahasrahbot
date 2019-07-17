@@ -39,7 +39,7 @@ class Daily(commands.Cog):
         await update_daily(hash)
         await ctx.send(embed=embed)
 
-    @tasks.loop(minutes=1, reconnect=True)
+    @tasks.loop(hours=1, reconnect=True)
     async def announce_daily(self):
         print("announcer running")
         hash = await find_daily_hash()
