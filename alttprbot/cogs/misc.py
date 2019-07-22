@@ -1,4 +1,5 @@
 
+
 import discord
 from discord.ext import commands
 
@@ -13,7 +14,7 @@ class Misc(commands.Cog):
 
     @commands.command()
     async def crc32(self, ctx):
-        await ctx.send("If you need help verifying your ROM file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink to an already randomized game too!")
+        await ctx.send("If you need help verifying your ROM file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!")
 
 def setup(bot):
     bot.add_cog(Misc(bot))
