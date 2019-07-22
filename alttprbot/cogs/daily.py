@@ -73,7 +73,7 @@ async def update_daily(hash):
 
 async def daily_embed(hash):
     seed = await get_daily_seed(hash)
-    embed = discord.Embed(title=seed.data['spoiler']['meta']['name'], description="This is today's daily seed.  It can always be found at https://alttpr.com/daily", color=discord.Colour.blue())
+    embed = discord.Embed(title=seed.data['spoiler']['meta']['name'], description="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily", color=discord.Colour.blue())
     embed.add_field(name='Logic', value=seed.data['spoiler']['meta']['logic'], inline=True)
     embed.add_field(name='Difficulty', value=seed.data['spoiler']['meta']['difficulty'], inline=True)
     embed.add_field(name='Variation', value=seed.data['spoiler']['meta']['variation'], inline=True)
