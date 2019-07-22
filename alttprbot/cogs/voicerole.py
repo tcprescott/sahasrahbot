@@ -11,9 +11,9 @@ class VoiceRole(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
         vc_roles = await voicerole.get_voice_roles_by_guild(member.guild.id)
 
-        if after.channel.id == before.channel.id:
-            return
-
+        if not after.channel == None and not before.channel == None:
+            if after.channel.id == before.channel.id:
+                return
         if not after.channel == None:
             for vc_role in vc_roles:
                 if after.channel.id == vc_role['voice_channel_id']:
