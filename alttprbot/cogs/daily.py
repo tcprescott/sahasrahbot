@@ -46,7 +46,7 @@ class Daily(commands.Cog):
     async def checkdailyannounce(self, ctx):
         await ctx.send(self.announce_daily.failed())
 
-    @tasks.loop(hours=1, reconnect=True)
+    @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
         print("announcer running")
         hash = await find_daily_hash()

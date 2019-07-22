@@ -5,7 +5,10 @@ async def get_parameter(guild_id, parameter):
         'SELECT * from config WHERE guild_id=%s AND parameter=%s;',
         [guild_id, parameter]
     )
-    return result[0]
+    if len(result) == 0:
+        return None
+    else:
+        return result[0]
 
 async def get_all_parameters_by_name(parameter):
     result = await orm.select(

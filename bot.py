@@ -15,6 +15,7 @@ discordbot.load_extension("alttprbot.cogs.admin")
 discordbot.load_extension("alttprbot.cogs.role")
 discordbot.load_extension("alttprbot.cogs.misc")
 discordbot.load_extension("alttprbot.cogs.daily")
+discordbot.load_extension("alttprbot.cogs.voicerole")
 
 @discordbot.event
 async def on_command_error(ctx, error):
