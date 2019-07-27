@@ -1,0 +1,9 @@
+class Config:
+    DEBUG = False
+    DB_HOST = '127.0.0.1'
+    DB_PORT = 3306
+    DB_NAME = 'alttprbot'
+    DB_USER = 'username'
+    DB_PASS = 'password'
+
+    DISCORD_TOKEN = 'discord_bot_token_here'
