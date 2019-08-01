@@ -4,6 +4,8 @@ from discord.ext import commands
 import pyz3r
 from pyz3r.customizer import customizer
 
+from ..database import alttprgen
+
 import aiohttp
 import json
 
@@ -32,12 +34,22 @@ class AlttprGen(commands.Cog):
             settings=settings
         )
 
-        embed = await seed_embed(seed, ctx.message.attachments[0].filename)
+        embed = await seed_embed(seed)
         await ctx.send(embed=embed)
 
     @seedgen.command()
-    async def preset(self, ctx, preset, tournament: bool=True):
-        pass
+    async def preset(self, ctx, preset):
+        result = await alttprgen.get_seed_preset(preset)
+        if not len(result):
+            raise Exception('Preset not found.')
+
+        seed = await pyz3r.async_alttpr(
+            randomizer=result['randomizer'],
+            settings=json.loads(result['settings'])
+        )
+
+        embed = await seed_embed(seed)
+        await ctx.send(embed=embed)
 
 async def get_customizer_json(url):
     async with aiohttp.ClientSession() as session:
@@ -46,11 +58,11 @@ async def get_customizer_json(url):
 
     return json.loads(text)
 
-async def seed_embed(seed, filename):
+async def seed_embed(seed):
     try:
         name = seed.data['spoiler']['meta']['name']
     except KeyError:
-        name = filename
+        name = 'Requested Seed'
     try:
         notes = seed.data['spoiler']['meta']['notes']
     except KeyError:
