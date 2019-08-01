@@ -15,6 +15,8 @@ import pyz3r
 
 def is_daily_channel():
     async def predicate(ctx):
+        if ctx.guild == None:
+            return False
         result = await config.get_parameter(ctx.guild.id, 'DailyAnnouncerChannel')
         if not result == None:
             channels = result['value'].split(',')

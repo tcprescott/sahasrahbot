@@ -44,12 +44,12 @@ async def on_command_completion(ctx):
     await ctx.message.add_reaction('👍')
     await ctx.message.remove_reaction('⌚',ctx.bot.user)
 
-@discordbot.check
-async def globally_block_dms(ctx):
-    if ctx.guild is None:
-        return False
-    else:
-        return True
+# @discordbot.check
+# async def globally_block_dms(ctx):
+#     if ctx.guild is None:
+#         return False
+#     else:
+#         return True
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
