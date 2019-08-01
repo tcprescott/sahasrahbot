@@ -1,4 +1,5 @@
 /env/
 /.vscode/
 /config.py
+/pyz3r
 __pycache__

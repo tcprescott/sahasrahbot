@@ -16,22 +16,24 @@ discordbot.load_extension("alttprbot.cogs.role")
 discordbot.load_extension("alttprbot.cogs.misc")
 discordbot.load_extension("alttprbot.cogs.daily")
 discordbot.load_extension("alttprbot.cogs.voicerole")
+discordbot.load_extension("alttprbot.cogs.alttprgen")
 
-@discordbot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CheckFailure):
-        await ctx.message.add_reaction('🚫')
-    if isinstance(error, commands.errors.MissingPermissions):
-        await ctx.message.add_reaction('🚫')
-    elif isinstance(error, commands.CommandNotFound):
-        pass
-    elif isinstance(error, commands.errors.MissingRequiredArgument):
-        await ctx.send(error)
-        await ctx.message.add_reaction('👎')
-    else:
-        await ctx.send(error)
-        await ctx.message.add_reaction('👎')
-    await ctx.message.remove_reaction('⌚',ctx.bot.user)
+if not Config.DEBUG:
+    @discordbot.event
+    async def on_command_error(ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.message.add_reaction('🚫')
+        if isinstance(error, commands.errors.MissingPermissions):
+            await ctx.message.add_reaction('🚫')
+        elif isinstance(error, commands.CommandNotFound):
+            pass
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send(error)
+            await ctx.message.add_reaction('👎')
+        else:
+            await ctx.send(error)
+            await ctx.message.add_reaction('👎')
+        await ctx.message.remove_reaction('⌚',ctx.bot.user)
 
 @discordbot.event
 async def on_command(ctx):
