@@ -168,7 +168,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
     if r == 'item':
         difficulty = random.choices(
             population=['easy','normal','hard','expert','insane'],
-            weights=[.5,1,1,1,.25]
+            weights=[.5,1,1,.5,.1]
         )[0]
         goal = random.choices(
             population=['ganon','dungeons','pedestal','triforce-hunt'],
