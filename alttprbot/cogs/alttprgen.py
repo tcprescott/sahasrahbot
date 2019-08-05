@@ -285,7 +285,7 @@ def random_enemizer(mode=None):
         )[0]
         enemy_damage = random.choices(
             population=['off','shuffle','chaos'],
-            weights=[1,.5,.5]
+            weights=[1,1,1]
         )[0]
         boss = random.choices(
             population=['off','basic','normal','chaos'],
