@@ -257,7 +257,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
 def random_enemizer(mode=None):
     enabled = random.choices(
         population=[True, False],
-        weights=[.5,1]
+        weights=[1,1]
     )[0]
     if not enabled:
         return False
