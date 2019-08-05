@@ -137,10 +137,10 @@ async def seed_embed(seed):
             pass
 
     try:
-        embed.add_field(name='Enemizer Enemy Damage', value=healthmap[seed.data['spoiler']['meta']['enemizer_enemy_damage']], inline=True)
+        embed.add_field(name='Enemizer Enemy Damage', value=seed.data['spoiler']['meta']['enemizer_enemy_damage'], inline=True)
     except KeyError:
         try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Damage', value=healthmap[seed.settings['enemizer']['enemy_damage']], inline=True)
+            if seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Damage', value=seed.settings['enemizer']['enemy_damage'], inline=True)
         except KeyError:
             pass
 
