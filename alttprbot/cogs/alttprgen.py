@@ -219,7 +219,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
             weights=[1,1]
         )[0]
         shuffle = random.choices(
-            population=['simple','restricted','full','crossed','insane'],
+            population=['simple','restricted','full','crossed','insanity'],
             weights=[1,1,1,1,1]
         )[0]
         variation = random.choices(
