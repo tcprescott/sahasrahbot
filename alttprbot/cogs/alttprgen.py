@@ -168,7 +168,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
     if r == 'item':
         difficulty = random.choices(
             population=['easy','normal','hard','expert','insane'],
-            weights=[.5,1,1,.5,.1]
+            weights=[.25,1,1,.5,.1]
         )[0]
         goal = random.choices(
             population=['ganon','dungeons','pedestal','triforce-hunt'],
@@ -208,7 +208,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
     elif r == 'entrance':
         difficulty = random.choices(
             population=['easy','normal','hard','expert','insane'],
-            weights=[.5,1,1,.5,.1]
+            weights=[.25,1,1,.5,.1]
         )[0]
         goal = random.choices(
             population=['ganon','crystals','dungeons','pedestal','triforcehunt'],
@@ -272,7 +272,7 @@ def random_enemizer(mode=None):
             )[0]
             enemy_health = random.choices(
                 population=[0,1,2,3,4],
-                weights=[1,1,1,.25,.1]
+                weights=[1,1,1,.5,.25]
             )[0]
 
         pot_shuffle = random.choices(
