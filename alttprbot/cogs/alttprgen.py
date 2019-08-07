@@ -180,7 +180,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
         )[0]
         weapons = random.choices(
             population=['randomized','uncle','swordless'],
-            weights=[1,1,1]
+            weights=[.4,.4,.2]
         )[0]
         variation = random.choices(
             population=['none','key-sanity','retro'],
@@ -216,7 +216,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
         )[0]
         mode = random.choices(
             population=['swordless','open'],
-            weights=[1,1]
+            weights=[.2,.8]
         )[0]
         shuffle = random.choices(
             population=['simple','restricted','full','crossed','insanity'],
