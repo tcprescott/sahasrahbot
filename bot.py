@@ -44,6 +44,15 @@ async def on_command_completion(ctx):
     await ctx.message.add_reaction('👍')
     await ctx.message.remove_reaction('⌚',ctx.bot.user)
 
+@discordbot.event
+async def on_message(message):
+    if discordbot.user in message.mentions:
+        emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')
+        if emoji:
+            await message.add_reaction(emoji)
+        
+    await discordbot.process_commands(message)
+
 # @discordbot.check
 # async def globally_block_dms(ctx):
 #     if ctx.guild is None:
