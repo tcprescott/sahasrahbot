@@ -35,7 +35,7 @@ class Daily(commands.Cog):
         name='daily',
         brief='Returns the current daily seed.',
         help='Returns the currently daily seed.')
-    # @is_daily_channel()
+    @is_daily_channel()
     async def daily(self, ctx):
         hash = await find_daily_hash()
         seed = await get_daily_seed(hash)
