@@ -5,6 +5,7 @@ import pyz3r
 from pyz3r.customizer import customizer
 
 from ..database import alttprgen
+from ..util import embed_formatter
 
 import aiohttp
 import json
@@ -36,7 +37,7 @@ class AlttprGen(commands.Cog):
             settings=settings
         )
 
-        embed = await seed_embed(seed)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
     @seedgen.command()
@@ -50,7 +51,7 @@ class AlttprGen(commands.Cog):
             settings=json.loads(result['settings'])
         )
 
-        embed = await seed_embed(seed)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
     @seedgen.command()
@@ -59,7 +60,7 @@ class AlttprGen(commands.Cog):
             raise Exception('randomizer must be random, item, or entrance!')
         seed = await generate_random_game(randomizer=randomizer, use_enemizer=use_enemizer, tournament=tournament)
 
-        embed = await seed_embed(seed)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
 async def get_customizer_json(url):
@@ -68,93 +69,6 @@ async def get_customizer_json(url):
             text = await resp.read()
 
     return json.loads(text)
-
-async def seed_embed(seed):
-    try:
-        name = seed.data['spoiler']['meta']['name']
-    except KeyError:
-        name = 'Requested Seed'
-    try:
-        notes = seed.data['spoiler']['meta']['notes']
-    except KeyError:
-        notes = ""
-
-    embed = discord.Embed(title=name, description=notes, color=discord.Colour.dark_red())
-    embed.add_field(name='Logic', value=seed.data['spoiler']['meta']['logic'], inline=True)
-    embed.add_field(name='Difficulty', value=seed.data['spoiler']['meta']['difficulty'], inline=True)
-    embed.add_field(name='Variation', value=seed.data['spoiler']['meta']['variation'], inline=True)
-    embed.add_field(name='State', value=seed.data['spoiler']['meta']['mode'], inline=True)
-
-    try:
-        embed.add_field(name='Swords', value=seed.data['spoiler']['meta']['weapons'], inline=True)
-    except KeyError:
-        pass
-
-    try:
-        embed.add_field(name='Shuffle', value=seed.data['spoiler']['meta']['shuffle'], inline=True)
-    except KeyError:
-        pass
-
-    embed.add_field(name='Goal', value=seed.data['spoiler']['meta']['goal'], inline=True)
-
-    try:
-        embed.add_field(name='Enemizer Enemy Shuffle', value=seed.data['spoiler']['meta']['enemizer_enemy'], inline=True)
-    except KeyError:
-        try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Shuffle', value=seed.settings['enemizer']['enemy'], inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(name='Enemizer Boss Shuffle', value=seed.data['spoiler']['meta']['enemizer_bosses'], inline=True)
-    except KeyError:
-        try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Boss Shuffle', value=seed.settings['enemizer']['bosses'], inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(name='Enemizer Pot Shuffle', value=seed.data['spoiler']['meta']['enemizer_pot_shuffle'], inline=True)
-    except KeyError:
-        try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Pot Shuffle', value=seed.settings['enemizer']['pot_shuffle'], inline=True)
-        except KeyError:
-            pass
-
-    healthmap = {
-        0: 'Default',
-        1: 'Easy (1-4 hp)',
-        2: 'Normal (2-15 hp)',
-        3: 'Hard (2-30 hp)',
-        4: 'Brick Wall (4-50 hp)'
-    }
-    try:
-        embed.add_field(name='Enemizer Enemy Health', value=healthmap[seed.data['spoiler']['meta']['enemizer_enemy_health']], inline=True)
-    except KeyError:
-        try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Health', value=healthmap[seed.settings['enemizer']['enemy_health']], inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(name='Enemizer Enemy Damage', value=seed.data['spoiler']['meta']['enemizer_enemy_damage'], inline=True)
-    except KeyError:
-        try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Damage', value=seed.settings['enemizer']['enemy_damage'], inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(name='Enemizer Palette Shuffle', value=seed.data['spoiler']['meta']['enemizer_palette_shuffle'], inline=True)
-    except KeyError:
-        try:
-            if seed.settings['enemizer']: embed.add_field(name='Enemizer Palette Shuffle', value=seed.settings['enemizer']['palette_shuffle'], inline=True)
-        except KeyError:
-            pass
-
-    embed.add_field(name='File Select Code', value=await seed.code(), inline=False)
-    embed.add_field(name='Permalink', value=seed.url, inline=False)
-    return embed
 
 async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer='random', tournament=True):
     if randomizer == 'random':

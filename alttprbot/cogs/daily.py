@@ -1,4 +1,5 @@
 from ..database import config, permissions, daily
+from ..util import embed_formatter
 
 import discord
 from discord.ext import tasks, commands
@@ -34,10 +35,11 @@ class Daily(commands.Cog):
         name='daily',
         brief='Returns the current daily seed.',
         help='Returns the currently daily seed.')
-    @is_daily_channel()
+    # @is_daily_channel()
     async def daily(self, ctx):
         hash = await find_daily_hash()
-        embed = await daily_embed(hash)
+        seed = await get_daily_seed(hash)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await update_daily(hash)
         await ctx.send(embed=embed)
 
@@ -53,7 +55,8 @@ class Daily(commands.Cog):
         print("announcer running")
         hash = await find_daily_hash()
         if await update_daily(hash):
-            embed = await daily_embed(hash)
+            seed = await get_daily_seed(hash)
+            embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             daily_announcer_channels = await config.get_all_parameters_by_name('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
                 guild = self.bot.get_guild(result['guild_id'])
@@ -64,27 +67,27 @@ class Daily(commands.Cog):
 def setup(bot):
     bot.add_cog(Daily(bot))
 
-async def update_daily(hash):
+async def update_daily(gamehash):
     latest_daily = await daily.get_latest_daily()
-    if not latest_daily['hash'] == hash:
+    if not latest_daily['hash'] == gamehash:
         print('omg new daily')
-        await daily.set_new_daily(hash)
+        await daily.set_new_daily(gamehash)
         return True
     else:
         return False
 
-async def daily_embed(hash):
-    seed = await get_daily_seed(hash)
-    embed = discord.Embed(title=seed.data['spoiler']['meta']['name'], description="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily", color=discord.Colour.blue())
-    embed.add_field(name='Logic', value=seed.data['spoiler']['meta']['logic'], inline=True)
-    embed.add_field(name='Difficulty', value=seed.data['spoiler']['meta']['difficulty'], inline=True)
-    embed.add_field(name='Variation', value=seed.data['spoiler']['meta']['variation'], inline=True)
-    embed.add_field(name='State', value=seed.data['spoiler']['meta']['mode'], inline=True)
-    embed.add_field(name='Swords', value=seed.data['spoiler']['meta']['weapons'], inline=True)
-    embed.add_field(name='Goal', value=seed.data['spoiler']['meta']['goal'], inline=True)
-    embed.add_field(name='File Select Code', value=await seed.code(), inline=False)
-    embed.add_field(name='Permalink', value=seed.url, inline=False)
-    return embed
+# async def daily_embed(hash):
+    
+#     embed = discord.Embed(title=seed.data['spoiler']['meta']['name'], description="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily", color=discord.Colour.blue())
+#     embed.add_field(name='Logic', value=seed.data['spoiler']['meta']['logic'], inline=True)
+#     embed.add_field(name='Difficulty', value=seed.data['spoiler']['meta']['difficulty'], inline=True)
+#     embed.add_field(name='Variation', value=seed.data['spoiler']['meta']['variation'], inline=True)
+#     embed.add_field(name='State', value=seed.data['spoiler']['meta']['mode'], inline=True)
+#     embed.add_field(name='Swords', value=seed.data['spoiler']['meta']['weapons'], inline=True)
+#     embed.add_field(name='Goal', value=seed.data['spoiler']['meta']['goal'], inline=True)
+#     embed.add_field(name='File Select Code', value=await seed.code(), inline=False)
+#     embed.add_field(name='Permalink', value=seed.url, inline=False)
+#     return embed
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash):

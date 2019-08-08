@@ -67,3 +67,133 @@ def reaction_menu(ctx, group, roles):
         date=datetime.datetime.now()
     ))
     return embed
+
+async def seed_embed(seed, emojis=False, name=False, notes=False):
+    if not name:
+        try:
+            name = seed.data['spoiler']['meta']['name']
+        except KeyError:
+            name = 'Requested Seed'
+            
+    if not notes:
+        try:
+            notes = seed.data['spoiler']['meta']['notes']
+        except KeyError:
+            notes = ""
+
+    embed = discord.Embed(title=name, description=notes, color=discord.Colour.dark_red())
+    embed.add_field(name='Logic', value=seed.data['spoiler']['meta']['logic'], inline=True)
+    embed.add_field(name='Difficulty', value=seed.data['spoiler']['meta']['difficulty'], inline=True)
+    embed.add_field(name='Variation', value=seed.data['spoiler']['meta']['variation'], inline=True)
+    embed.add_field(name='State', value=seed.data['spoiler']['meta']['mode'], inline=True)
+
+    try:
+        embed.add_field(name='Swords', value=seed.data['spoiler']['meta']['weapons'], inline=True)
+    except KeyError:
+        pass
+
+    try:
+        embed.add_field(name='Shuffle', value=seed.data['spoiler']['meta']['shuffle'], inline=True)
+    except KeyError:
+        pass
+
+    embed.add_field(name='Goal', value=seed.data['spoiler']['meta']['goal'], inline=True)
+
+    try:
+        embed.add_field(name='Enemizer Enemy Shuffle', value=seed.data['spoiler']['meta']['enemizer_enemy'], inline=True)
+    except KeyError:
+        try:
+            if seed.settings and seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Shuffle', value=seed.settings['enemizer']['enemy'], inline=True)
+        except KeyError:
+            pass
+
+    try:
+        embed.add_field(name='Enemizer Boss Shuffle', value=seed.data['spoiler']['meta']['enemizer_bosses'], inline=True)
+    except KeyError:
+        try:
+            if seed.settings and seed.settings['enemizer']: embed.add_field(name='Enemizer Boss Shuffle', value=seed.settings['enemizer']['bosses'], inline=True)
+        except KeyError:
+            pass
+
+    try:
+        embed.add_field(name='Enemizer Pot Shuffle', value=seed.data['spoiler']['meta']['enemizer_pot_shuffle'], inline=True)
+    except KeyError:
+        try:
+            if seed.settings and seed.settings['enemizer']: embed.add_field(name='Enemizer Pot Shuffle', value=seed.settings['enemizer']['pot_shuffle'], inline=True)
+        except KeyError:
+            pass
+
+    healthmap = {
+        0: 'Default',
+        1: 'Easy (1-4 hp)',
+        2: 'Normal (2-15 hp)',
+        3: 'Hard (2-30 hp)',
+        4: 'Brick Wall (4-50 hp)'
+    }
+    try:
+        embed.add_field(name='Enemizer Enemy Health', value=healthmap[seed.data['spoiler']['meta']['enemizer_enemy_health']], inline=True)
+    except KeyError:
+        try:
+            if seed.settings and seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Health', value=healthmap[seed.settings['enemizer']['enemy_health']], inline=True)
+        except KeyError:
+            pass
+
+    try:
+        embed.add_field(name='Enemizer Enemy Damage', value=seed.data['spoiler']['meta']['enemizer_enemy_damage'], inline=True)
+    except KeyError:
+        try:
+            if seed.settings and seed.settings['enemizer']: embed.add_field(name='Enemizer Enemy Damage', value=seed.settings['enemizer']['enemy_damage'], inline=True)
+        except KeyError:
+            pass
+
+    try:
+        embed.add_field(name='Enemizer Palette Shuffle', value=seed.data['spoiler']['meta']['enemizer_palette_shuffle'], inline=True)
+    except KeyError:
+        try:
+            if seed.settings and seed.settings['enemizer']: embed.add_field(name='Enemizer Palette Shuffle', value=seed.settings['enemizer']['palette_shuffle'], inline=True)
+        except KeyError:
+            pass
+
+    if emojis:
+        emoji_code_map = {
+            'Bow': 'Bow',
+            'Boomerang': 'BestBoomerang',
+            'Hookshot': 'Hookshot',
+            'Bombs': 'Blowup',
+            'Mushroom': 'Mushroom',
+            'Magic Powder': 'Powder',
+            'Ice Rod': 'IceRod',
+            'Pendant': 'GreenPendant',
+            'Bombos': 'Bombos',
+            'Ether': 'Ether',
+            'Quake': 'Quake',
+            'Lamp': 'Lamp',
+            'Hammer': 'MCHammer',
+            'Shovel': 'Shovel',
+            'Flute': 'Flute',
+            'Bugnet': 'BugNet',
+            'Book': 'Mudora',
+            'Empty Bottle': 'EmptyBottle',
+            'Green Potion': 'GreenPotion',
+            'Somaria': 'somaria',
+            'Cape': 'Cape',
+            'Mirror': 'Mirror',
+            'Boots': 'GoFast',
+            'Gloves': 'PowerGlove',
+            'Flippers': 'Flippers',
+            'Moon Pearl': 'MoonPearl',
+            'Shield': 'MirrorShield',
+            'Tunic': 'GreenTunic',
+            'Heart': 'ALotOfLove',
+            'Map': 'DungeonMap',
+            'Compass': 'DungeonCompass',
+            'Big Key': 'BigKey'
+        }
+        code = await seed.code()
+        c=list(map(lambda x: str(discord.utils.get(emojis, name=emoji_code_map[x])), code))
+        embed.add_field(name='File Select Code', value=' '.join(c) + ' (' + '/'.join(code) + ')', inline=False)
+    else:
+        embed.add_field(name='File Select Code', value=await seed.code(), inline=False)
+
+    embed.add_field(name='Permalink', value=seed.url, inline=False)
+    return embed
