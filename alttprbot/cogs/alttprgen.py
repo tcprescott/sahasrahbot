@@ -90,7 +90,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
         )[0]
         mode = random.choices(
             population=['standard','open','inverted'],
-            weights=[1,1,1]
+            weights=[1,1,.75]
         )[0]
         weapons = random.choices(
             population=['randomized','uncle','swordless'],
@@ -171,7 +171,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
 def random_enemizer(mode=None):
     enabled = random.choices(
         population=[True, False],
-        weights=[1,1]
+        weights=[.75,1]
     )[0]
     if not enabled:
         return False
@@ -199,7 +199,7 @@ def random_enemizer(mode=None):
         )[0]
         enemy_damage = random.choices(
             population=['off','shuffle','chaos'],
-            weights=[1,1,1]
+            weights=[1,1,.5]
         )[0]
         boss = random.choices(
             population=['off','basic','normal','chaos'],
