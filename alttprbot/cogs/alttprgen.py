@@ -58,13 +58,13 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def weightlist(self, ctx):
-        await ctx.send('Currently configured weights:\n\n{weights}\n\nCurrent weights of this bot can be found at '.format(
+        await ctx.send('Currently configured weights:\n\n{weights}\n\nCurrent weights of this bot can be found at https://github.com/tcprescott/alttpr-discord-bot/blob/master/alttprbot/alttprgen/weights.py'.format(
             weights='\n'.join(weights.keys())
         ))
 
     @seedgen.command()
     async def random(self, ctx, weightset='weighted', tournament: bool=True):
-        seed = await generate_random_game(weightset=weightset, tournament=tournament)
+        seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
