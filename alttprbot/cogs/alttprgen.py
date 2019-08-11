@@ -7,6 +7,8 @@ from pyz3r.customizer import customizer
 from ..database import alttprgen
 from ..util import embed_formatter
 
+from ..alttprgen.weights import weights
+
 import aiohttp
 import json
 
@@ -55,11 +57,26 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @seedgen.command()
-    async def random(self, ctx, randomizer='random', use_enemizer: bool=True, tournament: bool=True):
-        if randomizer not in ['random','item','entrance']:
-            raise Exception('randomizer must be random, item, or entrance!')
-        seed = await generate_random_game(randomizer=randomizer, use_enemizer=use_enemizer, tournament=tournament)
+    async def weightlist(self, ctx):
+        await ctx.send('Currently configured weights:\n\n{weights}\n\nCurrent weights of this bot can be found at '.format(
+            weights='\n'.join(weights.keys())
+        ))
 
+    @seedgen.command()
+    async def random(self, ctx, weightset='weighted', tournament: bool=True):
+        seed = await generate_random_game(weightset=weightset, tournament=tournament)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
+        await ctx.send(embed=embed)
+
+    @seedgen.command()
+    async def owgrandom(self, ctx, weightset='weighted', tournament: bool=True):
+        seed = await generate_random_game(logic='OverworldGlitches', weightset=weightset, tournament=tournament)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
+        await ctx.send(embed=embed)
+
+    @seedgen.command()
+    async def nologicrandom(self, ctx, weightset='weighted', tournament: bool=True):
+        seed = await generate_random_game(logic='None', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
@@ -70,42 +87,111 @@ async def get_customizer_json(url):
 
     return json.loads(text)
 
-async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer='random', tournament=True):
-    if randomizer == 'random':
+
+async def generate_random_game(logic='NoGlitches', weightset='weighted', tournament=True):
+    try:
+        o = weights[weightset]
+    except KeyError:
+        raise Exception('Invalid weightset chosen.')
+
+    if logic=='NoGlitches':
         r = random.choices(
-            population=['item','entrance'],
-            weights=[1,1]
+            population=list(o['randomizer'].keys()),
+            weights=list(o['randomizer'].values())
         )[0]
     else:
-        r = randomizer
+        r = 'item'
 
     if r == 'item':
         difficulty = random.choices(
-            population=['easy','normal','hard','expert','insane'],
-            weights=[.25,1,1,.5,.1]
+            population=list(o['difficulty'].keys()),
+            weights=list(o['difficulty'].values())
         )[0]
         goal = random.choices(
-            population=['ganon','dungeons','pedestal','triforce-hunt'],
-            weights=[1,1,1,1]
+            population=list(o['goal_item'].keys()),
+            weights=list(o['goal_item'].values())
         )[0]
         mode = random.choices(
-            population=['standard','open','inverted'],
-            weights=[1,1,.75]
+            population=list(o['mode_item'].keys()),
+            weights=list(o['mode_item'].values())
         )[0]
         weapons = random.choices(
-            population=['randomized','uncle','swordless'],
-            weights=[.4,.4,.2]
+            population=list(o['weapons'].keys()),
+            weights=list(o['weapons'].values())
         )[0]
         variation = random.choices(
-            population=['none','key-sanity','retro'],
-            weights=[1,1,.25]
+            population=list(o['variation'].keys()),
+            weights=list(o['variation'].values())
+        )[0]
+    elif r == 'entrance':
+        difficulty = random.choices(
+            population=list(o['difficulty'].keys()),
+            weights=list(o['difficulty'].values())
+        )[0]
+        goal = random.choices(
+            population=list(o['goal_entrance'].keys()),
+            weights=list(o['goal_entrance'].values())
+        )[0]
+        mode = random.choices(
+            population=list(o['mode_entrance'].keys()),
+            weights=list(o['mode_entrance'].values())
+        )[0]
+        shuffle = random.choices(
+            population=list(o['shuffle'].keys()),
+            weights=list(o['shuffle'].values())
+        )[0]
+        variation = random.choices(
+            population=list(o['variation'].keys()),
+            weights=list(o['variation'].values())
+        )[0]
+    else:
+        raise Exception('randomizer needs to be item or entrance!')
+
+    enemizer = random.choices(
+        population=list(o['enemizer_enabled'].keys()),
+        weights=list(o['enemizer_enabled'].values())
+    )[0]
+    if enemizer:
+        if mode == 'standard':
+            enemy=False
+            enemy_health=0
+        else:
+            enemy = random.choices(
+                population=list(o['enemizer_enemy'].keys()),
+                weights=list(o['enemizer_enemy'].values())
+            )[0]
+            enemy_health = random.choices(
+                population=list(o['enemizer_enemy_health'].keys()),
+                weights=list(o['enemizer_enemy_health'].values())
+            )[0]
+
+        pot_shuffle = random.choices(
+            population=list(o['enemizer_pot_shuffle'].keys()),
+            weights=list(o['enemizer_pot_shuffle'].values())
+        )[0]
+        palette_shuffle = random.choices(
+            population=list(o['enemizer_palette_shuffle'].keys()),
+            weights=list(o['enemizer_palette_shuffle'].values())
+        )[0]
+        enemy_damage = random.choices(
+            population=list(o['enemizer_enemy_damage'].keys()),
+            weights=list(o['enemizer_enemy_damage'].values())
+        )[0]
+        boss = random.choices(
+            population=list(o['enemizer_boss'].keys()),
+            weights=list(o['enemizer_boss'].values())
         )[0]
 
-        if use_enemizer:
-            enemizer=random_enemizer(mode)
-        else:
-            enemizer=False
-        
+        enemizer = {
+            "enemy":enemy,
+            "enemy_health":enemy_health,
+            "enemy_damage":enemy_damage,
+            "bosses":boss,
+            "palette_shuffle":palette_shuffle,
+            "pot_shuffle":pot_shuffle
+        }
+
+    if r=='item':
         settings={
             "logic":logic,
             "difficulty":difficulty,
@@ -118,34 +204,7 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
             "enemizer":enemizer,
             "lang":"en"
         }
-        
-    elif r == 'entrance':
-        difficulty = random.choices(
-            population=['easy','normal','hard','expert','insane'],
-            weights=[.25,1,1,.5,.1]
-        )[0]
-        goal = random.choices(
-            population=['ganon','crystals','dungeons','pedestal','triforcehunt'],
-            weights=[1,1,1,1,1]
-        )[0]
-        mode = random.choices(
-            population=['swordless','open'],
-            weights=[.2,.8]
-        )[0]
-        shuffle = random.choices(
-            population=['simple','restricted','full','crossed','insanity'],
-            weights=[.75,.75,1,1,.25]
-        )[0]
-        variation = random.choices(
-            population=['none','key-sanity','retro'],
-            weights=[1,1,.25]
-        )[0]
-
-        if use_enemizer:
-            enemizer=random_enemizer(mode)
-        else:
-            enemizer=False
-
+    elif r=='entrance':
         settings={
             "logic":"NoGlitches",
             "difficulty":difficulty,
@@ -167,53 +226,6 @@ async def generate_random_game(logic='NoGlitches', use_enemizer=True, randomizer
         settings=settings
     )
     return seed
-    
-def random_enemizer(mode=None):
-    enabled = random.choices(
-        population=[True, False],
-        weights=[.75,1]
-    )[0]
-    if not enabled:
-        return False
-    else:
-        if mode == 'standard':
-            enemy=False
-            enemy_health=0
-        else:
-            enemy = random.choices(
-                population=[True, False],
-                weights=[1,1]
-            )[0]
-            enemy_health = random.choices(
-                population=[0,1,2,3,4],
-                weights=[1,1,1,.5,.25]
-            )[0]
-
-        pot_shuffle = random.choices(
-            population=[True, False],
-            weights=[1,1]
-        )[0]
-        palette_shuffle = random.choices(
-            population=[True, False],
-            weights=[1,1]
-        )[0]
-        enemy_damage = random.choices(
-            population=['off','shuffle','chaos'],
-            weights=[1,1,.5]
-        )[0]
-        boss = random.choices(
-            population=['off','basic','normal','chaos'],
-            weights=[1,1,1,1]
-        )[0]
-
-        return {
-            "enemy":enemy,
-            "enemy_health":enemy_health,
-            "enemy_damage":enemy_damage,
-            "bosses":boss,
-            "palette_shuffle":palette_shuffle,
-            "pot_shuffle":pot_shuffle
-        }
 
 def setup(bot):
     bot.add_cog(AlttprGen(bot))
