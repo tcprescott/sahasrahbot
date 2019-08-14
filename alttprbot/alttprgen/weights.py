@@ -251,5 +251,90 @@ weights = {
             'normal': 1,
             'chaos': 1
         }
+    },
+    'pogchamp': {
+        'randomizer': {
+            'item': 1,
+            'entrance': 1
+        },
+        'difficulty': {
+            'normal': .5,
+            'hard': 1,
+            'expert': 1,
+            'insane': 1
+        },
+        'goal_item': {
+            'ganon': 1,
+            'dungeons': 1,
+            'pedestal': 1,
+            'triforce-hunt': 1
+        },
+        'goal_entrance': {
+            'ganon': 1,
+            'crystals': 1,
+            'dungeons': 1,
+            'pedestal': 1,
+            'triforcehunt': 1
+        },
+        'mode_item': {
+            'standard': .5,
+            'open': .5,
+            'inverted': 1
+        },
+        'mode_entrance': {
+            'swordless': 1,
+            'open': 1
+        },
+        'weapons': {
+            'randomized': .5,
+            'uncle': .5,
+            'swordless': 1
+        },
+        'shuffle': {
+            'simple': .5,
+            'restricted': .5,
+            'full': .75,
+            'crossed': 1,
+            'insanity': 1
+        },
+        'variation': {
+            'none': .75,
+            'key-sanity': 1,
+            'retro': .25
+        },
+        'enemizer_enabled': {
+            True: 1,
+            False: .5
+        },
+        'enemizer_enemy': {
+            True: 1,
+            False: 1
+        },
+        'enemizer_enemy_health': {
+            0: .25,
+            1: .5,
+            2: .75,
+            3: 1,
+            4: 1
+        },
+        'enemizer_pot_shuffle': {
+            True: 1,
+            False: 1,
+        },
+        'enemizer_palette_shuffle': {
+            True: 1,
+            False: 1
+        },
+        'enemizer_enemy_damage': {
+            'off': .5,
+            'shuffle': 1,
+            'chaos': 1,
+        },
+        'enemizer_boss': {
+            'off': .5,
+            'basic': 1,
+            'normal': 1,
+            'chaos': 1
+        }
     }
 }
