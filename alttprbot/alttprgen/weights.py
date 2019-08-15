@@ -397,10 +397,9 @@ weights = {
             'pedestal': 1,
             'triforcehunt': 1
         },
-        'mode_item': {
-            'standard': 1,
-            'open': 1,
-            'inverted': .75
+        'mode_entrance': {
+            'swordless': .2,
+            'open': .8
         },
         'shuffle': {
             'simple': 0.75,
