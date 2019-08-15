@@ -58,8 +58,12 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def weightlist(self, ctx):
+        w=''
+        for k in weights.keys():
+            d = weights[k]['description']
+            w += f'{k} - {d}\n'
         await ctx.send('Currently configured weights:\n\n{weights}\n\nCurrent weights of this bot can be found at https://github.com/tcprescott/alttpr-discord-bot/blob/master/alttprbot/alttprgen/weights.py'.format(
-            weights='\n'.join(weights.keys())
+            weights=w
         ))
 
     @seedgen.command()
@@ -90,7 +94,10 @@ async def get_customizer_json(url):
 
 async def generate_random_game(logic='NoGlitches', weightset='weighted', tournament=True):
     try:
-        o = weights[weightset]
+        if weightset=='casual':
+            o = weights['friendly']
+        else:
+            o = weights[weightset]
     except KeyError:
         raise Exception('Invalid weightset chosen.')
 
@@ -220,7 +227,7 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
     else:
         raise Exception('randomizer needs to be item or entrance!')
 
-    print(json.dumps(settings, indent=4))
+    # print(json.dumps(settings, indent=4))
     seed = await pyz3r.async_alttpr(
         randomizer=r,
         settings=settings
