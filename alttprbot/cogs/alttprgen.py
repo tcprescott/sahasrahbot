@@ -57,6 +57,20 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @seedgen.command()
+    @commands.is_owner()
+    async def savecustomizerpreset(self, ctx, preset):
+        try:
+            if not ctx.message.attachments[0].filename.endswith('.json'):
+                raise Exception('File should have a .json extension.')
+        except IndexError:
+            raise Exception('You must attach a customizer save json file.')
+        
+        customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
+
+        settings = customizer.convert2settings(customizer_settings, tournament=True)
+        await alttprgen.put_seed_preset(name=preset, randomizer='item', settings=json.dumps(settings))
+
+    @seedgen.command()
     async def weightlist(self, ctx):
         w=''
         for k in weights.keys():
