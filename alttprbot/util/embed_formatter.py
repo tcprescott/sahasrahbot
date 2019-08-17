@@ -163,13 +163,13 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
             'Mushroom': 'Mushroom',
             'Magic Powder': 'Powder',
             'Ice Rod': 'IceRod',
-            'Pendant': 'GreenPendant',
+            'Pendant': 'PendantOfCourage',
             'Bombos': 'Bombos',
             'Ether': 'Ether',
             'Quake': 'Quake',
             'Lamp': 'Lamp',
             'Hammer': 'MCHammer',
-            'Shovel': 'Shovel',
+            'Shovel': 'shovel',
             'Flute': 'Flute',
             'Bugnet': 'BugNet',
             'Book': 'Mudora',
@@ -177,7 +177,7 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
             'Green Potion': 'GreenPotion',
             'Somaria': 'somaria',
             'Cape': 'Cape',
-            'Mirror': 'Mirror',
+            'Mirror': 'mirror',
             'Boots': 'GoFast',
             'Gloves': 'PowerGlove',
             'Flippers': 'Flippers',
@@ -193,7 +193,8 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
         c=list(map(lambda x: str(discord.utils.get(emojis, name=emoji_code_map[x])), code))
         embed.add_field(name='File Select Code', value=' '.join(c) + ' (' + '/'.join(code) + ')', inline=False)
     else:
-        embed.add_field(name='File Select Code', value=await seed.code(), inline=False)
+        code = await seed.code()
+        embed.add_field(name='File Select Code', value='/'.join(code), inline=False)
 
     embed.add_field(name='Permalink', value=seed.url, inline=False)
     return embed
