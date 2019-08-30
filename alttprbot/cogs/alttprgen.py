@@ -14,6 +14,7 @@ import json
 
 import random
 
+
 class AlttprGen(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -23,16 +24,17 @@ class AlttprGen(commands.Cog):
         pass
 
     @seedgen.command()
-    async def custom(self, ctx, tournament: bool=True):
+    async def custom(self, ctx, tournament: bool = True):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
                 raise Exception('File should have a .json extension.')
         except IndexError:
             raise Exception('You must attach a customizer save json file.')
-        
+
         customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
 
-        settings = customizer.convert2settings(customizer_settings, tournament=tournament)
+        settings = customizer.convert2settings(
+            customizer_settings, tournament=tournament)
 
         seed = await pyz3r.async_alttpr(
             randomizer='item',
@@ -64,15 +66,16 @@ class AlttprGen(commands.Cog):
                 raise Exception('File should have a .json extension.')
         except IndexError:
             raise Exception('You must attach a customizer save json file.')
-        
+
         customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
 
-        settings = customizer.convert2settings(customizer_settings, tournament=True)
+        settings = customizer.convert2settings(
+            customizer_settings, tournament=True)
         await alttprgen.put_seed_preset(name=preset, randomizer='item', settings=json.dumps(settings))
 
     @seedgen.command()
     async def weightlist(self, ctx):
-        w=''
+        w = ''
         for k in weights.keys():
             d = weights[k]['description']
             w += f'{k} - {d}\n'
@@ -81,22 +84,23 @@ class AlttprGen(commands.Cog):
         ))
 
     @seedgen.command()
-    async def random(self, ctx, weightset='weighted', tournament: bool=True):
+    async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
     @seedgen.command()
-    async def owgrandom(self, ctx, weightset='weighted', tournament: bool=True):
+    async def owgrandom(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='OverworldGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
     @seedgen.command()
-    async def nologicrandom(self, ctx, weightset='weighted', tournament: bool=True):
+    async def nologicrandom(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='None', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
+
 
 async def get_customizer_json(url):
     async with aiohttp.ClientSession() as session:
@@ -108,14 +112,14 @@ async def get_customizer_json(url):
 
 async def generate_random_game(logic='NoGlitches', weightset='weighted', tournament=True):
     try:
-        if weightset=='casual':
+        if weightset == 'casual':
             o = weights['friendly']
         else:
             o = weights[weightset]
     except KeyError:
         raise Exception('Invalid weightset chosen.')
 
-    if logic=='NoGlitches':
+    if logic == 'NoGlitches':
         r = random.choices(
             population=list(o['randomizer'].keys()),
             weights=list(o['randomizer'].values())
@@ -174,8 +178,8 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
     )[0]
     if enemizer:
         if mode == 'standard':
-            enemy=False
-            enemy_health=0
+            enemy = False
+            enemy_health = 0
         else:
             enemy = random.choices(
                 population=list(o['enemizer_enemy'].keys()),
@@ -204,39 +208,39 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
         )[0]
 
         enemizer = {
-            "enemy":enemy,
-            "enemy_health":enemy_health,
-            "enemy_damage":enemy_damage,
-            "bosses":boss,
-            "palette_shuffle":palette_shuffle,
-            "pot_shuffle":pot_shuffle
+            "enemy": enemy,
+            "enemy_health": enemy_health,
+            "enemy_damage": enemy_damage,
+            "bosses": boss,
+            "palette_shuffle": palette_shuffle,
+            "pot_shuffle": pot_shuffle
         }
 
-    if r=='item':
-        settings={
-            "logic":logic,
-            "difficulty":difficulty,
-            "variation":variation,
-            "mode":mode,
-            "goal":goal,
-            "weapons":weapons,
-            "tournament":tournament,
-            "spoilers":False,
-            "enemizer":enemizer,
-            "lang":"en"
+    if r == 'item':
+        settings = {
+            "logic": logic,
+            "difficulty": difficulty,
+            "variation": variation,
+            "mode": mode,
+            "goal": goal,
+            "weapons": weapons,
+            "tournament": tournament,
+            "spoilers": False,
+            "enemizer": enemizer,
+            "lang": "en"
         }
-    elif r=='entrance':
-        settings={
-            "logic":"NoGlitches",
-            "difficulty":difficulty,
-            "variation":variation,
-            "mode":mode,
-            "goal":goal,
-            "shuffle":shuffle,
-            "tournament":tournament,
-            "spoilers":False,
-            "enemizer":enemizer,
-            "lang":"en"
+    elif r == 'entrance':
+        settings = {
+            "logic": "NoGlitches",
+            "difficulty": difficulty,
+            "variation": variation,
+            "mode": mode,
+            "goal": goal,
+            "shuffle": shuffle,
+            "tournament": tournament,
+            "spoilers": False,
+            "enemizer": enemizer,
+            "lang": "en"
         }
     else:
         raise Exception('randomizer needs to be item or entrance!')
@@ -247,6 +251,7 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
         settings=settings
     )
     return seed
+
 
 def setup(bot):
     bot.add_cog(AlttprGen(bot))

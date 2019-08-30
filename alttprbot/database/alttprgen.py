@@ -1,11 +1,13 @@
 from ..util import orm
 
+
 async def get_seed_preset(name):
     result = await orm.select(
         'SELECT * FROM seed_presets WHERE name=%s;',
         [name]
     )
     return result[0]
+
 
 async def put_seed_preset(name, randomizer, settings):
     await orm.execute(

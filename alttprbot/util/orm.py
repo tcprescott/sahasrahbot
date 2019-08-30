@@ -3,6 +3,7 @@ import aiomysql
 from config import Config
 from . import console
 
+
 async def create_pool(loop):
     console.info('creating connection pool')
     global __pool
@@ -20,6 +21,7 @@ async def create_pool(loop):
         loop=loop
     )
 
+
 async def select(sql, args=[], size=None):
     global __pool
     with (await __pool) as conn:
@@ -31,6 +33,7 @@ async def select(sql, args=[], size=None):
             rs = await cur.fetchall()
         await cur.close()
         return rs
+
 
 async def execute(sql, args=[]):
     global __pool

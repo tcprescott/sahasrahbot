@@ -33,16 +33,19 @@ if not Config.DEBUG:
         else:
             await ctx.send(error)
             await ctx.message.add_reaction('👎')
-        await ctx.message.remove_reaction('⌚',ctx.bot.user)
+        await ctx.message.remove_reaction('⌚', ctx.bot.user)
+
 
 @discordbot.event
 async def on_command(ctx):
     await ctx.message.add_reaction('⌚')
 
+
 @discordbot.event
 async def on_command_completion(ctx):
     await ctx.message.add_reaction('👍')
-    await ctx.message.remove_reaction('⌚',ctx.bot.user)
+    await ctx.message.remove_reaction('⌚', ctx.bot.user)
+
 
 @discordbot.event
 async def on_message(message):
@@ -50,7 +53,7 @@ async def on_message(message):
         emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')
         if emoji:
             await message.add_reaction(emoji)
-        
+
     await discordbot.process_commands(message)
 
 # @discordbot.check
