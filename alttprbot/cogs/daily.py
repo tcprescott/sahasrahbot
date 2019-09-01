@@ -4,6 +4,8 @@ from ..util import embed_formatter
 import discord
 from discord.ext import tasks, commands
 
+from config import Config as c
+
 import bs4
 import aiohttp
 import re
@@ -84,19 +86,20 @@ async def update_daily(gamehash):
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash):
-    return await pyz3r.async_alttpr(hash=hash)
+    return await pyz3r.alttpr(
+        hash=hash
+        baseurl=c.baseurl,
+        seed_baseurl=c.seed_baseurl,
+        username=c.username,
+        password=c.password
+    )
 
-# thanks Espeon for this bit of code (it was adapted to use aiohttp instead)
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def find_daily_hash():
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://alttpr.com/daily') as resp:
-            text = await resp.read()
-
-    html = bs4.BeautifulSoup(text.decode('utf-8'), 'html5lib')
-    hash_loader = str(html.find_all('vt-hash-loader')[0])
-
-    regex = re.compile(r'(hash=")\w{9,10}(")')
-    match = regex.search(hash_loader)
-    seed = match.group()[6:-1]
-    return seed
+    website = await pyz3r.alttpr(
+        baseurl=c.baseurl,
+        seed_baseurl=c.seed_baseurl,
+        username=c.username,
+        password=c.password
+    )
+    return await website.find_daily_hash()

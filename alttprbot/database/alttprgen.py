@@ -9,10 +9,10 @@ async def get_seed_preset(name):
     return result[0]
 
 
-async def put_seed_preset(name, randomizer, settings):
+async def put_seed_preset(name, customizer, settings):
     await orm.execute(
-        'INSERT INTO seed_presets (`name`,`randomizer`,`settings`) values (%s, %s, %s) ON DUPLICATE KEY UPDATE settings = %s',
-        [name, randomizer, settings, settings]
+        'INSERT INTO seed_presets (`name`,`customizer`,`settings`) values (%s, %s, %s) ON DUPLICATE KEY UPDATE settings = %s',
+        [name, customizer, settings, settings]
     )
 
 # async def set_new_daily(hash):

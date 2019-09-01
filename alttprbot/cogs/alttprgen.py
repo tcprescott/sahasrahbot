@@ -9,6 +9,8 @@ from ..util import embed_formatter
 
 from ..alttprgen.weights import weights
 
+from config import Config as c
+
 import aiohttp
 import json
 
@@ -36,8 +38,12 @@ class AlttprGen(commands.Cog):
         settings = customizer.convert2settings(
             customizer_settings, tournament=tournament)
 
-        seed = await pyz3r.async_alttpr(
-            randomizer='item',
+        seed = await pyz3r.alttpr(
+            customizer=True,
+            baseurl=c.baseurl,
+            seed_baseurl=c.seed_baseurl,
+            username=c.username,
+            password=c.password,
             settings=settings
         )
 
@@ -50,8 +56,12 @@ class AlttprGen(commands.Cog):
         if not len(result):
             raise Exception('Preset not found.')
 
-        seed = await pyz3r.async_alttpr(
-            randomizer=result['randomizer'],
+        seed = await pyz3r.alttpr(
+            customizer=True if result['customizer'] == 1 else False,
+            baseurl=c.baseurl,
+            seed_baseurl=c.seed_baseurl,
+            username=c.username,
+            password=c.password,
             settings=json.loads(result['settings'])
         )
 
@@ -71,7 +81,7 @@ class AlttprGen(commands.Cog):
 
         settings = customizer.convert2settings(
             customizer_settings, tournament=True)
-        await alttprgen.put_seed_preset(name=preset, randomizer='item', settings=json.dumps(settings))
+        await alttprgen.put_seed_preset(name=preset, customizer=1, settings=json.dumps(settings))
 
     @seedgen.command()
     async def weightlist(self, ctx):
@@ -84,18 +94,21 @@ class AlttprGen(commands.Cog):
         ))
 
     @seedgen.command()
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
     @seedgen.command()
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def owgrandom(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='OverworldGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
     @seedgen.command()
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def nologicrandom(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='None', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
@@ -246,8 +259,11 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
         raise Exception('randomizer needs to be item or entrance!')
 
     # print(json.dumps(settings, indent=4))
-    seed = await pyz3r.async_alttpr(
-        randomizer=r,
+    seed = await pyz3r.alttpr(
+        baseurl=c.baseurl,
+        seed_baseurl=c.seed_baseurl,
+        username=c.username,
+        password=c.password
         settings=settings
     )
     return seed

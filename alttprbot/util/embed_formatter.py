@@ -106,137 +106,43 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
         description=notes,
         color=discord.Colour.dark_red())
     embed.add_field(
-        name='Logic',
-        value=seed.data['spoiler']['meta']['logic'],
+        name='Item Placement',
+        value="Logic: {logic}\nItem Placement: {item_placement}\nDungeon Items: {dungeon_items}\nAccessibility: {accessibility}".format(
+            logic=seed.data['spoiler']['meta']['logic'],
+            item_placement=seed.data['spoiler']['meta']['item_placement'],
+            dungeon_items=seed.data['spoiler']['meta']['dungeon_items'],
+            accessibility=seed.data['spoiler']['meta']['accessibility'],
+        ),
+        inline=True)
+    embed.add_field(
+        name='Goal',
+        value="Goal: {goal}\nOpen Tower: {tower}\nGanon Vulnerable: {crystals}".format(
+            goal=seed.data['spoiler']['meta']['goal'],
+            tower=seed.data['spoiler']['meta']['entry_crystals_tower'],
+            crystals=seed.data['spoiler']['meta']['entry_crystals_ganon'],
+        ),
+        inline=True)
+    embed.add_field(
+        name='Gameplay',
+        value="World State: {mode}\nEntrance Shuffle: {entrance}\nBoss Shuffle: {boss}\nEnemy Shuffle: {enemy}\nHints: {hints}".format(
+            mode=seed.data['spoiler']['meta']['mode'],
+            entrance=seed.data['spoiler']['meta']['shuffle'] if seed.data['spoiler']['meta']['shuffle'] else "none",
+            boss=seed.data['spoiler']['meta']['enemizer.boss_shuffle'],
+            enemy=seed.data['spoiler']['meta']['enemizer.enemy_shuffle'],
+            hints=seed.data['spoiler']['meta']['hints']
+        ),
         inline=True)
     embed.add_field(
         name='Difficulty',
-        value=seed.data['spoiler']['meta']['difficulty'],
-        inline=True)
-    embed.add_field(
-        name='Variation',
-        value=seed.data['spoiler']['meta']['variation'],
-        inline=True)
-    embed.add_field(
-        name='State',
-        value=seed.data['spoiler']['meta']['mode'],
+        value="Swords: {weapons}\nItem Pool: {pool}\nItem Functionality: {functionality}\nEnemy Damage: {damage}\nEnemy Health: {health}".format(
+            weapons=seed.data['spoiler']['meta']['weapons'],
+            pool=seed.data['spoiler']['meta']['item_pool'],
+            functionality=seed.data['spoiler']['meta']['item_functionality'],
+            damage=seed.data['spoiler']['meta']['enemizer.enemy_damage'],
+            health=seed.data['spoiler']['meta']['enemizer.enemy_health'],
+        ),
         inline=True)
 
-    try:
-        embed.add_field(
-            name='Swords',
-            value=seed.data['spoiler']['meta']['weapons'],
-            inline=True)
-    except KeyError:
-        pass
-
-    try:
-        embed.add_field(
-            name='Shuffle',
-            value=seed.data['spoiler']['meta']['shuffle'],
-            inline=True)
-    except KeyError:
-        pass
-
-    embed.add_field(
-        name='Goal',
-        value=seed.data['spoiler']['meta']['goal'],
-        inline=True)
-
-    try:
-        embed.add_field(
-            name='Enemizer Enemy Shuffle',
-            value=seed.data['spoiler']['meta']['enemizer_enemy'],
-            inline=True)
-    except KeyError:
-        try:
-            if seed.settings and seed.settings['enemizer']:
-                embed.add_field(
-                    name='Enemizer Enemy Shuffle',
-                    value=seed.settings['enemizer']['enemy'],
-                    inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(
-            name='Enemizer Boss Shuffle',
-            value=seed.data['spoiler']['meta']['enemizer_bosses'],
-            inline=True)
-    except KeyError:
-        try:
-            if seed.settings and seed.settings['enemizer']:
-                embed.add_field(
-                    name='Enemizer Boss Shuffle',
-                    value=seed.settings['enemizer']['bosses'],
-                    inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(
-            name='Enemizer Pot Shuffle',
-            value=seed.data['spoiler']['meta']['enemizer_pot_shuffle'],
-            inline=True)
-    except KeyError:
-        try:
-            if seed.settings and seed.settings['enemizer']:
-                embed.add_field(
-                    name='Enemizer Pot Shuffle',
-                    value=seed.settings['enemizer']['pot_shuffle'],
-                    inline=True)
-        except KeyError:
-            pass
-
-    healthmap = {
-        0: 'Default',
-        1: 'Easy (1-4 hp)',
-        2: 'Normal (2-15 hp)',
-        3: 'Hard (2-30 hp)',
-        4: 'Brick Wall (4-50 hp)'
-    }
-    try:
-        embed.add_field(name='Enemizer Enemy Health',
-                        value=healthmap[seed.data['spoiler']['meta']['enemizer_enemy_health']],
-                        inline=True)
-    except KeyError:
-        try:
-            if seed.settings and seed.settings['enemizer']:
-                embed.add_field(name='Enemizer Enemy Health',
-                                value=healthmap[seed.settings['enemizer']['enemy_health']],
-                                inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(
-            name='Enemizer Enemy Damage',
-            value=seed.data['spoiler']['meta']['enemizer_enemy_damage'],
-            inline=True)
-    except KeyError:
-        try:
-            if seed.settings and seed.settings['enemizer']:
-                embed.add_field(
-                    name='Enemizer Enemy Damage',
-                    value=seed.settings['enemizer']['enemy_damage'],
-                    inline=True)
-        except KeyError:
-            pass
-
-    try:
-        embed.add_field(
-            name='Enemizer Palette Shuffle',
-            value=seed.data['spoiler']['meta']['enemizer_palette_shuffle'],
-            inline=True)
-    except KeyError:
-        try:
-            if seed.settings and seed.settings['enemizer']:
-                embed.add_field(
-                    name='Enemizer Palette Shuffle',
-                    value=seed.settings['enemizer']['palette_shuffle'],
-                    inline=True)
-        except KeyError:
-            pass
 
     if emojis:
         emoji_code_map = {
