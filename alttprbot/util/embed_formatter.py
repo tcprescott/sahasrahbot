@@ -1,6 +1,6 @@
 import discord
 import datetime
-
+from html.parser import HTMLParser
 
 def permissions(ctx, permissions):
     embed = discord.Embed(
@@ -97,7 +97,7 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
 
     if not notes:
         try:
-            notes = seed.data['spoiler']['meta']['notes']
+            notes = strip_tags(seed.data['spoiler']['meta']['notes'])
         except KeyError:
             notes = ""
 
@@ -204,3 +204,19 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
 
     embed.add_field(name='Permalink', value=seed.url, inline=False)
     return embed
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
