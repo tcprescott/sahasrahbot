@@ -87,7 +87,7 @@ async def update_daily(gamehash):
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash):
     return await pyz3r.alttpr(
-        hash=hash
+        hash=hash,
         baseurl=c.baseurl,
         seed_baseurl=c.seed_baseurl,
         username=c.username,

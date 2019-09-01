@@ -94,23 +94,9 @@ class AlttprGen(commands.Cog):
         ))
 
     @seedgen.command()
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    # @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
-        await ctx.send(embed=embed)
-
-    @seedgen.command()
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
-    async def owgrandom(self, ctx, weightset='weighted', tournament: bool = True):
-        seed = await generate_random_game(logic='OverworldGlitches', weightset=weightset, tournament=tournament)
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
-        await ctx.send(embed=embed)
-
-    @seedgen.command()
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
-    async def nologicrandom(self, ctx, weightset='weighted', tournament: bool = True):
-        seed = await generate_random_game(logic='None', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
@@ -132,142 +118,48 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
     except KeyError:
         raise Exception('Invalid weightset chosen.')
 
-    if logic == 'NoGlitches':
-        r = random.choices(
-            population=list(o['randomizer'].keys()),
-            weights=list(o['randomizer'].values())
-        )[0]
-    else:
-        r = 'item'
-
-    if r == 'item':
-        difficulty = random.choices(
-            population=list(o['difficulty'].keys()),
-            weights=list(o['difficulty'].values())
-        )[0]
-        goal = random.choices(
-            population=list(o['goal_item'].keys()),
-            weights=list(o['goal_item'].values())
-        )[0]
-        mode = random.choices(
-            population=list(o['mode_item'].keys()),
-            weights=list(o['mode_item'].values())
-        )[0]
-        weapons = random.choices(
-            population=list(o['weapons'].keys()),
-            weights=list(o['weapons'].values())
-        )[0]
-        variation = random.choices(
-            population=list(o['variation'].keys()),
-            weights=list(o['variation'].values())
-        )[0]
-    elif r == 'entrance':
-        difficulty = random.choices(
-            population=list(o['difficulty'].keys()),
-            weights=list(o['difficulty'].values())
-        )[0]
-        goal = random.choices(
-            population=list(o['goal_entrance'].keys()),
-            weights=list(o['goal_entrance'].values())
-        )[0]
-        mode = random.choices(
-            population=list(o['mode_entrance'].keys()),
-            weights=list(o['mode_entrance'].values())
-        )[0]
-        shuffle = random.choices(
-            population=list(o['shuffle'].keys()),
-            weights=list(o['shuffle'].values())
-        )[0]
-        variation = random.choices(
-            population=list(o['variation'].keys()),
-            weights=list(o['variation'].values())
-        )[0]
-    else:
-        raise Exception('randomizer needs to be item or entrance!')
-
-    enemizer = random.choices(
-        population=list(o['enemizer_enabled'].keys()),
-        weights=list(o['enemizer_enabled'].values())
-    )[0]
-    if enemizer:
-        if mode == 'standard':
-            enemy = False
-            enemy_health = 0
-        else:
-            enemy = random.choices(
-                population=list(o['enemizer_enemy'].keys()),
-                weights=list(o['enemizer_enemy'].values())
-            )[0]
-            enemy_health = random.choices(
-                population=list(o['enemizer_enemy_health'].keys()),
-                weights=list(o['enemizer_enemy_health'].values())
-            )[0]
-
-        pot_shuffle = random.choices(
-            population=list(o['enemizer_pot_shuffle'].keys()),
-            weights=list(o['enemizer_pot_shuffle'].values())
-        )[0]
-        palette_shuffle = random.choices(
-            population=list(o['enemizer_palette_shuffle'].keys()),
-            weights=list(o['enemizer_palette_shuffle'].values())
-        )[0]
-        enemy_damage = random.choices(
-            population=list(o['enemizer_enemy_damage'].keys()),
-            weights=list(o['enemizer_enemy_damage'].values())
-        )[0]
-        boss = random.choices(
-            population=list(o['enemizer_boss'].keys()),
-            weights=list(o['enemizer_boss'].values())
-        )[0]
-
-        enemizer = {
-            "enemy": enemy,
-            "enemy_health": enemy_health,
-            "enemy_damage": enemy_damage,
-            "bosses": boss,
-            "palette_shuffle": palette_shuffle,
-            "pot_shuffle": pot_shuffle
+    settings={
+        "glitches": get_random_option(o['glitches_required']),
+        "item_placement": get_random_option(o['item_placement']),
+        "dungeon_items": get_random_option(o['dungeon_items']),
+        "accessibility": get_random_option(o['accessibility']),
+        "goal": get_random_option(o['goals']),
+        "crystals": {
+            "ganon": get_random_option(o['tower_open']),
+            "tower": get_random_option(o['ganon_open']),
+        },
+        "mode": get_random_option(o['world_state']),
+        "entrances": get_random_option(o['entrance_shuffle']),
+        "hints": get_random_option(o['hints']),
+        "weapons": get_random_option(o['weapons']),
+        "item": {
+            "pool": get_random_option(o['item_pool']),
+            "functionality": get_random_option(o['item_functionality']),
+        },
+        "tournament": tournament,
+        "spoilers": False,
+        "lang": "en",
+        "enemizer": {
+            "boss_shuffle": get_random_option(o['boss_shuffle']),
+            "enemy_shuffle": get_random_option(o['enemy_shuffle']),
+            "enemy_damage": get_random_option(o['enemy_damage']),
+            "enemy_health": get_random_option(o['enemy_health']),
         }
+    }
 
-    if r == 'item':
-        settings = {
-            "logic": logic,
-            "difficulty": difficulty,
-            "variation": variation,
-            "mode": mode,
-            "goal": goal,
-            "weapons": weapons,
-            "tournament": tournament,
-            "spoilers": False,
-            "enemizer": enemizer,
-            "lang": "en"
-        }
-    elif r == 'entrance':
-        settings = {
-            "logic": "NoGlitches",
-            "difficulty": difficulty,
-            "variation": variation,
-            "mode": mode,
-            "goal": goal,
-            "shuffle": shuffle,
-            "tournament": tournament,
-            "spoilers": False,
-            "enemizer": enemizer,
-            "lang": "en"
-        }
-    else:
-        raise Exception('randomizer needs to be item or entrance!')
 
     # print(json.dumps(settings, indent=4))
     seed = await pyz3r.alttpr(
         baseurl=c.baseurl,
         seed_baseurl=c.seed_baseurl,
         username=c.username,
-        password=c.password
+        password=c.password,
         settings=settings
     )
     return seed
 
+def get_random_option(optset):
+    return random.choices(population=list(optset.keys()),weights=list(optset.values()))[0]
 
 def setup(bot):
     bot.add_cog(AlttprGen(bot))

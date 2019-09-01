@@ -1,420 +1,329 @@
 weights = {
-    'friendly': {
-        'description': "This is designed to be relatively accessible, but has a decent variety of choices.",
-        'randomizer': {
-            'item': 1,
-            'entrance': .5
+    'daily': {
+        "glitches_required": {
+            "none": 76,
+            "overworld_glitches": 21,
+            "major_glitches": 3,
+            "no_logic": 0
         },
-        'difficulty': {
-            'easy': 1,
-            'normal': 1,
-            'hard': .5
+        "item_placement": {
+            "basic": 60,
+            "advanced": 40
         },
-        'goal_item': {
-            'ganon': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforce-hunt': 1
+        "dungeon_items": {
+            "standard": 60,
+            "mc": 10,
+            "mcs": 10,
+            "full": 20
         },
-        'goal_entrance': {
-            'ganon': 1,
-            'crystals': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforcehunt': 1
+        "accessibility": {
+            "items": 60,
+            "locations": 10,
+            "none": 30
         },
-        'mode_item': {
-            'standard': 1,
-            'open': 1,
-            'inverted': .25
+        "goals": {
+            "ganon": 30,
+            "fast_ganon": 40,
+            "dungeons": 10,
+            "pedestal": 10,
+            "triforce-hunt": 10
         },
-        'mode_entrance': {
-            'swordless': .2,
-            'open': 1
+        "tower_open": {
+            "0": 5,
+            "1": 5,
+            "2": 5,
+            "3": 5,
+            "4": 5,
+            "5": 5,
+            "6": 5,
+            "7": 50,
+            "random": 15
         },
-        'weapons': {
-            'randomized': 1,
-            'uncle': 1,
-            'swordless': .2
+        "ganon_open": {
+            "0": 5,
+            "1": 5,
+            "2": 5,
+            "3": 5,
+            "4": 5,
+            "5": 5,
+            "6": 5,
+            "7": 50,
+            "random": 15
         },
-        'shuffle': {
-            'simple': 1,
-            'restricted': 1,
-            'full': .25,
-            'crossed': .25,
+        "world_state": {
+            "standard": 20,
+            "open": 45,
+            "inverted": 25,
+            "retro": 10
         },
-        'variation': {
-            'none': 1,
-            'key-sanity': .75,
-            'retro': .15
+        "entrance_shuffle": {
+            "none": 90,
+            "simple": 2,
+            "restricted": 2,
+            "full": 2,
+            "crossed": 2,
+            "insanity": 2
         },
-        'enemizer_enabled': {
-            True: .25,
-            False: 1
+        "boss_shuffle": {
+            "none": 60,
+            "simple": 10,
+            "full": 10,
+            "random": 20
         },
-        'enemizer_enemy': {
-            True: 1,
-            False: 1
+        "enemy_shuffle": {
+            "none": 80,
+            "shuffled": 10,
+            "random": 10
         },
-        'enemizer_enemy_health': {
-            0: 1,
-            1: 1,
-            2: .25,
+        "hints": {
+            "on": 50,
+            "off": 50
         },
-        'enemizer_pot_shuffle': {
-            True: 1,
-            False: 1,
+        "weapons": {
+            "randomized": 60,
+            "assured": 10,
+            "vanilla": 10,
+            "swordless": 10
         },
-        'enemizer_palette_shuffle': {
-            True: 1,
-            False: 1
+        "item_pool": {
+            "normal": 70,
+            "hard": 20,
+            "expert": 10,
+            "crowd_control": 0
         },
-        'enemizer_enemy_damage': {
-            'off': 1,
-            'shuffle': .5,
-            'chaos': .25,
+        "item_functionality": {
+            "normal": 70,
+            "hard": 20,
+            "expert": 10
         },
-        'enemizer_boss': {
-            'off': 1,
-            'basic': 1,
-            'normal': 1,
-            'chaos': .5
+        "enemy_damage": {
+            "default": 80,
+            "shuffled": 10,
+            "random": 10
+        },
+        "enemy_health": {
+            "default": 80,
+            "easy": 5,
+            "hard": 10,
+            "expert": 5
         }
     },
     'weighted': {
-        'description': "The \"traditional\" weightset.  Offers all settings, but makes really easy and hard settings less likely.",
-        'randomizer': {
-            'item': 1,
-            'entrance': 1
+        "glitches_required": {
+            "none": 100,
+            "overworld_glitches": 0,
+            "major_glitches": 0,
+            "no_logic": 0
         },
-        'difficulty': {
-            'easy': .25,
-            'normal': 1,
-            'hard': 1,
-            'expert': .5,
-            'insane': .1
+        "item_placement": {
+            "basic": 25,
+            "advanced": 75
         },
-        'goal_item': {
-            'ganon': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforce-hunt': 1
+        "dungeon_items": {
+            "standard": 60,
+            "mc": 10,
+            "mcs": 10,
+            "full": 20
         },
-        'goal_entrance': {
-            'ganon': 1,
-            'crystals': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforcehunt': 1
+        "accessibility": {
+            "items": 60,
+            "locations": 10,
+            "none": 30
         },
-        'mode_item': {
-            'standard': 1,
-            'open': 1,
-            'inverted': .75
+        "goals": {
+            "ganon": 40,
+            "fast_ganon": 20,
+            "dungeons": 10,
+            "pedestal": 20,
+            "triforce-hunt": 10
         },
-        'mode_entrance': {
-            'swordless': .2,
-            'open': .8
+        "tower_open": {
+            "0": 5,
+            "1": 5,
+            "2": 5,
+            "3": 5,
+            "4": 5,
+            "5": 5,
+            "6": 5,
+            "7": 50,
+            "random": 15
         },
-        'weapons': {
-            'randomized': .4,
-            'uncle': .4,
-            'swordless': .2
+        "ganon_open": {
+            "0": 5,
+            "1": 5,
+            "2": 5,
+            "3": 5,
+            "4": 5,
+            "5": 5,
+            "6": 5,
+            "7": 50,
+            "random": 15
         },
-        'shuffle': {
-            'simple': 0.75,
-            'restricted': 0.75,
-            'full': 1,
-            'crossed': 1,
-            'insanity': .25
+        "world_state": {
+            "standard": 35,
+            "open": 35,
+            "inverted": 20,
+            "retro": 10
         },
-        'variation': {
-            'none': 1,
-            'key-sanity': 1,
-            'retro': .25
+        "entrance_shuffle": {
+            "none": 60,
+            "simple": 7,
+            "restricted": 10,
+            "full": 10,
+            "crossed": 10,
+            "insanity": 2
         },
-        'enemizer_enabled': {
-            True: 0.75,
-            False: 1
+        "boss_shuffle": {
+            "none": 60,
+            "simple": 10,
+            "full": 10,
+            "random": 20
         },
-        'enemizer_enemy': {
-            True: 1,
-            False: 1
+        "enemy_shuffle": {
+            "none": 60,
+            "shuffled": 20,
+            "random": 20
         },
-        'enemizer_enemy_health': {
-            0: 1,
-            1: 1,
-            2: 1,
-            3: 0.5,
-            4: 0.25
+        "hints": {
+            "on": 50,
+            "off": 50
         },
-        'enemizer_pot_shuffle': {
-            True: 1,
-            False: 1,
+        "weapons": {
+            "randomized": 20,
+            "assured": 60,
+            "vanilla": 15,
+            "swordless": 5
         },
-        'enemizer_palette_shuffle': {
-            True: 1,
-            False: 1
+        "item_pool": {
+            "normal": 80,
+            "hard": 20,
+            "expert": 0,
+            "crowd_control": 0
         },
-        'enemizer_enemy_damage': {
-            'off': 1,
-            'shuffle': 1,
-            'chaos': 0.5,
+        "item_functionality": {
+            "normal": 80,
+            "hard": 20,
+            "expert": 0
         },
-        'enemizer_boss': {
-            'off': 1,
-            'basic': 1,
-            'normal': 1,
-            'chaos': 1
+        "enemy_damage": {
+            "default": 80,
+            "shuffled": 10,
+            "random": 10
+        },
+        "enemy_health": {
+            "default": 80,
+            "easy": 5,
+            "hard": 10,
+            "expert": 5
         }
     },
     'unweighted': {
-        'description': "Everything is equally available, without any weighting.",
-        'randomizer': {
-            'item': 1,
-            'entrance': 1
+        "glitches_required": {
+            "none": 1,
+            "overworld_glitches": 1,
+            "major_glitches": 1,
+            "no_logic": 1
         },
-        'difficulty': {
-            'easy': 1,
-            'normal': 1,
-            'hard': 1,
-            'expert': 1,
-            'insane': 1
+        "item_placement": {
+            "basic": 1,
+            "advanced": 1
         },
-        'goal_item': {
-            'ganon': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforce-hunt': 1
+        "dungeon_items": {
+            "standard": 1,
+            "mc": 1,
+            "mcs": 1,
+            "full": 1
         },
-        'goal_entrance': {
-            'ganon': 1,
-            'crystals': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforcehunt': 1
+        "accessibility": {
+            "items": 1,
+            "locations": 1,
+            "none": 1
         },
-        'mode_item': {
-            'standard': 1,
-            'open': 1,
-            'inverted': 1
+        "goals": {
+            "ganon": 1,
+            "fast_ganon": 1,
+            "dungeons": 1,
+            "pedestal": 1,
+            "triforce-hunt": 1
         },
-        'mode_entrance': {
-            'swordless': 1,
-            'open': 1
+        "tower_open": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "6": 1,
+            "7": 1,
+            "random": 1
         },
-        'weapons': {
-            'randomized': 1,
-            'uncle': 1,
-            'swordless': 1
+        "ganon_open": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "6": 1,
+            "7": 1,
+            "random": 1
         },
-        'shuffle': {
-            'simple': 1,
-            'restricted': 1,
-            'full': 1,
-            'crossed': 1,
-            'insanity': 1
+        "world_state": {
+            "standard": 1,
+            "open": 1,
+            "inverted": 1,
+            "retro": 1
         },
-        'variation': {
-            'none': 1,
-            'key-sanity': 1,
-            'retro': 1
+        "entrance_shuffle": {
+            "none": 1,
+            "simple": 1,
+            "restricted": 1,
+            "full": 1,
+            "crossed": 1,
+            "insanity": 1
         },
-        'enemizer_enabled': {
-            True: 1,
-            False: 1
+        "boss_shuffle": {
+            "none": 1,
+            "simple": 1,
+            "full": 1,
+            "random": 1
         },
-        'enemizer_enemy': {
-            True: 1,
-            False: 1
+        "enemy_shuffle": {
+            "none": 1,
+            "shuffled": 1,
+            "random": 1
         },
-        'enemizer_enemy_health': {
-            0: 1,
-            1: 1,
-            2: 1,
-            3: 1,
-            4: 1
+        "hints": {
+            "on": 1,
+            "off": 1
         },
-        'enemizer_pot_shuffle': {
-            True: 1,
-            False: 1,
+        "weapons": {
+            "randomized": 1,
+            "assured": 1,
+            "vanilla": 1,
+            "swordless": 1
         },
-        'enemizer_palette_shuffle': {
-            True: 1,
-            False: 1
+        "item_pool": {
+            "normal": 1,
+            "hard": 1,
+            "expert": 1,
+            "crowd_control": 0
         },
-        'enemizer_enemy_damage': {
-            'off': 1,
-            'shuffle': 1,
-            'chaos': 1,
+        "item_functionality": {
+            "normal": 1,
+            "hard": 1,
+            "expert": 1
         },
-        'enemizer_boss': {
-            'off': 1,
-            'basic': 1,
-            'normal': 1,
-            'chaos': 1
-        }
-    },
-    'pogchamp': {
-        'description': "Kinda like unweighted, except the easy stuff isn't available or weighted to be less likely.",
-        'randomizer': {
-            'item': 1,
-            'entrance': 1
+        "enemy_damage": {
+            "default": 1,
+            "shuffled": 1,
+            "random": 1
         },
-        'difficulty': {
-            'normal': .5,
-            'hard': 1,
-            'expert': 1,
-            'insane': 1
-        },
-        'goal_item': {
-            'ganon': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforce-hunt': 1
-        },
-        'goal_entrance': {
-            'ganon': 1,
-            'crystals': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforcehunt': 1
-        },
-        'mode_item': {
-            'standard': .5,
-            'open': .5,
-            'inverted': 1
-        },
-        'mode_entrance': {
-            'swordless': 1,
-            'open': 1
-        },
-        'weapons': {
-            'randomized': .5,
-            'uncle': .5,
-            'swordless': 1
-        },
-        'shuffle': {
-            'simple': .5,
-            'restricted': .5,
-            'full': .75,
-            'crossed': 1,
-            'insanity': 1
-        },
-        'variation': {
-            'none': .75,
-            'key-sanity': 1,
-            'retro': .25
-        },
-        'enemizer_enabled': {
-            True: 1,
-            False: .5
-        },
-        'enemizer_enemy': {
-            True: 1,
-            False: 1
-        },
-        'enemizer_enemy_health': {
-            0: .25,
-            1: .5,
-            2: .75,
-            3: 1,
-            4: 1
-        },
-        'enemizer_pot_shuffle': {
-            True: 1,
-            False: 1,
-        },
-        'enemizer_palette_shuffle': {
-            True: 1,
-            False: 1
-        },
-        'enemizer_enemy_damage': {
-            'off': .5,
-            'shuffle': 1,
-            'chaos': 1,
-        },
-        'enemizer_boss': {
-            'off': .5,
-            'basic': 1,
-            'normal': 1,
-            'chaos': 1
-        }
-    },
-    'itemonly': {
-        'description': "Weighted, but item randomizer only (no entrance or enemizer).",
-        'randomizer': {
-            'item': 1
-        },
-        'difficulty': {
-            'easy': .25,
-            'normal': 1,
-            'hard': 1,
-            'expert': .5,
-            'insane': .1
-        },
-        'goal_item': {
-            'ganon': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforce-hunt': 1
-        },
-        'mode_item': {
-            'standard': 1,
-            'open': 1,
-            'inverted': .75
-        },
-        'weapons': {
-            'randomized': .4,
-            'uncle': .4,
-            'swordless': .2
-        },
-        'variation': {
-            'none': 1,
-            'key-sanity': 1,
-            'retro': .25
-        },
-        'enemizer_enabled': {
-            False: 1
-        }
-    },
-    'entranceonly': {
-        'description': "Weighted, but entrance randomizer only (no item or enemizer).",
-        'randomizer': {
-            'entrance': 1
-        },
-        'difficulty': {
-            'easy': .25,
-            'normal': 1,
-            'hard': 1,
-            'expert': .5,
-            'insane': .1
-        },
-        'goal_entrance': {
-            'ganon': 1,
-            'crystals': 1,
-            'dungeons': 1,
-            'pedestal': 1,
-            'triforcehunt': 1
-        },
-        'mode_entrance': {
-            'swordless': .2,
-            'open': .8
-        },
-        'shuffle': {
-            'simple': 0.75,
-            'restricted': 0.75,
-            'full': 1,
-            'crossed': 1,
-            'insanity': .25
-        },
-        'variation': {
-            'none': 1,
-            'key-sanity': 1,
-            'retro': .25
-        },
-        'enemizer_enabled': {
-            False: 1
+        "enemy_health": {
+            "default": 1,
+            "easy": 1,
+            "hard": 1,
+            "expert": 1
         }
     }
 }

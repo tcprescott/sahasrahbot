@@ -107,31 +107,42 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
         color=discord.Colour.dark_red())
     embed.add_field(
         name='Item Placement',
-        value="Logic: {logic}\nItem Placement: {item_placement}\nDungeon Items: {dungeon_items}\nAccessibility: {accessibility}".format(
+        value="Glitches Required: {logic}\nItem Placement: {item_placement}\nDungeon Items: {dungeon_items}\nAccessibility: {accessibility}".format(
             logic=seed.data['spoiler']['meta']['logic'],
             item_placement=seed.data['spoiler']['meta']['item_placement'],
             dungeon_items=seed.data['spoiler']['meta']['dungeon_items'],
             accessibility=seed.data['spoiler']['meta']['accessibility'],
         ),
-        inline=True)
+        inline=False)
+
+    try:
+        tower=seed.data['spoiler']['meta']['crystals_tower'] if not 'entry_crystals_tower' in seed.data['spoiler']['meta'] else seed.data['spoiler']['meta']['entry_crystals_tower']
+    except KeyError:
+        tower='unknown'
+
+    try:
+        ganon=seed.data['spoiler']['meta']['crystals_ganon'] if not 'entry_crystals_ganon' in seed.data['spoiler']['meta'] else seed.data['spoiler']['meta']['entry_crystals_ganon']
+    except KeyError:
+        ganon='unknown'
+
     embed.add_field(
         name='Goal',
-        value="Goal: {goal}\nOpen Tower: {tower}\nGanon Vulnerable: {crystals}".format(
+        value="Goal: {goal}\nOpen Tower: {tower}\nGanon Vulnerable: {ganon}".format(
             goal=seed.data['spoiler']['meta']['goal'],
-            tower=seed.data['spoiler']['meta']['entry_crystals_tower'],
-            crystals=seed.data['spoiler']['meta']['entry_crystals_ganon'],
+            tower=tower,
+            ganon=ganon,
         ),
-        inline=True)
+        inline=False)
     embed.add_field(
         name='Gameplay',
         value="World State: {mode}\nEntrance Shuffle: {entrance}\nBoss Shuffle: {boss}\nEnemy Shuffle: {enemy}\nHints: {hints}".format(
             mode=seed.data['spoiler']['meta']['mode'],
-            entrance=seed.data['spoiler']['meta']['shuffle'] if seed.data['spoiler']['meta']['shuffle'] else "none",
+            entrance="none" if not 'shuffle' in seed.data['spoiler']['meta'] else seed.data['spoiler']['meta']['shuffle'],
             boss=seed.data['spoiler']['meta']['enemizer.boss_shuffle'],
             enemy=seed.data['spoiler']['meta']['enemizer.enemy_shuffle'],
             hints=seed.data['spoiler']['meta']['hints']
         ),
-        inline=True)
+        inline=False)
     embed.add_field(
         name='Difficulty',
         value="Swords: {weapons}\nItem Pool: {pool}\nItem Functionality: {functionality}\nEnemy Damage: {damage}\nEnemy Health: {health}".format(
@@ -141,7 +152,7 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
             damage=seed.data['spoiler']['meta']['enemizer.enemy_damage'],
             health=seed.data['spoiler']['meta']['enemizer.enemy_health'],
         ),
-        inline=True)
+        inline=False)
 
 
     if emojis:
