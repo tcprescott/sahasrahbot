@@ -70,7 +70,7 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     @commands.is_owner()
-    async def savecustomizerpreset(self, ctx, preset):
+    async def savepreset(self, ctx, preset):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
                 raise Exception('File should have a .json extension.')
