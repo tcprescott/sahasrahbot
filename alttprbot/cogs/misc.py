@@ -15,9 +15,9 @@ class Misc(commands.Cog):
     async def pedestalgoal(self, ctx):
         await ctx.send("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
 
-    @commands.command()
+    @commands.command(aliases=['rom'])
     async def crc32(self, ctx):
-        await ctx.send("If you need help verifying your ROM file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!")
+        await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
 
 def setup(bot):
