@@ -3,6 +3,7 @@ from ..database import config, permissions, voicerole
 import discord
 from discord.ext import commands
 
+
 class VoiceRole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -11,18 +12,20 @@ class VoiceRole(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
         vc_roles = await voicerole.get_voice_roles_by_guild(member.guild.id)
 
-        if not after.channel == None and not before.channel == None:
+        if after.channel is not None and before.channel is not None:
             if after.channel.id == before.channel.id:
                 return
-        if not after.channel == None:
+        if after.channel is not None:
             for vc_role in vc_roles:
                 if after.channel.id == vc_role['voice_channel_id']:
-                    role = discord.utils.get(member.guild.roles, id=vc_role['role_id'])
+                    role = discord.utils.get(
+                        member.guild.roles, id=vc_role['role_id'])
                     await member.add_roles(role, reason='Joined voice channel.')
-        if not before.channel == None:
+        if before.channel is not None:
             for vc_role in vc_roles:
                 if before.channel.id == vc_role['voice_channel_id']:
-                    role = discord.utils.get(member.guild.roles, id=vc_role['role_id'])
+                    role = discord.utils.get(
+                        member.guild.roles, id=vc_role['role_id'])
                     await member.remove_roles(role, reason='Left voice channel.')
         return
 
@@ -38,6 +41,7 @@ class VoiceRole(commands.Cog):
     @voicerole.command(name='delete', aliases=['d'])
     async def vr_delete(self, ctx, id: int):
         await voicerole.delete_voice_role(ctx.guild.id, id)
+
 
 def setup(bot):
     bot.add_cog(VoiceRole(bot))

@@ -3,11 +3,13 @@ from ..util import embed_formatter
 import discord
 from discord.ext import commands
 
+
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # get/set configuration values, only the server manager should be able to set these
+    # get/set configuration values, only the server manager should be able to
+    # set these
     @commands.group(name='config')
     @commands.has_permissions(manage_guild=True)
     async def config_func(self, ctx):
@@ -26,7 +28,8 @@ class Admin(commands.Cog):
     async def config_delete(self, ctx, parameter):
         await config.delete_parameter(ctx.guild.id, parameter)
 
-    # get/set configuration values, only a server manager should be able to set these
+    # get/set configuration values, only a server manager should be able to
+    # set these
     @commands.group(name='permission')
     @commands.has_permissions(manage_guild=True)
     async def permission_func(self, ctx):
@@ -48,7 +51,6 @@ class Admin(commands.Cog):
     async def permission_delete(self, ctx, role_name, permission):
         role = discord.utils.get(ctx.guild.roles, name=role_name)
         await permissions.delete_permission(ctx.guild.id, role.id, permission)
-
 
 
 def setup(bot):

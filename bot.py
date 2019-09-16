@@ -5,7 +5,7 @@ from discord.ext import commands
 # from alttprbot import reactionrole
 from alttprbot.util import orm
 
-from config import Config
+from config import Config as c
 
 discordbot = commands.Bot(
     command_prefix="$",
@@ -18,7 +18,7 @@ discordbot.load_extension("alttprbot.cogs.daily")
 discordbot.load_extension("alttprbot.cogs.voicerole")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
 
-if not Config.DEBUG:
+if not c.DEBUG:
     @discordbot.event
     async def on_command_error(ctx, error):
         if isinstance(error, commands.CheckFailure):
@@ -33,16 +33,19 @@ if not Config.DEBUG:
         else:
             await ctx.send(error)
             await ctx.message.add_reaction('👎')
-        await ctx.message.remove_reaction('⌚',ctx.bot.user)
+        await ctx.message.remove_reaction('⌚', ctx.bot.user)
+
 
 @discordbot.event
 async def on_command(ctx):
     await ctx.message.add_reaction('⌚')
 
+
 @discordbot.event
 async def on_command_completion(ctx):
     await ctx.message.add_reaction('👍')
-    await ctx.message.remove_reaction('⌚',ctx.bot.user)
+    await ctx.message.remove_reaction('⌚', ctx.bot.user)
+
 
 @discordbot.event
 async def on_message(message):
@@ -50,7 +53,7 @@ async def on_message(message):
         emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')
         if emoji:
             await message.add_reaction(emoji)
-        
+
     await discordbot.process_commands(message)
 
 # @discordbot.check
@@ -63,5 +66,5 @@ async def on_message(message):
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.create_task(orm.create_pool(loop))
-    loop.create_task(discordbot.start(Config.DISCORD_TOKEN))
+    loop.create_task(discordbot.start(c.DISCORD_TOKEN))
     loop.run_forever()
