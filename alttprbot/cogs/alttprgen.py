@@ -94,7 +94,7 @@ class AlttprGen(commands.Cog):
         ))
 
     @seedgen.command()
-    # @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")

@@ -132,7 +132,7 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
             entrance="None" if not 'shuffle' in seed.data['spoiler']['meta'] else settings_map['entrance_shuffle'][seed.data['spoiler']['meta']['shuffle']],
             boss=settings_map['boss_shuffle'][seed.data['spoiler']['meta']['enemizer.boss_shuffle']],
             enemy=settings_map['enemy_shuffle'][seed.data['spoiler']['meta']['enemizer.enemy_shuffle']],
-            hints="On" if seed.data['spoiler']['meta']['hints'] else "Off"
+            hints=seed.data['spoiler']['meta']['hints']
         ),
         inline=True)
     embed.add_field(
