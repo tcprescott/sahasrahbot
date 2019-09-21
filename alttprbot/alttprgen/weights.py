@@ -1,6 +1,7 @@
 weights = {
     # this emulates the weights used when picking the daily
     'daily': {
+        "description": "Uses the weights currently in use for generating the daily games.",
         "glitches_required": {
             "none": 76,
             "overworld_glitches": 21,
@@ -110,6 +111,7 @@ weights = {
         }
     },
     'friendly': {
+        "description": "A friendlier weightset.  Designed for those who don't want something something extreme.",
         "glitches_required": {
             "none": 100,
             "overworld_glitches": 0,
@@ -219,6 +221,7 @@ weights = {
         }
     },
     'weighted': {
+        "description": "The default.  Offers every setting, but with some balance.",
         "glitches_required": {
             "none": 100,
             "overworld_glitches": 0,
@@ -328,6 +331,7 @@ weights = {
         }
     },
     'unweighted': {
+        "description": "Every option is possible.  GLHF.",
         "glitches_required": {
             "none": 1,
             "overworld_glitches": 0,
@@ -437,6 +441,7 @@ weights = {
         }
     },
     'owg': {
+        "description": "This'll always be OWG.  Always.",
         "glitches_required": {
             "none": 0,
             "overworld_glitches": 100,
@@ -546,6 +551,7 @@ weights = {
         }
     },
     'nologic': {
+        "description": "Anything can be anywhere and nothing maters anymore.",
         "glitches_required": {
             "none": 0,
             "overworld_glitches": 0,
