@@ -4,7 +4,6 @@ from discord.ext import commands
 import pyz3r
 from pyz3r.customizer import customizer
 
-from ..database import alttprgen
 from ..util import embed_formatter
 
 from ..alttprgen.weights import weights
@@ -52,24 +51,12 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def preset(self, ctx, preset):
-        seed = await get_preset(preset)
+        seed, goal_name = await get_preset(preset)
+        if not seed:
+            raise Exception('Could not generate game.  Maybe preset does not exist?')
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-    @seedgen.command()
-    @commands.is_owner()
-    async def savepreset(self, ctx, preset):
-        try:
-            if not ctx.message.attachments[0].filename.endswith('.json'):
-                raise Exception('File should have a .json extension.')
-        except IndexError:
-            raise Exception('You must attach a customizer save json file.')
-
-        customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
-
-        settings = customizer.convert2settings(
-            customizer_settings, tournament=True)
-        await alttprgen.put_seed_preset(name=preset, customizer=1, settings=json.dumps(settings))
 
     @seedgen.command()
     async def weightlist(self, ctx):

@@ -56,11 +56,11 @@ class SrlBot(pydle.Client):
         if args.command == '$preset' and target.startswith('#srl-'):
             await self.message(target, "Generating game, please wait.")
             srl_id = srl_race_id(target)
-            preset_result = await alttprgen.get_seed_preset(args.preset)
-            if not preset_result:
+            seed, goal_name = await get_preset(args.preset)
+            if not seed:
                 await self.message(target, "That preset does not exist.")
-            goal = f"vt8 randomizer - {preset_result['goal_name']}"
-            seed = await get_preset(args.preset)
+                return
+            goal = f"vt8 randomizer - {goal_name}"
             code = await seed.code()
             await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
             await srl_races.insert_srl_race(srl_id, goal)

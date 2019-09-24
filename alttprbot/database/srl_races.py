@@ -5,3 +5,9 @@ async def insert_srl_race(srl_id, goal):
         'INSERT INTO srl_races(srl_id, goal) VALUES (%s,%s) ON DUPLICATE KEY UPDATE goal = %s;',
         [srl_id, goal, goal]
     )
+
+async def get_srl_races():
+    results = await orm.select(
+        'SELECT * from srl_races;'
+    )
+    return results
