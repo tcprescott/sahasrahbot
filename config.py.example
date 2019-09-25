@@ -7,3 +7,11 @@ class Config:
     DB_PASS = 'password'
 
     DISCORD_TOKEN = 'discord_bot_token_here'
+
+    SRL_NICK = 'SahasrahTest'
+    SRL_PASSWORD = 'password'
+
+    baseurl='https://alttpr.com'
+    seed_baseurl='https://s3.us-east-2.amazonaws.com/alttpr-patches'
+    username=None
+    password=None

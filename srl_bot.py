@@ -34,11 +34,14 @@ class SrlBot(pydle.Client):
             return
 
         if (target == '#speedrunslive' and source == 'RaceBot') or (target == 'SahasrahTest' and source == 'synack'):
-            p = re.compile("Race initiated for The Legend of Zelda: A Link to the Past Hacks\. Join (#srl-[a-z0-9]{5}) to participate\.")
+            p = re.compile("Race initiated for The Legend of Zelda: A Link to the Past Hacks\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
             result = p.search(message)
             if result:
-                await asyncio.sleep(1)
-                await self.join(result.group(1))
+                if not c.DEBUG:
+                    await asyncio.sleep(1)
+                    await self.join(result.group(1))
+                else:
+                    print(f'would have joined {result.group(1)}')
 
         if not message[0] == '$':
             return
@@ -52,6 +55,7 @@ class SrlBot(pydle.Client):
 
         parser_preset = subparsers.add_parser('$preset')
         parser_preset.add_argument('preset')
+        parser_preset.add_argument('--hints', action='store_true')
 
         parser_spoiler = subparsers.add_parser('$spoiler')
 
@@ -64,15 +68,20 @@ class SrlBot(pydle.Client):
         parser_echo = subparsers.add_parser('$echo')
         parser_echo.add_argument('message')
 
-        args = parser.parse_args(split_msg)
+        parser_help = subparsers.add_parser('$help')
+
+        try:
+            args = parser.parse_args(split_msg)
+        except argparse.ArgumentError as e:
+            await self.message(e)
         # print(args)
 
         if args.command == '$preset' and target.startswith('#srl-'):
-            await self.message(target, "Generating game, please wait.")
+            await self.message(target, "Generating game, please wait.  If nothing happens after two minutes, contact Synack.")
             srl_id = srl_race_id(target)
-            seed, goal_name = await get_preset(args.preset)
+            seed, goal_name = await get_preset(args.preset, hints=args.hints)
             if not seed:
-                await self.message(target, "That preset does not exist.")
+                await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                 return
             goal = f"vt8 randomizer - {goal_name}"
             code = await seed.code()
@@ -80,7 +89,7 @@ class SrlBot(pydle.Client):
             await srl_races.insert_srl_race(srl_id, goal)
 
         if args.command == '$random' and target.startswith('#srl-'):
-            await self.message(target, "Generating game, please wait.")
+            await self.message(target, "Generating game, please wait.  If nothing happens after two minutes, contact Synack.")
             srl_id = srl_race_id(target)
             seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
             code = await seed.code()
@@ -90,6 +99,9 @@ class SrlBot(pydle.Client):
 
         if args.command == '$spoiler' and target.startswith('#srl-'):
             await self.message(target, "Not yet implemented.  Sorry!")
+
+        if args.command == '$help' and target.startswith('#srl-'):
+            await self.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
 
         if args.command == '$joinroom':
             await self.join(args.channel)
@@ -111,6 +123,7 @@ class SrlBot(pydle.Client):
             await process_active_races()
             # schedule.every(1).minutes.do(join_active_races, 'alttphacks')
             schedule.every(1).minutes.do(process_active_races)
+            await self.join('#srl-pees0')
 
 
 async def join_active_races(game):
@@ -119,8 +132,10 @@ async def join_active_races(game):
         if race['game']['abbrev'] == game:
             race_id=race['id']
             if not client.in_channel(f'#srl-{race_id}'):
-                await client.join(f'#srl-{race_id}')
-                print(f'joined #srl-{race_id} on startup')
+                if c.DEBUG:
+                    print(f'would have joined #srl-{race_id}')
+                else:
+                    await client.join(f'#srl-{race_id}')
 
 async def process_active_races():
     print('process active races running')
