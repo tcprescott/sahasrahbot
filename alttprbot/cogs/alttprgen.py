@@ -22,7 +22,8 @@ class AlttprGen(commands.Cog):
 
     @commands.group()
     async def seedgen(self, ctx):
-        pass
+        if ctx.invoked_subcommand is None:
+            raise Exception('Try providing a valid subcommand.  Use "$help seedgen" for assistance.')
 
     @seedgen.command()
     async def custom(self, ctx, tournament: bool = True):
