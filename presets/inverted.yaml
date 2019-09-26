@@ -23,5 +23,5 @@ settings:
   entrances: none
   tournament: true
   accessibility: items
-  dungeon_items: full
+  dungeon_items: standard
   item_placement: advanced

@@ -9,6 +9,7 @@ from ..util import embed_formatter
 from ..alttprgen.weights import weights
 from ..alttprgen.random import generate_random_game
 from ..alttprgen.preset import get_preset
+from ..alttprgen.spoilers import generate_spoiler_game
 
 from config import Config as c
 
@@ -57,6 +58,15 @@ class AlttprGen(commands.Cog):
             raise Exception('Could not generate game.  Maybe preset does not exist?')
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
         await ctx.send(embed=embed)
+
+
+    @seedgen.command()
+    async def spoiler(self, ctx, preset):
+        seed, goal_name, spoiler_log_url = await generate_spoiler_game(preset)
+        if not seed:
+            raise Exception('Could not generate game.  Maybe preset does not exist?')
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
+        await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
 
 
     @seedgen.command()
