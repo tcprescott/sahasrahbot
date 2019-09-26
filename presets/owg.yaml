@@ -1,5 +1,5 @@
 ---
-goal_name: open nologic
+goal_name: open owg
 customizer: false
 settings:
   goal: ganon
@@ -18,10 +18,10 @@ settings:
     enemy_damage: default
     enemy_health: default
     enemy_shuffle: none
-  glitches: no_logic
+  glitches: overworld_glitches
   spoilers: false
   entrances: none
   tournament: true
   accessibility: items
-  dungeon_items: full
+  dungeon_items: standard
   item_placement: advanced
