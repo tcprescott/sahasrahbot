@@ -41,7 +41,7 @@ class SrlBot(pydle.Client):
                     await asyncio.sleep(1)
                     await self.join(result.group(1))
                     await asyncio.sleep(60)
-                    await self.message(target, "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
+                    await self.message(result.group(1), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
                 else:
                     print(f'would have joined {result.group(1)}')
 
