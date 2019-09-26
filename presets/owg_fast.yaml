@@ -1,0 +1,27 @@
+---
+goal_name: open fast ganon owg
+customizer: false
+settings:
+  goal: fast_ganon
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: open
+  hints: 'off'
+  weapons: randomized
+  crystals:
+    ganon: '7'
+    tower: '7'
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: overworld_glitches
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: standard
+  item_placement: advanced
