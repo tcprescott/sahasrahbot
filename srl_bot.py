@@ -69,6 +69,8 @@ class SrlBot(pydle.Client):
 
         parser_leave = subparsers.add_parser('$leave')
 
+        parser_vt = subparsers.add_parser('$vt')
+
         parser_echo = subparsers.add_parser('$echo')
         parser_echo.add_argument('message')
 
@@ -112,6 +114,9 @@ class SrlBot(pydle.Client):
 
         if args.command == '$leave' and target.startswith('#srl-'):
             await self.part(target)
+
+        if args.command == '$vt' and target.startswith('#srl-'):
+            await self.message(target, "You summon VT, he looks around confused and curses your next game with bad RNG.")
 
         if args.command == '$echo':
             await self.message(source, args.message)
