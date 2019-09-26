@@ -40,6 +40,8 @@ class SrlBot(pydle.Client):
                 if not c.DEBUG:
                     await asyncio.sleep(1)
                     await self.join(result.group(1))
+                    await asyncio.sleep(1)
+                    await self.message(target, "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
                 else:
                     print(f'would have joined {result.group(1)}')
 
@@ -65,6 +67,8 @@ class SrlBot(pydle.Client):
         parser_join = subparsers.add_parser('$joinroom')
         parser_join.add_argument('channel')
 
+        parser_leave = subparsers.add_parser('$leave')
+
         parser_echo = subparsers.add_parser('$echo')
         parser_echo.add_argument('message')
 
@@ -77,7 +81,7 @@ class SrlBot(pydle.Client):
         # print(args)
 
         if args.command == '$preset' and target.startswith('#srl-'):
-            await self.message(target, "Generating game, please wait.  If nothing happens after two minutes, contact Synack.")
+            await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
             srl_id = srl_race_id(target)
             seed, goal_name = await get_preset(args.preset, hints=args.hints)
             if not seed:
@@ -89,7 +93,7 @@ class SrlBot(pydle.Client):
             await srl_races.insert_srl_race(srl_id, goal)
 
         if args.command == '$random' and target.startswith('#srl-'):
-            await self.message(target, "Generating game, please wait.  If nothing happens after two minutes, contact Synack.")
+            await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
             srl_id = srl_race_id(target)
             seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
             code = await seed.code()
@@ -105,6 +109,9 @@ class SrlBot(pydle.Client):
 
         if args.command == '$joinroom':
             await self.join(args.channel)
+
+        if args.command == '$leave' and target.startswith('#srl-'):
+            await self.part(target)
 
         if args.command == '$echo':
             await self.message(source, args.message)
