@@ -33,7 +33,7 @@ class SrlBot(pydle.Client):
         if source == c.SRL_NICK:
             return
 
-        if (target == '#speedrunslive' and source == 'RaceBot') or (target == 'SahasrahTest' and source == 'synack'):
+        if target == '#speedrunslive' and source == 'RaceBot':
             p = re.compile("Race initiated for The Legend of Zelda: A Link to the Past Hacks\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
             result = p.search(message)
             if result:
