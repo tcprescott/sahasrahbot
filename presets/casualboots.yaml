@@ -1,6 +1,7 @@
 ---
 goal_name: "open w/ boots start"
 customizer: true
+study_minutes: 15
 settings:
   l: {}
   eq:

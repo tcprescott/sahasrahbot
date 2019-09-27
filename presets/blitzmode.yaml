@@ -1,11 +1,11 @@
 customizer: true
-goal_name: ambrosia
+goal_name: fast ganon open 4/4 w/ starting items
 study_minutes: 15
 settings:
   accessibility: items
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: '4'
+    tower: '4'
   custom:
     canBombJump: false
     canBootsClip: false
@@ -125,7 +125,7 @@ settings:
         L1SwordAndShield: 0
         L3Sword: 0
         L4Sword: 0
-        Lamp: 1
+        Lamp: 0
         MagicMirror: 1
         MapA1: 0
         MapA2: 1
@@ -143,22 +143,22 @@ settings:
         MapP3: 1
         MasterSword: 0
         MirrorShield: 0
-        MoonPearl: 1
+        MoonPearl: 0
         Mushroom: 1
-        Nothing: 0
+        Nothing: 8
         OcarinaActive: 0
-        OcarinaInactive: 1
+        OcarinaInactive: 0
         OneHundredRupees: 1
         OneRupee: 2
-        PegasusBoots: 1
+        PegasusBoots: 0
         PieceOfHeart: 24
         Powder: 1
         PowerGlove: 0
         ProgressiveArmor: 2
         ProgressiveBow: 2
-        ProgressiveGlove: 2
+        ProgressiveGlove: 0
         ProgressiveShield: 3
-        ProgressiveSword: 4
+        ProgressiveSword: 2
         Quake: 1
         QuarterMagic: 0
         RedBoomerang: 1
@@ -186,7 +186,7 @@ settings:
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
-    region.bossNormalLocation: false
+    region.bossNormalLocation: true
     region.wildBigKeys: false
     region.wildCompasses: false
     region.wildKeys: false
@@ -199,7 +199,7 @@ settings:
     rom.rupeeBow: false
     rom.timerMode: 'off'
     rom.timerStart: ''
-    spoil.BootsLocation: true
+    spoil.BootsLocation: false
     spoil.Hints: true
   drops:
     '0':
@@ -278,22 +278,29 @@ settings:
     - auto_fill
   dungeon_items: standard
   eq:
+  - ProgressiveSword
+  - ProgressiveSword
+  - MoonPearl
+  - Lamp
+  - PegasusBoots
+  - ProgressiveGlove
+  - ProgressiveGlove
+  - OcarinaActive
   - BossHeartContainer
   - BossHeartContainer
   - BossHeartContainer
   glitches: none
-  goal: ganon
+  goal: fast_ganon
   item:
     functionality: normal
     pool: normal
   item_placement: advanced
   l: {}
   lang: en
-  mode: standard
-  name: Ambrosia
-  notes: This is a sword-assured standard seed (.casual) where the Uncle will spoil
-    the Boots location at the start, and all dungeon bosses are guaranteed to drop
-    an item (not a map/compass/key).
+  mode: open
+  name: BlitzMode
+  notes: 4/4 fast ganon. start with Boots, Activated Flute, Pearl, Mitts, Master Sword,
+    Lamp
   spoilers_ongen: false
   tournament: true
-  weapons: assured
+  weapons: randomized
