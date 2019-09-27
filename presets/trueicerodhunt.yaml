@@ -1,6 +1,8 @@
 ---
 goal_name: "True Ice Rod Hunt"
 customizer: True
+study_minutes: 15
+shuffle_prize_packs: false
 settings:
   l:
     VHVydGxlIFJvY2sgLSBCb3NzOjE=: Triforce:1

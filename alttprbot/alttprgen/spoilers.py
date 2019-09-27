@@ -1,11 +1,16 @@
-import aiofiles
 import json
+import random
+import string
+from collections import OrderedDict
+
+import aiofiles
 import pyz3r.misc
-import random, string
+import yaml
+
+from config import Config as c
 
 from .preset import get_preset
 
-from config import Config as c
 
 async def generate_spoiler_game(preset):
     seed, goal_name = await get_preset(preset, hints=False, spoilers_ongen=True)
@@ -35,7 +40,7 @@ async def write_json_to_disk(seed):
     except KeyError:
         pass
 
-    sorteddict = {}
+    sorteddict = OrderedDict() 
 
     prizemap = [
         ['Eastern Palace', 'Eastern Palace - Prize:1'],
@@ -88,9 +93,13 @@ async def write_json_to_disk(seed):
     for dungeon, prize in prizemap:
         del sorteddict[dungeon][prize]
 
+    # async with aiofiles.open(f"{c.SpoilerLogLocal}/{filename}", "w+", newline='\r\n') as out:
+    #     await out.write(json.dumps(sorteddict, indent=4))
+    #     await out.flush()
+
     async with aiofiles.open(f"{c.SpoilerLogLocal}/{filename}", "w+", newline='\r\n') as out:
-        await out.write(json.dumps(sorteddict, indent=4))
-        await out.flush()
+        dump = yaml.dump(sorteddict, default_flow_style=False)
+        await out.write(dump)
 
     return c.SpoilerLogUrlBase + '/' + filename
 

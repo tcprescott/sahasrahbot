@@ -1,6 +1,8 @@
 ---
 goal_name: "standard w/ boots start"
 customizer: true
+study_minutes: 15
+shuffle_prize_packs: true
 settings:
   l: {}
   eq:
@@ -17,68 +19,68 @@ settings:
   name: ''
   drops:
     '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - Heart
+    - Heart
+    - Heart
+    - Heart
+    - RupeeGreen
+    - Heart
+    - Heart
+    - RupeeGreen
     '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - RupeeBlue
+    - RupeeGreen
+    - RupeeBlue
+    - RupeeRed
+    - RupeeBlue
+    - RupeeGreen
+    - RupeeBlue
+    - RupeeBlue
     '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - MagicRefillFull
+    - MagicRefillSmall
+    - MagicRefillSmall
+    - RupeeBlue
+    - MagicRefillFull
+    - MagicRefillSmall
+    - Heart
+    - MagicRefillSmall
     '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - BombRefill1
+    - BombRefill1
+    - BombRefill1
+    - BombRefill4
+    - BombRefill1
+    - BombRefill1
+    - BombRefill8
+    - BombRefill1
     '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - ArrowRefill5
+    - Heart
+    - ArrowRefill5
+    - ArrowRefill10
+    - ArrowRefill5
+    - Heart
+    - ArrowRefill5
+    - ArrowRefill10
     '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - MagicRefillSmall
+    - RupeeGreen
+    - Heart
+    - ArrowRefill5
+    - MagicRefillSmall
+    - BombRefill1
+    - RupeeGreen
+    - Heart
     '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    - Heart
+    - Fairy
+    - MagicRefillFull
+    - RupeeRed
+    - BombRefill8
+    - Heart
+    - RupeeRed
+    - ArrowRefill10
     crab:
     - auto_fill
     - auto_fill
