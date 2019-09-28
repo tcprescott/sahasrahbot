@@ -53,7 +53,8 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def preset(self, ctx, preset, hints=False):
-        seed, goal_name = await get_preset(preset, hints=False)
+        seed, preset_dict = await get_preset(preset, hints=hints, spoilers_ongen=False)
+        goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)

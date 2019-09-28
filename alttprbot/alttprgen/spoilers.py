@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import aiofiles
 import pyz3r.misc
-import yaml
+import oyaml as yaml
 
 from config import Config as c
 
@@ -13,7 +13,8 @@ from .preset import get_preset
 
 
 async def generate_spoiler_game(preset):
-    seed, goal_name = await get_preset(preset, hints=False, spoilers_ongen=True)
+    seed, preset_dict = await get_preset(preset, hints=False, spoilers_ongen=True)
+    goal_name = preset_dict['goal_name']
     if not seed:
         return False, False, False
     spoiler_log_url = await write_json_to_disk(seed)
@@ -30,53 +31,91 @@ async def write_json_to_disk(seed):
     except KeyError:
         pass
 
-    try:
-        del s['Shops'] #QOL this information is useless for this tournament
-    except KeyError:
-        pass
+    # if seed.meta['meta'][]
+    # try:
+    #     del s['Shops'] #QOL this information is useless for this tournament
+    # except KeyError:
+    #     pass
 
-    try:
-        del s['Bosses'] #QOL this information is useful only for enemizer
-    except KeyError:
-        pass
+    # if seed.data['meta']['enemizer.boss_shuffle'] == 'none':
+    #     try:
+    #         del s['Bosses'] #QOL this information is useful only for enemizer
+    #     except KeyError:
+    #         pass
 
     sorteddict = OrderedDict() 
 
-    prizemap = [
-        ['Eastern Palace', 'Eastern Palace - Prize:1'],
-        ['Desert Palace', 'Desert Palace - Prize:1'],
-        ['Tower Of Hera', 'Tower of Hera - Prize:1'],
-        ['Dark Palace', 'Palace of Darkness - Prize:1'],
-        ['Swamp Palace', 'Swamp Palace - Prize:1'],
-        ['Skull Woods', 'Skull Woods - Prize:1'],
-        ['Thieves Town', 'Thieves\' Town - Prize:1'],
-        ['Ice Palace', 'Ice Palace - Prize:1'],
-        ['Misery Mire', 'Misery Mire - Prize:1'],
-        ['Turtle Rock', 'Turtle Rock - Prize:1'],
-    ]
+    if not 'shuffle' in s['meta']:
+        sectionlist = [
+            'Special',
+            'Hyrule Castle',
+            'Eastern Palace',
+            'Desert Palace',
+            'Tower Of Hera',
+            'Dark Palace',
+            'Swamp Palace',
+            'Skull Woods',
+            'Thieves Town',
+            'Ice Palace',
+            'Misery Mire',
+            'Turtle Rock',
+            'Ganons Tower',
+            'Light World',
+            'Death Mountain',
+            'Dark World'
+        ]
+        prizemap = [
+            ['Eastern Palace', 'Eastern Palace - Prize:1'],
+            ['Desert Palace', 'Desert Palace - Prize:1'],
+            ['Tower Of Hera', 'Tower of Hera - Prize:1'],
+            ['Dark Palace', 'Palace of Darkness - Prize:1'],
+            ['Swamp Palace', 'Swamp Palace - Prize:1'],
+            ['Skull Woods', 'Skull Woods - Prize:1'],
+            ['Thieves Town', 'Thieves\' Town - Prize:1'],
+            ['Ice Palace', 'Ice Palace - Prize:1'],
+            ['Misery Mire', 'Misery Mire - Prize:1'],
+            ['Turtle Rock', 'Turtle Rock - Prize:1'],
+        ]
+    else:
+        sectionlist = [
+            'Special',
+            'Hyrule Castle',
+            'Eastern Palace',
+            'Desert Palace',
+            'Tower of Hera',
+            'Palace of Darkness',
+            'Swamp Palace',
+            'Skull Woods',
+            'Thieves Town',
+            'Ice Palace',
+            'Misery Mire',
+            'Turtle Rock',
+            'Ganons Tower',
+            'Caves',
+            'Light World',
+            'Dark World'
+        ]
+        prizemap = [
+            ['Eastern Palace', 'Eastern Palace - Prize'],
+            ['Desert Palace', 'Desert Palace - Prize'],
+            ['Tower of Hera', 'Tower of Hera - Prize'],
+            ['Palace of Darkness', 'Palace of Darkness - Prize'],
+            ['Swamp Palace', 'Swamp Palace - Prize'],
+            ['Skull Woods', 'Skull Woods - Prize'],
+            ['Thieves Town', 'Thieves\' Town - Prize'],
+            ['Ice Palace', 'Ice Palace - Prize'],
+            ['Misery Mire', 'Misery Mire - Prize'],
+            ['Turtle Rock', 'Turtle Rock - Prize'],
+        ]
     sorteddict['Prizes'] = {}
     for dungeon, prize in prizemap:
-        sorteddict['Prizes'][dungeon] = s[dungeon][prize]
-    sorteddict['Special']        = s['Special']
-    sorteddict['Hyrule Castle']  = sort_dict(s['Hyrule Castle'])
-    sorteddict['Eastern Palace'] = sort_dict(s['Eastern Palace'])
-    sorteddict['Desert Palace']  = sort_dict(s['Desert Palace'])
-    sorteddict['Tower Of Hera']  = sort_dict(s['Tower Of Hera'])
-    sorteddict['Castle Tower']   = sort_dict(s['Castle Tower'])
-    sorteddict['Dark Palace']    = sort_dict(s['Dark Palace'])
-    sorteddict['Swamp Palace']   = sort_dict(s['Swamp Palace'])
-    sorteddict['Skull Woods']    = sort_dict(s['Skull Woods'])
-    sorteddict['Thieves Town']   = sort_dict(s['Thieves Town'])
-    sorteddict['Ice Palace']     = sort_dict(s['Ice Palace'])
-    sorteddict['Misery Mire']    = sort_dict(s['Misery Mire'])
-    sorteddict['Turtle Rock']    = sort_dict(s['Turtle Rock'])
-    sorteddict['Ganons Tower']   = sort_dict(s['Ganons Tower'])
-    sorteddict['Light World']    = sort_dict(s['Light World'])
-    sorteddict['Death Mountain'] = sort_dict(s['Death Mountain'])
-    sorteddict['Dark World']     = sort_dict(s['Dark World'])
+        sorteddict['Prizes'][dungeon] = s[dungeon][prize].replace(':1','')
+
+    for section in sectionlist:
+        sorteddict[section] = mw_filter(s[section])
 
     drops = get_seed_prizepacks(seed.data)
-    sorteddict['Drops']          = {}
+    sorteddict['Drops'] = {}
     sorteddict['Drops']['PullTree'] = drops['PullTree']
     sorteddict['Drops']['RupeeCrab'] = {}
     sorteddict['Drops']['RupeeCrab']['Main'] = drops['RupeeCrab']['Main']
@@ -86,20 +125,29 @@ async def write_json_to_disk(seed):
 
     sorteddict['Special']['DiggingGameDigs'] = pyz3r.misc.misc.seek_patch_data(seed.data['patch'], 982421, 1)[0]
 
+    if s['meta']['mode'] == 'retro':
+        sorteddict['Shops'] = s['Shops']
+
+    if not s['meta']['enemizer.boss_shuffle'] == 'none':
+        sorteddict['Bosses'] = mw_filter(s['Bosses'])
+
+    if 'shuffle' in s['meta'] and not s['meta']['shuffle'] == 'none':
+        sorteddict['Entrances'] = s['Entrances']
+
     sorteddict['meta']           = s['meta']
     sorteddict['meta']['hash']   = seed.hash
     sorteddict['meta']['permalink'] = seed.url
 
     for dungeon, prize in prizemap:
-        del sorteddict[dungeon][prize]
-
-    # async with aiofiles.open(f"{c.SpoilerLogLocal}/{filename}", "w+", newline='\r\n') as out:
-    #     await out.write(json.dumps(sorteddict, indent=4))
-    #     await out.flush()
+        del sorteddict[dungeon][prize.replace(':1','')]
 
     async with aiofiles.open(f"{c.SpoilerLogLocal}/{filename}", "w+", newline='\r\n') as out:
-        dump = yaml.dump(sorteddict, default_flow_style=False)
-        await out.write(dump)
+        await out.write(json.dumps(sorteddict, indent=4))
+        await out.flush()
+
+    # async with aiofiles.open(f"{c.SpoilerLogLocal}/{filename}", "w+", newline='\r\n') as out:
+    #     dump = yaml.dump(sorteddict)
+    #     await out.write(dump)
 
     return c.SpoilerLogUrlBase + '/' + filename
 
@@ -142,8 +190,14 @@ def get_sprite_droppable(i):
     try: return spritemap[i]
     except KeyError: return 'ERR: UNKNOWN'
 
-def sort_dict(dict):
+# def mw_filter(dict):
+#     sorteddict = {}
+#     for key in sorted(dict):
+#         sorteddict[key] = dict[key]
+#     return sorteddict
+
+def mw_filter(dict):
     sorteddict = {}
-    for key in sorted(dict):
-        sorteddict[key] = dict[key]
+    for key, item in dict.items():
+        sorteddict[key.replace(':1','')] = dict[key].replace(':1','')
     return sorteddict

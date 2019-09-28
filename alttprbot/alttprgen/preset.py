@@ -63,4 +63,4 @@ async def get_preset(preset, hints=False, nohints=False, spoilers_ongen=False):
         password=c.password,
         settings=preset_dict['settings']
     )
-    return seed, preset_dict['goal_name']
+    return seed, preset_dict
