@@ -24,4 +24,4 @@ async def get_srl_race_by_id(srl_id):
         'SELECT * from srl_races where srl_id=%s;',
         [srl_id]
     )
-    return results[0]
+    return results[0] if len(results) > 0 else False

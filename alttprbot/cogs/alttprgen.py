@@ -62,7 +62,7 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def spoiler(self, ctx, preset):
-        seed, goal_name, spoiler_log_url = await generate_spoiler_game(preset)
+        seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)

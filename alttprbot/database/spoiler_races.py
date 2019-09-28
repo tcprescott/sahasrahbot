@@ -2,7 +2,7 @@ from ..util import orm
 
 async def insert_spoiler_race(srl_id, spoiler_url):
     await orm.execute(
-        'INSERT INTO spoiler_races(srl_id, goal) VALUES (%s,%s) ON DUPLICATE KEY UPDATE spoiler_url = %s;',
+        'INSERT INTO spoiler_races(srl_id, spoiler_url) VALUES (%s,%s) ON DUPLICATE KEY UPDATE spoiler_url = %s;',
         [srl_id, spoiler_url, spoiler_url]
     )
 
@@ -23,4 +23,4 @@ async def get_spoiler_race_by_id(srl_id):
         'SELECT * from spoiler_races where srl_id=%s;',
         [srl_id]
     )
-    return results[0]
+    return results[0] if len(results) > 0 else False

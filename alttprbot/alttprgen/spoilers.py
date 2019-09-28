@@ -14,11 +14,10 @@ from .preset import get_preset
 
 async def generate_spoiler_game(preset):
     seed, preset_dict = await get_preset(preset, hints=False, spoilers_ongen=True)
-    goal_name = preset_dict['goal_name']
     if not seed:
         return False, False, False
     spoiler_log_url = await write_json_to_disk(seed)
-    return seed, goal_name, spoiler_log_url
+    return seed, preset_dict, spoiler_log_url
 
 async def write_json_to_disk(seed):
     code = await seed.code()
