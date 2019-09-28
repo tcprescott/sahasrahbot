@@ -11,7 +11,6 @@ import aiohttp
 
 from alttprbot.alttprgen.preset import get_preset
 from alttprbot.alttprgen.random import generate_random_game
-from alttprbot.alttprgen.weights import weights
 from alttprbot.database import srl_races
 from alttprbot.database import spoiler_races
 from alttprbot.util import orm

@@ -6,7 +6,6 @@ from pyz3r.customizer import customizer
 
 from ..util import embed_formatter
 
-from ..alttprgen.weights import weights
 from ..alttprgen.random import generate_random_game
 from ..alttprgen.preset import get_preset
 from ..alttprgen.spoilers import generate_spoiler_game
@@ -72,13 +71,7 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def weightlist(self, ctx):
-        w = ''
-        for k in weights.keys():
-            d = weights[k]['description']
-            w += f'{k} - {d}\n'
-        await ctx.send('Currently configured weights:\n\n{weights}\n\nCurrent weights of this bot can be found at https://github.com/tcprescott/alttpr-discord-bot/blob/master/alttprbot/alttprgen/weights.py'.format(
-            weights=w
-        ))
+        await ctx.send('Current weights of this bot can be found at https://github.com/tcprescott/alttpr-discord-bot/tree/master/weights')
 
     @seedgen.command()
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
