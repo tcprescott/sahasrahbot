@@ -1,0 +1,23 @@
+<html>
+<head><title>SahasrahBot</title></head>
+<body>
+<h1>Supported Commands</h1>
+<h2>$preset</h2>
+<p>Use this command in the SRL race room.</p>
+<p>This allows you to generate a game using a pre-defined combination of settings.</p>
+<p>Example: <pre>$preset open</pre></p>
+<p>Currently supported presets can be found <a href="https://github.com/tcprescott/alttpr-discord-bot/tree/master/presets">on the project github.</a>.  The preset name will be the name of the file without the .yaml extension.</p>
+<p>You can append "--hints" to the command to enable hints.  All presets have hints disabled by default.  This only applies to non-customizer presets!</p>
+<h2>$random</h2>
+<p>Use this command in an SRL race room.</p>
+<p>This allows you to generate a game with random settings.  You can specify a weightset (<a href="https://github.com/tcprescott/alttpr-discord-bot/blob/master/alttprbot/alttprgen/weights.py">list of weightsets</a>) as an argument.  Default is "weighted".</p>
+<p>Example: <pre>$random weighted</pre></p>
+<h2>$spoiler</h2>
+<p>Not yet implemented.</p>
+<h2>$joinroom</h2>
+<p>Use this in #speedrunslive channel to force SahasrahBot to join the race room.</p>
+<p>Example: <pre>$joinroom #srl-abc12</pre></p>
+<h2>$help</h2>
+<p>Shows this help.</p>
+</body>
+</html>
