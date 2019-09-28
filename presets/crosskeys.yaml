@@ -1,7 +1,6 @@
 ---
 goal_name: "normal open keysanity + entrance shuffle"
 customizer: false
-study_minutes: 30
 settings:
   goal: fast_ganon
   item:

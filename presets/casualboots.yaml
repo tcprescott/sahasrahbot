@@ -1,7 +1,6 @@
 ---
 goal_name: "casual w/ boots start"
 customizer: true
-study_minutes: 15
 shuffle_prize_packs: true
 settings:
   l: {}
