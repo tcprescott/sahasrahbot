@@ -18,3 +18,10 @@ async def get_srl_races():
         'SELECT * from srl_races;'
     )
     return results
+
+async def get_srl_race_by_id(srl_id):
+    results = await orm.select(
+        'SELECT * from srl_races where srl_id=%s;',
+        [srl_id]
+    )
+    return results[0]

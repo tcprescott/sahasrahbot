@@ -16,6 +16,10 @@ from alttprbot.database import srl_races
 from alttprbot.util import orm
 from config import Config as c
 
+starting = re.compile("\\x034\\x02The race will begin in 10 seconds!\\x03\\x02")
+go = re.compile("\\x034\\x02GO!\\x03\\x02")
+newroom = re.compile("Race initiated for The Legend of Zelda: A Link to the Past Hacks\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
+
 
 class SrlBot(pydle.Client):
     async def on_connect(self):
@@ -34,8 +38,7 @@ class SrlBot(pydle.Client):
             return
 
         if target == '#speedrunslive' and source == 'RaceBot':
-            p = re.compile("Race initiated for The Legend of Zelda: A Link to the Past Hacks\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
-            result = p.search(message)
+            result = newroom.search(message)
             if result:
                 if not c.DEBUG:
                     await asyncio.sleep(1)
@@ -44,6 +47,24 @@ class SrlBot(pydle.Client):
                     await self.message(result.group(1), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
                 else:
                     print(f'would have joined {result.group(1)}')
+
+        if target.startswith('#srl-') and source == 'RaceBot':
+            if starting.match(message):
+                srl_id = srl_race_id(target)
+                race = await srl_races.get_srl_race_by_id(srl_id)
+                if race:
+                    if not client.in_channel(target):
+                        await client.join(target)
+                    await client.message(target, f".setgoal {race['goal']}")
+                    await srl_races.delete_srl_race(srl_id)
+
+            # if go.match(message):
+            #     srl_id = srl_race_id(target)
+            #     race = await srl_races.get_srl_race_by_id(srl_id)
+            #     if race:
+            #         # to be used in the future by spoiler races
+            #         print("would have fired something on race start")
+            #         pass
 
         if not message[0] == '$':
             return
@@ -134,8 +155,8 @@ class SrlBot(pydle.Client):
             await join_active_races('alttphacks')
             await process_active_races()
             # schedule.every(1).minutes.do(join_active_races, 'alttphacks')
-            schedule.every(1).minutes.do(process_active_races)
-            await self.join('#srl-pees0')
+            # schedule.every(1).minutes.do(process_active_races)
+            # await self.join('#srl-pees0')
 
 
 async def join_active_races(game):
@@ -184,14 +205,14 @@ async def request_generic(url, method='get', reqparams=None, data=None, header={
                 return await resp.read()
 
 # the actual scheduler loop 
-async def scheduler():
-    while True:
-        await schedule.run_pending()
-        await asyncio.sleep(1)
+# async def scheduler():
+#     while True:
+#         await schedule.run_pending()
+#         await asyncio.sleep(1)
 
 if __name__ == '__main__':
     client = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
     loop = asyncio.get_event_loop()
     loop.create_task(orm.create_pool(loop))
-    loop.create_task(scheduler())
+    # loop.create_task(scheduler())
     client.run('irc.speedrunslive.com')
