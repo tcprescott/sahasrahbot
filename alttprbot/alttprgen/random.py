@@ -1,16 +1,17 @@
-from .weights import weights
 import random
 import pyz3r
+import os
+import aiofiles
+import yaml
 from config import Config as c
 
 async def generate_random_game(logic='NoGlitches', weightset='weighted', tournament=True):
+    basename = os.path.basename(f'{weightset}.yaml')
     try:
-        if weightset == 'casual':
-            o = weights['friendly']
-        else:
-            o = weights[weightset]
-    except KeyError:
-        raise Exception('Invalid weightset chosen.')
+        async with aiofiles.open(os.path.join("weights", basename)) as f:
+            o = yaml.load(await f.read(), Loader=yaml.FullLoader)
+    except FileNotFoundError:
+        return False, False
 
     settings={
         "glitches": get_random_option(o['glitches_required']),

@@ -1,5 +1,5 @@
 ---
-goal_name: inverted
+goal_name: enemizer open
 customizer: false
 settings:
   goal: ganon
@@ -7,17 +7,17 @@ settings:
     pool: normal
     functionality: normal
   lang: en
-  mode: inverted
+  mode: open
   hints: 'off'
   weapons: randomized
   crystals:
     ganon: '7'
     tower: '7'
   enemizer:
-    boss_shuffle: none
+    boss_shuffle: random
     enemy_damage: default
     enemy_health: default
-    enemy_shuffle: none
+    enemy_shuffle: random
   glitches: none
   spoilers: false
   entrances: none

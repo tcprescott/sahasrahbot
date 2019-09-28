@@ -1,7 +1,6 @@
 ---
 goal_name: open keysanity nologic
 customizer: false
-study_minutes: 15
 settings:
   goal: ganon
   item:

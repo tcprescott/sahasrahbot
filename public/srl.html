@@ -1,23 +1,35 @@
 <html>
-<head><title>SahasrahBot</title></head>
+<head>
+    <title>SahasrahBot</title>
+</head>
 <body>
-<h1>Supported Commands</h1>
-<h2>$preset</h2>
-<p>Use this command in the SRL race room.</p>
-<p>This allows you to generate a game using a pre-defined combination of settings.</p>
-<p>Example: <pre>$preset open</pre></p>
-<p>Currently supported presets can be found <a href="https://github.com/tcprescott/alttpr-discord-bot/tree/master/presets">on the project github.</a>.  The preset name will be the name of the file without the .yaml extension.</p>
-<p>You can append "--hints" to the command to enable hints.  All presets have hints disabled by default.  This only applies to non-customizer presets!</p>
-<h2>$random</h2>
-<p>Use this command in an SRL race room.</p>
-<p>This allows you to generate a game with random settings.  You can specify a weightset (<a href="https://github.com/tcprescott/alttpr-discord-bot/blob/master/alttprbot/alttprgen/weights.py">list of weightsets</a>) as an argument.  Default is "weighted".</p>
-<p>Example: <pre>$random weighted</pre></p>
-<h2>$spoiler</h2>
-<p>Not yet implemented.</p>
-<h2>$joinroom</h2>
-<p>Use this in #speedrunslive channel to force SahasrahBot to join the race room.</p>
-<p>Example: <pre>$joinroom #srl-abc12</pre></p>
-<h2>$help</h2>
-<p>Shows this help.</p>
+    <h1>Supported Commands</h1>
+    <h2>$preset</h2>
+        <p>Use this command in the SRL race room.</p>
+        <p>This allows you to generate a game using a pre-defined combination of settings.</p>
+        <p>Example: <pre>$preset open</pre></p>
+        <p>Currently supported presets can be found <a href="https://github.com/tcprescott/alttpr-discord-bot/tree/master/presets">on the project github.</a>.  The preset name will be the name of the file without the .yaml extension.</p>
+        <p>You can append "--hints" to the command to enable hints.  All presets have hints disabled by default.  This only applies to non-customizer presets!</p>
+    <h2>$random</h2>
+        <p>Use this command in an SRL race room.</p>
+        <p>Currently supported weights can be found <a href="https://github.com/tcprescott/alttpr-discord-bot/tree/master/weights">on the project github.</a>.  The preset name will be the name of the file without the .yaml extension.</p><p>Example: <pre>$random weighted</pre></p>
+    <h2>$spoiler</h2>
+        <p>Use this command in the SRL race room.</p>
+        <p>This allows you to generate a spoiler race game using a pre-defined combination of settings.</p>
+        <p>Currently supported presets can be found <a href="https://github.com/tcprescott/alttpr-discord-bot/tree/master/presets">on the project github.</a>.  The preset name will be the name of the file without the .yaml extension.</p>
+        <p>Example: <pre>$spoiler open</pre></p>
+        <p>SahasrahBot, after the start of the race in SRL, will automatically begin counting down 15 minutes (this will be adjustable in an update).</p>
+        <p>This bot will inform you when you're ready to begin racing.</p>\
+    <h2>$custom</h2>
+        <p>Not yet implemented.  This will allow a racer to roll a game using a customizer save by providing a URL to the save file.</p>
+    <h2>$cancel</h2>
+        <p>Use this command in the SRL race room.</p>
+        <p>This command cancells an existing race.  This m
+        <p>Use this command in the SRL race room.</p>ust be done before rerolling.</p>
+    <h2>$joinroom</h2>
+        <p>Use this in #speedrunslive channel to force SahasrahBot to join the race room.</p>
+        <p>Example: <pre>$joinroom #srl-abc12</pre></p>
+    <h2>$help</h2>
+        <p>Gives you a link to this help page.</p>
 </body>
 </html>

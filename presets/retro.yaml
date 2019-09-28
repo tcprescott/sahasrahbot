@@ -1,5 +1,5 @@
 ---
-goal_name: inverted
+goal_name: retro
 customizer: false
 settings:
   goal: ganon
@@ -7,7 +7,7 @@ settings:
     pool: normal
     functionality: normal
   lang: en
-  mode: inverted
+  mode: retro
   hints: 'off'
   weapons: randomized
   crystals:

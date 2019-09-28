@@ -5,14 +5,17 @@ import shlex
 import time
 import json
 
-import aioschedule as schedule
+# import aioschedule as schedule
 import pydle
 import aiohttp
+import ircmessage
+import math
 
 from alttprbot.alttprgen.preset import get_preset
+from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.alttprgen.random import generate_random_game
-from alttprbot.alttprgen.weights import weights
 from alttprbot.database import srl_races
+from alttprbot.database import spoiler_races
 from alttprbot.util import orm
 from config import Config as c
 
@@ -30,6 +33,7 @@ class SrlBot(pydle.Client):
     # source = sendering of the message
     # message = the message, duh
     async def on_message(self, target, source, message):
+        # print messages to stdout for debugging purposes.  We should eventually set this up so it writes to a log file or something.
         print('MESSAGE: ' + target + ' - ' + source +
               ' - ' + message)  # dumb debugging message
 
@@ -37,6 +41,7 @@ class SrlBot(pydle.Client):
         if source == c.SRL_NICK:
             return
 
+        # next lets react to any stuff we're interested in hearing from RaceBot
         if target == '#speedrunslive' and source == 'RaceBot':
             result = newroom.search(message)
             if result:
@@ -58,89 +63,141 @@ class SrlBot(pydle.Client):
                     await client.message(target, f".setgoal {race['goal']}")
                     await srl_races.delete_srl_race(srl_id)
 
-            # if go.match(message):
-            #     srl_id = srl_race_id(target)
-            #     race = await srl_races.get_srl_race_by_id(srl_id)
-            #     if race:
-            #         # to be used in the future by spoiler races
-            #         print("would have fired something on race start")
-            #         pass
+            if go.match(message):
+                srl_id = srl_race_id(target)
+                race = await spoiler_races.get_spoiler_race_by_id(srl_id)
+                if race:
+                    # to be used in the future by spoiler races
+                    await self.message(target, 'Sending spoiler log...')
+                    await self.message(target, '---------------')
+                    await self.message(target, f"This race\'s spoiler log: {race['spoiler_url']}")
+                    await self.message(target, '---------------')
+                    await self.message(target, 'GLHF! :mudora:')
+                    await countdown_timer(
+                        ircbot=self,
+                        duration_in_seconds=900,
+                        srl_channel=target,
+                        loop=loop,
+                        beginmessage=True,
+                    )
+                    await spoiler_races.delete_spoiler_race(srl_id)
 
-        if not message[0] == '$':
-            return
 
-        split_msg = ['sb'] + shlex.split(message)
+        # Handle any messages that start with $
+        if message[0] == '$':
+            split_msg = ['sb'] + shlex.split(message)
 
-        parser = argparse.ArgumentParser()
-        parser.add_argument('base', type=str)
+            parser = argparse.ArgumentParser()
+            parser.add_argument('base', type=str)
 
-        subparsers = parser.add_subparsers(dest="command")
+            subparsers = parser.add_subparsers(dest="command")
 
-        parser_preset = subparsers.add_parser('$preset')
-        parser_preset.add_argument('preset')
-        parser_preset.add_argument('--hints', action='store_true')
+            parser_preset = subparsers.add_parser('$preset')
+            parser_preset.add_argument('preset')
+            parser_preset.add_argument('--hints', action='store_true')
 
-        parser_spoiler = subparsers.add_parser('$spoiler')
+            parser_custom = subparsers.add_parser('$custom')
 
-        parser_random = subparsers.add_parser('$random')
-        parser_random.add_argument('weightset', nargs='?', default="weighted")
+            parser_spoiler = subparsers.add_parser('$spoiler')
+            parser_spoiler.add_argument('preset')
+            # parser_spoiler.add_argument('--studyperiod', type=int)
 
-        parser_join = subparsers.add_parser('$joinroom')
-        parser_join.add_argument('channel')
+            parser_random = subparsers.add_parser('$random')
+            parser_random.add_argument('weightset', nargs='?', default="weighted")
 
-        parser_leave = subparsers.add_parser('$leave')
+            parser_join = subparsers.add_parser('$joinroom')
+            parser_join.add_argument('channel')
 
-        parser_vt = subparsers.add_parser('$vt')
+            parser_leave = subparsers.add_parser('$leave')
 
-        parser_echo = subparsers.add_parser('$echo')
-        parser_echo.add_argument('message')
+            parser_cancel = subparsers.add_parser('$cancel')
 
-        parser_help = subparsers.add_parser('$help')
+            parser_vt = subparsers.add_parser('$vt')
 
-        try:
-            args = parser.parse_args(split_msg)
-        except argparse.ArgumentError as e:
-            await self.message(e)
-        # print(args)
+            parser_echo = subparsers.add_parser('$echo')
+            parser_echo.add_argument('message')
 
-        if args.command == '$preset' and target.startswith('#srl-'):
-            await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-            srl_id = srl_race_id(target)
-            seed, goal_name = await get_preset(args.preset, hints=args.hints)
-            if not seed:
-                await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
-                return
-            goal = f"vt8 randomizer - {goal_name}"
-            code = await seed.code()
-            await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-            await srl_races.insert_srl_race(srl_id, goal)
+            parser_help = subparsers.add_parser('$help')
 
-        if args.command == '$random' and target.startswith('#srl-'):
-            await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-            srl_id = srl_race_id(target)
-            seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
-            code = await seed.code()
-            goal = f"vt8 randomizer - random {args.weightset}"
-            await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-            await srl_races.insert_srl_race(srl_id, goal)
+            try:
+                args = parser.parse_args(split_msg)
+            except argparse.ArgumentError as e:
+                await self.message(e)
+            # print(args)
 
-        if args.command == '$spoiler' and target.startswith('#srl-'):
-            await self.message(target, "Not yet implemented.  Sorry!")
+            if args.command == '$preset' and target.startswith('#srl-'):
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+                srl_id = srl_race_id(target)
+                race = await srl_races.get_srl_race_by_id(srl_id)
+                if race:
+                    await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
+                    return
+                seed, preset_dict = await get_preset(args.preset, hints=args.hints, spoilers_ongen=False)
+                goal_name = preset_dict['goal_name']
+                if not seed:
+                    await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                    return
+                goal = f"vt8 randomizer - {goal_name}"
+                code = await seed.code()
+                await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                await srl_races.insert_srl_race(srl_id, goal)
 
-        if args.command == '$help' and target.startswith('#srl-'):
-            await self.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+            if args.command == '$random' and target.startswith('#srl-'):
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+                srl_id = srl_race_id(target)
+                race = await srl_races.get_srl_race_by_id(srl_id)
+                if race:
+                    await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
+                    return
+                seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
+                code = await seed.code()
+                goal = f"vt8 randomizer - random {args.weightset}"
+                await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                await srl_races.insert_srl_race(srl_id, goal)
 
-        if args.command == '$joinroom':
-            await self.join(args.channel)
+            if args.command == '$custom' and target.startswith('#srl-'):
+                await self.message(target, "Not yet implemented.  Sorry!")
 
-        if args.command == '$leave' and target.startswith('#srl-'):
-            await self.part(target)
+            if args.command == '$spoiler' and target.startswith('#srl-'):
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+                srl_id = srl_race_id(target)
+                race = await srl_races.get_srl_race_by_id(srl_id)
+                if race:
+                    await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
+                    return
+                seed, preset_dict, spoiler_log_url = await generate_spoiler_game(args.preset)
+                goal_name = preset_dict['goal_name']
+                if not seed:
+                    await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                    return
+                goal = f"vt8 randomizer - spoiler {goal_name}"
+                code = await seed.code()
+                await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A countdown timer at that time will begin.")
+                await srl_races.insert_srl_race(srl_id, goal)
+                await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url)
 
-        if args.command == '$vt' and target.startswith('#srl-'):
-            await self.message(target, "You summon VT, he looks around confused and curses your next game with bad RNG.")
+            if args.command == '$cancel' and target.startswith('#srl-'):
+                srl_id = srl_race_id(target)
+                await srl_races.delete_srl_race(srl_id)
+                await spoiler_races.delete_spoiler_race(srl_id)
+                await self.message(target, "Current race cancelled.")
+                await self.message(target, f".setgoal new race")
 
-        if args.command == '$echo':
-            await self.message(source, args.message)
+            if args.command == '$help' and target.startswith('#srl-'):
+                await self.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+
+            if args.command == '$joinroom':
+                await self.join(args.channel)
+
+            if args.command == '$leave' and target.startswith('#srl-'):
+                await self.part(target)
+
+            if args.command == '$vt' and target.startswith('#srl-'):
+                await self.message(target, "You summon VT, he looks around confused and curses your next game with bad RNG.")
+
+            if args.command == '$echo':
+                await self.message(source, args.message)
 
     # target = you
     # source = sendering of the message
@@ -203,6 +260,32 @@ async def request_generic(url, method='get', reqparams=None, data=None, header={
                 return json.loads(await resp.text())
             elif returntype == 'binary':
                 return await resp.read()
+
+
+async def countdown_timer(ircbot, duration_in_seconds, srl_channel, loop, beginmessage=False):
+    reminders = [1800,1500,1200,900,600,300,120,60,30,10,9,8,7,6,5,4,3,2,1]
+    start_time = loop.time()
+    end_time = loop.time() + duration_in_seconds
+    while True:
+        # print(datetime.datetime.now())
+        timeleft = math.ceil(start_time - loop.time() + duration_in_seconds)
+        # print(timeleft)
+        if timeleft in reminders:
+            minutes = math.floor(timeleft/60)
+            seconds = math.ceil(timeleft % 60)
+            if minutes == 0 and seconds > 10:
+                msg = f'{seconds} second(s) remain!'
+            elif minutes == 0 and seconds <= 10:
+                msg = ircmessage.style(f"{seconds} second(s) remain!", fg='green', bold=True)
+            else:
+                msg = f'{minutes} minute(s), {seconds} seconds remain!'
+            await ircbot.message(srl_channel, msg)
+            reminders.remove(timeleft)
+        if loop.time() >= end_time:
+            if beginmessage:
+                await ircbot.message(srl_channel, ircmessage.style('Log study has finished.  Begin racing!', fg='red', bold=True))
+            break
+        await asyncio.sleep(.5)
 
 # the actual scheduler loop 
 # async def scheduler():
