@@ -158,7 +158,7 @@ settings:
         L1Sword: 0
         L3Sword: 0
         L4Sword: 0
-        Nothing: 0
+        Nothing: 1
         RedMail: 0
         BigKeyA1: 0
         BigKeyA2: 1
@@ -217,7 +217,7 @@ settings:
         BookOfMudora: 1
         BowAndArrows: 0
         MirrorShield: 0
-        PegasusBoots: 1
+        PegasusBoots: 0
         PieceOfHeart: 24
         QuarterMagic: 0
         RedBoomerang: 1
