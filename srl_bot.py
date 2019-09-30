@@ -14,6 +14,9 @@ import math
 from alttprbot.alttprgen.preset import get_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.alttprgen.random import generate_random_game
+
+from alttprbot.smz3gen.preset import get_preset as smz3_get_preset
+
 from alttprbot.database import srl_races
 from alttprbot.database import spoiler_races
 from alttprbot.util import orm
@@ -21,8 +24,12 @@ from config import Config as c
 
 starting = re.compile("\\x034\\x02The race will begin in 10 seconds!\\x03\\x02")
 go = re.compile("\\x034\\x02GO!\\x03\\x02")
-newroom = re.compile("Race initiated for The Legend of Zelda: A Link to the Past Hacks\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
+newroom = re.compile("Race initiated for (.*)\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
 
+srl_game_whitelist = [
+    'The Legend of Zelda: A Link to the Past Hacks',
+    'A Link to the Past & Super Metroid Combo Randomizer'
+]
 
 class SrlBot(pydle.Client):
     async def on_connect(self):
@@ -44,14 +51,14 @@ class SrlBot(pydle.Client):
         # next lets react to any stuff we're interested in hearing from RaceBot
         if target == '#speedrunslive' and source == 'RaceBot':
             result = newroom.search(message)
-            if result:
+            if result and result.group(1) in srl_game_whitelist:
                 if not c.DEBUG:
                     await asyncio.sleep(1)
-                    await self.join(result.group(1))
+                    await self.join(result.group(2))
                     await asyncio.sleep(60)
-                    await self.message(result.group(1), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
+                    await self.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
                 else:
-                    print(f'would have joined {result.group(1)}')
+                    print(f'would have joined {result.group(2)}')
 
         if target.startswith('#srl-') and source == 'RaceBot':
             if starting.match(message):
@@ -67,7 +74,6 @@ class SrlBot(pydle.Client):
                 srl_id = srl_race_id(target)
                 race = await spoiler_races.get_spoiler_race_by_id(srl_id)
                 if race:
-                    # to be used in the future by spoiler races
                     await self.message(target, 'Sending spoiler log...')
                     await self.message(target, '---------------')
                     await self.message(target, f"This race\'s spoiler log: {race['spoiler_url']}")
@@ -126,55 +132,83 @@ class SrlBot(pydle.Client):
             # print(args)
 
             if args.command == '$preset' and target.startswith('#srl-'):
-                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
                 srl_id = srl_race_id(target)
+                srl = await get_race(srl_id)
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
                 race = await srl_races.get_srl_race_by_id(srl_id)
+
                 if race:
                     await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
                     return
-                seed, preset_dict = await get_preset(args.preset, hints=args.hints, spoilers_ongen=False)
-                goal_name = preset_dict['goal_name']
-                if not seed:
-                    await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+
+                if srl['game']['abbrev'] == 'alttphacks':
+                    seed, preset_dict = await get_preset(args.preset, hints=args.hints, spoilers_ongen=False)
+                    goal_name = preset_dict['goal_name']
+                    if not seed:
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        return
+                    goal = f"vt8 randomizer - {goal_name}"
+                    code = await seed.code()
+                    await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                elif srl['game']['abbrev'] == 'alttpsm':
+                    seed = await smz3_get_preset(args.preset)
+                    goal = 'beat the games'
+                    await self.message(target, f".setgoal {goal} - {args.preset} - {seed.url}")
+                else:
+                    await self.message(target, "This game is not yet supported.")
                     return
-                goal = f"vt8 randomizer - {goal_name}"
-                code = await seed.code()
-                await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+
                 await srl_races.insert_srl_race(srl_id, goal)
 
             if args.command == '$random' and target.startswith('#srl-'):
-                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
                 srl_id = srl_race_id(target)
+                srl = await get_race(srl_id)
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
                 race = await srl_races.get_srl_race_by_id(srl_id)
+
                 if race:
                     await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
                     return
-                seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
-                code = await seed.code()
-                goal = f"vt8 randomizer - random {args.weightset}"
-                await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+
+                if srl['game']['abbrev'] == 'alttphacks':
+                    seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
+                    code = await seed.code()
+                    goal = f"vt8 randomizer - random {args.weightset}"
+                    await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                else:
+                    await self.message(target, "This game is not yet supported.")
+                    return
+
                 await srl_races.insert_srl_race(srl_id, goal)
 
             if args.command == '$custom' and target.startswith('#srl-'):
                 await self.message(target, "Not yet implemented.  Sorry!")
 
             if args.command == '$spoiler' and target.startswith('#srl-'):
-                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
                 srl_id = srl_race_id(target)
+                srl = await get_race(srl_id)
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
                 race = await srl_races.get_srl_race_by_id(srl_id)
+
                 if race:
                     await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
                     return
-                seed, preset_dict, spoiler_log_url = await generate_spoiler_game(args.preset)
-                goal_name = preset_dict['goal_name']
-                if not seed:
-                    await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+
+                if srl['game']['abbrev'] == 'alttphacks':
+                    seed, preset_dict, spoiler_log_url = await generate_spoiler_game(args.preset)
+                    goal_name = preset_dict['goal_name']
+                    if not seed:
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        return
+                    goal = f"vt8 randomizer - spoiler {goal_name}"
+                    code = await seed.code()
+                    await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                    await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A countdown timer at that time will begin.")
+                    await srl_races.insert_srl_race(srl_id, goal)
+                else:
+                    await self.message(target, "This game is not yet supported.")
                     return
-                goal = f"vt8 randomizer - spoiler {goal_name}"
-                code = await seed.code()
-                await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-                await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A countdown timer at that time will begin.")
-                await srl_races.insert_srl_race(srl_id, goal)
+
                 await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url)
 
             if args.command == '$cancel' and target.startswith('#srl-'):
