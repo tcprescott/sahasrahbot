@@ -101,15 +101,18 @@ class SrlBot(pydle.Client):
             parser_preset = subparsers.add_parser('$preset')
             parser_preset.add_argument('preset')
             parser_preset.add_argument('--hints', action='store_true')
+            parser_preset.add_argument('--silent', action='store_true')
 
             parser_custom = subparsers.add_parser('$custom')
 
             parser_spoiler = subparsers.add_parser('$spoiler')
             parser_spoiler.add_argument('preset')
             # parser_spoiler.add_argument('--studyperiod', type=int)
+            parser_spoiler.add_argument('--silent', action='store_true')
 
             parser_random = subparsers.add_parser('$random')
             parser_random.add_argument('weightset', nargs='?', default="weighted")
+            parser_random.add_argument('--silent', action='store_true')
 
             parser_join = subparsers.add_parser('$joinroom')
             parser_join.add_argument('channel')
@@ -129,7 +132,7 @@ class SrlBot(pydle.Client):
                 args = parser.parse_args(split_msg)
             except argparse.ArgumentError as e:
                 await self.message(e)
-            # print(args)
+            print(args)
 
             if args.command == '$preset' and target.startswith('#srl-'):
                 srl_id = srl_race_id(target)
@@ -149,11 +152,17 @@ class SrlBot(pydle.Client):
                         return
                     goal = f"vt8 randomizer - {goal_name}"
                     code = await seed.code()
-                    await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                    if args.silent:
+                        await self.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+                    else:
+                        await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
                 elif srl['game']['abbrev'] == 'alttpsm':
                     seed = await smz3_get_preset(args.preset)
                     goal = 'beat the games'
-                    await self.message(target, f".setgoal {goal} - {args.preset} - {seed.url}")
+                    if args.silent:
+                        await self.message(target, f"{goal} - {args.preset} - {seed.url}")
+                    else:
+                        await self.message(target, f".setgoal {goal} - {args.preset} - {seed.url}")
                 else:
                     await self.message(target, "This game is not yet supported.")
                     return
@@ -174,7 +183,10 @@ class SrlBot(pydle.Client):
                     seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
                     code = await seed.code()
                     goal = f"vt8 randomizer - random {args.weightset}"
-                    await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                    if args.silent:
+                        await self.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+                    else:
+                        await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
                 else:
                     await self.message(target, "This game is not yet supported.")
                     return
@@ -202,7 +214,10 @@ class SrlBot(pydle.Client):
                         return
                     goal = f"vt8 randomizer - spoiler {goal_name}"
                     code = await seed.code()
-                    await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                    if args.silent:
+                        await self.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+                    else:
+                        await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
                     await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A countdown timer at that time will begin.")
                     await srl_races.insert_srl_race(srl_id, goal)
                 else:
