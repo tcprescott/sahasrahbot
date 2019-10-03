@@ -7,6 +7,7 @@ from pyz3r.customizer import customizer
 from ..util import embed_formatter
 
 from ..alttprgen.random import generate_random_game
+from ..alttprgen.mystery import generate_mystery_game
 from ..alttprgen.preset import get_preset
 from ..alttprgen.spoilers import generate_spoiler_game
 
@@ -78,6 +79,13 @@ class AlttprGen(commands.Cog):
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
+        await ctx.send(embed=embed)
+
+    @seedgen.command()
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    async def mystery(self, ctx, weightset='weighted', tournament: bool = True):
+        seed = await generate_mystery_game(weightset=weightset, tournament=tournament)
+        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Mystery Race Game")
         await ctx.send(embed=embed)
 
 

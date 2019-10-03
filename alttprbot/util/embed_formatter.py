@@ -107,44 +107,53 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
         title=name,
         description=notes,
         color=discord.Colour.dark_red())
-    embed.add_field(
-        name='Item Placement',
-        value="**Glitches Required:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
-            logic=seed.data['spoiler']['meta']['logic'],
-            item_placement=settings_map['item_placement'][seed.data['spoiler']['meta']['item_placement']],
-            dungeon_items=settings_map['dungeon_items'][seed.data['spoiler']['meta']['dungeon_items']],
-            accessibility=settings_map['accessibility'][seed.data['spoiler']['meta']['accessibility']],
-        ),
-        inline=True)
 
-    embed.add_field(
-        name='Goal',
-        value="**Goal:** {goal}\n**Open Tower:** {tower}\n**Ganon Vulnerable:** {ganon}".format(
-            goal=settings_map['goals'][seed.data['spoiler']['meta']['goal']],
-            tower=seed.data['spoiler']['meta']['entry_crystals_tower'],
-            ganon=seed.data['spoiler']['meta']['entry_crystals_ganon'],
-        ),
-        inline=True)
-    embed.add_field(
-        name='Gameplay',
-        value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Hints:** {hints}".format(
-            mode=settings_map['world_state'][seed.data['spoiler']['meta']['mode']],
-            entrance="None" if not 'shuffle' in seed.data['spoiler']['meta'] else settings_map['entrance_shuffle'][seed.data['spoiler']['meta']['shuffle']],
-            boss=settings_map['boss_shuffle'][seed.data['spoiler']['meta']['enemizer.boss_shuffle']],
-            enemy=settings_map['enemy_shuffle'][seed.data['spoiler']['meta']['enemizer.enemy_shuffle']],
-            hints=seed.data['spoiler']['meta']['hints']
-        ),
-        inline=True)
-    embed.add_field(
-        name='Difficulty',
-        value="**Swords:** {weapons}\n**Item Pool:** {pool}\n**Item Functionality:** {functionality}\n**Enemy Damage:** {damage}\n**Enemy Health:** {health}".format(
-            weapons=settings_map['weapons'][seed.data['spoiler']['meta']['weapons']],
-            pool=settings_map['item_pool'][seed.data['spoiler']['meta']['item_pool']],
-            functionality=settings_map['item_functionality'][seed.data['spoiler']['meta']['item_functionality']],
-            damage=settings_map['enemy_damage'][seed.data['spoiler']['meta']['enemizer.enemy_damage']],
-            health=settings_map['enemy_health'][seed.data['spoiler']['meta']['enemizer.enemy_health']],
-        ),
-        inline=True)
+    if 'mystery' in seed.data['spoiler']['meta'] and seed.data['spoiler']['meta']['mystery']:
+        embed.add_field(
+            name='Item Placement',
+            value="**Glitches Required:** {logic}\n".format(
+                logic=seed.data['spoiler']['meta']['logic'],
+            ),
+            inline=True)
+    else:
+        embed.add_field(
+            name='Item Placement',
+            value="**Glitches Required:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
+                logic=seed.data['spoiler']['meta']['logic'],
+                item_placement=settings_map['item_placement'][seed.data['spoiler']['meta']['item_placement']],
+                dungeon_items=settings_map['dungeon_items'][seed.data['spoiler']['meta']['dungeon_items']],
+                accessibility=settings_map['accessibility'][seed.data['spoiler']['meta']['accessibility']],
+            ),
+            inline=True)
+
+        embed.add_field(
+            name='Goal',
+            value="**Goal:** {goal}\n**Open Tower:** {tower}\n**Ganon Vulnerable:** {ganon}".format(
+                goal=settings_map['goals'][seed.data['spoiler']['meta']['goal']],
+                tower=seed.data['spoiler']['meta']['entry_crystals_tower'],
+                ganon=seed.data['spoiler']['meta']['entry_crystals_ganon'],
+            ),
+            inline=True)
+        embed.add_field(
+            name='Gameplay',
+            value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Hints:** {hints}".format(
+                mode=settings_map['world_state'][seed.data['spoiler']['meta']['mode']],
+                entrance="None" if not 'shuffle' in seed.data['spoiler']['meta'] else settings_map['entrance_shuffle'][seed.data['spoiler']['meta']['shuffle']],
+                boss=settings_map['boss_shuffle'][seed.data['spoiler']['meta']['enemizer.boss_shuffle']],
+                enemy=settings_map['enemy_shuffle'][seed.data['spoiler']['meta']['enemizer.enemy_shuffle']],
+                hints=seed.data['spoiler']['meta']['hints']
+            ),
+            inline=True)
+        embed.add_field(
+            name='Difficulty',
+            value="**Swords:** {weapons}\n**Item Pool:** {pool}\n**Item Functionality:** {functionality}\n**Enemy Damage:** {damage}\n**Enemy Health:** {health}".format(
+                weapons=settings_map['weapons'][seed.data['spoiler']['meta']['weapons']],
+                pool=settings_map['item_pool'][seed.data['spoiler']['meta']['item_pool']],
+                functionality=settings_map['item_functionality'][seed.data['spoiler']['meta']['item_functionality']],
+                damage=settings_map['enemy_damage'][seed.data['spoiler']['meta']['enemizer.enemy_damage']],
+                health=settings_map['enemy_health'][seed.data['spoiler']['meta']['enemizer.enemy_health']],
+            ),
+            inline=True)
 
 
     if emojis:
