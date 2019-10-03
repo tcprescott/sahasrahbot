@@ -110,11 +110,9 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
 
     if 'mystery' in seed.data['spoiler']['meta'] and seed.data['spoiler']['meta']['mystery']:
         embed.add_field(
-            name='Item Placement',
-            value="**Glitches Required:** {logic}\n".format(
-                logic=seed.data['spoiler']['meta']['logic'],
-            ),
-            inline=True)
+            name='Mystery Game',
+            value="No meta information is available for this game.",
+            inline=False)
     else:
         embed.add_field(
             name='Item Placement',
