@@ -17,6 +17,7 @@ discordbot.load_extension("alttprbot.cogs.misc")
 discordbot.load_extension("alttprbot.cogs.daily")
 discordbot.load_extension("alttprbot.cogs.voicerole")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
+discordbot.load_extension("alttprbot.cogs.smz3gen")
 
 if not c.DEBUG:
     @discordbot.event

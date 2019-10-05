@@ -16,6 +16,7 @@ from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.alttprgen.random import generate_random_game
 
 from alttprbot.smz3gen.preset import get_preset as smz3_get_preset
+from alttprbot.smz3gen.spoilers import generate_spoiler_game as smz3_generate_spoiler_game
 
 from alttprbot.database import srl_races
 from alttprbot.database import spoiler_races
@@ -60,8 +61,8 @@ class SrlBot(pydle.Client):
                 else:
                     print(f'would have joined {result.group(2)}')
 
-        if target.startswith('#srl-') and source == 'RaceBot':
-            if starting.match(message):
+        if target.startswith('#srl-') and (source == 'RaceBot' or source == 'synack'):
+            if starting.match(message) or message=='$test starting':
                 srl_id = srl_race_id(target)
                 race = await srl_races.get_srl_race_by_id(srl_id)
                 if race:
@@ -70,7 +71,7 @@ class SrlBot(pydle.Client):
                     await client.message(target, f".setgoal {race['goal']}")
                     await srl_races.delete_srl_race(srl_id)
 
-            if go.match(message):
+            if go.match(message) or message=='$test go':
                 srl_id = srl_race_id(target)
                 race = await spoiler_races.get_spoiler_race_by_id(srl_id)
                 if race:
@@ -81,7 +82,7 @@ class SrlBot(pydle.Client):
                     await self.message(target, 'GLHF! :mudora:')
                     await countdown_timer(
                         ircbot=self,
-                        duration_in_seconds=900,
+                        duration_in_seconds=race['studytime'],
                         srl_channel=target,
                         loop=loop,
                         beginmessage=True,
@@ -107,7 +108,7 @@ class SrlBot(pydle.Client):
 
             parser_spoiler = subparsers.add_parser('$spoiler')
             parser_spoiler.add_argument('preset')
-            # parser_spoiler.add_argument('--studyperiod', type=int)
+            parser_spoiler.add_argument('--studytime', type=int)
             parser_spoiler.add_argument('--silent', action='store_true')
 
             parser_random = subparsers.add_parser('$random')
@@ -213,18 +214,31 @@ class SrlBot(pydle.Client):
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                         return
                     goal = f"vt8 randomizer - spoiler {goal_name}"
+                    studytime = 900 if not args.studytime else args.studytime 
                     code = await seed.code()
                     if args.silent:
                         await self.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
                     else:
                         await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-                    await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A countdown timer at that time will begin.")
-                    await srl_races.insert_srl_race(srl_id, goal)
+                    await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
+                elif srl['game']['abbrev'] == 'alttpsm':
+                    seed, spoiler_log_url = await smz3_generate_spoiler_game(args.preset)
+                    if not seed:
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        return
+                    goal = f"spoiler beat the games"
+                    studytime = 1500 if not args.studytime else args.studytime 
+                    if args.silent:
+                        await self.message(target, f"{goal} - {seed.url}")
+                    else:
+                        await self.message(target, f".setgoal {goal} - {seed.url}")
+                    await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
                 else:
                     await self.message(target, "This game is not yet supported.")
                     return
 
-                await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url)
+                await srl_races.insert_srl_race(srl_id, goal)
+                await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url, studytime)
 
             if args.command == '$cancel' and target.startswith('#srl-'):
                 srl_id = srl_race_id(target)

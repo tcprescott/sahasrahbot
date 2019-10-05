@@ -5,28 +5,28 @@ import logging
 def debug(info_str: str):
     caller_mod_name = inspect.getmodule(inspect.stack()[1][0]).__name__
     logging.getLogger(
-        'alttpr-discord-bot').debug('[{0}] {1}'.format(caller_mod_name, info_str))
+        'sahasrahbot').debug('[{0}] {1}'.format(caller_mod_name, info_str))
 
 
 def info(info_str: str):
     caller_mod_name = inspect.getmodule(inspect.stack()[1][0]).__name__
     logging.getLogger(
-        'alttpr-discord-bot').info('[{0}] {1}'.format(caller_mod_name, info_str))
+        'sahasrahbot').info('[{0}] {1}'.format(caller_mod_name, info_str))
 
 
 def warning(error_str: str):
     caller_mod_name = inspect.getmodule(inspect.stack()[1][0]).__name__
     logging.getLogger(
-        'alttpr-discord-bot').warning('[{0}] {1}'.format(caller_mod_name, error_str))
+        'sahasrahbot').warning('[{0}] {1}'.format(caller_mod_name, error_str))
 
 
 def error(error_str: str):
     caller_mod_name = inspect.getmodule(inspect.stack()[1][0]).__name__
-    logging.getLogger('alttpr-discord-bot').error(
+    logging.getLogger('sahasrahbot').error(
         '[{0}] {1}'.format(caller_mod_name, error_str), exc_info=True)
 
 
 def critical(error_str: str):
     caller_mod_name = inspect.getmodule(inspect.stack()[1][0]).__name__
-    logging.getLogger('alttpr-discord-bot').critical(
+    logging.getLogger('sahasrahbot').critical(
         '[{0}] {1}'.format(caller_mod_name, error_str), exc_info=True)

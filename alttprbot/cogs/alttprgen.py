@@ -72,7 +72,7 @@ class AlttprGen(commands.Cog):
 
     @seedgen.command()
     async def weightlist(self, ctx):
-        await ctx.send('Current weights of this bot can be found at https://github.com/tcprescott/alttpr-discord-bot/tree/master/weights')
+        await ctx.send('Current weights of this bot can be found at https://github.com/tcprescott/sahasrahbot/tree/master/weights')
 
     @seedgen.command()
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)

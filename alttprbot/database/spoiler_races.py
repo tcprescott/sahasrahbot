@@ -1,9 +1,9 @@
 from ..util import orm
 
-async def insert_spoiler_race(srl_id, spoiler_url):
+async def insert_spoiler_race(srl_id, spoiler_url, studytime=900):
     await orm.execute(
-        'INSERT INTO spoiler_races(srl_id, spoiler_url) VALUES (%s,%s) ON DUPLICATE KEY UPDATE spoiler_url = %s;',
-        [srl_id, spoiler_url, spoiler_url]
+        'INSERT INTO spoiler_races(srl_id, spoiler_url, studytime) VALUES (%s,%s,%s);',
+        [srl_id, spoiler_url, studytime]
     )
 
 async def delete_spoiler_race(srl_id):
