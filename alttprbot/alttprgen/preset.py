@@ -36,7 +36,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers_ongen=False):
     if 'shuffle_prize_packs' in preset_dict and preset_dict['shuffle_prize_packs'] and preset_dict['customizer']:
         p = ['0','1','2','3','4','5','6']
         random.shuffle(p)
-        print(p)
+        # print(p)
 
         packs = {}
         packs[p[0]] = preset_dict['settings']['drops']['0']
@@ -53,7 +53,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers_ongen=False):
 
         preset_dict['settings']['drops'] = packs
 
-    print(json.dumps(preset_dict['settings'], indent=4))
+    # print(json.dumps(preset_dict['settings'], indent=4))
 
     seed = await pyz3r.alttpr(
         customizer=preset_dict['customizer'],

@@ -133,7 +133,7 @@ class SrlBot(pydle.Client):
                 args = parser.parse_args(split_msg)
             except argparse.ArgumentError as e:
                 await self.message(e)
-            print(args)
+            # print(args)
 
             if args.command == '$preset' and target.startswith('#srl-'):
                 srl_id = srl_race_id(target)

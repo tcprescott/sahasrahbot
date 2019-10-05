@@ -8,7 +8,7 @@ parser.add_argument('customizer_save')
 parser.add_argument('preset_name')
 parser.add_argument('goal_name')
 args = parser.parse_args()
-print(args)
+# print(args)
 
 with open(args.customizer_save) as f:
     customizer_settings = json.loads(f.read())
