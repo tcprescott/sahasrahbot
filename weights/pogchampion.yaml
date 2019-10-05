@@ -1,21 +1,21 @@
-description: A friendlier weightset.  Designed for those who don't want something something extreme.
+description: The poggiest of PogChampions.
 glitches_required:
   none: 100
   overworld_glitches: 0
   major_glitches: 0
   no_logic: 0
 item_placement:
-  basic: 30
-  advanced: 70
+  basic: 25
+  advanced: 75
 dungeon_items:
-  standard: 50
-  mc: 10
-  mcs: 10
+  standard: 20
+  mc: 20
+  mcs: 30
   full: 30
 accessibility:
-  items: 75
-  locations: 0
-  none: 25
+  items: 50
+  locations: 10
+  none: 40
 goals:
   ganon: 40
   fast_ganon: 20
@@ -48,44 +48,44 @@ world_state:
   inverted: 20
   retro: 10
 entrance_shuffle:
-  none: 80
+  none: 30
   simple: 10
-  restricted: 5
-  full: 5
-  crossed: 0
-  insanity: 0
+  restricted: 10
+  full: 15
+  crossed: 20
+  insanity: 15
 boss_shuffle:
-  none: 60
-  simple: 10
-  full: 10
+  none: 40
+  simple: 20
+  full: 20
   random: 20
 enemy_shuffle:
-  none: 80
-  shuffled: 10
-  random: 10
+  none: 40
+  shuffled: 30
+  random: 30
 hints:
-  'on': 70
-  'off': 30
+  'on': 50
+  'off': 50
 weapons:
-  randomized: 40
-  assured: 40
-  vanilla: 5
-  swordless: 5
+  randomized: 20
+  assured: 30
+  vanilla: 15
+  swordless: 30
 item_pool:
-  normal: 80
-  hard: 20
-  expert: 0
+  normal: 50
+  hard: 35
+  expert: 15
   crowd_control: 0
 item_functionality:
-  normal: 80
-  hard: 20
-  expert: 0
+  normal: 50
+  hard: 35
+  expert: 15
 enemy_damage:
-  default: 80
-  shuffled: 10
-  random: 10
+  default: 40
+  shuffled: 30
+  random: 30
 enemy_health:
-  default: 90
-  easy: 10
-  hard: 0
-  expert: 0
+  default: 30
+  easy: 20
+  hard: 30
+  expert: 20
