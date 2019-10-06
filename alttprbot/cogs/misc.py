@@ -35,7 +35,7 @@ class Misc(commands.Cog):
         url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
         link = f"http://alttp.mymm1.com/holyimage/{game}-{slug}.html"
         await ctx.send(
-            f"{image['title']}\n\n{url}\n\nLink: <{link}>"
+            f"**{image['title']}**\n\n{url}\n\nLink: <{link}>"
         )
 
 
