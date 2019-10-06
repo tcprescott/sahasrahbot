@@ -1,6 +1,11 @@
 import discord
 from discord.ext import commands
 
+import aiocache
+import aiohttp
+import json
+
+from urllib.parse import urljoin
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -19,6 +24,25 @@ class Misc(commands.Cog):
     async def crc32(self, ctx):
         await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
+    @commands.command()
+    async def holyimage(self, ctx, slug, game='z3r'):
+        images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
+        i = images[game]
+        image = next(item for item in i if item["slug"] == slug)
+        url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
+        link = f"http://alttp.mymm1.com/holyimage/{game}-{slug}.html"
+        await ctx.send(
+            f"{image['title']}\n\n{url}\n\nLink: <{link}>"
+        )
+
+
+@aiocache.cached(ttl=3600, cache=aiocache.SimpleMemoryCache)
+async def get_json(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            text = await resp.read()
+
+    return json.loads(text)
 
 def setup(bot):
     bot.add_cog(Misc(bot))
