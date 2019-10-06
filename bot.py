@@ -12,6 +12,7 @@ discordbot = commands.Bot(
 )
 
 discordbot.load_extension("alttprbot.cogs.admin")
+discordbot.load_extension("alttprbot.cogs.moderation")
 discordbot.load_extension("alttprbot.cogs.role")
 discordbot.load_extension("alttprbot.cogs.misc")
 discordbot.load_extension("alttprbot.cogs.daily")
