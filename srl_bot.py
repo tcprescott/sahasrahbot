@@ -5,6 +5,8 @@ import shlex
 import time
 import json
 
+import sys
+
 # import aioschedule as schedule
 import pydle
 import aiohttp
@@ -94,7 +96,7 @@ class SrlBot(pydle.Client):
         if message[0] == '$':
             split_msg = ['sb'] + shlex.split(message)
 
-            parser = argparse.ArgumentParser()
+            parser = SrlArgumentParser()
             parser.add_argument('base', type=str)
 
             subparsers = parser.add_subparsers(dest="command")
@@ -132,8 +134,10 @@ class SrlBot(pydle.Client):
             try:
                 args = parser.parse_args(split_msg)
             except argparse.ArgumentError as e:
-                await self.message(e)
-            # print(args)
+                if not target == '#speedrunslive':
+                    await self.message(source, e.message)
+                return
+            print(args)
 
             if args.command == '$preset' and target.startswith('#srl-'):
                 srl_id = srl_race_id(target)
@@ -355,6 +359,30 @@ async def countdown_timer(ircbot, duration_in_seconds, srl_channel, loop, beginm
 #     while True:
 #         await schedule.run_pending()
 #         await asyncio.sleep(1)
+
+class SrlArgumentParser(argparse.ArgumentParser):    
+    def _get_action_from_name(self, name):
+        """Given a name, get the Action instance registered with this parser.
+        If only it were made available in the ArgumentError object. It is 
+        passed as it's first arg...
+        """
+        container = self._actions
+        if name is None:
+            return None
+        for action in container:
+            if '/'.join(action.option_strings) == name:
+                return action
+            elif action.metavar == name:
+                return action
+            elif action.dest == name:
+                return action
+
+    def error(self, message):
+        exc = sys.exc_info()[1]
+        if exc:
+            exc.argument = self._get_action_from_name(exc.argument_name)
+            raise exc
+        # super(SrlArgumentParser, self).error(message)
 
 if __name__ == '__main__':
     client = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
