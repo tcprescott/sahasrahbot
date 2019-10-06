@@ -16,7 +16,7 @@ class Moderation(commands.Cog):
                 if attachment.filename.endswith(('.sfc','.smc')):
                     if await should_delete_message(message.guild.id):
                         await message.delete()
-                        await message.channel.send(f'{message.author.mention} Please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
+                        await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
 
 async def should_delete_message(guild_id):
     deleteroms = await config.get_parameter(guild_id, 'DeleteRoms')
