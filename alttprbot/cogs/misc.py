@@ -28,25 +28,23 @@ class Misc(commands.Cog):
     async def holyimage(self, ctx, slug, game='z3r'):
         images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
         i = images[game]
-        if slug == 'zsnes':
-            image = {
-                    "title": "Don't Use ZSNES",
-                    "slug": "zsnes",
-                    "url": "z3r-zsnes.png"
-                }
-        else:
+
+        try:
+            image = next(item for item in i if item["slug"] == slug)
+        except StopIteration:
             try:
-                image = next(item for item in i if item["slug"] == slug)
+                image = next(item for item in i if item["idx"] == int(slug))
             except StopIteration:
                 raise Exception('That holyimage does not exist.')
+
         url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
-        link = f"http://alttp.mymm1.com/holyimage/{game}-{slug}.html"
+        link = f"http://alttp.mymm1.com/holyimage/{game}-{image['slug']}.html"
         await ctx.send(
             f"**{image['title']}**\n\n{url}\n\nLink: <{link}>"
         )
 
 
-@aiocache.cached(ttl=3600, cache=aiocache.SimpleMemoryCache)
+@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache)
 async def get_json(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
