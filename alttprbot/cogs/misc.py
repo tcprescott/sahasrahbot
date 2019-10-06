@@ -28,7 +28,10 @@ class Misc(commands.Cog):
     async def holyimage(self, ctx, slug, game='z3r'):
         images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
         i = images[game]
-        image = next(item for item in i if item["slug"] == slug)
+        try:
+            image = next(item for item in i if item["slug"] == slug)
+        except StopIteration:
+            raise Exception('That holyimage does not exist.')
         url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
         link = f"http://alttp.mymm1.com/holyimage/{game}-{slug}.html"
         await ctx.send(
