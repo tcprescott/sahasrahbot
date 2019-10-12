@@ -45,10 +45,10 @@ class Tournament(commands.Cog):
         await loadnicks(ctx)
         await ctx.send('Loaded SRL nicks from gsheet.')
 
-        await send_irc_message(f'#srl-{raceid}','NOTICE: The seed for this race will be distributed in 60 seconds.  Please .join if you intend to race.  If you have not joined, you will not receive the seed.')
+        await send_irc_message(raceid,'NOTICE: The seed for this race will be distributed in 60 seconds.  Please .join if you intend to race.  If you have not joined, you will not receive the seed.')
         await ctx.send('Sent .join warning in SRL.')
         if not c.DEBUG: await asyncio.sleep(60)
-        await send_irc_message(f'#srl-{raceid}','The seed is being generated and distributed.  Please standby.')
+        await send_irc_message(raceid,'The seed is being generated and distributed.  Please standby.')
         await ctx.send('Starting seed generation.')
 
         seed, preset_dict = await get_preset('open', hints=False, spoilers_ongen=False)
@@ -62,7 +62,7 @@ class Tournament(commands.Cog):
         await ctx.send(embed=embed)
         
         await self.send_qualifier_dms(ctx, seed, embed, race)
-        await send_irc_message(f'#srl-{raceid}','The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
+        await send_irc_message(raceid,'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
         await gsheet_qualifier(race, num)
         await ctx.send(build_multistream_links(race))
 
@@ -104,7 +104,7 @@ class Tournament(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def sendirc(self, channel, message):
+    async def sendirc(self, ctx, channel, message):
         await send_irc_message(channel, message)
 
     async def send_qualifier_dms(self, ctx, seed, embed, race):
