@@ -1,8 +1,10 @@
 import re
 import asyncio
+import datetime
 
 import discord
 import gspread_asyncio
+import gspread.exceptions
 from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -35,7 +37,7 @@ class Tournament(commands.Cog):
     @commands.command()
     @checks.has_any_channel('testing','console')
     @commands.has_any_role('Admins','Mods')
-    async def startqual(self, ctx, raceid, num):
+    async def startqual(self, ctx, raceid, num: int):
         race = await get_race(raceid)
         if race == {}:
             raise Exception('That race does not exist.')
@@ -61,6 +63,8 @@ class Tournament(commands.Cog):
         
         await self.send_qualifier_dms(ctx, seed, embed, race)
         await send_irc_message(f'#srl-{raceid}','The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
+        await gsheet_qualifier(race, num)
+        await ctx.send(build_multistream_links(race))
 
     @commands.command()
     @checks.has_any_channel('testing','console')
@@ -86,6 +90,22 @@ class Tournament(commands.Cog):
         await ctx.send(embed=embed)
 
         await self.send_qualifier_dms(ctx, seed, embed, race)
+        await gsheet_qualifier(race, num)
+        await ctx.send(build_multistream_links(race))
+
+    @commands.command()
+    @checks.has_any_channel('testing','console')
+    @commands.has_any_role('Admins','Mods')
+    async def qualmulti(self, ctx, raceid):
+        race = await get_race(raceid)
+        if race == {}:
+            raise Exception('That race does not exist.')
+        await ctx.send(build_multistream_links(race))
+
+    @commands.command()
+    @commands.is_owner()
+    async def sendirc(self, channel, message):
+        await send_irc_message(channel, message)
 
     async def send_qualifier_dms(self, ctx, seed, embed, race):
         bad_nicks = []
@@ -140,6 +160,40 @@ async def loadnicks(ctx):
             names='\n'.join(bad_discord_names)
         ))
 
+def build_multistream_links(race):
+    twitchnames = []
+    for entrant in race['entrants']:
+        twitch = race['entrants'][entrant]['twitch']
+        if not twitch=="":
+            twitchnames.append(twitch)
+        
+    chunks = [twitchnames[i * 4:(i + 1) * 4] for i in range((len(twitchnames) + 4 - 1) // 4 )]
+    multi = "Multistream links:\n\n"
+    for chunk in chunks:
+        multi += '<https://multistre.am/{streams}/layout12/>\n'.format(
+            streams='/'.join(chunk)
+        )
+    return multi
+
+async def gsheet_qualifier(race, num):
+    agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
+    agc = await agcm.authorize()
+    wb = await agc.open_by_key(c.TournamentQualifierSheet)
+
+    try:
+        wks = await wb.worksheet(f'Qualifier #{num} - {datetime.datetime.now().date()}')
+        await wks.clear()
+    except gspread.exceptions.WorksheetNotFound:
+        wks = await wb.add_worksheet(title=f'Qualifier #{num} - {datetime.datetime.now().date()}', rows=50, cols=10)
+
+    await wks.append_row(['Nickname','Twitch Stream','Finish Time'])
+
+    for entrant in race['entrants']:
+        if entrant=="JOPEBUSTER":
+            continue
+        twitch = race['entrants'][entrant]['twitch']
+        await wks.append_row([entrant,twitch])
+
 async def get_race(raceid):
     if raceid == "test":
         return {
@@ -182,7 +236,43 @@ async def get_race(raceid):
                         "time": -3,
                         "message": "",
                         "statetext": "Entered",
-                        "twitch": "",
+                        "twitch": "abc123",
+                        "trueskill": "0"
+                    },
+                    "unknownplayer1": {
+                        "displayname": "unknownplayer",
+                        "place": 9994,
+                        "time": -3,
+                        "message": "",
+                        "statetext": "Entered",
+                        "twitch": "sfs",
+                        "trueskill": "0"
+                    },
+                    "unknownplayer2": {
+                        "displayname": "unknownplayer",
+                        "place": 9994,
+                        "time": -3,
+                        "message": "",
+                        "statetext": "Entered",
+                        "twitch": "bbbdf",
+                        "trueskill": "0"
+                    },
+                    "unknownplayer3": {
+                        "displayname": "unknownplayer",
+                        "place": 9994,
+                        "time": -3,
+                        "message": "",
+                        "statetext": "Entered",
+                        "twitch": "ghjjgh",
+                        "trueskill": "0"
+                    },
+                    "unknownplayer4": {
+                        "displayname": "unknownplayer",
+                        "place": 9994,
+                        "time": -3,
+                        "message": "",
+                        "statetext": "Entered",
+                        "twitch": "ilkhjghj",
                         "trueskill": "0"
                     },
                     "JOPEBUSTER": {
