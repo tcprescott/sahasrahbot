@@ -13,4 +13,7 @@ pyz3r >= 4.0.0
 pysmz3 >= 1.0.1
 pyyaml >= 5.1.2
 ircmessage
-oyaml
+Quart
+quart-openapi
+gspread_asyncio
+oauth2client

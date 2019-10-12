@@ -5,7 +5,6 @@ from collections import OrderedDict
 
 import aiofiles
 import pyz3r.misc
-import oyaml as yaml
 
 from config import Config as c
 

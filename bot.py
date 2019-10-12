@@ -12,6 +12,7 @@ discordbot = commands.Bot(
 )
 
 discordbot.load_extension("alttprbot.cogs.admin")
+# discordbot.load_extension("alttprbot.cogs.audit")
 discordbot.load_extension("alttprbot.cogs.moderation")
 discordbot.load_extension("alttprbot.cogs.role")
 discordbot.load_extension("alttprbot.cogs.misc")
@@ -19,6 +20,7 @@ discordbot.load_extension("alttprbot.cogs.daily")
 discordbot.load_extension("alttprbot.cogs.voicerole")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
 discordbot.load_extension("alttprbot.cogs.smz3gen")
+discordbot.load_extension("alttprbot.cogs.tournament")
 
 if not c.DEBUG:
     @discordbot.event
