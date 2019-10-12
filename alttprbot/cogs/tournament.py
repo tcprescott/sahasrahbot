@@ -103,11 +103,20 @@ class Tournament(commands.Cog):
         await ctx.send(build_multistream_links(race))
 
     @commands.command()
+    @checks.has_any_channel('testing','console')
+    @commands.has_any_role('Admins','Mods')
+    async def checkreg(self, ctx, raceid):
+        race = await get_race(raceid)
+        if race == {}:
+            raise Exception('That race does not exist.')
+        await self.send_qualifier_dms(ctx, embed=None, race=race, checkonly=True)
+
+    @commands.command()
     @commands.is_owner()
     async def sendirc(self, ctx, channel, message):
         await send_irc_message(channel, message)
 
-    async def send_qualifier_dms(self, ctx, seed, embed, race):
+    async def send_qualifier_dms(self, ctx, embed, race, checkonly=False):
         bad_nicks = []
         unable_to_dm = []
 
@@ -122,7 +131,7 @@ class Tournament(commands.Cog):
                     user = self.bot.get_user(discord_user['discord_user_id'])
                     if user is not None:
                         try:
-                            await user.send(embed=embed)
+                            if not checkonly: await user.send(embed=embed)
                         except:
                             unable_to_dm.append(entrant)
                     else:
