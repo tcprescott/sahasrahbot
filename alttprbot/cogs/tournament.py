@@ -61,7 +61,7 @@ class Tournament(commands.Cog):
             emojis=self.bot.emojis)
         await ctx.send(embed=embed)
         
-        await self.send_qualifier_dms(ctx, seed, embed, race)
+        await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(await seed.code()))
         await send_irc_message(raceid,'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
         await gsheet_qualifier(race, num)
         await ctx.send(build_multistream_links(race))
@@ -89,7 +89,7 @@ class Tournament(commands.Cog):
             emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-        await self.send_qualifier_dms(ctx, seed, embed, race)
+        await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(await seed.code()))
         await gsheet_qualifier(race, num)
         await ctx.send(build_multistream_links(race))
 
@@ -109,6 +109,7 @@ class Tournament(commands.Cog):
         race = await get_race(raceid)
         if race == {}:
             raise Exception('That race does not exist.')
+        await loadnicks(ctx)
         await self.send_qualifier_dms(ctx, embed=None, race=race, checkonly=True)
 
     @commands.command()
@@ -116,7 +117,7 @@ class Tournament(commands.Cog):
     async def sendirc(self, ctx, channel, message):
         await send_irc_message(channel, message)
 
-    async def send_qualifier_dms(self, ctx, embed, race, checkonly=False):
+    async def send_qualifier_dms(self, ctx, embed, race, checkonly=False, url=None, code=None):
         bad_nicks = []
         unable_to_dm = []
 
@@ -147,6 +148,10 @@ class Tournament(commands.Cog):
                 id=race['id'],
                 dms='\n'.join(unable_to_dm),
             ))
+        if len(unable_to_dm) == 0 and len(bad_nicks) == 0 and checkonly:
+            await ctx.send(f"All users joined to the race in #srl-{race['id']} are able to be resolved.")
+        if (len(unable_to_dm) > 0 or len(bad_nicks) > 0) and not checkonly:
+            await ctx.send(f"Please send this to those who did not receive the DMs.\n```Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n\n{url}\n{code}```")
 
 async def loadnicks(ctx):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
