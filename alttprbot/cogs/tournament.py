@@ -52,7 +52,7 @@ class Tournament(commands.Cog):
         await self.run_qual(ctx, raceid, hashid=hashid)
 
     @commands.command()
-    @checks.has_any_channel('testing','console')
+    @checks.has_any_channel('testing','console','qual-bot')
     @commands.has_any_role('Admins','Mods')
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.channel)
     async def finishqual(self, ctx, raceid):
