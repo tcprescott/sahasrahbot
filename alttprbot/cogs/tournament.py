@@ -29,13 +29,13 @@ class Tournament(commands.Cog):
             return False
 
     @commands.command()
-    @checks.has_any_channel('testing','console')
+    @checks.has_any_channel('testing','console','qual-bot')
     @commands.has_any_role('Admins','Mods')
     async def loadnicks(self, ctx):
         await loadnicks(ctx)
 
     @commands.command()
-    @checks.has_any_channel('testing','console')
+    @checks.has_any_channel('testing','console','qual-bot')
     @commands.has_any_role('Admins','Mods')
     async def startqual(self, ctx, raceid, num: int):
         race = await get_race(raceid)
@@ -67,7 +67,7 @@ class Tournament(commands.Cog):
         await ctx.send(build_multistream_links(race))
 
     @commands.command()
-    @checks.has_any_channel('testing','console')
+    @checks.has_any_channel('testing','console','qual-bot')
     @commands.has_any_role('Admins','Mods')
     async def resendqual(self, ctx, raceid, num, hash):
         race = await get_race(raceid)
@@ -94,7 +94,7 @@ class Tournament(commands.Cog):
         await ctx.send(build_multistream_links(race))
 
     @commands.command()
-    @checks.has_any_channel('testing','console')
+    @checks.has_any_channel('testing','console','qual-bot')
     @commands.has_any_role('Admins','Mods')
     async def qualmulti(self, ctx, raceid):
         race = await get_race(raceid)
@@ -103,7 +103,7 @@ class Tournament(commands.Cog):
         await ctx.send(build_multistream_links(race))
 
     @commands.command()
-    @checks.has_any_channel('testing','console')
+    @checks.has_any_channel('testing','console','qual-bot')
     @commands.has_any_role('Admins','Mods')
     async def checkreg(self, ctx, raceid):
         race = await get_race(raceid)
