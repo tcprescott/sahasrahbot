@@ -121,12 +121,12 @@ class Tournament(commands.Cog):
 
     async def run_qual(self, ctx, raceid, hashid):
         date = datetime.datetime.now(timezone('US/Eastern')).date()
-        race = await get_race(raceid)
-        if race == {}:
+        race2 = await get_race(raceid)
+        if race2 == {}:
             raise Exception('That race does not exist.')
-        if not race['game']['abbrev'] == 'alttphacks':
+        if not race2['game']['abbrev'] == 'alttphacks':
             raise Exception('That is not an alttphacks game.')
-        if not race['state'] == 1:
+        if not race2['state'] == 1:
             raise Exception('The race is not open for entry.')
 
         await loadnicks(ctx)
@@ -135,6 +135,7 @@ class Tournament(commands.Cog):
         await send_irc_message(raceid,'NOTICE: The seed for this race will be distributed in 60 seconds.  Please .join if you intend to race.  If you have not joined, you will not receive the seed.')
         await ctx.send('Sent .join warning in SRL.')
         if not c.DEBUG: await asyncio.sleep(60)
+        race = await get_race(raceid)
         await send_irc_message(raceid,'The seed is being generated and distributed.  Please standby.')
         await ctx.send('Starting seed generation.')
 
