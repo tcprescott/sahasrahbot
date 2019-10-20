@@ -122,7 +122,7 @@ class SrlBot(pydle.Client):
             parser_random.add_argument('weightset', nargs='?', default="weighted")
             parser_random.add_argument('--silent', action='store_true')
 
-            parser_mystery = subparsers.add_parser('$random')
+            parser_mystery = subparsers.add_parser('$mystery')
             parser_mystery.add_argument('weightset', nargs='?', default="weighted")
             parser_mystery.add_argument('--silent', action='store_true')
 
