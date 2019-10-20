@@ -13,15 +13,20 @@ import aiohttp
 import ircmessage
 import math
 
-from alttprbot.alttprgen.preset import get_preset
-from alttprbot.alttprgen.spoilers import generate_spoiler_game
-from alttprbot.alttprgen.random import generate_random_game
+from alttprbot.alttprgen import preset, spoilers, random, mystery
 
-from alttprbot.smz3gen.preset import get_preset as smz3_get_preset
-from alttprbot.smz3gen.spoilers import generate_spoiler_game as smz3_generate_spoiler_game
+# from alttprbot.alttprgen.preset import get_preset
+# from alttprbot.alttprgen.spoilers import generate_spoiler_game
+# from alttprbot.alttprgen.random import generate_random_game
+# from alttprbot.alttprgen.mystery import generate_mystery_game
 
-from alttprbot.database import srl_races
-from alttprbot.database import spoiler_races
+from alttprbot.smz3gen import preset as smz3_preset
+from alttprbot.smz3gen import spoilers as smz3_spoilers
+
+# from alttprbot.smz3gen.preset import get_preset as smz3_get_preset
+# from alttprbot.smz3gen.spoilers import generate_spoiler_game as smz3_generate_spoiler_game
+
+from alttprbot.database import srl_races, spoiler_races
 from alttprbot.util import orm
 from config import Config as c
 
@@ -117,6 +122,10 @@ class SrlBot(pydle.Client):
             parser_random.add_argument('weightset', nargs='?', default="weighted")
             parser_random.add_argument('--silent', action='store_true')
 
+            parser_mystery = subparsers.add_parser('$random')
+            parser_mystery.add_argument('weightset', nargs='?', default="weighted")
+            parser_mystery.add_argument('--silent', action='store_true')
+
             parser_join = subparsers.add_parser('$joinroom')
             parser_join.add_argument('channel')
 
@@ -150,7 +159,7 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed, preset_dict = await get_preset(args.preset, hints=args.hints, spoilers_ongen=False)
+                    seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers_ongen=False)
                     goal_name = preset_dict['goal_name']
                     if not seed:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
@@ -162,7 +171,7 @@ class SrlBot(pydle.Client):
                     else:
                         await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
                 elif srl['game']['abbrev'] == 'alttpsm':
-                    seed = await smz3_get_preset(args.preset)
+                    seed = await smz3_preset.get_preset(args.preset)
                     goal = 'beat the games'
                     if args.silent:
                         await self.message(target, f"{goal} - {args.preset} - {seed.url}")
@@ -185,9 +194,33 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed = await generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
+                    seed = await random.generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
                     code = await seed.code()
                     goal = f"vt8 randomizer - random {args.weightset}"
+                    if args.silent:
+                        await self.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+                    else:
+                        await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                else:
+                    await self.message(target, "This game is not yet supported.")
+                    return
+
+                await srl_races.insert_srl_race(srl_id, goal)
+
+            if args.command == '$mystery' and target.startswith('#srl-'):
+                srl_id = srl_race_id(target)
+                srl = await get_race(srl_id)
+                await self.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+                race = await srl_races.get_srl_race_by_id(srl_id)
+
+                if race:
+                    await self.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
+                    return
+
+                if srl['game']['abbrev'] == 'alttphacks':
+                    seed = await mystery.generate_mystery_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
+                    code = await seed.code()
+                    goal = f"vt8 randomizer - mystery {args.weightset}"
                     if args.silent:
                         await self.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
                     else:
@@ -212,7 +245,7 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed, preset_dict, spoiler_log_url = await generate_spoiler_game(args.preset)
+                    seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
                     goal_name = preset_dict['goal_name']
                     if not seed:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
@@ -226,7 +259,7 @@ class SrlBot(pydle.Client):
                         await self.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
                     await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
                 elif srl['game']['abbrev'] == 'alttpsm':
-                    seed, spoiler_log_url = await smz3_generate_spoiler_game(args.preset)
+                    seed, spoiler_log_url = await smz3_spoilers.generate_spoiler_game(args.preset)
                     if not seed:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                         return
