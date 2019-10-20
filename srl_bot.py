@@ -218,7 +218,7 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed = await mystery.generate_mystery_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
+                    seed = await mystery.generate_mystery_game(weightset=args.weightset, tournament=True)
                     code = await seed.code()
                     goal = f"vt8 randomizer - mystery {args.weightset}"
                     if args.silent:
