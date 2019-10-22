@@ -17,3 +17,4 @@ Quart
 quart-openapi
 gspread_asyncio
 oauth2client
+jishaku
