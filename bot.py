@@ -1,6 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands
+import importlib
 
 # from alttprbot import reactionrole
 from alttprbot.util import orm
@@ -21,6 +22,9 @@ discordbot.load_extension("alttprbot.cogs.voicerole")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
 discordbot.load_extension("alttprbot.cogs.smz3gen")
 discordbot.load_extension("alttprbot.cogs.tournament")
+
+if importlib.util.find_spec('jishaku'):
+    discordbot.load_extension('jishaku')
 
 if not c.DEBUG:
     @discordbot.event
