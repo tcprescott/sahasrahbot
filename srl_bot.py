@@ -1,32 +1,23 @@
 import argparse
 import asyncio
+import json
+import math
 import re
 import shlex
-import time
-import json
-
 import sys
+import time
 
-# import aioschedule as schedule
-import pydle
 import aiohttp
 import ircmessage
-import math
+# import aioschedule as schedule
+import pydle
+from quart import abort, jsonify, request
+from quart_openapi import Pint, Resource
 
-from alttprbot.alttprgen import preset, spoilers, random, mystery
-
-# from alttprbot.alttprgen.preset import get_preset
-# from alttprbot.alttprgen.spoilers import generate_spoiler_game
-# from alttprbot.alttprgen.random import generate_random_game
-# from alttprbot.alttprgen.mystery import generate_mystery_game
-
+from alttprbot.alttprgen import mystery, preset, random, spoilers
+from alttprbot.database import spoiler_races, srl_races
 from alttprbot.smz3gen import preset as smz3_preset
 from alttprbot.smz3gen import spoilers as smz3_spoilers
-
-# from alttprbot.smz3gen.preset import get_preset as smz3_get_preset
-# from alttprbot.smz3gen.spoilers import generate_spoiler_game as smz3_generate_spoiler_game
-
-from alttprbot.database import srl_races, spoiler_races
 from alttprbot.util import orm
 from config import Config as c
 
@@ -144,7 +135,7 @@ class SrlBot(pydle.Client):
                 args = parser.parse_args(split_msg)
             except argparse.ArgumentError as e:
                 if not target == '#speedrunslive':
-                    await self.message(source, e.message)
+                    await self.message(target, e.message)
                 return
             print(args)
 
@@ -419,8 +410,6 @@ class SrlArgumentParser(argparse.ArgumentParser):
 
 # small restful API server running locally so my other bots can send messages
 
-from quart_openapi import Pint, Resource
-from quart import request, jsonify, abort
 app = Pint(__name__, title='Srl Bot API')
 
 @app.route('/api/message')
