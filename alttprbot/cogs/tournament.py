@@ -65,7 +65,8 @@ class Tournament(commands.Cog):
         race = await get_race(raceid)
         if race == {}:
             raise Exception('That race does not exist.')
-        await ctx.send(build_multistream_links(race))
+        for multi in build_multistream_links(race):
+            await ctx.send(multi)
 
     @commands.command()
     @checks.has_any_channel('testing','console','qual-bot')
@@ -120,7 +121,7 @@ class Tournament(commands.Cog):
             await ctx.send(f"Please send this to those who did not receive the DMs.\n```Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n\n{url}\n{code}```")
 
     async def run_qual(self, ctx, raceid, hashid):
-        date = datetime.datetime.now(timezone('US/Eastern')).date()
+        date = datetime.datetime.now(timezone('US/Pacific')).date()
         race2 = await get_race(raceid)
         if race2 == {}:
             raise Exception('That race does not exist.')
@@ -158,10 +159,11 @@ class Tournament(commands.Cog):
         await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(await seed.code()))
         await send_irc_message(raceid,'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
         await gsheet_qualifier_start(race=race, date=date)
-        await ctx.send(build_multistream_links(race))
+        for multi in build_multistream_links(race):
+            await ctx.send(multi)
 
     async def finish_qual(self, ctx, raceid):
-        date = datetime.datetime.now(timezone('US/Eastern')).date()
+        date = datetime.datetime.now(timezone('US/Pacific')).date()
         race = await get_race(raceid, complete=True)
         if race == {}:
             raise Exception('That race does not exist.')
@@ -205,11 +207,9 @@ def build_multistream_links(race):
             twitchnames.append(twitch)
         
     chunks = [twitchnames[i * 4:(i + 1) * 4] for i in range((len(twitchnames) + 4 - 1) // 4 )]
-    multi = "Multistream links:\n\n"
+    multi = []
     for chunk in chunks:
-        multi += '<https://multistre.am/{streams}/layout12/>\n'.format(
-            streams='/'.join(chunk)
-        )
+        multi.append('<https://multistre.am/{streams}/layout12/>\n'.format(streams='/'.join(chunk)))
     return multi
 
 
@@ -218,30 +218,34 @@ async def gsheet_qualifier_start(race, date):
     agc = await agcm.authorize()
     wb = await agc.open_by_key(c.TournamentQualifierSheet)
 
+    raceid = race['id']
+
     try:
-        wks = await wb.worksheet(f'Qualifier - {date}')
+        wks = await wb.worksheet(f'Qualifier - {date} - {raceid}')
         await wks.clear()
     except gspread.exceptions.WorksheetNotFound:
-        wks = await wb.add_worksheet(title=f'Qualifier - {date}', rows=50, cols=10)
+        wks = await wb.add_worksheet(title=f'Qualifier - {date} - {raceid}', rows=50, cols=10)
 
-    await wks.append_row(['Place', 'Nickname','Twitch Stream','Finish Time','Score'])
+    await wks.append_row(['Place', 'Nickname','Twitch Stream','Finish Time','Score','Notes'])
 
     for entrant in race['entrants']:
         if entrant=="JOPEBUSTER":
             continue
         twitch = race['entrants'][entrant]['twitch']
-        await wks.append_row([9999,entrant,twitch])
+        await wks.append_row([9999,entrant,twitch,'','=IF(ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)>105,105,IF(ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)<0,0,ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)))'], value_input_option='USER_ENTERED')
 
 async def gsheet_qualifier_finish(race, date):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
     agc = await agcm.authorize()
     wb = await agc.open_by_key(c.TournamentQualifierSheet)
 
+    raceid = race['id']
+
     try:
-        wks = await wb.worksheet(f'Qualifier - {date}')
+        wks = await wb.worksheet(f'Qualifier - {date} - {raceid}')
     except gspread.exceptions.WorksheetNotFound:
         await gsheet_qualifier_start(race, date)
-        wks = await wb.worksheet(f'Qualifier - {date}')
+        wks = await wb.worksheet(f'Qualifier - {date} - {raceid}')
 
     for idx, row in enumerate(await wks.get_all_records()):
         entrant = race['entrants'][row['Nickname']]
