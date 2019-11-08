@@ -24,6 +24,7 @@ from config import Config as c
 starting = re.compile("\\x034\\x02The race will begin in 10 seconds!\\x03\\x02")
 go = re.compile("\\x034\\x02GO!\\x03\\x02")
 newroom = re.compile("Race initiated for (.*)\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
+runnerdone = re.compile("(.*) (has forfeited from the race\.|has finished in .* place with a time of [0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.)")
 
 srl_game_whitelist = [
     'The Legend of Zelda: A Link to the Past Hacks',
@@ -71,6 +72,17 @@ class SrlBot(pydle.Client):
 
             if go.match(message) or message=='$test go':
                 srl_id = srl_race_id(target)
+
+                await request_json_post(
+                    'http://localhost:5001/api/srl/start',
+                    data = {
+                        'auth': c.InternalApiToken,
+                        'raceid': srl_id
+                    },
+                    returntype=json
+                )
+
+                # spoilers
                 race = await spoiler_races.get_spoiler_race_by_id(srl_id)
                 if race:
                     await self.message(target, 'Sending spoiler log...')
@@ -86,6 +98,17 @@ class SrlBot(pydle.Client):
                         beginmessage=True,
                     )
                     await spoiler_races.delete_spoiler_race(srl_id)
+
+            result = runnerdone.search(message)
+            if result:
+                await request_json_post(
+                    'http://localhost:5001/api/srl/finish',
+                    data = {
+                        'auth': c.InternalApiToken,
+                        'nick': result.group(1)
+                    },
+                    returntype=json
+                )
 
 
         # Handle any messages that start with $
@@ -352,6 +375,15 @@ async def request_generic(url, method='get', reqparams=None, data=None, header={
             elif returntype == 'binary':
                 return await resp.read()
 
+async def request_json_post(url, data, auth=None, returntype='text'):
+    async with aiohttp.ClientSession(auth=auth, raise_for_status=True) as session:
+        async with session.post(url=url, json=data, auth=auth) as resp:
+            if returntype == 'text':
+                return await resp.text()
+            elif returntype == 'json':
+                return json.loads(await resp.text())
+            elif returntype == 'binary':
+                return await resp.read()
 
 async def countdown_timer(ircbot, duration_in_seconds, srl_channel, loop, beginmessage=False):
     reminders = [1800,1500,1200,900,600,300,120,60,30,10,9,8,7,6,5,4,3,2,1]
@@ -430,6 +462,5 @@ if __name__ == '__main__':
     loop.create_task(orm.create_pool(loop))
 
     loop.create_task(client.connect('irc.speedrunslive.com'))
-    loop.create_task(client.handle_forever())
     loop.create_task(app.run(host='127.0.0.1', port=5000, loop=loop))
     loop.run_forever()

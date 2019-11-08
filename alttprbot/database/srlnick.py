@@ -12,3 +12,10 @@ async def get_discord_id(srl_nick):
         [srl_nick]
     )
     return results if len(results) > 0 else False
+
+async def get_srl_nick(discord_user_id):
+    results = await orm.select(
+        'SELECT * from srlnick where discord_user_id=%s;',
+        [discord_user_id]
+    )
+    return results if len(results) > 0 else False

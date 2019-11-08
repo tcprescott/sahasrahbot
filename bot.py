@@ -6,6 +6,7 @@ import traceback
 
 # from alttprbot import reactionrole
 from alttprbot.util import orm
+from alttprbot.api.app import app
 
 from config import Config as c
 
@@ -23,6 +24,7 @@ discordbot.load_extension("alttprbot.cogs.voicerole")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
 discordbot.load_extension("alttprbot.cogs.smz3gen")
 discordbot.load_extension("alttprbot.cogs.tournament")
+discordbot.load_extension("alttprbot.cogs.srl")
 
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
@@ -84,4 +86,5 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.create_task(orm.create_pool(loop))
     loop.create_task(discordbot.start(c.DISCORD_TOKEN))
+    loop.create_task(app.run(host='127.0.0.1', port=5001, loop=loop))
     loop.run_forever()
