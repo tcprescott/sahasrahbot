@@ -248,7 +248,10 @@ async def gsheet_qualifier_finish(race, date):
         wks = await wb.worksheet(f'Qualifier - {date} - {raceid}')
 
     for idx, row in enumerate(await wks.get_all_records()):
-        entrant = race['entrants'][row['Nickname']]
+        try:
+            entrant = race['entrants'][row['Nickname']]
+        except KeyError:
+            continue
         await wks.update_cell(idx+2, 4, entrant['time'])
         await wks.update_cell(idx+2, 1, entrant['place'])
 
