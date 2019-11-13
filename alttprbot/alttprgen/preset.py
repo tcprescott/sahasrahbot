@@ -9,7 +9,7 @@ import yaml
 from config import Config as c
 
 
-async def get_preset(preset, hints=False, nohints=False, spoilers_ongen=False):
+async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
     # make sure someone isn't trying some path traversal shennaniganons
     basename = os.path.basename(f'{preset}.yaml')
     try:
@@ -30,8 +30,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers_ongen=False):
             preset_dict['settings']['hints'] = 'off'
 
     preset_dict['settings']['tournament'] = True
-    preset_dict['settings']['spoilers_ongen'] = spoilers_ongen
-    preset_dict['settings']['spoilers'] = False
+    preset_dict['settings']['spoilers'] = spoilers
 
     if 'shuffle_prize_packs' in preset_dict and preset_dict['shuffle_prize_packs'] and preset_dict['customizer']:
         p = ['0','1','2','3','4','5','6']

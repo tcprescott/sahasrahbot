@@ -173,7 +173,7 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers_ongen=False)
+                    seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
                     goal_name = preset_dict['goal_name']
                     if not seed:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")

@@ -24,7 +24,7 @@ class smz3gen(commands.Cog):
 
     @smz3gen.command()
     async def preset(self, ctx, preset, hints=False):
-        seed, preset_dict = await get_preset(preset, hints=hints, spoilers_ongen=False)
+        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
         goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')

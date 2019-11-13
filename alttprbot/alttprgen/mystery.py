@@ -32,8 +32,7 @@ async def generate_mystery_game(weightset='weighted', tournament=True):
             "functionality": get_random_option(o['item_functionality']),
         },
         "tournament": tournament,
-        "spoilers": False,
-        "mystery": True,
+        "spoilers": "mystery",
         "lang": "en",
         "enemizer": {
             "boss_shuffle": get_random_option(o['boss_shuffle']),
@@ -45,7 +44,10 @@ async def generate_mystery_game(weightset='weighted', tournament=True):
 
     # print(json.dumps(settings, indent=4))
     seed = await pyz3r.alttpr(
-        baseurl='https://mystery.synack.live',
+        baseurl=c.baseurl,
+        seed_baseurl=c.seed_baseurl,
+        username=c.username,
+        password=c.password,
         settings=settings
     )
     return seed

@@ -21,12 +21,11 @@ class AlttprGen(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
-    async def seedgen(self, ctx):
-        if ctx.invoked_subcommand is None:
-            raise Exception('Try providing a valid subcommand.  Use "$help seedgen" for assistance.')
+    @commands.command(hidden=True)
+    async def seedgen(self, ctx, cmd):
+        await ctx.send(f'You can just use ${cmd} from now on!')
 
-    @seedgen.command()
+    @commands.command()
     async def custom(self, ctx, tournament: bool = True):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
@@ -51,9 +50,9 @@ class AlttprGen(commands.Cog):
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-    @seedgen.command()
+    @commands.command()
     async def preset(self, ctx, preset, hints=False):
-        seed, preset_dict = await get_preset(preset, hints=hints, spoilers_ongen=False)
+        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
         goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')
@@ -61,7 +60,7 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
 
-    @seedgen.command()
+    @commands.command()
     async def spoiler(self, ctx, preset):
         seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
@@ -70,18 +69,18 @@ class AlttprGen(commands.Cog):
         await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
 
 
-    @seedgen.command()
+    @commands.command()
     async def weightlist(self, ctx):
         await ctx.send('Current weights of this bot can be found at https://github.com/tcprescott/sahasrahbot/tree/master/weights')
 
-    @seedgen.command()
+    @commands.command()
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
-    @seedgen.command()
+    @commands.command()
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_mystery_game(weightset=weightset, tournament=tournament)

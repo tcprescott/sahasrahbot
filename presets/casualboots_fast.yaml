@@ -296,4 +296,4 @@ settings:
   accessibility: items
   dungeon_items: standard
   item_placement: advanced
-  spoilers_ongen: false
+  spoilers: "off"
