@@ -108,7 +108,7 @@ async def seed_embed(seed, emojis=False, name=False, notes=False):
         description=notes,
         color=discord.Colour.dark_red())
 
-    if 'mystery' in seed.data['spoiler']['meta'] and seed.data['spoiler']['meta']['mystery']:
+    if 'spoilers' in seed.data['spoiler']['meta'] and seed.data['spoiler']['meta']['spoilers'] == "mystery":
         embed.add_field(
             name='Mystery Game',
             value="No meta information is available for this game.",

@@ -12,7 +12,7 @@ from .preset import get_preset
 
 
 async def generate_spoiler_game(preset):
-    seed, preset_dict = await get_preset(preset, hints=False, spoilers_ongen=True)
+    seed, preset_dict = await get_preset(preset, hints=False, spoilers="generate")
     if not seed:
         return False, False, False
     spoiler_log_url = await write_json_to_disk(seed)

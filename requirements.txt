@@ -9,7 +9,7 @@ emoji == 0.5.3
 html5lib == 1.0.1
 PyMySQL == 0.9.2
 pydle >= 0.9.3
-pyz3r >= 4.0.0
+pyz3r >= 4.1.1
 pysmz3 >= 1.0.1
 pyyaml >= 5.1.2
 ircmessage

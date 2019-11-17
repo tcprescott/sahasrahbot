@@ -141,7 +141,7 @@ class Tournament(commands.Cog):
         await ctx.send('Starting seed generation.')
 
         if hashid is None:
-            seed, preset_dict = await get_preset('open', hints=False, spoilers_ongen=False)
+            seed, preset_dict = await get_preset('open', hints=False, spoilers="off")
             if not seed:
                 raise Exception('Could not generate game.')
         else:

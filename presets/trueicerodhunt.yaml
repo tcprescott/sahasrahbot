@@ -487,4 +487,4 @@ settings:
   accessibility: none
   dungeon_items: full
   item_placement: advanced
-  spoilers_ongen: false
+  spoilers: "off"

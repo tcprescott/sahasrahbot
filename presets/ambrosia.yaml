@@ -294,6 +294,6 @@ settings:
   notes: This is a sword-assured standard seed (.casual) where the Uncle will spoil
     the Boots location at the start, and all dungeon bosses are guaranteed to drop
     an item (not a map/compass/key).
-  spoilers_ongen: false
+  spoilers: "off"
   tournament: true
   weapons: assured

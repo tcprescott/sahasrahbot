@@ -301,6 +301,6 @@ settings:
   name: BlitzMode
   notes: 4/4 fast ganon. start with Boots, Activated Flute, Pearl, Mitts, Master Sword,
     Lamp
-  spoilers_ongen: false
+  spoilers: "off"
   tournament: true
   weapons: randomized
