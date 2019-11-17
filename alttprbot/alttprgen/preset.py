@@ -18,16 +18,10 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
     except FileNotFoundError:
         return False, False
 
-    if preset_dict['customizer']:
-        if hints:
-            preset_dict['settings']['custom']['spoil.Hints'] = True
-        elif nohints:
-            preset_dict['settings']['custom']['spoil.Hints'] = False
-    else:
-        if hints:
-            preset_dict['settings']['hints'] = 'on'
-        elif nohints:
-            preset_dict['settings']['hints'] = 'off'
+    if hints:
+        preset_dict['settings']['hints'] = 'on'
+    elif nohints:
+        preset_dict['settings']['hints'] = 'off'
 
     preset_dict['settings']['tournament'] = True
     preset_dict['settings']['spoilers'] = spoilers

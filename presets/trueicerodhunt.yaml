@@ -442,7 +442,6 @@ settings:
         BottleWithGreenPotion: 0
     canOWYBA: false
     canBombJump: false
-    spoil.Hints: false
     canBootsClip: false
     canBunnySurf: false
     canWaterWalk: false
@@ -488,3 +487,4 @@ settings:
   dungeon_items: full
   item_placement: advanced
   spoilers: "off"
+  hints: "off"

@@ -200,7 +200,6 @@ settings:
     rom.timerMode: 'off'
     rom.timerStart: ''
     spoil.BootsLocation: false
-    spoil.Hints: true
   drops:
     '0':
     - Heart
@@ -304,3 +303,4 @@ settings:
   spoilers: "off"
   tournament: true
   weapons: randomized
+  hints: "on"
