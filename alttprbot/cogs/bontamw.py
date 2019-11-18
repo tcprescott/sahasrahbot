@@ -41,6 +41,7 @@ class BontaMultiworld(commands.Cog):
         )
 
     @commands.command()
+    @commands.is_owner()
     async def mwmsg(self, ctx, token, msg):
         await cleanup_procs()
         global multiworlds
