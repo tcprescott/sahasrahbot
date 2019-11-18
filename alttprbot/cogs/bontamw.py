@@ -103,7 +103,7 @@ async def generate_multiworld():
         '--progressive','on',
         '--algorithm','balanced',
         '--shuffle','vanilla',
-        '--rom','/opt/multiworld/Zelda_3_Jap_v1.sfc',
+        '--rom','/opt/multiworld/ROM/Zelda_3_Jap_v1.sfc',
         '--fastmenu','normal',
         '--heartbeep','half',
         '--hints',
