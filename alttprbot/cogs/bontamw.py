@@ -5,6 +5,11 @@ import asyncio
 import string
 import random
 import os
+import asyncio
+
+import time
+import datetime
+import timeit
 
 from config import Config as c
 
@@ -48,6 +53,26 @@ class BontaMultiworld(commands.Cog):
         proc = multiworlds[token]
         proc.stdin.write(bytearray(msg + "\n", 'utf-8'))
         await proc.stdin.drain()
+
+
+    @commands.command()
+    async def mwcountdown(self, ctx, token, sec: int=10):
+        await cleanup_procs()
+        global multiworlds
+        proc = multiworlds[token]
+
+        now=datetime.datetime.now
+        target = now()
+        one_second_later = datetime.timedelta(seconds=1)
+        for remaining in range(sec, 0, -1):
+            target += one_second_later
+            secsrecmaining = datetime.timedelta(seconds=remaining).seconds
+            proc.stdin.write(bytearray(str(secsrecmaining) + "\n", 'utf-8'))
+            await ctx.send(secsrecmaining)
+            await asyncio.sleep((target - now()).total_seconds())
+        
+        await ctx.send("GO!")
+        proc.stdin.write(bytearray("GO!\n", 'utf-8'))
 
 
     @commands.command()
