@@ -24,6 +24,7 @@ discordbot.load_extension("alttprbot.cogs.voicerole")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
 discordbot.load_extension("alttprbot.cogs.smz3gen")
 discordbot.load_extension("alttprbot.cogs.tournament")
+discordbot.load_extension("alttprbot.cogs.tourneyqualifier")
 discordbot.load_extension("alttprbot.cogs.srl")
 discordbot.load_extension("alttprbot.cogs.bontamw")
 
