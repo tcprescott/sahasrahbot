@@ -13,23 +13,27 @@ from ..database import srlnick, config
 
 discordbot = None
 
-class SRL(commands.Cog):
+class Nickname(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         global discordbot
         discordbot = self.bot
 
     @commands.command()
-    async def setsrlnick(self, ctx, nick):
+    async def srl(self, ctx, nick):
         await srlnick.insert_srl_nick(ctx.author.id, nick)
 
     @commands.command()
-    async def getsrlnick(self, ctx):
-        nick = await srlnick.get_srl_nick(ctx.author.id)
+    async def twitch(self, ctx, twitch):
+        await srlnick.insert_twitch_name(ctx.author.id, twitch)
+
+    @commands.command()
+    async def getnick(self, ctx):
+        nick = await srlnick.get_nicknames(ctx.author.id)
         if nick:
-            await ctx.send(f"Your currently registered nickname for SRL is `{nick[0]['srl_nick']}`")
+            await ctx.send(f"Your currently registered nickname for SRL is `{nick[0]['srl_nick']}`\nYour currently registered nickname for Twitch is `{nick[0]['twitch_name']}`")
         else:
-            await ctx.send("You currently do not have a SRL nick registered with this bot.  Use the command `$setsrlnick yournick` to do that!")
+            await ctx.send("You currently do not have any nicknames registered with this bot.  Use the command `$srl yournick` and `$twitch yournick` to do that!")
 
 @app.route('/api/srl/finish', methods=['POST'])
 async def finish():
@@ -82,4 +86,4 @@ async def start():
 
 
 def setup(bot):
-    bot.add_cog(SRL(bot))
+    bot.add_cog(Nickname(bot))

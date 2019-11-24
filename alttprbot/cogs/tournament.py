@@ -4,6 +4,7 @@ import pyz3r
 
 from config import Config as c
 from ..database import config
+from ..database import srlnick
 
 from ..util import checks, embed_formatter, http
 from ..tournament import main
@@ -44,6 +45,21 @@ class Tournament(commands.Cog):
                 await member.send(embed=embed)
             except:
                 await logging_channel.send(f"Unable to send DM to {player['discordTag']}")
+
+    @commands.command()
+    @commands.has_permissions(manage_roles=True)
+    async def loadroles(self, ctx, role: discord.Role, names):
+        namelist = names.splitlines()
+
+        for name in namelist:
+            discord_users = await srlnick.get_discord_id(name)
+            if discord_users is False:
+                continue
+            else:
+                for discord_user in discord_users:
+                    member = ctx.guild.get_member(discord_user['discord_user_id'])
+                    if member is not None:
+                        await member.add_roles(role)
 
 def setup(bot):
     bot.add_cog(Tournament(bot))
