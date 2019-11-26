@@ -5,6 +5,97 @@ import discord
 from discord.ext import commands
 from ..database import srlnick
 from config import Config as c
+import pyz3r
+
+async def get_settings(episodeid, guildid):
+    agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
+    agc = await agcm.authorize()
+    wb = await agc.open_by_key(c.Tournament[guildid]['schedule_sheet'])
+    wks = await wb.get_worksheet(0)
+ 
+    records = await wks.get_all_records()
+    try:
+        return records[episodeid-2]
+    except IndexError:
+        raise Exception('That race does not exist.  Find your match on the schedule at <https://docs.google.com/spreadsheets/d/1qqFiRNXPyMG4B_wpxS-kammIS1Zv5D2fClSSHsPahU4/edit#gid=441409857>.')
+
+async def generate_game(episodeid, guildid):
+    sheet_settings = await get_settings(episodeid, guildid)
+
+    if sheet_settings is None:
+        raise Exception('Episode not found.  Submit settings first.')
+
+    settingsmap = {
+        'Standard': 'standard',
+        'Maps/Compasses': 'mc',
+        'Defeat Ganon': 'ganon',
+        'Fast Ganon': 'fast_ganon',
+        '7/7': '7',
+        '6/6': '6',
+        'Open': 'open',
+        'Randomized': 'randomized',
+        'Assured': 'assured'
+    }
+
+    settings = {
+            "glitches": "none",
+            "item_placement": "advanced",
+            "dungeon_items": settingsmap[sheet_settings['Dungeon Item Shuffle']],
+            "accessibility": "items",
+            "goal": settingsmap[sheet_settings['Goal']],
+            "crystals": {
+                "ganon": settingsmap[sheet_settings['GT/Ganon Crystals']],
+                "tower": settingsmap[sheet_settings['GT/Ganon Crystals']],
+            },
+            "mode": settingsmap[sheet_settings['World State']],
+            "entrances": "none",
+            "hints": "off",
+            "weapons": settingsmap[sheet_settings['Swords']],
+            "item": {
+                "pool": "normal",
+                "functionality": "normal"
+            },
+            "tournament": True,
+            "spoilers": "off",
+            "lang":"en",
+            "enemizer": {
+                "boss_shuffle":"none",
+                "enemy_shuffle":"none",
+                "enemy_damage":"default",
+                "enemy_health":"default"
+            }
+        }
+
+    seed = await pyz3r.alttpr(
+        baseurl=c.baseurl,
+        seed_baseurl=c.seed_baseurl,
+        username=c.username,
+        password=c.password,
+        settings=settings
+    )
+
+    player1 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 1 - Twitch Name '])
+
+    if player1 is False:
+        raise Exception(f"Unable to identify {sheet_settings['Player 1 - Twitch Name ']}")
+
+    player2 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 2 - Twitch Name '])
+
+    if player2 is False:
+        raise Exception(f"Unable to identify {sheet_settings['Player 1 - Twitch Name ']}")
+
+    players = [
+        {
+            "displayName": sheet_settings['Player 1 - Twitch Name '],
+            "discordId": player1[0]['discord_user_id']
+        },
+        {
+            "displayName": sheet_settings['Player 2 - Twitch Name '],
+            "discordId": player2[0]['discord_user_id']
+        }
+    ]
+
+    return seed, sheet_settings['What Game in this Round?'], players
 
 async def loadnicks(ctx):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)

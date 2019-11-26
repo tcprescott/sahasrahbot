@@ -21,7 +21,7 @@ async def get_discord_id(srl_nick):
 
 async def get_discord_id_by_twitch(twitch_name):
     results = await orm.select(
-        'SELECT * from srlnick where srl_nick=%s;',
+        'SELECT * from srlnick where twitch_name=%s;',
         [twitch_name]
     )
     return results if len(results) > 0 else False

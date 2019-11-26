@@ -23,16 +23,22 @@ class Tournament(commands.Cog):
             return False
 
     @commands.command()
-    @commands.is_owner()
+    @commands.has_any_role('Admin','Admins','Bot Admin')
     async def ccloadreg(self, ctx):
         if c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
             await secondary.loadnicks(ctx)
+        else:
+            raise Exception('This command only works for the Challenge Cup.')
 
     @commands.command()
-    @checks.has_any_channel('testing','console','lobby','restreamers','sg-races')
+    @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing')
     async def tourneyrace(self, ctx, episode_number: int):
         if c.Tournament[ctx.guild.id]['tournament'] == 'main':
             seed, game_number, players = await main.generate_game(episode_number, ctx.guild.id)
+        elif c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
+            seed, game_number, players = await secondary.generate_game(episode_number, ctx.guild.id)
+        else:
+            raise Exception('This should not have happened.  Ping Synack.')
 
         embed = await embed_formatter.seed_embed(
             seed,
@@ -43,16 +49,18 @@ class Tournament(commands.Cog):
         logging_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
         await logging_channel.send(embed=embed)
 
-        converter = commands.MemberConverter()
         for player in players:
             try:
-                member = await converter.convert(ctx, player['discordTag'])
+                if not player.get('discordId', '') == '':
+                    member = ctx.guild.get_member(int(player['discordId']))
+                else:
+                    member = await commands.MemberConverter().convert(ctx, player['discordTag'])
                 await member.send(embed=embed)
             except:
                 await logging_channel.send(f"Unable to send DM to {player['discordTag']}")
 
     @commands.command()
-    @commands.has_permissions(manage_roles=True)
+    @commands.has_any_role('Admin','Admins','Bot Admin')
     async def loadroles(self, ctx, role: discord.Role, names):
         namelist = names.splitlines()
 
