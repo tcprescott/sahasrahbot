@@ -57,7 +57,7 @@ class Tournament(commands.Cog):
                     member = await commands.MemberConverter().convert(ctx, player['discordTag'])
                 await member.send(embed=embed)
             except:
-                await logging_channel.send(f"Unable to send DM to {player['discordTag']}")
+                await logging_channel.send(f"Unable to send DM to {player['displayName']}")
 
     @commands.command()
     @commands.has_any_role('Admin','Admins','Bot Admin')
