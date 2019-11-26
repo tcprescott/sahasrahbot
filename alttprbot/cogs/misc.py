@@ -11,17 +11,17 @@ class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='joineddate')
+    @commands.command()
     @commands.is_owner()
-    async def group_list(self, ctx, member: discord.Member):
+    async def joineddate(self, ctx, member: discord.Member):
         await ctx.send(member.joined_at)
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):
         await ctx.send("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
 
-    @commands.command(aliases=['rom'])
-    async def crc32(self, ctx):
+    @commands.command(aliases=['crc32'])
+    async def rom(self, ctx):
         await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
     @commands.command()

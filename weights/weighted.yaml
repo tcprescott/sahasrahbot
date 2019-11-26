@@ -67,8 +67,8 @@ hints:
   'on': 50
   'off': 50
 weapons:
-  randomized: 20
-  assured: 60
+  randomized: 40
+  assured: 40
   vanilla: 15
   swordless: 5
 item_pool:

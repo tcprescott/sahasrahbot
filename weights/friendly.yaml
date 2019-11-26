@@ -1,57 +1,57 @@
-description: A friendlier weightset.  Designed for those who don't want something something extreme.
+description: A friendlier weightset.  Designed for those who don't want something something extreme (or entrance).
 glitches_required:
   none: 100
   overworld_glitches: 0
   major_glitches: 0
   no_logic: 0
 item_placement:
-  basic: 30
-  advanced: 70
+  basic: 33
+  advanced: 67
 dungeon_items:
-  standard: 50
-  mc: 10
-  mcs: 10
-  full: 30
+  standard: 40
+  mc: 15
+  mcs: 15
+  full: 20
 accessibility:
-  items: 75
+  items: 70
   locations: 0
-  none: 25
+  none: 30
 goals:
-  ganon: 40
-  fast_ganon: 20
+  ganon: 35
+  fast_ganon: 40
   dungeons: 10
-  pedestal: 20
-  triforce-hunt: 10
+  pedestal: 10
+  triforce-hunt: 5
 tower_open:
   '0': 5
   '1': 5
   '2': 5
   '3': 5
-  '4': 5
-  '5': 5
-  '6': 5
-  '7': 50
-  random: 15
+  '4': 10
+  '5': 10
+  '6': 20
+  '7': 40
+  random: 0
 ganon_open:
   '0': 5
   '1': 5
   '2': 5
   '3': 5
-  '4': 5
-  '5': 5
-  '6': 5
-  '7': 50
-  random: 15
+  '4': 10
+  '5': 10
+  '6': 20
+  '7': 40
+  random: 0
 world_state:
   standard: 35
   open: 35
   inverted: 20
   retro: 10
 entrance_shuffle:
-  none: 80
-  simple: 10
-  restricted: 5
-  full: 5
+  none: 100
+  simple: 0
+  restricted: 0
+  full: 0
   crossed: 0
   insanity: 0
 boss_shuffle:
@@ -64,12 +64,12 @@ enemy_shuffle:
   shuffled: 10
   random: 10
 hints:
-  'on': 70
-  'off': 30
+  'on': 50
+  'off': 50
 weapons:
   randomized: 40
   assured: 40
-  vanilla: 5
+  vanilla: 10
   swordless: 5
 item_pool:
   normal: 80
@@ -85,7 +85,7 @@ enemy_damage:
   shuffled: 10
   random: 10
 enemy_health:
-  default: 90
+  default: 80
   easy: 10
-  hard: 0
+  hard: 10
   expert: 0
