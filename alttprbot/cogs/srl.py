@@ -20,12 +20,27 @@ class SRL(commands.Cog):
         discordbot = self.bot
 
     @commands.command()
+<<<<<<< Updated upstream:alttprbot/cogs/srl.py
     async def setsrlnick(self, ctx, nick):
         await srlnick.insert_srl_nick(ctx.author.id, nick)
 
     @commands.command()
     async def getsrlnick(self, ctx):
         nick = await srlnick.get_srl_nick(ctx.author.id)
+=======
+    @commands.is_owner()
+    async def srl(self, ctx, nick):
+        await srlnick.insert_srl_nick(ctx.author.id, nick)
+
+    @commands.command()
+    @commands.is_owner()
+    async def twitch(self, ctx, twitch):
+        await srlnick.insert_twitch_name(ctx.author.id, twitch)
+
+    @commands.command()
+    async def getnick(self, ctx):
+        nick = await srlnick.get_nicknames(ctx.author.id)
+>>>>>>> Stashed changes:alttprbot/cogs/nickname.py
         if nick:
             await ctx.send(f"Your currently registered nickname for SRL is `{nick[0]['srl_nick']}`")
         else:

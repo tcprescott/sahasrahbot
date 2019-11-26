@@ -17,6 +17,7 @@ from config import Config as c
 from ..alttprgen.preset import get_preset
 from ..database import srlnick
 from ..util import checks, embed_formatter, http
+from ..tournament import main, secondary
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
@@ -32,10 +33,10 @@ class Tournament(commands.Cog):
             return False
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
-    async def loadnicks(self, ctx):
-        await loadnicks(ctx)
+    @commands.is_owner()
+    async def ccloadreg(self, ctx):
+        if c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
+            await secondary.loadnicks(ctx)
 
     @commands.command()
     @checks.has_any_channel('testing','console','qual-bot')
