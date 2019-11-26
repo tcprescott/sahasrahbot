@@ -7,15 +7,7 @@ from ..database import config
 from ..database import srlnick
 
 from ..util import checks, embed_formatter, http
-<<<<<<< Updated upstream
-<<<<<<< HEAD
 from ..tournament import main, secondary
-=======
-from ..tournament import main
->>>>>>> e8ee61466da50a4564de2195c0f60f4bbb78a223
-=======
-from ..tournament import main, secondary
->>>>>>> Stashed changes
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
@@ -30,20 +22,11 @@ class Tournament(commands.Cog):
         else:
             return False
 
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
     @commands.command()
     @commands.is_owner()
     async def ccloadreg(self, ctx):
         if c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
             await secondary.loadnicks(ctx)
-<<<<<<< Updated upstream
-=======
->>>>>>> e8ee61466da50a4564de2195c0f60f4bbb78a223
-=======
->>>>>>> Stashed changes
 
     @commands.command()
     @checks.has_any_channel('testing','console','lobby','restreamers','sg-races')
