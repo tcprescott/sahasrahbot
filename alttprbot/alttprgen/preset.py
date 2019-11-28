@@ -3,7 +3,7 @@ import random
 import json
 
 import aiofiles
-import pyz3r
+from ..util.alttpr_discord import alttpr
 import yaml
 
 from config import Config as c
@@ -48,12 +48,5 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
 
     # print(json.dumps(preset_dict['settings'], indent=4))
 
-    seed = await pyz3r.alttpr(
-        customizer=preset_dict['customizer'],
-        baseurl=c.baseurl,
-        seed_baseurl=c.seed_baseurl,
-        username=c.username,
-        password=c.password,
-        settings=preset_dict['settings']
-    )
+    seed = await alttpr(customizer=preset_dict['customizer'], settings=preset_dict['settings'])
     return seed, preset_dict

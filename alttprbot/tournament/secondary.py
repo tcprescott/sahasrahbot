@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 from ..database import srlnick
 from config import Config as c
-import pyz3r
+from ..util.alttpr_discord import alttpr
 
 async def get_settings(episodeid, guildid):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
@@ -65,13 +65,7 @@ async def generate_game(episodeid, guildid):
             }
         }
 
-    seed = await pyz3r.alttpr(
-        baseurl=c.baseurl,
-        seed_baseurl=c.seed_baseurl,
-        username=c.username,
-        password=c.password,
-        settings=settings
-    )
+    seed = await alttpr(settings=settings)
 
     player1 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 1'])
 

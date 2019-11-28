@@ -14,19 +14,19 @@ discordbot = commands.Bot(
     command_prefix="$",
 )
 
-discordbot.load_extension("alttprbot.cogs.admin")
 # discordbot.load_extension("alttprbot.cogs.audit")
-discordbot.load_extension("alttprbot.cogs.moderation")
-discordbot.load_extension("alttprbot.cogs.role")
-discordbot.load_extension("alttprbot.cogs.misc")
-discordbot.load_extension("alttprbot.cogs.daily")
-discordbot.load_extension("alttprbot.cogs.voicerole")
+discordbot.load_extension("alttprbot.cogs.admin")
 discordbot.load_extension("alttprbot.cogs.alttprgen")
+discordbot.load_extension("alttprbot.cogs.bontamw")
+discordbot.load_extension("alttprbot.cogs.daily")
+discordbot.load_extension("alttprbot.cogs.misc")
+discordbot.load_extension("alttprbot.cogs.moderation")
+discordbot.load_extension("alttprbot.cogs.nickname")
+discordbot.load_extension("alttprbot.cogs.role")
 discordbot.load_extension("alttprbot.cogs.smz3gen")
 discordbot.load_extension("alttprbot.cogs.tournament")
 discordbot.load_extension("alttprbot.cogs.tourneyqualifier")
-discordbot.load_extension("alttprbot.cogs.nickname")
-discordbot.load_extension("alttprbot.cogs.bontamw")
+discordbot.load_extension("alttprbot.cogs.voicerole")
 
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')

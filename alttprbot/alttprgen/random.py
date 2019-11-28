@@ -1,5 +1,5 @@
 import random
-import pyz3r
+from ..util.alttpr_discord import alttpr
 import os
 import aiofiles
 import yaml
@@ -43,13 +43,7 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
     }
 
     # print(json.dumps(settings, indent=4))
-    seed = await pyz3r.alttpr(
-        baseurl=c.baseurl,
-        seed_baseurl=c.seed_baseurl,
-        username=c.username,
-        password=c.password,
-        settings=settings
-    )
+    seed = await alttpr(settings=settings)
     return seed
 
 def get_random_option(optset):

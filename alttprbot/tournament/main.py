@@ -1,4 +1,4 @@
-import pyz3r
+from ..util.alttpr_discord import alttpr
 from config import Config as c
 from ..util import speedgaming
 
@@ -74,13 +74,7 @@ async def generate_game(episodeid, guildid):
             }
         }
 
-    seed = await pyz3r.alttpr(
-        baseurl=c.baseurl,
-        seed_baseurl=c.seed_baseurl,
-        username=c.username,
-        password=c.password,
-        settings=settings
-    )
+    seed = await alttpr(settings=settings)
 
     return seed, sheet_settings['Game Number'], episode['match1']['players']
 

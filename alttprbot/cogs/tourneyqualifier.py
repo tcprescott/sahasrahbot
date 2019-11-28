@@ -7,7 +7,7 @@ import aiofiles
 import discord
 import gspread.exceptions
 import gspread_asyncio
-import pyz3r
+from ..util.alttpr_discord import alttpr
 from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 from pytz import timezone
@@ -145,12 +145,11 @@ class TournamentQualifier(commands.Cog):
             if not seed:
                 raise Exception('Could not generate game.')
         else:
-            seed = await pyz3r.alttpr(hash=hashid)
+            seed = await alttpr(hash=hashid)
             if not seed:
                 raise Exception('Could not retrieve game.')
 
-        embed = await embed_formatter.seed_embed(
-            seed,
+        embed = await seed.embed(
             name=f"Tournament Qualifier - {date}",
             notes='Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n',
             emojis=self.bot.emojis)

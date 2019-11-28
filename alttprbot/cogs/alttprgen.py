@@ -1,13 +1,10 @@
 import discord
 from discord.ext import commands
 
-import pyz3r
+from ..util.alttpr_discord import alttpr
 from pyz3r.customizer import customizer
 
-from ..util import embed_formatter
-
 from ..alttprgen.random import generate_random_game
-# from ..alttprgen.mystery import generate_mystery_game
 from ..alttprgen.preset import get_preset
 from ..alttprgen.spoilers import generate_spoiler_game
 
@@ -40,16 +37,9 @@ class AlttprGen(commands.Cog):
         settings = customizer.convert2settings(
             customizer_settings, tournament=tournament)
 
-        seed = await pyz3r.alttpr(
-            customizer=True,
-            baseurl=c.baseurl,
-            seed_baseurl=c.seed_baseurl,
-            username=c.username,
-            password=c.password,
-            settings=settings
-        )
+        seed = await alttpr(customizer=True, settings=settings)
 
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
+        embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
     @commands.command(
@@ -60,7 +50,7 @@ class AlttprGen(commands.Cog):
         goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
+        embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
 
@@ -71,7 +61,7 @@ class AlttprGen(commands.Cog):
         seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
+        embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
 
 
@@ -81,7 +71,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(weightset=weightset, tournament=tournament, spoilers="off")
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
+        embed = await seed.embed(emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
     @commands.command(
@@ -90,7 +80,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted', tournament: bool = True):
         seed = await generate_random_game(weightset=weightset, tournament=tournament, spoilers="mystery")
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Mystery Race Game")
+        embed = await seed.embed(emojis=self.bot.emojis, name="Mystery Race Game")
         await ctx.send(embed=embed)
 
 

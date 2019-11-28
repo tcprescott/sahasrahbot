@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import pyz3r
 
 from config import Config as c
 from ..database import config
@@ -42,8 +41,7 @@ class Tournament(commands.Cog):
         else:
             raise Exception('This should not have happened.  Ping Synack.')
 
-        embed = await embed_formatter.seed_embed(
-            seed,
+        embed = await seed.embed(
             name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number}",
             emojis=self.bot.emojis
         )

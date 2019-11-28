@@ -1,5 +1,4 @@
 from ..database import config, permissions, daily
-from ..util import embed_formatter
 
 import discord
 from discord.ext import tasks, commands
@@ -14,7 +13,7 @@ import html5lib
 
 import aiocache
 
-import pyz3r
+from ..util.alttpr_discord import alttpr
 
 
 def is_daily_channel():
@@ -43,7 +42,7 @@ class Daily(commands.Cog):
     async def daily(self, ctx):
         hash = await find_daily_hash()
         seed = await get_daily_seed(hash)
-        embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+        embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await update_daily(hash)
         await ctx.send(embed=embed)
 
@@ -53,7 +52,7 @@ class Daily(commands.Cog):
         hash = await find_daily_hash()
         if await update_daily(hash):
             seed = await get_daily_seed(hash)
-            embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+            embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             daily_announcer_channels = await config.get_all_parameters_by_name('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
                 guild = self.bot.get_guild(result['guild_id'])
@@ -79,20 +78,9 @@ async def update_daily(gamehash):
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash):
-    return await pyz3r.alttpr(
-        hash=hash,
-        baseurl=c.baseurl,
-        seed_baseurl=c.seed_baseurl,
-        username=c.username,
-        password=c.password
-    )
+    return await alttpr(hash=hash)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def find_daily_hash():
-    website = await pyz3r.alttpr(
-        baseurl=c.baseurl,
-        seed_baseurl=c.seed_baseurl,
-        username=c.username,
-        password=c.password
-    )
+    website = await alttpr()
     return await website.find_daily_hash()
