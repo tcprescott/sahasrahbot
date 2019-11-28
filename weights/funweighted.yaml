@@ -1,4 +1,4 @@
-description: The poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season One winner Kyong.
+description: Unweighted except no chance of triforce hunts or insanity entrance shuffles.
 glitches_required:
   none: 100
   overworld_glitches: 0
@@ -88,4 +88,4 @@ enemy_health:
   default: 1
   easy: 1
   hard: 1
-  expert: 1  
+  expert: 1
