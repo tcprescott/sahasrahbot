@@ -15,7 +15,7 @@ async def get_settings(episodeid, guildid):
     wks = await wb.get_worksheet(0)
  
     for row in await wks.get_all_records():
-        if row['SpeedGaming Episode ID'] == episodeid:
+        if row['SpeedGaming Episode ID'] == int(episodeid):
             return row
     return None
 
