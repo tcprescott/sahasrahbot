@@ -31,8 +31,8 @@ class Tournament(commands.Cog):
             raise Exception('This command only works for the Challenge Cup.')
 
     @commands.command()
-    @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing')
-    async def tourneyrace(self, ctx, episode_number: int):
+    @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing','bot-commands')
+    async def tourneyrace(self, ctx, episode_number):
         if c.Tournament[ctx.guild.id]['tournament'] == 'main':
             seed, game_number, players = await main.generate_game(episode_number, ctx.guild.id)
         elif c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
@@ -42,7 +42,7 @@ class Tournament(commands.Cog):
 
         embed = await embed_formatter.seed_embed(
             seed,
-            name=f"{players[0]['displayName']} vs. {players[1]['displayName']}",
+            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number}",
             emojis=self.bot.emojis
         )
 

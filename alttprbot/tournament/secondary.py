@@ -11,13 +11,12 @@ async def get_settings(episodeid, guildid):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
     agc = await agcm.authorize()
     wb = await agc.open_by_key(c.Tournament[guildid]['schedule_sheet'])
-    wks = await wb.get_worksheet(0)
+    wks = await wb.worksheet('Schedule')
  
-    records = await wks.get_all_records()
-    try:
-        return records[episodeid-2]
-    except IndexError:
-        raise Exception('That race does not exist.  Find your match on the schedule at <https://docs.google.com/spreadsheets/d/1qqFiRNXPyMG4B_wpxS-kammIS1Zv5D2fClSSHsPahU4/edit#gid=441409857>.')
+    for row in await wks.get_all_records():
+        if row['Game ID'] == episodeid:
+            return row
+    return None
 
 async def generate_game(episodeid, guildid):
     sheet_settings = await get_settings(episodeid, guildid)
@@ -74,28 +73,28 @@ async def generate_game(episodeid, guildid):
         settings=settings
     )
 
-    player1 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 1 - Twitch Name '])
+    player1 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 1'])
 
     if player1 is False:
-        raise Exception(f"Unable to identify {sheet_settings['Player 1 - Twitch Name ']}")
+        raise Exception(f"Unable to identify {sheet_settings['Player 1']}")
 
-    player2 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 2 - Twitch Name '])
+    player2 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 2'])
 
     if player2 is False:
-        raise Exception(f"Unable to identify {sheet_settings['Player 1 - Twitch Name ']}")
+        raise Exception(f"Unable to identify {sheet_settings['Player 2']}")
 
     players = [
         {
-            "displayName": sheet_settings['Player 1 - Twitch Name '],
+            "displayName": sheet_settings['Player 1'],
             "discordId": player1[0]['discord_user_id']
         },
         {
-            "displayName": sheet_settings['Player 2 - Twitch Name '],
+            "displayName": sheet_settings['Player 2'],
             "discordId": player2[0]['discord_user_id']
         }
     ]
 
-    return seed, sheet_settings['What Game in this Round?'], players
+    return seed, sheet_settings['Game'], players
 
 async def loadnicks(ctx):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
