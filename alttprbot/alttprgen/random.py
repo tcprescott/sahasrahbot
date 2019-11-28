@@ -5,7 +5,7 @@ import aiofiles
 import yaml
 from config import Config as c
 
-async def generate_random_game(logic='NoGlitches', weightset='weighted', tournament=True):
+async def generate_random_game(weightset='weighted', tournament=True, spoilers="off"):
     basename = os.path.basename(f'{weightset}.yaml')
     try:
         async with aiofiles.open(os.path.join("weights", basename)) as f:
@@ -32,7 +32,7 @@ async def generate_random_game(logic='NoGlitches', weightset='weighted', tournam
             "functionality": get_random_option(o['item_functionality']),
         },
         "tournament": tournament,
-        "spoilers": False,
+        "spoilers": spoilers,
         "lang": "en",
         "enemizer": {
             "boss_shuffle": get_random_option(o['boss_shuffle']),

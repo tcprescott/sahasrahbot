@@ -7,7 +7,7 @@ from pyz3r.customizer import customizer
 from ..util import embed_formatter
 
 from ..alttprgen.random import generate_random_game
-from ..alttprgen.mystery import generate_mystery_game
+# from ..alttprgen.mystery import generate_mystery_game
 from ..alttprgen.preset import get_preset
 from ..alttprgen.spoilers import generate_spoiler_game
 
@@ -25,7 +25,9 @@ class AlttprGen(commands.Cog):
     async def seedgen(self, ctx, cmd):
         await ctx.send(f'You can just use ${cmd} from now on!')
 
-    @commands.command()
+    @commands.command(
+        help='Generate a customizer game using a customizer save file attached to the message.'
+    )
     async def custom(self, ctx, tournament: bool = True):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
@@ -50,7 +52,9 @@ class AlttprGen(commands.Cog):
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(
+        help='Generate a preset.  Find a list of presets at https://l.synack.live/presets'
+    )
     async def preset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
         goal_name = preset_dict['goal_name']
@@ -60,7 +64,9 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
 
-    @commands.command()
+    @commands.command(
+        help='Generate a spoiler game.  Find a list of presets at https://l.synack.live/presets'
+    )
     async def spoiler(self, ctx, preset):
         seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
@@ -69,21 +75,21 @@ class AlttprGen(commands.Cog):
         await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
 
 
-    @commands.command()
-    async def weightlist(self, ctx):
-        await ctx.send('Current weights of this bot can be found at https://github.com/tcprescott/sahasrahbot/tree/master/weights')
-
-    @commands.command()
+    @commands.command(
+        help='Generate a game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
+    )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
-        seed = await generate_random_game(logic='NoGlitches', weightset=weightset, tournament=tournament)
+        seed = await generate_random_game(weightset=weightset, tournament=tournament, spoilers="off")
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Random Race Game")
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(
+        help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
+    )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted', tournament: bool = True):
-        seed = await generate_mystery_game(weightset=weightset, tournament=tournament)
+        seed = await generate_random_game(weightset=weightset, tournament=tournament, spoilers="mystery")
         embed = await embed_formatter.seed_embed(seed, emojis=self.bot.emojis, name="Mystery Race Game")
         await ctx.send(embed=embed)
 

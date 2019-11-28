@@ -14,7 +14,7 @@ import pydle
 from quart import abort, jsonify, request
 from quart_openapi import Pint, Resource
 
-from alttprbot.alttprgen import mystery, preset, random, spoilers
+from alttprbot.alttprgen import preset, random, spoilers
 from alttprbot.database import spoiler_races, srl_races
 from alttprbot.smz3gen import preset as smz3_preset
 from alttprbot.smz3gen import spoilers as smz3_spoilers
@@ -208,7 +208,7 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed = await random.generate_random_game(logic='NoGlitches', weightset=args.weightset, tournament=True)
+                    seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="off")
                     code = await seed.code()
                     goal = f"vt8 randomizer - random {args.weightset}"
                     if args.silent:
@@ -232,7 +232,7 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed = await mystery.generate_mystery_game(weightset=args.weightset, tournament=True)
+                    seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="mystery")
                     code = await seed.code()
                     goal = f"vt8 randomizer - mystery {args.weightset}"
                     if args.silent:

@@ -20,11 +20,16 @@ class Misc(commands.Cog):
     async def pedestalgoal(self, ctx):
         await ctx.send("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
 
-    @commands.command(aliases=['crc32'])
+    @commands.command(
+        aliases=['crc32'],
+        help="Posts instructions on how to verify your ROM is correct, or how to get the permalink to your randomized game."
+    )
     async def rom(self, ctx):
         await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
-    @commands.command()
+    @commands.command(
+        help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/"
+    )
     async def holyimage(self, ctx, slug, game='z3r'):
         images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
         i = images[game]

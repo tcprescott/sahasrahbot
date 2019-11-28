@@ -30,7 +30,9 @@ class Tournament(commands.Cog):
         else:
             raise Exception('This command only works for the Challenge Cup.')
 
-    @commands.command()
+    @commands.command(
+        help="Generate a tournament race."
+    )
     @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing','bot-commands')
     async def tourneyrace(self, ctx, episode_number):
         if c.Tournament[ctx.guild.id]['tournament'] == 'main':

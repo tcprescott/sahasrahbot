@@ -47,16 +47,9 @@ class Daily(commands.Cog):
         await update_daily(hash)
         await ctx.send(embed=embed)
 
-    @commands.command(
-        name='checkdailyannounce'
-    )
-    @commands.is_owner()
-    async def checkdailyannounce(self, ctx):
-        await ctx.send(self.announce_daily.failed())
 
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
-        print("announcer running")
         hash = await find_daily_hash()
         if await update_daily(hash):
             seed = await get_daily_seed(hash)
