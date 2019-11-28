@@ -28,7 +28,8 @@ class Misc(commands.Cog):
         await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
     @commands.command(
-        help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/"
+        help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
+        aliases=['holy']
     )
     async def holyimage(self, ctx, slug, game='z3r'):
         images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
