@@ -209,6 +209,11 @@ class SrlBot(pydle.Client):
 
                 if srl['game']['abbrev'] == 'alttphacks':
                     seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="off")
+
+                    if not seed:
+                        await self.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        return
+
                     code = await seed.code()
                     goal = f"vt8 randomizer - random {args.weightset}"
                     if args.silent:
@@ -233,6 +238,11 @@ class SrlBot(pydle.Client):
 
                 if srl['game']['abbrev'] == 'alttphacks':
                     seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="mystery")
+
+                    if not seed:
+                        await self.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        return
+
                     code = await seed.code()
                     goal = f"vt8 randomizer - mystery {args.weightset}"
                     if args.silent:
@@ -261,9 +271,11 @@ class SrlBot(pydle.Client):
                 if srl['game']['abbrev'] == 'alttphacks':
                     seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
                     goal_name = preset_dict['goal_name']
+
                     if not seed:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                         return
+
                     goal = f"vt8 randomizer - spoiler {goal_name}"
                     studytime = 900 if not args.studytime else args.studytime 
                     code = await seed.code()
@@ -274,9 +286,11 @@ class SrlBot(pydle.Client):
                     await self.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
                 elif srl['game']['abbrev'] == 'alttpsm':
                     seed, spoiler_log_url = await smz3_spoilers.generate_spoiler_game(args.preset)
+
                     if not seed:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                         return
+
                     goal = f"spoiler beat the games"
                     studytime = 1500 if not args.studytime else args.studytime 
                     if args.silent:
