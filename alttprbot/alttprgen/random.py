@@ -42,7 +42,13 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
         }
     }
 
-    # print(json.dumps(settings, indent=4))
+    # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
+    if settings['weapons'] not in ['vanilla','assured'] and settings['mode'] == 'standard' and (
+            settings['enemizer']['enemy_shuffle'] != 'none'
+            or settings['enemizer']['enemy_damage'] != 'default'
+            or settings['enemizer']['enemy_health'] != 'default'):
+        settings['weapons'] == 'assured'
+
     seed = await alttpr(settings=settings)
     return seed
 
