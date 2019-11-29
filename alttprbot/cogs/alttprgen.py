@@ -70,17 +70,43 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
-        seed = await generate_random_game(weightset=weightset, tournament=tournament, spoilers="off")
-        embed = await seed.embed(emojis=self.bot.emojis, name="Random Race Game")
+        try:
+            if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
+                raise Exception('File should have a .yaml extension.')
+            if not weightset == "custom" and ctx.message.attachments[0]:
+                raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
+        except IndexError:
+            raise Exception('You must attach a weightset yaml file.')
+
+        seed = await generate_random_game(
+            weightset=weightset,
+            tournament=tournament,
+            spoilers="off",
+            custom_weightset_url=ctx.message.attachments[0].url if weightset=="custom" else None
+        )
+        embed = await seed.embed(emojis=self.bot.emojis, name="Random Settings Game")
         await ctx.send(embed=embed)
 
     @commands.command(
         help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
-    async def mystery(self, ctx, weightset='weighted', tournament: bool = True):
-        seed = await generate_random_game(weightset=weightset, tournament=tournament, spoilers="mystery")
-        embed = await seed.embed(emojis=self.bot.emojis, name="Mystery Race Game")
+    async def mystery(self, ctx, weightset='weighted'):
+        try:
+            if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
+                raise Exception('File should have a .yaml extension.')
+            if not weightset == "custom" and ctx.message.attachments[0]:
+                raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
+        except IndexError:
+            raise Exception('You must attach a weightset yaml file.')
+
+        seed = await generate_random_game(
+            weightset=weightset,
+            tournament=False,
+            spoilers="mystery",
+            custom_weightset_url=ctx.message.attachments[0].url if weightset=="custom" else None
+        )
+        embed = await seed.embed(emojis=self.bot.emojis, name="Mystery Game")
         await ctx.send(embed=embed)
 
 

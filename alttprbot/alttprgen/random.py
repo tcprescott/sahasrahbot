@@ -1,17 +1,23 @@
 import random
 from ..util.alttpr_discord import alttpr
+from ..util.http import request_generic
 import os
 import aiofiles
 import yaml
 from config import Config as c
 
-async def generate_random_game(weightset='weighted', tournament=True, spoilers="off"):
+async def generate_random_game(weightset='weighted', tournament=True, spoilers="off", custom_weightset_url=None):
     basename = os.path.basename(f'{weightset}.yaml')
-    try:
-        async with aiofiles.open(os.path.join("weights", basename)) as f:
-            o = yaml.load(await f.read(), Loader=yaml.FullLoader)
-    except FileNotFoundError:
-        return False, False
+
+    if not weightset == 'custom':
+        try:
+            async with aiofiles.open(os.path.join("weights", basename)) as f:
+                o = yaml.load(await f.read(), Loader=yaml.FullLoader)
+        except FileNotFoundError:
+            return False, False
+    elif weightset == 'custom' and custom_weightset_url:
+        o = await request_generic(custom_weightset_url, method='get', returntype='yaml')
+
 
     settings={
         "glitches": get_random_option(o['glitches_required']),
