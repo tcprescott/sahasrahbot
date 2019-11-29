@@ -31,7 +31,9 @@ class Misc(commands.Cog):
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
     )
-    async def holyimage(self, ctx, slug, game='z3r'):
+    async def holyimage(self, ctx, slug=None, game='z3r'):
+        if slug is None: raise Exception('You must specify a holy image.  Check out <http://alttp.mymm1.com/holyimage/>')
+
         images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
         i = images[game]
 
@@ -41,9 +43,9 @@ class Misc(commands.Cog):
             try:
                 image = next(item for item in i if item["idx"] == int(slug))
             except StopIteration:
-                raise Exception('That holy image does not exist.  Check out http://alttp.mymm1.com/holyimage/')
+                raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
             except ValueError:
-                raise Exception('That holy image does not exist.  Check out http://alttp.mymm1.com/holyimage/')
+                raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
 
         url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
         link = f"http://alttp.mymm1.com/holyimage/{game}-{image['slug']}.html"
