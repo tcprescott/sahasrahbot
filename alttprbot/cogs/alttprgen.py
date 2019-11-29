@@ -102,7 +102,7 @@ class AlttprGen(commands.Cog):
 
         seed = await generate_random_game(
             weightset=weightset,
-            tournament=False,
+            tournament=True,
             spoilers="mystery",
             custom_weightset_url=ctx.message.attachments[0].url if weightset=="custom" else None
         )
