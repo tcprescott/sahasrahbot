@@ -4,7 +4,7 @@ import discord
 from config import Config as c
 
 async def alttpr(settings=None, hash=None, customizer=False):
-    seed = alttprDiscordClass(settings, hash, customizer)
+    seed = alttprDiscordClass(settings=settings, hash=hash, customizer=customizer)
     await seed._init()
     return seed
 
