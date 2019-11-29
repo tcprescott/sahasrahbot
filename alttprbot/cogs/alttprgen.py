@@ -70,13 +70,10 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
-        try:
-            if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
-                raise Exception('File should have a .yaml extension.')
-            if not weightset == "custom" and ctx.message.attachments[0]:
-                raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
-        except IndexError:
-            raise Exception('You must attach a weightset yaml file.')
+        if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
+            raise Exception('File should have a .yaml extension.')
+        if not weightset == "custom" and ctx.message.attachments[0]:
+            raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
 
         seed = await generate_random_game(
             weightset=weightset,
@@ -92,13 +89,10 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
-        try:
-            if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
-                raise Exception('File should have a .yaml extension.')
-            if not weightset == "custom" and ctx.message.attachments[0]:
-                raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
-        except IndexError:
-            raise Exception('You must attach a weightset yaml file.')
+        if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
+            raise Exception('File should have a .yaml extension.')
+        if not weightset == "custom" and ctx.message.attachments[0]:
+            raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
 
         seed = await generate_random_game(
             weightset=weightset,
