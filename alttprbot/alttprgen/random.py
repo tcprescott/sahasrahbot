@@ -53,7 +53,7 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
             settings['enemizer']['enemy_shuffle'] != 'none'
             or settings['enemizer']['enemy_damage'] != 'default'
             or settings['enemizer']['enemy_health'] != 'default'):
-        settings['weapons'] == 'assured'
+        settings['weapons'] = 'assured'
 
     seed = await alttpr(settings=settings)
     return seed
