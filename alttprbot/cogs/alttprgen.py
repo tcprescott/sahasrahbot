@@ -70,11 +70,13 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
+        if weightset == "custom" and not ctx.message.attachments:
+            raise Exception('You must attach a file when specifying a custom weightset.')
         if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
             raise Exception('File should have a .yaml extension.')
-        if not weightset == "custom" and ctx.message.attachments[0]:
+        elif not weightset == "custom" and ctx.message.attachments:
             raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
-
+        
         seed = await generate_random_game(
             weightset=weightset,
             tournament=tournament,
@@ -89,9 +91,11 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
+        if weightset == "custom" and not ctx.message.attachments:
+            raise Exception('You must attach a file when specifying a custom weightset.')
         if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
             raise Exception('File should have a .yaml extension.')
-        if not weightset == "custom" and ctx.message.attachments[0]:
+        elif not weightset == "custom" and ctx.message.attachments:
             raise Exception('If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
 
         seed = await generate_random_game(
