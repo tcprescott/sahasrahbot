@@ -31,7 +31,7 @@ async def generate_game(episodeid, guildid):
     sheet_settings = await get_settings(episodeid, guildid)
 
     if sheet_settings is None:
-        raise Exception('Episode not found.  Submit settings first.')
+        raise Exception('Settings submission not found at <https://docs.google.com/spreadsheets/d/1GHBnuxdLgBcx4llvHepQjwd8Q1ASbQ_4J8ubblyG-0c/edit#gid=941774009>.  Please submit settings at <http://bit.ly/2Dbr9Kr>')
 
     settingsmap = {
         'Standard': 'standard',
