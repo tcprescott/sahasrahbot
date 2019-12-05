@@ -315,6 +315,7 @@ settings:
         KeyD1: 0
         KeyD2: 0
         KeyD3: 0
+        KeyD4: 0
         KeyD5: 0
         KeyD6: 0
         KeyD7: 0
@@ -329,6 +330,7 @@ settings:
         MapD1: 0
         MapD2: 0
         MapD3: 0
+        MapD4: 0
         MapD5: 0
         MapD6: 0
         MapD7: 0
@@ -357,6 +359,7 @@ settings:
         BigKeyD1: 0
         BigKeyD2: 0
         BigKeyD3: 0
+        BigKeyD4: 0
         BigKeyD5: 0
         BigKeyD6: 0
         BigKeyD7: 0
@@ -381,6 +384,7 @@ settings:
         CompassD1: 0
         CompassD2: 0
         CompassD3: 0
+        CompassD4: 0
         CompassD5: 0
         CompassD6: 0
         CompassD7: 0
