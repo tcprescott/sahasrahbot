@@ -56,7 +56,7 @@ class SrlBot(pydle.Client):
                     await asyncio.sleep(1)
                     await self.join(result.group(2))
                     await asyncio.sleep(60)
-                    await self.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
+                    await self.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live")
                 else:
                     print(f'would have joined {result.group(2)}')
 
@@ -176,7 +176,7 @@ class SrlBot(pydle.Client):
                     seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
                     goal_name = preset_dict['goal_name']
                     if not seed:
-                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
                         return
                     goal = f"vt8 randomizer - {goal_name}"
                     code = await seed.code()

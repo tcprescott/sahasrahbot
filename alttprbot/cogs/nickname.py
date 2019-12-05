@@ -22,14 +22,12 @@ class Nickname(commands.Cog):
     @commands.command(
         help="Register your SRL nick with SahasrahBot."
     )
-    @commands.is_owner()
     async def srl(self, ctx, nick):
         await srlnick.insert_srl_nick(ctx.author.id, nick)
 
     @commands.command(
         help="Register your Twitch name with SahasrahBot."
     )
-    @commands.is_owner()
     async def twitch(self, ctx, twitch):
         await srlnick.insert_twitch_name(ctx.author.id, twitch)
 
