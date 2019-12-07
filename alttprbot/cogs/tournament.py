@@ -45,9 +45,15 @@ class Tournament(commands.Cog):
             name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number}",
             emojis=self.bot.emojis
         )
+        tournament_embed = await seed.tournament_embed(
+            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number}",
+            notes="The permalink for this seed was sent via direct message to each runner.",
+            emojis=self.bot.emojis
+        )
 
         logging_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
         await logging_channel.send(embed=embed)
+        await ctx.send(embed=tournament_embed)
 
         for player in players:
             try:
@@ -57,7 +63,10 @@ class Tournament(commands.Cog):
                     member = await commands.MemberConverter().convert(ctx, player['discordTag'])
                 await member.send(embed=embed)
             except:
-                await logging_channel.send(f"Unable to send DM to {player['displayName']}")
+                await logging_channel.send(f"@here Unable to send DM to {player['displayName']}")
+                await ctx.send(f"Unable to send DM to {player['displayName']}")
+
+       
 
     @commands.command()
     @commands.has_any_role('Admin','Admins','Bot Admin')

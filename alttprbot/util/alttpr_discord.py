@@ -3,6 +3,41 @@ from html.parser import HTMLParser
 import discord
 from config import Config as c
 
+emoji_code_map = {
+    'Bow': 'Bow',
+    'Boomerang': 'BestBoomerang',
+    'Hookshot': 'Hookshot',
+    'Bombs': 'Blowup',
+    'Mushroom': 'Mushroom',
+    'Magic Powder': 'Powder',
+    'Ice Rod': 'IceRod',
+    'Pendant': 'PendantOfCourage',
+    'Bombos': 'Bombos',
+    'Ether': 'Ether',
+    'Quake': 'Quake',
+    'Lamp': 'Lamp',
+    'Hammer': 'MCHammer',
+    'Shovel': 'shovel',
+    'Flute': 'Flute',
+    'Bugnet': 'BugNet',
+    'Book': 'Mudora',
+    'Empty Bottle': 'EmptyBottle',
+    'Green Potion': 'GreenPotion',
+    'Somaria': 'somaria',
+    'Cape': 'Cape',
+    'Mirror': 'mirror',
+    'Boots': 'GoFast',
+    'Gloves': 'PowerGlove',
+    'Flippers': 'Flippers',
+    'Moon Pearl': 'MoonPearl',
+    'Shield': 'MirrorShield',
+    'Tunic': 'GreenTunic',
+    'Heart': 'ALotOfLove',
+    'Map': 'DungeonMap',
+    'Compass': 'DungeonCompass',
+    'Big Key': 'BigKey'
+}
+
 async def alttpr(settings=None, hash=None, customizer=False):
     seed = alttprDiscordClass(settings=settings, hash=hash, customizer=customizer)
     await seed._init()
@@ -86,40 +121,6 @@ class alttprDiscordClass(alttprClass):
                 inline=True)
 
         if emojis:
-            emoji_code_map = {
-                'Bow': 'Bow',
-                'Boomerang': 'BestBoomerang',
-                'Hookshot': 'Hookshot',
-                'Bombs': 'Blowup',
-                'Mushroom': 'Mushroom',
-                'Magic Powder': 'Powder',
-                'Ice Rod': 'IceRod',
-                'Pendant': 'PendantOfCourage',
-                'Bombos': 'Bombos',
-                'Ether': 'Ether',
-                'Quake': 'Quake',
-                'Lamp': 'Lamp',
-                'Hammer': 'MCHammer',
-                'Shovel': 'shovel',
-                'Flute': 'Flute',
-                'Bugnet': 'BugNet',
-                'Book': 'Mudora',
-                'Empty Bottle': 'EmptyBottle',
-                'Green Potion': 'GreenPotion',
-                'Somaria': 'somaria',
-                'Cape': 'Cape',
-                'Mirror': 'mirror',
-                'Boots': 'GoFast',
-                'Gloves': 'PowerGlove',
-                'Flippers': 'Flippers',
-                'Moon Pearl': 'MoonPearl',
-                'Shield': 'MirrorShield',
-                'Tunic': 'GreenTunic',
-                'Heart': 'ALotOfLove',
-                'Map': 'DungeonMap',
-                'Compass': 'DungeonCompass',
-                'Big Key': 'BigKey'
-            }
             code = await self.code()
             c = list(map(lambda x: str(discord.utils.get(
                 emojis, name=emoji_code_map[x])), code))
@@ -133,6 +134,53 @@ class alttprDiscordClass(alttprClass):
                 inline=False)
 
         embed.add_field(name='Permalink', value=self.url, inline=False)
+        return embed
+
+
+    async def tournament_embed(self, emojis=False, name=False, notes=False):
+        if not name:
+            try:
+                name = self.data['spoiler']['meta']['name']
+            except KeyError:
+                name = 'Requested Seed'
+
+        if not notes:
+            try:
+                notes = strip_tags(self.data['spoiler']['meta']['notes'])
+            except KeyError:
+                notes = ""
+
+        settings_map = await self.randomizer_settings()
+
+        embed = discord.Embed(
+            title=name,
+            description=notes,
+            color=discord.Colour.dark_red())
+
+        if self.data['spoiler']['meta'].get('spoilers','off') == "mystery":
+            embed.add_field(
+                name='Mystery Game',
+                value="No meta information is available for this game.",
+                inline=False)
+
+        embed.add_field(
+            name='Settings',
+            value=f"**Logic:** {self.data['spoiler']['meta']['logic']}\n**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n**Open Tower:** {self.data['spoiler']['meta']['entry_crystals_tower']}\n**Ganon Vulnerable:** {self.data['spoiler']['meta']['entry_crystals_ganon']}\n**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
+        )
+
+        if emojis:
+            code = await self.code()
+            c = list(map(lambda x: str(discord.utils.get(
+                emojis, name=emoji_code_map[x])), code))
+            embed.add_field(name='File Select Code', value=' '.join(
+                c) + ' (' + '/'.join(code) + ')', inline=False)
+        else:
+            code = await self.code()
+            embed.add_field(
+                name='File Select Code',
+                value='/'.join(code),
+                inline=False)
+
         return embed
 
 class MLStripper(HTMLParser):
