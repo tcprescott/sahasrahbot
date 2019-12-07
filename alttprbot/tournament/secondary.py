@@ -7,6 +7,12 @@ from ..database import srlnick
 from config import Config as c
 from ..util.alttpr_discord import alttpr
 
+class ChallengeCupScheduleNotFound(Exception):
+    pass
+
+class InvalidSettingsException(Exception):
+    pass
+
 async def get_settings(episodeid, guildid):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
     agc = await agcm.authorize()
@@ -22,7 +28,17 @@ async def generate_game(episodeid, guildid):
     sheet_settings = await get_settings(episodeid, guildid)
 
     if sheet_settings is None:
-        raise Exception('Episode not found.  Submit settings first.')
+        raise ChallengeCupScheduleNotFound('Episode not found.  Submit settings first.')
+
+    if not sanity_check(
+        game=sheet_settings['Game Number'],
+        dis=sheet_settings['Dungeon Item Shuffle'],
+        goal=sheet_settings['Goal'],
+        crystals=sheet_settings['GT/Ganon Crystals'],
+        state=sheet_settings['World State'],
+        swords=sheet_settings['Swords']
+    ):
+        raise InvalidSettingsException("The settings chosen are invalid for this game.  Please contact an Admin to correct the settings.")
 
     settingsmap = {
         'Standard': 'standard',
@@ -89,6 +105,19 @@ async def generate_game(episodeid, guildid):
     ]
 
     return seed, sheet_settings['Game'], players
+
+def sanity_check(game, dis, goal, crystals, state, swords):
+    count = 0
+    if not dis == 'Standard': count+=1
+    if not goal == 'Defeat Ganon': count+=1
+    if not crystals == '7/7': count+=1
+    if not state == 'Open': count+=1
+    if not swords == 'Randomized': count+=1
+
+    if game=='1st': return True if count==0 else False
+    elif game=='2nd': return True if count<=1 else False
+    elif game=='3rd': return True if count<=2 else False
+    else: return False
 
 async def loadnicks(ctx):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)

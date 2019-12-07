@@ -120,18 +120,8 @@ class alttprDiscordClass(alttprClass):
                 ),
                 inline=True)
 
-        if emojis:
-            code = await self.code()
-            c = list(map(lambda x: str(discord.utils.get(
-                emojis, name=emoji_code_map[x])), code))
-            embed.add_field(name='File Select Code', value=' '.join(
-                c) + ' (' + '/'.join(code) + ')', inline=False)
-        else:
-            code = await self.code()
-            embed.add_field(
-                name='File Select Code',
-                value='/'.join(code),
-                inline=False)
+        code = await self.code()
+        embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
 
         embed.add_field(name='Permalink', value=self.url, inline=False)
         return embed
@@ -168,20 +158,18 @@ class alttprDiscordClass(alttprClass):
             value=f"**Logic:** {self.data['spoiler']['meta']['logic']}\n**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n**Open Tower:** {self.data['spoiler']['meta']['entry_crystals_tower']}\n**Ganon Vulnerable:** {self.data['spoiler']['meta']['entry_crystals_ganon']}\n**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
         )
 
-        if emojis:
-            code = await self.code()
-            c = list(map(lambda x: str(discord.utils.get(
-                emojis, name=emoji_code_map[x])), code))
-            embed.add_field(name='File Select Code', value=' '.join(
-                c) + ' (' + '/'.join(code) + ')', inline=False)
-        else:
-            code = await self.code()
-            embed.add_field(
-                name='File Select Code',
-                value='/'.join(code),
-                inline=False)
+        code = await self.code()
+        embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
 
         return embed
+
+async def build_file_select_code(code, emojis=None):
+    if emojis:
+        c = list(map(lambda x: str(discord.utils.get(
+            emojis, name=emoji_code_map[x])), code))
+        return ' '.join(c) + ' (' + '/'.join(code) + ')'
+    else:
+        return '/'.join(code)
 
 class MLStripper(HTMLParser):
     def __init__(self):

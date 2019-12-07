@@ -1,12 +1,14 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 
 from config import Config as c
-from ..database import config
-from ..database import srlnick
 
-from ..util import checks, embed_formatter, http
+from ..database import config, srlnick
 from ..tournament import main, secondary
+from ..util import checks, embed_formatter, http, speedgaming
+
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
@@ -66,7 +68,46 @@ class Tournament(commands.Cog):
                 await logging_channel.send(f"@here Unable to send DM to {player['displayName']}")
                 await ctx.send(f"Unable to send DM to {player['displayName']}")
 
-       
+
+    @commands.command(
+        help="Generate a tournament race, but waits 5 minutes.",
+        hidden=True
+    )
+    @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing','bot-commands')
+    async def restreamrace(self, ctx, episode_number):
+        if c.Tournament[ctx.guild.id]['tournament'] == 'main':
+            seed, game_number, players = await main.generate_game(episode_number, ctx.guild.id)
+        elif c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
+            seed, game_number, players = await secondary.generate_game(episode_number, ctx.guild.id)
+        else:
+            raise Exception('This should not have happened.  Ping Synack.')
+
+        await asyncio.sleep(300)
+
+        embed = await seed.embed(
+            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number}",
+            emojis=self.bot.emojis
+        )
+        tournament_embed = await seed.tournament_embed(
+            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number}",
+            notes="The permalink for this seed was sent via direct message to each runner.",
+            emojis=self.bot.emojis
+        )
+
+        logging_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
+        await logging_channel.send(embed=embed)
+        await ctx.send(embed=tournament_embed)
+
+        for player in players:
+            try:
+                if not player.get('discordId', '') == '':
+                    member = ctx.guild.get_member(int(player['discordId']))
+                else:
+                    member = await commands.MemberConverter().convert(ctx, player['discordTag'])
+                await member.send(embed=embed)
+            except:
+                await logging_channel.send(f"@here Unable to send DM to {player['displayName']}")
+                await ctx.send(f"Unable to send DM to {player['displayName']}")
 
     @commands.command()
     @commands.has_any_role('Admin','Admins','Bot Admin')
