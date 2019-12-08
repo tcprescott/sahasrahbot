@@ -31,7 +31,7 @@ async def generate_game(episodeid, guildid):
         raise ChallengeCupScheduleNotFound('Episode not found.  Submit settings first.')
 
     if not sanity_check(
-        game=sheet_settings['Game Number'],
+        game=sheet_settings['Game'],
         dis=sheet_settings['Dungeon Item Shuffle'],
         goal=sheet_settings['Goal'],
         crystals=sheet_settings['GT/Ganon Crystals'],

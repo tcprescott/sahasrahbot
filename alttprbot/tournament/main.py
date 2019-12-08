@@ -8,8 +8,10 @@ import gspread.exceptions
 import gspread_asyncio
 from oauth2client.service_account import ServiceAccountCredentials
 
-class SGEpisodeNotFoundException(Exception):
-    pass
+import datetime
+from pytz import timezone
+
+tz = timezone('EST')
 
 class SettingsSubmissionNotFoundException(Exception):
     pass
@@ -17,41 +19,66 @@ class SettingsSubmissionNotFoundException(Exception):
 class InvalidSettingsException(Exception):
     pass
 
-async def get_settings(episodeid, guildid):
-    agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
-    agc = await agcm.authorize()
-    wb = await agc.open_by_key(c.Tournament[guildid]['schedule_sheet'])
-    wks = await wb.get_worksheet(0)
- 
-    for row in await wks.get_all_records():
-        if row['SpeedGaming Episode ID'] == int(episodeid):
-            return row
-    return None
+class AlreadyGeneratedException(Exception):
+    pass
 
-async def generate_game(episodeid, guildid):
+async def settings_sheet(episodeid, guildid):
+    sheet = SettingsSheet(episodeid, guildid)
+    await sheet._init()
+    return sheet
+
+class SettingsSheet():
+    def __init__(self, episodeid, guildid: int):
+        self.agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
+        self.config = c.Tournament[guildid]
+        self.episodeid = episodeid
+
+    async def _init(self):
+        self.agc = await self.agcm.authorize()
+        self.wb = await self.agc.open_by_key(self.config['schedule_sheet'])
+        self.wks = await self.wb.get_worksheet(0)
+
+        self.headers = await self.wks.row_values(1)
+
+        for idx, row in enumerate(await self.wks.get_all_records()):
+            if row['SpeedGaming Episode ID'] == int(self.episodeid):
+                self.rowid = idx+2
+                self.row = row
+                return row
+        raise SettingsSubmissionNotFoundException('Settings submission not found at <https://docs.google.com/spreadsheets/d/1GHBnuxdLgBcx4llvHepQjwd8Q1ASbQ_4J8ubblyG-0c/edit#gid=941774009>.  Please submit settings at <http://bit.ly/2Dbr9Kr>')
+    
+    async def write_gen_date(self):
+        date_gen_column = self.headers.index('Date Generated')+1
+        await self.wks.update_cell(row=self.rowid, col=date_gen_column, value=datetime.datetime.now(tz).isoformat())
+
+    def is_generated(self):
+        if not self.row['Date Generated'] == '': return True
+        else: return False
+
+    def sanity_check(self):
+        count = 0
+        if not self.row['Dungeon Item Shuffle'] == 'Standard': count+=1
+        if not self.row['Goal'] == 'Defeat Ganon': count+=1
+        if not self.row['GT/Ganon Crystals'] == '7/7': count+=1
+        if not self.row['World State'] == 'Open': count+=1
+        if not self.row['Swords'] == 'Randomized': count+=1
+
+        if self.row['Game Number']==1: return True if count==0 else False
+        elif self.row['Game Number']==2: return True if count<=1 else False
+        elif self.row['Game Number']==3: return True if count<=2 else False
+        else: return False
+
+async def generate_game(episodeid, guildid, force=False):
     episode = await speedgaming.get_episode(int(episodeid))
 
-    if 'error' in episode:
-        raise SGEpisodeNotFoundException(episode["error"])
+    sheet_settings = await settings_sheet(episodeid, guildid)
 
-    if not episode['event']['slug'] == 'alttpr':
-        raise SGEpisodeNotFoundException('Not an alttpr tournament race.')
-
-    sheet_settings = await get_settings(episodeid, guildid)
-
-    if not sanity_check(
-        game=sheet_settings['Game Number'],
-        dis=sheet_settings['Dungeon Item Shuffle'],
-        goal=sheet_settings['Goal'],
-        crystals=sheet_settings['GT/Ganon Crystals'],
-        state=sheet_settings['World State'],
-        swords=sheet_settings['Swords']
-    ):
-        raise InvalidSettingsException("The settings chosen are invalid for this game.  Please contact an Admin to correct the settings.")
-
-    if sheet_settings is None:
-        raise SettingsSubmissionNotFoundException('Settings submission not found at <https://docs.google.com/spreadsheets/d/1GHBnuxdLgBcx4llvHepQjwd8Q1ASbQ_4J8ubblyG-0c/edit#gid=941774009>.  Please submit settings at <http://bit.ly/2Dbr9Kr>')
-
+    if not force:
+        if not sheet_settings.sanity_check():
+            raise InvalidSettingsException("The settings chosen are invalid for this game.  Please contact an Admin to correct the settings.")
+        if sheet_settings.is_generated():
+            raise AlreadyGeneratedException("This game has already been generated.  Please contact a tournament administrator for assistance.")
+        
     settingsmap = {
         'Standard': 'standard',
         'Maps/Compasses': 'mc',
@@ -67,17 +94,17 @@ async def generate_game(episodeid, guildid):
     settings = {
             "glitches": "none",
             "item_placement": "advanced",
-            "dungeon_items": settingsmap[sheet_settings['Dungeon Item Shuffle']],
+            "dungeon_items": settingsmap[sheet_settings.row['Dungeon Item Shuffle']],
             "accessibility": "items",
-            "goal": settingsmap[sheet_settings['Goal']],
+            "goal": settingsmap[sheet_settings.row['Goal']],
             "crystals": {
-                "ganon": settingsmap[sheet_settings['GT/Ganon Crystals']],
-                "tower": settingsmap[sheet_settings['GT/Ganon Crystals']],
+                "ganon": settingsmap[sheet_settings.row['GT/Ganon Crystals']],
+                "tower": settingsmap[sheet_settings.row['GT/Ganon Crystals']],
             },
-            "mode": settingsmap[sheet_settings['World State']],
+            "mode": settingsmap[sheet_settings.row['World State']],
             "entrances": "none",
             "hints": "off",
-            "weapons": settingsmap[sheet_settings['Swords']],
+            "weapons": settingsmap[sheet_settings.row['Swords']],
             "item": {
                 "pool": "normal",
                 "functionality": "normal"
@@ -95,20 +122,10 @@ async def generate_game(episodeid, guildid):
 
     seed = await alttpr(settings=settings)
 
-    return seed, sheet_settings['Game Number'], episode['match1']['players']
+    await sheet_settings.write_gen_date()
+    return seed, sheet_settings.row['Game Number'], episode['match1']['players']
 
-def sanity_check(game, dis, goal, crystals, state, swords):
-    count = 0
-    if not dis == 'Standard': count+=1
-    if not goal == 'Defeat Ganon': count+=1
-    if not crystals == '7/7': count+=1
-    if not state == 'Open': count+=1
-    if not swords == 'Randomized': count+=1
 
-    if game==1: return True if count==0 else False
-    elif game==2: return True if count<=1 else False
-    elif game==3: return True if count<=2 else False
-    else: return False
 
 def get_creds():
    return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
