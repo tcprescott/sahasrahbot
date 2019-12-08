@@ -10,7 +10,17 @@ from alttprbot.api.app import app
 
 from config import Config as c
 
-discordbot = commands.Bot(
+# override discord.py's process_commands coroutine in the commands.Bot class
+# this allows SpeedGamingBot to issue commands to SahasrahBot
+class SahasrahBot(commands.Bot):
+    async def process_commands(self, message):
+        if message.author.bot and not message.author.id == 344251539931660288:
+            return
+
+        ctx = await self.get_context(message)
+        await self.invoke(ctx)
+
+discordbot = SahasrahBot(
     command_prefix="$",
 )
 
