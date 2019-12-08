@@ -1,4 +1,5 @@
 /env/
+/env_old/
 /.vscode/
 /config.py
 /pyz3r
