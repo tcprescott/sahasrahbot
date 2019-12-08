@@ -24,7 +24,7 @@ async def get_settings(episodeid, guildid):
             return row
     return None
 
-async def generate_game(episodeid, guildid):
+async def generate_game(episodeid, guildid, force=False):
     sheet_settings = await get_settings(episodeid, guildid)
 
     if sheet_settings is None:

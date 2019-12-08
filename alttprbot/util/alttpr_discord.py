@@ -2,6 +2,7 @@ from pyz3r.alttpr import alttprClass
 from html.parser import HTMLParser
 import discord
 from config import Config as c
+import datetime
 
 emoji_code_map = {
     'Bow': 'Bow',
@@ -69,7 +70,9 @@ class alttprDiscordClass(alttprClass):
         embed = discord.Embed(
             title=name,
             description=notes,
-            color=discord.Colour.dark_red())
+            color=discord.Colour.dark_red(),
+            timestamp=datetime.datetime.fromisoformat(self.data['generated'])
+        )
 
         if self.data['spoiler']['meta'].get('spoilers','off') == "mystery":
             embed.add_field(
@@ -124,6 +127,8 @@ class alttprDiscordClass(alttprClass):
         embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
 
         embed.add_field(name='Permalink', value=self.url, inline=False)
+
+        embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed
 
 
@@ -145,7 +150,9 @@ class alttprDiscordClass(alttprClass):
         embed = discord.Embed(
             title=name,
             description=notes,
-            color=discord.Colour.dark_red())
+            color=discord.Colour.dark_gold(),
+            timestamp=datetime.datetime.fromisoformat(self.data['generated'])
+        )
 
         if self.data['spoiler']['meta'].get('spoilers','off') == "mystery":
             embed.add_field(
@@ -161,6 +168,7 @@ class alttprDiscordClass(alttprClass):
         code = await self.code()
         embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
 
+        embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed
 
 async def build_file_select_code(code, emojis=None):
