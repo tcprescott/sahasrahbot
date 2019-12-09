@@ -44,7 +44,6 @@ class Misc(commands.Cog):
         except StopIteration:
             raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
 
-        url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
         link = f"http://alttp.mymm1.com/holyimage/{game}-{image['slug']}.html"
 
         embed = discord.Embed(
@@ -54,10 +53,11 @@ class Misc(commands.Cog):
         )
 
         if 'url' in image:
+            url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
             if image.get('mode','') == 'redirect':
-                embed.add_field(name='Link', value=image.get('url'), inline=False)
+                embed.add_field(name='Link', value=url, inline=False)
             else:
-                embed.set_image(url=image.get('url'))
+                embed.set_image(url=url)
 
         embed.add_field(name="Source", value=link)
 
