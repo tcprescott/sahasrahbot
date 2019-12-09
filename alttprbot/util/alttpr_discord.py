@@ -1,5 +1,5 @@
 from pyz3r.alttpr import alttprClass 
-from html.parser import HTMLParser
+import html2markdown
 import discord
 from config import Config as c
 import datetime
@@ -61,7 +61,7 @@ class alttprDiscordClass(alttprClass):
 
         if not notes:
             try:
-                notes = strip_tags(self.data['spoiler']['meta']['notes'])
+                notes = html2markdown.convert(self.data['spoiler']['meta']['notes'])
             except KeyError:
                 notes = ""
 
@@ -141,7 +141,7 @@ class alttprDiscordClass(alttprClass):
 
         if not notes:
             try:
-                notes = strip_tags(self.data['spoiler']['meta']['notes'])
+                notes = html2markdown.convert(self.data['spoiler']['meta']['notes'])
             except KeyError:
                 notes = ""
 
@@ -178,19 +178,3 @@ async def build_file_select_code(code, emojis=None):
         return ' '.join(c) + ' (' + '/'.join(code) + ')'
     else:
         return '/'.join(code)
-
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.strict = False
-        self.convert_charrefs= True
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
