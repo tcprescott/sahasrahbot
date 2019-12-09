@@ -10,6 +10,8 @@ from alttprbot.api.app import app
 
 from config import Config as c
 
+# from dotenv import load_dotenv
+# load_dotenv()
 
 discordbot = commands.Bot(
     command_prefix="$",
@@ -32,7 +34,7 @@ discordbot.load_extension("alttprbot.cogs.voicerole")
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
-if not False:
+if not c.DEBUG:
     @discordbot.event
     async def on_command_error(ctx, error):
         riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
@@ -79,7 +81,7 @@ async def on_message(message):
 
     ctx = await discordbot.get_context(message)
     await discordbot.invoke(ctx)
-    
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

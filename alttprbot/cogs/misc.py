@@ -38,7 +38,7 @@ class Misc(commands.Cog):
         i = images[game]
 
         try:
-            image = next(item for item in i if item["slug"] == slug)
+            image = next(item for item in i if item["slug"] == slug or slug in item.get("aliases", []))
         except StopIteration:
             try:
                 image = next(item for item in i if item["idx"] == int(slug))
