@@ -1,5 +1,7 @@
 import json
 from urllib.parse import urljoin
+from html.parser import HTMLParser
+import datetime
 
 import aiocache
 import aiohttp
@@ -44,9 +46,23 @@ class Misc(commands.Cog):
 
         url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
         link = f"http://alttp.mymm1.com/holyimage/{game}-{image['slug']}.html"
-        await ctx.send(
-            f"**{image['title']}**\nLink: <{link}>\n\n{url}"
+
+        embed = discord.Embed(
+            title=image.get('title'),
+            description=None if not 'desc' in image else strip_tags(image['desc']),
+            color=discord.Colour.dark_green()
         )
+
+        if 'url' in image:
+            if image.get('mode','') == 'redirect':
+                embed.add_field(name='Link', value=image.get('url'), inline=False)
+            else:
+                embed.set_image(url=image.get('url'))
+
+        embed.add_field(name="Source", value=link)
+
+
+        await ctx.send(embed=embed)
 
 
 @aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache)
@@ -56,6 +72,23 @@ async def get_json(url):
             text = await resp.read()
 
     return json.loads(text)
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
