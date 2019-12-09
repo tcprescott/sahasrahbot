@@ -26,6 +26,7 @@ class TournamentQualifier(commands.Cog):
         self.bot = bot
 
     async def cog_check(self, ctx):
+        if ctx.guild is None: return False
         if ctx.guild.id in c.TournamentServers:
             return True
         else:

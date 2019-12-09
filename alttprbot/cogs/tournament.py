@@ -18,6 +18,7 @@ class Tournament(commands.Cog):
         self.bot = bot
 
     async def cog_check(self, ctx):
+        if ctx.guild is None: return False
         if ctx.guild.id in c.Tournament:
             return True
         else:
@@ -33,12 +34,21 @@ class Tournament(commands.Cog):
 
     @commands.command(
         help="Generate a tournament race.",
-        aliases=['restreamrace']
+        aliases=['restreamrace','tournyrace','tounyrace']
     )
     @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing','bot-commands')
     async def tourneyrace(self, ctx, episode_number):
+        logging_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
+
         if c.Tournament[ctx.guild.id]['tournament'] == 'main':
-            seed, game_number, players = await main.generate_game(episode_number, ctx.guild.id)
+            try:
+                seed, game_number, players = await main.generate_game(episode_number, ctx.guild.id)
+            except main.SettingsSubmissionNotFoundException as e:
+                await dm_all_players_sg(ctx, episode_number, f"Settings submission not found at <https://docs.google.com/spreadsheets/d/1GHBnuxdLgBcx4llvHepQjwd8Q1ASbQ_4J8ubblyG-0c/edit#gid=941774009>.  Please submit settings at <http://bit.ly/2Dbr9Kr> for episode `{episode_number}`!  Once complete, re-run `$tourneyrace` command or contact your setup helper to have command re-ran.")
+                raise
+            except main.InvalidSettingsException as e:
+                await dm_all_players_sg(ctx, episode_number, f"Settings submitted for episode `{episode_number}` are invalid!  Please contact a tournament administrator for assistance.")
+                raise
         elif c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
             seed, game_number, players = await secondary.generate_game(episode_number, ctx.guild.id)
         else:
@@ -54,7 +64,6 @@ class Tournament(commands.Cog):
             emojis=self.bot.emojis
         )
 
-        logging_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
         await logging_channel.send(embed=embed)
         await ctx.send(embed=tournament_embed)
 
@@ -84,6 +93,20 @@ class Tournament(commands.Cog):
                     member = ctx.guild.get_member(discord_user['discord_user_id'])
                     if member is not None:
                         await member.add_roles(role)
+
+
+async def dm_all_players_sg(ctx, episode_number, msg):
+    episode = await speedgaming.get_episode(int(episode_number))
+    for player in episode['match1']['players']:
+        try:
+            if not player.get('discordId', '') == '':
+                member = ctx.guild.get_member(int(player['discordId']))
+            else:
+                member = await commands.MemberConverter().convert(ctx, player['discordTag'])
+            await member.send(msg)
+        except:
+            pass
+
 
 def setup(bot):
     bot.add_cog(Tournament(bot))

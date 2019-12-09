@@ -10,17 +10,8 @@ from alttprbot.api.app import app
 
 from config import Config as c
 
-# override discord.py's process_commands coroutine in the commands.Bot class
-# this allows SpeedGamingBot to issue commands to SahasrahBot
-class SahasrahBot(commands.Bot):
-    async def process_commands(self, message):
-        if message.author.bot and not message.author.id == 344251539931660288:
-            return
 
-        ctx = await self.get_context(message)
-        await self.invoke(ctx)
-
-discordbot = SahasrahBot(
+discordbot = commands.Bot(
     command_prefix="$",
 )
 
@@ -41,10 +32,14 @@ discordbot.load_extension("alttprbot.cogs.voicerole")
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
-if not c.DEBUG:
+if not False:
     @discordbot.event
     async def on_command_error(ctx, error):
+        riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
+        if riplink is None: riplink = '👎'
+
         await ctx.message.remove_reaction('⌚', ctx.bot.user)
+
         if isinstance(error, commands.CheckFailure):
             await ctx.message.add_reaction('🚫')
         if isinstance(error, commands.errors.MissingPermissions):
@@ -53,10 +48,10 @@ if not c.DEBUG:
             pass
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             await ctx.send(error)
-            await ctx.message.add_reaction('👎')
+            await ctx.message.add_reaction(riplink)
         else:
             await ctx.send(error)
-            await ctx.message.add_reaction('👎')
+            await ctx.message.add_reaction(riplink)
 
 
 @discordbot.event
@@ -66,7 +61,7 @@ async def on_command(ctx):
 
 @discordbot.event
 async def on_command_completion(ctx):
-    await ctx.message.add_reaction('👍')
+    await ctx.message.add_reaction('✅')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
 
 
@@ -77,14 +72,14 @@ async def on_message(message):
         if emoji:
             await message.add_reaction(emoji)
 
-    await discordbot.process_commands(message)
+    # override discord.py's process_commands coroutine in the commands.Bot class
+    # this allows SpeedGamingBot to issue commands to SahasrahBot
+    if message.author.bot and not message.author.id == 344251539931660288:
+        return
 
-# @discordbot.check
-# async def globally_block_dms(ctx):
-#     if ctx.guild is None:
-#         return False
-#     else:
-#         return True
+    ctx = await discordbot.get_context(message)
+    await discordbot.invoke(ctx)
+    
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

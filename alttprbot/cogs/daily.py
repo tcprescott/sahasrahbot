@@ -18,8 +18,7 @@ from ..util.alttpr_discord import alttpr
 
 def is_daily_channel():
     async def predicate(ctx):
-        if ctx.guild is None:
-            return False
+        if ctx.guild is None: return False
         result = await config.get_parameter(ctx.guild.id, 'DailyAnnouncerChannel')
         if result is not None:
             channels = result['value'].split(',')
