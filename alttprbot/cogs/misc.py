@@ -1,6 +1,6 @@
 import json
 from urllib.parse import urljoin
-from html.parser import HTMLParser
+import html2markdown
 import datetime
 
 import aiocache
@@ -48,7 +48,7 @@ class Misc(commands.Cog):
 
         embed = discord.Embed(
             title=image.get('title'),
-            description=None if not 'desc' in image else strip_tags(image['desc']),
+            description=None if not 'desc' in image else html2markdown.convert(image['desc']),
             color=discord.Colour.dark_green()
         )
 
@@ -75,22 +75,6 @@ async def get_json(url):
             text = await resp.read()
 
     return json.loads(text)
-
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.strict = False
-        self.convert_charrefs= True
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
 
 
 def setup(bot):
