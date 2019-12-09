@@ -49,7 +49,7 @@ class Misc(commands.Cog):
         embed = discord.Embed(
             title=image.get('title'),
             description=None if not 'desc' in image else html2markdown.convert(image['desc']),
-            color=discord.Colour.dark_green()
+            color=discord.Colour.from_rgb(0xFF, 0xAF, 0x00)
         )
 
         if 'url' in image:
