@@ -38,14 +38,9 @@ class Misc(commands.Cog):
         i = images[game]
 
         try:
-            image = next(item for item in i if item["slug"] == slug or slug in item.get("aliases", []))
+            image = next(item for item in i if item["slug"] == slug or slug in item.get("aliases", []) or str(item["idx"]) == slug)
         except StopIteration:
-            try:
-                image = next(item for item in i if item["idx"] == int(slug))
-            except StopIteration:
-                raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
-            except ValueError:
-                raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
+            raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
 
         url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
         link = f"http://alttp.mymm1.com/holyimage/{game}-{image['slug']}.html"
