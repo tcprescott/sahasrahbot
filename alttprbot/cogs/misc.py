@@ -61,6 +61,9 @@ class Misc(commands.Cog):
 
         embed.add_field(name="Source", value=link)
 
+        if 'credit' in image:
+            embed.set_footer(text=f"Created by {image['credit']}")
+
 
         await ctx.send(embed=embed)
 
