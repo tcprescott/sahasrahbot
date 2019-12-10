@@ -43,7 +43,7 @@ if not c.DEBUG:
         await ctx.message.remove_reaction('⌚', ctx.bot.user)
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.message.add_reaction('🚫')
+            pass
         if isinstance(error, commands.errors.MissingPermissions):
             await ctx.message.add_reaction('🚫')
         elif isinstance(error, commands.CommandNotFound):

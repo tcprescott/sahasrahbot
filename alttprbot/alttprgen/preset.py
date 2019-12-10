@@ -18,7 +18,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
         async with aiofiles.open(os.path.join("presets", basename)) as f:
             preset_dict = yaml.load(await f.read(), Loader=yaml.FullLoader)
     except FileNotFoundError:
-        raise PresetNotFoundException(f'Could not find preset {preset}')
+        raise PresetNotFoundException(f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>')
 
     if hints:
         preset_dict['settings']['hints'] = 'on'

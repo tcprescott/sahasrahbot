@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from ..util.alttpr_discord import alttpr
+from ..util import checks
 from pyz3r.customizer import customizer
 
 from ..alttprgen.random import generate_random_game
@@ -18,13 +19,11 @@ class AlttprGen(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    async def seedgen(self, ctx, cmd):
-        await ctx.send(f'You can just use ${cmd} from now on!')
 
     @commands.command(
         help='Generate a customizer game using a customizer save file attached to the message.'
     )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def custom(self, ctx, tournament: bool = True):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
@@ -45,6 +44,7 @@ class AlttprGen(commands.Cog):
     @commands.command(
         help='Generate a preset.  Find a list of presets at https://l.synack.live/presets'
     )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def preset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
         goal_name = preset_dict['goal_name']
@@ -57,6 +57,7 @@ class AlttprGen(commands.Cog):
     @commands.command(
         help='Generate a spoiler game.  Find a list of presets at https://l.synack.live/presets'
     )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def spoiler(self, ctx, preset):
         seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
@@ -68,6 +69,7 @@ class AlttprGen(commands.Cog):
     @commands.command(
         help='Generate a game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
     )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         if weightset == "custom" and not ctx.message.attachments:
@@ -89,6 +91,7 @@ class AlttprGen(commands.Cog):
     @commands.command(
         help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
     )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
         if weightset == "custom" and not ctx.message.attachments:

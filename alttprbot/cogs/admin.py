@@ -14,7 +14,7 @@ class Admin(commands.Cog):
         name='config',
         help='A set of commands for configuring SahasrahBot for this server.'
     )
-    @commands.has_permissions(manage_guild=True)
+    @commands.is_owner()
     async def config_func(self, ctx):
         pass
 
@@ -22,6 +22,7 @@ class Admin(commands.Cog):
         name='set',
         help='Set a parameter.'
     )
+    @commands.is_owner()
     async def config_set(self, ctx, parameter, value):
         await config.set_parameter(ctx.guild.id, parameter, value)
 
@@ -29,6 +30,7 @@ class Admin(commands.Cog):
         name='get',
         help='Get a parameter.'
     )
+    @commands.is_owner()
     async def config_get(self, ctx):
         result = await config.get_parameters_by_guild(ctx.guild.id)
         await ctx.send(embed=embed_formatter.config(ctx, result))
@@ -37,6 +39,7 @@ class Admin(commands.Cog):
         name='delete',
         help='Delete a parameter.'
     )
+    @commands.is_owner()
     async def config_delete(self, ctx, parameter):
         await config.delete_parameter(ctx.guild.id, parameter)
 
