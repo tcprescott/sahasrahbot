@@ -173,11 +173,12 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
+                    try:
+                        seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
+                    except preset.PresetNotFoundException:
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+
                     goal_name = preset_dict['goal_name']
-                    if not seed:
-                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
-                        return
                     goal = f"vt8 randomizer - {goal_name}"
                     code = await seed.code()
                     if args.silent:
@@ -208,10 +209,10 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="off")
-
-                    if not seed:
-                        await self.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                    try:
+                        seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="off")
+                    except random.WeightsetNotFoundException:
+                        await self.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
                         return
 
                     code = await seed.code()
@@ -237,10 +238,10 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="mystery")
-
-                    if not seed:
-                        await self.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                    try:
+                        seed = await random.generate_random_game(weightset=args.weightset, tournament=True, spoilers="mystery")
+                    except random.WeightsetNotFoundException:
+                        await self.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
                         return
 
                     code = await seed.code()
@@ -269,11 +270,14 @@ class SrlBot(pydle.Client):
                     return
 
                 if srl['game']['abbrev'] == 'alttphacks':
-                    seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
+                    try:
+                        seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
+                    except preset.PresetNotFoundException:
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+
                     goal_name = preset_dict['goal_name']
 
                     if not seed:
-                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                         return
 
                     goal = f"vt8 randomizer - spoiler {goal_name}"
@@ -287,7 +291,7 @@ class SrlBot(pydle.Client):
                 elif srl['game']['abbrev'] == 'alttpsm':
                     seed, spoiler_log_url = await smz3_spoilers.generate_spoiler_game(args.preset)
 
-                    if not seed:
+                    if seed is None:
                         await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
                         return
 

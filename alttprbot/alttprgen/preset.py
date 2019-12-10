@@ -8,6 +8,8 @@ import yaml
 
 from config import Config as c
 
+class PresetNotFoundException(Exception):
+    pass
 
 async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
     # make sure someone isn't trying some path traversal shennaniganons
@@ -16,7 +18,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
         async with aiofiles.open(os.path.join("presets", basename)) as f:
             preset_dict = yaml.load(await f.read(), Loader=yaml.FullLoader)
     except FileNotFoundError:
-        return False, False
+        raise PresetNotFoundException(f'Could not find preset {preset}')
 
     if hints:
         preset_dict['settings']['hints'] = 'on'
