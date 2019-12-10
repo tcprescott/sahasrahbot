@@ -12,7 +12,7 @@ Example: `$preset open`
 
 Currently supported presets can be found <https://l.synack.live/presets>.  The preset name will be the name of the file without the .yaml extension.
 
-You can append "--hints" to the command to enable hints.  All presets have hints disabled by default, with a few exceptions (see preset for details).
+You can append `--hints` to the command to enable hints.  All presets have hints disabled by default, with a few exceptions (see preset for details).
 Supported for both alttphacks and smz3 games.  For smz3, only the normal and hard presets are supported.
 
 
