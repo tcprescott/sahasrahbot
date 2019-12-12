@@ -55,10 +55,10 @@ class AlttprGen(commands.Cog):
 
 
     @commands.command(
-        help='Generate a preset with spoilers.  Find a list of presets at https://l.synack.live/presets'
+        help='Generate a preset without the tournament flag enabled.  Find a list of presets at https://l.synack.live/presets'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def presetspoilers(self, ctx, preset, hints=False):
+    async def nonracepreset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
         goal_name = preset_dict['goal_name']
         if not seed:
