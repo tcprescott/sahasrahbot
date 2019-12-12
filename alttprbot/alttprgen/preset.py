@@ -11,7 +11,7 @@ from config import Config as c
 class PresetNotFoundException(Exception):
     pass
 
-async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
+async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournament=True):
     # make sure someone isn't trying some path traversal shennaniganons
     basename = os.path.basename(f'{preset}.yaml')
     try:
@@ -25,7 +25,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off"):
     elif nohints:
         preset_dict['settings']['hints'] = 'off'
 
-    preset_dict['settings']['tournament'] = True
+    preset_dict['settings']['tournament'] = tournament
     preset_dict['settings']['spoilers'] = spoilers
 
     if 'shuffle_prize_packs' in preset_dict and preset_dict['shuffle_prize_packs'] and preset_dict['customizer']:

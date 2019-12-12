@@ -42,11 +42,24 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        help='Generate a preset.  Find a list of presets at https://l.synack.live/presets'
+        help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def preset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
+        goal_name = preset_dict['goal_name']
+        if not seed:
+            raise Exception('Could not generate game.  Maybe preset does not exist?')
+        embed = await seed.embed(emojis=self.bot.emojis)
+        await ctx.send(embed=embed)
+
+
+    @commands.command(
+        help='Generate a preset with spoilers.  Find a list of presets at https://l.synack.live/presets'
+    )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def presetspoilers(self, ctx, preset, hints=False):
+        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
         goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception('Could not generate game.  Maybe preset does not exist?')
