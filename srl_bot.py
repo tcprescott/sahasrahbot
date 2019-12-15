@@ -35,6 +35,7 @@ class SrlBot(pydle.Client):
     async def on_connect(self):
         await self.message('NickServ', 'identify ' + c.SRL_PASSWORD)
         await self.join('#speedrunslive')
+        await self.join('#alttpr')
 
     # target = channel of the message
     # source = sendering of the message
@@ -176,7 +177,7 @@ class SrlBot(pydle.Client):
                     try:
                         seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
                     except preset.PresetNotFoundException:
-                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
 
                     goal_name = preset_dict['goal_name']
                     goal = f"vt8 randomizer - {goal_name}"
@@ -273,7 +274,7 @@ class SrlBot(pydle.Client):
                     try:
                         seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
                     except preset.PresetNotFoundException:
-                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
 
                     goal_name = preset_dict['goal_name']
 
@@ -292,7 +293,7 @@ class SrlBot(pydle.Client):
                     seed, spoiler_log_url = await smz3_spoilers.generate_spoiler_game(args.preset)
 
                     if seed is None:
-                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                        await self.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
                         return
 
                     goal = f"spoiler beat the games"
@@ -317,7 +318,7 @@ class SrlBot(pydle.Client):
                 await self.message(target, f".setgoal new race")
 
             if args.command == '$help' and target.startswith('#srl-'):
-                await self.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
+                await self.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live")
 
             if args.command == '$joinroom':
                 await self.join(args.channel)
