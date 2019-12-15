@@ -68,7 +68,7 @@ class Misc(commands.Cog):
         await ctx.send(embed=embed)
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache)
+#@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache)
 async def get_json(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
