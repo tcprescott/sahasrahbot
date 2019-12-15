@@ -124,6 +124,17 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
 
+    @commands.command(hidden=True,aliases=['festives'])
+    async def festive(self, ctx):
+        embed = discord.Embed(
+            title='Festive Randomizer Information',
+            description='Latest details of any upcoming festive randomizers.',
+            color=discord.Color.green()
+        )
+        embed.set_image(url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
+        await ctx.send(embed=embed)
+
+
 async def get_customizer_json(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:

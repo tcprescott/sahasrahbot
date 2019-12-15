@@ -29,10 +29,6 @@ class Misc(commands.Cog):
     async def rom(self, ctx):
         await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
-    @commands.command(hidden=True,aliases=['festives'])
-    async def festive(self, ctx):
-        await ctx.send('https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
-
     @commands.command(
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
