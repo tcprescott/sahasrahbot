@@ -28,7 +28,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
     preset_dict['settings']['tournament'] = tournament
     preset_dict['settings']['spoilers'] = spoilers
 
-    if 'shuffle_prize_packs' in preset_dict and preset_dict['shuffle_prize_packs'] and preset_dict['customizer']:
+    if preset_dict.get('shuffle_prize_packs', False) and preset_dict['customizer']:
         p = ['0','1','2','3','4','5','6']
         random.shuffle(p)
         # print(p)

@@ -1,7 +1,7 @@
 import argparse
 import json
 import yaml
-from pyz3r.customizer import customizer
+from pyz3r import customizer
 
 parser = argparse.ArgumentParser()
 parser.add_argument('customizer_save')

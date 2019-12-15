@@ -1,7 +1,7 @@
-import pysmz3
+import pyz3r
 
 async def get_preset(preset, tournament=True, morph='randomized'):
-    seed = await pysmz3.smz3(
+    seed = await pyz3r.smz3(
         settings={
             'logic': 'NoMajorGlitches',
             'sm_logic': 'Casual' if preset == 'normal' else 'Tournament',

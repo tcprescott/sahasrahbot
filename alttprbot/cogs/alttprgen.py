@@ -3,9 +3,9 @@ from discord.ext import commands
 
 from ..util.alttpr_discord import alttpr
 from ..util import checks
-from pyz3r.customizer import customizer
+import pyz3r
 
-from ..alttprgen.random import generate_random_game
+from ..alttprgen.mystery import generate_random_game
 from ..alttprgen.preset import get_preset
 from ..alttprgen.spoilers import generate_spoiler_game
 
@@ -33,7 +33,7 @@ class AlttprGen(commands.Cog):
 
         customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
 
-        settings = customizer.convert2settings(
+        settings = pyz3r.customizer.convert2settings(
             customizer_settings, tournament=tournament)
 
         seed = await alttpr(customizer=True, settings=settings)
