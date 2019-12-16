@@ -20,8 +20,6 @@ srl_game_whitelist = [
 async def handler(target, source, message, client):
     if not (source == 'RaceBot' or source == 'synack'): return
     
-    loop = asyncio.get_running_loop()
-
     if target == '#speedrunslive':
         result = newroom.search(message)
         if result and result.group(1) in srl_game_whitelist:
@@ -47,7 +45,7 @@ async def handler(target, source, message, client):
             srl_id = srl_race_id(target)
 
             await discord_race_start(srl_id)
-            
+
             # spoilers
             race = await spoiler_races.get_spoiler_race_by_id(srl_id)
             if race:
@@ -60,7 +58,6 @@ async def handler(target, source, message, client):
                     ircbot=client,
                     duration_in_seconds=race['studytime'],
                     srl_channel=target,
-                    loop=loop,
                     beginmessage=True,
                 )
                 await spoiler_races.delete_spoiler_race(srl_id)
@@ -91,7 +88,9 @@ async def discord_race_finish(result):
             returntype='json'
         )
 
-async def countdown_timer(ircbot, duration_in_seconds, srl_channel, loop, beginmessage=False):
+async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage=False):
+    loop = asyncio.get_running_loop()
+
     reminders = [1800,1500,1200,900,600,300,120,60,30,10,9,8,7,6,5,4,3,2,1]
     start_time = loop.time()
     end_time = loop.time() + duration_in_seconds

@@ -1,31 +1,16 @@
-import argparse
 import asyncio
-import json
-import math
-import re
-import shlex
-import sys
-import time
 
-import aiohttp
-import ircmessage
 # import aioschedule as schedule
 import pydle
 from quart import abort, jsonify, request
 from quart_openapi import Pint, Resource
 
-from alttprbot.alttprgen import preset, mystery, spoilers
-from alttprbot.database import spoiler_races, srl_races
-from alttprbot.smz3gen import preset as smz3_preset
-from alttprbot.smz3gen import spoilers as smz3_spoilers
+from alttprbot.database import srl_races
 from alttprbot.util import orm
-
-from alttprbot.util.srl import get_all_races, get_race, srl_race_id
-from alttprbot_srl import racebot, commands
-
+from alttprbot.util.srl import get_all_races, get_race
+from alttprbot_srl import commands, racebot
 from config import Config as c
 
-import alttprbot_srl.commands
 
 class SrlBot(pydle.Client):
     async def on_connect(self):
