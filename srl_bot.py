@@ -46,15 +46,15 @@ class SrlBot(pydle.Client):
             await asyncio.sleep(1)
             await self.join('#speedrunslive')
             await self.join('#alttpr')
-            await self.join_active_races('alttphacks')
+            await self.join_active_races(['alttphacks','alttpsm'])
             await self.process_active_races()
             if c.DEBUG: await self.join('#srl-synack-testing')
 
 
-    async def join_active_races(self, game):
+    async def join_active_races(self, games):
         races = await get_all_races()
         for race in races['races']:
-            if race['game']['abbrev'] == game:
+            if race['game']['abbrev'] in games:
                 race_id=race['id']
                 if not self.in_channel(f'#srl-{race_id}'):
                     if c.DEBUG:
