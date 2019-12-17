@@ -29,6 +29,10 @@ class Misc(commands.Cog):
     async def rom(self, ctx):
         await ctx.send("If you need help verifying your legally dumped Japan 1.0 rom file needed for ALTTPR, check this out: http://alttp.mymm1.com/game/checkcrc/\nIt can also tell you the permalink of an already randomized game!\n\nFor legal reasons, we cannot provide help with finding this ROM online.")
 
+    @commands.command(help="Gives you a link to the ALTTPR Wiki")
+    async def wiki(self, ctx):
+        await ctx.send('https://link.alttpr.com/wiki')
+
     @commands.command(
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
