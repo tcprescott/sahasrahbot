@@ -31,7 +31,7 @@ class Misc(commands.Cog):
 
     @commands.command(help="Gives you a link to the ALTTPR Wiki")
     async def wiki(self, ctx):
-        await ctx.send('https://link.alttpr.com/wiki')
+        await ctx.send('http://alttp.mymm1.com/wiki/The_Legend_of_Zelda:_A_Link_to_the_Past')
 
     @commands.command(
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
