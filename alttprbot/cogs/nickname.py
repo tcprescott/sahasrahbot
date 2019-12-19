@@ -1,15 +1,12 @@
 import discord
 from discord.ext import commands
-
 from quart import abort, jsonify, request
-from quart_openapi import Pint, Resource
-
-from config import Config as c
 
 from alttprbot.api.app import app
-from ..util import srl
+from config import Config as c
 
-from ..database import srlnick, config
+from ..database import config, srlnick
+from ..util import srl
 
 discordbot = None
 
@@ -55,7 +52,7 @@ async def finish():
                     for nickmapping in nickmappings:
                         user = discord.utils.get(guild.members, id=nickmapping['discord_user_id'])
                         try:
-                            await user.remove_roles(role)
+                            await user.remove_roles(role, reason=f'Finished SRL race {data.get("raceid","unknown")}')
                         except:
                             pass
         else:
@@ -81,7 +78,7 @@ async def start():
                         for nickmapping in nickmappings:
                             user = discord.utils.get(guild.members, id=nickmapping['discord_user_id'])
                             try:
-                                await user.add_roles(role)
+                                await user.add_roles(role, reason=f'Started SRL race {data.get("raceid","unknown")}')
                             except:
                                 pass        
         else:

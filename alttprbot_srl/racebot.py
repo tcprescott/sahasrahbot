@@ -1,11 +1,13 @@
-import re
-from config import Config as c
 import asyncio
-from alttprbot.util.srl import get_all_races, get_race, srl_race_id
-from alttprbot.database import spoiler_races, srl_races
-from alttprbot.util.http import request_generic, request_json_post
-import ircmessage
 import math
+import re
+
+import ircmessage
+
+from alttprbot.database import spoiler_races, srl_races
+from alttprbot.util.http import request_json_post
+from alttprbot.util.srl import srl_race_id
+from config import Config as c
 
 starting = re.compile("\\x034\\x02The race will begin in 10 seconds!\\x03\\x02")
 go = re.compile("\\x034\\x02GO!\\x03\\x02")
@@ -18,7 +20,9 @@ srl_game_whitelist = [
 ]
 
 async def handler(target, source, message, client):
-    if not (source == 'RaceBot' or source == 'synack'): return
+    if not (source == 'RaceBot' or source == 'synack'):
+        return
+    srl_id = srl_race_id(target)
     
     if target == '#speedrunslive':
         result = newroom.search(message)
@@ -33,7 +37,6 @@ async def handler(target, source, message, client):
 
     if target.startswith('#srl-'):
         if starting.match(message) or message=='test starting':
-            srl_id = srl_race_id(target)
             race = await srl_races.get_srl_race_by_id(srl_id)
             if race:
                 if not client.in_channel(target):
@@ -42,8 +45,6 @@ async def handler(target, source, message, client):
                 await srl_races.delete_srl_race(srl_id)
 
         if go.match(message) or message=='test go':
-            srl_id = srl_race_id(target)
-
             await discord_race_start(srl_id)
 
             # spoilers
@@ -63,7 +64,8 @@ async def handler(target, source, message, client):
                 await spoiler_races.delete_spoiler_race(srl_id)
 
         result = runnerdone.search(message)
-        if result: await discord_race_finish(result)
+        if result:
+            await discord_race_finish(result, srl_id)
 
 
 async def discord_race_start(srl_id):
@@ -77,13 +79,14 @@ async def discord_race_start(srl_id):
             returntype='json'
         )
 
-async def discord_race_finish(result):
+async def discord_race_finish(result, srl_id):
     if not c.DEBUG:
         await request_json_post(
             'http://localhost:5001/api/srl/finish',
             data = {
                 'auth': c.InternalApiToken,
-                'nick': result.group(1)
+                'nick': result.group(1),
+                'raceid': srl_id
             },
             returntype='json'
         )
