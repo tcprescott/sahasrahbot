@@ -83,7 +83,7 @@ class AlttprGen(commands.Cog):
         help='Generate a game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+#    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         if weightset == "custom" and not ctx.message.attachments:
             raise Exception('You must attach a file when specifying a custom weightset.')
@@ -105,7 +105,7 @@ class AlttprGen(commands.Cog):
         help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+#    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
         if weightset == "custom" and not ctx.message.attachments:
             raise Exception('You must attach a file when specifying a custom weightset.')
