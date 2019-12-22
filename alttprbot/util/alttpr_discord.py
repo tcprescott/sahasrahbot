@@ -1,8 +1,11 @@
-from pyz3r.alttpr import alttprClass 
-import html2markdown
-import discord
-from config import Config as c
 import datetime
+
+import discord
+import html2markdown
+from pyz3r.alttpr import alttprClass
+from pyz3r.http import http
+
+from config import Config as c
 
 emoji_code_map = {
     'Bow': 'Bow',
@@ -39,18 +42,49 @@ emoji_code_map = {
     'Big Key': 'BigKey'
 }
 
-async def alttpr(settings=None, hash=None, customizer=False):
-    seed = alttprDiscordClass(settings=settings, hash=hash, customizer=customizer)
+async def alttpr(settings=None, hash=None, customizer=False, festive=False):
+    seed = alttprDiscordClass(settings=settings, hash=hash, customizer=customizer, festive=festive)
     await seed._init()
     return seed
 
 class alttprDiscordClass(alttprClass):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, festive, *args, **kwargs):
         super(alttprDiscordClass, self).__init__(*args, **kwargs)
         self.seed_baseurl = c.seed_baseurl
         self.baseurl = c.baseurl
         self.username = c.username
         self.password = c.password
+        self.festive = festive
+
+    async def _init(self):
+
+        self.site = http(
+            site_baseurl=self.baseurl,
+            patch_baseurl=self.seed_baseurl,
+            username=self.username,
+            password=self.password,
+        )
+
+        if self.customizer:
+            endpoint = '/api/customizer'
+        elif self.festive:
+            endpoint = '/api/festive'
+        else:
+            endpoint = '/api/randomizer'
+
+        if self.settings is None and self.hash is None:
+            self.data = None
+        else:
+            if self.settings:
+                self.data = await self.site.generate_game(endpoint, self.settings)
+                self.hash = self.data['hash']
+            else:
+                self.data = await self.site.retrieve_game(self.hash)
+
+            self.url = '{baseurl}/h/{hash}'.format(
+                baseurl=self.baseurl,
+                hash=self.hash
+            )
 
     async def embed(self, emojis=False, name=False, notes=False):
         if not name:
@@ -73,6 +107,12 @@ class alttprDiscordClass(alttprClass):
             color=discord.Colour.dark_red(),
             timestamp=datetime.datetime.fromisoformat(self.data['generated'])
         )
+
+        if self.data['spoiler']['meta'].get('special',False):
+            embed.add_field(
+                name='Festive Randomizer',
+                value="This game is a festive randomizer.  Happy holidays!",
+                inline=False)
 
         if self.data['spoiler']['meta'].get('spoilers','off') == "mystery":
             embed.add_field(
@@ -98,8 +138,8 @@ class alttprDiscordClass(alttprClass):
                 name='Goal',
                 value="**Goal:** {goal}\n**Open Tower:** {tower}\n**Ganon Vulnerable:** {ganon}".format(
                     goal=settings_map['goals'][self.data['spoiler']['meta']['goal']],
-                    tower=self.data['spoiler']['meta']['entry_crystals_tower'],
-                    ganon=self.data['spoiler']['meta']['entry_crystals_ganon'],
+                    tower=self.data['spoiler']['meta'].get('entry_crystals_tower', 'unknown'),
+                    ganon=self.data['spoiler']['meta'].get('entry_crystals_ganon', 'unknown'),
                 ),
                 inline=True)
             embed.add_field(
