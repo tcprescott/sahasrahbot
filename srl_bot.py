@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 # import aioschedule as schedule
 import pydle
@@ -15,6 +16,13 @@ from config import Config as c
 class SrlBot(pydle.Client):
     async def on_connect(self):
         await self.message('NickServ', 'identify ' + c.SRL_PASSWORD)
+        await asyncio.sleep(1)
+        await self.join('#speedrunslive')
+        await self.join('#alttpr')
+        await self.join_active_races(['alttphacks', 'alttpsm'])
+        await self.process_active_races()
+        if c.DEBUG:
+            await self.join('#srl-synack-testing')
 
     # target = channel of the message
     # source = sendering of the message
@@ -25,37 +33,41 @@ class SrlBot(pydle.Client):
               ' - ' + message)  # dumb debugging message
 
         # filter messages sent by the bot (we do not want to react to these)
-        if source == c.SRL_NICK: return
+        if source == c.SRL_NICK:
+            return
 
         # handle messages from racebot
         await racebot.handler(target=target, source=source, message=message, client=self)
 
-        # handle user commands
-        await commands.handler(target=target, source=source, message=message, client=self)
-
+        try:
+            # handle user commands
+            await commands.handler(target=target, source=source, message=message, client=self)
+        except Exception as err:
+            await self.message(target, f'Error {type(err)}: "{str(err)}".  Please contact Synack if this condition persists.')
+            raise err
 
     # target = you
     # source = sendering of the message
     # message = the message, duh
+
     async def on_notice(self, target, source, message):
         print('NOTICE: ' + target + ' - ' + source +
               ' - ' + message)  # dumb debugging message
 
         # do stuff that we want after getting recognized by NickServ
-        if message == 'Password accepted - you are now recognized.':
-            await asyncio.sleep(1)
-            await self.join('#speedrunslive')
-            await self.join('#alttpr')
-            await self.join_active_races(['alttphacks','alttpsm'])
-            await self.process_active_races()
-            if c.DEBUG: await self.join('#srl-synack-testing')
-
+        # if message == 'Password accepted - you are now recognized.':
+        #     await asyncio.sleep(1)
+        #     await self.join('#speedrunslive')
+        #     await self.join('#alttpr')
+        #     await self.join_active_races(['alttphacks', 'alttpsm'])
+        #     await self.process_active_races()
+        #     if c.DEBUG: await self.join('#srl-synack-testing')
 
     async def join_active_races(self, games):
         races = await get_all_races()
         for race in races['races']:
             if race['game']['abbrev'] in games:
-                race_id=race['id']
+                race_id = race['id']
                 if not self.in_channel(f'#srl-{race_id}'):
                     if c.DEBUG:
                         print(f'would have joined #srl-{race_id}')
@@ -79,6 +91,7 @@ class SrlBot(pydle.Client):
 
 app = Pint(__name__, title='Srl Bot API')
 
+
 @app.route('/api/message')
 class Message(Resource):
     async def post(self):
@@ -90,6 +103,7 @@ class Message(Resource):
             return jsonify({"success": True})
         else:
             abort(401)
+
 
 if __name__ == '__main__':
     client = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)

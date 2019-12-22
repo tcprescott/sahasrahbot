@@ -1,0 +1,16 @@
+---
+goal_name: festive owg - DO NOT RECORD
+festive: true
+settings:
+  glitches: overworld_glitches
+  item_placement: advanced
+  dungeon_items: standard
+  accessibility: items
+  hints: 'off'
+  weapons: assured
+  item:
+    pool: normal
+    functionality: normal
+  tournament: true
+  spoilers: 'off'
+  lang: en

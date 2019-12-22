@@ -1,12 +1,14 @@
 import argparse
-import sys
 import shlex
-from alttprbot.util.srl import get_all_races, get_race, srl_race_id
-from alttprbot.database import srl_races
-from alttprbot.alttprgen import preset, mystery, spoilers
+import sys
+
+from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races, srl_races
 from alttprbot.smz3gen import preset as smz3_preset
 from alttprbot.smz3gen import spoilers as smz3_spoilers
+from alttprbot.util.srl import get_all_races, get_race, srl_race_id
+
+from config import Config as c
 
 
 async def handler(target, source, message, client):
@@ -30,10 +32,7 @@ async def handler(target, source, message, client):
             return
 
         if srl['game']['abbrev'] == 'alttphacks':
-            try:
-                seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
-            except preset.PresetNotFoundException:
-                await client.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
+            seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
 
             goal_name = preset_dict['goal_name']
             goal = f"vt8 randomizer - {goal_name}"
@@ -55,7 +54,10 @@ async def handler(target, source, message, client):
 
         await srl_races.insert_srl_race(srl_id, goal)
 
-    if args.command == '$random' and target.startswith('#srl-'):
+    if args.command in ['$random', '$festiverandom', '$mystery', '$festivemystery'] and target.startswith('#srl-'):
+        mode = "random" if args.command in ['$random', '$festiverandom'] else "mystery"
+        festive = True if args.command in ['$festiverandom', '$festivemystery'] and c.FESTIVEMODE else False
+
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
         await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -66,43 +68,20 @@ async def handler(target, source, message, client):
             return
 
         if srl['game']['abbrev'] == 'alttphacks':
-            try:
-                seed = await mystery.generate_random_game(weightset=args.weightset, tournament=True, spoilers="off")
-            except mystery.WeightsetNotFoundException:
-                await client.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
-                return
+            seed = await mystery.generate_random_game(
+                weightset=args.weightset,
+                tournament=True,
+                spoilers="off" if mode == "random" else "mystery",
+                festive=festive
+            )
 
             code = await seed.code()
-            goal = f"vt8 randomizer - random {args.weightset}"
-            if args.silent:
-                await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+
+            if festive:
+                goal = f"vt8 randomizer - {mode} {args.weightset} - DO NOT RECORD"
             else:
-                await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-        else:
-            await client.message(target, "This game is not yet supported.")
-            return
+                goal = f"vt8 randomizer - {mode} {args.weightset}"
 
-        await srl_races.insert_srl_race(srl_id, goal)
-
-    if args.command == '$mystery' and target.startswith('#srl-'):
-        srl_id = srl_race_id(target)
-        srl = await get_race(srl_id)
-        await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-        race = await srl_races.get_srl_race_by_id(srl_id)
-
-        if race:
-            await client.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
-            return
-
-        if srl['game']['abbrev'] == 'alttphacks':
-            try:
-                seed = await mystery.generate_random_game(weightset=args.weightset, tournament=True, spoilers="mystery")
-            except mystery.WeightsetNotFoundException:
-                await client.message(target, "That weightset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
-                return
-
-            code = await seed.code()
-            goal = f"vt8 randomizer - mystery {args.weightset}"
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
             else:
@@ -127,10 +106,7 @@ async def handler(target, source, message, client):
             return
 
         if srl['game']['abbrev'] == 'alttphacks':
-            try:
-                seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
-            except preset.PresetNotFoundException:
-                await client.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
+            seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
 
             goal_name = preset_dict['goal_name']
 
@@ -215,6 +191,15 @@ def parse_args(message):
     parser_mystery = subparsers.add_parser('$mystery')
     parser_mystery.add_argument('weightset', nargs='?', default="weighted")
     parser_mystery.add_argument('--silent', action='store_true')
+
+    if c.FESTIVEMODE:
+        parser_festiverandom = subparsers.add_parser('$festiverandom')
+        parser_festiverandom.add_argument('weightset', nargs='?', default="weighted")
+        parser_festiverandom.add_argument('--silent', action='store_true')
+
+        parser_festivemystery = subparsers.add_parser('$festivemystery')
+        parser_festivemystery.add_argument('weightset', nargs='?', default="weighted")
+        parser_festivemystery.add_argument('--silent', action='store_true')
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')
