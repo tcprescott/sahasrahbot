@@ -78,7 +78,7 @@ async def handler(target, source, message, client):
             code = await seed.code()
 
             if festive:
-                goal = f"vt8 randomizer - {mode} {args.weightset} - DO NOT RECORD"
+                goal = f"vt8 randomizer - festive {mode} {args.weightset} - DO NOT RECORD"
             else:
                 goal = f"vt8 randomizer - {mode} {args.weightset}"
 
