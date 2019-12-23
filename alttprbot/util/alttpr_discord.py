@@ -48,43 +48,12 @@ async def alttpr(settings=None, hash=None, customizer=False, festive=False):
     return seed
 
 class alttprDiscordClass(alttprClass):
-    def __init__(self, festive, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(alttprDiscordClass, self).__init__(*args, **kwargs)
         self.seed_baseurl = c.seed_baseurl
         self.baseurl = c.baseurl
         self.username = c.username
         self.password = c.password
-        self.festive = festive
-
-    async def _init(self):
-
-        self.site = http(
-            site_baseurl=self.baseurl,
-            patch_baseurl=self.seed_baseurl,
-            username=self.username,
-            password=self.password,
-        )
-
-        if self.customizer:
-            endpoint = '/api/customizer'
-        elif self.festive:
-            endpoint = '/api/festive'
-        else:
-            endpoint = '/api/randomizer'
-
-        if self.settings is None and self.hash is None:
-            self.data = None
-        else:
-            if self.settings:
-                self.data = await self.site.generate_game(endpoint, self.settings)
-                self.hash = self.data['hash']
-            else:
-                self.data = await self.site.retrieve_game(self.hash)
-
-            self.url = '{baseurl}/h/{hash}'.format(
-                baseurl=self.baseurl,
-                hash=self.hash
-            )
 
     async def embed(self, emojis=False, name=False, notes=False):
         if not name:
@@ -213,8 +182,8 @@ class alttprDiscordClass(alttprClass):
 
 async def build_file_select_code(code, emojis=None):
     if emojis:
-        c = list(map(lambda x: str(discord.utils.get(
+        emoji_list = list(map(lambda x: str(discord.utils.get(
             emojis, name=emoji_code_map[x])), code))
-        return ' '.join(c) + ' (' + '/'.join(code) + ')'
+        return ' '.join(emoji_list) + ' (' + '/'.join(code) + ')'
     else:
         return '/'.join(code)
