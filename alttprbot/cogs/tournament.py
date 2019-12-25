@@ -64,6 +64,18 @@ class Tournament(commands.Cog):
             emojis=self.bot.emojis
         )
 
+        if c.Tournament[ctx.guild.id]['tournament'] == 'main' and 'commentary_channel' in c.Tournament[ctx.guild.id]:
+            episode = await speedgaming.get_episode(int(episode_number))
+            broadcast_channels = []
+            for channel in episode['channels']:
+                if not channel['name'] == "No Stream":
+                    broadcast_channels.append(channel['name'])
+            if len(broadcast_channels) > 0:
+                commentary_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['commentary_channel'])
+                tournament_embed.insert_field_at(0, name="Broadcast Channels", value=f"*{', '.join(broadcast_channels)}*", inline=False)
+                embed.insert_field_at(0, name="Broadcast Channels", value=f"*{', '.join(broadcast_channels)}*", inline=False)
+                await commentary_channel.send(embed=tournament_embed)
+
         await logging_channel.send(embed=embed)
         await ctx.send(embed=tournament_embed)
 
