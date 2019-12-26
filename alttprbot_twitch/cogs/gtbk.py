@@ -10,7 +10,7 @@ from alttprbot.util import speedgaming
 async def whitelisted(ctx):
     if ctx.author.name == ctx.channel.name:
         return True
-    if ctx.author.is_mod():
+    if ctx.author.is_mod:
         return True
 
     if ctx.channel.name in [
