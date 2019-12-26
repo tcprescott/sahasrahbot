@@ -1,10 +1,28 @@
-from . import http
-from config import Config as c
-import aiofiles
+import datetime
 import json
+from datetime import timedelta
+
+import aiofiles
+
+from config import Config as c
+
+from . import http
+
 
 class SGEpisodeNotFoundException(Exception):
     pass
+
+async def get_upcoming_episodes_by_event(event):
+    now = datetime.datetime.now()
+    sched_from = now - timedelta(hours=12)
+    sched_to = now + timedelta(hours=6)
+    params = {
+        'event': event,
+        'from': sched_from.isoformat(),
+        'to': sched_to.isoformat()
+    }
+    result = await http.request_generic(f'{c.SgApiEndpoint}/schedule', reqparams=params, returntype='json')
+    return result
 
 async def get_episode(episodeid, complete=False):
     # if we're developing locally, we want to have some artifical data to use that isn't from SpeedGaming

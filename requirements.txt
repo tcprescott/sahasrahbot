@@ -19,3 +19,5 @@ oauth2client
 jishaku
 python-dotenv
 html2markdown
+TwitchIO
+pytz
