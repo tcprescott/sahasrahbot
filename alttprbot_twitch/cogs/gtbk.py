@@ -80,7 +80,7 @@ class Gtbk():
         for runnerup in runnerups:
             await gtbk.update_score(guess_id=runnerup['guess_id'], score=5)
 
-        # await gtbk.update_game_status(ctx.channel.name, "COMPLETED")
+        await gtbk.update_game_status(ctx.channel.name, "COMPLETED")
 
         msg = f"{winner['twitch_user']} was the winner of the Ganon\'s Tower Big Key guessing game. {winner['twitch_user']} guessed {winner['guess']} and the big key was {key} and has thus scored {points} point(s) on the {ctx.channel.name} GTBK leaderboard!"
 
