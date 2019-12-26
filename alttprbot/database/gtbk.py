@@ -63,9 +63,30 @@ async def update_score(guess_id, score):
         [score, guess_id]
     )
 
-async def get_channel_leaderboard(channel):
+async def get_channel_group(channel):
     results = await orm.select(
-        'SELECT guess.twitch_user,SUM(score) as "points" FROM alttprbot_dev.gtbk_guesses guess LEFT JOIN alttprbot_dev.gtbk_games games ON games.game_id = guess.game_id WHERE games.channel=%s GROUP BY guess.twitch_user, games.channel ORDER BY points desc LIMIT 10;',
+        'SELECT * from twitch_channels where channel=%s;',
         [channel]
     )
-    return results
+    return results[0] if len(results) > 0 else None
+
+async def get_group_leaderboard(group):
+    sql = 'SELECT guess.twitch_user,tc.group,SUM(score) as "points" ' \
+            'FROM gtbk_guesses guess ' \
+            'LEFT JOIN gtbk_games games ON games.game_id = guess.game_id ' \
+            'LEFT JOIN twitch_channels tc ON games.channel = tc.channel ' \
+            'WHERE tc.group=%s ' \
+            'GROUP BY guess.twitch_user, tc.group ' \
+            'ORDER BY points desc ' \
+            'LIMIT 10;'
+    return await orm.select(sql, [group])
+
+async def get_channel_leaderboard(channel):
+    sql = 'SELECT guess.twitch_user,games.channel,SUM(score) as "points" ' \
+            'FROM gtbk_guesses guess ' \
+            'LEFT JOIN gtbk_games games ON games.game_id = guess.game_id ' \
+            'WHERE games.channel=%s ' \
+            'GROUP BY guess.twitch_user, games.channel ' \
+            'ORDER BY points desc ' \
+            'LIMIT 10;'
+    return await orm.select(sql, [channel])

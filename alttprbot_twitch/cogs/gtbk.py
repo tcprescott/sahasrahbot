@@ -102,7 +102,12 @@ class Gtbk():
 
     @commands.command()
     async def leaderboard(self, ctx):
-        leaderboard = await gtbk.get_channel_leaderboard(ctx.channel.name)
+        group_mapping = await gtbk.get_channel_group(ctx.channel.name)
+
+        if group_mapping:
+            leaderboard = await gtbk.get_group_leaderboard(group_mapping['group'])
+        else:
+            leaderboard = await gtbk.get_channel_leaderboard(ctx.channel.name)
         msg = f'Current GTBK game leaderboard for {ctx.channel.name}: '
         for row in leaderboard:
             if row['points'] > 0:
