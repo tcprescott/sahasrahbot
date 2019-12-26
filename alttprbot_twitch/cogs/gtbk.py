@@ -91,7 +91,7 @@ class Gtbk():
 
         await ctx.send(msg)
 
-    @commands.command(aliases=['key'])
+    @commands.command()
     @commands.check(whitelisted)
     async def status(self, ctx):
         game = await gtbk.get_current_active_game(ctx.channel.name)
