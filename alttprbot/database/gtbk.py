@@ -90,3 +90,11 @@ async def get_channel_leaderboard(channel):
             'ORDER BY points desc ' \
             'LIMIT 10;'
     return await orm.select(sql, [channel])
+
+async def get_channel_whitelist(channel):
+    sql = 'SELECT * FROM gtbk_whitelist where channel=%s;'
+    return await orm.select(sql, [channel])
+
+async def add_channel_whitelist(channel, twitch_user):
+    sql = 'INSERT INTO gtbk_whitelist(channel, twitch_user) VALUES (%s,%s);'
+    await orm.execute(sql, [channel, twitch_user])

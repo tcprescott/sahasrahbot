@@ -30,10 +30,21 @@ async def whitelisted(ctx):
         if ctx.author.name.lower() in whitelist:
             return True
 
+    channel_whitelist = await gtbk.get_channel_whitelist(ctx.channel.name)
+    for user in channel_whitelist:
+        if user['twitch_user'].lower() == ctx.author.name.lower():
+            return True
+
     return False
 
 async def is_synack(ctx):
     return ctx.author.name == 'the_synack'
+
+async def is_broadcastor(ctx):
+    return ctx.author.name == ctx.channel.name
+
+async def is_mod(ctx):
+    return ctx.author.is_mod or ctx.author.name == ctx.channel.name
 
 @commands.core.cog()
 class Gtbk():
@@ -61,8 +72,14 @@ class Gtbk():
     @commands.check(whitelisted)
     async def stop(self, ctx):
         await gtbk.update_game_status(ctx.channel.name, "STOPPED")
-        points = await calculate_score(ctx.channel.name)
-        await ctx.send(f'Guesses have now closed. {points} points will be awarded to the winner. Good luck!')
+        guesses = await gtbk.get_active_game_guesses(ctx.channel.name)
+        if guesses:
+            points = await calculate_score(ctx.channel.name)
+            await ctx.send(f'Guesses have now closed. {points} points will be awarded to the winner. Good luck!')
+        else:
+            await ctx.send("Game had no guesses.  This game is now completed.")
+            await gtbk.update_game_status(ctx.channel.name, "COMPLETED")
+
 
     @commands.command(aliases=['key'])
     @commands.check(whitelisted)
@@ -113,6 +130,12 @@ class Gtbk():
             if row['points'] > 0:
                 msg += f"{row['twitch_user']} has {row['points']} point(s), "
         await ctx.send(msg)
+
+    @commands.command()
+    @commands.check(whitelisted)
+    async def whitelist(self, ctx, twitch_user):
+        await gtbk.add_channel_whitelist(ctx.channel.name, twitch_user)
+        await ctx.send(f"{twitch_user} whitelisted successfully!")
 
     @commands.command()
     @commands.check(is_synack)
