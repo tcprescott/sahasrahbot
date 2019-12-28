@@ -71,7 +71,9 @@ def reaction_menu(ctx, group, roles):
     embed = discord.Embed(
         title=group['name'],
         description=group['description'],
-        color=discord.Colour.green())
+        color=discord.Colour.green(),
+        timestamp=datetime.datetime.now()
+    )
     value = ''
     for role in roles:
         value = value + '{emoji} `{name}`: {description}\n'.format(
@@ -80,8 +82,5 @@ def reaction_menu(ctx, group, roles):
             description=role['description']
         )
     embed.add_field(name='Roles', value=value, inline=False)
-    embed.set_footer(text='id: {id} - last updated {date}'.format(
-        id=group['id'],
-        date=datetime.datetime.now()
-    ))
+    embed.set_footer(text=group['id'])
     return embed

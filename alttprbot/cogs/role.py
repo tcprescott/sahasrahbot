@@ -1,11 +1,12 @@
 
-import discord
-from discord.ext import commands
-from ..database import role
-from ..util import embed_formatter
 import re
 
+import discord
+from discord.ext import commands
 from emoji import UNICODE_EMOJI
+
+from ..database import role
+from ..util import embed_formatter
 
 
 class Role(commands.Cog):
@@ -27,7 +28,6 @@ class Role(commands.Cog):
 
         guild = await self.bot.fetch_guild(payload.guild_id)
         member = await guild.fetch_member(payload.user_id)
-        role_list = []
         for roleids in roles:
             role_obj = guild.get_role(roleids['role_id'])
             if role_obj is None:
@@ -45,7 +45,6 @@ class Role(commands.Cog):
 
         guild = await self.bot.fetch_guild(payload.guild_id)
         member = await guild.fetch_member(payload.user_id)
-        role_list = []
         for roleids in roles:
             role_obj = guild.get_role(roleids['role_id'])
             if role_obj is None:
@@ -65,9 +64,7 @@ class Role(commands.Cog):
             raise Exception(
                 'No more than 20 roles can be on a group.  Please create a new group.')
 
-        if discord.utils.find(
-                lambda e: str(e) == emoji,
-                ctx.bot.emojis) is None and is_emoji(emoji) == False:
+        if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
             raise Exception('Custom emoji is not available to this bot.')
 
         await role.create_role(ctx.guild.id, group_id, role_name.id, name, emoji, description, protect_mentions)
@@ -142,7 +139,13 @@ async def refresh_bot_message(ctx, group_id):
     message = await channel.fetch_message(group['message_id'])
 
     for item in roles:
-        await message.add_reaction(strip_custom_emoji(item['emoji']))
+        try:
+            await message.add_reaction(strip_custom_emoji(item['emoji']))
+        except discord.errors.HTTPException as err:
+            if err.code == 10014:
+                await ctx.send("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
+            else:
+                raise
 
     if group['bot_managed']:
         embed = embed_formatter.reaction_menu(ctx, group, roles)
