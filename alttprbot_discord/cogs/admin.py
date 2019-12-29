@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from alttprbot.database import config
+from alttprbot_srl.bot import srlbot
 
 from ..util import embed_formatter
 
@@ -44,30 +45,25 @@ class Admin(commands.Cog):
     async def config_delete(self, ctx, parameter):
         await config.delete_parameter(ctx.guild.id, parameter)
 
-    # get/set configuration values, only a server manager should be able to
-    # set these
-    # @commands.group(name='permission')
-    # @commands.has_permissions(manage_guild=True)
-    # async def permission_func(self, ctx):
-    #     pass
+    @commands.command()
+    @commands.is_owner()
+    async def srlmsg(self, ctx, channel, message):
+        await srlbot.message(channel, message)
 
-    # @permission_func.command(name='set')
-    # async def permission_set(self, ctx, role_name, permission):
-    #     role = discord.utils.get(ctx.guild.roles, name=role_name)
-    #     if not role:
-    #         raise Exception('role does not exist')
-    #     await permissions.set_permission(ctx.guild.id, role.id, permission)
+    @commands.command()
+    @commands.is_owner()
+    async def srljoin(self, ctx, channel):
+        await srlbot.join(channel)
 
-    # @permission_func.command(name='get')
-    # async def permission_get(self, ctx):
-    #     result = await permissions.get_permissions_by_guild(ctx.guild.id)
-    #     await ctx.send(embed=embed_formatter.permissions(ctx, result))
+    @commands.command()
+    @commands.is_owner()
+    async def srlpart(self, ctx, channel):
+        await srlbot.part(channel)
 
-    # @permission_func.command(name='delete')
-    # async def permission_delete(self, ctx, role_name, permission):
-    #     role = discord.utils.get(ctx.guild.roles, name=role_name)
-    #     await permissions.delete_permission(ctx.guild.id, role.id, permission)
-
+    @commands.command()
+    @commands.is_owner()
+    async def srlnotice(self, ctx, channel, message):
+        await srlbot.notice(channel, message)
 
 def setup(bot):
     bot.add_cog(Admin(bot))

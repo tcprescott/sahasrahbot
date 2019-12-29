@@ -22,7 +22,7 @@ discordbot.load_extension("alttprbot_discord.cogs.nickname")
 discordbot.load_extension("alttprbot_discord.cogs.role")
 discordbot.load_extension("alttprbot_discord.cogs.smz3gen")
 discordbot.load_extension("alttprbot_discord.cogs.tournament")
-discordbot.load_extension("alttprbot_discord.cogs.tourneyqualifier")
+# discordbot.load_extension("alttprbot_discord.cogs.tourneyqualifier")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 
 if importlib.util.find_spec('jishaku'):
