@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import sys
 import aiofiles
 
 import pydle
