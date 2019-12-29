@@ -1,14 +1,12 @@
-import asyncio
-
 import discord
 from discord.ext import commands
 
+from alttprbot.database import srlnick
+from alttprbot.tournament import main, secondary
+from alttprbot.util import speedgaming
 from config import Config as c
 
-from ..database import config, srlnick
-from ..tournament import main, secondary
-from ..util import checks, embed_formatter, http, speedgaming
-
+from ..util import checks
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
@@ -18,7 +16,8 @@ class Tournament(commands.Cog):
         self.bot = bot
 
     async def cog_check(self, ctx):
-        if ctx.guild is None: return False
+        if ctx.guild is None:
+            return False
         if ctx.guild.id in c.Tournament:
             return True
         else:

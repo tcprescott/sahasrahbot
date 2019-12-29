@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 
-from ..database import config
+from alttprbot.database import config
+
 
 class Moderation(commands.Cog):
     def __init__(self, bot):

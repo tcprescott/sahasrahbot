@@ -1,7 +1,8 @@
-from ..database import config, permissions
-from ..util import embed_formatter
-import discord
 from discord.ext import commands
+
+from alttprbot.database import config
+
+from ..util import embed_formatter
 
 
 class Admin(commands.Cog):

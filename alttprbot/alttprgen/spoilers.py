@@ -1,10 +1,8 @@
 import json
 import random
 import string
-from collections import OrderedDict
 
 import aiofiles
-import pyz3r
 
 from config import Config as c
 

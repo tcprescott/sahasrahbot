@@ -1,10 +1,7 @@
 import asyncio
 import sys
 
-# import aioschedule as schedule
 import pydle
-from quart import abort, jsonify, request
-from quart_openapi import Pint, Resource
 
 from alttprbot.database import srl_races
 from alttprbot.util import orm
@@ -89,27 +86,13 @@ class SrlBot(pydle.Client):
                 await srl_races.delete_srl_race(active_race['srl_id'])
 
 
-app = Pint(__name__, title='Srl Bot API')
-
-
-@app.route('/api/message')
-class Message(Resource):
-    async def post(self):
-        data = await request.get_json()
-        if 'auth' in data and data['auth'] == c.InternalApiToken:
-            if not client.in_channel(data['channel']):
-                abort(400, "Bot not in specified channel")
-            result = await client.message(data['channel'], data['message'])
-            return jsonify({"success": True})
-        else:
-            abort(401)
+srlbot = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
 
 
 if __name__ == '__main__':
-    client = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
     loop = asyncio.get_event_loop()
     loop.create_task(orm.create_pool(loop))
 
-    loop.create_task(client.connect('irc.speedrunslive.com'))
-    loop.create_task(app.run(host='127.0.0.1', port=5000, loop=loop))
+    loop.create_task(srlbot.connect('irc.speedrunslive.com'))
+    # loop.create_task(app.run(host='127.0.0.1', port=5000, loop=loop))
     loop.run_forever()

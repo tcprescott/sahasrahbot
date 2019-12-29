@@ -5,7 +5,7 @@ import aiofiles
 import pyz3r
 import yaml
 
-from ..util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttpr_discord import alttpr
 from ..util.http import request_generic
 
 

@@ -5,11 +5,11 @@ import discord
 import pyz3r
 from discord.ext import commands
 
+from alttprbot.alttprgen.mystery import generate_random_game
+from alttprbot.alttprgen.preset import get_preset
+from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from config import Config as c
 
-from ..alttprgen.mystery import generate_random_game
-from ..alttprgen.preset import get_preset
-from ..alttprgen.spoilers import generate_spoiler_game
 from ..util import checks
 from ..util.alttpr_discord import alttpr
 

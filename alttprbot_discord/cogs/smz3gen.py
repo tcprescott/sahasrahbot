@@ -1,16 +1,8 @@
-import discord
 from discord.ext import commands
 
-import pysmz3
-
-from ..util import embed_formatter, checks
-
-from ..smz3gen.preset import get_preset
-from ..smz3gen.spoilers import generate_spoiler_game
-
-from config import Config as c
-
-import json
+from alttprbot.smz3gen.preset import get_preset
+from alttprbot.smz3gen.spoilers import generate_spoiler_game
+from ..util import checks
 
 
 class smz3gen(commands.Cog):

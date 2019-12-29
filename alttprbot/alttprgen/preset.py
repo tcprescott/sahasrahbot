@@ -6,7 +6,7 @@ import yaml
 
 from config import Config as c
 
-from ..util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttpr_discord import alttpr
 
 
 class PresetNotFoundException(Exception):

@@ -1,17 +1,8 @@
-from ..database import config, permissions, daily
-
-import discord
-from discord.ext import tasks, commands
-
-from config import Config as c
-
-import bs4
-import aiohttp
-import re
-import asyncio
-import html5lib
-
 import aiocache
+import discord
+from discord.ext import commands, tasks
+
+from alttprbot.database import config, daily
 
 from ..util.alttpr_discord import alttpr
 

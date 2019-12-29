@@ -5,7 +5,8 @@ import discord
 from discord.ext import commands
 from emoji import UNICODE_EMOJI
 
-from ..database import role
+from alttprbot.database import role
+
 from ..util import embed_formatter
 
 

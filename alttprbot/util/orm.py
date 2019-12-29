@@ -1,4 +1,3 @@
-import asyncio
 import aiomysql
 from config import Config as c
 from . import console

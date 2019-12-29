@@ -1,15 +1,14 @@
-from ..util.alttpr_discord import alttpr
-from config import Config as c
-from ..util import speedgaming
-
-from time import perf_counter 
+import datetime
 
 import gspread.exceptions
 import gspread_asyncio
 from oauth2client.service_account import ServiceAccountCredentials
-
-import datetime
 from pytz import timezone
+
+from alttprbot_discord.util.alttpr_discord import alttpr
+from config import Config as c
+
+from ..util import speedgaming
 
 tz = timezone('EST')
 

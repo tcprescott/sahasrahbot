@@ -1,15 +1,10 @@
-import discord
-from discord.ext import commands
-
 import asyncio
-import string
-import random
-import os
-import asyncio
-
-import time
 import datetime
-import timeit
+import os
+import random
+import string
+
+from discord.ext import commands
 
 from config import Config as c
 

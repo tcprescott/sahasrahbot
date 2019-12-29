@@ -1,8 +1,12 @@
-from config import Config as c
-import aiofiles
 import json
 import re
+
+import aiofiles
+
+from config import Config as c
+
 from . import http
+
 
 async def get_race(raceid, complete=False):
     # if we're developing locally, we want to have some artifical data to use that isn't from SRL

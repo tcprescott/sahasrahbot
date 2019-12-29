@@ -5,8 +5,8 @@ import re
 import ircmessage
 
 from alttprbot.database import spoiler_races, srl_races
-from alttprbot.util.http import request_json_post
 from alttprbot.util.srl import srl_race_id
+from alttprbot_srl import discord_integration
 from config import Config as c
 
 starting = re.compile("\\x034\\x02The race will begin in 10 seconds!\\x03\\x02")
@@ -45,7 +45,7 @@ async def handler(target, source, message, client):
                 await srl_races.delete_srl_race(srl_id)
 
         if go.match(message) or message=='test go':
-            await discord_race_start(srl_id)
+            await discord_integration.discord_race_start(srl_id)
 
             # spoilers
             race = await spoiler_races.get_spoiler_race_by_id(srl_id)
@@ -65,36 +65,13 @@ async def handler(target, source, message, client):
 
         result = runnerdone.search(message)
         if result:
-            await discord_race_finish(result, srl_id)
+            await discord_integration.discord_race_finish(result.group(1), srl_id)
 
-
-async def discord_race_start(srl_id):
-    if not c.DEBUG:
-        await request_json_post(
-            'http://localhost:5001/api/srl/start',
-            data = {
-                'auth': c.InternalApiToken,
-                'raceid': srl_id
-            },
-            returntype='json'
-        )
-
-async def discord_race_finish(result, srl_id):
-    if not c.DEBUG:
-        await request_json_post(
-            'http://localhost:5001/api/srl/finish',
-            data = {
-                'auth': c.InternalApiToken,
-                'nick': result.group(1),
-                'raceid': srl_id
-            },
-            returntype='json'
-        )
 
 async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage=False):
     loop = asyncio.get_running_loop()
 
-    reminders = [1800,1500,1200,900,600,300,120,60,30,10,9,8,7,6,5,4,3,2,1]
+    reminders = [1800, 1500, 1200, 900, 600, 300, 120, 60, 30, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
     start_time = loop.time()
     end_time = loop.time() + duration_in_seconds
     while True:

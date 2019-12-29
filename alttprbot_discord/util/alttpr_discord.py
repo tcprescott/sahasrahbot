@@ -3,7 +3,6 @@ import datetime
 import discord
 import html2markdown
 from pyz3r.alttpr import alttprClass
-from pyz3r.http import http
 
 from config import Config as c
 

@@ -1,7 +1,7 @@
-from ..database import config, permissions, voicerole
-
 import discord
 from discord.ext import commands
+
+from alttprbot.database import voicerole
 
 
 class VoiceRole(commands.Cog):

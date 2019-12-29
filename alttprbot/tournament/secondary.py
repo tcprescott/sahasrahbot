@@ -3,9 +3,9 @@ import gspread_asyncio
 from oauth2client.service_account import ServiceAccountCredentials
 import discord
 from discord.ext import commands
-from ..database import srlnick
+from alttprbot.database import srlnick
 from config import Config as c
-from ..util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttpr_discord import alttpr
 
 class ChallengeCupScheduleNotFound(Exception):
     pass

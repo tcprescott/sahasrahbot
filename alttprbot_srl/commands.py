@@ -6,8 +6,7 @@ from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races, srl_races
 from alttprbot.smz3gen import preset as smz3_preset
 from alttprbot.smz3gen import spoilers as smz3_spoilers
-from alttprbot.util.srl import get_all_races, get_race, srl_race_id
-
+from alttprbot.util.srl import get_race, srl_race_id
 from config import Config as c
 
 

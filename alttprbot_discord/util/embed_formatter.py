@@ -1,24 +1,6 @@
-import discord
 import datetime
 
-def permissions(ctx, permissions):
-    embed = discord.Embed(
-        title="Server Permissions",
-        description="List of permissions and assigned roles for those permissions.",
-        color=discord.Colour.green())
-    permdict = {}
-    for permission in permissions:
-        role = discord.utils.get(
-            ctx.guild.roles,
-            id=permission['role_id']).name
-        permdict.setdefault(permission['permission'], []).append(role)
-    for perm in permdict:
-        embed.add_field(
-            name=perm,
-            value='\n'.join(
-                permdict.get(perm)),
-            inline=False)
-    return embed
+import discord
 
 
 def config(ctx, configdict):
