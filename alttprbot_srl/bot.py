@@ -72,10 +72,10 @@ class SrlBot(pydle.Client):
         await message_logger("KILL", target, by, f"Killed for reason {reason}")
 
     async def on_mode_change(self, channel, modes, by):
-        await message_logger("MODE_CHANGE", channel, by, modes)
+        await message_logger("MODE", channel, by, f'Gave {modes[0]} to {modes[1]}')
 
     async def on_topic_change(self, channel, message, by):
-        await message_logger("TOPIC_CHANGE", channel, by, message)
+        await message_logger("TOPIC", channel, by, message)
 
     async def join_active_races(self, games):
         races = await get_all_races()
@@ -108,8 +108,16 @@ async def message_logger(msgtype, target, source, message):
     message = message.replace(c.SRL_PASSWORD, '**********')
 
     # write event to channel log
-    async with aiofiles.open(f'/var/log/sahasrahbot/srl/{target}.txt', mode='a+') as logfile:
-        await logfile.write(f'{datetime.datetime.now()} - {msgtype} - {target} - {source} - {message}\n')
+
+
+    msg = f'{datetime.datetime.now()} - {msgtype} - {target} - {source} - "{message}"\n'
+    if target == c.SRL_NICK:
+        fileloc = f'/var/log/sahasrahbot/srl/{source}.txt'
+    else:
+        fileloc = f'/var/log/sahasrahbot/srl/{target}.txt'
+
+    async with aiofiles.open(fileloc, mode='a+') as logfile:
+        await logfile.write(msg)
 
 
 srlbot = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
