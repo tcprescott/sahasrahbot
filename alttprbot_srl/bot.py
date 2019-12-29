@@ -66,7 +66,7 @@ class SrlBot(pydle.Client):
         await message_logger("PART", channel, user, message)
 
     async def on_kick(self, channel, target, by, reason=None):
-        await message_logger("KICK", target, by, f"Kicked for reason {reason}")
+        await message_logger("KICK", channel, target, f"Kicked by {by} for reason {reason}")
 
     async def on_kill(self, target, by, reason):
         await message_logger("KILL", target, by, f"Killed for reason {reason}")
