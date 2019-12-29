@@ -1,5 +1,7 @@
 import asyncio
+import datetime
 import sys
+import aiofiles
 
 import pydle
 
@@ -25,9 +27,7 @@ class SrlBot(pydle.Client):
     # source = sendering of the message
     # message = the message, duh
     async def on_message(self, target, source, message):
-        # print messages to stdout for debugging purposes.  We should eventually set this up so it writes to a log file or something.
-        print('MESSAGE: ' + target + ' - ' + source +
-              ' - ' + message)  # dumb debugging message
+        await message_logger("MSG", target, source, message)
 
         # filter messages sent by the bot (we do not want to react to these)
         if source == c.SRL_NICK:
@@ -48,8 +48,7 @@ class SrlBot(pydle.Client):
     # message = the message, duh
 
     async def on_notice(self, target, source, message):
-        print('NOTICE: ' + target + ' - ' + source +
-              ' - ' + message)  # dumb debugging message
+        await message_logger("NOTICE", target, source, message)
 
         # do stuff that we want after getting recognized by NickServ
         # if message == 'Password accepted - you are now recognized.':
@@ -59,6 +58,24 @@ class SrlBot(pydle.Client):
         #     await self.join_active_races(['alttphacks', 'alttpsm'])
         #     await self.process_active_races()
         #     if c.DEBUG: await self.join('#srl-synack-testing')
+
+    async def on_join(self, channel, user):
+        await message_logger("JOIN", channel, user, "Joined channel.")
+
+    async def on_part(self, channel, user, message):
+        await message_logger("PART", channel, user, message)
+
+    async def on_kick(self, channel, target, by, reason=None):
+        await message_logger("KICK", target, by, f"Kicked for reason {reason}")
+
+    async def on_kill(self, target, by, reason):
+        await message_logger("KILL", target, by, f"Killed for reason {reason}")
+
+    async def on_mode_change(self, channel, modes, by):
+        await message_logger("MODE_CHANGE", channel, by, modes)
+
+    async def on_topic_change(self, channel, message, by):
+        await message_logger("TOPIC_CHANGE", channel, by, message)
 
     async def join_active_races(self, games):
         races = await get_all_races()
@@ -84,6 +101,15 @@ class SrlBot(pydle.Client):
                     await self.join(channel_name)
                 await self.message(channel_name, f".setgoal {active_race['goal']}")
                 await srl_races.delete_srl_race(active_race['srl_id'])
+
+
+async def message_logger(msgtype, target, source, message):
+    # redact passwords from logs
+    message = message.replace(c.SRL_PASSWORD, '**********')
+
+    # write event to channel log
+    async with aiofiles.open(f'/var/log/sahasrahbot/srl/{target}.txt', mode='a+') as logfile:
+        await logfile.write(f'{datetime.datetime.now()} - {msgtype} - {target} - {source} - {message}\n')
 
 
 srlbot = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)

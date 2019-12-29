@@ -136,7 +136,7 @@ async def loadnicks(ctx):
                 await srlnick.insert_twitch_name(member.id, row['Twitch Name'])
                 await member.add_roles(player_role)
                 await wks.update_cell(idx+2, 5, 'Y')
-            except discord.ext.commands.errors.BadArgument as e:
+            except discord.ext.commands.errors.BadArgument:
                 bad_discord_names.append(row['Discord Name'])
                 await wks.update_cell(idx+2, 5, 'Error')
 
@@ -146,6 +146,6 @@ async def loadnicks(ctx):
         ))
 
 def get_creds():
-   return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
-      ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
-      'https://www.googleapis.com/auth/spreadsheets'])
+    return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
+        ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/spreadsheets'])

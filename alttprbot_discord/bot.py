@@ -28,26 +28,27 @@ discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
-if not c.DEBUG:
-    @discordbot.event
-    async def on_command_error(ctx, error):
-        riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
-        if riplink is None: riplink = '👎'
+@discordbot.event
+async def on_command_error(ctx, error):
+    await ctx.message.remove_reaction('⌚', ctx.bot.user)
 
-        await ctx.message.remove_reaction('⌚', ctx.bot.user)
+    riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
+    if riplink is None:
+        riplink = '👎'
 
-        if isinstance(error, commands.CheckFailure):
-            pass
-        if isinstance(error, commands.errors.MissingPermissions):
-            await ctx.message.add_reaction('🚫')
-        elif isinstance(error, commands.CommandNotFound):
-            pass
-        elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(error)
-            await ctx.message.add_reaction(riplink)
-        else:
-            await ctx.send(error)
-            await ctx.message.add_reaction(riplink)
+    if isinstance(error, commands.CheckFailure):
+        await ctx.message.add_reaction('🚫')
+    if isinstance(error, commands.errors.MissingPermissions):
+        await ctx.message.add_reaction('🚫')
+    elif isinstance(error, commands.CommandNotFound):
+        pass
+    elif isinstance(error, commands.errors.MissingRequiredArgument):
+        await ctx.send(error)
+        await ctx.message.add_reaction(riplink)
+    else:
+        await ctx.send(error.original)
+        await ctx.message.add_reaction(riplink)
+        raise error.original
 
 
 @discordbot.event
