@@ -65,5 +65,10 @@ class Admin(commands.Cog):
     async def srlnotice(self, ctx, channel, message):
         await srlbot.notice(channel, message)
 
+    @commands.command()
+    @commands.is_owner()
+    async def srljoinall(self, ctx):
+        await srlbot.join_active_races(['alttphacks','alttpsm'])
+
 def setup(bot):
     bot.add_cog(Admin(bot))
