@@ -4,8 +4,7 @@ import random
 import aiofiles
 import yaml
 
-from config import Config as c
-
+from alttprbot.database import config
 from alttprbot_discord.util.alttpr_discord import alttpr
 
 
@@ -19,7 +18,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
     try:
         async with aiofiles.open(os.path.join("presets", basename)) as f:
             preset_dict = yaml.load(await f.read(), Loader=yaml.FullLoader)
-        if preset_dict.get('festive') and not c.FESTIVEMODE:
+        if preset_dict.get('festive') and not await config.get(0, 'FestiveMode') == "true":
             raise PresetNotFoundException(
                 f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>')
     except FileNotFoundError:

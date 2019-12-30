@@ -3,7 +3,7 @@ import shlex
 import sys
 
 from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import spoiler_races, srl_races
+from alttprbot.database import spoiler_races, srl_races, config
 from alttprbot.smz3gen import preset as smz3_preset
 from alttprbot.smz3gen import spoilers as smz3_spoilers
 from alttprbot.util.srl import get_race, srl_race_id
@@ -19,6 +19,8 @@ async def handler(target, source, message, client):
         if not target == '#speedrunslive':
             await client.message(target, e.message)
         return
+
+    festivemode = await config.get(0, 'FestiveMode') == "true"
 
     if args.command == '$preset' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
@@ -55,7 +57,7 @@ async def handler(target, source, message, client):
 
     if args.command in ['$random', '$festiverandom', '$mystery', '$festivemystery'] and target.startswith('#srl-'):
         mode = "random" if args.command in ['$random', '$festiverandom'] else "mystery"
-        festive = True if args.command in ['$festiverandom', '$festivemystery'] and c.FESTIVEMODE else False
+        festive = True if args.command in ['$festiverandom', '$festivemystery'] and festivemode else False
 
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
@@ -163,7 +165,7 @@ async def handler(target, source, message, client):
     if args.command == '$echo':
         await client.message(source, args.message)
 
-def parse_args(message):
+async def parse_args(message):
     split_msg = ['sb'] + shlex.split(message)
 
     parser = SrlArgumentParser()
@@ -191,7 +193,7 @@ def parse_args(message):
     parser_mystery.add_argument('weightset', nargs='?', default="weighted")
     parser_mystery.add_argument('--silent', action='store_true')
 
-    if c.FESTIVEMODE:
+    if await config.get(0, 'FestiveMode') == "true":
         parser_festiverandom = subparsers.add_parser('$festiverandom')
         parser_festiverandom.add_argument('weightset', nargs='?', default="weighted")
         parser_festiverandom.add_argument('--silent', action='store_true')
