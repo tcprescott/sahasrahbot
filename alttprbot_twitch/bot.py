@@ -1,8 +1,5 @@
-import asyncio
-
 from twitchio.ext import commands
 
-from alttprbot.util import orm
 from config import Config as c
 
 twitchbot = commands.Bot(
@@ -23,8 +20,3 @@ async def event_command_error(ctx, error):
         await ctx.send(error)
         raise error
 
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.create_task(orm.create_pool(loop))
-    loop.create_task(twitchbot.run())
-    loop.run_forever()

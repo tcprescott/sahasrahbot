@@ -5,7 +5,6 @@ import aiofiles
 import pydle
 
 from alttprbot.database import srl_races
-from alttprbot.util import orm
 from alttprbot.util.srl import get_all_races, get_race
 from alttprbot_srl import commands, racebot
 from config import Config as c
@@ -121,11 +120,3 @@ async def message_logger(msgtype, target, source, message):
 
 srlbot = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
 
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.create_task(orm.create_pool(loop))
-
-    loop.create_task(srlbot.connect('irc.speedrunslive.com'))
-    # loop.create_task(app.run(host='127.0.0.1', port=5000, loop=loop))
-    loop.run_forever()

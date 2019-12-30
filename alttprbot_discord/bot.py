@@ -1,14 +1,25 @@
-import asyncio
 import importlib
 
 import discord
 from discord.ext import commands
 
-from alttprbot.util import orm
-from config import Config as c
+from alttprbot.database import config
+
+
+async def determine_prefix(bot, message):
+    if message.guild is None:
+        return "$"
+
+    prefix = await config.get_parameter(message.guild.id, "CommandPrefix")
+
+    if prefix is None:
+        return "$"
+    else:
+        return prefix['value']
+
 
 discordbot = commands.Bot(
-    command_prefix="$",
+    command_prefix=determine_prefix,
 )
 
 # discordbot.load_extension("alttprbot_discord.cogs.audit")
@@ -76,11 +87,3 @@ async def on_message(message):
 
     ctx = await discordbot.get_context(message)
     await discordbot.invoke(ctx)
-
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.create_task(orm.create_pool(loop))
-    loop.create_task(discordbot.start(c.DISCORD_TOKEN))
-    # loop.create_task(app.run(host='127.0.0.1', port=5001, loop=loop))
-    loop.run_forever()

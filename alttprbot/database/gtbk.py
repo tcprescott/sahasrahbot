@@ -1,7 +1,9 @@
-import aiocache
 import asyncio
 
+import aiocache
+
 from ..util import orm
+
 
 class GtbkGuessingGameException(Exception):
     pass
