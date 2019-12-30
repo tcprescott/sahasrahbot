@@ -14,7 +14,7 @@ async def handler(target, source, message, client):
     if not message[0] == '$': return
 
     try:
-        args = parse_args(message)
+        args = await parse_args(message)
     except argparse.ArgumentError as e:
         if not target == '#speedrunslive':
             await client.message(target, e.message)

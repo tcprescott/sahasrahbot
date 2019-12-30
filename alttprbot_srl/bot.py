@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import aiofiles
 
@@ -13,7 +12,6 @@ from config import Config as c
 class SrlBot(pydle.Client):
     async def on_connect(self):
         await self.message('NickServ', 'identify ' + c.SRL_PASSWORD)
-        await asyncio.sleep(1)
         await self.join('#speedrunslive')
         await self.join('#alttpr')
         await self.join_active_races(['alttphacks', 'alttpsm'])
@@ -38,7 +36,7 @@ class SrlBot(pydle.Client):
             # handle user commands
             await commands.handler(target=target, source=source, message=message, client=self)
         except Exception as err:
-            await self.message(target, f'Error {type(err)}: "{str(err)}".  Please contact Synack if this condition persists.')
+            await self.message(target, f'{type(err)}: "{str(err)}".  Please contact Synack if this condition persists.')
             raise err
 
     # target = you
@@ -119,4 +117,3 @@ async def message_logger(msgtype, target, source, message):
 
 
 srlbot = SrlBot(c.SRL_NICK, realname=c.SRL_NICK)
-
