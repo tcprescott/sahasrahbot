@@ -1,3 +1,4 @@
+import aiocache
 from discord.ext import commands
 
 from alttprbot.database import config
@@ -10,63 +11,61 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # get/set configuration values, only the server manager should be able to
-    # set these
-    @commands.group(
-        name='config',
-        help='A set of commands for configuring SahasrahBot for this server.'
-    )
-    @commands.is_owner()
-    async def config_func(self, ctx):
-        pass
+    async def cog_check(self, ctx):
+        if await ctx.bot.is_owner(ctx.author):
+            return True
 
-    @config_func.command(
-        name='set',
+        return False
+
+    @commands.command(
+        name='configset',
         help='Set a parameter.'
     )
-    @commands.is_owner()
-    async def config_set(self, ctx, parameter, value):
-        await config.set_parameter(ctx.guild.id, parameter, value)
+    async def configset(self, ctx, parameter, value):
+        guildid = ctx.guild.id if ctx.guild else 0
+        await config.set_parameter(guildid, parameter, value)
 
-    @config_func.command(
-        name='get',
+    @commands.command(
+        name='configget',
         help='Get a parameter.'
     )
-    @commands.is_owner()
-    async def config_get(self, ctx):
-        result = await config.get_parameters_by_guild(ctx.guild.id)
+    async def configget(self, ctx):
+        guildid = ctx.guild.id if ctx.guild else 0
+        result = await config.get_parameters_by_guild(guildid)
         await ctx.send(embed=embed_formatter.config(ctx, result))
 
-    @config_func.command(
-        name='delete',
+    @commands.command(
+        name='configdelete',
         help='Delete a parameter.'
     )
-    @commands.is_owner()
-    async def config_delete(self, ctx, parameter):
-        await config.delete_parameter(ctx.guild.id, parameter)
+    async def configdelete(self, ctx, parameter):
+        guildid = ctx.guild.id if ctx.guild else 0
+        await config.delete_parameter(guildid, parameter)
+
+    @commands.command(
+        name='configcache',
+        help='Clear the configuration cache.  Useful if database was manually updated.'
+    )
+    async def configcache(self, ctx):
+        await aiocache.SimpleMemoryCache().clear(namespace="config")
 
     @commands.command()
-    @commands.is_owner()
     async def srlmsg(self, ctx, channel, message):
         await srlbot.message(channel, message)
 
     @commands.command()
-    @commands.is_owner()
     async def srljoin(self, ctx, channel):
         await srlbot.join(channel)
 
     @commands.command()
-    @commands.is_owner()
     async def srlpart(self, ctx, channel):
         await srlbot.part(channel)
 
     @commands.command()
-    @commands.is_owner()
     async def srlnotice(self, ctx, channel, message):
         await srlbot.notice(channel, message)
 
     @commands.command()
-    @commands.is_owner()
     async def srljoinall(self, ctx):
         await srlbot.join_active_races(['alttphacks','alttpsm'])
 
