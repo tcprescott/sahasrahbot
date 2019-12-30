@@ -19,6 +19,7 @@ class AlttprGen(commands.Cog):
         self.bot = bot
 
     @commands.command(
+        brief='Generate a customizer game.',
         help='Generate a customizer game using a customizer save file attached to the message.'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -40,6 +41,7 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
+        brief='Generate a race preset.',
         help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -53,7 +55,8 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        help='Generate a preset without the tournament flag enabled.  Find a list of presets at https://l.synack.live/presets'
+        brief='Generate a preset without the race flag enabled.',
+        help='Generate a preset without the race flag enabled.  Find a list of presets at https://l.synack.live/presets'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def nonracepreset(self, ctx, preset, hints=False):
@@ -66,6 +69,7 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
+        brief='Generate a spoiler game.',
         help='Generate a spoiler game.  Find a list of presets at https://l.synack.live/presets'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -78,6 +82,7 @@ class AlttprGen(commands.Cog):
         await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
 
     @commands.command(
+        brief='Generate a game with randomized settings.',
         help='Generate a game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -86,6 +91,7 @@ class AlttprGen(commands.Cog):
         await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=False)
 
     @commands.command(
+        brief='Generate a mystery game.',
         help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -95,6 +101,7 @@ class AlttprGen(commands.Cog):
 
     if c.FESTIVEMODE:
         @commands.command(
+            brief='Generate a festive game with randomized settings.',
             help='Generate a festive game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
         )
         @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -103,6 +110,7 @@ class AlttprGen(commands.Cog):
             await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=True)
 
         @commands.command(
+            brief='Generate a festive mystery game.',
             help='Generate a festive mystery game.  Find a list of weights at https://l.synack.live/weights'
         )
         @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')

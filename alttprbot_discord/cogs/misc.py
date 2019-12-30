@@ -24,6 +24,7 @@ class Misc(commands.Cog):
 
     @commands.command(
         aliases=['crc32'],
+        brief="Posts instructions on how to verify your ROM is correct.",
         help="Posts instructions on how to verify your ROM is correct, or how to get the permalink to your randomized game."
     )
     async def rom(self, ctx):
@@ -34,6 +35,7 @@ class Misc(commands.Cog):
         await ctx.send(discord.utils.get(ctx.bot.emojis, name='RIPLink'))
 
     @commands.command(
+        brief="Retrieves a holy image.",
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
     )

@@ -18,7 +18,6 @@ class Admin(commands.Cog):
         return False
 
     @commands.command(
-        name='configset',
         help='Set a parameter.'
     )
     async def configset(self, ctx, parameter, value):
@@ -26,7 +25,6 @@ class Admin(commands.Cog):
         await config.set_parameter(guildid, parameter, value)
 
     @commands.command(
-        name='configget',
         help='Get a parameter.'
     )
     async def configget(self, ctx):
@@ -35,7 +33,6 @@ class Admin(commands.Cog):
         await ctx.send(embed=embed_formatter.config(ctx, result))
 
     @commands.command(
-        name='configdelete',
         help='Delete a parameter.'
     )
     async def configdelete(self, ctx, parameter):
@@ -43,7 +40,7 @@ class Admin(commands.Cog):
         await config.delete_parameter(guildid, parameter)
 
     @commands.command(
-        name='configcache',
+        brief='Clear the configuration cache.',
         help='Clear the configuration cache.  Useful if database was manually updated.'
     )
     async def configcache(self, ctx):

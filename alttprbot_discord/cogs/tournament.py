@@ -33,9 +33,9 @@ class Tournament(commands.Cog):
 
     @commands.command(
         help="Generate a tournament race.",
-        aliases=['restreamrace','tournyrace','tounyrace']
+        aliases=['restreamrace', 'tournyrace', 'tounyrace']
     )
-    @checks.has_any_channel('testing','console','lobby','restreamers','sg-races','bot-console','bot-testing','bot-commands')
+    @checks.has_any_channel('testing', 'console', 'lobby', 'restreamers', 'sg-races', 'bot-console', 'bot-testing', 'bot-commands')
     async def tourneyrace(self, ctx, episode_number):
         logging_channel = discord.utils.get(ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
 
