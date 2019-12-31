@@ -16,8 +16,8 @@ async def create_voice_role(guild_id, voice_channel_id, role_id):
     )
 
 
-async def delete_voice_role(guild_id, id):
+async def delete_voice_role(guild_id, role_id):
     await orm.execute(
         'DELETE FROM voice_role WHERE guild_id=%s AND id=%s;',
-        [guild_id, id]
+        [guild_id, role_id]
     )

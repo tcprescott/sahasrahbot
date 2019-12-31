@@ -67,7 +67,7 @@ class BontaMultiworld(commands.Cog):
             proc.stdin.write(bytearray(str(secsrecmaining) + "\n", 'utf-8'))
             await ctx.send(secsrecmaining)
             await asyncio.sleep((target - now()).total_seconds())
-        
+
         await ctx.send("GO!")
         proc.stdin.write(bytearray("GO!\n", 'utf-8'))
 

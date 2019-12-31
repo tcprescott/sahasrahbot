@@ -120,7 +120,7 @@ async def dm_all_players_sg(ctx, episode_number, msg):
             else:
                 member = await commands.MemberConverter().convert(ctx, player['discordTag'])
             await member.send(msg)
-        except:
+        except discord.HTTPException:
             pass
 
 

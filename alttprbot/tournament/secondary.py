@@ -1,10 +1,12 @@
-import gspread_asyncio
-from oauth2client.service_account import ServiceAccountCredentials
 import discord
+import gspread_asyncio
 from discord.ext import commands
+from oauth2client.service_account import ServiceAccountCredentials
+
 from alttprbot.database import srlnick
-from config import Config as c
 from alttprbot_discord.util.alttpr_discord import alttpr
+from config import Config as c
+
 
 class ChallengeCupScheduleNotFound(Exception):
     pass
@@ -23,19 +25,19 @@ async def get_settings(episodeid, guildid):
             return row
     return None
 
-async def generate_game(episodeid, guildid, force=False):
+async def generate_game(episodeid, guildid):
     sheet_settings = await get_settings(episodeid, guildid)
 
     if sheet_settings is None:
         raise ChallengeCupScheduleNotFound('Episode not found.  Submit settings first.')
 
     if not sanity_check(
-        game=sheet_settings['Game'],
-        dis=sheet_settings['Dungeon Item Shuffle'],
-        goal=sheet_settings['Goal'],
-        crystals=sheet_settings['GT/Ganon Crystals'],
-        state=sheet_settings['World State'],
-        swords=sheet_settings['Swords']
+            game=sheet_settings['Game'],
+            dis=sheet_settings['Dungeon Item Shuffle'],
+            goal=sheet_settings['Goal'],
+            crystals=sheet_settings['GT/Ganon Crystals'],
+            state=sheet_settings['World State'],
+            swords=sheet_settings['Swords']
     ):
         raise InvalidSettingsException("The settings chosen are invalid for this game.  Please contact an Admin to correct the settings.")
 

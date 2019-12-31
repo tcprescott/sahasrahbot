@@ -39,8 +39,8 @@ class VoiceRole(commands.Cog):
         await voicerole.create_voice_role(ctx.guild.id, voice_channel.id, role.id)
 
     @voicerole.command(name='delete', aliases=['d'])
-    async def vr_delete(self, ctx, id: int):
-        await voicerole.delete_voice_role(ctx.guild.id, id)
+    async def vr_delete(self, ctx, role_id: int):
+        await voicerole.delete_voice_role(ctx.guild.id, role_id)
 
 
 def setup(bot):

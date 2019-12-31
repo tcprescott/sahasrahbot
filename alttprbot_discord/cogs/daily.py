@@ -67,8 +67,8 @@ async def update_daily(hash_id):
 
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
-async def get_daily_seed(hash):
-    return await alttpr(hash=hash)
+async def get_daily_seed(hash_id):
+    return await alttpr(hash=hash_id)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def find_daily_hash():

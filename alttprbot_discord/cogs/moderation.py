@@ -9,7 +9,6 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        
         # delete roms if server is configured to do so
         if len(message.attachments) > 0:
             for attachment in message.attachments:

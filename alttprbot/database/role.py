@@ -109,10 +109,10 @@ async def delete_role(guild_id, role_id):
     )
 
 
-async def update_role(guild_id, id, name, description, protect_mentions: int):
+async def update_role(guild_id, role_id, name, description, protect_mentions: int):
     await orm.execute(
         'UPDATE reaction_role SET name=%s, description=%s, protect_mentions=%s WHERE guild_id=%s AND id=%s',
-        [name, description, protect_mentions, guild_id, id]
+        [name, description, protect_mentions, guild_id, role_id]
     )
 
 

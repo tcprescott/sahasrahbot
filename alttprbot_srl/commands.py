@@ -229,7 +229,7 @@ async def parse_args(message):
 class SrlArgumentParser(argparse.ArgumentParser):
     def _get_action_from_name(self, name):
         """Given a name, get the Action instance registered with this parser.
-        If only it were made available in the ArgumentError object. It is 
+        If only it were made available in the ArgumentError object. It is
         passed as it's first arg...
         """
         container = self._actions

@@ -1,6 +1,5 @@
 import datetime
 
-import gspread.exceptions
 import gspread_asyncio
 from oauth2client.service_account import ServiceAccountCredentials
 from pytz import timezone
@@ -85,18 +84,17 @@ class SettingsSheet():
             return False
 
 
-async def generate_game(episodeid, guildid, force=False):
+async def generate_game(episodeid, guildid):
     episode = await speedgaming.get_episode(int(episodeid))
 
     sheet_settings = await settings_sheet(episodeid, guildid)
 
-    if not force:
-        if not sheet_settings.sanity_check():
-            raise InvalidSettingsException(
-                "The settings chosen are invalid for this game.  Please contact an Admin to correct the settings.")
-        if sheet_settings.is_generated():
-            raise AlreadyGeneratedException(
-                "This game has already been generated.  Please contact a tournament administrator for assistance.")
+    if not sheet_settings.sanity_check():
+        raise InvalidSettingsException(
+            "The settings chosen are invalid for this game.  Please contact an Admin to correct the settings.")
+    if sheet_settings.is_generated():
+        raise AlreadyGeneratedException(
+            "This game has already been generated.  Please contact a tournament administrator for assistance.")
 
     settingsmap = {
         'Standard': 'standard',

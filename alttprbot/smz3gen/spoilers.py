@@ -23,7 +23,7 @@ async def write_json_to_disk(seed):
     # magic happens here to make it pretty-printed and tournament-compliant
     s = seed.data['spoiler']
 
-    sorteddict = OrderedDict() 
+    sorteddict = OrderedDict()
 
     sectionlist = [
         'Special',
