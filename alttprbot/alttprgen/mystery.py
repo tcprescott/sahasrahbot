@@ -35,10 +35,6 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
 
     settings['tournament'] = tournament
 
-    # Stop gap measure until swordless entrance with a hard+ item pool is fixed
-    if settings.get('entrances', 'none') != 'none' and settings['item']['pool'] in ['hard', 'expert'] and settings['weapons'] == 'swordless':
-        settings['weapons'] = 'randomized'
-
     seed = await alttpr(settings=settings, festive=festive)
     return seed
 

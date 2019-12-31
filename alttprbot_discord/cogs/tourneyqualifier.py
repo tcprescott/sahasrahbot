@@ -150,7 +150,7 @@ class TournamentQualifier(commands.Cog):
             if not seed:
                 raise Exception('Could not generate game.')
         else:
-            seed = await alttpr(hash=hashid)
+            seed = await alttpr(hash_id=hashid)
             if not seed:
                 raise Exception('Could not retrieve game.')
 

@@ -41,8 +41,8 @@ emoji_code_map = {
     'Big Key': 'BigKey'
 }
 
-async def alttpr(settings=None, hash=None, customizer=False, festive=False):
-    seed = alttprDiscordClass(settings=settings, hash=hash, customizer=customizer, festive=festive)
+async def alttpr(settings=None, hash_id=None, customizer=False, festive=False):
+    seed = alttprDiscordClass(settings=settings, hash_id=hash_id, customizer=customizer, festive=festive)
     await seed._init()
     return seed
 
