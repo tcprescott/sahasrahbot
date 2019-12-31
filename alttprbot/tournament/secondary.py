@@ -1,4 +1,3 @@
-import gspread.exceptions
 import gspread_asyncio
 from oauth2client.service_account import ServiceAccountCredentials
 import discord

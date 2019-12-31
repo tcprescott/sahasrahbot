@@ -18,7 +18,7 @@ async def discord_race_start(srl_id):
                     user = discord.utils.get(guild.members, id=nickmapping['discord_user_id'])
                     try:
                         await user.add_roles(role, reason=f'Started SRL race {srl_id}')
-                    except:
+                    except discord.HTTPException:
                         pass
 
 
@@ -33,5 +33,5 @@ async def discord_race_finish(nick, srl_id):
                 user = discord.utils.get(guild.members, id=nickmapping['discord_user_id'])
                 try:
                     await user.remove_roles(role, reason=f'Finished SRL race {srl_id}')
-                except:
+                except discord.HTTPException:
                     pass

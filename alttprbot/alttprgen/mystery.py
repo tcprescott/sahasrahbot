@@ -19,7 +19,7 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
     if not weightset == 'custom':
         try:
             async with aiofiles.open(os.path.join("weights", basename)) as f:
-                weights = yaml.load(await f.read(), Loader=yaml.FullLoader)
+                weights = yaml.safe_load(await f.read())
         except FileNotFoundError:
             raise WeightsetNotFoundException(
                 f'Could not find weightset {weightset}.  See a list of available weights at <https://l.synack.live/weights>')

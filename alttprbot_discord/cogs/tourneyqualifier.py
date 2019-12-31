@@ -102,7 +102,7 @@ class TournamentQualifier(commands.Cog):
                         try:
                             if not checkonly and not c.DEBUG:
                                 await user.send(embed=embed)
-                        except:
+                        except discord.HTTPException:
                             unable_to_dm.append(entrant)
                     else:
                         unable_to_dm.append(entrant)

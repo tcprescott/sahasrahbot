@@ -36,7 +36,7 @@ async def get_group_roles(reaction_group_id, guild_id):
 async def get_role(reaction_role_id, guild_id):
     role = await orm.select(
         'SELECT * from reaction_role where id = %s and guild_id = %s;',
-        [reaction_role_id]
+        [reaction_role_id, guild_id]
     )
     return role[0]
 
@@ -102,10 +102,10 @@ async def create_role(guild_id, reaction_group_id, role_id, name, emoji, descrip
     )
 
 
-async def delete_role(guild_id, id):
+async def delete_role(guild_id, role_id):
     await orm.execute(
         'DELETE FROM reaction_role WHERE guild_id=%s AND id=%s',
-        [guild_id, id]
+        [guild_id, role_id]
     )
 
 

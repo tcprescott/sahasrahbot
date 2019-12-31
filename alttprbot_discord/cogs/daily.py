@@ -30,18 +30,18 @@ class Daily(commands.Cog):
         help='Returns the currently daily seed.')
     @is_daily_channel()
     async def daily(self, ctx):
-        hash = await find_daily_hash()
-        seed = await get_daily_seed(hash)
+        hash_id = await find_daily_hash()
+        seed = await get_daily_seed(hash_id)
         embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
-        await update_daily(hash)
+        await update_daily(hash_id)
         await ctx.send(embed=embed)
 
 
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
-        hash = await find_daily_hash()
-        if await update_daily(hash):
-            seed = await get_daily_seed(hash)
+        hash_id = await find_daily_hash()
+        if await update_daily(hash_id):
+            seed = await get_daily_seed(hash_id)
             embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             daily_announcer_channels = await config.get_all_parameters_by_name('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
@@ -56,11 +56,11 @@ def setup(bot):
     bot.add_cog(Daily(bot))
 
 
-async def update_daily(gamehash):
+async def update_daily(hash_id):
     latest_daily = await daily.get_latest_daily()
-    if not latest_daily['hash'] == gamehash:
+    if not latest_daily['hash'] == hash_id:
         print('omg new daily')
-        await daily.set_new_daily(gamehash)
+        await daily.set_new_daily(hash_id)
         return True
     else:
         return False

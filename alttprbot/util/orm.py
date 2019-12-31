@@ -43,6 +43,6 @@ async def execute(sql, args=[]):
             await cur.execute(sql.replace('?', '%s'), args)
             affected = cur.rowcount
             await cur.close()
-        except BaseException as e:
+        except BaseException:
             raise
         return affected

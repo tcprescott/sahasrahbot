@@ -9,8 +9,8 @@ async def get_latest_daily():
     return result[0]
 
 
-async def set_new_daily(hash):
+async def set_new_daily(hash_id):
     await orm.execute(
         'INSERT INTO daily (`hash`) values (%s)',
-        [hash]
+        [hash_id]
     )

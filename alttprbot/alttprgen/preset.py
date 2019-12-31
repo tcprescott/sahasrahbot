@@ -17,7 +17,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
     basename = os.path.basename(f'{preset}.yaml')
     try:
         async with aiofiles.open(os.path.join("presets", basename)) as f:
-            preset_dict = yaml.load(await f.read(), Loader=yaml.FullLoader)
+            preset_dict = yaml.safe_load(await f.read())
         if preset_dict.get('festive') and not await config.get(0, 'FestiveMode') == "true":
             raise PresetNotFoundException(
                 f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>')

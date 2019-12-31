@@ -1,16 +1,11 @@
 from discord.ext import commands
 
-from alttprbot.database import config, srlnick
-from alttprbot.util import srl
+from alttprbot.database import srlnick
 
-
-discordbot = None
 
 class Nickname(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        global discordbot
-        discordbot = self.bot
 
     @commands.command(
         help="Register your SRL nick with SahasrahBot."
