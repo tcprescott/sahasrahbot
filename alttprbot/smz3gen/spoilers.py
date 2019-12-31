@@ -4,7 +4,6 @@ import string
 from collections import OrderedDict
 
 import aiofiles
-import pyz3r.misc
 
 from config import Config as c
 
@@ -86,4 +85,3 @@ async def write_json_to_disk(seed):
     #     await out.write(dump)
 
     return c.SpoilerLogUrlBase + '/' + filename
-

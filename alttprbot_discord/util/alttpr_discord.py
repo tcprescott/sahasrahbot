@@ -114,7 +114,7 @@ class alttprDiscordClass(alttprClass):
                 name='Gameplay',
                 value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Hints:** {hints}".format(
                     mode=settings_map['world_state'][self.data['spoiler']['meta']['mode']],
-                    entrance="None" if not 'shuffle' in self.data['spoiler']['meta'] else settings_map['entrance_shuffle'][self.data['spoiler']['meta']['shuffle']],
+                    entrance=settings_map['entrance_shuffle'][self.data['spoiler']['meta']['shuffle']] if 'shuffle' in self.data['spoiler']['meta'] else "None",
                     boss=settings_map['boss_shuffle'][self.data['spoiler']['meta']['enemizer.boss_shuffle']],
                     enemy=settings_map['enemy_shuffle'][self.data['spoiler']['meta']['enemizer.enemy_shuffle']],
                     hints=self.data['spoiler']['meta']['hints']

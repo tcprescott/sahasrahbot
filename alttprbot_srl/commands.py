@@ -10,7 +10,8 @@ from alttprbot.util.srl import get_race, srl_race_id
 
 
 async def handler(target, source, message, client):
-    if not message[0] == '$': return
+    if not message[0] == '$':
+        return
 
     try:
         args = await parse_args(message)
@@ -55,8 +56,10 @@ async def handler(target, source, message, client):
         await srl_races.insert_srl_race(srl_id, goal)
 
     if args.command in ['$random', '$festiverandom', '$mystery', '$festivemystery'] and target.startswith('#srl-'):
-        mode = "random" if args.command in ['$random', '$festiverandom'] else "mystery"
-        festive = True if args.command in ['$festiverandom', '$festivemystery'] and festivemode else False
+        mode = "random" if args.command in [
+            '$random', '$festiverandom'] else "mystery"
+        festive = True if args.command in [
+            '$festiverandom', '$festivemystery'] and festivemode else False
 
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
@@ -114,7 +117,7 @@ async def handler(target, source, message, client):
                 return
 
             goal = f"vt8 randomizer - spoiler {goal_name}"
-            studytime = 900 if not args.studytime else args.studytime 
+            studytime = 900 if not args.studytime else args.studytime
             code = await seed.code()
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
@@ -129,7 +132,7 @@ async def handler(target, source, message, client):
                 return
 
             goal = f"spoiler beat the games"
-            studytime = 1500 if not args.studytime else args.studytime 
+            studytime = 1500 if not args.studytime else args.studytime
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url}")
             else:
@@ -164,6 +167,7 @@ async def handler(target, source, message, client):
     if args.command == '$echo':
         await client.message(source, args.message)
 
+
 async def parse_args(message):
     split_msg = ['sb'] + shlex.split(message)
 
@@ -177,7 +181,7 @@ async def parse_args(message):
     parser_preset.add_argument('--hints', action='store_true')
     parser_preset.add_argument('--silent', action='store_true')
 
-    parser_custom = subparsers.add_parser('$custom')
+    subparsers.add_parser('$custom')
 
     parser_spoiler = subparsers.add_parser('$spoiler')
     parser_spoiler.add_argument('preset')
@@ -194,33 +198,35 @@ async def parse_args(message):
 
     if await config.get(0, 'FestiveMode') == "true":
         parser_festiverandom = subparsers.add_parser('$festiverandom')
-        parser_festiverandom.add_argument('weightset', nargs='?', default="weighted")
+        parser_festiverandom.add_argument(
+            'weightset', nargs='?', default="weighted")
         parser_festiverandom.add_argument('--silent', action='store_true')
 
         parser_festivemystery = subparsers.add_parser('$festivemystery')
-        parser_festivemystery.add_argument('weightset', nargs='?', default="weighted")
+        parser_festivemystery.add_argument(
+            'weightset', nargs='?', default="weighted")
         parser_festivemystery.add_argument('--silent', action='store_true')
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')
 
-    parser_leave = subparsers.add_parser('$leave')
+    subparsers.add_parser('$leave')
 
-    parser_cancel = subparsers.add_parser('$cancel')
+    subparsers.add_parser('$cancel')
 
-    parser_vt = subparsers.add_parser('$vt')
+    subparsers.add_parser('$vt')
 
     parser_echo = subparsers.add_parser('$echo')
     parser_echo.add_argument('message')
 
-    parser_help = subparsers.add_parser('$help')
+    subparsers.add_parser('$help')
 
-    
     args = parser.parse_args(split_msg)
 
     return args
 
-class SrlArgumentParser(argparse.ArgumentParser):    
+
+class SrlArgumentParser(argparse.ArgumentParser):
     def _get_action_from_name(self, name):
         """Given a name, get the Action instance registered with this parser.
         If only it were made available in the ArgumentError object. It is 

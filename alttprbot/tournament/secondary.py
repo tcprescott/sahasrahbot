@@ -17,7 +17,7 @@ async def get_settings(episodeid, guildid):
     agc = await agcm.authorize()
     wb = await agc.open_by_key(c.Tournament[guildid]['schedule_sheet'])
     wks = await wb.worksheet('Schedule')
- 
+
     for row in await wks.get_all_records():
         if row['Game ID'] == episodeid:
             return row

@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 
 
@@ -9,7 +8,7 @@ class Audit(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         print("message created")
-    
+
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         print("message delete")

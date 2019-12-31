@@ -39,7 +39,8 @@ class Misc(commands.Cog):
         aliases=['holy']
     )
     async def holyimage(self, ctx, slug=None, game='z3r'):
-        if slug is None: raise Exception('You must specify a holy image.  Check out <http://alttp.mymm1.com/holyimage/>')
+        if slug is None:
+            raise Exception('You must specify a holy image.  Check out <http://alttp.mymm1.com/holyimage/>')
 
         images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
         i = images[game]
@@ -53,13 +54,13 @@ class Misc(commands.Cog):
 
         embed = discord.Embed(
             title=image.get('title'),
-            description=None if not 'desc' in image else html2markdown.convert(image['desc']),
+            description=html2markdown.convert(image['desc']) if 'desc' in image else None,
             color=discord.Colour.from_rgb(0xFF, 0xAF, 0x00)
         )
 
         if 'url' in image:
             url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
-            if image.get('mode','') == 'redirect':
+            if image.get('mode', '') == 'redirect':
                 embed.add_field(name='Link', value=url, inline=False)
             else:
                 embed.set_image(url=url)

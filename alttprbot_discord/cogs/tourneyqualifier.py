@@ -22,47 +22,49 @@ from ..util.alttpr_discord import alttpr
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
 
+
 class TournamentQualifier(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def cog_check(self, ctx):
-        if ctx.guild is None: return False
+        if ctx.guild is None:
+            return False
         if ctx.guild.id in c.TournamentServers:
             return True
         else:
             return False
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
+    @checks.has_any_channel('testing', 'console', 'qual-bot')
+    @commands.has_any_role('Admins', 'Mods')
     async def loadnicks(self, ctx):
         await loadnicks(ctx)
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
+    @checks.has_any_channel('testing', 'console', 'qual-bot')
+    @commands.has_any_role('Admins', 'Mods')
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.channel)
     async def startqual(self, ctx, raceid):
         await self.run_qual(ctx, raceid, hashid=None)
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
+    @checks.has_any_channel('testing', 'console', 'qual-bot')
+    @commands.has_any_role('Admins', 'Mods')
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.channel)
     async def resendqual(self, ctx, raceid, hashid):
         await self.run_qual(ctx, raceid, hashid=hashid)
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
+    @checks.has_any_channel('testing', 'console', 'qual-bot')
+    @commands.has_any_role('Admins', 'Mods')
     @commands.cooldown(rate=1, per=30, type=commands.BucketType.channel)
     async def finishqual(self, ctx, raceid):
         await self.finish_qual(ctx, raceid)
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
+    @checks.has_any_channel('testing', 'console', 'qual-bot')
+    @commands.has_any_role('Admins', 'Mods')
     async def qualmulti(self, ctx, raceid):
         race = await get_race(raceid)
         if race == {}:
@@ -71,8 +73,8 @@ class TournamentQualifier(commands.Cog):
             await ctx.send(multi)
 
     @commands.command()
-    @checks.has_any_channel('testing','console','qual-bot')
-    @commands.has_any_role('Admins','Mods')
+    @checks.has_any_channel('testing', 'console', 'qual-bot')
+    @commands.has_any_role('Admins', 'Mods')
     async def checkreg(self, ctx, raceid):
         race = await get_race(raceid)
         if race == {}:
@@ -135,15 +137,16 @@ class TournamentQualifier(commands.Cog):
         await loadnicks(ctx)
         await ctx.send('Loaded SRL nicks from gsheet.')
 
-        await send_irc_message(raceid,'NOTICE: The seed for this race will be distributed in 60 seconds.  Please .join if you intend to race.  If you have not joined, you will not receive the seed.')
+        await send_irc_message(raceid, 'NOTICE: The seed for this race will be distributed in 60 seconds.  Please .join if you intend to race.  If you have not joined, you will not receive the seed.')
         await ctx.send('Sent .join warning in SRL.')
-        if not c.DEBUG: await asyncio.sleep(60)
+        if not c.DEBUG:
+            await asyncio.sleep(60)
         race = await get_race(raceid)
-        await send_irc_message(raceid,'The seed is being generated and distributed.  Please standby.')
+        await send_irc_message(raceid, 'The seed is being generated and distributed.  Please standby.')
         await ctx.send('Starting seed generation.')
 
         if hashid is None:
-            seed, preset_dict = await get_preset('open', hints=False, spoilers="off")
+            seed = await get_preset('open', hints=False, spoilers="off")
             if not seed:
                 raise Exception('Could not generate game.')
         else:
@@ -156,9 +159,9 @@ class TournamentQualifier(commands.Cog):
             notes='Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n',
             emojis=self.bot.emojis)
         await ctx.send(embed=embed)
-        
+
         await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(await seed.code()))
-        await send_irc_message(raceid,'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
+        await send_irc_message(raceid, 'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
         await gsheet_qualifier_start(race=race, date=date)
         for multi in build_multistream_links(race):
             await ctx.send(multi)
@@ -182,16 +185,16 @@ async def loadnicks(ctx):
     wb = await agc.open_by_key(c.TournamentQualifierSheet)
     wks = await wb.get_worksheet(0)
 
-    bad_discord_names=[]
+    bad_discord_names = []
 
     converter = commands.MemberConverter()
     for idx, row in enumerate(await wks.get_all_records()):
-        if not row['Nick Loaded'] in ['Y','ignore']:
+        if not row['Nick Loaded'] in ['Y', 'ignore']:
             try:
                 member = await converter.convert(ctx, row['Discord Name'])
                 await srlnick.insert_srl_nick(member.id, row['SRL Name'])
                 await wks.update_cell(idx+2, 6, 'Y')
-            except discord.ext.commands.errors.BadArgument as e:
+            except discord.ext.commands.errors.BadArgument:
                 bad_discord_names.append(row['Discord Name'])
                 await wks.update_cell(idx+2, 6, 'Error')
 
@@ -200,17 +203,20 @@ async def loadnicks(ctx):
             names='\n'.join(bad_discord_names)
         ))
 
+
 def build_multistream_links(race):
     twitchnames = []
     for entrant in race['entrants']:
         twitch = race['entrants'][entrant]['twitch']
-        if not twitch=="":
+        if not twitch == "":
             twitchnames.append(twitch)
-        
-    chunks = [twitchnames[i * 4:(i + 1) * 4] for i in range((len(twitchnames) + 4 - 1) // 4 )]
+
+    chunks = [twitchnames[i * 4:(i + 1) * 4]
+              for i in range((len(twitchnames) + 4 - 1) // 4)]
     multi = []
     for chunk in chunks:
-        multi.append('<https://multistre.am/{streams}/layout12/>\n'.format(streams='/'.join(chunk)))
+        multi.append(
+            '<https://multistre.am/{streams}/layout12/>\n'.format(streams='/'.join(chunk)))
     return multi
 
 
@@ -227,13 +233,14 @@ async def gsheet_qualifier_start(race, date):
     except gspread.exceptions.WorksheetNotFound:
         wks = await wb.add_worksheet(title=f'Qualifier - {date} - {raceid}', rows=50, cols=10)
 
-    await wks.append_row(['Place', 'Nickname','Twitch Stream','Finish Time','Score','Notes'])
+    await wks.append_row(['Place', 'Nickname', 'Twitch Stream', 'Finish Time', 'Score', 'Notes'])
 
     for entrant in race['entrants']:
-        if entrant=="JOPEBUSTER":
+        if entrant == "JOPEBUSTER":
             continue
         twitch = race['entrants'][entrant]['twitch']
-        await wks.append_row([9999,entrant,twitch,'','=IF(ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)>105,105,IF(ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)<0,0,ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)))'], value_input_option='USER_ENTERED')
+        await wks.append_row([9999, entrant, twitch, '', '=IF(ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)>105,105,IF(ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)<0,0,ROUND((2-(INDIRECT(\"R[0]C[-1]\", false)/AVERAGE($D$2:$D$6)))*100,2)))'], value_input_option='USER_ENTERED')
+
 
 async def gsheet_qualifier_finish(race, date):
     agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
@@ -274,6 +281,7 @@ async def get_race(raceid, complete=False):
 
     return await http.request_generic(f'http://api.speedrunslive.com/races/{raceid}', returntype='json')
 
+
 async def send_irc_message(raceid, message):
     await srlbot.message(f'#srl-{raceid}', message)
 
@@ -281,10 +289,12 @@ async def send_irc_message(raceid, message):
 #     if re.search('^#srl-[a-z0-9]{5}$', channel):
 #         return channel.partition('-')[-1]
 
+
 def get_creds():
-   return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
-      ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
-      'https://www.googleapis.com/auth/spreadsheets'])
+    return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
+                                                            ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
+                                                             'https://www.googleapis.com/auth/spreadsheets'])
+
 
 def setup(bot):
     bot.add_cog(TournamentQualifier(bot))

@@ -48,7 +48,6 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def preset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
-        goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -62,7 +61,6 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def nonracepreset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
-        goal_name = preset_dict['goal_name']
         if not seed:
             raise Exception(
                 'Could not generate game.  Maybe preset does not exist?')

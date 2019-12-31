@@ -113,28 +113,28 @@ async def start_multiworld(token, port=None):
     global MULTIWORLDS
     MULTIWORLDS[token] = proc
     return port
-    
+
 async def generate_multiworld():
     rnd_token = randomString(6)
     os.mkdir(f'/var/www/html/multiworld/{rnd_token}')
     cmd = [
         '/opt/multiworld/ALttPEntranceRandomizer/env/bin/python',
         '/opt/multiworld/ALttPEntranceRandomizer/EntranceRandomizer.py',
-        '--mode','open',
-        '--goal','ganon',
-        '--difficulty','normal',
-        '--progressive','on',
-        '--algorithm','balanced',
-        '--shuffle','vanilla',
-        '--rom','/opt/multiworld/ROM/Zelda_3_Jap_v1.sfc',
-        '--fastmenu','normal',
-        '--heartbeep','half',
+        '--mode', 'open',
+        '--goal', 'ganon',
+        '--difficulty', 'normal',
+        '--progressive', 'on',
+        '--algorithm', 'balanced',
+        '--shuffle', 'vanilla',
+        '--rom', '/opt/multiworld/ROM/Zelda_3_Jap_v1.sfc',
+        '--fastmenu', 'normal',
+        '--heartbeep', 'half',
         '--hints',
-        '--heartcolor','red',
+        '--heartcolor', 'red',
         '--skip_playthrough',
-        '--multi','2', #player count
-        #'--names','Synack,SomeoneElse', #names
-        '--outputpath',f'/var/www/html/multiworld/{rnd_token}'
+        '--multi', '2', #player count
+        #'--names', 'Synack,SomeoneElse', #names
+        '--outputpath', f'/var/www/html/multiworld/{rnd_token}'
     ]
     print(' '.join(cmd))
     proc = await asyncio.create_subprocess_shell(
