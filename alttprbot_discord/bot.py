@@ -1,4 +1,6 @@
+import asyncio
 import importlib
+import random
 
 import discord
 from discord.ext import commands
@@ -75,11 +77,6 @@ async def on_command_completion(ctx):
 
 @discordbot.event
 async def on_message(message):
-    if discordbot.user in message.mentions:
-        emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')
-        if emoji:
-            await message.add_reaction(emoji)
-
     # override discord.py's process_commands coroutine in the commands.Bot class
     # this allows SpeedGamingBot to issue commands to SahasrahBot
     if message.author.bot and not message.author.id == 344251539931660288:
@@ -87,3 +84,9 @@ async def on_message(message):
 
     ctx = await discordbot.get_context(message)
     await discordbot.invoke(ctx)
+
+    if discordbot.user in message.mentions:
+        emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')
+        if emoji:
+            await asyncio.sleep(random.random()*5)
+            await message.add_reaction(emoji)
