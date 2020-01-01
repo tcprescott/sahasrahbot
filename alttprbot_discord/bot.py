@@ -13,11 +13,7 @@ async def determine_prefix(bot, message):
         return "$"
 
     prefix = await config.get_parameter(message.guild.id, "CommandPrefix")
-
-    if prefix is None:
-        return "$"
-    else:
-        return prefix['value']
+    return "$" if prefix is None else prefix['value']
 
 
 discordbot = commands.Bot(
@@ -55,14 +51,14 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction('🚫')
     elif isinstance(error, commands.CommandNotFound):
         pass
-    elif isinstance(error, commands.errors.MissingRequiredArgument):
-        await ctx.send(error)
-        await ctx.message.add_reaction(riplink)
-    else:
+    elif hasattr(error, 'original'):
         await ctx.send(error.original)
         await ctx.message.add_reaction(riplink)
         raise error.original
-
+    else:
+        await ctx.send(error)
+        await ctx.message.add_reaction(riplink)
+        raise error
 
 @discordbot.event
 async def on_command(ctx):
