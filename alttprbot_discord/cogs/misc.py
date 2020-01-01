@@ -7,6 +7,8 @@ import discord
 import html2markdown
 from discord.ext import commands
 
+from alttprbot.util.holyimage import holy
+
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -39,37 +41,25 @@ class Misc(commands.Cog):
         aliases=['holy']
     )
     async def holyimage(self, ctx, slug=None, game='z3r'):
-        if slug is None:
-            raise Exception('You must specify a holy image.  Check out <http://alttp.mymm1.com/holyimage/>')
-
-        images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
-        i = images[game]
-
-        try:
-            image = next(item for item in i if item["slug"] == slug or slug in item.get("aliases", []) or str(item["idx"]) == slug)
-        except StopIteration:
-            raise Exception('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>')
-
-        link = f"http://alttp.mymm1.com/holyimage/{game}-{image['slug']}.html"
+        holyimage = await holy(slug=slug, game=game)
 
         embed = discord.Embed(
-            title=image.get('title'),
-            description=html2markdown.convert(image['desc']) if 'desc' in image else None,
+            title=holyimage.image.get('title'),
+            description=html2markdown.convert(holyimage.image['desc']) if 'desc' in holyimage.image else None,
             color=discord.Colour.from_rgb(0xFF, 0xAF, 0x00)
         )
 
-        if 'url' in image:
-            url = urljoin('http://alttp.mymm1.com/holyimage/',image['url'])
-            if image.get('mode', '') == 'redirect':
+        if 'url' in holyimage.image:
+            url = urljoin('http://alttp.mymm1.com/holyimage/', holyimage.image['url'])
+            if holyimage.image.get('mode', '') == 'redirect':
                 embed.add_field(name='Link', value=url, inline=False)
             else:
                 embed.set_image(url=url)
 
-        embed.add_field(name="Source", value=link)
+        embed.add_field(name="Source", value=holyimage.link)
 
-        if 'credit' in image:
-            embed.set_footer(text=f"Created by {image['credit']}")
-
+        if 'credit' in holyimage.image:
+            embed.set_footer(text=f"Created by {holyimage.image['credit']}")
 
         await ctx.send(embed=embed)
 

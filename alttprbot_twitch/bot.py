@@ -16,6 +16,8 @@ twitchbot.load_module('alttprbot_twitch.cogs.gtbk')
 async def event_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
         raise error
+    if isinstance(error, commands.CommandNotFound):
+        pass
     else:
         await ctx.send(error)
         raise error
