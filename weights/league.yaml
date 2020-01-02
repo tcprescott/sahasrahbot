@@ -1,0 +1,90 @@
+glitches_required:
+  none: 100
+  overworld_glitches: 0
+  major_glitches: 0
+  no_logic: 0
+item_placement:
+  basic: 0
+  advanced: 100
+dungeon_items:
+  standard: 45
+  mc: 15
+  mcs: 10
+  full: 30
+accessibility:
+  items: 90
+  locations: 10
+  none: 0
+goals:
+  ganon: 35
+  fast_ganon: 25
+  dungeons: 20
+  pedestal: 20
+  triforce-hunt: 0
+tower_open:
+  '0': 0
+  '1': 0
+  '2': 0
+  '3': 15
+  '4': 15
+  '5': 20
+  '6': 25
+  '7': 25
+  random: 0
+ganon_open:
+  '0': 0
+  '1': 0
+  '2': 0
+  '3': 10
+  '4': 10
+  '5': 20
+  '6': 20
+  '7': 40
+  random: 0
+world_state:
+  standard: 45
+  open: 45
+  inverted: 10
+  retro: 0
+entrance_shuffle:
+  none: 70
+  simple: 10
+  restricted: 0
+  full: 10
+  crossed: 10
+  insanity: 0
+boss_shuffle:
+  none: 70
+  simple: 10
+  full: 10
+  random: 10
+enemy_shuffle:
+  none: 85
+  shuffled: 5
+  random: 10
+hints:
+  'on': 00
+  'off': 100
+weapons:
+  randomized: 45
+  assured: 45
+  vanilla: 5
+  swordless: 5
+item_pool:
+  normal: 85
+  hard: 10
+  expert: 5
+  crowd_control: 0
+item_functionality:
+  normal: 100
+  hard: 0
+  expert: 0
+enemy_damage:
+  default: 100
+  shuffled: 0
+  random: 0
+enemy_health:
+  default: 100
+  easy: 0
+  hard: 0
+  expert: 0
