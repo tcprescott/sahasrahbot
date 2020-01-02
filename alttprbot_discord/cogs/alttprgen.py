@@ -28,8 +28,8 @@ class AlttprGen(commands.Cog):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
                 raise Exception('File should have a .json extension.')
-        except IndexError:
-            raise Exception('You must attach a customizer save json file.')
+        except IndexError as err:
+            raise Exception('You must attach a customizer save json file.') from err
 
         customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
 

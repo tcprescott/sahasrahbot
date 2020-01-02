@@ -21,9 +21,9 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
         if preset_dict.get('festive') and not await config.get(0, 'FestiveMode') == "true":
             raise PresetNotFoundException(
                 f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>')
-    except FileNotFoundError:
+    except FileNotFoundError as err:
         raise PresetNotFoundException(
-            f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>')
+            f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>') from err
 
     if hints:
         preset_dict['settings']['hints'] = 'on'

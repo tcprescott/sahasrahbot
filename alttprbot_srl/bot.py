@@ -37,7 +37,7 @@ class SrlBot(pydle.Client):
             await commands.handler(target=target, source=source, message=message, client=self)
         except Exception as err:
             await self.message(target, f'{type(err)}: "{str(err)}".  Please contact Synack if this condition persists.')
-            raise err
+            raise
 
     # target = you
     # source = sendering of the message
@@ -101,7 +101,10 @@ class SrlBot(pydle.Client):
 
 async def message_logger(msgtype, target, source, message):
     # redact passwords from logs
-    message = message.replace(c.SRL_PASSWORD, '**********')
+    try:
+        message = message.replace(c.SRL_PASSWORD, '**********')
+    except AttributeError:
+        pass
 
     # write event to channel log
 

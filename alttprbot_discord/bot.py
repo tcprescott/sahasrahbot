@@ -1,6 +1,8 @@
 import asyncio
 import importlib
 import random
+import traceback
+import sys
 
 import discord
 from discord.ext import commands
@@ -51,14 +53,16 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction('🚫')
     elif isinstance(error, commands.CommandNotFound):
         pass
-    elif hasattr(error, 'original'):
-        await ctx.send(error.original)
-        await ctx.message.add_reaction(riplink)
-        raise error.original
     else:
-        await ctx.send(error)
+        error_to_display = error.original if hasattr(error, 'original') else error
+
+        # error_channel = await commands.TextChannelConverter().convert(ctx, await config.get(0, "ErrorChannel"))
+        # if error_channel:
+        #     await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
+
         await ctx.message.add_reaction(riplink)
-        raise error
+        await ctx.send(error_to_display)
+        raise error_to_display
 
 @discordbot.event
 async def on_command(ctx):
