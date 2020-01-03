@@ -29,7 +29,7 @@ async def insert_guess(channel, twitch_user, guess):
     result = await get_current_active_game(channel)
     if result:
         await orm.execute(
-            'INSERT INTO gtbk_guesses(game_id, twitch_user, guess) VALUES (%s,%s,%s) ON DUPLICATE KEY UPDATE guess = %s;',
+            'INSERT INTO gtbk_guesses(game_id, twitch_user, guess) VALUES (%s,%s,%s) ON DUPLICATE KEY UPDATE guess = %s, `timestamp` = CURRENT_TIMESTAMP;',
             [result['game_id'], twitch_user, guess, guess]
         )
     else:
