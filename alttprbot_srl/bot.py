@@ -14,8 +14,8 @@ class SrlBot(pydle.Client):
         await self.message('NickServ', 'identify ' + c.SRL_PASSWORD)
         await self.join('#speedrunslive')
         await self.join('#alttpr')
-        await self.join_active_races(['alttphacks', 'alttpsm'])
-        await self.process_active_races()
+#        await self.join_active_races(['alttphacks', 'alttpsm'])
+#        await self.process_active_races()
         if c.DEBUG:
             await self.join('#srl-synack-testing')
 
@@ -47,12 +47,12 @@ class SrlBot(pydle.Client):
         await message_logger("NOTICE", target, source, message)
 
         # do stuff that we want after getting recognized by NickServ
-        # if message == 'Password accepted - you are now recognized.':
-        #     await asyncio.sleep(1)
+        if message == 'Password accepted - you are now recognized.':
+            await asyncio.sleep(1)
         #     await self.join('#speedrunslive')
         #     await self.join('#alttpr')
-        #     await self.join_active_races(['alttphacks', 'alttpsm'])
-        #     await self.process_active_races()
+            await self.join_active_races(['alttphacks', 'alttpsm'])
+            await self.process_active_races()
         #     if c.DEBUG: await self.join('#srl-synack-testing')
 
     async def on_join(self, channel, user):

@@ -50,7 +50,7 @@ async def get_active_game_guesses(channel):
     result = await get_current_active_game(channel)
     if result:
         results = await orm.select(
-            'SELECT * from gtbk_guesses where game_id=%s;',
+            'SELECT * from gtbk_guesses where game_id=%s order by timestamp asc, guess_id asc;',
             [result['game_id']]
         )
         return results
