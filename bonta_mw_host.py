@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import json
+import zlib
 import random
 import string
 
@@ -29,6 +30,8 @@ async def create_game():
         token = data['token']
     else:
         binary = await http.request_generic(data['multidata_url'], method='get', returntype='binary')
+        json.loads(zlib.decompress(binary).decode("utf-8"))
+        
         token = random_string(6)
 
         async with aiofiles.open(f"data/multidata_files/{token}_multidata", "wb") as multidata_file:
