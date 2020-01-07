@@ -9,3 +9,4 @@ weights/bot_testing.yaml
 public/spoilers
 test_input/
 .env
+data/
