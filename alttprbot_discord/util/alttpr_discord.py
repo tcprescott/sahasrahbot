@@ -55,6 +55,7 @@ class alttprDiscordClass(alttprClass):
         self.password = c.password
 
     async def embed(self, emojis=False, name=False, notes=False):
+        emojis = False
         if not name:
             try:
                 name = self.data['spoiler']['meta']['name']
@@ -136,7 +137,7 @@ class alttprDiscordClass(alttprClass):
 
         embed.add_field(name='Permalink', value=self.url, inline=False)
 
-        embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
+        # embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed
 
 

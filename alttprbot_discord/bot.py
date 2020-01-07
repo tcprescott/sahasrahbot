@@ -3,6 +3,7 @@ import importlib
 import random
 import traceback
 import sys
+from importlib import util
 
 import discord
 from discord.ext import commands
@@ -29,14 +30,11 @@ discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
-discordbot.load_extension("alttprbot_discord.cogs.nickname")
 discordbot.load_extension("alttprbot_discord.cogs.role")
 discordbot.load_extension("alttprbot_discord.cogs.smz3gen")
-discordbot.load_extension("alttprbot_discord.cogs.tournament")
-# discordbot.load_extension("alttprbot_discord.cogs.tourneyqualifier")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 
-if importlib.util.find_spec('jishaku'):
+if util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
 @discordbot.event
