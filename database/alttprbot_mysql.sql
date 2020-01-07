@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.25-28, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.28-31, for Linux (x86_64)
 --
 -- Host: localhost    Database: alttprbot
 -- ------------------------------------------------------
--- Server version	5.7.25-28
+-- Server version	5.7.28-31
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -25,25 +25,6 @@
 /*!50717 DEALLOCATE PREPARE s */;
 
 --
--- Table structure for table `audit`
---
-
-DROP TABLE IF EXISTS `audit`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `audit` (
-  `id` int(11) NOT NULL,
-  `guild_id` bigint(20) NOT NULL,
-  `date` datetime DEFAULT CURRENT_TIMESTAMP,
-  `user` varchar(400) CHARACTER SET utf8mb4 DEFAULT NULL,
-  `action` varchar(400) CHARACTER SET utf8mb4 DEFAULT NULL,
-  `oldvalue` varchar(400) CHARACTER SET utf8mb4 DEFAULT NULL,
-  `newvalue` varchar(400) CHARACTER SET utf8mb4 DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `config`
 --
 
@@ -56,7 +37,7 @@ CREATE TABLE `config` (
   `parameter` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,7 +51,57 @@ CREATE TABLE `daily` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `hash` varchar(45) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=196 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `gtbk_games`
+--
+
+DROP TABLE IF EXISTS `gtbk_games`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `gtbk_games` (
+  `game_id` int(11) NOT NULL AUTO_INCREMENT,
+  `channel` varchar(200) DEFAULT NULL,
+  `status` varchar(45) DEFAULT NULL,
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`game_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `gtbk_guesses`
+--
+
+DROP TABLE IF EXISTS `gtbk_guesses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `gtbk_guesses` (
+  `guess_id` int(11) NOT NULL AUTO_INCREMENT,
+  `game_id` int(11) DEFAULT NULL,
+  `twitch_user` varchar(200) DEFAULT NULL,
+  `guess` int(11) DEFAULT NULL,
+  `score` int(11) DEFAULT '0',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`guess_id`),
+  UNIQUE KEY `guess_UNIQUE` (`game_id`,`twitch_user`)
+) ENGINE=InnoDB AUTO_INCREMENT=2784 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `gtbk_whitelist`
+--
+
+DROP TABLE IF EXISTS `gtbk_whitelist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `gtbk_whitelist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `channel` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  `twitch_user` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,7 +119,7 @@ CREATE TABLE `mention_counters` (
   `last_used` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `role_id_UNIQUE` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3531 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=8202 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +155,7 @@ CREATE TABLE `reaction_group` (
   `bot_managed` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `message_id_UNIQUE` (`message_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,7 +175,7 @@ CREATE TABLE `reaction_role` (
   `description` varchar(400) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `protect_mentions` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -157,11 +188,78 @@ DROP TABLE IF EXISTS `seed_presets`;
 CREATE TABLE `seed_presets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `randomizer` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `randomizer` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `customizer` tinyint(4) DEFAULT NULL,
   `settings` json NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `spoiler_races`
+--
+
+DROP TABLE IF EXISTS `spoiler_races`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `spoiler_races` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `srl_id` varchar(45) COLLATE utf8_bin NOT NULL,
+  `spoiler_url` varchar(255) COLLATE utf8_bin NOT NULL,
+  `studytime` int(11) DEFAULT NULL,
+  `date` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `srl_id_UNIQUE` (`srl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `srl_races`
+--
+
+DROP TABLE IF EXISTS `srl_races`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `srl_races` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `srl_id` varchar(45) NOT NULL,
+  `goal` varchar(200) NOT NULL,
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `channel_UNIQUE` (`srl_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=359 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `srlnick`
+--
+
+DROP TABLE IF EXISTS `srlnick`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `srlnick` (
+  `discord_user_id` bigint(20) NOT NULL,
+  `srl_nick` varchar(200) DEFAULT NULL,
+  `twitch_name` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`discord_user_id`),
+  KEY `idx_srlnick_srl_nick` (`srl_nick`),
+  KEY `idx_srlnick_twitch_name` (`twitch_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `twitch_channels`
+--
+
+DROP TABLE IF EXISTS `twitch_channels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `twitch_channels` (
+  `channel` varchar(200) NOT NULL,
+  `group` varchar(45) NOT NULL,
+  PRIMARY KEY (`channel`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -177,7 +275,7 @@ CREATE TABLE `voice_role` (
   `voice_channel_id` bigint(20) NOT NULL,
   `role_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50112 SET @disable_bulk_load = IF (@is_rocksdb_supported, 'SET SESSION rocksdb_bulk_load = @old_rocksdb_bulk_load', 'SET @dummy_rocksdb_bulk_load = 0') */;
 /*!50112 PREPARE s FROM @disable_bulk_load */;
@@ -193,4 +291,4 @@ CREATE TABLE `voice_role` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-17  2:57:29
+-- Dump completed on 2020-01-07  9:18:44
