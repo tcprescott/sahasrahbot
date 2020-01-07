@@ -5,10 +5,10 @@ import random
 import string
 
 import aiofiles
-from quart import Quart, abort, request
+from quart import Quart, abort, request, jsonify
 
 from alttprbot.util import http
-from config import Config as c
+# from config import Config as c
 
 APP = Quart(__name__)
 
@@ -21,15 +21,18 @@ async def create_game():
     # if not data['auth_token'] == c.BontaMwHostKey:
     #     abort(401)
     
-    if not 'multidata_url' in data:
+    if not 'multidata_url' in data and not 'token' in data:
         abort(400)
 
-    binary = await http.request_generic(data['multidata_url'], method='get', returntype='binary')
     port = data.get('port', random.randint(30000, 35000))
-    token = data.get('token', random_string(6))
+    if 'token' in data:
+        token = data['token']
+    else:
+        binary = await http.request_generic(data['multidata_url'], method='get', returntype='binary')
+        token = random_string(6)
 
-    async with aiofiles.open(f"data/multidata_files/{token}_multidata", "wb") as multidata_file:
-        await multidata_file.write(binary)
+        async with aiofiles.open(f"data/multidata_files/{token}_multidata", "wb") as multidata_file:
+            await multidata_file.write(binary)
 
     cmd = [
         '/opt/multiworld/BontaMultiworld_v31/env/bin/python',
@@ -47,6 +50,7 @@ async def create_game():
     global MULTIWORLDS
 
     MULTIWORLDS[token] = {
+        'token': token,
         'proc': proc,
         'port': port,
         'admin': data.get('admin', None),
@@ -96,9 +100,10 @@ async def update_game(token):
     if not 'msg' in data:
         abort(400)
 
-    proc = MULTIWORLDS[token]
+    proc = MULTIWORLDS[token]['proc']
     proc.stdin.write(bytearray(data['msg'] + "\n", 'utf-8'))
     await proc.stdin.drain()
+    return jsonify(success=True)
 
 @APP.route('/game/<string:token_id>', methods=['DELETE'])
 async def delete_game(token_id):
