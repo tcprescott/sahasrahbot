@@ -26,6 +26,7 @@ discordbot = commands.Bot(
 discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
+discordbot.load_extension("alttprbot_discord.cogs.bontamw_tournament")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
