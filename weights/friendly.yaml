@@ -82,8 +82,8 @@ item_functionality:
   expert: 0
 enemy_damage:
   default: 80
-  shuffled: 10
-  random: 10
+  shuffled: 20
+  random: 0
 enemy_health:
   default: 80
   easy: 10
