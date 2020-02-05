@@ -1,4 +1,4 @@
-description: Big Jon's favorite weights
+description: "BigJon's favorite"
 glitches_required:
   none: 100
   overworld_glitches: 0
@@ -8,14 +8,14 @@ item_placement:
   basic: 50
   advanced: 50
 dungeon_items:
-  standard: 25
-  mc: 25
-  mcs: 25
-  full: 25
+  standard: 60
+  mc: 20
+  mcs: 20
+  full: 20
 accessibility:
-  items: 33.3
-  locations: 33.3
-  none: 33.4
+  items: 50
+  locations: 50
+  none: 0
 goals:
   ganon: 20
   fast_ganon: 20
@@ -48,12 +48,12 @@ world_state:
   inverted: 25
   retro: 25
 entrance_shuffle:
-  none: 100
-  simple: 0
-  restricted: 0
-  full: 0
-  crossed: 0
-  insanity: 0
+  none: 50
+  simple: 10
+  restricted: 10
+  full: 10
+  crossed: 10
+  insanity: 10
 boss_shuffle:
   none: 25
   simple: 25

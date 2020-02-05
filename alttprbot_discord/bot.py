@@ -62,7 +62,11 @@ async def on_command_error(ctx, error):
         #     await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
 
         await ctx.message.add_reaction(riplink)
-        await ctx.send(error_to_display)
+        try:
+            await ctx.send(error_to_display)
+        except discord.errors.HTTPException:
+            pass
+
         raise error_to_display
 
 @discordbot.event
