@@ -22,7 +22,7 @@ discordbot = commands.Bot(
     command_prefix=determine_prefix,
 )
 
-# discordbot.load_extension("alttprbot_discord.cogs.audit")
+discordbot.load_extension("alttprbot_discord.cogs.audit")
 discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
