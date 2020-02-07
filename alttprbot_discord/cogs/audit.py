@@ -63,9 +63,12 @@ class Audit(commands.Cog):
         if message.author.id == self.bot.user.id:
             return
         if await config.get(message.guild.id, 'AuditLogging') == 'true':
+            old_message = await audit.get_cached_messages(message.id)
+            if old_message[-1]['content'] == message.content:
+                return
             audit_channel_id = await config.get(message.guild.id, 'AuditLogChannel')
             if audit_channel_id:
-                embed = await audit_embed_edit(message)
+                embed = await audit_embed_edit(old_message, message)
                 audit_channel = discord.utils.get(message.guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
@@ -211,8 +214,7 @@ async def audit_embed_member_banned(member):
     embed.set_thumbnail(url=member.avatar_url)
     return embed
 
-async def audit_embed_edit(message):
-    old_message = await audit.get_cached_messages(message.id)
+async def audit_embed_edit(old_message, message):
     if not old_message:
         old_content = '??? err unknown ???'
     else:
