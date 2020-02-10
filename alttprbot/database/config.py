@@ -49,6 +49,8 @@ async def delete_parameter(guild_id, parameter):
     )
     await aiocache.SimpleMemoryCache().clear(namespace="config")
 
+
+@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="config")
 async def get(guild_id, parameter):
     parameter = await get_parameter(guild_id, parameter)
     if parameter is None:
