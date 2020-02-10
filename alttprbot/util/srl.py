@@ -34,11 +34,21 @@ def srl_race_id(channel):
 async def get_all_races():
     return await http.request_generic(f'http://api.speedrunslive.com/races', returntype='json')
 
-async def send_irc_message(raceid, message):
-    if c.DEBUG: return
-    data = {
-        'auth': c.InternalApiToken,
-        'channel': f'#srl-{raceid}',
-        'message': message
+async def get_player(player):
+    return await http.request_generic(f'http://api.speedrunslive.com/players/{player}', returntype='json', reqparams=params)
+
+async def get_pastraces(game, player):
+    # if we're developing locally, we want to have some artifical data to use that isn't from SRL
+    if c.DEBUG:
+        if player == "test0":
+            async with aiofiles.open('test_input/srl_pastraces.json', 'r') as f:
+                return json.loads(await f.read(), strict=False)
+        elif player == "test1" and not complete:
+            async with aiofiles.open('test_input/srl_pastraces_empty.json', 'r') as f:
+                return json.loads(await f.read(), strict=False)
+
+    params = {
+        'game': game,
+        'player': player,
     }
-    await http.request_json_post('http://localhost:5000/api/message', data=data, auth=None, returntype='text')
+    return await http.request_generic('http://api.speedrunslive.com/pastraces', returntype='json', reqparams=params)

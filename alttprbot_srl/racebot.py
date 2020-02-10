@@ -6,7 +6,7 @@ import ircmessage
 
 from alttprbot.database import spoiler_races, srl_races
 from alttprbot.util.srl import srl_race_id
-from alttprbot_srl import discord_integration
+from alttprbot_srl import discord_integration, alt_hunter
 from config import Config as c
 
 starting = re.compile(
@@ -49,8 +49,6 @@ async def handler(target, source, message, client):
                 await srl_races.delete_srl_race(srl_id)
 
         if go.match(message) or message == 'test go':
-            await discord_integration.discord_race_start(srl_id)
-
             # spoilers
             race = await spoiler_races.get_spoiler_race_by_id(srl_id)
             if race:
@@ -66,6 +64,10 @@ async def handler(target, source, message, client):
                     beginmessage=True,
                 )
                 await spoiler_races.delete_spoiler_race(srl_id)
+
+            await discord_integration.discord_race_start(srl_id)
+            await alt_hunter.check_race(srl_id)
+
 
         result = runnerdone.search(message)
         if result:
