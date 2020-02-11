@@ -24,7 +24,7 @@ async def get_upcoming_episodes_by_event(event):
     result = await http.request_generic(f'{c.SgApiEndpoint}/schedule', reqparams=params, returntype='json')
     return result
 
-async def get_episode(episodeid, complete=False):
+async def get_episode(episodeid: int, complete=False):
     # if we're developing locally, we want to have some artifical data to use that isn't from SpeedGaming
     if c.DEBUG:
         if episodeid == 1:

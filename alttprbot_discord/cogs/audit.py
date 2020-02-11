@@ -1,7 +1,7 @@
 import datetime
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 from alttprbot.database import audit, config
 
@@ -13,6 +13,16 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.guild is None:
+            await audit.insert_message(
+                guild_id=0,
+                message_id=message.id,
+                user_id=message.author.id,
+                channel_id=message.channel.id,
+                message_date=message.created_at,
+                content=message.content
+            )
+            return
         if await config.get(message.guild.id, 'AuditLogging') == 'true':
             if message.id == self.bot.user.id:
                 return
@@ -27,6 +37,8 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
+        if payload.guild_id is None:
+            return
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
         if payload.message_id == self.bot.user.id:
@@ -42,6 +54,8 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload):
+        if payload.guild_id is None:
+            return
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
         if payload.message_id == self.bot.user.id:
@@ -59,6 +73,8 @@ class Audit(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
+        if channel.guild is None:
+            return
         message = await channel.fetch_message(payload.message_id)
         if message.author.id == self.bot.user.id:
             return
@@ -104,6 +120,8 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        if member.guild is None:
+            return
         if await config.get(member.guild.id, 'AuditLogging') == 'true':
             audit_channel_id = await config.get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
@@ -114,6 +132,8 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
+        if member.guild is None:
+            return
         if await config.get(member.guild.id, 'AuditLogging') == 'true':
             audit_channel_id = await config.get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
@@ -156,6 +176,8 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
+        if guild is None:
+            return
         if await config.get(guild.id, 'AuditLogging') == 'true':
             audit_channel_id = await config.get(user.guild.id, 'AuditLogChannel')
             if audit_channel_id:

@@ -35,20 +35,21 @@ async def get_all_races():
     return await http.request_generic(f'http://api.speedrunslive.com/races', returntype='json')
 
 async def get_player(player):
-    return await http.request_generic(f'http://api.speedrunslive.com/players/{player}', returntype='json', reqparams=params)
+    return await http.request_generic(f'http://api.speedrunslive.com/players/{player}', returntype='json')
 
-async def get_pastraces(game, player):
+async def get_pastraces(game, player, pagesize=20):
     # if we're developing locally, we want to have some artifical data to use that isn't from SRL
     if c.DEBUG:
         if player == "test0":
             async with aiofiles.open('test_input/srl_pastraces.json', 'r') as f:
                 return json.loads(await f.read(), strict=False)
-        elif player == "test1" and not complete:
+        elif player == "test1":
             async with aiofiles.open('test_input/srl_pastraces_empty.json', 'r') as f:
                 return json.loads(await f.read(), strict=False)
 
     params = {
         'game': game,
         'player': player,
+        'pageSize': pagesize
     }
     return await http.request_generic('http://api.speedrunslive.com/pastraces', returntype='json', reqparams=params)

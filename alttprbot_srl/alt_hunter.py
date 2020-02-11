@@ -1,19 +1,25 @@
+import datetime
+
+import aiohttp.client_exceptions
 import discord
 
 from alttprbot.database import config
-from alttprbot.util import srl, http
+from alttprbot.util import http, srl
 from alttprbot_discord.bot import discordbot
 from config import Config as c
-import aiohttp.client_exceptions
-import datetime
 
 
 async def check_race(srl_id):
     race = await srl.get_race(srl_id)
+
+    # only report on alttphacks races for now, make this configurable in the future
+    if not race['game']['abbrev'] == 'alttphacks':
+        return
+
     configguilds = await config.get_all_parameters_by_name('AltHunterReportingChannel')
     for entrant in race['entrants']:
         try:
-            pastraces = await srl.get_pastraces('alttphacks', entrant)
+            pastraces = await srl.get_pastraces(game=race['game']['abbrev'], player=entrant, pagesize=0)
         except aiohttp.client_exceptions.ClientResponseError:
             print(f'could not get history of {entrant}, skipping...')
             continue

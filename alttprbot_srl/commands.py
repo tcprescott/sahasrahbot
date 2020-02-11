@@ -7,6 +7,7 @@ from alttprbot.database import spoiler_races, srl_races, config
 from alttprbot.smz3gen import preset as smz3_preset
 from alttprbot.smz3gen import spoilers as smz3_spoilers
 from alttprbot.util.srl import get_race, srl_race_id
+from alttprbot.tournament import league
 
 
 async def handler(target, source, message, client):
@@ -145,6 +146,9 @@ async def handler(target, source, message, client):
         await srl_races.insert_srl_race(srl_id, goal)
         await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url, studytime)
 
+    if args.command == '$leaguerace' and target.startswith('#srl-'):
+        await league.process_league_race(target, args, client)
+
     if args.command == '$cancel' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
         await srl_races.delete_srl_race(srl_id)
@@ -163,9 +167,6 @@ async def handler(target, source, message, client):
 
     if args.command == '$vt' and target.startswith('#srl-'):
         await client.message(target, "You summon VT, he looks around confused and curses your next game with bad RNG.")
-
-    if args.command == '$echo':
-        await client.message(source, args.message)
 
 
 async def parse_args(message):
@@ -206,6 +207,10 @@ async def parse_args(message):
         parser_festivemystery.add_argument(
             'weightset', nargs='?', default="weighted")
         parser_festivemystery.add_argument('--silent', action='store_true')
+
+    parser_leaguerace = subparsers.add_parser('$leaguerace')
+    parser_leaguerace.add_argument('episodeid')
+    parser_leaguerace.add_argument('--week', default=None)
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')

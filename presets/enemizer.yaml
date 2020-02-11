@@ -14,10 +14,10 @@ settings:
     ganon: '7'
     tower: '7'
   enemizer:
-    boss_shuffle: random
+    boss_shuffle: full
     enemy_damage: default
     enemy_health: default
-    enemy_shuffle: random
+    enemy_shuffle: shuffled
   glitches: none
   spoilers: false
   entrances: none
