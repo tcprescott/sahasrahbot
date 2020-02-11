@@ -1,8 +1,8 @@
 import asyncio
 import importlib
 import random
-import traceback
 import sys
+import traceback
 
 import discord
 from discord.ext import commands
@@ -22,11 +22,12 @@ discordbot = commands.Bot(
     command_prefix=determine_prefix,
 )
 
-discordbot.load_extension("alttprbot_discord.cogs.audit")
 discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
+discordbot.load_extension("alttprbot_discord.cogs.audit")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
+discordbot.load_extension("alttprbot_discord.cogs.league")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
 discordbot.load_extension("alttprbot_discord.cogs.nickname")

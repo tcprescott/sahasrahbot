@@ -73,7 +73,7 @@ class Audit(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
-        if channel.guild is None:
+        if isinstance(channel, discord.DMChannel):
             return
         message = await channel.fetch_message(payload.message_id)
         if message.author.id == self.bot.user.id:

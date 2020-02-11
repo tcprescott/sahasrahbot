@@ -165,7 +165,7 @@ async def process_league_race(target, args, client):
             if audit_channel is not None:
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}")
 
-    if generated_league_race.type == 'spoilers':
+    if generated_league_race.type == 'spoiler':
         await spoiler_races.insert_spoiler_race(srl_id, generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
 
     await srl_races.insert_srl_race(srl_id, goal)
