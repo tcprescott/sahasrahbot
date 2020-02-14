@@ -9,7 +9,7 @@ class GtbkGuessingGameException(Exception):
 @aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="gtbk_status")
 async def get_current_active_game(channel):
     results = await orm.select(
-        'SELECT * from gtbk_games where channel=%s and not status="COMPLETED";',
+        'SELECT * from gtbk_games where channel=%s and status<>"COMPLETED";',
         [channel]
     )
     return results[0] if len(results) > 0 else None
