@@ -44,7 +44,7 @@ class Admin(commands.Cog):
         help='Clear the configuration cache.  Useful if database was manually updated.'
     )
     async def configcache(self, ctx):
-        await aiocache.SimpleMemoryCache().clear(namespace="config")
+        await config.CACHE.clear()
 
     @commands.command()
     async def srlmsg(self, ctx, channel, message):

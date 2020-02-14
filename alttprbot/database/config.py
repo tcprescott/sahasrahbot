@@ -2,35 +2,45 @@ import aiocache
 
 from ..util import orm
 
+CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="config")
 async def get_parameter(guild_id, parameter):
-    result = await orm.select(
+    if await CACHE.exists(f'{parameter}_{guild_id}_config'):
+        results = await CACHE.get(f'{parameter}_{guild_id}_config')
+        return results[0] if len(results) > 0 else None
+
+    results = await orm.select(
         'SELECT * from config WHERE guild_id=%s AND parameter=%s;',
         [guild_id, parameter]
     )
-    if len(result) == 0:
-        return None
-    else:
-        return result[0]
+    await CACHE.set(f'{parameter}_{guild_id}_config', results)
+    return results[0] if len(results) > 0 else None
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="config")
 async def get_all_parameters_by_name(parameter):
-    result = await orm.select(
+    if await CACHE.exists(f'{parameter}_allconfig'):
+        results = await CACHE.get(f'{parameter}_allconfig')
+        return results[0] if len(results) > 0 else None
+
+    results = await orm.select(
         'SELECT * from config WHERE parameter=%s;',
         [parameter]
     )
-    return result
+    await CACHE.set(f'{parameter}_allconfig', results)
+    return results
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="config")
 async def get_parameters_by_guild(guild_id):
-    result = await orm.select(
+    if await CACHE.exists(f'{guild_id}_guildconfig'):
+        results = await CACHE.get(f'{guild_id}_guildconfig')
+        return results
+
+    results = await orm.select(
         'SELECT * from config WHERE guild_id=%s;',
         [guild_id]
     )
-    return result
+    await CACHE.set(f'{guild_id}_guildconfig', results)
+    return results
 
 
 async def set_parameter(guild_id, parameter, value):
@@ -39,7 +49,9 @@ async def set_parameter(guild_id, parameter, value):
         'INSERT INTO config (`guild_id`,`parameter`,`value`) values (%s, %s, %s)',
         [guild_id, parameter, value]
     )
-    await aiocache.SimpleMemoryCache().clear(namespace="config")
+    await CACHE.delete(f'{parameter}_{guild_id}_config')
+    await CACHE.delete(f'{parameter}_allconfig')
+    await CACHE.delete(f'{guild_id}_guildconfig')
 
 
 async def delete_parameter(guild_id, parameter):
@@ -47,10 +59,11 @@ async def delete_parameter(guild_id, parameter):
         'DELETE FROM config WHERE guild_id=%s AND parameter=%s',
         [guild_id, parameter]
     )
-    await aiocache.SimpleMemoryCache().clear(namespace="config")
+    await CACHE.delete(f'{parameter}_{guild_id}_config')
+    await CACHE.delete(f'{parameter}_allconfig')
+    await CACHE.delete(f'{guild_id}_guildconfig')
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="config")
 async def get(guild_id, parameter):
     parameter = await get_parameter(guild_id, parameter)
     if parameter is None:

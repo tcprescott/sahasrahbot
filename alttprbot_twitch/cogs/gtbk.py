@@ -8,13 +8,13 @@ from alttprbot.util import speedgaming
 
 
 async def whitelisted(ctx):
-    if ctx.author.name == 'the_synack':
-        return True
+    # if ctx.author.name == 'the_synack':
+    #     return True
 
-    if ctx.author.name == ctx.channel.name:
-        return True
-    if ctx.author.is_mod:
-        return True
+    # if ctx.author.name == ctx.channel.name:
+    #     return True
+    # if ctx.author.is_mod:
+    #     return True
 
     if ctx.channel.name in [
             'alttprandomizer',
@@ -28,7 +28,8 @@ async def whitelisted(ctx):
             'speedgaming3',
             'speedgaming4',
             'speedgaming5',
-            'speedgaming6']:
+            'speedgaming6',
+            'the_synack']:
         whitelist = await get_whitelist_users(['alttpr', 'owg'])
         if ctx.author.name.lower() in whitelist:
             return True

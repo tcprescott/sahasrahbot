@@ -2,8 +2,8 @@ import aiocache
 
 from ..util import orm
 
+CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="role")
 async def get_role_by_group_emoji(channel_id, message_id, emoji, guild_id):
     roles = await orm.select(
         'SELECT rr.role_id from reaction_group rg LEFT JOIN reaction_role rr ON rr.reaction_group_id = rg.id WHERE rg.channel_id=%s AND rg.message_id=%s AND rg.guild_id=%s and rr.emoji=%s;',
@@ -12,7 +12,6 @@ async def get_role_by_group_emoji(channel_id, message_id, emoji, guild_id):
     return roles
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="role")
 async def get_guild_groups(guild_id):
     groups = await orm.select(
         'SELECT * from reaction_group WHERE guild_id=%s;',
@@ -21,7 +20,6 @@ async def get_guild_groups(guild_id):
     return groups
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="role")
 async def get_guild_group_by_id(reaction_group_id, guild_id):
     groups = await orm.select(
         'SELECT * from reaction_group WHERE id=%s AND guild_id=%s;',
@@ -30,7 +28,6 @@ async def get_guild_group_by_id(reaction_group_id, guild_id):
     return groups
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="role")
 async def get_group_roles(reaction_group_id, guild_id):
     roles = await orm.select(
         'SELECT * from reaction_role where reaction_group_id=%s AND guild_id=%s;',
@@ -39,7 +36,6 @@ async def get_group_roles(reaction_group_id, guild_id):
     return roles
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="role")
 async def get_role(reaction_role_id, guild_id):
     role = await orm.select(
         'SELECT * from reaction_role where id = %s and guild_id = %s;',
@@ -48,7 +44,6 @@ async def get_role(reaction_role_id, guild_id):
     return role[0]
 
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="role")
 async def get_role_group(reaction_role_id, guild_id):
     role = await orm.select(
         'SELECT rg.id, rg.guild_id, rg.channel_id, rg.message_id, rr.emoji '

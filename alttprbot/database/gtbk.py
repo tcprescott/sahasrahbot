@@ -2,16 +2,21 @@ import aiocache
 
 from ..util import orm
 
+CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
 class GtbkGuessingGameException(Exception):
     pass
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache, namespace="gtbk_status")
 async def get_current_active_game(channel):
+    if await CACHE.exists(f'{channel}_gtbk_active_game'):
+        results = await CACHE.get(f'{channel}_gtbk_active_game')
+        return results[0] if len(results) > 0 else None
+
     results = await orm.select(
         'SELECT * from gtbk_games where channel=%s and status<>"COMPLETED";',
         [channel]
     )
+    await CACHE.set(f'{channel}_gtbk_active_game', results)
     return results[0] if len(results) > 0 else None
 
 async def start_game(channel):
@@ -21,7 +26,7 @@ async def start_game(channel):
             'INSERT INTO gtbk_games(channel, status) VALUES (%s, %s)',
             [channel, "STARTED"]
         )
-        await aiocache.SimpleMemoryCache().clear(namespace="gtbk_status")
+        await CACHE.delete(f'{channel}_gtbk_active_game')
     else:
         raise GtbkGuessingGameException("This channel already has an active GTBK game!")
 
@@ -42,7 +47,7 @@ async def update_game_status(channel, status):
             'UPDATE gtbk_games SET status=%s where game_id=%s',
             [status, result['game_id']]
         )
-        await aiocache.SimpleMemoryCache().clear(namespace="gtbk_status")
+        await CACHE.delete(f'{channel}_gtbk_active_game')
     else:
         raise GtbkGuessingGameException("This channel does not have an active GTBK game!")
 
