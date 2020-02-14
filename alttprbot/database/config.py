@@ -20,7 +20,7 @@ async def get_parameter(guild_id, parameter):
 async def get_all_parameters_by_name(parameter):
     if await CACHE.exists(f'{parameter}_allconfig'):
         results = await CACHE.get(f'{parameter}_allconfig')
-        return results[0] if len(results) > 0 else None
+        return results
 
     results = await orm.select(
         'SELECT * from config WHERE parameter=%s;',
