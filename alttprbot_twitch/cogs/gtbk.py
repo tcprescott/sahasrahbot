@@ -8,13 +8,13 @@ from alttprbot.util import speedgaming
 
 
 async def whitelisted(ctx):
-    # if ctx.author.name == 'the_synack':
-    #     return True
+    if ctx.author.name == 'the_synack':
+        return True
 
-    # if ctx.author.name == ctx.channel.name:
-    #     return True
-    # if ctx.author.is_mod:
-    #     return True
+    if ctx.author.name == ctx.channel.name:
+        return True
+    if ctx.author.is_mod:
+        return True
 
     if ctx.channel.name in [
             'alttprandomizer',
