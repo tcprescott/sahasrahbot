@@ -1,9 +1,9 @@
 from ..util import orm
 
-async def insert_message(guild_id: int, message_id: int, user_id: int, channel_id: int, message_date, content):
+async def insert_message(guild_id: int, message_id: int, user_id: int, channel_id: int, message_date, content, attachment):
     await orm.execute(
-        'INSERT INTO audit_messages (guild_id, message_id, user_id, channel_id, message_date, content) values (%s, %s, %s, %s, %s, %s)',
-        [guild_id, message_id, user_id, channel_id, message_date, content]
+        'INSERT INTO audit_messages (guild_id, message_id, user_id, channel_id, message_date, content, attachment) values (%s, %s, %s, %s, %s, %s, %s)',
+        [guild_id, message_id, user_id, channel_id, message_date, content, attachment]
     )
 
 async def get_cached_messages(message_id: int):

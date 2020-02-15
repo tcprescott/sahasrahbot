@@ -13,27 +13,13 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.id == self.bot.user.id:
+            return
         if message.guild is None:
-            await audit.insert_message(
-                guild_id=0,
-                message_id=message.id,
-                user_id=message.author.id,
-                channel_id=message.channel.id,
-                message_date=message.created_at,
-                content=message.content
-            )
+            await record_message(message)
             return
         if await config.get(message.guild.id, 'AuditLogging') == 'true':
-            if message.id == self.bot.user.id:
-                return
-            await audit.insert_message(
-                guild_id=message.guild.id,
-                message_id=message.id,
-                user_id=message.author.id,
-                channel_id=message.channel.id,
-                message_date=message.created_at,
-                content=message.content
-            )
+            await record_message(message)
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
@@ -89,14 +75,7 @@ class Audit(commands.Cog):
 
                 await audit_channel.send(embed=embed)
 
-            await audit.insert_message(
-                guild_id=message.guild.id,
-                message_id=message.id,
-                user_id=message.author.id,
-                channel_id=message.channel.id,
-                message_date=message.created_at,
-                content=message.content
-            )
+            await record_message(message)
 
     # @commands.Cog.listener()
     # async def on_reaction_clear(self, message, reactions):
@@ -263,10 +242,12 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
     if old_message is None:
         author = None
         old_content = '*unknown*'
+        old_attachment_url = None
         original_timestamp = '*unknown*'
     else:
         author = guild.get_member(int(old_message[-1]['user_id']))
         old_content = old_message[-1]['content']
+        old_attachment_url = old_message[-1]['attachment']
         original_timestamp = f"{old_message[0]['message_date']} UTC"
     
     old_content = '*empty*' if old_content == '' else old_content
@@ -279,10 +260,23 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
     )
 
     embed.add_field(name='Old Message', value=old_content[:1500] + ('..' if len(old_content) > 1500 else ''), inline=False)
+    if old_attachment_url:
+        embed.add_field(name='Old Attachment', value=old_attachment_url, inline=False)
     embed.add_field(name='Message Timestamp', value=original_timestamp, inline=False)
     embed.set_footer(text="Logged at")
 
     return embed
+
+async def record_message(message):
+    await audit.insert_message(
+        guild_id=message.guild.id if message.guild else 0,
+        message_id=message.id,
+        user_id=message.author.id,
+        channel_id=message.channel.id,
+        message_date=message.created_at,
+        content=message.content,
+        attachment=message.attachments[0].url if message.attachments else None
+    )
 
 def setup(bot):
     bot.add_cog(Audit(bot))
