@@ -11,7 +11,13 @@ class BontaMultiworld(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(
+        help=('Host a multiworld using an attached multidata file from Bonta\'s multiworld implementation.\n'
+              'The multidata file that is attached must be from the multiworld_31 branch or another compatible implementation.\n\n'
+              'Returns a "token" that can be used with the $mwmsg command to send commands to the server console.'
+        ),
+        brief='Host a multiworld using Bonta\'s multiworld implementation.'
+    )
     async def mwhost(self, ctx):
         if not ctx.message.attachments:
             raise SahasrahBotException('Must attach a multidata file.')
@@ -30,11 +36,18 @@ class BontaMultiworld(commands.Cog):
             f"Host: {c.MultiworldHostBase}:{multiworld['port']}"
         )
 
-    @commands.command()
+    @commands.command(
+        help=(
+            'Sends a command to the multiworld server.\n'
+            'The msg should be wrapped in quotes.  For example: $mwmsg abc123 "/kick Synack"\n'
+            'Only the creator of the game, or the owner of this bot, may send commands.'
+        ),
+        brief='Send a command to the multiworld server.'
+    )
     async def mwmsg(self, ctx, token, msg):
         result = await http.request_generic(url=f'http://localhost:5000/game/{token}', method='get', returntype='json')
 
-        if not result['admin'] == ctx.author.id:
+        if not result['admin'] == ctx.author.id or not await ctx.bot.is_owner(ctx.author):
             raise SahasrahBotException('You must be the creater of the game to send messages to it.')
 
         data = {
