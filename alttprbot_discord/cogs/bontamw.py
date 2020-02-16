@@ -5,8 +5,6 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
 from config import Config as c
 
-MULTIWORLDS = {}
-
 class BontaMultiworld(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
