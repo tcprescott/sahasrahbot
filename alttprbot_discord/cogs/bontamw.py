@@ -1,3 +1,4 @@
+from aiohttp import ClientResponseError
 from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
@@ -19,7 +20,10 @@ class BontaMultiworld(commands.Cog):
             'multidata_url': ctx.message.attachments[0].url,
             'admin': ctx.author.id
         }
-        multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
+        try:
+            multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
+        except ClientResponseError as err:
+            raise SahasrahBotException('Unable to generate host using the provided multidata.  Ensure you\'re using the latest version of the mutiworld (<https://github.com/Bonta0/ALttPEntranceRandomizer/tree/multiworld_31>)!') from err
 
         await ctx.send(
             f"Game Token: {multiworld['token']}\n"
