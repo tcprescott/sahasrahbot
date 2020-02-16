@@ -4,14 +4,15 @@ from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 
 from alttprbot.database import srlnick
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 from config import Config as c
 
 
-class ChallengeCupScheduleNotFound(Exception):
+class ChallengeCupScheduleNotFound(SahasrahBotException):
     pass
 
-class InvalidSettingsException(Exception):
+class InvalidSettingsException(SahasrahBotException):
     pass
 
 async def get_settings(episodeid, guildid):
@@ -87,12 +88,12 @@ async def generate_game(episodeid, guildid):
     player1 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 1'])
 
     if player1 is False:
-        raise Exception(f"Unable to identify {sheet_settings['Player 1']}")
+        raise SahasrahBotException(f"Unable to identify {sheet_settings['Player 1']}")
 
     player2 = await srlnick.get_discord_id_by_twitch(sheet_settings['Player 2'])
 
     if player2 is False:
-        raise Exception(f"Unable to identify {sheet_settings['Player 2']}")
+        raise SahasrahBotException(f"Unable to identify {sheet_settings['Player 2']}")
 
     players = [
         {

@@ -6,6 +6,7 @@ from discord.ext import commands
 from emoji import UNICODE_EMOJI
 
 from alttprbot.database import role
+from alttprbot.exceptions import SahasrahBotException
 
 from ..util import embed_formatter
 
@@ -62,11 +63,11 @@ class Role(commands.Cog):
     async def role_create(self, ctx, group_id: int, role_name: discord.Role, name, description, emoji, protect_mentions: bool = True):
         existing_roles = await role.get_group_roles(group_id, ctx.guild.id)
         if len(existing_roles) >= 20:
-            raise Exception(
+            raise SahasrahBotException(
                 'No more than 20 roles can be on a group.  Please create a new group.')
 
         if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
-            raise Exception('Custom emoji is not available to this bot.')
+            raise SahasrahBotException('Custom emoji is not available to this bot.')
 
         await role.create_role(ctx.guild.id, group_id, role_name.id, name, emoji, description, protect_mentions)
         await refresh_bot_message(ctx, group_id)

@@ -1,5 +1,6 @@
 from discord.ext import commands
 
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
 from config import Config as c
 
@@ -12,7 +13,7 @@ class BontaMultiworld(commands.Cog):
     @commands.command()
     async def mwhost(self, ctx):
         if not ctx.message.attachments:
-            raise Exception('Must attach a multidata file.')
+            raise SahasrahBotException('Must attach a multidata file.')
 
         data = {
             'multidata_url': ctx.message.attachments[0].url,
@@ -30,7 +31,7 @@ class BontaMultiworld(commands.Cog):
         result = await http.request_generic(url=f'http://localhost:5000/game/{token}', method='get', returntype='json')
 
         if not result['admin'] == ctx.author.id:
-            raise Exception('You must be the creater of the game to send messages to it.')
+            raise SahasrahBotException('You must be the creater of the game to send messages to it.')
 
         data = {
             'msg': msg

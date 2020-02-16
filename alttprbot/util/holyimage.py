@@ -2,12 +2,15 @@ import json
 
 import aiohttp
 
+from alttprbot.exceptions import SahasrahBotException
+
+
 async def holy(slug, game='z3r'):
     image = HolyImage(slug=slug, game=game)
     await image._init()
     return image
 
-class HolyImageNotFound(Exception):
+class HolyImageNotFound(SahasrahBotException):
     pass
 
 class HolyImage():

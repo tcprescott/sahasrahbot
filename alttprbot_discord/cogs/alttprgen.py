@@ -9,10 +9,13 @@ from alttprbot.alttprgen.mystery import generate_random_game
 from alttprbot.alttprgen.preset import get_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.database import config
-# from config import Config as c
+from alttprbot.exceptions import SahasrahBotException
 
 from ..util import checks
 from ..util.alttpr_discord import alttpr
+
+# from config import Config as c
+
 
 
 class AlttprGen(commands.Cog):
@@ -27,9 +30,9 @@ class AlttprGen(commands.Cog):
     async def custom(self, ctx, tournament: bool = True):
         try:
             if not ctx.message.attachments[0].filename.endswith('.json'):
-                raise Exception('File should have a .json extension.')
+                raise SahasrahBotException('File should have a .json extension.')
         except IndexError as err:
-            raise Exception('You must attach a customizer save json file.') from err
+            raise SahasrahBotException('You must attach a customizer save json file.') from err
 
         customizer_settings = await get_customizer_json(ctx.message.attachments[0].url)
 
@@ -49,7 +52,7 @@ class AlttprGen(commands.Cog):
     async def preset(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
         if not seed:
-            raise Exception(
+            raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
@@ -62,7 +65,7 @@ class AlttprGen(commands.Cog):
     async def nonracepreset(self, ctx, preset, hints=False):
         seed = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
         if not seed:
-            raise Exception(
+            raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
@@ -75,7 +78,7 @@ class AlttprGen(commands.Cog):
     async def spoiler(self, ctx, preset):
         seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
-            raise Exception(
+            raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
@@ -140,12 +143,12 @@ class AlttprGen(commands.Cog):
 
 async def randomgame(ctx, weightset, tournament=True, spoilers="off", festive=False):
     if weightset == "custom" and not ctx.message.attachments:
-        raise Exception(
+        raise SahasrahBotException(
             'You must attach a file when specifying a custom weightset.')
     if weightset == "custom" and not ctx.message.attachments[0].filename.endswith('.yaml'):
-        raise Exception('File should have a .yaml extension.')
+        raise SahasrahBotException('File should have a .yaml extension.')
     elif not weightset == "custom" and ctx.message.attachments:
-        raise Exception(
+        raise SahasrahBotException(
             'If you\'re intending to use a custom weightset, please specify the weightset as "custom".')
 
     seed = await generate_random_game(

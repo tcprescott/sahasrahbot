@@ -3,6 +3,7 @@ import importlib
 import random
 import sys
 import traceback
+from alttprbot.exceptions import SahasrahBotException
 
 import discord
 from discord.ext import commands
@@ -56,17 +57,17 @@ async def on_command_error(ctx, error):
     else:
         error_to_display = error.original if hasattr(error, 'original') else error
 
-        # error_channel = await commands.TextChannelConverter().convert(ctx, await config.get(0, "ErrorChannel"))
-        # if error_channel:
-        #     await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
-
         await ctx.message.add_reaction(riplink)
         try:
             await ctx.send(error_to_display)
         except discord.errors.HTTPException:
             pass
 
-        raise error_to_display
+        if not isinstance(error_to_display, SahasrahBotException):
+            error_channel = await commands.TextChannelConverter().convert(ctx, await config.get(0, "ErrorChannel"))
+            if error_channel:
+                await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
+            raise error_to_display
 
 @discordbot.event
 async def on_command(ctx):

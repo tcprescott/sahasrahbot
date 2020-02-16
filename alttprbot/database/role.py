@@ -1,5 +1,6 @@
 import aiocache
 
+from alttprbot.exceptions import SahasrahBotException
 from ..util import orm
 
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
@@ -63,7 +64,7 @@ async def create_group(guild_id, channel_id, message_id, name, description, bot_
     )
 
     if len(existing_groups) > 0:
-        raise Exception('Group already exists for specified message.')
+        raise SahasrahBotException('Group already exists for specified message.')
 
     await orm.execute(
         'INSERT into reaction_group (`guild_id`,`channel_id`,`message_id`,`name`,`description`,`bot_managed`) values (%s, %s, %s, %s, %s, %s)',
@@ -101,7 +102,7 @@ async def create_role(guild_id, reaction_group_id, role_id, name, emoji, descrip
     )
     # do something else if this already exists
     if len(existing_roles) > 0:
-        raise Exception('Emoji already exists on group.')
+        raise SahasrahBotException('Emoji already exists on group.')
 
     await orm.execute(
         'INSERT into reaction_role (`guild_id`, `reaction_group_id`, `role_id`, `name`, `emoji`, `description`, `protect_mentions`) values (%s, %s, %s, %s, %s, %s, %s)',

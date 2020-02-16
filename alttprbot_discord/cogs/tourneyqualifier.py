@@ -12,9 +12,10 @@ from pytz import timezone
 
 from alttprbot.alttprgen.preset import get_preset
 from alttprbot.database import srlnick
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
-from config import Config as c
 from alttprbot_srl.bot import srlbot
+from config import Config as c
 
 from ..util import checks
 from ..util.alttpr_discord import alttpr
@@ -68,7 +69,7 @@ class TournamentQualifier(commands.Cog):
     async def qualmulti(self, ctx, raceid):
         race = await get_race(raceid)
         if race == {}:
-            raise Exception('That race does not exist.')
+            raise SahasrahBotException('That race does not exist.')
         for multi in build_multistream_links(race):
             await ctx.send(multi)
 
@@ -78,7 +79,7 @@ class TournamentQualifier(commands.Cog):
     async def checkreg(self, ctx, raceid):
         race = await get_race(raceid)
         if race == {}:
-            raise Exception('That race does not exist.')
+            raise SahasrahBotException('That race does not exist.')
         await loadnicks(ctx)
         await self.send_qualifier_dms(ctx, embed=None, race=race, checkonly=True)
 
@@ -128,11 +129,11 @@ class TournamentQualifier(commands.Cog):
         date = datetime.datetime.now(timezone('US/Pacific')).date()
         race2 = await get_race(raceid)
         if race2 == {}:
-            raise Exception('That race does not exist.')
+            raise SahasrahBotException('That race does not exist.')
         if not race2['game']['abbrev'] == 'alttphacks':
-            raise Exception('That is not an alttphacks game.')
+            raise SahasrahBotException('That is not an alttphacks game.')
         if not race2['state'] == 1:
-            raise Exception('The race is not open for entry.')
+            raise SahasrahBotException('The race is not open for entry.')
 
         await loadnicks(ctx)
         await ctx.send('Loaded SRL nicks from gsheet.')
@@ -148,11 +149,11 @@ class TournamentQualifier(commands.Cog):
         if hashid is None:
             seed = await get_preset('open', hints=False, spoilers="off")
             if not seed:
-                raise Exception('Could not generate game.')
+                raise SahasrahBotException('Could not generate game.')
         else:
             seed = await alttpr(hash_id=hashid)
             if not seed:
-                raise Exception('Could not retrieve game.')
+                raise SahasrahBotException('Could not retrieve game.')
 
         embed = await seed.embed(
             name=f"Tournament Qualifier - {date}",
@@ -170,11 +171,11 @@ class TournamentQualifier(commands.Cog):
         date = datetime.datetime.now(timezone('US/Pacific')).date()
         race = await get_race(raceid, complete=True)
         if race == {}:
-            raise Exception('That race does not exist.')
+            raise SahasrahBotException('That race does not exist.')
         if not race['game']['abbrev'] == 'alttphacks':
-            raise Exception('That is not an alttphacks game.')
+            raise SahasrahBotException('That is not an alttphacks game.')
         if not race['state'] == 4:
-            raise Exception('The race has not completed.')
+            raise SahasrahBotException('The race has not completed.')
 
         await gsheet_qualifier_finish(race=race, date=date)
 

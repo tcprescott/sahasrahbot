@@ -5,11 +5,13 @@ import aiofiles
 import pyz3r
 import yaml
 
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
+
 from ..util.http import request_generic
 
 
-class WeightsetNotFoundException(Exception):
+class WeightsetNotFoundException(SahasrahBotException):
     pass
 
 

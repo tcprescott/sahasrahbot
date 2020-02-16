@@ -2,6 +2,7 @@ import discord
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import config, spoiler_races, srl_races
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
 
@@ -47,7 +48,7 @@ WEEKDATA = {
     },
 }
 
-class WeekNotFoundException(Exception):
+class WeekNotFoundException(SahasrahBotException):
     pass
 
 async def league_race(episodeid: int, week=None):
@@ -85,7 +86,7 @@ class LeagueRace():
             self.studyperiod = WEEKDATA[self.week]['studyperiod']
             self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
         else:
-            raise Exception('Week type not found, something went horribly wrong...')
+            raise SahasrahBotException('Week type not found, something went horribly wrong...')
 
     def get_player_discords(self):
         player_list = []

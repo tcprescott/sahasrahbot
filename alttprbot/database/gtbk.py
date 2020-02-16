@@ -1,10 +1,11 @@
 import aiocache
 
+from alttprbot.exceptions import SahasrahBotException
 from ..util import orm
 
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
-class GtbkGuessingGameException(Exception):
+class GtbkGuessingGameException(SahasrahBotException):
     pass
 
 async def get_current_active_game(channel):

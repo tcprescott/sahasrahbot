@@ -5,10 +5,11 @@ import aiofiles
 import yaml
 
 from alttprbot.database import config
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
 
-class PresetNotFoundException(Exception):
+class PresetNotFoundException(SahasrahBotException):
     pass
 
 

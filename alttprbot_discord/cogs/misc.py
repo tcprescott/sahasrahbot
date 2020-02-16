@@ -7,6 +7,7 @@ import discord
 import html2markdown
 from discord.ext import commands
 
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util.holyimage import holy
 
 
@@ -18,6 +19,11 @@ class Misc(commands.Cog):
     @commands.is_owner()
     async def joineddate(self, ctx, member: discord.Member):
         await ctx.send(member.joined_at)
+
+    @commands.command()
+    @commands.is_owner()
+    async def throwerror(self, ctx):
+        raise SahasrahBotException('omg')
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):
