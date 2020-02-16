@@ -5,6 +5,7 @@ import aiofiles
 import pydle
 
 from alttprbot.database import srl_races
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util.srl import get_all_races, get_race
 from alttprbot_srl import commands, racebot
 from config import Config as c
@@ -24,26 +25,25 @@ class SrlBot(pydle.Client):
     # source = sendering of the message
     # message = the message, duh
     async def on_message(self, target, source, message):
-        await message_logger("MSG", target, source, message)
-
-        # filter messages sent by the bot (we do not want to react to these)
-        if source == c.SRL_NICK:
-            return
-
-        # handle messages from racebot
-        await racebot.handler(target=target, source=source, message=message, client=self)
-
         try:
+            await message_logger("MSG", target, source, message)
+
+            # filter messages sent by the bot (we do not want to react to these)
+            if source == c.SRL_NICK:
+                return
+
+            # handle messages from racebot
+            await racebot.handler(target=target, source=source, message=message, client=self)
             # handle user commands
             await commands.handler(target=target, source=source, message=message, client=self)
         except Exception as err:
             await self.message(target, f'{type(err)}: "{str(err)}".  Please contact Synack if this condition persists.')
-            raise
+            if not isinstance(err, SahasrahBotException):
+                raise
 
     # target = you
     # source = sendering of the message
     # message = the message, duh
-
     async def on_notice(self, target, source, message):
         await message_logger("NOTICE", target, source, message)
 
