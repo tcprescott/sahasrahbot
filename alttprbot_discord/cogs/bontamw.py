@@ -53,8 +53,14 @@ class BontaMultiworld(commands.Cog):
         }
         await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data)
 
-    @commands.command()
-    @commands.is_owner()
+    @commands.command(
+        help=(
+            'Resume an existing multiworld that was previously closed.\n'
+            'Specify the existing token, and port number.\n\n'
+            'Multidata and multisave file are removed from the server after 7 days.'
+        ),
+        brief='Resume a multiworld that was previously closed.'
+    )
     async def mwresume(self, ctx, token, port):
         data = {
             'token': token,
