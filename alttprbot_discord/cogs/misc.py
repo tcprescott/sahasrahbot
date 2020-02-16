@@ -23,7 +23,7 @@ class Misc(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def throwerror(self, ctx):
-        raise SahasrahBotException('omg')
+        raise Exception('omg')
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):

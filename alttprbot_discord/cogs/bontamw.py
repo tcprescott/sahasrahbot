@@ -29,6 +29,9 @@ class BontaMultiworld(commands.Cog):
         except ClientResponseError as err:
             raise SahasrahBotException('Unable to generate host using the provided multidata.  Ensure you\'re using the latest version of the mutiworld (<https://github.com/Bonta0/ALttPEntranceRandomizer/tree/multiworld_31>)!') from err
 
+        if not multiworld.get('success', True):
+            raise SahasrahBotException(f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
+
         await ctx.send(
             f"Game Token: {multiworld['token']}\n"
             f"Host: {c.MultiworldHostBase}:{multiworld['port']}"
