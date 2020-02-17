@@ -4,7 +4,7 @@ import sys
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races, srl_races, config
-from alttprbot.smz3gen import preset as smz3_preset
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.smz3gen import spoilers as smz3_spoilers
 from alttprbot.util.srl import get_race, srl_race_id
 from alttprbot.tournament import league
@@ -16,9 +16,9 @@ async def handler(target, source, message, client):
 
     try:
         args = await parse_args(message)
-    except argparse.ArgumentError as e:
+    except argparse.ArgumentError as err:
         if not target == '#speedrunslive':
-            await client.message(target, e.message)
+            await client.message(target, err.message)
         return
 
     festivemode = await config.get(0, 'FestiveMode') == "true"
@@ -30,29 +30,25 @@ async def handler(target, source, message, client):
         race = await srl_races.get_srl_race_by_id(srl_id)
 
         if race:
-            await client.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
-            return
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
             seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
-
-            goal_name = preset_dict['goal_name']
-            goal = f"vt8 randomizer - {goal_name}"
+            goal = f"vt8 randomizer - {preset_dict['goal_name']}"
             code = await seed.code()
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
             else:
                 await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
         elif srl['game']['abbrev'] == 'alttpsm':
-            seed = await smz3_preset.get_preset(args.preset)
-            goal = 'beat the games'
+            seed, preset_dict = await preset.get_preset(args.preset, randomizer='smz3')
+            goal = preset_dict['goal_name']
             if args.silent:
                 await client.message(target, f"{goal} - {args.preset} - {seed.url}")
             else:
                 await client.message(target, f".setgoal {goal} - {args.preset} - {seed.url}")
         else:
-            await client.message(target, "This game is not yet supported.")
-            return
+            raise SahasrahBotException("This game is not yet supported.")
 
         await srl_races.insert_srl_race(srl_id, goal)
 
@@ -68,8 +64,7 @@ async def handler(target, source, message, client):
         race = await srl_races.get_srl_race_by_id(srl_id)
 
         if race:
-            await client.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
-            return
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
             seed = await mystery.generate_random_game(
@@ -91,8 +86,7 @@ async def handler(target, source, message, client):
             else:
                 await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
         else:
-            await client.message(target, "This game is not yet supported.")
-            return
+            raise SahasrahBotException("This game is not yet supported.")
 
         await srl_races.insert_srl_race(srl_id, goal)
 
@@ -106,8 +100,7 @@ async def handler(target, source, message, client):
         race = await srl_races.get_srl_race_by_id(srl_id)
 
         if race:
-            await client.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
-            return
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
             seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)
@@ -129,8 +122,7 @@ async def handler(target, source, message, client):
             seed, spoiler_log_url = await smz3_spoilers.generate_spoiler_game(args.preset)
 
             if seed is None:
-                await client.message(target, "That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
-                return
+                raise SahasrahBotException("That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
 
             goal = f"spoiler beat the games"
             studytime = 1500 if not args.studytime else args.studytime

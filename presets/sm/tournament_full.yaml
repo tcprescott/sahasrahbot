@@ -1,0 +1,11 @@
+randomizer: 'sm'
+goal_name: beat the game (v11 beta)
+use_new: True
+settings:
+    logic: tournament
+    goal: defeatmb
+    placement: "full"
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"
