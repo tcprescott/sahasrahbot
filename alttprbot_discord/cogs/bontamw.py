@@ -1,9 +1,11 @@
+import discord
 from aiohttp import ClientResponseError
 from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
 from config import Config as c
+
 
 class BontaMultiworld(commands.Cog):
     def __init__(self, bot):
@@ -22,7 +24,13 @@ class BontaMultiworld(commands.Cog):
 
         data = {
             'multidata_url': ctx.message.attachments[0].url,
-            'admin': ctx.author.id
+            'admin': ctx.author.id,
+            'meta': {
+                'channel': None if isinstance(ctx.channel, discord.DMChannel) else ctx.channel.name,
+                'guild': ctx.guild.name if ctx.guild else None,
+                'multidata_url': ctx.message.attachments[0].url,
+                'name': f'{ctx.author.name}#{ctx.author.discriminator}'
+            }
         }
         try:
             multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
