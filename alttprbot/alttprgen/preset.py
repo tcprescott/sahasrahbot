@@ -5,7 +5,7 @@ import aiofiles
 import pyz3r
 import yaml
 
-from alttprbot.database import config
+from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
@@ -61,7 +61,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
             festive=preset_dict.get('festive', False),
             settings=preset_dict['settings']
         )
-        return seed, preset_dict
+        hash_id = seed.hash
     elif randomizer in ['sm', 'smz3']:
         if preset_dict.get('use_new', True):
             preset_dict['settings']['race'] = "true" if tournament else "false"
@@ -69,6 +69,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
                 randomizer=randomizer,
                 settings=preset_dict['settings']
             )
+            hash_id = seed.slug_id
         else:
             if randomizer == 'sm':
                 raise SahasrahBotException('Super Metroid randomizer is only supported on new version.')
@@ -76,5 +77,16 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
             seed = await pyz3r.smz3(
                 settings=preset_dict['settings']
             )
-        return seed, preset_dict
-    
+            hash_id = seed.hash
+    else:
+        raise SahasrahBotException(f'Randomizer {randomizer} is not supported.')
+
+    await audit.insert_generated_game(
+        randomizer=randomizer,
+        hash_id=hash_id,
+        permalink=seed.url,
+        settings=preset_dict['settings'],
+        gentype='preset',
+        genoption=preset
+    )
+    return seed, preset_dict

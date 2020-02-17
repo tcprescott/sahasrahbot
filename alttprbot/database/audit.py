@@ -1,3 +1,5 @@
+import json
+
 from ..util import orm
 
 async def insert_message(guild_id: int, message_id: int, user_id: int, channel_id: int, message_date, content, attachment):
@@ -19,7 +21,15 @@ async def set_deleted(message_id: int):
         [message_id]
     )
 
-async def clean_history():
+async def insert_generated_game(randomizer, hash_id, permalink, settings, gentype, genoption):
     await orm.execute(
-        'DELETE FROM audit_messages WHERE message_date < NOW() - INTERVAL 30 DAY;'
+        'INSERT INTO audit_generated_games (randomizer, hash_id, permalink, settings, gentype, genoption) values (%s, %s, %s, %s, %s, %s)',
+        [randomizer, hash_id, permalink, json.dumps(settings), gentype, genoption]
     )
+
+async def get_generated_game(hash_id):
+    results = await orm.select(
+        'SELECT * from audit_generated_games WHERE hash_id=%s;',
+        [hash_id]
+    )
+    return results[0] if len(results) > 0 else None

@@ -5,6 +5,7 @@ import aiofiles
 import pyz3r
 import yaml
 
+from alttprbot.database import audit
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
@@ -38,6 +39,14 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
     settings['tournament'] = tournament
 
     seed = await alttpr(settings=settings, festive=festive)
+    await audit.insert_generated_game(
+        randomizer='alttpr',
+        hash_id=seed.hash,
+        permalink=seed.url,
+        settings=settings,
+        gentype='mystery',
+        genoption=weightset
+    )
     return seed
 
 

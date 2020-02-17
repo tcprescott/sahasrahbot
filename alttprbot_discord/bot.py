@@ -61,8 +61,8 @@ async def on_command_error(ctx, error):
 
         if not isinstance(error_to_display, SahasrahBotException):
             error_channel = await commands.TextChannelConverter().convert(ctx, await config.get(0, "ErrorChannel"))
-            if error_channel:
-                await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
+            # if error_channel:
+            #     await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
             try:
                 appinfo = await discordbot.application_info()
                 await ctx.send(f'Something happened that should not have happened. {appinfo.owner.mention}')
