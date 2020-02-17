@@ -200,6 +200,7 @@ settings:
     rom.rupeeBow: false
     rom.timerMode: 'off'
     rom.timerStart: ''
+    rom.GanonAgRNG: 'none'
     spoil.BootsLocation: false
   drops:
     '0':
@@ -293,7 +294,7 @@ settings:
   lang: en
   mode: standard
   name: Classic Randomizer
-  notes: Kids these days and their fancy progressive upgrades and lack of bomb/arrow upgrades in the item pool. Dang nabbit!
+  notes: Kids these days and their fancy progressive upgrades and lack of bomb/arrow upgrades in the item pool. Dang nabbit! (oh and no Ganon/Aga RNG)
   spoilers: 'off'
   tournament: true
   weapons: randomized
