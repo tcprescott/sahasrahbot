@@ -1,6 +1,8 @@
-import aiohttp
 import json
+
+import aiohttp
 import yaml
+
 
 async def request_generic(url, method='get', reqparams=None, data=None, header={}, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=None, raise_for_status=True) as session:
