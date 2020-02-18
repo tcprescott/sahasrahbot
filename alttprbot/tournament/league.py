@@ -149,13 +149,22 @@ async def process_league_race(target, args, client):
         emojis=discordbot.emojis
     )
 
+
+    broadcast_channels = [a['name'] for a in generated_league_race.episode['channels'] if not a['name'] == 'No Stream']
+
+    if len(broadcast_channels) > 0:
+        tournament_embed.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+        embed.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+
     audit_channel_id = await config.get(generated_league_race.guild.id, 'AlttprLeagueAuditChannel')
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(int(audit_channel_id))
         await audit_channel.send(embed=embed)
 
     commentary_channel_id = await config.get(generated_league_race.guild.id, 'AlttprLeagueCommentaryChannel')
-    if commentary_channel_id is not None:
+    if commentary_channel_id is not None and len(broadcast_channels) > 0:
         commentary_channel = discordbot.get_channel(int(commentary_channel_id))
         await commentary_channel.send(embed=tournament_embed)
 
