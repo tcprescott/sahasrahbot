@@ -25,6 +25,9 @@ async def check_race(srl_id):
             continue
         if pastraces['count'] == 0:
             print(f'{entrant} is new')
+            pastraces_all = await srl.get_pastraces(game=None, player=entrant, pagesize=0)
+            if pastraces_all['count'] > 50:
+                continue
             twitch_nick = race['entrants'][entrant]['twitch']
             if twitch_nick == '':
                 twitch_info = None
@@ -55,6 +58,13 @@ async def check_race(srl_id):
                     inline=False
                 )
                 embed.set_thumbnail(url=twitch_info['logo'])
+
+            if pastraces_all['count'] > 0:
+                embed.add_field(
+                    name=f"Total SRL Races (outside of {race['game']['abbrev']})",
+                    value=pastraces_all['count'],
+                    inline=False
+                )
 
             for configguild in configguilds:
                 channel = discordbot.get_channel(int(configguild['value']))

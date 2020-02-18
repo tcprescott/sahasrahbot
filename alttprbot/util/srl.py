@@ -48,8 +48,9 @@ async def get_pastraces(game, player, pagesize=20):
                 return json.loads(await f.read(), strict=False)
 
     params = {
-        'game': game,
         'player': player,
         'pageSize': pagesize
     }
+    if game is not None:
+        params['game'] = game
     return await http.request_generic('http://api.speedrunslive.com/pastraces', returntype='json', reqparams=params)

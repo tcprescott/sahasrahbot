@@ -39,7 +39,7 @@ async def create_game():
             abort(400, description=f'Game with token {token} already exists.')
     else:
         binary = await http.request_generic(data['multidata_url'], method='get', returntype='binary')
-        json.loads(zlib.decompress(binary).decode("utf-8"))
+        multidata = json.loads(zlib.decompress(binary).decode("utf-8"))
         
         token = random_string(6)
 
@@ -70,7 +70,8 @@ async def create_game():
         'port': port,
         'admin': data.get('admin', None),
         'date': datetime.datetime.now(),
-        'meta': data.get('meta', None)
+        'meta': data.get('meta', None),
+        'players': multidata['names']
     }
     response = APP.response_class(
         response=json.dumps(MULTIWORLDS[token], default=multiworld_converter),
