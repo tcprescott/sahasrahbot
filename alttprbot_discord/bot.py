@@ -54,6 +54,8 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction('🚫')
     elif isinstance(error, commands.CommandNotFound):
         pass
+    elif isinstance(error, commands.UserInputError):
+        await ctx.send(error)
     else:
         error_to_display = error.original if hasattr(error, 'original') else error
 
