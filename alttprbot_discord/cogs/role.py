@@ -161,12 +161,7 @@ def strip_custom_emoji(emoji):
 
 
 def is_emoji(s):
-    count = 0
-    for emoji in UNICODE_EMOJI:
-        count += s.count(emoji)
-        if count > 1:
-            return False
-    return bool(count)
+    return True if s in UNICODE_EMOJI else False
 
 
 def setup(bot):
