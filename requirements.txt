@@ -20,3 +20,4 @@ python-dotenv
 html2markdown
 TwitchIO
 pytz
+urlextract
