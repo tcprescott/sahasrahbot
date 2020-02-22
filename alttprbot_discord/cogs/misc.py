@@ -7,13 +7,17 @@ import discord
 import html2markdown
 from discord.ext import commands
 
-from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util.holyimage import holy
 
 
 class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.content.lower() == '!role furaime':
+            await message.add_reaction('👀')
 
     @commands.command()
     @commands.is_owner()
