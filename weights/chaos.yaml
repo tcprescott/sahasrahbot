@@ -2,23 +2,19 @@ description: Chaos...
 customizer:
     triforce-hunt:
         goal:
-            min: 15
-            max: 50
+            min: 25
+            max: 35
         pool:
             min: 30
-            max: 50
+            max: 45
     custom:
         item.overflow.replacement.Sword:
-            TwentyRupees2: 1
             Rupoor: 1
         item.overflow.replacement.Shield:
-            TwentyRupees2: 1
             Rupoor: 1
         item.overflow.replacement.Armor:
-            TwentyRupees2: 1
             Rupoor: 1
         item.overflow.replacement.Bow:
-            TwentyRupees2: 1
             Rupoor: 1
         item.value.Rupoor:
             10: 1
