@@ -1,8 +1,33 @@
 description: Chaos...
 customizer:
+    triforce-hunt:
+        goal:
+            min: 15
+            max: 50
+        pool:
+            min: 30
+            max: 50
     custom:
-      customPrizePacks:
-        False: 1
+        item.overflow.replacement.Sword:
+            TwentyRupees2: 1
+            Rupoor: 1
+        item.overflow.replacement.Shield:
+            TwentyRupees2: 1
+            Rupoor: 1
+        item.overflow.replacement.Armor:
+            TwentyRupees2: 1
+            Rupoor: 1
+        item.overflow.replacement.Bow:
+            TwentyRupees2: 1
+            Rupoor: 1
+        item.value.Rupoor:
+            10: 1
+            30: 1
+            50: 1
+            100: 1
+        spoil.BootsLocation:
+            True: 1
+            False: 1
     eq:
         'ProgressiveSword':
             0: 80
