@@ -1,0 +1,231 @@
+description: Chaos...
+customizer:
+    custom:
+      customPrizePacks:
+        False: 1
+    eq:
+        'ProgressiveSword':
+            0: 94
+            1: 2
+            2: 2
+            3: 1
+            4: 1
+        'BossHeartContainer':
+            0: 80
+            1: 10
+            2: 5
+            3: 3
+            4: 2
+        'Bottle1':
+            0: 90
+            1: 2
+            2: 1
+            3: 1
+            4: 2
+            5: 1
+            6: 1
+            7: 2
+        'Bottle2':
+            0: 90
+            1: 2
+            2: 1
+            3: 1
+            4: 2
+            5: 1
+            6: 1
+            7: 2
+        'Bottle3':
+            0: 90
+            1: 2
+            2: 1
+            3: 1
+            4: 2
+            5: 1
+            6: 1
+            7: 2
+        'Bottle4':
+            0: 90
+            1: 2
+            2: 1
+            3: 1
+            4: 2
+            5: 1
+            6: 1
+            7: 2
+        'Bombos':
+            0: 95
+            1: 5
+        'BookOfMudora':
+            0: 95
+            1: 5
+        'CaneOfSomaria':
+            0: 95
+            1: 5
+        'Cape':
+            0: 95
+            1: 5
+        'Ether':
+            0: 95
+            1: 5
+        'FireRod':
+            0: 95
+            1: 5
+        'Flippers':
+            0: 95
+            1: 5
+        'Hammer':
+            0: 95
+            1: 5
+        'Hookshot':
+            0: 95
+            1: 5
+        'IceRod':
+            0: 95
+            1: 5
+        'Lamp':
+            0: 95
+            1: 5
+        'MagicMirror':
+            0: 95
+            1: 5
+        'MoonPearl':
+            0: 95
+            1: 5
+        'Mushroom':
+            0: 95
+            1: 5
+        'OcarinaInactive':
+            0: 95
+            1: 5
+        'PegasusBoots':
+            0: 95
+            1: 5
+        'Powder':
+            0: 95
+            1: 5
+        'Quake':
+            0: 95
+            1: 5
+        'Shovel':
+            0: 95
+            1: 5
+        'ProgressiveGlove':
+            0: 95
+            1: 3
+            2: 2
+        'ProgressiveBow':
+            0: 95
+            1: 3
+            2: 2
+        'BugCatchingNet':
+            0: 95
+            1: 5
+        'ProgressiveShield':
+            0: 94
+            1: 3
+            2: 2
+            3: 1
+        'CaneOfByrna':
+            0: 95
+            1: 5
+        'TenBombs':
+            0: 95
+            1: 5
+        'HalfMagic':
+            0: 95
+            1: 5
+        'HeartContainer':
+            0: 95
+            1: 5
+        'ProgressiveArmor':
+            0: 95
+            1: 3
+            2: 2
+        'Boomerang':
+            0: 95
+            1: 5
+        'RedBoomerang':
+            0: 95
+            1: 5
+glitches_required:
+  none: 1
+  overworld_glitches: 0
+  major_glitches: 0
+  no_logic: 0
+item_placement:
+  basic: 1
+  advanced: 1
+dungeon_items:
+  standard: 1
+  mc: 1
+  mcs: 1
+  full: 1
+accessibility:
+  items: 1
+  locations: 1
+  none: 1
+goals:
+  ganon: 1
+  fast_ganon: 1
+  dungeons: 1
+  pedestal: 1
+  triforce-hunt: 1
+tower_open:
+  '0': 1
+  '1': 1
+  '2': 1
+  '3': 1
+  '4': 1
+  '5': 1
+  '6': 1
+  '7': 1
+  random: 1
+ganon_open:
+  '0': 1
+  '1': 1
+  '2': 1
+  '3': 1
+  '4': 1
+  '5': 1
+  '6': 1
+  '7': 1
+  random: 1
+world_state:
+  standard: 1
+  open: 1
+  inverted: 1
+  retro: 1
+entrance_shuffle:
+  none: 1
+boss_shuffle:
+  none: 1
+  simple: 1
+  full: 1
+  random: 1
+enemy_shuffle:
+  none: 1
+  shuffled: 1
+  random: 1
+hints:
+  'on': 1
+  'off': 1
+weapons:
+  randomized: 1
+  assured: 1
+  vanilla: 1
+  swordless: 1
+item_pool:
+  normal: 1
+  hard: 1
+  expert: 1
+  crowd_control: 0
+item_functionality:
+  normal: 1
+  hard: 1
+enemy_damage:
+  default: 1
+  shuffled: 1
+enemy_health:
+  default: 1
+  easy: 1
+  hard: 1

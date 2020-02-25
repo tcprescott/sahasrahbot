@@ -30,15 +30,15 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
         weights = await request_generic(custom_weightset_url, method='get', returntype='yaml')
 
     if festive:
-        settings = festive_generate_random_settings(
+        settings, customizer = festive_generate_random_settings(
             weights=weights, spoilers=spoilers)
     else:
-        settings = pyz3r.mystery.generate_random_settings(
+        settings, customizer = pyz3r.mystery.generate_random_settings(
             weights=weights, spoilers=spoilers)
 
     settings['tournament'] = tournament
 
-    seed = await alttpr(settings=settings, festive=festive)
+    seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
     await audit.insert_generated_game(
         randomizer='alttpr',
         hash_id=seed.hash,
@@ -67,7 +67,7 @@ def festive_generate_random_settings(weights, tournament=True, spoilers="mystery
         "lang": "en"
     }
 
-    return settings
+    return settings, False
 
 
 def get_random_option(optset):
