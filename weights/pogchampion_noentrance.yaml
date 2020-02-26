@@ -47,7 +47,8 @@ world_state:
   open: 25
   inverted: 20
   retro: 15
-entrance_shuffle: none
+entrance_shuffle:
+  none: 100
 boss_shuffle:
   none: 60
   simple: 5
