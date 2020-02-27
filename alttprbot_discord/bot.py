@@ -40,23 +40,27 @@ discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
+if importlib.util.find_spec('stupid_memes'):
+    discordbot.load_extension('stupid_memes')
+
 @discordbot.event
 async def on_command_error(ctx, error):
+    riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
 
-    riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
-    if riplink is None:
-        riplink = '👎'
-
     if isinstance(error, commands.CheckFailure):
-        await ctx.message.add_reaction('🚫')
-    if isinstance(error, commands.errors.MissingPermissions):
+        pass
+    elif isinstance(error, commands.errors.MissingPermissions):
         await ctx.message.add_reaction('🚫')
     elif isinstance(error, commands.CommandNotFound):
         pass
     elif isinstance(error, commands.UserInputError):
+        if riplink is None:
+            riplink = '👎'
         await ctx.send(error)
     else:
+        if riplink is None:
+            riplink = '👎'
         error_to_display = error.original if hasattr(error, 'original') else error
 
         await ctx.message.add_reaction(riplink)
