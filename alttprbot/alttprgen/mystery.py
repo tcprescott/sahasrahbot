@@ -15,6 +15,24 @@ from ..util.http import request_generic
 class WeightsetNotFoundException(SahasrahBotException):
     pass
 
+async def generate_test_game(weightset='weighted', festive=False):
+    basename = os.path.basename(f'{weightset}.yaml')
+
+    try:
+        async with aiofiles.open(os.path.join("weights", basename)) as f:
+            weights = yaml.safe_load(await f.read())
+    except FileNotFoundError as err:
+        raise WeightsetNotFoundException(
+            f'Could not find weightset {weightset}.  See a list of available weights at <https://l.synack.live/weights>') from err
+
+    if festive:
+        settings, customizer = festive_generate_random_settings(
+            weights=weights)
+    else:
+        settings, customizer = pyz3r.mystery.generate_random_settings(
+            weights=weights)
+
+    return settings
 
 async def generate_random_game(weightset='weighted', tournament=True, spoilers="off", custom_weightset_url=None, festive=False):
     basename = os.path.basename(f'{weightset}.yaml')
