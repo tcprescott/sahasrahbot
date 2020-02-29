@@ -21,10 +21,10 @@ async def set_deleted(message_id: int):
         [message_id]
     )
 
-async def insert_generated_game(randomizer, hash_id, permalink, settings, gentype, genoption):
+async def insert_generated_game(randomizer, hash_id, permalink, settings, gentype, genoption, customizer=0):
     await orm.execute(
-        'INSERT INTO audit_generated_games (randomizer, hash_id, permalink, settings, gentype, genoption) values (%s, %s, %s, %s, %s, %s)',
-        [randomizer, hash_id, permalink, json.dumps(settings), gentype, genoption]
+        'INSERT INTO audit_generated_games (randomizer, hash_id, permalink, settings, gentype, genoption, customizer) values (%s, %s, %s, %s, %s, %s, %s)',
+        [randomizer, hash_id, permalink, json.dumps(settings), gentype, genoption, customizer]
     )
 
 async def get_generated_game(hash_id):

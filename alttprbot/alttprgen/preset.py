@@ -87,6 +87,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
         permalink=seed.url,
         settings=preset_dict['settings'],
         gentype='preset',
-        genoption=preset
+        genoption=preset,
+        customizer=1 if preset_dict.get('customizer', False) else 0
     )
     return seed, preset_dict
