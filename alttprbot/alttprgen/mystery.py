@@ -1,10 +1,9 @@
 import os
-import random
 
 import aiofiles
-import pyz3r
 import yaml
 
+import pyz3r
 from alttprbot.database import audit
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
@@ -72,15 +71,15 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
 
 def festive_generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings = {
-        "glitches": get_random_option(weights['glitches_required']),
-        "item_placement": get_random_option(weights['item_placement']),
-        "dungeon_items": get_random_option(weights['dungeon_items']),
-        "accessibility": get_random_option(weights['accessibility']),
-        "hints": get_random_option(weights['hints']),
-        "weapons": get_random_option(weights['weapons']),
+        "glitches": pyz3r.mystery.get_random_option(weights['glitches_required']),
+        "item_placement": pyz3r.mystery.get_random_option(weights['item_placement']),
+        "dungeon_items": pyz3r.mystery.get_random_option(weights['dungeon_items']),
+        "accessibility": pyz3r.mystery.get_random_option(weights['accessibility']),
+        "hints": pyz3r.mystery.get_random_option(weights['hints']),
+        "weapons": pyz3r.mystery.get_random_option(weights['weapons']),
         "item": {
-            "pool": get_random_option(weights['item_pool']),
-            "functionality": get_random_option(weights['item_functionality']),
+            "pool": pyz3r.mystery.get_random_option(weights['item_pool']),
+            "functionality": pyz3r.mystery.get_random_option(weights['item_functionality']),
         },
         "tournament": tournament,
         "spoilers": spoilers,
@@ -88,7 +87,3 @@ def festive_generate_random_settings(weights, tournament=True, spoilers="mystery
     }
 
     return settings, False
-
-
-def get_random_option(optset):
-    return random.choices(population=list(optset.keys()), weights=list(optset.values()))[0]
