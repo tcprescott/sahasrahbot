@@ -40,8 +40,8 @@ discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
-if importlib.util.find_spec('stupid_memes'):
-    discordbot.load_extension('stupid_memes')
+if importlib.util.find_spec('sahasrahbot_private.stupid_memes'):
+    discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
 @discordbot.event
 async def on_command_error(ctx, error):
