@@ -57,13 +57,15 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
     settings['tournament'] = tournament
 
     seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
+
     await audit.insert_generated_game(
         randomizer='alttpr',
         hash_id=seed.hash,
         permalink=seed.url,
         settings=settings,
         gentype='mystery',
-        genoption=weightset
+        genoption=weightset,
+        customizer=1 if customizer else 0
     )
     return seed
 
