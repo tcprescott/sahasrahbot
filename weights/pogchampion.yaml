@@ -108,17 +108,18 @@ customizer:
     customPrizePacks:
       True: 50
       False: 50
-    # need enemizer/dmg shuffle logic
+    # item.require.Lamp is actually backwards (True enables dark room navigation)
+    # if this is True, enemy_shuffle and enemy_damage are set to defaults
     item.require.Lamp:
-      True: 90
-      False: 10
+      True: 10
+      False: 90
     prize.shufflePendants:
       True: 95
       False: 5
     prize.shuffleCrystals:
       True: 95
       False: 5
-    # wilds will only activate with dungeon_items = standard
+    # any of these being in here will set dungeon_items to standard
     region.wildMaps:
       True: 50
       False: 50
