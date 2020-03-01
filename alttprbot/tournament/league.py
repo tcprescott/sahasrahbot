@@ -42,9 +42,9 @@ WEEKDATA = {
     },
     '7': {
         'type': 'preset',
-        'preset': 'open',
+        'preset': 'dungeons',
         'coop': True,
-        'friendly_name': 'Week 7 - Open Co-op Info Share - DO NOT RECORD'
+        'friendly_name': 'Week 7 - All Dungeons Co-op Info Share - DO NOT RECORD'
     },
 }
 
