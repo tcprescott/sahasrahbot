@@ -126,10 +126,11 @@ customizer:
     region.wildBigKeys:
       True: 50
       False: 50
-    # this is broken, plz fix
+    # 0: nothing, 16: items outside their dungeons, 255: everything
     rom.freeItemText:
-      0: 90
-      255: 10
+      0: 10
+      16: 70
+      255: 20
     rom.dungeonCount:
       'pickup': 50
       'off': 50
