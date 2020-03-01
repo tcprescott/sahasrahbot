@@ -90,7 +90,7 @@ class AlttprGen(commands.Cog):
         help='Generate a game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @commands.cooldown(rate=5, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted', tournament: bool = True):
         await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=False)
 
@@ -99,7 +99,7 @@ class AlttprGen(commands.Cog):
         help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @commands.cooldown(rate=5, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery", festive=False)
 
@@ -155,7 +155,7 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @checks.restrict_command_globally('FestiveMode')
-    @commands.cooldown(rate=5, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def festiverandom(self, ctx, weightset='weighted', tournament: bool = True):
         await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=True)
 
@@ -165,7 +165,7 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @checks.restrict_command_globally('FestiveMode')
-    @commands.cooldown(rate=5, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def festivemystery(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery", festive=True)
 
