@@ -5,8 +5,9 @@ import re
 import ircmessage
 
 from alttprbot.database import spoiler_races, srl_races
+from alttprbot.tournament import league
 from alttprbot.util.srl import srl_race_id
-from alttprbot_srl import discord_integration, alt_hunter
+from alttprbot_srl import alt_hunter, discord_integration
 from config import Config as c
 
 starting = re.compile(
@@ -16,12 +17,22 @@ newroom = re.compile(
     "Race initiated for (.*)\. Join\\x034 (#srl-[a-z0-9]{5}) \\x03to participate\.")
 runnerdone = re.compile(
     "(.*) (has forfeited from the race\.|has finished in .* place with a time of [0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.)")
+racedone = re.compile(
+    "^Status: Complete \| Game: .*$"
+)
 
 srl_game_whitelist = [
     'The Legend of Zelda: A Link to the Past Hacks',
     'A Link to the Past & Super Metroid Combo Randomizer'
 ]
 
+async def topic_change_handler(target, source, message, client):
+    if not (source == 'RaceBot' or source == 'synack'):
+        return
+
+    if target.startswith('#srl-') and racedone.search(message):
+        await asyncio.sleep(5)
+        await league.process_league_race_finish(target, client)
 
 async def handler(target, source, message, client):
     if not (source == 'RaceBot' or source == 'synack'):
@@ -68,6 +79,8 @@ async def handler(target, source, message, client):
             await discord_integration.discord_race_start(srl_id)
             await alt_hunter.check_race(srl_id)
 
+        if message == 'test complete':
+            await topic_change_handler(target, source, message, client)
 
         result = runnerdone.search(message)
         if result:

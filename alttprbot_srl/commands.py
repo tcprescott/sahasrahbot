@@ -3,11 +3,12 @@ import shlex
 import sys
 
 from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import spoiler_races, srl_races, config
+from alttprbot.database import (config, spoiler_races, srl_races,
+                                tournament_results)
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.smz3gen import spoilers as smz3_spoilers
-from alttprbot.util.srl import get_race, srl_race_id
 from alttprbot.tournament import league
+from alttprbot.util.srl import get_race, srl_race_id
 
 
 async def handler(target, source, message, client):
@@ -145,6 +146,7 @@ async def handler(target, source, message, client):
         srl_id = srl_race_id(target)
         await srl_races.delete_srl_race(srl_id)
         await spoiler_races.delete_spoiler_race(srl_id)
+        await tournament_results.delete_active_touranment_race(srl_id)
         await client.message(target, "Current race cancelled.")
         await client.message(target, f".setgoal new race")
 

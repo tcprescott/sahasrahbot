@@ -1,7 +1,10 @@
+import json
+
 import discord
 
 from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import config, spoiler_races, srl_races
+from alttprbot.database import (config, spoiler_races, srl_races,
+                                tournament_results)
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
@@ -74,6 +77,7 @@ class LeagueRace():
         self.episode = await speedgaming.get_episode(self.episodeid)
         self.type = WEEKDATA[self.week]['type']
         self.friendly_name = WEEKDATA[self.week]['friendly_name']
+        self.spoiler_log_url = None
 
         if self.type == 'preset':
             self.preset = WEEKDATA[self.week]['preset']
@@ -179,5 +183,22 @@ async def process_league_race(target, args, client):
         await spoiler_races.insert_spoiler_race(srl_id, generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
 
     await srl_races.insert_srl_race(srl_id, goal)
+    await tournament_results.insert_tournament_race(
+        srl_id=srl_id,
+        episode_id=generated_league_race.episodeid,
+        permalink=generated_league_race.seed.url,
+        event='alttprleague',
+        week=generated_league_race.week,
+        spoiler=generated_league_race.spoiler_log_url if generated_league_race.spoiler_log_url else None
+    )
 
     await client.message(target, "Seed has been generated, you should have received a DM in Discord.  Please contact a League Moderator if you haven't received the DM.")
+
+async def process_league_race_finish(target, client):
+    srl_id = srl.srl_race_id(target)
+    srl_race = await srl.get_race(srl_id)
+
+    await tournament_results.record_tournament_results(
+        srl_id=srl_id,
+        results_json=json.dumps(srl_race['entrants'])
+    )

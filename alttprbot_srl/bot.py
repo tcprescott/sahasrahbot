@@ -73,6 +73,7 @@ class SrlBot(pydle.Client):
 
     async def on_topic_change(self, channel, message, by):
         await message_logger("TOPIC", channel, by, message)
+        await racebot.topic_change_handler(channel, by, message, client=self)
 
     async def join_active_races(self, games):
         races = await get_all_races()
