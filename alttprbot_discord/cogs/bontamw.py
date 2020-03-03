@@ -41,10 +41,7 @@ class BontaMultiworld(commands.Cog):
         if not multiworld.get('success', True):
             raise SahasrahBotException(f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
 
-        await ctx.send(
-            f"Game Token: {multiworld['token']}\n"
-            f"Host: {c.MultiworldHostBase}:{multiworld['port']}"
-        )
+        await ctx.send(embed=make_embed(multiworld))
 
     @commands.command(
         help=(
@@ -63,7 +60,10 @@ class BontaMultiworld(commands.Cog):
         data = {
             'msg': msg
         }
-        await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data)
+        response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data, returntype='json')
+
+        if 'resp' in response and response['resp'] is not None:
+            await ctx.send(response['resp'])
 
     @commands.command(
         help=(
@@ -77,14 +77,29 @@ class BontaMultiworld(commands.Cog):
         data = {
             'token': token,
             'port': port,
-            'admin': ctx.author.id
+            'admin': ctx.author.id,
+            'meta': {
+                'channel': None if isinstance(ctx.channel, discord.DMChannel) else ctx.channel.name,
+                'guild': ctx.guild.name if ctx.guild else None,
+                'name': f'{ctx.author.name}#{ctx.author.discriminator}'
+            }
         }
         multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
 
-        await ctx.send(
-            f"Game Token: {multiworld['token']}\n"
-            f"Host: {c.MultiworldHostBase}:{multiworld['port']}"
-        )
+        await ctx.send(embed=make_embed(multiworld))
+
+def make_embed(multiworld):
+    embed = discord.Embed(
+        title='Multiworld Game',
+        description='Here are the details of your multiworld game.',
+        color=discord.Color.green()
+    )
+    embed.add_field(name="Game Token", value=multiworld['token'], inline=False)
+    embed.add_field(name="Host", value=f"{c.MultiworldHostBase}:{multiworld['port']}", inline=False)
+    for idx, team in enumerate(multiworld.get('players', []), start=1):
+        embed.add_field(name=f"Team #{idx}", value='\n'.join(team))
+
+    return embed
 
 def setup(bot):
     bot.add_cog(BontaMultiworld(bot))
