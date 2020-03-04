@@ -147,5 +147,5 @@ customizer:
       True: 5
       False: 95
     spoil.BootsLocation:
-      True: 50
-      False: 50
+      True: 70
+      False: 30
