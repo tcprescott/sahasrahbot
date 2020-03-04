@@ -230,6 +230,171 @@ customizer:
         'RedBoomerang':
             0: 85
             1: 15
+        "BigKeyA1": 0
+        "BigKeyA2":
+            0: 95
+            1: 5
+        "BigKeyD1":
+            0: 95
+            1: 5
+        "BigKeyD2":
+            0: 95
+            1: 5
+        "BigKeyD3":
+            0: 95
+            1: 5
+        "BigKeyD4":
+            0: 95
+            1: 5
+        "BigKeyD5":
+            0: 95
+            1: 5
+        "BigKeyD6":
+            0: 95
+            1: 5
+        "BigKeyD7":
+            0: 95
+            1: 5
+        "BigKeyH1": 0
+        "BigKeyH2": 0
+        "BigKeyP1":
+            0: 95
+            1: 5
+        "BigKeyP2":
+            0: 95
+            1: 5
+        "BigKeyP3":
+            0: 95
+            1: 5
+        "CompassA1": 0
+        "CompassA2":
+            0: 95
+            1: 5
+        "CompassD1":
+            0: 95
+            1: 5
+        "CompassD2":
+            0: 95
+            1: 5
+        "CompassD3":
+            0: 95
+            1: 5
+        "CompassD4":
+            0: 95
+            1: 5
+        "CompassD5":
+            0: 95
+            1: 5
+        "CompassD6":
+            0: 95
+            1: 5
+        "CompassD7":
+            0: 95
+            1: 5
+        "CompassH1": 0
+        "CompassH2": 0
+        "CompassP1":
+            0: 95
+            1: 5
+        "CompassP2":
+            0: 95
+            1: 5
+        "CompassP3":
+            0: 95
+            1: 5
+        "KeyA1":
+            0: 95
+            1: 3
+            2: 2
+        "KeyA2":
+            0: 95
+            1: 5
+            2: 5
+            3: 5
+            4: 5
+        "KeyD1":
+            0: 95
+            1: 5
+            2: 5
+            3: 5
+            4: 5
+            5: 5
+            6: 5
+        "KeyD2":
+            0: 95
+            1: 5
+        "KeyD3":
+            0: 95
+            1: 5
+            2: 5
+            3: 5
+        "KeyD4":
+            0: 95
+            1: 5
+        "KeyD5":
+            0: 95
+            1: 5
+            2: 5
+        "KeyD6":
+            0: 95
+            1: 5
+            2: 5
+            3: 5
+        "KeyD7":
+            0: 95
+            1: 5
+            2: 5
+            3: 5
+            4: 5
+        "KeyH1": 0
+        "KeyH2":
+            0: 95
+            1: 5
+        "KeyP1": 0
+        "KeyP2":
+            0: 95
+            1: 5
+        "KeyP3":
+            0: 95
+            1: 5
+        "MapA1": 0
+        "MapA2":
+            0: 95
+            1: 5
+        "MapD1":
+            0: 95
+            1: 5
+        "MapD2":
+            0: 95
+            1: 5
+        "MapD3":
+            0: 95
+            1: 5
+        "MapD4":
+            0: 95
+            1: 5
+        "MapD5":
+            0: 95
+            1: 5
+        "MapD6":
+            0: 95
+            1: 5
+        "MapD7":
+            0: 95
+            1: 5
+        "MapH1": 0
+        "MapH2":
+            0: 95
+            1: 5
+        "MapP1":
+            0: 95
+            1: 5
+        "MapP2":
+            0: 95
+            1: 5
+        "MapP3":
+            0: 95
+            1: 5
 glitches_required: "none"
 item_placement:
   basic: 1
@@ -274,8 +439,7 @@ world_state:
   open: 1
   inverted: 1
   retro: 1
-entrance_shuffle:
-  none: 1
+entrance_shuffle: "none"
 boss_shuffle:
   none: 1
   simple: 1
