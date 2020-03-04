@@ -135,8 +135,8 @@ customizer:
       'pickup': 50
       'off': 50
     rom.mapOnPickup:
-      True: 90
-      False: 10
+      True: 50
+      False: 50
     rom.timerMode:
       'countdown-ohko': 1
       'off': 99
