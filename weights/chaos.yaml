@@ -2,25 +2,85 @@ description: Chaos...
 customizer:
     triforce-hunt:
         goal:
-            min: 25
-            max: 35
+            min: 30
+            max: 60
         pool:
             min: 30
-            max: 45
+            max: 70
+        min_difference: 10
     custom:
+        customPrizePacks:
+            True: 50
+            False: 50
+        # item.require.Lamp is actually backwards (True enables dark room navigation)
+        # if this is True, enemy_shuffle and enemy_damage are set to defaults
+        item.require.Lamp:
+            True: 10
+            False: 90
+        prize.shufflePendants:
+            True: 95
+            False: 5
+        prize.shuffleCrystals:
+            True: 95
+            False: 5
+        # any of these being in here will set dungeon_items to standard
+        region.wildMaps:
+            True: 50
+            False: 50
+        region.wildCompasses:
+            True: 50
+            False: 50
+        region.wildKeys:
+            True: 50
+            False: 50
+        region.wildBigKeys:
+            True: 50
+            False: 50
+        # 0: nothing, 16: items outside their dungeons, 255: everything
+        rom.freeItemText:
+            0: 10
+            16: 70
+            255: 20
+        rom.dungeonCount:
+            'pickup': 50
+            'off': 50
+        rom.mapOnPickup:
+            True: 90
+            False: 10
+        rom.timerMode:
+            'countdown-ohko': 1
+            'off': 99
+        rom.rupeeBow:
+            True: 5
+            False: 95
+        rom.genericKeys:
+            True: 5
+            False: 95
         item.overflow.replacement.Sword:
-            Rupoor: 1
+            TwentyRupees2: 25
+            Heart: 10
+            SmallMagic: 15
+            Rupoor: 50
         item.overflow.replacement.Shield:
-            Rupoor: 1
+            TwentyRupees2: 25
+            Heart: 10
+            SmallMagic: 15
+            Rupoor: 50
         item.overflow.replacement.Armor:
-            Rupoor: 1
+            TwentyRupees2: 25
+            Heart: 10
+            SmallMagic: 15
+            Rupoor: 50
         item.overflow.replacement.Bow:
-            Rupoor: 1
+            TwentyRupees2: 25
+            Heart: 10
+            SmallMagic: 15
+            Rupoor: 50
         item.value.Rupoor:
-            10: 1
-            30: 1
             50: 1
             100: 1
+            200: 1
+            300: 1
         spoil.BootsLocation:
             True: 1
             False: 1
@@ -32,11 +92,13 @@ customizer:
             3: 3
             4: 2
         'BossHeartContainer':
-            0: 80
+            0: 60
             1: 10
-            2: 5
-            3: 3
-            4: 2
+            2: 10
+            3: 10
+            4: 5
+            5: 3
+            6: 2
         'Bottle1':
             0: 80
             1: 10
@@ -74,105 +136,101 @@ customizer:
             6: 1
             7: 2
         'Bombos':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'BookOfMudora':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'CaneOfSomaria':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Cape':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Ether':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'FireRod':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Flippers':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Hammer':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Hookshot':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'IceRod':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Lamp':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'MagicMirror':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'MoonPearl':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Mushroom':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'OcarinaInactive':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'PegasusBoots':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Powder':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Quake':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'Shovel':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'ProgressiveGlove':
-            0: 90
-            1: 5
+            0: 85
+            1: 10
             2: 5
         'ProgressiveBow':
-            0: 90
-            1: 5
+            0: 85
+            1: 10
             2: 5
         'BugCatchingNet':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'ProgressiveShield':
-            0: 90
-            1: 5
+            0: 85
+            1: 10
             2: 3
             3: 2
         'CaneOfByrna':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'TenBombs':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'HalfMagic':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'HeartContainer':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'ProgressiveArmor':
-            0: 90
-            1: 3
-            2: 2
+            0: 85
+            1: 10
+            2: 5
         'Boomerang':
-            0: 90
-            1: 10
+            0: 85
+            1: 15
         'RedBoomerang':
-            0: 90
-            1: 10
-glitches_required:
-  none: 1
-  overworld_glitches: 0
-  major_glitches: 0
-  no_logic: 0
+            0: 85
+            1: 15
+glitches_required: "none"
 item_placement:
   basic: 1
   advanced: 1
@@ -240,9 +298,7 @@ item_pool:
   hard: 1
   expert: 1
   crowd_control: 0
-item_functionality:
-  normal: 1
-  hard: 1
+item_functionality: "normal"
 enemy_damage:
   default: 1
   shuffled: 1
