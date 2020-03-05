@@ -480,15 +480,8 @@ world_state:
   inverted: 1
   retro: 1
 entrance_shuffle: "none"
-boss_shuffle:
-  none: 1
-  simple: 1
-  full: 1
-  random: 1
-enemy_shuffle:
-  none: 1
-  shuffled: 1
-  random: 1
+boss_shuffle: "none"
+enemy_shuffle: "none"
 hints:
   'on': 1
   'off': 1
@@ -499,10 +492,5 @@ weapons:
   swordless: 1
 item_pool: "normal" # don't be decieved, this is randomized elsewhere...
 item_functionality: "normal"
-enemy_damage:
-  default: 1
-  shuffled: 1
-enemy_health:
-  default: 1
-  easy: 1
-  hard: 1
+enemy_damage: "default"
+enemy_health: "default"
