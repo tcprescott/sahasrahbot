@@ -107,9 +107,9 @@ customizer:
             24: 85 # normal
         item.overflow.count.Bottle: 4
         item.value.Rupoor:
-            10: 50
-            20: 30
-            50: 20
+            5: 50
+            10: 30
+            20: 20
         spoil.BootsLocation:
             True: 70
             False: 30
@@ -130,6 +130,25 @@ customizer:
             2: 80
             3: 15
             4: 5
+        'ThreeHundredRupees':
+            4: 60
+            5: 20
+            6: 20
+            7: 10
+            8: 5
+            9: 5
+        'OneHundredRupees':
+            1: 80
+            2: 10
+            3: 5
+            4: 5
+        'Rupoor':
+            0: 60
+            3: 20
+            6: 20
+            9: 10
+            12: 5
+            15: 5
     eq:
         'ProgressiveSword':
             0: 80
@@ -138,13 +157,13 @@ customizer:
             3: 3
             4: 2
         'BossHeartContainer':
-            0: 60
+            0: 80
             1: 10
-            2: 10
-            3: 10
-            4: 5
-            5: 3
-            6: 2
+            2: 5
+            3: 3
+            4: 2
+            5: 1
+            6: 1
         'Bottle1':
             0: 80
             1: 10
