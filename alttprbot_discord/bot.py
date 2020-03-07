@@ -6,6 +6,7 @@ import traceback
 
 import discord
 from discord.ext import commands
+from importlib import util
 
 
 async def determine_prefix(bot, message):
@@ -27,7 +28,7 @@ discordbot.load_extension("alttprbot_discord.cogs.league")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
 
-if importlib.util.find_spec('jishaku'):
+if util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
 @discordbot.event
