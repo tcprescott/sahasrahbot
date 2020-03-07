@@ -3,7 +3,6 @@ import importlib
 import random
 import sys
 import traceback
-from importlib import util
 
 import discord
 from discord.ext import commands
@@ -28,7 +27,7 @@ discordbot.load_extension("alttprbot_discord.cogs.league")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
 
-if util.find_spec('jishaku'):
+if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
 @discordbot.event
