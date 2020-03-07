@@ -1,4 +1,4 @@
-description: A friendlier weightset.  Designed for those who don't want something something extreme (or entrance).
+description: A friendlier weightset.  Designed for those who don't want something extreme (or entrance).
 glitches_required:
   none: 100
   overworld_glitches: 0
@@ -82,8 +82,8 @@ item_functionality:
   expert: 0
 enemy_damage:
   default: 80
-  shuffled: 10
-  random: 10
+  shuffled: 20
+  random: 0
 enemy_health:
   default: 80
   easy: 10

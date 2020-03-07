@@ -1,6 +1,5 @@
 customizer: true
-goal_name: ambrosia
-shuffle_prize_packs: true
+goal_name: classic
 settings:
   accessibility: items
   crystals:
@@ -17,6 +16,7 @@ settings:
     canMirrorWrap: false
     canOWYBA: false
     canOneFrameClipOW: false
+    canOneFrameClipUW: false
     canSuperBunny: false
     canSuperSpeed: false
     canWaterFairyRevive: false
@@ -40,8 +40,8 @@ settings:
     item:
       count:
         Arrow: 1
-        ArrowUpgrade10: 0
-        ArrowUpgrade5: 0
+        ArrowUpgrade10: 1
+        ArrowUpgrade5: 6
         BigKeyA1: 0
         BigKeyA2: 1
         BigKeyD1: 1
@@ -57,11 +57,11 @@ settings:
         BigKeyP2: 1
         BigKeyP3: 1
         BlueClock: 0
-        BlueMail: 0
-        BlueShield: 0
+        BlueMail: 1
+        BlueShield: 1
         Bomb: 0
-        BombUpgrade10: 0
-        BombUpgrade5: 0
+        BombUpgrade10: 1
+        BombUpgrade5: 6
         Bombos: 1
         BookOfMudora: 1
         Boomerang: 1
@@ -75,7 +75,7 @@ settings:
         BottleWithRandom: 4
         BottleWithRedPotion: 0
         Bow: 0
-        BowAndArrows: 0
+        BowAndArrows: 1
         BowAndSilverArrows: 0
         BugCatchingNet: 1
         CaneOfByrna: 1
@@ -121,10 +121,10 @@ settings:
         KeyP1: 0
         KeyP2: 1
         KeyP3: 1
-        L1Sword: 0
+        L1Sword: 1
         L1SwordAndShield: 0
-        L3Sword: 0
-        L4Sword: 0
+        L3Sword: 1
+        L4Sword: 1
         Lamp: 1
         MagicMirror: 1
         MapA1: 0
@@ -141,8 +141,8 @@ settings:
         MapP1: 1
         MapP2: 1
         MapP3: 1
-        MasterSword: 0
-        MirrorShield: 0
+        MasterSword: 1
+        MirrorShield: 1
         MoonPearl: 1
         Mushroom: 1
         Nothing: 0
@@ -153,27 +153,27 @@ settings:
         PegasusBoots: 1
         PieceOfHeart: 24
         Powder: 1
-        PowerGlove: 0
-        ProgressiveArmor: 2
-        ProgressiveBow: 2
-        ProgressiveGlove: 2
-        ProgressiveShield: 3
-        ProgressiveSword: 4
+        PowerGlove: 1
+        ProgressiveArmor: 0
+        ProgressiveBow: 0
+        ProgressiveGlove: 0
+        ProgressiveShield: 0
+        ProgressiveSword: 0
         Quake: 1
         QuarterMagic: 0
         RedBoomerang: 1
         RedClock: 0
-        RedMail: 0
-        RedShield: 0
+        RedMail: 1
+        RedShield: 1
         Rupoor: 0
         Shovel: 1
-        SilverArrowUpgrade: 0
+        SilverArrowUpgrade: 1
         SmallMagic: 0
-        TenArrows: 12
-        TenBombs: 1
-        ThreeBombs: 16
+        TenArrows: 4
+        TenBombs: 0
+        ThreeBombs: 10
         ThreeHundredRupees: 5
-        TitansMitt: 0
+        TitansMitt: 1
         Triforce: 0
         TriforcePiece: 0
         TwentyRupees: 28
@@ -186,7 +186,7 @@ settings:
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
-    region.bossNormalLocation: false
+    region.bossNormalLocation: true
     region.wildBigKeys: false
     region.wildCompasses: false
     region.wildKeys: false
@@ -195,75 +195,76 @@ settings:
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.genericKeys: false
+    rom.logicMode: NoGlitches
     rom.mapOnPickup: false
     rom.rupeeBow: false
     rom.timerMode: 'off'
     rom.timerStart: ''
-    spoil.BootsLocation: true
+    spoil.BootsLocation: false
   drops:
     '0':
-    - Heart
-    - Heart
-    - Heart
-    - Heart
-    - RupeeGreen
-    - Heart
-    - Heart
-    - RupeeGreen
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '1':
-    - RupeeBlue
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeRed
-    - RupeeBlue
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeBlue
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '2':
-    - MagicRefillFull
-    - MagicRefillSmall
-    - MagicRefillSmall
-    - RupeeBlue
-    - MagicRefillFull
-    - MagicRefillSmall
-    - Heart
-    - MagicRefillSmall
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '3':
-    - BombRefill1
-    - BombRefill1
-    - BombRefill1
-    - BombRefill4
-    - BombRefill1
-    - BombRefill1
-    - BombRefill8
-    - BombRefill1
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '4':
-    - ArrowRefill5
-    - Heart
-    - ArrowRefill5
-    - ArrowRefill10
-    - ArrowRefill5
-    - Heart
-    - ArrowRefill5
-    - ArrowRefill10
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '5':
-    - MagicRefillSmall
-    - RupeeGreen
-    - Heart
-    - ArrowRefill5
-    - MagicRefillSmall
-    - BombRefill1
-    - RupeeGreen
-    - Heart
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '6':
-    - Heart
-    - Fairy
-    - MagicRefillFull
-    - RupeeRed
-    - BombRefill8
-    - Heart
-    - RupeeRed
-    - ArrowRefill10
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     crab:
     - auto_fill
     - auto_fill
@@ -282,18 +283,17 @@ settings:
   - BossHeartContainer
   glitches: none
   goal: ganon
+  hints: 'off'
   item:
     functionality: normal
     pool: normal
   item_placement: advanced
-  l: {}
+  l:
+    TGluaydzIFVuY2xlOjE=: L1Sword:1
   lang: en
   mode: standard
-  name: Ambrosia
-  notes: This is a sword-assured standard seed (.casual) where the Uncle will spoil
-    the Boots location at the start, and all dungeon bosses are guaranteed to drop
-    an item (not a map/compass/key).
-  spoilers: "off"
+  name: Classic Randomizer
+  notes: Kids these days and their fancy progressive upgrades and lack of bomb/arrow upgrades in the item pool. Dang nabbit!
+  spoilers: 'off'
   tournament: true
-  weapons: assured
-  hints: "off"
+  weapons: randomized
