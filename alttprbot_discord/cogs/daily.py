@@ -2,6 +2,8 @@ import aiocache
 import discord
 from discord.ext import commands, tasks
 
+from alttprbot.util import http
+
 from ..util.alttpr_discord import alttpr
 
 
@@ -15,7 +17,8 @@ class Daily(commands.Cog):
         brief='Returns the current daily seed.',
         help='Returns the currently daily seed.')
     async def daily(self, ctx):
-        hash_id = await find_daily_hash()
+        daily_challenge = await find_daily_hash()
+        hash_id = daily_challenge['hash']
         seed = await get_daily_seed(hash_id)
         embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await update_daily(hash_id)
@@ -24,7 +27,8 @@ class Daily(commands.Cog):
 
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
-        hash_id = await find_daily_hash()
+        daily_challenge = await find_daily_hash()
+        hash_id = daily_challenge['hash']
         if await update_daily(hash_id):
             seed = await get_daily_seed(hash_id)
             embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
@@ -51,5 +55,4 @@ async def get_daily_seed(hash_id):
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def find_daily_hash():
-    website = await alttpr()
-    return await website.find_daily_hash()
+    return await http.request_generic('https://alttpr.com/api/daily', returntype='json')

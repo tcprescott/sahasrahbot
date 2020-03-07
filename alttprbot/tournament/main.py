@@ -4,6 +4,7 @@ import gspread_asyncio
 from oauth2client.service_account import ServiceAccountCredentials
 from pytz import timezone
 
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 from config import Config as c
 
@@ -12,15 +13,15 @@ from ..util import speedgaming
 tz = timezone('EST')
 
 
-class SettingsSubmissionNotFoundException(Exception):
+class SettingsSubmissionNotFoundException(SahasrahBotException):
     pass
 
 
-class InvalidSettingsException(Exception):
+class InvalidSettingsException(SahasrahBotException):
     pass
 
 
-class AlreadyGeneratedException(Exception):
+class AlreadyGeneratedException(SahasrahBotException):
     pass
 
 

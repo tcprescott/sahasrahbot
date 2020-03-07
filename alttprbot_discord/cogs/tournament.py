@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from alttprbot.database import srlnick
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.tournament import main, secondary
 from alttprbot.util import speedgaming
 from config import Config as c
@@ -30,7 +31,7 @@ class Tournament(commands.Cog):
         if c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
             await secondary.loadnicks(ctx)
         else:
-            raise Exception('This command only works for the Challenge Cup.')
+            raise SahasrahBotException('This command only works for the Challenge Cup.')
 
     @commands.command(
         help="Generate a tournament race.",
@@ -53,7 +54,7 @@ class Tournament(commands.Cog):
         elif c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
             seed, game_number, players = await secondary.generate_game(episode_number, ctx.guild.id)
         else:
-            raise Exception('This should not have happened.  Ping Synack.')
+            raise SahasrahBotException('This should not have happened.  Ping Synack.')
 
         embed = await seed.embed(
             name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number} - {episode_number}",

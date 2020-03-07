@@ -4,12 +4,13 @@ from datetime import timedelta
 
 import aiofiles
 
+from alttprbot.exceptions import SahasrahBotException
 from config import Config as c
 
 from . import http
 
 
-class SGEpisodeNotFoundException(Exception):
+class SGEpisodeNotFoundException(SahasrahBotException):
     pass
 
 async def get_upcoming_episodes_by_event(event):
@@ -46,7 +47,7 @@ async def get_episode(episodeid: int, complete=False):
     if 'error' in result:
         raise SGEpisodeNotFoundException(result["error"])
 
-    if not result['event']['slug'] == 'alttpr':
-        raise SGEpisodeNotFoundException('Not an alttpr tournament race.')
+    # if not result['event']['slug'] == 'alttpr':
+    #     raise SGEpisodeNotFoundException('Not an alttpr tournament race.')
 
     return result

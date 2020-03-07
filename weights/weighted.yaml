@@ -89,3 +89,8 @@ enemy_health:
   easy: 5
   hard: 10
   expert: 5
+customizer:
+  eq:
+    'PegasusBoots':
+        False: 70
+        True: 30

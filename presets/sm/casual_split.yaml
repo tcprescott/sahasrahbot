@@ -1,0 +1,11 @@
+randomizer: 'sm'
+goal_name: beat the game (v11 beta)
+use_new: True
+settings:
+    logic: casual
+    goal: defeatmb
+    placement: "split"
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"

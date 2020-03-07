@@ -14,10 +14,20 @@ class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.content.lower() == '!role furaime':
+            await message.add_reaction('👀')
+
     @commands.command()
     @commands.is_owner()
     async def joineddate(self, ctx, member: discord.Member):
         await ctx.send(member.joined_at)
+
+    @commands.command()
+    @commands.is_owner()
+    async def throwerror(self, ctx):
+        raise Exception('omg')
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):

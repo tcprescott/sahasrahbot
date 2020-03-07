@@ -3,6 +3,7 @@ import importlib
 import random
 import sys
 import traceback
+from alttprbot.exceptions import SahasrahBotException
 
 import discord
 from discord.ext import commands
@@ -33,19 +34,22 @@ if util.find_spec('jishaku'):
 
 @discordbot.event
 async def on_command_error(ctx, error):
+    riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
 
-    riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
-    if riplink is None:
-        riplink = '👎'
-
     if isinstance(error, commands.CheckFailure):
-        await ctx.message.add_reaction('🚫')
-    if isinstance(error, commands.errors.MissingPermissions):
+        pass
+    elif isinstance(error, commands.errors.MissingPermissions):
         await ctx.message.add_reaction('🚫')
     elif isinstance(error, commands.CommandNotFound):
         pass
+    elif isinstance(error, commands.UserInputError):
+        if riplink is None:
+            riplink = '👎'
+        await ctx.send(error)
     else:
+        if riplink is None:
+            riplink = '👎'
         error_to_display = error.original if hasattr(error, 'original') else error
 
         # error_channel = await commands.TextChannelConverter().convert(ctx, await config.get(0, "ErrorChannel"))

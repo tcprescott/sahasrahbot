@@ -1,0 +1,10 @@
+randomizer: 'smz3'
+goal_name: beat the games (v11 beta)
+use_new: True
+settings:
+    smlogic: Hard
+    goal: defeatboth
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"

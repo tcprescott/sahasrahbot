@@ -1,0 +1,2 @@
+class SahasrahBotException(Exception):
+    pass

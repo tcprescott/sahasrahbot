@@ -1,7 +1,11 @@
+import json
+
 import discord
 
 from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import config, spoiler_races, srl_races
+from alttprbot.database import (config, spoiler_races, srl_races,
+                                tournament_results)
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
 
@@ -41,13 +45,13 @@ WEEKDATA = {
     },
     '7': {
         'type': 'preset',
-        'preset': 'open',
+        'preset': 'dungeons',
         'coop': True,
-        'friendly_name': 'Week 7 - Open Co-op Info Share - DO NOT RECORD'
+        'friendly_name': 'Week 7 - All Dungeons Co-op Info Share - DO NOT RECORD'
     },
 }
 
-class WeekNotFoundException(Exception):
+class WeekNotFoundException(SahasrahBotException):
     pass
 
 async def league_race(episodeid: int, week=None):
@@ -73,6 +77,7 @@ class LeagueRace():
         self.episode = await speedgaming.get_episode(self.episodeid)
         self.type = WEEKDATA[self.week]['type']
         self.friendly_name = WEEKDATA[self.week]['friendly_name']
+        self.spoiler_log_url = None
 
         if self.type == 'preset':
             self.preset = WEEKDATA[self.week]['preset']
@@ -85,7 +90,7 @@ class LeagueRace():
             self.studyperiod = WEEKDATA[self.week]['studyperiod']
             self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
         else:
-            raise Exception('Week type not found, something went horribly wrong...')
+            raise SahasrahBotException('Week type not found, something went horribly wrong...')
 
     def get_player_discords(self):
         player_list = []
@@ -148,13 +153,22 @@ async def process_league_race(target, args, client):
         emojis=discordbot.emojis
     )
 
+
+    broadcast_channels = [a['name'] for a in generated_league_race.episode['channels'] if not a['name'] == 'No Stream']
+
+    if len(broadcast_channels) > 0:
+        tournament_embed.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+        embed.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+
     audit_channel_id = await config.get(generated_league_race.guild.id, 'AlttprLeagueAuditChannel')
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(int(audit_channel_id))
         await audit_channel.send(embed=embed)
 
     commentary_channel_id = await config.get(generated_league_race.guild.id, 'AlttprLeagueCommentaryChannel')
-    if commentary_channel_id is not None:
+    if commentary_channel_id is not None and len(broadcast_channels) > 0:
         commentary_channel = discordbot.get_channel(int(commentary_channel_id))
         await commentary_channel.send(embed=tournament_embed)
 
@@ -169,5 +183,22 @@ async def process_league_race(target, args, client):
         await spoiler_races.insert_spoiler_race(srl_id, generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
 
     await srl_races.insert_srl_race(srl_id, goal)
+    await tournament_results.insert_tournament_race(
+        srl_id=srl_id,
+        episode_id=generated_league_race.episodeid,
+        permalink=generated_league_race.seed.url,
+        event='alttprleague',
+        week=generated_league_race.week,
+        spoiler=generated_league_race.spoiler_log_url if generated_league_race.spoiler_log_url else None
+    )
 
     await client.message(target, "Seed has been generated, you should have received a DM in Discord.  Please contact a League Moderator if you haven't received the DM.")
+
+async def process_league_race_finish(target, client):
+    srl_id = srl.srl_race_id(target)
+    srl_race = await srl.get_race(srl_id)
+
+    await tournament_results.record_tournament_results(
+        srl_id=srl_id,
+        results_json=json.dumps(srl_race['entrants'])
+    )
