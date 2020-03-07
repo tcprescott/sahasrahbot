@@ -1,21 +1,19 @@
 import asyncio
 import importlib
 import random
-import traceback
 import sys
+import traceback
 from importlib import util
 
 import discord
 from discord.ext import commands
-
-from alttprbot.database import config
 
 
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
 
-    prefix = await config.get_parameter(message.guild.id, "CommandPrefix")
+    prefix = None
     return "$" if prefix is None else prefix['value']
 
 
@@ -23,16 +21,12 @@ discordbot = commands.Bot(
     command_prefix=determine_prefix,
 )
 
-# discordbot.load_extension("alttprbot_discord.cogs.audit")
-discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
+discordbot.load_extension("alttprbot_discord.cogs.league")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
-discordbot.load_extension("alttprbot_discord.cogs.role")
-discordbot.load_extension("alttprbot_discord.cogs.smz3gen")
-discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 
 if util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')

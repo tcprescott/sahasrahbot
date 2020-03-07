@@ -54,7 +54,7 @@ class Misc(commands.Cog):
             if holyimage.image.get('mode', '') == 'redirect':
                 embed.add_field(name='Link', value=url, inline=False)
             else:
-                embed.set_image(url=url)
+                embed.set_thumbnail(url=url)
 
         embed.add_field(name="Source", value=holyimage.link)
 

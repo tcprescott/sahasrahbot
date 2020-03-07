@@ -1,27 +1,27 @@
 ---
-goal_name: enemizer open
+goal_name: "inverted keysanity + entrance shuffle"
 customizer: false
 settings:
-  goal: ganon
+  goal: fast_ganon
   item:
     pool: normal
     functionality: normal
   lang: en
-  mode: open
+  mode: inverted
   hints: 'off'
   weapons: randomized
   crystals:
     ganon: '7'
     tower: '7'
   enemizer:
-    boss_shuffle: full
+    boss_shuffle: none
     enemy_damage: default
     enemy_health: default
-    enemy_shuffle: shuffled
+    enemy_shuffle: none
   glitches: none
   spoilers: false
-  entrances: none
+  entrances: crossed
   tournament: true
   accessibility: items
-  dungeon_items: standard
+  dungeon_items: full
   item_placement: advanced

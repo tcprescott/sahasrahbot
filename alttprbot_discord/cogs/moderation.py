@@ -1,7 +1,5 @@
 from discord.ext import commands
 
-from alttprbot.database import config
-
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -18,11 +16,7 @@ class Moderation(commands.Cog):
                         await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
 
 async def should_delete_message(guild_id):
-    deleteroms = await config.get_parameter(guild_id, 'DeleteRoms')
-    if deleteroms and deleteroms['value'] == 'true':
-        return True
-    else:
-        return False
+    return False
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

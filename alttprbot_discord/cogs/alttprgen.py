@@ -8,7 +8,6 @@ from discord.ext import commands
 from alttprbot.alttprgen.mystery import generate_random_game
 from alttprbot.alttprgen.preset import get_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
-from alttprbot.database import config
 # from config import Config as c
 
 from ..util import checks
@@ -103,7 +102,6 @@ class AlttprGen(commands.Cog):
         help='Generate a festive game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @checks.restrict_command_globally('FestiveMode')
     @commands.cooldown(rate=5, per=900, type=commands.BucketType.user)
     async def festiverandom(self, ctx, weightset='weighted', tournament: bool = True):
         await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=True)
@@ -113,28 +111,20 @@ class AlttprGen(commands.Cog):
         help='Generate a festive mystery game.  Find a list of weights at https://l.synack.live/weights'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @checks.restrict_command_globally('FestiveMode')
     @commands.cooldown(rate=5, per=900, type=commands.BucketType.user)
     async def festivemystery(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery", festive=True)
 
     @commands.command(hidden=True, aliases=['festives'])
     async def festive(self, ctx):
-        if await config.get(0, 'FestiveMode') == "true":
-            embed = discord.Embed(
-                title='Festive Randomizer Information',
-                description='Latest details of any upcoming festive randomizers.',
-                color=discord.Color.green()
-            )
-            embed.add_field(name="Christmas Festive 2019", value="https://alttpr.com/special")
-        else:
-            embed = discord.Embed(
-                title='Festive Randomizer Information',
-                description='Latest details of any upcoming festive randomizers.',
-                color=discord.Color.red()
-            )
-            embed.set_image(
-                url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
+
+        embed = discord.Embed(
+            title='Festive Randomizer Information',
+            description='Latest details of any upcoming festive randomizers.',
+            color=discord.Color.red()
+        )
+        embed.set_image(
+            url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
         await ctx.send(embed=embed)
 
 

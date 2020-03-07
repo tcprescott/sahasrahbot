@@ -2,21 +2,7 @@ import aiocache
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot.database import config, daily
-
 from ..util.alttpr_discord import alttpr
-
-
-def is_daily_channel():
-    async def predicate(ctx):
-        if ctx.guild is None: return False
-        result = await config.get_parameter(ctx.guild.id, 'DailyAnnouncerChannel')
-        if result is not None:
-            channels = result['value'].split(',')
-            if ctx.channel.name in channels:
-                return True
-        return False
-    return commands.check(predicate)
 
 
 class Daily(commands.Cog):
@@ -28,7 +14,6 @@ class Daily(commands.Cog):
         name='daily',
         brief='Returns the current daily seed.',
         help='Returns the currently daily seed.')
-    @is_daily_channel()
     async def daily(self, ctx):
         hash_id = await find_daily_hash()
         seed = await get_daily_seed(hash_id)
@@ -57,13 +42,7 @@ def setup(bot):
 
 
 async def update_daily(hash_id):
-    latest_daily = await daily.get_latest_daily()
-    if not latest_daily['hash'] == hash_id:
-        print('omg new daily')
-        await daily.set_new_daily(hash_id)
-        return True
-    else:
-        return False
+    return False
 
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
