@@ -1,4 +1,4 @@
-description: Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld)
+description: "Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld)"
 customizer:
     triforce-hunt:
         goal:
@@ -39,7 +39,7 @@ customizer:
             0: 10
             16: 70
             255: 20
-        rom.FreeItemMenu: 255
+        rom.freeItemMenu: 255
         rom.dungeonCount:
             'pickup': 40
             'on': 10
@@ -506,13 +506,13 @@ world_state:
   retro: 1
 entrance_shuffle: "none"
 boss_shuffle:
-    none: 80
-    simple: 10
-    full: 5
-    random: 5
-  enemy_shuffle:
-    none: 80
-    shuffled: 20
+  none: 80
+  simple: 10
+  full: 5
+  random: 5
+enemy_shuffle:
+  none: 80
+  shuffled: 20
 hints:
   'on': 50
   'off': 50
@@ -522,9 +522,9 @@ weapons:
 item_pool: "normal" # don't be decieved, this is randomized elsewhere...
 item_functionality: "normal"
 enemy_damage:
-    default: 80
-    shuffled: 20
-  enemy_health:
-    default: 80
-    easy: 10
-    hard: 10
+  default: 80
+  shuffled: 20
+enemy_health:
+  default: 80
+  easy: 10
+  hard: 10

@@ -19,8 +19,7 @@ class Misc(commands.Cog):
         if message.content.lower() == '!role furaime':
             await message.add_reaction('👀')
 
-    @commands.command()
-    @commands.is_owner()
+    @commands.command(hidden=True)
     async def joineddate(self, ctx, member: discord.Member):
         await ctx.send(member.joined_at)
 
@@ -28,6 +27,10 @@ class Misc(commands.Cog):
     @commands.is_owner()
     async def throwerror(self, ctx):
         raise Exception('omg')
+
+    @commands.command()
+    async def prng(self, ctx):
+        await ctx.send("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):
