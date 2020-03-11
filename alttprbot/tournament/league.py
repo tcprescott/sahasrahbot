@@ -104,6 +104,8 @@ class LeagueRace():
                     else:
                         member = self.guild.get_member_named(player['discordTag'])
                     
+                    if member is None:
+                        raise SahasrahBotException(f"Unable to resolve Discord User for {player['displayName']} ({player['discordTag']}).  Please contact a moderator for help.")
                     player_list.append(member)
                 except discord.HTTPException:
                     pass
