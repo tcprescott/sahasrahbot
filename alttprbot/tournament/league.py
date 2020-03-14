@@ -82,13 +82,16 @@ class LeagueRace():
         if self.type == 'preset':
             self.preset = WEEKDATA[self.week]['preset']
             self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
+            self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'unknown')}"
         elif self.type == 'mystery':
             self.weightset = WEEKDATA[self.week]['weightset']
-            self.seed, self.preset_dict = await mystery.generate_random_game(self.weightset)
+            self.seed = await mystery.generate_random_game(self.weightset)
+            self.goal_after_start = f"vt8 randomizer - mystery {self.weightset}"
         elif self.type == 'spoiler':
             self.preset = WEEKDATA[self.week]['preset']
             self.studyperiod = WEEKDATA[self.week]['studyperiod']
             self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
+            self.goal_after_start = f"vt8 randomizer - spoiler {self.preset_dict.get('goal_name', 'unknown')}"
         else:
             raise SahasrahBotException('Week type not found, something went horribly wrong...')
 
@@ -184,7 +187,8 @@ async def process_league_race(target, args, client):
     if generated_league_race.type == 'spoiler':
         await spoiler_races.insert_spoiler_race(srl_id, generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
 
-    await srl_races.insert_srl_race(srl_id, goal)
+
+    await srl_races.insert_srl_race(srl_id, generated_league_race.goal_after_start)
     await tournament_results.insert_tournament_race(
         srl_id=srl_id,
         episode_id=generated_league_race.episodeid,
