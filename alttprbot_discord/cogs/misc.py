@@ -1,4 +1,6 @@
+import asyncio
 import json
+import random
 from urllib.parse import urljoin
 
 import aiocache
@@ -18,6 +20,10 @@ class Misc(commands.Cog):
     async def on_message(self, message):
         if message.content.lower() == '!role furaime':
             await message.add_reaction('👀')
+        if discord.utils.get(message.role_mentions, id=524738280630124574):
+            if random.choice([True, False]):
+                await asyncio.sleep((random.random()*30)+30)
+                await message.channel.send(f'@{message.author.mention}')
 
     @commands.command(hidden=True)
     async def joineddate(self, ctx, member: discord.Member):
