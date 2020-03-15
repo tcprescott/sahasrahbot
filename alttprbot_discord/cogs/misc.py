@@ -25,9 +25,24 @@ class Misc(commands.Cog):
                 await asyncio.sleep((random.random()*30)+30)
                 await message.channel.send(f'@{message.author.mention}')
 
-    @commands.command(hidden=True)
-    async def joineddate(self, ctx, member: discord.Member):
-        await ctx.send(member.joined_at)
+    @commands.command(aliases=['joineddate'])
+    @commands.check_any(
+        commands.has_any_role(523276397679083520, 307883683526868992),
+        commands.has_permissions(administrator=True),
+        commands.has_permissions(manage_guild=True)
+    )
+    async def memberinfo(self, ctx, member: discord.Member=None):
+        if member is None:
+            member = ctx.author
+        embed = discord.Embed(
+            title=f"Member info for {member.name}#{member.discriminator}",
+            color=member.color
+        )
+        embed.add_field(name='Created at', value=member.created_at, inline=False)
+        embed.add_field(name='Joined at', value=member.joined_at, inline=False)
+        embed.add_field(name="Discord ID", value=member.id, inline=False)
+        embed.set_thumbnail(url=member.avatar_url)
+        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.is_owner()
