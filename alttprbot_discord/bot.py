@@ -20,7 +20,7 @@ async def determine_prefix(bot, message):
 
 
 discordbot = commands.Bot(
-    command_prefix=determine_prefix,
+    command_prefix=determine_prefix
 )
 
 discordbot.load_extension("alttprbot_discord.cogs.admin")
