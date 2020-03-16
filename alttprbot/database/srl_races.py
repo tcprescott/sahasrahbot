@@ -1,9 +1,9 @@
 from ..util import orm
 
-async def insert_srl_race(srl_id, goal):
+async def insert_srl_race(srl_id, goal, message=None):
     await orm.execute(
-        'INSERT INTO srl_races(srl_id, goal) VALUES (%s,%s) ON DUPLICATE KEY UPDATE goal = %s;',
-        [srl_id, goal, goal]
+        'INSERT INTO srl_races(srl_id, goal, message) VALUES (%s,%s,%s) ON DUPLICATE KEY UPDATE goal = %s, message = %s;',
+        [srl_id, goal, message, goal, message]
     )
 
 async def delete_srl_race(srl_id):

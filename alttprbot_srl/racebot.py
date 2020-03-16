@@ -57,6 +57,9 @@ async def handler(target, source, message, client):
                 if not client.in_channel(target):
                     await client.join(target)
                 await client.message(target, f".setgoal {race['goal']}")
+                if race['message'] is not None:
+                    await asyncio.sleep(15)
+                    await client.message(target, race['message'])
                 await srl_races.delete_srl_race(srl_id)
 
         if go.match(message) or message == 'test go':

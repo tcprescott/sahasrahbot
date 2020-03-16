@@ -2,6 +2,8 @@ import argparse
 import shlex
 import sys
 
+import ircmessage
+
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, srl_races,
                                 tournament_results)
@@ -10,6 +12,7 @@ from alttprbot.smz3gen import spoilers as smz3_spoilers
 from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
 
+ACCESSIBLE_RACE_WARNING = ircmessage.style('WARNING: ', bold=True, fg='red') + ircmessage.style('This race is using an accessible ruleset that prohibits most sequence breaking glitches.  Please visit https://link.alttpr.com/accessible for more details!', fg='red')
 
 async def handler(target, source, message, client):
     if not message[0] == '$':
@@ -23,6 +26,7 @@ async def handler(target, source, message, client):
         return
 
     festivemode = await config.get(0, 'FestiveMode') == "true"
+    post_start_message = None
 
     if args.command == '$preset' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
@@ -36,6 +40,10 @@ async def handler(target, source, message, client):
         if srl['game']['abbrev'] == 'alttphacks':
             seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
             goal = f"vt8 randomizer - {preset_dict['goal_name']}"
+            if args.accessible and seed.data['spoiler']['meta']['logic'] == 'NoGlitches':
+                goal = f"{goal} - accessible ruleset"
+                await client.message(target, ACCESSIBLE_RACE_WARNING)
+                post_start_message = ACCESSIBLE_RACE_WARNING
             code = await seed.code()
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
@@ -51,13 +59,11 @@ async def handler(target, source, message, client):
         else:
             raise SahasrahBotException("This game is not yet supported.")
 
-        await srl_races.insert_srl_race(srl_id, goal)
+        await srl_races.insert_srl_race(srl_id, goal, post_start_message)
 
-    if args.command in ['$random', '$festiverandom', '$mystery', '$festivemystery'] and target.startswith('#srl-'):
-        mode = "random" if args.command in [
-            '$random', '$festiverandom'] else "mystery"
-        festive = True if args.command in [
-            '$festiverandom', '$festivemystery'] and festivemode else False
+    if args.command in ['$mystery', '$festivemystery'] and target.startswith('#srl-'):
+        mode = "mystery"
+        festive = True if args.command in ['$festivemystery'] and festivemode else False
 
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
@@ -82,6 +88,11 @@ async def handler(target, source, message, client):
             else:
                 goal = f"vt8 randomizer - {mode} {args.weightset}"
 
+            if args.accessible and seed.data['spoiler']['meta']['logic'] == 'NoGlitches':
+                goal = f"{goal} - accessible ruleset"
+                await client.message(target, ACCESSIBLE_RACE_WARNING)
+                post_start_message = ACCESSIBLE_RACE_WARNING
+
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
             else:
@@ -89,7 +100,7 @@ async def handler(target, source, message, client):
         else:
             raise SahasrahBotException("This game is not yet supported.")
 
-        await srl_races.insert_srl_race(srl_id, goal)
+        await srl_races.insert_srl_race(srl_id, goal, post_start_message)
 
     if args.command == '$custom' and target.startswith('#srl-'):
         await client.message(target, "Not yet implemented.  Sorry!")
@@ -112,6 +123,12 @@ async def handler(target, source, message, client):
                 return
 
             goal = f"vt8 randomizer - spoiler {goal_name}"
+
+            if args.accessible and seed.data['spoiler']['meta']['logic'] == 'NoGlitches':
+                goal = f"{goal} - accessible ruleset"
+                await client.message(target, ACCESSIBLE_RACE_WARNING)
+                post_start_message = ACCESSIBLE_RACE_WARNING
+
             studytime = 900 if not args.studytime else args.studytime
             code = await seed.code()
             if args.silent:
@@ -136,7 +153,7 @@ async def handler(target, source, message, client):
             await client.message(target, "This game is not yet supported.")
             return
 
-        await srl_races.insert_srl_race(srl_id, goal)
+        await srl_races.insert_srl_race(srl_id, goal, post_start_message)
         await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url, studytime)
 
     if args.command == '$leaguerace' and target.startswith('#srl-'):
@@ -149,6 +166,12 @@ async def handler(target, source, message, client):
         await tournament_results.delete_active_touranment_race(srl_id)
         await client.message(target, "Current race cancelled.")
         await client.message(target, f".setgoal new race")
+
+    if args.command == '$rules' and target.startswith('#srl-'):
+        await client.message(target, "For the ALTTPR rules for this race, visit https://link.alttpr.com/racerules")
+
+    if args.command == '$accessible' and target.startswith('#srl-'):
+        await client.message(target, "For the ALTTPR accessible racing rules, visit https://link.alttpr.com/accessible")
 
     if args.command == '$help':
         await client.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live")
@@ -175,6 +198,7 @@ async def parse_args(message):
     parser_preset.add_argument('preset')
     parser_preset.add_argument('--hints', action='store_true')
     parser_preset.add_argument('--silent', action='store_true')
+    parser_preset.add_argument('--accessible', action='store_true')
 
     subparsers.add_parser('$custom')
 
@@ -182,25 +206,19 @@ async def parse_args(message):
     parser_spoiler.add_argument('preset')
     parser_spoiler.add_argument('--studytime', type=int)
     parser_spoiler.add_argument('--silent', action='store_true')
-
-    parser_random = subparsers.add_parser('$random')
-    parser_random.add_argument('weightset', nargs='?', default="weighted")
-    parser_random.add_argument('--silent', action='store_true')
+    parser_spoiler.add_argument('--accessible', action='store_true')
 
     parser_mystery = subparsers.add_parser('$mystery')
     parser_mystery.add_argument('weightset', nargs='?', default="weighted")
     parser_mystery.add_argument('--silent', action='store_true')
+    parser_mystery.add_argument('--accessible', action='store_true')
 
     if await config.get(0, 'FestiveMode') == "true":
-        parser_festiverandom = subparsers.add_parser('$festiverandom')
-        parser_festiverandom.add_argument(
-            'weightset', nargs='?', default="weighted")
-        parser_festiverandom.add_argument('--silent', action='store_true')
-
         parser_festivemystery = subparsers.add_parser('$festivemystery')
         parser_festivemystery.add_argument(
             'weightset', nargs='?', default="weighted")
         parser_festivemystery.add_argument('--silent', action='store_true')
+        parser_preset.add_argument('--accessible', action='store_true')
 
     parser_leaguerace = subparsers.add_parser('$leaguerace')
     parser_leaguerace.add_argument('episodeid')
@@ -214,6 +232,8 @@ async def parse_args(message):
     subparsers.add_parser('$cancel')
 
     subparsers.add_parser('$vt')
+
+    subparsers.add_parser('$rules')
 
     parser_echo = subparsers.add_parser('$echo')
     parser_echo.add_argument('message')
