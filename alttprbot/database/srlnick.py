@@ -1,9 +1,9 @@
 from ..util import orm
 
-async def insert_srl_nick(discord_user_id, srl_nick):
+async def insert_srl_nick(discord_user_id, srl_nick, srl_verified: int = 0):
     await orm.execute(
-        'INSERT INTO srlnick(discord_user_id, srl_nick) VALUES (%s,%s) ON DUPLICATE KEY UPDATE srl_nick = %s;',
-        [discord_user_id, srl_nick, srl_nick]
+        'INSERT INTO srlnick(`discord_user_id`, `srl_nick`, `srl_verified`) VALUES (%s,%s,%s) ON DUPLICATE KEY UPDATE `srl_nick` = %s, `srl_verified` = %s;',
+        [discord_user_id, srl_nick, srl_verified, srl_nick, srl_verified]
     )
 
 async def insert_twitch_name(discord_user_id, twitch_name):
