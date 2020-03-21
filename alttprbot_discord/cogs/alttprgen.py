@@ -4,6 +4,7 @@ import json
 import aiohttp
 import discord
 from discord.ext import commands
+from z3rsramr import parse_sram
 
 import pyz3r
 from alttprbot.alttprgen.mystery import (generate_random_game,
@@ -12,6 +13,7 @@ from alttprbot.alttprgen.preset import get_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot_discord.util.alttpr_discord import build_file_select_code
 
 from ..util import checks
 from ..util.alttpr_discord import alttpr
@@ -188,6 +190,68 @@ class AlttprGen(commands.Cog):
                 url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def alttprstats(self, ctx):
+        if ctx.message.attachments:
+            sram = await ctx.message.attachments[0].read()
+            parsed = parse_sram(sram)
+            embed = discord.Embed(
+                title=f"ALTTPR Stats for \"{parsed.get('filename', '').strip()}\"",
+                description=f"Collection Rate {parsed.get('collection rate')}",
+                color=discord.Color.blue()
+            )
+            embed.add_field(
+                name="Time",
+                value=(
+                    f"Total Time: {parsed.get('total time', None)}\n"
+                    f"Lag Time: {parsed.get('lag time', None)}\n"
+                    f"Menu Time: {parsed.get('menu time', None)}\n\n"
+                    f"First Sword: {parsed.get('first sword', None)}\n"
+                    f"Flute Found: {parsed.get('flute found', None)}\n"
+                    f"Mirror Found: {parsed.get('mirror found', None)}\n"
+                    f"Boots Found: {parsed.get('boots found', None)}\n"
+                ),
+                inline=False
+            )
+            embed.add_field(
+                name="Important Stats",
+                value=(
+                    f"Bonks: {parsed.get('bonks', None)}\n"
+                    f"Deaths: {parsed.get('deaths', None)}\n"
+                    f"Revivals: {parsed.get('fairy revivals', None)}\n"
+                    f"Overworld Mirrors: {parsed.get('overworld mirrors', None)}\n"
+                    f"Rupees Spent: {parsed.get('rupees spent', None)}\n"
+                    f"Save and Quits: {parsed.get('save and quits', None)}\n"
+                    f"Screen Transitions: {parsed.get('screen transitions', None)}\n"
+                    f"Times Fluted: {parsed.get('times fluted', None)}\n"
+                    f"Underworld Mirrors: {parsed.get('underworld mirrors', None)}\n"
+                )
+            )
+            embed.add_field(
+                name="Misc Stats",
+                value=(
+                    f"Swordless Bosses: {parsed.get('swordless bosses', None)}\n"
+                    f"Fighter Sword Bosses: {parsed.get('fighter sword bosses', None)}\n"
+                    f"Master Sword Bosses: {parsed.get('master sword bosses', None)}\n"
+                    f"Tempered Sword Bosses: {parsed.get('tempered sword bosses', None)}\n"
+                    f"Golden Sword Bosses: {parsed.get('golden sword bosses', None)}\n\n"
+                    f"Heart Containers: {parsed.get('heart containers', None)}\n"
+                    f"Heart Containers: {parsed.get('heart pieces', None)}\n"
+                    f"Mail Upgrade: {parsed.get('mails', None)}\n"
+
+                )
+            )
+            if not parsed.get('hash id', 'none') == 'none':
+                seed = await pyz3r.alttpr(hash_id=parsed.get('hash id', 'none'))
+                embed.add_field(name='File Select Code', value=await build_file_select_code(
+                    code=await seed.code(),
+                    emojis=ctx.bot.emojis
+                ), inline=False)
+                embed.add_field(name='Permalink', value=seed.url, inline=False)
+
+            await ctx.send(embed=embed)
+        else:
+            raise SahasrahBotException("You must attach an SRAM file.")
 
 async def randomgame(ctx, weightset, tournament=True, spoilers="off", festive=False):
     if weightset == "custom" and not ctx.message.attachments:

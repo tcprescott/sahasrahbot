@@ -21,3 +21,4 @@ html2markdown
 TwitchIO
 pytz
 urlextract
+z3r-sramr-py
