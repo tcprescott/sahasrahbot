@@ -2,14 +2,13 @@ import os
 
 import aiofiles
 import yaml
-from tenacity import RetryError, Retrying, stop_after_attempt
+from aiohttp.client_exceptions import ClientResponseError
+from tenacity import RetryError, Retrying, stop_after_attempt, retry_if_exception_type
 
 import pyz3r
 from alttprbot.database import audit
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
-
-from ..util.http import request_generic
 
 
 class WeightsetNotFoundException(SahasrahBotException):
@@ -44,7 +43,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
         weights = await get_weights(weightset)
 
     try:
-        for attempt in Retrying(stop=stop_after_attempt(5)):
+        for attempt in Retrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
             with attempt:
                 try:
                     if festive:
@@ -56,7 +55,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
 
                     settings['tournament'] = tournament
                     seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
-                except Exception:
+                except ClientResponseError:
                     await audit.insert_generated_game(
                         randomizer='alttpr',
                         hash_id=None,

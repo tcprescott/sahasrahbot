@@ -18,7 +18,7 @@ pydle >= 0.9.3
 python-dotenv
 pytz
 pyyaml >= 5.1.2
-pyz3r >= 4.5.6
+pyz3r >= 4.5.7
 quart-openapi
 tenacity
 urlextract
