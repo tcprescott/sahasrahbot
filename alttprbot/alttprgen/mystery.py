@@ -16,14 +16,7 @@ class WeightsetNotFoundException(SahasrahBotException):
     pass
 
 async def generate_test_game(weightset='weighted', festive=False):
-    basename = os.path.basename(f'{weightset}.yaml')
-
-    try:
-        async with aiofiles.open(os.path.join("weights", basename)) as f:
-            weights = yaml.safe_load(await f.read())
-    except FileNotFoundError as err:
-        raise WeightsetNotFoundException(
-            f'Could not find weightset {weightset}.  See a list of available weights at <https://l.synack.live/weights>') from err
+    weights = await get_weights(weightset)
 
     if festive:
         settings, customizer = festive_generate_random_settings(
@@ -49,7 +42,7 @@ async def get_weights(weightset='weighted'):
 async def generate_random_game(weightset='weighted', weights=None, tournament=True, spoilers="off", festive=False):
     if weights is None:
         weights = await get_weights(weightset)
-        
+
     try:
         for attempt in Retrying(stop=stop_after_attempt(5)):
             with attempt:
