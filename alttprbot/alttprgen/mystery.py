@@ -48,7 +48,7 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
         weights = await request_generic(custom_weightset_url, method='get', returntype='yaml')
 
     try:
-        for attempt in Retrying(stop=stop_after_attempt(2)):
+        for attempt in Retrying(stop=stop_after_attempt(5)):
             with attempt:
                 try:
                     if festive:
