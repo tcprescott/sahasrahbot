@@ -2,6 +2,7 @@ import os
 
 import aiofiles
 import yaml
+from tenacity import RetryError, Retrying, stop_after_attempt
 
 import pyz3r
 from alttprbot.database import audit
@@ -9,7 +10,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
 from ..util.http import request_generic
-import tenacity
+
 
 class WeightsetNotFoundException(SahasrahBotException):
     pass
@@ -46,7 +47,32 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
     elif weightset == 'custom' and custom_weightset_url:
         weights = await request_generic(custom_weightset_url, method='get', returntype='yaml')
 
-    seed, settings, customizer = await make_mystery_game(weights, festive, spoilers, tournament)
+    try:
+        for attempt in Retrying(stop=stop_after_attempt(2)):
+            with attempt:
+                try:
+                    if festive:
+                        settings, customizer = festive_generate_random_settings(
+                            weights=weights, spoilers=spoilers)
+                    else:
+                        settings, customizer = pyz3r.mystery.generate_random_settings(
+                            weights=weights, spoilers=spoilers)
+
+                    settings['tournament'] = tournament
+                    seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
+                except Exception:
+                    await audit.insert_generated_game(
+                        randomizer='alttpr',
+                        hash_id=None,
+                        permalink=None,
+                        settings=settings,
+                        gentype='mystery failure',
+                        genoption=weightset,
+                        customizer=1 if customizer else 0
+                    )
+                    raise
+    except RetryError as e:
+        raise e.last_attempt._exception from e
 
     await audit.insert_generated_game(
         randomizer='alttpr',
@@ -58,20 +84,6 @@ async def generate_random_game(weightset='weighted', tournament=True, spoilers="
         customizer=1 if customizer else 0
     )
     return seed
-
-@tenacity.retry(stop=tenacity.stop_after_attempt(5))
-async def make_mystery_game(weights, festive, spoilers, tournament):
-    if festive:
-        settings, customizer = festive_generate_random_settings(
-            weights=weights, spoilers=spoilers)
-    else:
-        settings, customizer = pyz3r.mystery.generate_random_settings(
-            weights=weights, spoilers=spoilers)
-
-    settings['tournament'] = tournament
-    print(settings)
-    seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
-    return seed, settings, customizer
 
 def festive_generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings = {
