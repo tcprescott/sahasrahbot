@@ -34,19 +34,22 @@ async def generate_test_game(weightset='weighted', festive=False):
 
     return settings
 
-async def generate_random_game(weightset='weighted', tournament=True, spoilers="off", custom_weightset_url=None, festive=False):
+async def get_weights(weightset='weighted'):
     basename = os.path.basename(f'{weightset}.yaml')
 
-    if not weightset == 'custom':
-        try:
-            async with aiofiles.open(os.path.join("weights", basename)) as f:
-                weights = yaml.safe_load(await f.read())
-        except FileNotFoundError as err:
-            raise WeightsetNotFoundException(
-                f'Could not find weightset {weightset}.  See a list of available weights at <https://l.synack.live/weights>') from err
-    elif weightset == 'custom' and custom_weightset_url:
-        weights = await request_generic(custom_weightset_url, method='get', returntype='yaml')
+    try:
+        async with aiofiles.open(os.path.join("weights", basename)) as f:
+            weights = yaml.safe_load(await f.read())
+    except FileNotFoundError as err:
+        raise WeightsetNotFoundException(
+            f'Could not find weightset {weightset}.  See a list of available weights at <https://l.synack.live/weights>') from err
+    
+    return weights
 
+async def generate_random_game(weightset='weighted', weights=None, tournament=True, spoilers="off", festive=False):
+    if weights is None:
+        weights = await get_weights(weightset)
+        
     try:
         for attempt in Retrying(stop=stop_after_attempt(5)):
             with attempt:
