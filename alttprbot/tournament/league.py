@@ -85,7 +85,7 @@ class LeagueRace():
             self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'unknown')}"
         elif self.type == 'mystery':
             self.weightset = WEEKDATA[self.week]['weightset']
-            self.seed = await mystery.generate_random_game(self.weightset)
+            self.seed = await mystery.generate_random_game(self.weightset, spoilers="mystery", tournament=True)
             self.goal_after_start = f"vt8 randomizer - mystery {self.weightset}"
         elif self.type == 'spoiler':
             self.preset = WEEKDATA[self.week]['preset']
