@@ -1,0 +1,87 @@
+description: This'll always be MG.  Always.
+glitches_required: "major_glitches"
+item_placement:
+  basic: 25
+  advanced: 75
+dungeon_items:
+  standard: 60
+  mc: 10
+  mcs: 10
+  full: 20
+accessibility:
+  items: 70
+  locations: 0
+  none: 30
+goals:
+  ganon: 40
+  fast_ganon: 20
+  dungeons: 10
+  pedestal: 20
+  triforce-hunt: 10
+tower_open:
+  '0': 5
+  '1': 5
+  '2': 5
+  '3': 5
+  '4': 5
+  '5': 5
+  '6': 5
+  '7': 50
+  random: 15
+ganon_open:
+  '0': 5
+  '1': 5
+  '2': 5
+  '3': 5
+  '4': 5
+  '5': 5
+  '6': 5
+  '7': 50
+  random: 15
+world_state:
+  standard: 10
+  open: 70
+  inverted: 20
+  retro: 0
+entrance_shuffle:
+  none: 100
+  simple: 0
+  restricted: 0
+  full: 0
+  crossed: 0
+  insanity: 0
+boss_shuffle:
+  none: 60
+  simple: 10
+  full: 10
+  random: 20
+enemy_shuffle:
+  none: 60
+  shuffled: 20
+  random: 20
+hints:
+  'on': 50
+  'off': 50
+weapons:
+  randomized: 20
+  assured: 60
+  vanilla: 15
+  swordless: 5
+item_pool:
+  normal: 80
+  hard: 15
+  expert: 5
+  crowd_control: 0
+item_functionality:
+  normal: 80
+  hard: 15
+  expert: 5
+enemy_damage:
+  default: 80
+  shuffled: 10
+  random: 10
+enemy_health:
+  default: 80
+  easy: 5
+  hard: 10
+  expert: 5
