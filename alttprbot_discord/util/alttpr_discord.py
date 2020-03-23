@@ -167,11 +167,15 @@ class alttprDiscordClass(alttprClass):
                 name='Mystery Game',
                 value="No meta information is available for this game.",
                 inline=False)
-
-        embed.add_field(
-            name='Settings',
-            value=f"**Logic:** {self.data['spoiler']['meta']['logic']}\n**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n**Open Tower:** {self.data['spoiler']['meta']['entry_crystals_tower']}\n**Ganon Vulnerable:** {self.data['spoiler']['meta']['entry_crystals_ganon']}\n**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
-        )
+            embed.add_field(
+                name='Item Placement',
+                value=f"**Logic:** {self.data['spoiler']['meta']['logic']}",
+                inline=True)
+        else:
+            embed.add_field(
+                name='Settings',
+                value=f"**Logic:** {self.data['spoiler']['meta']['logic']}\n**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n**Open Tower:** {self.data['spoiler']['meta']['entry_crystals_tower']}\n**Ganon Vulnerable:** {self.data['spoiler']['meta']['entry_crystals_ganon']}\n**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
+            )
 
         code = await self.code()
         embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
