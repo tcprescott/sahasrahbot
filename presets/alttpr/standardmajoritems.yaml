@@ -6,6 +6,7 @@ settings:
     ganon: '7'
     tower: '7'
   custom:
+    customPrizePacks: false
     canBombJump: false
     canBootsClip: false
     canBunnyRevive: false
@@ -206,68 +207,68 @@ settings:
     spoil.BootsLocation: false
   drops:
     '0':
-    - Heart
-    - Heart
-    - Heart
-    - Heart
-    - RupeeGreen
-    - Heart
-    - Heart
-    - RupeeGreen
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '1':
-    - RupeeBlue
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeRed
-    - RupeeBlue
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeBlue
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '2':
-    - MagicRefillFull
-    - MagicRefillSmall
-    - MagicRefillSmall
-    - RupeeBlue
-    - MagicRefillFull
-    - MagicRefillSmall
-    - Heart
-    - MagicRefillSmall
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '3':
-    - BombRefill1
-    - BombRefill1
-    - BombRefill1
-    - BombRefill4
-    - BombRefill1
-    - BombRefill1
-    - BombRefill8
-    - BombRefill1
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '4':
-    - ArrowRefill5
-    - Heart
-    - ArrowRefill5
-    - ArrowRefill10
-    - ArrowRefill5
-    - Heart
-    - ArrowRefill5
-    - ArrowRefill10
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '5':
-    - MagicRefillSmall
-    - RupeeGreen
-    - Heart
-    - ArrowRefill5
-    - MagicRefillSmall
-    - BombRefill1
-    - RupeeGreen
-    - Heart
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '6':
-    - Heart
-    - Fairy
-    - MagicRefillFull
-    - RupeeRed
-    - BombRefill8
-    - Heart
-    - RupeeRed
-    - ArrowRefill10
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     crab:
     - auto_fill
     - auto_fill
