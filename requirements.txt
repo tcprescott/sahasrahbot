@@ -22,4 +22,4 @@ pyz3r >= 4.5.7
 quart-openapi
 tenacity
 urlextract
-z3r-sramr-py
+z3r-sramr-py >= 0.2.1

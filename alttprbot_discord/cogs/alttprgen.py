@@ -201,65 +201,74 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def alttprstats(self, ctx):
+    async def alttprstats(self, ctx, raw: bool = False):
         if ctx.message.attachments:
             sram = await ctx.message.attachments[0].read()
             parsed = parse_sram(sram)
-            embed = discord.Embed(
-                title=f"ALTTPR Stats for \"{parsed.get('filename', '').strip()}\"",
-                description=f"Collection Rate {parsed.get('collection rate')}",
-                color=discord.Color.blue()
-            )
-            embed.add_field(
-                name="Time",
-                value=(
-                    f"Total Time: {parsed.get('total time', None)}\n"
-                    f"Lag Time: {parsed.get('lag time', None)}\n"
-                    f"Menu Time: {parsed.get('menu time', None)}\n\n"
-                    f"First Sword: {parsed.get('first sword', None)}\n"
-                    f"Flute Found: {parsed.get('flute found', None)}\n"
-                    f"Mirror Found: {parsed.get('mirror found', None)}\n"
-                    f"Boots Found: {parsed.get('boots found', None)}\n"
-                ),
-                inline=False
-            )
-            embed.add_field(
-                name="Important Stats",
-                value=(
-                    f"Bonks: {parsed.get('bonks', None)}\n"
-                    f"Deaths: {parsed.get('deaths', None)}\n"
-                    f"Revivals: {parsed.get('fairy revivals', None)}\n"
-                    f"Overworld Mirrors: {parsed.get('overworld mirrors', None)}\n"
-                    f"Rupees Spent: {parsed.get('rupees spent', None)}\n"
-                    f"Save and Quits: {parsed.get('save and quits', None)}\n"
-                    f"Screen Transitions: {parsed.get('screen transitions', None)}\n"
-                    f"Times Fluted: {parsed.get('times fluted', None)}\n"
-                    f"Underworld Mirrors: {parsed.get('underworld mirrors', None)}\n"
+            if raw:
+                await ctx.send(
+                    file=discord.File(
+                        io.StringIO(json.dumps(parsed, indent=4)),
+                        filename=f"stats_{parsed['meta'].get('filename', 'alttpr').strip()}.txt"
+                    )
                 )
-            )
-            embed.add_field(
-                name="Misc Stats",
-                value=(
-                    f"Swordless Bosses: {parsed.get('swordless bosses', None)}\n"
-                    f"Fighter Sword Bosses: {parsed.get('fighter sword bosses', None)}\n"
-                    f"Master Sword Bosses: {parsed.get('master sword bosses', None)}\n"
-                    f"Tempered Sword Bosses: {parsed.get('tempered sword bosses', None)}\n"
-                    f"Golden Sword Bosses: {parsed.get('golden sword bosses', None)}\n\n"
-                    f"Heart Containers: {parsed.get('heart containers', None)}\n"
-                    f"Heart Containers: {parsed.get('heart pieces', None)}\n"
-                    f"Mail Upgrade: {parsed.get('mails', None)}\n"
-
+            else:
+                embed = discord.Embed(
+                    title=f"ALTTPR Stats for \"{parsed['meta'].get('filename', '').strip()}\"",
+                    description=f"Collection Rate {parsed['stats'].get('collection rate')}",
+                    color=discord.Color.blue()
                 )
-            )
-            if not parsed.get('hash id', 'none') == 'none':
-                seed = await pyz3r.alttpr(hash_id=parsed.get('hash id', 'none'))
-                embed.add_field(name='File Select Code', value=await build_file_select_code(
-                    code=await seed.code(),
-                    emojis=ctx.bot.emojis
-                ), inline=False)
-                embed.add_field(name='Permalink', value=seed.url, inline=False)
+                embed.add_field(
+                    name="Time",
+                    value=(
+                        f"Total Time: {parsed['stats'].get('total time', None)}\n"
+                        f"Lag Time: {parsed['stats'].get('lag time', None)}\n"
+                        f"Menu Time: {parsed['stats'].get('menu time', None)}\n\n"
+                        f"First Sword: {parsed['stats'].get('first sword', None)}\n"
+                        f"Flute Found: {parsed['stats'].get('flute found', None)}\n"
+                        f"Mirror Found: {parsed['stats'].get('mirror found', None)}\n"
+                        f"Boots Found: {parsed['stats'].get('boots found', None)}\n"
+                    ),
+                    inline=False
+                )
+                embed.add_field(
+                    name="Important Stats",
+                    value=(
+                        f"Bonks: {parsed['stats'].get('bonks', None)}\n"
+                        f"Deaths: {parsed['stats'].get('deaths', None)}\n"
+                        f"Revivals: {parsed['stats'].get('faerie revivals', None)}\n"
+                        f"Overworld Mirrors: {parsed['stats'].get('overworld mirrors', None)}\n"
+                        f"Rupees Spent: {parsed['stats'].get('rupees spent', None)}\n"
+                        f"Save and Quits: {parsed['stats'].get('save and quits', None)}\n"
+                        f"Screen Transitions: {parsed['stats'].get('screen transitions', None)}\n"
+                        f"Times Fluted: {parsed['stats'].get('times fluted', None)}\n"
+                        f"Underworld Mirrors: {parsed['stats'].get('underworld mirrors', None)}\n"
+                    )
+                )
+                embed.add_field(
+                    name="Misc Stats",
+                    value=(
+                        f"Swordless Bosses: {parsed['stats'].get('swordless bosses', None)}\n"
+                        f"Fighter Sword Bosses: {parsed['stats'].get('fighter sword bosses', None)}\n"
+                        f"Master Sword Bosses: {parsed['stats'].get('master sword bosses', None)}\n"
+                        f"Tempered Sword Bosses: {parsed['stats'].get('tempered sword bosses', None)}\n"
+                        f"Golden Sword Bosses: {parsed['stats'].get('golden sword bosses', None)}\n\n"
+                        f"Heart Containers: {parsed['stats'].get('heart containers', None)}\n"
+                        f"Heart Containers: {parsed['stats'].get('heart pieces', None)}\n"
+                        f"Mail Upgrade: {parsed['stats'].get('mails', None)}\n"
+                        f"Bottles: {parsed['equipment'].get('bottles', None)}\n"
+                        f"Silver Arrows: {parsed['equipment'].get('silver arrows', None)}\n"
+                    )
+                )
+                if not parsed.get('hash id', 'none') == 'none':
+                    seed = await pyz3r.alttpr(hash_id=parsed.get('hash id', 'none'))
+                    embed.add_field(name='File Select Code', value=await build_file_select_code(
+                        code=await seed.code(),
+                        emojis=ctx.bot.emojis
+                    ), inline=False)
+                    embed.add_field(name='Permalink', value=seed.url, inline=False)
 
-            await ctx.send(embed=embed)
+                await ctx.send(embed=embed)
         else:
             raise SahasrahBotException("You must attach an SRAM file.")
 
