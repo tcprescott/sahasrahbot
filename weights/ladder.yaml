@@ -1,0 +1,69 @@
+description: Pre-season mystery weights for ALTTPR Ladder.  https://discord.gg/Jy7Srva
+glitches_required: "none"
+item_placement:
+  basic: 30
+  advanced: 70
+dungeon_items:
+  standard: 30
+  mc: 20
+  mcs: 20
+  full: 30
+accessibility:
+  items: 80
+  none: 20
+goals:
+  ganon: 35
+  fast_ganon: 35
+  dungeons: 10
+  pedestal: 15
+  triforce-hunt: 5
+tower_open:
+  '0': 5
+  '1': 5
+  '2': 10
+  '3': 10
+  '4': 10
+  '5': 20
+  '6': 20
+  '7': 20
+ganon_open:
+  '0': 0
+  '1': 0
+  '2': 0
+  '3': 10
+  '4': 10
+  '5': 25
+  '6': 25
+  '7': 30
+world_state:
+  standard: 40
+  open: 40
+  inverted: 10
+  retro: 10
+entrance_shuffle:
+  none: 60
+  crossed: 40
+boss_shuffle:
+  none: 70
+  full: 30
+enemy_shuffle:
+  none: 70
+  shuffled: 30
+hints:
+  'on': 10
+  'off': 90
+weapons:
+  randomized: 50
+  assured: 20
+  vanilla: 20
+  swordless: 10
+item_pool:
+  normal: 60
+  hard: 30
+  expert: 10
+item_functionality:
+  normal: 60
+  hard: 30
+  expert: 10
+enemy_damage: "default"
+enemy_health: "default"
