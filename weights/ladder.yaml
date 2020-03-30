@@ -42,7 +42,8 @@ world_state:
   retro: 10
 entrance_shuffle:
   none: 60
-  crossed: 40
+  full: 20
+  crossed: 20
 boss_shuffle:
   none: 70
   full: 30
