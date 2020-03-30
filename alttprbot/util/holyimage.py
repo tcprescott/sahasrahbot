@@ -27,7 +27,7 @@ class HolyImage():
 
         try:
             image = next(item for item in i if item["slug"] == self.slug.lower() or self.slug.lower() in item.get("aliases", []) or self.slug.lower() == str(item["idx"]))
-        except StopIteration as err:
+        except (StopIteration, KeyError) as err:
             raise HolyImageNotFound('That holy image does not exist.  Check out <http://alttp.mymm1.com/holyimage/>') from err
 
         self.image = image
