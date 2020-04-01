@@ -27,6 +27,11 @@ class Audit(commands.Cog):
             return
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
+
+        # ignore these channels for reasons
+        if channel and channel.id in [694710452478803968, 694710286455930911]:
+            return
+
         if payload.message_id == self.bot.user.id:
             return
         if await config.get(guild.id, 'AuditLogging') == 'true':
