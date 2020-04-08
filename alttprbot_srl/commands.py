@@ -129,7 +129,7 @@ async def handler(target, source, message, client):
                 await client.message(target, ACCESSIBLE_RACE_WARNING)
                 post_start_message = ACCESSIBLE_RACE_WARNING
 
-            studytime = 900 if not args.studytime else args.studytime
+            studytime = 900 if args.studytime is None else args.studytime
             code = await seed.code()
             if args.silent:
                 await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
