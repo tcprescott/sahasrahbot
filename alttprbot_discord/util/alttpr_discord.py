@@ -162,7 +162,7 @@ class alttprDiscordClass(alttprClass):
             timestamp=datetime.datetime.fromisoformat(self.data['generated'])
         )
 
-        if self.data['spoiler']['meta'].get('spoilers','off') == "mystery":
+        if self.data['spoiler']['meta'].get('spoilers', 'off') == "mystery":
             embed.add_field(
                 name='Mystery Game',
                 value="No meta information is available for this game.",
@@ -174,7 +174,13 @@ class alttprDiscordClass(alttprClass):
         else:
             embed.add_field(
                 name='Settings',
-                value=f"**Logic:** {self.data['spoiler']['meta']['logic']}\n**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n**Open Tower:** {self.data['spoiler']['meta']['entry_crystals_tower']}\n**Ganon Vulnerable:** {self.data['spoiler']['meta']['entry_crystals_ganon']}\n**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
+                value=(
+                    f"**Logic:** {self.data['spoiler']['meta']['logic']}\n"
+                    f"**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n"
+                    f"**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n"
+                    f"**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n"
+                    f"**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
+                )
             )
 
         code = await self.code()

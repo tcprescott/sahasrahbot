@@ -1,6 +1,10 @@
+import datetime
 import json
 
 import discord
+import gspread_asyncio
+from oauth2client.service_account import ServiceAccountCredentials
+from pytz import timezone
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, srl_races,
@@ -8,8 +12,12 @@ from alttprbot.database import (config, spoiler_races, srl_races,
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
+from alttprbot_discord.util import alttpr_discord
+from config import Config as c
 
 from ..util import speedgaming
+
+tz = timezone('US/Eastern')
 
 WEEKDATA = {
     '1': {
@@ -48,11 +56,121 @@ WEEKDATA = {
         'preset': 'dungeons',
         'coop': True,
         'friendly_name': 'Week 7 - All Dungeons Co-op Info Share - DO NOT RECORD'
+    }
+}
+
+PLAYOFFDATA = {
+    1: {
+        'type': 'preset',
+        'preset': 'open',
+        'friendly_name': 'Playoffs Game 1 - Open'
     },
+    2: {
+        'type': 'preset',
+        'preset': 'ambrosia',
+        'friendly_name': 'Playoffs Game 2 - Ambrosia'
+    },
+    3: {
+        'type': 'gsheet',
+        'friendly_name': 'Playoffs Game 3'
+    },
+    4: {
+        'type': 'gsheet',
+        'friendly_name': 'Playoffs Game 4'
+    },
+    5: {
+        'type': 'gsheet',
+        'friendly_name': 'Playoffs Game 5'
+    }
+}
+
+SETTINGSMAP = {
+    'Standard': 'standard',
+    'Maps/Compasses': 'mc',
+    'Maps/Compasses/Small Keys': 'mcs',
+    'Keysanity': 'full',
+    'Defeat Ganon': 'ganon',
+    'Fast Ganon': 'fast_ganon',
+    'All Dungeons': 'dungeons',
+    'Open': 'open',
+    'Inverted': 'inverted',
+    'Randomized': 'randomized',
+    'Assured': 'assured',
+    'Vanilla': 'vanilla',
+    'Swordless': 'swordless'
 }
 
 class WeekNotFoundException(SahasrahBotException):
     pass
+
+class SettingsSubmissionNotFoundException(SahasrahBotException):
+    pass
+
+async def settings_sheet(episodeid):
+    sheet = SettingsSheet(episodeid)
+    await sheet._init()
+    return sheet
+
+class SettingsSheet():
+    def __init__(self, episodeid):
+        self.agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
+        self.episodeid = episodeid
+
+    async def _init(self):
+        self.agc = await self.agcm.authorize()
+        self.wb = await self.agc.open_by_key('1K3_Eccv8fG-ZPXhbX4J6bNV-9sQf9_IiJzl6ycvPtGE')
+        self.wks = await self.wb.get_worksheet(0)
+
+        self.headers = await self.wks.row_values(1)
+
+        for idx, row in enumerate(await self.wks.get_all_records()):
+            if row['SpeedGaming Episode ID'] == int(self.episodeid):
+                self.rowid = idx+2
+                self.row = row
+                return row
+        raise SettingsSubmissionNotFoundException(
+            'Settings submission not found at <https://docs.google.com/spreadsheets/d/1K3_Eccv8fG-ZPXhbX4J6bNV-9sQf9_IiJzl6ycvPtGE/edit#gid=1883794426>.  Please submit settings.')
+
+    async def write_gen_date(self):
+        date_gen_column = self.headers.index('Date Generated')+1
+        await self.wks.update_cell(row=self.rowid, col=date_gen_column, value=datetime.datetime.now(tz).isoformat())
+
+    def is_generated(self):
+        if not self.row['Date Generated'] == '':
+            return True
+        else:
+            return False
+
+    @property
+    def settings(self):
+        return {
+            "glitches": "none",
+            "item_placement": "advanced",
+            "dungeon_items": SETTINGSMAP[self.row['Dungeon Item Shuffle']],
+            "accessibility": "items",
+            "goal": SETTINGSMAP[self.row['Goal']],
+            "crystals": {
+                "ganon": '7',
+                "tower": '7',
+            },
+            "mode": SETTINGSMAP[self.row['World State']],
+            "entrances": "none",
+            "hints": "off",
+            "weapons": SETTINGSMAP[self.row['Swords']],
+            "item": {
+                "pool": "normal",
+                "functionality": "normal"
+            },
+            "tournament": True,
+            "spoilers": "off",
+            "lang": "en",
+            "enemizer": {
+                    "boss_shuffle": "none",
+                    "enemy_shuffle": "none",
+                    "enemy_damage": "default",
+                    "enemy_health": "default"
+            }
+        }
 
 async def league_race(episodeid: int, week=None):
     race = LeagueRace(episodeid, week)
@@ -71,29 +189,49 @@ class LeagueRace():
         if self.week is None:
             self.week = await config.get(guild_id, 'AlttprLeagueWeek')
 
-        if self.week not in WEEKDATA:
+        if self.week not in WEEKDATA and not self.week == 'playoffs':
             raise WeekNotFoundException(f'Week {self.week} was not found!')
 
         self.episode = await speedgaming.get_episode(self.episodeid)
-        self.type = WEEKDATA[self.week]['type']
-        self.friendly_name = WEEKDATA[self.week]['friendly_name']
-        self.spoiler_log_url = None
 
-        if self.type == 'preset':
-            self.preset = WEEKDATA[self.week]['preset']
-            self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
-            self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'unknown')}"
-        elif self.type == 'mystery':
-            self.weightset = WEEKDATA[self.week]['weightset']
-            self.seed = await mystery.generate_random_game(weightset=self.weightset, spoilers="mystery", tournament=True)
-            self.goal_after_start = f"vt8 randomizer - mystery {self.weightset}"
-        elif self.type == 'spoiler':
-            self.preset = WEEKDATA[self.week]['preset']
-            self.studyperiod = WEEKDATA[self.week]['studyperiod']
-            self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
-            self.goal_after_start = f"vt8 randomizer - spoiler {self.preset_dict.get('goal_name', 'unknown')}"
+        if self.week == 'playoffs':
+            sheet_settings = await settings_sheet(self.episodeid)
+            self.type = PLAYOFFDATA[sheet_settings.row['Game Number']]['type']
+            self.friendly_name = PLAYOFFDATA[sheet_settings.row['Game Number']]['friendly_name']
+            self.spoiler_log_url = None
+
+            if self.type == 'preset':
+                self.preset = PLAYOFFDATA[sheet_settings.row['Game Number']]['preset']
+                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
+                self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'unknown')}"
+            elif self.type == 'gsheet':
+                self.preset = None
+                self.preset_dict = None
+                self.seed = await alttpr_discord.alttpr(
+                    settings=sheet_settings.settings
+                )
+                self.goal_after_start = f"vt8 randomizer - league playoff"
+            await sheet_settings.write_gen_date()
         else:
-            raise SahasrahBotException('Week type not found, something went horribly wrong...')
+            self.type = WEEKDATA[self.week]['type']
+            self.friendly_name = WEEKDATA[self.week]['friendly_name']
+            self.spoiler_log_url = None
+
+            if self.type == 'preset':
+                self.preset = WEEKDATA[self.week]['preset']
+                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
+                self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'unknown')}"
+            elif self.type == 'mystery':
+                self.weightset = WEEKDATA[self.week]['weightset']
+                self.seed = await mystery.generate_random_game(weightset=self.weightset, spoilers="mystery", tournament=True)
+                self.goal_after_start = f"vt8 randomizer - mystery {self.weightset}"
+            elif self.type == 'spoiler':
+                self.preset = WEEKDATA[self.week]['preset']
+                self.studyperiod = WEEKDATA[self.week]['studyperiod']
+                self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
+                self.goal_after_start = f"vt8 randomizer - spoiler {self.preset_dict.get('goal_name', 'unknown')}"
+            else:
+                raise SahasrahBotException('Week type not found, something went horribly wrong...')
 
     def get_player_discords(self):
         player_list = []
@@ -208,3 +346,8 @@ async def process_league_race_finish(target, client):
         srl_id=srl_id,
         results_json=json.dumps(srl_race['entrants'])
     )
+
+def get_creds():
+    return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
+                                                            ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
+                                                             'https://www.googleapis.com/auth/spreadsheets'])
