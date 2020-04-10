@@ -1,0 +1,27 @@
+---
+goal_name: "open beatable 0/0 fast ganon"
+customizer: false
+settings:
+  goal: fast_ganon
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: open
+  hints: 'off'
+  weapons: assured
+  crystals:
+    ganon: '0'
+    tower: '0'
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: none
+  dungeon_items: standard
+  item_placement: basic
