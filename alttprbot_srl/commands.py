@@ -8,7 +8,6 @@ from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, srl_races,
                                 tournament_results)
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.smz3gen import spoilers as smz3_spoilers
 from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
 
@@ -38,26 +37,31 @@ async def handler(target, source, message, client):
             raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
-            seed, preset_dict = await preset.get_preset(args.preset, hints=args.hints, spoilers="off")
-            goal = f"vt8 randomizer - {preset_dict['goal_name']}"
+            randomizer = 'alttpr'
+        elif srl['game']['abbrev'] == 'alttpsm':
+            randomizer = 'smz3'
+        elif srl['game']['abbrev'] == 'smhacks':
+            randomizer = 'sm'
+        else:
+            raise SahasrahBotException("This game is not yet supported.")
+
+        seed, preset_dict = await preset.get_preset(args.preset, randomizer=randomizer, hints=args.hints, spoilers="off")
+        goal = preset_dict['goal_name']
+        if srl['game']['abbrev'] == 'alttphacks':
             if args.accessible and seed.data['spoiler']['meta']['logic'] == 'NoGlitches':
                 goal = f"{goal} - accessible ruleset"
                 await client.message(target, ACCESSIBLE_RACE_WARNING)
                 post_start_message = ACCESSIBLE_RACE_WARNING
-            code = await seed.code()
-            if args.silent:
-                await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
-            else:
-                await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-        elif srl['game']['abbrev'] == 'alttpsm':
-            seed, preset_dict = await preset.get_preset(args.preset, randomizer='smz3')
-            goal = preset_dict['goal_name']
-            if args.silent:
-                await client.message(target, f"{goal} - {args.preset} - {seed.url}")
-            else:
-                await client.message(target, f".setgoal {goal} - {args.preset} - {seed.url}")
+        
+        pre_race_goal = goal
+        pre_race_goal += f" - {seed.url}"
+        if seed.code is not None:
+            pre_race_goal += f" - ({'/'.join(seed.code)})" if isinstance(seed.code, list) else f" - ({seed.code})"
+
+        if args.silent:
+            await client.message(target, pre_race_goal)
         else:
-            raise SahasrahBotException("This game is not yet supported.")
+            await client.message(target, f".setgoal {pre_race_goal}")
 
         await srl_races.insert_srl_race(srl_id, goal, post_start_message)
 
@@ -81,8 +85,6 @@ async def handler(target, source, message, client):
                 festive=festive
             )
 
-            code = await seed.code()
-
             if festive:
                 goal = f"vt8 randomizer - festive {mode} {args.weightset} - DO NOT RECORD"
             else:
@@ -94,9 +96,9 @@ async def handler(target, source, message, client):
                 post_start_message = ACCESSIBLE_RACE_WARNING
 
             if args.silent:
-                await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+                await client.message(target, f"{goal} - {seed.url} - ({'/'.join(seed.code)})")
             else:
-                await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
+                await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(seed.code)})")
         else:
             raise SahasrahBotException("This game is not yet supported.")
 
@@ -130,24 +132,10 @@ async def handler(target, source, message, client):
                 post_start_message = ACCESSIBLE_RACE_WARNING
 
             studytime = 900 if args.studytime is None else args.studytime
-            code = await seed.code()
             if args.silent:
-                await client.message(target, f"{goal} - {seed.url} - ({'/'.join(code)})")
+                await client.message(target, f"{goal} - {seed.url} - ({'/'.join(seed.code)})")
             else:
-                await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(code)})")
-            await client.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
-        elif srl['game']['abbrev'] == 'alttpsm':
-            seed, spoiler_log_url = await smz3_spoilers.generate_spoiler_game(args.preset)
-
-            if seed is None:
-                raise SahasrahBotException("That preset does not exist.  For documentation on using this bot, visit https://sahasrahbot.synack.live")
-
-            goal = f"spoiler beat the games"
-            studytime = 1500 if not args.studytime else args.studytime
-            if args.silent:
-                await client.message(target, f"{goal} - {seed.url}")
-            else:
-                await client.message(target, f".setgoal {goal} - {seed.url}")
+                await client.message(target, f".setgoal {goal} - {seed.url} - ({'/'.join(seed.code)})")
             await client.message(target, f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
         else:
             await client.message(target, "This game is not yet supported.")

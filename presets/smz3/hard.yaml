@@ -1,17 +1,11 @@
 randomizer: 'smz3'
 goal_name: beat the games
-use_new: False
 settings:
-    logic: NoMajorGlitches
-    sm_logic: Tournament
-    difficulty: normal
-    variation: combo
-    mode: open
-    goal: ganon
-    weapons: ''
-    morph: randomized
-    heart_speed: half
-    sram_trace: 'false'
-    menu_speed: normal
-    debug: False
-    tournament: True
+    smlogic: hard
+    goal: defeatboth
+    swordlocation: randomized
+    morphlocation: randomized
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"

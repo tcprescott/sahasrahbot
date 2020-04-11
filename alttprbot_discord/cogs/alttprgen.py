@@ -263,7 +263,7 @@ class AlttprGen(commands.Cog):
                 if not parsed.get('hash id', 'none') == 'none':
                     seed = await pyz3r.alttpr(hash_id=parsed.get('hash id', 'none'))
                     embed.add_field(name='File Select Code', value=await build_file_select_code(
-                        code=await seed.code(),
+                        code=seed.code,
                         emojis=ctx.bot.emojis
                     ), inline=False)
                     embed.add_field(name='Permalink', value=seed.url, inline=False)
