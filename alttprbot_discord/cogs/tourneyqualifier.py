@@ -161,7 +161,7 @@ class TournamentQualifier(commands.Cog):
             emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-        await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(await seed.code()))
+        await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(seed.code))
         await send_irc_message(raceid, 'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
         await gsheet_qualifier_start(race=race, date=date)
         for multi in build_multistream_links(race):

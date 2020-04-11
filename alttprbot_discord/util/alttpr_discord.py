@@ -131,8 +131,7 @@ class alttprDiscordClass(alttprClass):
                 ),
                 inline=True)
 
-        code = await self.code()
-        embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
+        embed.add_field(name='File Select Code', value=await build_file_select_code(self.code, emojis=emojis), inline=False)
 
         embed.add_field(name='Permalink', value=self.url, inline=False)
 
@@ -183,8 +182,7 @@ class alttprDiscordClass(alttprClass):
                 )
             )
 
-        code = await self.code()
-        embed.add_field(name='File Select Code', value=await build_file_select_code(code, emojis=emojis), inline=False)
+        embed.add_field(name='File Select Code', value=await build_file_select_code(self.code, emojis=emojis), inline=False)
 
         embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed

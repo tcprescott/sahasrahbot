@@ -2,7 +2,6 @@ from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.preset import get_preset
-from alttprbot.smz3gen.spoilers import generate_spoiler_game
 from ..util import checks
 
 
@@ -20,16 +19,10 @@ class smz3gen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def preset(self, ctx, preset):
         seed, preset_dict = await get_preset(preset, randomizer='smz3')
-        await ctx.send(f'Permalink: {seed.url}')
-
-
-    @smz3gen.command()
-    @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
-    async def spoiler(self, ctx, preset):
-        seed, spoiler_log_url = await generate_spoiler_game(preset)
-        if not seed:
-            raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
-        await ctx.send(f'Permalink: {seed.url}\nSpoiler log <{spoiler_log_url}>')
+        await ctx.send((
+                f'Permalink: {seed.url}\n'
+                f'Code: {seed.code}'
+            ))
 
 
 def setup(bot):
