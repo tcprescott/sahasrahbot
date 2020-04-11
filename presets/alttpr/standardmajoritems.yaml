@@ -1,5 +1,5 @@
 customizer: true
-goal_name: vt8 randomizer - standard major item shuffle
+goal_name: standard major item shuffle
 settings:
   accessibility: items
   crystals:

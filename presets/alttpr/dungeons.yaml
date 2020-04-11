@@ -1,5 +1,5 @@
 ---
-goal_name: vt8 randomizer - open all dungeons
+goal_name: open all dungeons
 customizer: false
 settings:
   goal: dungeons

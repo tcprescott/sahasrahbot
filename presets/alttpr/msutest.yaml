@@ -1,5 +1,5 @@
 ---
-goal_name: "vt8 randomizer - msu1 testing do not race this unless you're a silly goose"
+goal_name: "msu1 testing do not race this unless you're a silly goose"
 customizer: True
 shuffle_prize_packs: false
 settings:

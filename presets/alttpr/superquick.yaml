@@ -1,5 +1,5 @@
 ---
-goal_name: "vt8 randomizer - open beatable 0/0 fast ganon"
+goal_name: "open beatable 0/0 fast ganon"
 customizer: false
 settings:
   goal: fast_ganon

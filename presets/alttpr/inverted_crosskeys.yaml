@@ -1,5 +1,5 @@
 ---
-goal_name: "vt8 randomizer - inverted keysanity + entrance shuffle"
+goal_name: "inverted keysanity + entrance shuffle"
 customizer: false
 settings:
   goal: fast_ganon

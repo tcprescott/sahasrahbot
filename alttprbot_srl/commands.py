@@ -54,6 +54,10 @@ async def handler(target, source, message, client):
                 post_start_message = ACCESSIBLE_RACE_WARNING
         
         pre_race_goal = goal
+        if srl['game']['abbrev'] == 'alttphacks':
+            pre_race_goal = f'vt8 randomizer - {pre_race_goal}'
+            goal = f'vt8 randomizer - {goal}'
+
         pre_race_goal += f" - {seed.url}"
         if seed.code is not None:
             pre_race_goal += f" - ({'/'.join(seed.code)})" if isinstance(seed.code, list) else f" - ({seed.code})"
