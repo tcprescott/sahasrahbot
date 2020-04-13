@@ -55,7 +55,7 @@ WEEKDATA = {
         'type': 'preset',
         'preset': 'dungeons',
         'coop': True,
-        'friendly_name': 'Week 7 - All Dungeons Co-op Info Share - DO NOT RECORD'
+        'friendly_name': 'Week 7 - All Dungeons Co-op Info Share'
     }
 }
 
@@ -232,6 +232,9 @@ class LeagueRace():
                 self.goal_after_start = f"vt8 randomizer - spoiler {self.preset_dict.get('goal_name', 'unknown')}"
             else:
                 raise SahasrahBotException('Week type not found, something went horribly wrong...')
+
+            if WEEKDATA[self.week].get('coop', False):
+                self.goal_after_start += ' - DO NOT RECORD'
 
     def get_player_discords(self):
         player_list = []
