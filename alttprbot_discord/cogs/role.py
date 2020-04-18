@@ -55,7 +55,7 @@ class Role(commands.Cog):
                 await member.remove_roles(role_obj, reason="Removed by message reaction.")
 
     @commands.group(aliases=['rr'])
-    @commands.has_permissions(manage_roles=True)
+    @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactionrole(self, ctx):
         pass
 
@@ -97,7 +97,7 @@ class Role(commands.Cog):
         await ctx.send(embed=embed_formatter.reaction_role_list(ctx, roles))
 
     @commands.group(aliases=['rg'])
-    @commands.has_permissions(manage_roles=True)
+    @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactiongroup(self, ctx):
         pass
 
