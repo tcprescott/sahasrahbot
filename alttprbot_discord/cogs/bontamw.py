@@ -19,7 +19,7 @@ class BontaMultiworld(commands.Cog):
     @commands.command(
         help=('Host a multiworld using an attached multidata file from Bonta\'s multiworld implementation.\n'
               'The multidata file that is attached must be from the multiworld_31 branch or another compatible implementation, such as Berserker\'s MultiWorld Utilities.\n\n'
-              'The racemode option, when enabled, disables hints, forfeting, and cheat commands.\n\n'
+              'The racemode option, when enabled, disables hints, forfeiting, and cheat commands.\n\n'
               'Returns a "token" that can be used with the $mwmsg command to send commands to the server console.\n\n'
               'Warning: Games are automatically closed after 24 hours.  If you require more time than that, you may re-open the game using $mwresume'
         ),
