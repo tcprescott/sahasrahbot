@@ -203,7 +203,7 @@ class LeagueRace():
             if self.type == 'preset':
                 self.preset = PLAYOFFDATA[sheet_settings.row['Game Number']]['preset']
                 self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
-                self.goal_after_start = f"{self.preset_dict.get('goal_name', 'vt8 randomizer - misc')}"
+                self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'vt8 randomizer - misc')}"
             elif self.type == 'gsheet':
                 self.preset = None
                 self.preset_dict = None
