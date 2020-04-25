@@ -74,7 +74,7 @@ async def on_command_error(ctx, error):
 #                await ctx.send(f'Something happened that should not have happened. {appinfo.owner.mention}')
 #            except discord.errors.HTTPException:
 #                pass
-            await ctx.send(f"```{error_to_display}```")
+            await ctx.send(f"```{repr(error_to_display)}```")
             raise error_to_display
         else:
             await ctx.send(error_to_display)

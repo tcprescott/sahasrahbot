@@ -61,8 +61,8 @@ class BontaMultiworld(commands.Cog):
     async def mwmsg(self, ctx, token, msg):
         result = await http.request_generic(url=f'http://localhost:5000/game/{token}', method='get', returntype='json')
 
-        if not result['admin'] == ctx.author.id and not token=='rrv9m4':
-            raise SahasrahBotException('You must be the creater of the game to send messages to it.')
+        if not result['admin'] == ctx.author.id and not (token == 'v40la3' and msg.startswith('/kick ')):
+            raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
         data = {
             'msg': msg
