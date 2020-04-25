@@ -59,6 +59,9 @@ class alttprDiscordClass(alttprClass):
         settings_list = []
         meta = self.data['spoiler']['meta']
 
+        if meta['spoilers'] == 'mystery':
+            return 'mystery'
+
         settings = {
             'mode': meta.get('mode', 'open'),
             'weapons': meta.get('weapons', 'randomized'),
