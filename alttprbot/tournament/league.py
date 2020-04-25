@@ -210,7 +210,7 @@ class LeagueRace():
                 self.seed = await alttpr_discord.alttpr(
                     settings=sheet_settings.settings
                 )
-                self.goal_after_start = f"vt8 randomizer - league playoff"
+                self.goal_after_start = f"vt8 randomizer - {self.seed.generated_goal}"
             await sheet_settings.write_gen_date()
         else:
             self.type = WEEKDATA[self.week]['type']

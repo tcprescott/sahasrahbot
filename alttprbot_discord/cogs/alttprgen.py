@@ -14,7 +14,7 @@ from alttprbot.alttprgen.preset import get_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import build_file_select_code
+from alttprbot_discord.util.alttpr_discord import alttpr
 
 from ..util import checks
 
@@ -25,6 +25,15 @@ from ..util import checks
 class AlttprGen(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    @commands.is_owner()
+    async def goalstring(self, ctx, hash_id):
+        seed = await alttpr(hash_id=hash_id)
+        await ctx.send(
+            f"goal string: `{seed.generated_goal}`\n"
+            f"file select code: {seed.build_file_select_code(emojis=self.bot.emojis)}"
+        )
 
     @commands.command(
         brief='Generate a race preset.',
@@ -261,9 +270,8 @@ class AlttprGen(commands.Cog):
                     )
                 )
                 if not parsed.get('hash id', 'none') == 'none':
-                    seed = await pyz3r.alttpr(hash_id=parsed.get('hash id', 'none'))
-                    embed.add_field(name='File Select Code', value=await build_file_select_code(
-                        code=seed.code,
+                    seed = await alttpr(hash_id=parsed.get('hash id', 'none'))
+                    embed.add_field(name='File Select Code', value=seed.build_file_select_code(
                         emojis=ctx.bot.emojis
                     ), inline=False)
                     embed.add_field(name='Permalink', value=seed.url, inline=False)
