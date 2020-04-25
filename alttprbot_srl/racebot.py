@@ -6,8 +6,9 @@ import ircmessage
 
 from alttprbot.database import spoiler_races, srl_races
 from alttprbot.tournament import league
-from alttprbot.util.srl import srl_race_id
-from alttprbot_srl import alt_hunter, discord_integration
+from alttprbot.util.srl import get_race, srl_race_id
+from alttprbot_srl import alt_hunter, discord_integration, spoilers
+from alttprbot_discord.util import alttpr_discord
 from config import Config as c
 
 starting = re.compile(
@@ -19,6 +20,9 @@ runnerdone = re.compile(
     "(.*) (has forfeited from the race\.|has finished in .* place with a time of [0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.)")
 racedone = re.compile(
     "^Status: Complete \| Game: .*$"
+)
+permalink = re.compile(
+    ".*https://alttpr\.com/.?.?.?h/([A-Za-z0-9]{10}).*"
 )
 
 srl_game_whitelist = [
@@ -40,55 +44,52 @@ async def handler(target, source, message, client):
     srl_id = srl_race_id(target)
 
     if target == '#speedrunslive':
-        result = newroom.search(message)
-        if result and result.group(1) in srl_game_whitelist:
-            if not c.DEBUG:
-                await asyncio.sleep(1)
-                await client.join(result.group(2))
-                await asyncio.sleep(60)
-                await client.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live")
-            else:
-                print(f'would have joined {result.group(2)}')
+        asyncio.create_task(join_srl_room(client, message))
 
     if target.startswith('#srl-'):
         if starting.match(message) or message == 'test starting':
-            race = await srl_races.get_srl_race_by_id(srl_id)
-            if race:
-                if not client.in_channel(target):
-                    await client.join(target)
-                await client.message(target, f".setgoal {race['goal']}")
-                if race['message'] is not None:
-                    await asyncio.sleep(15)
-                    await client.message(target, race['message'])
-                await srl_races.delete_srl_race(srl_id)
+            asyncio.create_task(set_goal(srl_id, client, target))
 
         if go.match(message) or message == 'test go':
-            # spoilers
-            race = await spoiler_races.get_spoiler_race_by_id(srl_id)
-            if race:
-                await client.message(target, 'Sending spoiler log...')
-                await client.message(target, '---------------')
-                await client.message(target, f"This race\'s spoiler log: {race['spoiler_url']}")
-                await client.message(target, '---------------')
-                await client.message(target, 'GLHF! :mudora:')
-                await countdown_timer(
-                    ircbot=client,
-                    duration_in_seconds=race['studytime'],
-                    srl_channel=target,
-                    beginmessage=True,
-                )
-                await spoiler_races.delete_spoiler_race(srl_id)
-
-            await discord_integration.discord_race_start(srl_id)
-            await alt_hunter.check_race(srl_id)
+            asyncio.create_task(spoilers.send_spoiler_log(srl_id, client, target))
+            asyncio.create_task(discord_integration.discord_race_start(srl_id))
+            asyncio.create_task(alt_hunter.check_race(srl_id))
 
         if message == 'test complete':
             await topic_change_handler(target, source, message, client)
 
         result = runnerdone.search(message)
         if result:
-            await discord_integration.discord_race_finish(result.group(1), srl_id)
+            asyncio.create_task(discord_integration.discord_race_finish(result.group(1), srl_id))
 
+async def join_srl_room(client, message):
+    result = newroom.search(message)
+    if result and result.group(1) in srl_game_whitelist:
+        if not c.DEBUG:
+            await asyncio.sleep(1)
+            await client.join(result.group(2))
+            await asyncio.sleep(60)
+            await client.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live")
+        else:
+            print(f'would have joined {result.group(2)}')
+
+async def set_goal(srl_id, client, target):
+    race = await srl_races.get_srl_race_by_id(srl_id)
+    if race:
+        if not client.in_channel(target):
+            await client.join(target)
+        await client.message(target, f".setgoal {race['goal']}")
+        if race['message'] is not None:
+            await asyncio.sleep(15)
+            await client.message(target, race['message'])
+        await srl_races.delete_srl_race(srl_id)
+    else:
+        srl = await get_race(srl_id)
+        if srl['game']['abbrev'] == 'alttphacks':
+            result = permalink.match(srl['goal'])
+            if result is not None:
+                seed = await alttpr_discord.alttpr(hash_id=result.group(1))
+                await client.message(target, f".setgoal vt8 randomizer - {seed.generated_goal}")
 
 async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage=False):
     loop = asyncio.get_running_loop()
