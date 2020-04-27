@@ -69,6 +69,9 @@ class BontaMultiworld(commands.Cog):
         }
         response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data, returntype='json')
 
+        if response.get('success', True) is False:
+            raise SahasrahBotException(response.get('error', 'Unknown error occured while processing message.'))
+
         if 'resp' in response and response['resp'] is not None:
             await ctx.send(response['resp'])
 
