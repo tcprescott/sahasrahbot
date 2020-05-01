@@ -19,20 +19,20 @@ class BontaMultiworld(commands.Cog):
     @commands.command(
         help=('Host a multiworld using an attached multidata file from Bonta\'s multiworld implementation.\n'
               'The multidata file that is attached must be from the multiworld_31 branch or another compatible implementation, such as Berserker\'s MultiWorld Utilities.\n\n'
-              'The racemode option, when enabled, disables hints, forfeiting, and cheat commands.\n\n'
+              'The use_server_options option, when enabled, will use the server_options embedded in the multidata file, if it exists.\n\n'
               'Returns a "token" that can be used with the $mwmsg command to send commands to the server console.\n\n'
               'Warning: Games are automatically closed after 24 hours.  If you require more time than that, you may re-open the game using $mwresume'
         ),
         brief='Host a multiworld using Bonta\'s multiworld implementation.'
     )
-    async def mwhost(self, ctx, racemode: bool = False):
+    async def mwhost(self, ctx, use_server_options: bool = False):
         if not ctx.message.attachments:
             raise SahasrahBotException('Must attach a multidata file.')
 
         data = {
             'multidata_url': ctx.message.attachments[0].url,
             'admin': ctx.author.id,
-            'racemode': racemode,
+            'use_server_options': use_server_options,
             'meta': {
                 'channel': None if isinstance(ctx.channel, discord.DMChannel) else ctx.channel.name,
                 'guild': ctx.guild.name if ctx.guild else None,
@@ -83,12 +83,12 @@ class BontaMultiworld(commands.Cog):
         ),
         brief='Resume a multiworld that was previously closed.'
     )
-    async def mwresume(self, ctx, token, port, racemode: bool = False):
+    async def mwresume(self, ctx, token, port, use_server_options: bool=False):
         data = {
             'token': token,
             'port': port,
             'admin': ctx.author.id,
-            'racemode': racemode,
+            'use_server_options': use_server_options
             'meta': {
                 'channel': None if isinstance(ctx.channel, discord.DMChannel) else ctx.channel.name,
                 'guild': ctx.guild.name if ctx.guild else None,
