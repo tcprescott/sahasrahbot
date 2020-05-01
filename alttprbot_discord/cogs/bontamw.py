@@ -88,7 +88,7 @@ class BontaMultiworld(commands.Cog):
             'token': token,
             'port': port,
             'admin': ctx.author.id,
-            'use_server_options': use_server_options
+            'use_server_options': use_server_options,
             'meta': {
                 'channel': None if isinstance(ctx.channel, discord.DMChannel) else ctx.channel.name,
                 'guild': ctx.guild.name if ctx.guild else None,
