@@ -8,7 +8,7 @@ from pytz import timezone
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, srl_races,
-                                tournament_results)
+                                tournament_results, twitch_command_text)
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
@@ -194,6 +194,7 @@ class LeagueRace():
 
         self.episode = await speedgaming.get_episode(self.episodeid)
 
+
         if self.week == 'playoffs':
             sheet_settings = await settings_sheet(self.episodeid)
             self.type = PLAYOFFDATA[sheet_settings.row['Game Number']]['type']
@@ -204,6 +205,7 @@ class LeagueRace():
                 self.preset = PLAYOFFDATA[sheet_settings.row['Game Number']]['preset']
                 self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
                 self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'vt8 randomizer - misc')}"
+                self.twitch_mode_command = f"The preset for this race is {self.preset}!  It is game number {sheet_settings.row['Game Number']} of this series."
             elif self.type == 'gsheet':
                 self.preset = None
                 self.preset_dict = None
@@ -211,11 +213,13 @@ class LeagueRace():
                     settings=sheet_settings.settings
                 )
                 self.goal_after_start = f"vt8 randomizer - {self.seed.generated_goal}"
+                self.twitch_mode_command = f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {sheet_settings.row['Game Number']} of this series."
             await sheet_settings.write_gen_date()
         else:
             self.type = WEEKDATA[self.week]['type']
             self.friendly_name = WEEKDATA[self.week]['friendly_name']
             self.spoiler_log_url = None
+            self.twitch_mode_command = "THIS IS A PLACEHOLDER DO SOMETHING HERE"
 
             if self.type == 'preset':
                 self.preset = WEEKDATA[self.week]['preset']
@@ -301,6 +305,9 @@ async def process_league_race(target, args, client):
 
 
     broadcast_channels = [a['name'] for a in generated_league_race.episode['channels'] if not a['name'] == 'No Stream']
+
+    for channel in broadcast_channels:
+        await twitch_command_text.insert_command_text(channel.lower(), "mode", generated_league_race.twitch_mode_command)
 
     if len(broadcast_channels) > 0:
         tournament_embed.insert_field_at(

@@ -12,6 +12,7 @@ twitchbot = commands.Bot(
 )
 
 twitchbot.load_module('alttprbot_twitch.cogs.gtbk')
+twitchbot.load_module('alttprbot_twitch.cogs.league')
 
 @twitchbot.event
 async def event_command_error(ctx, error):
