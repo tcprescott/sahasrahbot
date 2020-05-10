@@ -142,8 +142,8 @@ def make_embed(multiworld):
     )
     embed.add_field(name="Game Token", value=multiworld['token'], inline=False)
     embed.add_field(name="Host", value=f"{c.MultiworldHostBase}:{multiworld['port']}", inline=False)
-    if len(multiworld.get('players', [])) < 50:
-        for idx, team in enumerate(multiworld.get('players', []), start=1):
+    for idx, team in enumerate(multiworld.get('players', []), start=1):
+        if len(team) < 50:
             embed.add_field(name=f"Team #{idx}", value='\n'.join(team))
 
     return embed
