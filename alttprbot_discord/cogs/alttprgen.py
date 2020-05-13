@@ -317,6 +317,33 @@ class AlttprGen(commands.Cog):
         else:
             raise SahasrahBotException("You must attach an SRAM file.")
 
+    @commands.command(
+        brief='Make a SahasrahBot preset file from a customizer save.',
+        help=(
+            'Take a customizer settings save and create a SahasrahBot preset file from it.\n'
+            'This can then be fed into SahasrahBot using the "$preset custom" command.\n\n'
+        )
+    )
+    async def convertcustomizer(self, ctx):
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            customizer_save = json.loads(content)
+            settings = pyz3r.customizer.convert2settings(customizer_save)
+            preset_dict = {
+                'customizer': True,
+                'goal_name': "REPLACE WITH SRL GOAL STRING",
+                'randomizer': 'alttpr',
+                'settings': settings
+            }
+            await ctx.send(
+                file=discord.File(
+                    io.StringIO(yaml.dump(preset_dict)),
+                    filename=f"output.yaml"
+                )
+            )
+        else:
+            raise SahasrahBotException("You must supply a valid yaml file.")
+
 async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off", festive=False):
     seed = await generate_random_game(
         weightset=weightset,
