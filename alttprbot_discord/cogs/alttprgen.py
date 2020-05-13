@@ -10,7 +10,7 @@ from z3rsramr import parse_sram
 import pyz3r
 from alttprbot.alttprgen.mystery import (generate_random_game,
                                          generate_test_game)
-from alttprbot.alttprgen.preset import get_preset
+from alttprbot.alttprgen.preset import get_preset, fetch_preset, generate_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
@@ -35,9 +35,11 @@ class AlttprGen(commands.Cog):
             f"file select code: {seed.build_file_select_code(emojis=self.bot.emojis)}"
         )
 
-    @commands.command(
+    @commands.group(
         brief='Generate a race preset.',
-        help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets'
+        help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets',
+        invoke_without_command=True,
+        aliases=['racepreset']
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def preset(self, ctx, preset, hints=False):
@@ -48,9 +50,27 @@ class AlttprGen(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-    @commands.command(
+    @preset.command(
+        name='custom',
+        brief='Generate a custom preset.',
+        help='Generate a custom preset.  This file should be attached to the message.'
+    )
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def preset_custom(self, ctx, tournament: bool = True):
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            preset_dict = yaml.safe_load(content)
+            seed = await generate_preset(preset_dict, preset='custom', spoilers="off", tournament=True)
+        else:
+            raise SahasrahBotException("You must supply a valid yaml file.")
+        embed = await seed.embed(emojis=self.bot.emojis)
+        await ctx.send(embed=embed)
+
+    @commands.group(
         brief='Generate a preset without the race flag enabled.',
-        help='Generate a preset without the race flag enabled.  Find a list of presets at https://l.synack.live/presets'
+        help='Generate a preset without the race flag enabled.  Find a list of presets at https://l.synack.live/presets',
+        invoke_without_command=True,
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def nonracepreset(self, ctx, preset, hints=False):
@@ -58,6 +78,23 @@ class AlttprGen(commands.Cog):
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
+        embed = await seed.embed(emojis=self.bot.emojis)
+        await ctx.send(embed=embed)
+
+    @nonracepreset.command(
+        name='custom',
+        brief='Generate a custom preset.',
+        help='Generate a custom preset.  This file should be attached to the message.'
+    )
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def nonracepreset_custom(self, ctx, tournament: bool = True):
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            preset_dict = yaml.safe_load(content)
+            seed = await generate_preset(preset_dict, preset='custom', spoilers="on", tournament=True)
+        else:
+            raise SahasrahBotException("You must supply a valid yaml file.")
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 

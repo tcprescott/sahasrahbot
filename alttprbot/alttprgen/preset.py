@@ -12,11 +12,16 @@ from alttprbot_discord.util.alttpr_discord import alttpr
 class PresetNotFoundException(SahasrahBotException):
     pass
 
-
+# this is until I port the existing code over to the new fetch_preset and generate_preset coroutines, or do something else that isn't as terrible
 async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournament=True, randomizer='alttpr'):
+    preset_dict = await fetch_preset(preset, randomizer)
+    seed = await generate_preset(preset_dict, preset=preset, hints=hints, nohints=nohints, spoilers=spoilers, tournament=tournament)
+    return seed, preset_dict
+
+async def fetch_preset(preset, randomizer='alttpr'):
     # make sure someone isn't trying some path traversal shennaniganons
     basename = os.path.basename(f'{preset}.yaml')
-    
+
     try:
         async with aiofiles.open(os.path.join(f"presets/{randomizer}", basename)) as f:
             preset_dict = yaml.safe_load(await f.read())
@@ -27,7 +32,12 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
         raise PresetNotFoundException(
             f'Could not find preset {preset}.  See a list of available presets at <https://l.synack.live/presets>') from err
 
-    if preset_dict.get('randomizer', randomizer) == 'alttpr':
+    return preset_dict
+
+async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, spoilers="off", tournament=True):
+    randomizer = preset_dict.get('randomizer', 'alttpr')
+
+    if randomizer == 'alttpr':
         if hints:
             preset_dict['settings']['hints'] = 'on'
         elif nohints:
@@ -42,7 +52,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
             settings=preset_dict['settings']
         )
         hash_id = seed.hash
-    elif preset_dict.get('randomizer', randomizer) in ['sm', 'smz3']:
+    elif randomizer in ['sm', 'smz3']:
         preset_dict['settings']['race'] = "true" if tournament else "false"
         seed = await pyz3r.sm(
             randomizer=randomizer,
@@ -61,4 +71,4 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
         genoption=preset,
         customizer=1 if preset_dict.get('customizer', False) else 0
     )
-    return seed, preset_dict
+    return seed
