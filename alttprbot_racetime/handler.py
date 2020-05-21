@@ -89,7 +89,7 @@ class AlttprHandler(RaceHandler):
             studytime = preset_dict.get('studytime', 900)
 
         await self.set_raceinfo(f"spoiler {preset_dict.get('goal_name', 'unknown')} - {seed.url} - ({'/'.join(seed.code)})")
-        await self.send_message(f"The spoiler log for this race will be sent after the race begins in SRL.  A {studytime}s countdown timer at that time will begin.")
+        await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, studytime)
         self.seed_rolled = True
 
