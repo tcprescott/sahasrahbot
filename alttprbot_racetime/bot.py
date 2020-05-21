@@ -25,6 +25,14 @@ class AlttprBot(Bot):
     def get_handler_class(self):
         return AlttprHandler
 
+    def get_handler_kwargs(self, ws_conn, state):
+        return {
+            'conn': ws_conn,
+            'logger': self.logger,
+            'state': state,
+            'command_prefix': c.RACETIME_COMMAND_PREFIX,
+        }
+
     async def start(self):
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
