@@ -136,7 +136,7 @@ customizer:
       True: 50
       False: 50
     rom.timerMode:
-      "countdown-ohko": 5
+      # "countdown-ohko": 5
       "off": 95
     rom.rupeeBow:
       True: 10
