@@ -5,16 +5,24 @@ customizer:
     pool: [30, 70]
     min_difference: 10
   timed-ohko:
-    timerStart: [900, 1200]
+    forced_settings:
+      item_placement: basic
+      item_functionality: normal
+      enemizer:
+        enemy_damage: default
+        enemy_health: default
+        boss_shuffle: none
+        enemy_shuffle: none
+    timerStart: [900, 1800]
     clock:
       GreenClock:
         value: [60, 120]
-        pool: [1, 10]
+        pool: [10, 20]
       BlueClock:
-        value: [180, 300]
-        pool: [1, 10]
+        value: [120, 300]
+        pool: [5, 15]
       RedClock:
-        value: [-60, 60]
+        value: [-120, 0]
         pool: [1, 5]
   custom:
     customPrizePacks:
