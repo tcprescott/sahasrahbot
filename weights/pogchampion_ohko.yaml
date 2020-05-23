@@ -81,6 +81,14 @@ enemy_health:
   expert: 20
 customizer:
   timed-ohko:
+    forced_settings:
+      item_placement: basic
+      item_functionality: normal
+      enemizer:
+        enemy_damage: default
+        enemy_health: default
+        boss_shuffle: none
+        enemy_shuffle: none
     timerStart: [900, 1800]
     clock:
       GreenClock:
