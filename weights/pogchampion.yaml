@@ -100,7 +100,7 @@ customizer:
     clock:
       GreenClock:
         value: [180, 300]
-        pool: [8, 12]
+        pool: [12, 16]
       BlueClock:
         value: [300, 600]
         pool: [0, 2]
