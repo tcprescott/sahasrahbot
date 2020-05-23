@@ -1,9 +1,5 @@
 description: This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Two winner Bonta.
-glitches_required:
-  none: 100
-  overworld_glitches: 0
-  major_glitches: 0
-  no_logic: 0
+glitches_required: "none"
 item_placement:
   basic: 33
   advanced: 67
