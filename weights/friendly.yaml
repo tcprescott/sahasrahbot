@@ -23,24 +23,24 @@ goals:
   pedestal: 10
   triforce-hunt: 5
 tower_open:
-  '0': 5
-  '1': 5
-  '2': 5
-  '3': 5
-  '4': 10
-  '5': 10
-  '6': 20
-  '7': 40
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 20
+  "7": 40
   random: 0
 ganon_open:
-  '0': 5
-  '1': 5
-  '2': 5
-  '3': 5
-  '4': 10
-  '5': 10
-  '6': 20
-  '7': 40
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 20
+  "7": 40
   random: 0
 world_state:
   standard: 35
@@ -64,8 +64,8 @@ enemy_shuffle:
   shuffled: 10
   random: 10
 hints:
-  'on': 50
-  'off': 50
+  "on": 50
+  "off": 50
 weapons:
   randomized: 40
   assured: 40
@@ -91,6 +91,6 @@ enemy_health:
   expert: 0
 customizer:
   eq:
-    'PegasusBoots':
-        False: 70
-        True: 30
+    "PegasusBoots":
+      False: 70
+      True: 30

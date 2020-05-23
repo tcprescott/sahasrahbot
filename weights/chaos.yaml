@@ -1,471 +1,479 @@
 description: "Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld)"
 customizer:
-    triforce-hunt:
-        goal:
-            min: 30
-            max: 60
-        pool:
-            min: 40
-            max: 70
-        min_difference: 10
-    custom:
-        customPrizePacks:
-            True: 50
-            False: 50
-        # item.require.Lamp is actually backwards (True enables dark room navigation)
-        # if this is True, enemy_shuffle and enemy_damage are set to defaults
-        item.require.Lamp: False
-        prize.shufflePendants:
-            True: 95
-            False: 5
-        prize.shuffleCrystals:
-            True: 95
-            False: 5
-        # any of these being in here will set dungeon_items to standard
-        region.wildMaps:
-            True: 50
-            False: 50
-        region.wildCompasses:
-            True: 50
-            False: 50
-        region.wildKeys:
-            True: 50
-            False: 50
-        region.wildBigKeys:
-            True: 50
-            False: 50
-        # 0: nothing, 16: items outside their dungeons, 255: everything
-        rom.freeItemText:
-            0: 10
-            16: 70
-            255: 20
-        rom.freeItemMenu: 255
-        rom.dungeonCount:
-            'pickup': 40
-            'on': 10
-            'off': 50
-        rom.mapOnPickup:
-            True: 90
-            False: 10
-        rom.timerMode:
-            'countdown-ohko': 1
-            'off': 99
-        rom.rupeeBow:
-            True: 5
-            False: 95
-        rom.genericKeys:
-            True: 5
-            False: 95
-        item.overflow.replacement.Sword:
-            TwentyRupees2: 25
-            Heart: 10
-            SmallMagic: 15
-            Rupoor: 50
-        item.overflow.replacement.Shield:
-            TwentyRupees2: 25
-            Heart: 10
-            SmallMagic: 15
-            Rupoor: 50
-        item.overflow.replacement.Armor:
-            TwentyRupees2: 25
-            Heart: 10
-            SmallMagic: 15
-            Rupoor: 50
-        item.overflow.replacement.Bow:
-            TwentyRupees2: 25
-            Heart: 10
-            SmallMagic: 15
-            Rupoor: 50
-        item.overflow.replacement.Bottle:
-            TwentyRupees2: 25
-            Heart: 10
-            SmallMagic: 15
-            Rupoor: 50
-        item.overflow.count.Sword:
-            2: 5 # expert
-            3: 10 # hard
-            4: 85 # normal
-        item.overflow.count.Armor:
-            0: 5 # hard/expert
-            1: 10 
-            2: 85 # normal
-        item.overflow.count.Bow:
-            1: 10 # hard/expert
-            2: 90 # normal
-        item.overflow.count.Shield:
-            0: 5 
-            1: 5 # expert
-            2: 10 # hard
-            3: 80 # normal
-        item.overflow.count.BossHeartContainer:
-            2: 5 # expert
-            6: 10 # hard
-            10: 85 # normal
-        item.overflow.count.PieceOfHeart:
-            8: 5 # expert
-            16: 10 # hard
-            24: 85 # normal
-        item.overflow.count.Bottle: 4
-        item.value.Rupoor:
-            5: 50
-            10: 30
-            20: 20
-        spoil.BootsLocation:
-            True: 70
-            False: 30
-    pool:
-        'ProgressiveSword':
-            4: 70
-            6: 20
-            8: 10
-        'ProgressiveArmor':
-            2: 80
-            3: 15
-            4: 5
-        'ProgressiveShield':
-            3: 80
-            4: 10
-            5: 10
-        'ProgressiveBow':
-            2: 80
-            3: 15
-            4: 5
-        'ThreeHundredRupees':
-            4: 60
-            5: 20
-            6: 20
-            7: 10
-            8: 5
-            9: 5
-        'OneHundredRupees':
-            1: 80
-            2: 10
-            3: 5
-            4: 5
-        'Rupoor':
-            0: 30
-            3: 25
-            6: 20
-            9: 15
-            12: 5
-            15: 5
-        'TwentyRupees':
-            5: 5
-            10: 10
-            15: 15
-            20: 20
-            28: 50
-    eq:
-        'ProgressiveSword':
-            0: 80
-            1: 10
-            2: 5
-            3: 3
-            4: 2
-        'BossHeartContainer':
-            0: 80
-            1: 10
-            2: 5
-            3: 3
-            4: 2
-            5: 1
-            6: 1
-        'Bottle1':
-            0: 80
-            1: 10
-            2: 5
-            3: 3
-            4: 2
-            5: 1
-            6: 1
-            7: 2
-        'Bottle2':
-            0: 80
-            1: 10
-            2: 5
-            3: 3
-            4: 2
-            5: 1
-            6: 1
-            7: 2
-        'Bottle3':
-            0: 80
-            1: 10
-            2: 5
-            3: 3
-            4: 2
-            5: 1
-            6: 1
-            7: 2
-        'Bottle4':
-            0: 80
-            1: 10
-            2: 5
-            3: 3
-            4: 2
-            5: 1
-            6: 1
-            7: 2
-        'Bombos':
-            0: 85
-            1: 15
-        'BookOfMudora':
-            0: 85
-            1: 15
-        'CaneOfSomaria':
-            0: 85
-            1: 15
-        'Cape':
-            0: 85
-            1: 15
-        'Ether':
-            0: 85
-            1: 15
-        'FireRod':
-            0: 85
-            1: 15
-        'Flippers':
-            0: 85
-            1: 15
-        'Hammer':
-            0: 85
-            1: 15
-        'Hookshot':
-            0: 85
-            1: 15
-        'IceRod':
-            0: 85
-            1: 15
-        'Lamp':
-            0: 85
-            1: 15
-        'MagicMirror':
-            0: 85
-            1: 15
-        'MoonPearl':
-            0: 85
-            1: 15
-        'Mushroom':
-            0: 85
-            1: 15
-        'OcarinaInactive':
-            0: 85
-            1: 15
-        'PegasusBoots':
-            0: 50
-            1: 50
-        'Powder':
-            0: 85
-            1: 15
-        'Quake':
-            0: 85
-            1: 15
-        'Shovel':
-            0: 85
-            1: 15
-        'ProgressiveGlove':
-            0: 85
-            1: 10
-            2: 5
-        'ProgressiveBow':
-            0: 85
-            1: 10
-            2: 5
-        'BugCatchingNet':
-            0: 85
-            1: 15
-        'ProgressiveShield':
-            0: 85
-            1: 10
-            2: 3
-            3: 2
-        'CaneOfByrna':
-            0: 85
-            1: 15
-        'TenBombs':
-            0: 85
-            1: 15
-        'HalfMagic':
-            0: 85
-            1: 15
-        'HeartContainer':
-            0: 85
-            1: 15
-        'ProgressiveArmor':
-            0: 85
-            1: 10
-            2: 5
-        'Boomerang':
-            0: 85
-            1: 15
-        'RedBoomerang':
-            0: 85
-            1: 15
-        "BigKeyA1": 0
-        "BigKeyA2":
-            0: 95
-            1: 5
-        "BigKeyD1":
-            0: 95
-            1: 5
-        "BigKeyD2":
-            0: 95
-            1: 5
-        "BigKeyD3":
-            0: 95
-            1: 5
-        "BigKeyD4":
-            0: 95
-            1: 5
-        "BigKeyD5":
-            0: 95
-            1: 5
-        "BigKeyD6":
-            0: 95
-            1: 5
-        "BigKeyD7":
-            0: 95
-            1: 5
-        "BigKeyH1": 0
-        "BigKeyH2": 0
-        "BigKeyP1":
-            0: 95
-            1: 5
-        "BigKeyP2":
-            0: 95
-            1: 5
-        "BigKeyP3":
-            0: 95
-            1: 5
-        "CompassA1": 0
-        "CompassA2":
-            0: 95
-            1: 5
-        "CompassD1":
-            0: 95
-            1: 5
-        "CompassD2":
-            0: 95
-            1: 5
-        "CompassD3":
-            0: 95
-            1: 5
-        "CompassD4":
-            0: 95
-            1: 5
-        "CompassD5":
-            0: 95
-            1: 5
-        "CompassD6":
-            0: 95
-            1: 5
-        "CompassD7":
-            0: 95
-            1: 5
-        "CompassH1": 0
-        "CompassH2": 0
-        "CompassP1":
-            0: 95
-            1: 5
-        "CompassP2":
-            0: 95
-            1: 5
-        "CompassP3":
-            0: 95
-            1: 5
-        "KeyA1":
-            0: 95
-            1: 3
-            2: 2
-        "KeyA2":
-            0: 95
-            1: 2
-            2: 1
-            3: 1
-            4: 1
-        "KeyD1":
-            0: 94
-            1: 1
-            2: 1
-            3: 1
-            4: 1
-            5: 1
-            6: 1
-        "KeyD2":
-            0: 95
-            1: 5
-        "KeyD3":
-            0: 95
-            1: 2
-            2: 2
-            3: 1
-        "KeyD4":
-            0: 95
-            1: 5
-        "KeyD5":
-            0: 95
-            1: 5
-            2: 5
-        "KeyD6":
-            0: 95
-            1: 2
-            2: 2
-            3: 1
-        "KeyD7":
-            0: 95
-            1: 2
-            2: 1
-            3: 1
-            4: 1
-        "KeyH1": 0
-        "KeyH2":
-            0: 95
-            1: 5
-        "KeyP1": 0
-        "KeyP2":
-            0: 95
-            1: 5
-        "KeyP3":
-            0: 95
-            1: 5
-        "MapA1": 0
-        "MapA2":
-            0: 95
-            1: 5
-        "MapD1":
-            0: 95
-            1: 5
-        "MapD2":
-            0: 95
-            1: 5
-        "MapD3":
-            0: 95
-            1: 5
-        "MapD4":
-            0: 95
-            1: 5
-        "MapD5":
-            0: 95
-            1: 5
-        "MapD6":
-            0: 95
-            1: 5
-        "MapD7":
-            0: 95
-            1: 5
-        "MapH1": 0
-        "MapH2":
-            0: 95
-            1: 5
-        "MapP1":
-            0: 95
-            1: 5
-        "MapP2":
-            0: 95
-            1: 5
-        "MapP3":
-            0: 95
-            1: 5
+  triforce-hunt:
+    goal: [30, 60]
+    pool: [30, 70]
+    min_difference: 10
+  timed-ohko:
+    timerStart: [900, 1200]
+    clock:
+      GreenClock:
+        value: [60, 120]
+        pool: [1, 10]
+      BlueClock:
+        value: [180, 300]
+        pool: [1, 10]
+      RedClock:
+        value: [-60, 60]
+        pool: [1, 5]
+  custom:
+    customPrizePacks:
+      True: 50
+      False: 50
+    # item.require.Lamp is actually backwards (True enables dark room navigation)
+    # if this is True, enemy_shuffle and enemy_damage are set to defaults
+    item.require.Lamp: False
+    prize.shufflePendants:
+      True: 95
+      False: 5
+    prize.shuffleCrystals:
+      True: 95
+      False: 5
+    # any of these being in here will set dungeon_items to standard
+    region.wildMaps:
+      True: 50
+      False: 50
+    region.wildCompasses:
+      True: 50
+      False: 50
+    region.wildKeys:
+      True: 50
+      False: 50
+    region.wildBigKeys:
+      True: 50
+      False: 50
+    # 0: nothing, 16: items outside their dungeons, 255: everything
+    rom.freeItemText:
+      0: 10
+      16: 70
+      255: 20
+    rom.freeItemMenu: 255
+    rom.dungeonCount:
+      "pickup": 40
+      "on": 10
+      "off": 50
+    rom.mapOnPickup:
+      True: 90
+      False: 10
+    rom.timerMode:
+      "countdown-ohko": 1
+      "off": 99
+    rom.rupeeBow:
+      True: 5
+      False: 95
+    rom.genericKeys:
+      True: 5
+      False: 95
+    item.overflow.replacement.Sword:
+      TwentyRupees2: 25
+      Heart: 10
+      SmallMagic: 15
+      Rupoor: 50
+    item.overflow.replacement.Shield:
+      TwentyRupees2: 25
+      Heart: 10
+      SmallMagic: 15
+      Rupoor: 50
+    item.overflow.replacement.Armor:
+      TwentyRupees2: 25
+      Heart: 10
+      SmallMagic: 15
+      Rupoor: 50
+    item.overflow.replacement.Bow:
+      TwentyRupees2: 25
+      Heart: 10
+      SmallMagic: 15
+      Rupoor: 50
+    item.overflow.replacement.Bottle:
+      TwentyRupees2: 25
+      Heart: 10
+      SmallMagic: 15
+      Rupoor: 50
+    item.overflow.count.Sword:
+      2: 5 # expert
+      3: 10 # hard
+      4: 85 # normal
+    item.overflow.count.Armor:
+      0: 5 # hard/expert
+      1: 10
+      2: 85 # normal
+    item.overflow.count.Bow:
+      1: 10 # hard/expert
+      2: 90 # normal
+    item.overflow.count.Shield:
+      0: 5
+      1: 5 # expert
+      2: 10 # hard
+      3: 80 # normal
+    item.overflow.count.BossHeartContainer:
+      2: 5 # expert
+      6: 10 # hard
+      10: 85 # normal
+    item.overflow.count.PieceOfHeart:
+      8: 5 # expert
+      16: 10 # hard
+      24: 85 # normal
+    item.overflow.count.Bottle: 4
+    item.value.Rupoor:
+      5: 50
+      10: 30
+      20: 20
+    spoil.BootsLocation:
+      True: 70
+      False: 30
+  pool:
+    "ProgressiveSword":
+      4: 70
+      6: 20
+      8: 10
+    "ProgressiveArmor":
+      2: 80
+      3: 15
+      4: 5
+    "ProgressiveShield":
+      3: 80
+      4: 10
+      5: 10
+    "ProgressiveBow":
+      2: 80
+      3: 15
+      4: 5
+    "ThreeHundredRupees":
+      4: 60
+      5: 20
+      6: 20
+      7: 10
+      8: 5
+      9: 5
+    "OneHundredRupees":
+      1: 80
+      2: 10
+      3: 5
+      4: 5
+    "Rupoor":
+      0: 30
+      3: 25
+      6: 20
+      9: 15
+      12: 5
+      15: 5
+    "TwentyRupees":
+      5: 5
+      10: 10
+      15: 15
+      20: 20
+      28: 50
+  eq:
+    "ProgressiveSword":
+      0: 80
+      1: 10
+      2: 5
+      3: 3
+      4: 2
+    "BossHeartContainer":
+      0: 80
+      1: 10
+      2: 5
+      3: 3
+      4: 2
+      5: 1
+      6: 1
+    "Bottle1":
+      0: 80
+      1: 10
+      2: 5
+      3: 3
+      4: 2
+      5: 1
+      6: 1
+      7: 2
+    "Bottle2":
+      0: 80
+      1: 10
+      2: 5
+      3: 3
+      4: 2
+      5: 1
+      6: 1
+      7: 2
+    "Bottle3":
+      0: 80
+      1: 10
+      2: 5
+      3: 3
+      4: 2
+      5: 1
+      6: 1
+      7: 2
+    "Bottle4":
+      0: 80
+      1: 10
+      2: 5
+      3: 3
+      4: 2
+      5: 1
+      6: 1
+      7: 2
+    "Bombos":
+      0: 85
+      1: 15
+    "BookOfMudora":
+      0: 85
+      1: 15
+    "CaneOfSomaria":
+      0: 85
+      1: 15
+    "Cape":
+      0: 85
+      1: 15
+    "Ether":
+      0: 85
+      1: 15
+    "FireRod":
+      0: 85
+      1: 15
+    "Flippers":
+      0: 85
+      1: 15
+    "Hammer":
+      0: 85
+      1: 15
+    "Hookshot":
+      0: 85
+      1: 15
+    "IceRod":
+      0: 85
+      1: 15
+    "Lamp":
+      0: 85
+      1: 15
+    "MagicMirror":
+      0: 85
+      1: 15
+    "MoonPearl":
+      0: 85
+      1: 15
+    "Mushroom":
+      0: 85
+      1: 15
+    "OcarinaInactive":
+      0: 85
+      1: 15
+    "PegasusBoots":
+      0: 50
+      1: 50
+    "Powder":
+      0: 85
+      1: 15
+    "Quake":
+      0: 85
+      1: 15
+    "Shovel":
+      0: 85
+      1: 15
+    "ProgressiveGlove":
+      0: 85
+      1: 10
+      2: 5
+    "ProgressiveBow":
+      0: 85
+      1: 10
+      2: 5
+    "BugCatchingNet":
+      0: 85
+      1: 15
+    "ProgressiveShield":
+      0: 85
+      1: 10
+      2: 3
+      3: 2
+    "CaneOfByrna":
+      0: 85
+      1: 15
+    "TenBombs":
+      0: 85
+      1: 15
+    "HalfMagic":
+      0: 85
+      1: 15
+    "HeartContainer":
+      0: 85
+      1: 15
+    "ProgressiveArmor":
+      0: 85
+      1: 10
+      2: 5
+    "Boomerang":
+      0: 85
+      1: 15
+    "RedBoomerang":
+      0: 85
+      1: 15
+    "BigKeyA1": 0
+    "BigKeyA2":
+      0: 95
+      1: 5
+    "BigKeyD1":
+      0: 95
+      1: 5
+    "BigKeyD2":
+      0: 95
+      1: 5
+    "BigKeyD3":
+      0: 95
+      1: 5
+    "BigKeyD4":
+      0: 95
+      1: 5
+    "BigKeyD5":
+      0: 95
+      1: 5
+    "BigKeyD6":
+      0: 95
+      1: 5
+    "BigKeyD7":
+      0: 95
+      1: 5
+    "BigKeyH1": 0
+    "BigKeyH2": 0
+    "BigKeyP1":
+      0: 95
+      1: 5
+    "BigKeyP2":
+      0: 95
+      1: 5
+    "BigKeyP3":
+      0: 95
+      1: 5
+    "CompassA1": 0
+    "CompassA2":
+      0: 95
+      1: 5
+    "CompassD1":
+      0: 95
+      1: 5
+    "CompassD2":
+      0: 95
+      1: 5
+    "CompassD3":
+      0: 95
+      1: 5
+    "CompassD4":
+      0: 95
+      1: 5
+    "CompassD5":
+      0: 95
+      1: 5
+    "CompassD6":
+      0: 95
+      1: 5
+    "CompassD7":
+      0: 95
+      1: 5
+    "CompassH1": 0
+    "CompassH2": 0
+    "CompassP1":
+      0: 95
+      1: 5
+    "CompassP2":
+      0: 95
+      1: 5
+    "CompassP3":
+      0: 95
+      1: 5
+    "KeyA1":
+      0: 95
+      1: 3
+      2: 2
+    "KeyA2":
+      0: 95
+      1: 2
+      2: 1
+      3: 1
+      4: 1
+    "KeyD1":
+      0: 94
+      1: 1
+      2: 1
+      3: 1
+      4: 1
+      5: 1
+      6: 1
+    "KeyD2":
+      0: 95
+      1: 5
+    "KeyD3":
+      0: 95
+      1: 2
+      2: 2
+      3: 1
+    "KeyD4":
+      0: 95
+      1: 5
+    "KeyD5":
+      0: 95
+      1: 5
+      2: 5
+    "KeyD6":
+      0: 95
+      1: 2
+      2: 2
+      3: 1
+    "KeyD7":
+      0: 95
+      1: 2
+      2: 1
+      3: 1
+      4: 1
+    "KeyH1": 0
+    "KeyH2":
+      0: 95
+      1: 5
+    "KeyP1": 0
+    "KeyP2":
+      0: 95
+      1: 5
+    "KeyP3":
+      0: 95
+      1: 5
+    "MapA1": 0
+    "MapA2":
+      0: 95
+      1: 5
+    "MapD1":
+      0: 95
+      1: 5
+    "MapD2":
+      0: 95
+      1: 5
+    "MapD3":
+      0: 95
+      1: 5
+    "MapD4":
+      0: 95
+      1: 5
+    "MapD5":
+      0: 95
+      1: 5
+    "MapD6":
+      0: 95
+      1: 5
+    "MapD7":
+      0: 95
+      1: 5
+    "MapH1": 0
+    "MapH2":
+      0: 95
+      1: 5
+    "MapP1":
+      0: 95
+      1: 5
+    "MapP2":
+      0: 95
+      1: 5
+    "MapP3":
+      0: 95
+      1: 5
 glitches_required: "none"
 item_placement: "advanced"
 dungeon_items: "standard"
@@ -480,24 +488,24 @@ goals:
   pedestal: 20
   triforce-hunt: 20
 tower_open:
-  '0': 1
-  '1': 1
-  '2': 1
-  '3': 1
-  '4': 1
-  '5': 1
-  '6': 1
-  '7': 1
+  "0": 1
+  "1": 1
+  "2": 1
+  "3": 1
+  "4": 1
+  "5": 1
+  "6": 1
+  "7": 1
   random: 1
 ganon_open:
-  '0': 1
-  '1': 1
-  '2': 1
-  '3': 1
-  '4': 1
-  '5': 1
-  '6': 1
-  '7': 1
+  "0": 1
+  "1": 1
+  "2": 1
+  "3": 1
+  "4": 1
+  "5": 1
+  "6": 1
+  "7": 1
   random: 1
 world_state:
   standard: 1
@@ -514,8 +522,8 @@ enemy_shuffle:
   none: 80
   shuffled: 20
 hints:
-  'on': 50
-  'off': 50
+  "on": 50
+  "off": 50
 weapons:
   randomized: 90
   swordless: 10

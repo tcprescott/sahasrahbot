@@ -23,24 +23,24 @@ goals:
   pedestal: 20
   triforce-hunt: 5
 tower_open:
-  '0': 5
-  '1': 5
-  '2': 5
-  '3': 5
-  '4': 5
-  '5': 5
-  '6': 5
-  '7': 40
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 5
+  "5": 5
+  "6": 5
+  "7": 40
   random: 25
 ganon_open:
-  '0': 5
-  '1': 5
-  '2': 5
-  '3': 5
-  '4': 5
-  '5': 5
-  '6': 5
-  '7': 40
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 5
+  "5": 5
+  "6": 5
+  "7": 40
   random: 25
 world_state:
   standard: 40
@@ -64,8 +64,8 @@ enemy_shuffle:
   shuffled: 20
   random: 30
 hints:
-  'on': 50
-  'off': 50
+  "on": 50
+  "off": 50
 weapons:
   randomized: 40
   assured: 25
@@ -89,4 +89,3 @@ enemy_health:
   easy: 10
   hard: 20
   expert: 10
-

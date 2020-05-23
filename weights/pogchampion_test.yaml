@@ -1,4 +1,4 @@
-description: This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Three winner Furaime.
+description: A modification of current pogchampion weights, but forces timed ohko for testing.
 glitches_required: "none"
 item_placement:
   basic: 33
@@ -13,10 +13,10 @@ accessibility:
   locations: 10
   none: 35
 goals:
-  ganon: 25
-  fast_ganon: 32
-  dungeons: 20
-  pedestal: 13
+  # ganon: 25
+  # fast_ganon: 32
+  # dungeons: 20
+  # pedestal: 13
   triforce-hunt: 10
 tower_open:
   "0": 5
@@ -43,13 +43,7 @@ world_state:
   open: 25
   inverted: 20
   retro: 15
-entrance_shuffle:
-  none: 60
-  simple: 0
-  restricted: 1
-  full: 0
-  crossed: 30
-  insanity: 9
+entrance_shuffle: "none"
 boss_shuffle:
   none: 60
   simple: 5
@@ -86,6 +80,18 @@ enemy_health:
   hard: 20
   expert: 20
 customizer:
+  timed-ohko:
+    timerStart: [900, 1200]
+    clock:
+      GreenClock:
+        value: [60, 120]
+        pool: [1, 10]
+      BlueClock:
+        value: [180, 300]
+        pool: [1, 10]
+      RedClock:
+        value: [-60, 60]
+        pool: [1, 5]
   triforce-hunt:
     goal: [30, 60]
     pool: [30, 70]
@@ -136,8 +142,8 @@ customizer:
       True: 50
       False: 50
     rom.timerMode:
-      "countdown-ohko": 5
-      "off": 95
+      "countdown-ohko": 100
+      "off": 0
     rom.rupeeBow:
       True: 10
       False: 90

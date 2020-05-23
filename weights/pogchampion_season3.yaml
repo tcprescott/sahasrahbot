@@ -23,31 +23,37 @@ goals:
   pedestal: 13
   triforce-hunt: 10
 tower_open:
-  '0': 5
-  '1': 5
-  '2': 5
-  '3': 5
-  '4': 10
-  '5': 10
-  '6': 10
-  '7': 30
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 10
+  "7": 30
   random: 20
 ganon_open:
-  '0': 5
-  '1': 5
-  '2': 5
-  '3': 5
-  '4': 10
-  '5': 10
-  '6': 15
-  '7': 25
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 15
+  "7": 25
   random: 20
 world_state:
   standard: 40
   open: 25
   inverted: 20
   retro: 15
-entrance_shuffle: "none"
+entrance_shuffle:
+  none: 60
+  simple: 0
+  restricted: 1
+  full: 0
+  crossed: 30
+  insanity: 9
 boss_shuffle:
   none: 60
   simple: 5
@@ -58,8 +64,8 @@ enemy_shuffle:
   shuffled: 33
   random: 2
 hints:
-  'on': 33
-  'off': 67
+  "on": 33
+  "off": 67
 weapons:
   randomized: 45
   assured: 25
@@ -85,17 +91,13 @@ enemy_health:
   expert: 10
 customizer:
   triforce-hunt:
-    goal:
-      min: 30
-      max: 60
-    pool:
-      min: 30
-      max: 70
+    goal: [30, 60]
+    pool: [30, 70]
     min_difference:
       0: 50
       10: 50
   eq:
-    PegasusBoots:
+    "PegasusBoots":
       True: 30
       False: 70
   custom:
@@ -132,14 +134,14 @@ customizer:
       16: 70
       255: 20
     rom.dungeonCount:
-      'pickup': 50
-      'off': 50
+      "pickup": 50
+      "off": 50
     rom.mapOnPickup:
       True: 50
       False: 50
     rom.timerMode:
-      'countdown-ohko': 1
-      'off': 99
+      "countdown-ohko": 1
+      "off": 99
     rom.rupeeBow:
       True: 5
       False: 95
