@@ -57,7 +57,8 @@ class AlttprHandler(RaceHandler):
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))
             return
-        await self.set_raceinfo(f"{preset_dict.get('goal_name', 'unknown')} - {seed.url} - ({'/'.join(seed.code)})")
+        await self.set_raceinfo(f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})")
+        await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
@@ -88,7 +89,8 @@ class AlttprHandler(RaceHandler):
         except IndexError:
             studytime = preset_dict.get('studytime', 900)
 
-        await self.set_raceinfo(f"spoiler {preset_dict.get('goal_name', 'unknown')} - {seed.url} - ({'/'.join(seed.code)})")
+        await self.set_raceinfo(f"spoiler {preset_name} - {seed.url} - ({'/'.join(seed.code)})")
+        await self.send_message(seed.url)
         await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, studytime)
         self.seed_rolled = True
@@ -113,6 +115,7 @@ class AlttprHandler(RaceHandler):
             return
 
         await self.set_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+        await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
