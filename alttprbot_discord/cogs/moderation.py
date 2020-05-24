@@ -21,6 +21,8 @@ class Moderation(commands.Cog):
     async def on_message(self, message):
         if isinstance(message.channel, discord.DMChannel):
             return
+        if message.guild is None:
+            return
 
         if message.author.joined_at > datetime.datetime.now()-datetime.timedelta(days=1) and await config.get(message.guild.id, 'ModerateNewMemberContent') == "true":
             for url in urlextractor.gen_urls(message.content):
