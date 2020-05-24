@@ -89,6 +89,8 @@ customizer:
         enemy_health: default
         boss_shuffle: none
         enemy_shuffle: none
+      custom:
+        item.require.Lamp: False
     timerStart: [900, 1500]
     clock:
       GreenClock:
