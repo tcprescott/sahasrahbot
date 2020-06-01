@@ -126,6 +126,7 @@ class AlttprHandler(RaceHandler):
         name = self.data.get('name')
         race = await spoiler_races.get_spoiler_race_by_id(name)
         if race:
+            await spoiler_races.delete_spoiler_race(name)
             await self.send_message('Sending spoiler log...')
             await self.send_message('---------------')
             await self.send_message(f"This race\'s spoiler log: {race['spoiler_url']}")
@@ -135,7 +136,6 @@ class AlttprHandler(RaceHandler):
                 duration_in_seconds=race['studytime'],
                 beginmessage=True,
             )
-            await spoiler_races.delete_spoiler_race(name)
 
     async def countdown_timer(self, duration_in_seconds, beginmessage=False):
         loop = asyncio.get_running_loop()
