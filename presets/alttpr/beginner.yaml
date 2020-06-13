@@ -9,7 +9,7 @@ settings:
   lang: en
   mode: standard
   hints: 'off'
-  weapons: randomized
+  weapons: assured
   crystals:
     ganon: '7'
     tower: '7'
