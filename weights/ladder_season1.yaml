@@ -1,20 +1,21 @@
-description: Season two mystery weights for ALTTPR Ladder.  https://discord.gg/Jy7Srva
-allow_quickswap: True
+description: Pre-season mystery weights for ALTTPR Ladder.  https://discord.gg/Jy7Srva
 glitches_required: "none"
-item_placement: "advanced"
+item_placement:
+  basic: 30
+  advanced: 70
 dungeon_items:
   standard: 30
   mc: 20
   mcs: 20
   full: 30
 accessibility:
-  items: 90
-  none: 10
+  items: 80
+  none: 20
 goals:
   ganon: 35
   fast_ganon: 35
-  dungeons: 15
-  pedestal: 10
+  dungeons: 10
+  pedestal: 15
   triforce-hunt: 5
 tower_open:
   "0": 5
@@ -40,8 +41,8 @@ world_state:
   inverted: 10
   retro: 10
 entrance_shuffle:
-  none: 70
-  full: 10
+  none: 60
+  full: 20
   crossed: 20
 boss_shuffle:
   none: 70

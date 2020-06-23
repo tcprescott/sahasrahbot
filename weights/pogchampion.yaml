@@ -1,4 +1,5 @@
 description: This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Three winner Furaime.
+allow_quickswap: True
 glitches_required: "none"
 item_placement:
   basic: 33
