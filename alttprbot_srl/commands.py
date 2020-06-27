@@ -27,7 +27,7 @@ async def handler(target, source, message, client):
     festivemode = await config.get(0, 'FestiveMode') == "true"
     post_start_message = None
 
-    if args.command == '$preset' and target.startswith('#srl-'):
+    if args.command in ['$preset', '$race', '$quickswaprace'] and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
         await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -45,7 +45,13 @@ async def handler(target, source, message, client):
         else:
             raise SahasrahBotException("This game is not yet supported.")
 
-        seed, preset_dict = await preset.get_preset(args.preset, randomizer=randomizer, hints=args.hints, spoilers="off")
+        seed, preset_dict = await preset.get_preset(
+            args.preset,
+            randomizer=randomizer,
+            hints=args.hints,
+            spoilers="off",
+            allow_quickswap=True if args.command == "$quickswaprace" else False
+        )
         goal = preset_dict['goal_name']
         if srl['game']['abbrev'] == 'alttphacks':
             if args.accessible and seed.data['spoiler']['meta']['logic'] == 'NoGlitches':
@@ -61,6 +67,8 @@ async def handler(target, source, message, client):
         pre_race_goal += f" - {seed.url}"
         if seed.code is not None:
             pre_race_goal += f" - ({'/'.join(seed.code)})" if isinstance(seed.code, list) else f" - ({seed.code})"
+            if args.command == "$quickswaprace":
+                pre_race_goal += " - Quickswap Enabled"
 
         if args.silent:
             await client.message(target, pre_race_goal)
@@ -191,6 +199,18 @@ async def parse_args(message):
     parser_preset.add_argument('--hints', action='store_true')
     parser_preset.add_argument('--silent', action='store_true')
     parser_preset.add_argument('--accessible', action='store_true')
+
+    parser_race = subparsers.add_parser('$race')
+    parser_race.add_argument('preset')
+    parser_race.add_argument('--hints', action='store_true')
+    parser_race.add_argument('--silent', action='store_true')
+    parser_race.add_argument('--accessible', action='store_true')
+
+    parser_quickswaprace = subparsers.add_parser('$quickswaprace')
+    parser_quickswaprace.add_argument('preset')
+    parser_quickswaprace.add_argument('--hints', action='store_true')
+    parser_quickswaprace.add_argument('--silent', action='store_true')
+    parser_quickswaprace.add_argument('--accessible', action='store_true')
 
     subparsers.add_parser('$custom')
 

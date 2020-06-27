@@ -3,12 +3,14 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 ---
 # SahasrahBot SRL Commands
-## $preset
+## $preset/$race/$quickswaprace
 Use this command in the SRL race room.
 
 This allows you to generate a game using a pre-defined combination of settings.
 
 Example: `$preset open`
+
+If `$quickswaprace` is the command, the item quickswap feature is enabled for the race.  Quickswap is always available for entrance randomizer races.
 
 Currently supported presets can be found <https://l.synack.live/presets>.  The preset name will be the name of the file without the .yaml extension.
 

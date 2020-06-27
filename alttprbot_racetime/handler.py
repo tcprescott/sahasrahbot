@@ -37,31 +37,14 @@ class AlttprHandler(RaceHandler):
             self.state['intro_sent'] = True
 
     async def ex_preset(self, args, message):
-        if self.seed_rolled:
-            await self.send_message(
-                'I already rolled a seed!'
-            )
-            return
+        await self.roll_game(args, message, allow_quickswap=False)
+
+    async def ex_race(self, args, message):
+        await self.roll_game(args, message, allow_quickswap=False)
+
+    async def ex_quickswaprace(self, args, message):
+        await self.roll_game(args, message, allow_quickswap=True)
         
-        try:
-            preset_name = args[0]
-        except IndexError:
-            await self.send_message(
-                'You must specify a preset!'
-            )
-            return
-
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-        try:
-            seed, preset_dict = await preset.get_preset(preset_name, randomizer='alttpr', spoilers="off")
-        except preset.PresetNotFoundException as e:
-            await self.send_message(str(e))
-            return
-        await self.set_raceinfo(f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})")
-        await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
-        self.seed_rolled = True
-
     async def ex_spoiler(self, args, message):
         if self.seed_rolled:
             await self.send_message(
@@ -164,3 +147,33 @@ class AlttprHandler(RaceHandler):
                     await self.send_message('Log study has finished.  Begin racing!')
                 break
             await asyncio.sleep(.5)
+
+    async def roll_game(self, args, message, allow_quickswap=False):
+        if self.seed_rolled:
+            await self.send_message(
+                'I already rolled a seed!'
+            )
+            return
+        
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        try:
+            seed, preset_dict = await preset.get_preset(preset_name, randomizer='alttpr', spoilers="off", allow_quickswap=allow_quickswap)
+        except preset.PresetNotFoundException as e:
+            await self.send_message(str(e))
+            return
+        
+        race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
+        if allow_quickswap:
+            race_info += " - Quickswap Enabled"
+        await self.set_raceinfo(race_info)
+        await self.send_message(seed.url)
+        await self.send_message("Seed rolling complete.  See race info for details.")
+        self.seed_rolled = True

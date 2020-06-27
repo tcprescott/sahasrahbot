@@ -39,7 +39,7 @@ class AlttprGen(commands.Cog):
         brief='Generate a race preset.',
         help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets',
         invoke_without_command=True,
-        aliases=['racepreset']
+        aliases=['racepreset', 'race']
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def preset(self, ctx, preset, hints=False):

@@ -13,9 +13,9 @@ class PresetNotFoundException(SahasrahBotException):
     pass
 
 # this is until I port the existing code over to the new fetch_preset and generate_preset coroutines, or do something else that isn't as terrible
-async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournament=True, randomizer='alttpr'):
+async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournament=True, randomizer='alttpr', allow_quickswap=False):
     preset_dict = await fetch_preset(preset, randomizer)
-    seed = await generate_preset(preset_dict, preset=preset, hints=hints, nohints=nohints, spoilers=spoilers, tournament=tournament)
+    seed = await generate_preset(preset_dict, preset=preset, hints=hints, nohints=nohints, spoilers=spoilers, tournament=tournament, allow_quickswap=allow_quickswap)
     return seed, preset_dict
 
 async def fetch_preset(preset, randomizer='alttpr'):
@@ -34,7 +34,7 @@ async def fetch_preset(preset, randomizer='alttpr'):
 
     return preset_dict
 
-async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, spoilers="off", tournament=True):
+async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False):
     randomizer = preset_dict.get('randomizer', 'alttpr')
 
     if randomizer == 'alttpr':
@@ -45,6 +45,9 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
 
         preset_dict['settings']['tournament'] = tournament
         preset_dict['settings']['spoilers'] = spoilers
+
+        if allow_quickswap:
+            preset_dict['settings']['allow_quickswap'] = True
 
         seed = await alttpr(
             customizer=preset_dict.get('customizer', False),
