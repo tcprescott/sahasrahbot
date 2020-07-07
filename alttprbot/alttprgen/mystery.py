@@ -34,7 +34,7 @@ async def get_weights(weightset='weighted'):
             weights = yaml.safe_load(await f.read())
     except FileNotFoundError as err:
         raise WeightsetNotFoundException(
-            f'Could not find weightset {weightset}.  See a list of available weights at <https://l.synack.live/weights>') from err
+            f'Could not find weightset {weightset}.  See a list of available weights at https://l.synack.live/weights') from err
     
     return weights
 
