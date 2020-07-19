@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print(os.environ)
-
 class Config:
     DEBUG = True if os.environ.get("DEBUG", "False") == "True" else False
 

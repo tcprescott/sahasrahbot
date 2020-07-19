@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import sentry_sdk
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from alttprbot.util import orm
 from config import Config as c
@@ -12,7 +13,10 @@ from alttprbot_api.api import sahasrahbotapi
 from alttprbot_racetime.bot import racetime_alttpr, racetime_smz3
 
 if os.environ.get("SENTRY_URL", None):
-    sentry_sdk.init(os.environ.get("SENTRY_URL"))
+    sentry_sdk.init(
+        os.environ.get("SENTRY_URL"),
+        integrations=[AioHttpIntegration()]
+    )
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
