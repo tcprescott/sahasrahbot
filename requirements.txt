@@ -6,11 +6,13 @@ aiohttp >= 3.5.4
 aiomysql >= 0.0.20
 beautifulsoup4 >= 4.8.0
 bs4 >= 0.0.1
+discord-sentry-reporting
 discord.py >= 1.3.1
 emoji >= 0.5.3
+git+git://github.com/tcprescott/racetime-bot.git@master
 gspread_asyncio
 html2markdown
-html5lib == 1.0.1
+html5lib >= 1.0.1
 ircmessage
 jishaku
 oauth2client
@@ -18,10 +20,11 @@ pydle >= 0.9.3
 python-dotenv
 pytz
 pyyaml >= 5.1.2
-pyz3r >= 5.0.0
+pyz3r >= 5.1.0
 quart-openapi
+sentry-sdk >= 0.16.1
+six >= 1.14.0
 tenacity
 urlextract
-z3r-sramr-py >= 0.2.2
-git+git://github.com/tcprescott/racetime-bot.git@master
 websockets !=7.0,!=8.0,!=8.0.1,<9.0,>=6.0
+z3r-sramr-py >= 0.2.2

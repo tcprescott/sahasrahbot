@@ -1,3 +1,4 @@
+import os
 import asyncio
 import importlib
 import random
@@ -9,7 +10,7 @@ import discord
 from discord.ext import commands
 
 from alttprbot.database import config
-
+from discord_sentry_reporting import use_sentry
 
 async def determine_prefix(bot, message):
     if message.guild is None:
@@ -23,12 +24,14 @@ discordbot = commands.Bot(
     command_prefix=determine_prefix
 )
 
+use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
+
 discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.audit")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
-discordbot.load_extension("alttprbot_discord.cogs.league")
+# discordbot.load_extension("alttprbot_discord.cogs.league")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
 discordbot.load_extension("alttprbot_discord.cogs.nickname")
@@ -66,14 +69,6 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction(riplink)
 
         if not isinstance(error_to_display, SahasrahBotException):
-#            error_channel = await commands.TextChannelConverter().convert(ctx, await config.get(0, "ErrorChannel"))
-            # if error_channel:
-            #     await error_channel.send(f"```python\n{''.join(traceback.format_exception(etype=type(error_to_display), value=error_to_display, tb=error_to_display.__traceback__))}```")
-#            try:
-#                appinfo = await discordbot.application_info()
-#                await ctx.send(f'Something happened that should not have happened. {appinfo.owner.mention}')
-#            except discord.errors.HTTPException:
-#                pass
             await ctx.send(f"```{repr(error_to_display)}```")
             raise error_to_display
         else:
