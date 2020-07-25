@@ -22,7 +22,7 @@ class Moderation(commands.Cog):
         if message.guild is None:
             return
 
-        if message.author.joined_at > datetime.datetime.now()-datetime.timedelta(days=1) and await config.get(message.guild.id, 'ModerateNewMemberContent') == "true":
+        if hasattr(message.author, 'joined_at') and message.author.joined_at > datetime.datetime.now()-datetime.timedelta(days=1) and await config.get(message.guild.id, 'ModerateNewMemberContent') == "true":
             for url in urlextractor.gen_urls(message.content):
                 if urlparse(url).netloc in ['discord.gg']:
                     await message.delete()
