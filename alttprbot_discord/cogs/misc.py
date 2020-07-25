@@ -110,6 +110,7 @@ class Misc(commands.Cog):
         brief="Retrieves the next ALTTPR SG daily race.",
         help="Retrieves the next ALTTPR SG daily race.",
     )
+    @commands.cooldown(rate=1, per=900, type=commands.BucketType.channel)
     async def sgdaily(self, ctx):
         sg_schedule = await speedgaming.get_upcoming_episodes_by_event('alttprdaily', hours_past=0, hours_future=168)
         if len(sg_schedule) == 0:
@@ -117,12 +118,12 @@ class Misc(commands.Cog):
             return
         episode = sg_schedule[0]
         when = dateutil.parser.parse(episode['when'])
-        when_central = when.astimezone(pytz.timezone('US/Eastern')).strftime('%m/%d/%y %I:%M %p')
-        when_europe = when.astimezone(pytz.timezone('CET')).strftime('%Y-%m-%d %I:%M %p')
+        when_central = when.astimezone(pytz.timezone('US/Eastern')).strftime('%m-%d %I:%M %p')
+        when_europe = when.astimezone(pytz.timezone('CET')).strftime('%m-%d %I:%M %p')
         difference = when - datetime.datetime.now(when.tzinfo)
         embed = discord.Embed(
             title=episode['event']['name'],
-            description=f"**Mode:** {episode['match1']['title']}"
+            description=f"**Mode:** {'*TBD*' if episode['match1']['title'] == '' else episode['match1']['title']}"
         )
         embed.set_thumbnail(url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
 
