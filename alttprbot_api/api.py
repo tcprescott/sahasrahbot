@@ -59,6 +59,10 @@ async def healthcheck():
         success=True
     )
 
+@sahasrahbotapi.route('/robots.txt', methods=['GET'])
+async def robots():
+    return 'User-agent: *\nDisallow: /\n'
+
 # @sahasrahbotapi.errorhandler(400)
 # def bad_request(e):
 #     return jsonify(success=False, error=repr(e))
