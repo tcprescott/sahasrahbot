@@ -264,7 +264,7 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
         timestamp=datetime.datetime.now()
     )
 
-    embed.add_field(name='Old Message', value=old_content[:1500] + ('..' if len(old_content) > 1500 else ''), inline=False)
+    embed.add_field(name='Old Message', value=old_content[:1020] + ('...' if len(old_content) > 1020 else ''), inline=False)
     if old_attachment_url:
         embed.add_field(name='Old Attachment', value=old_attachment_url, inline=False)
     embed.add_field(name='Message Timestamp', value=original_timestamp, inline=False)
