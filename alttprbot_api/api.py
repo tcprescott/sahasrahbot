@@ -59,14 +59,14 @@ async def healthcheck():
         success=True
     )
 
-@sahasrahbotapi.errorhandler(400)
-def bad_request(e):
-    return jsonify(success=False, error=repr(e))
+# @sahasrahbotapi.errorhandler(400)
+# def bad_request(e):
+#     return jsonify(success=False, error=repr(e))
 
-@sahasrahbotapi.errorhandler(404)
-def not_found(e):
-    return jsonify(success=False, error=repr(e))
+# @sahasrahbotapi.errorhandler(404)
+# def not_found(e):
+#     return jsonify(success=False, error=repr(e))
 
-@sahasrahbotapi.errorhandler(500)
-def something_bad_happened(e):
-    return jsonify(success=False, error=repr(e))
+# @sahasrahbotapi.errorhandler(500)
+# def something_bad_happened(e):
+#     return jsonify(success=False, error=repr(e))
