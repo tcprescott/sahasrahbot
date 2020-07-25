@@ -1,10 +1,12 @@
 from quart import Quart, abort, jsonify, request
 
-from pyz3r.mystery import generate_random_settings
 from alttprbot.alttprgen.mystery import get_weights
 from alttprbot.util import http
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
+from alttprbot_srl.bot import srlbot
+from pyz3r.mystery import generate_random_settings
+import os
 
 sahasrahbotapi = Quart(__name__)
 
@@ -36,6 +38,25 @@ async def mysterygenwithweights(weightset):
         settings=settings,
         customizer=customizer,
         endpoint='/api/customizer' if customizer else '/api/randomizer'
+    )
+
+@sahasrahbotapi.route('/healthcheck', methods=['GET'])
+async def healthcheck():
+    if discordbot.is_closed():
+        abort(500, description='Connection to Discord is closed.')
+
+    appinfo = await discordbot.application_info()
+    await discordbot.fetch_user(appinfo.owner.id)
+    
+    if not srlbot.connected:
+        abort(500, description="Connection to SRL id closed.")
+    
+    info = await srlbot.whois(os.environ['SRL_NICK'])
+    if not info['identified']:
+        abort(500, description="SRL bot is not identified with Nickserv.")
+
+    return jsonify(
+        success=True
     )
 
 @sahasrahbotapi.errorhandler(400)
