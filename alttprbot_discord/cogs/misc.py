@@ -8,8 +8,12 @@ import aiohttp
 import discord
 import html2markdown
 from discord.ext import commands
+import dateutil.parser
+import pytz
+import datetime
 
 from alttprbot.util.holyimage import holy
+from alttprbot.util import speedgaming
 
 
 class Misc(commands.Cog):
@@ -102,6 +106,32 @@ class Misc(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(
+        brief="Retrieves the next ALTTPR SG daily race.",
+        help="Retrieves the next ALTTPR SG daily race.",
+    )
+    async def sgdaily(self, ctx):
+        sg_schedule = await speedgaming.get_upcoming_episodes_by_event('alttprdaily', hours_past=0, hours_future=168)
+        if len(sg_schedule) == 0:
+            await ctx.send("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 7 days.")
+            return
+        episode = sg_schedule[0]
+        when = dateutil.parser.parse(episode['when'])
+        when_central = when.astimezone(pytz.timezone('US/Eastern')).strftime('%m/%d/%y %I:%M %p')
+        when_europe = when.astimezone(pytz.timezone('CET')).strftime('%Y-%m-%d %I:%M %p')
+        difference = when - datetime.datetime.now(when.tzinfo)
+        embed = discord.Embed(
+            title=episode['event']['name'],
+            description=f"**Mode:** {episode['match1']['title']}"
+        )
+        embed.set_thumbnail(url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
+
+        embed.add_field(name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
+        broadcast_channels = [a['name'] for a in episode['channels'] if not a['name'] == 'No Stream']
+        if broadcast_channels:
+            embed.add_field(name="Twitch Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+        embed.add_field(name="Daily Schedule", value="http://speedgaming.org/alttprdaily", inline=False)
+        await ctx.send(embed=embed)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def get_json(url):
