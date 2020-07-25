@@ -1,3 +1,5 @@
+import os
+
 from quart import Quart, abort, jsonify, request
 
 from alttprbot.alttprgen.mystery import get_weights
@@ -6,7 +8,6 @@ from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
 from alttprbot_srl.bot import srlbot
 from pyz3r.mystery import generate_random_settings
-import os
 
 sahasrahbotapi = Quart(__name__)
 
