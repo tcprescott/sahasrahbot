@@ -3,7 +3,6 @@ import os
 from quart import Quart, abort, jsonify, request
 
 from alttprbot.alttprgen.mystery import get_weights
-from alttprbot.util import http
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
 from alttprbot_srl.bot import srlbot
