@@ -39,6 +39,11 @@ class Smz3Handler(RaceHandler):
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!preset <preset>\" to generate a race preset.")
 
+    async def ex_cancel(self, args, message):
+        self.seed_rolled = False
+        await self.set_raceinfo("New Race", overwrite=True)
+        await self.send_message("Reseting bot state.  You may now roll a new game.")
+
     async def roll_game(self, args, message):
         if self.seed_rolled:
             await self.send_message(

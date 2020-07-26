@@ -102,6 +102,11 @@ class AlttprHandler(RaceHandler):
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
+    async def ex_cancel(self, args, message):
+        self.seed_rolled = False
+        await self.set_raceinfo("New Race", overwrite=True)
+        await self.send_message("Reseting bot state.  You may now roll a new game.")
+
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!preset <preset>\" to generate a race preset.\n\"!mystery <weightset>\" to generate a mystery game.\n\"!spoiler <preset>\" to generate a spoiler race.")
 
