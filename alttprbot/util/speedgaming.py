@@ -3,6 +3,7 @@ import json
 from datetime import timedelta
 
 import aiofiles
+import pytz
 
 from alttprbot.exceptions import SahasrahBotException
 from config import Config as c
@@ -14,7 +15,7 @@ class SGEpisodeNotFoundException(SahasrahBotException):
     pass
 
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
     sched_from = now - timedelta(hours=hours_past)
     sched_to = now + timedelta(hours=hours_future)
     params = {
