@@ -74,8 +74,8 @@ customizer:
       True: 50
       False: 50
     "OcarinaActive":
-      True: 70
-      False: 30
+      True: 30
+      False: 70
   custom:
     prize.crossWorld:
       True: 70
