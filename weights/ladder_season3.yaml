@@ -77,12 +77,6 @@ customizer:
       True: 70
       False: 30
   custom:
-    region.wildKeys:
-      True: 30
-      False: 70
-    region.wildBigKeys:
-      True: 30
-      False: 70
     prize.crossWorld:
       True: 70
       False: 30
