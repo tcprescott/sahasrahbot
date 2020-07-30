@@ -1,4 +1,7 @@
 description: "Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld)"
+preset:
+  none: 99.5
+  trueicerodhunt: .5
 customizer:
   triforce-hunt:
     goal: [30, 60]
