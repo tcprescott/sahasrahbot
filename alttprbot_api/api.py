@@ -2,11 +2,10 @@ import os
 
 from quart import Quart, abort, jsonify, request
 
-from alttprbot.alttprgen.mystery import get_weights
+from alttprbot.alttprgen.mystery import get_weights, generate_random_settings
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
 from alttprbot_srl.bot import srlbot
-from pyz3r.mystery import generate_random_settings
 
 sahasrahbotapi = Quart(__name__)
 
@@ -23,7 +22,7 @@ async def verify_srl_user(nick, key):
 @sahasrahbotapi.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
     weights = await request.get_json()
-    settings, customizer = generate_random_settings(weights=weights, spoilers="mystery")
+    settings, customizer = await generate_random_settings(weights=weights, spoilers="mystery")
     return jsonify(
         settings=settings,
         customizer=customizer,
@@ -33,7 +32,7 @@ async def mysterygen():
 @sahasrahbotapi.route('/api/settingsgen/mystery/<string:weightset>', methods=['GET'])
 async def mysterygenwithweights(weightset):
     weights = await get_weights(weightset)
-    settings, customizer = generate_random_settings(weights=weights, spoilers="mystery")
+    settings, customizer = await generate_random_settings(weights=weights, spoilers="mystery")
     return jsonify(
         settings=settings,
         customizer=customizer,

@@ -6,6 +6,7 @@ from aiohttp.client_exceptions import ClientResponseError
 from tenacity import RetryError, Retrying, stop_after_attempt, retry_if_exception_type
 
 import pyz3r
+from alttprbot.alttprgen.preset import fetch_preset
 from alttprbot.database import audit
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
@@ -46,12 +47,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
         for attempt in Retrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
             with attempt:
                 try:
-                    if festive:
-                        settings, customizer = festive_generate_random_settings(
-                            weights=weights, spoilers=spoilers)
-                    else:
-                        settings, customizer = pyz3r.mystery.generate_random_settings(
-                            weights=weights, spoilers=spoilers)
+                    settings, customizer = await generate_random_settings(weights, festive=festive, spoilers=spoilers)
 
                     settings['tournament'] = tournament
                     seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
@@ -98,3 +94,26 @@ def festive_generate_random_settings(weights, tournament=True, spoilers="mystery
     }
 
     return settings, False
+
+async def generate_random_settings(weights, festive=False, spoilers="mystery"):
+    if festive:
+        settings, customizer = festive_generate_random_settings(
+            weights=weights, spoilers=spoilers)
+    else:
+        if 'preset' in weights:
+            rolledpreset = pyz3r.mystery.get_random_option(weights['preset'])
+            if rolledpreset == 'none':
+                settings, customizer = pyz3r.mystery.generate_random_settings(
+                    weights=weights, spoilers=spoilers)
+            else:
+                preset_dict = await fetch_preset(rolledpreset, randomizer='alttpr')
+                settings = preset_dict['settings']
+                customizer = preset_dict.get('customizer', False)
+                settings.pop('name', None)
+                settings.pop('notes', None)
+                settings['spoilers'] = spoilers
+        else:
+            settings, customizer = pyz3r.mystery.generate_random_settings(
+                weights=weights, spoilers=spoilers)
+
+    return settings, customizer
