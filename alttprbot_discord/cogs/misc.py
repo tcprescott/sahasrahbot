@@ -119,7 +119,7 @@ class Misc(commands.Cog):
         episode = sg_schedule[0]
         when = dateutil.parser.parse(episode['when'])
         when_central = when.astimezone(pytz.timezone('US/Eastern')).strftime('%m-%d %I:%M %p')
-        when_europe = when.astimezone(pytz.timezone('CET')).strftime('%m-%d %I:%M %p')
+        when_europe = when.astimezone(pytz.timezone('Europe/Berlin')).strftime('%m-%d %I:%M %p')
         difference = when - datetime.datetime.now(when.tzinfo)
         embed = discord.Embed(
             title=episode['event']['name'],
@@ -127,7 +127,7 @@ class Misc(commands.Cog):
         )
         embed.set_thumbnail(url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
 
-        embed.add_field(name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
+        embed.add_field(name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
         broadcast_channels = [a['name'] for a in episode['channels'] if not a['name'] == 'No Stream']
         if broadcast_channels:
             embed.add_field(name="Twitch Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
