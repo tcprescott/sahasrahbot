@@ -37,7 +37,7 @@ discordbot.load_extension("alttprbot_discord.cogs.moderation")
 discordbot.load_extension("alttprbot_discord.cogs.nickname")
 discordbot.load_extension("alttprbot_discord.cogs.role")
 discordbot.load_extension("alttprbot_discord.cogs.smvaria")
-discordbot.load_extension("alttprbot_discord.cogs.smz3gen")
+discordbot.load_extension("alttprbot_discord.cogs.smz3")
 # discordbot.load_extension("alttprbot_discord.cogs.tournament")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 

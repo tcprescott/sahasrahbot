@@ -5,22 +5,17 @@ import aiohttp
 import discord
 import yaml
 from discord.ext import commands
-from z3rsramr import parse_sram
+from z3rsramr import parse_sram #pylint: disable=no-name-in-module
 
 import pyz3r
-from alttprbot.alttprgen.mystery import (generate_random_game,
-                                         generate_test_game)
-from alttprbot.alttprgen.preset import get_preset, fetch_preset, generate_preset
+from alttprbot.alttprgen.mystery import (generate_random_game)
+from alttprbot.alttprgen.preset import get_preset, generate_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
 from ..util import checks
-
-# from config import Config as c
-
-
 
 class AlttprGen(commands.Cog):
     def __init__(self, bot):
@@ -39,10 +34,10 @@ class AlttprGen(commands.Cog):
         brief='Generate a race preset.',
         help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets',
         invoke_without_command=True,
-        aliases=['racepreset', 'race']
+        aliases=['racepreset', 'preset']
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def preset(self, ctx, preset, hints=False):
+    async def race(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
         if not seed:
             raise SahasrahBotException(
@@ -50,14 +45,14 @@ class AlttprGen(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-    @preset.command(
+    @race.command(
         name='custom',
         brief='Generate a custom preset.',
         help='Generate a custom preset.  This file should be attached to the message.'
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def preset_custom(self, ctx, tournament: bool = True):
+    async def race_custom(self, ctx, tournament: bool = True):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             preset_dict = yaml.safe_load(content)
@@ -71,9 +66,10 @@ class AlttprGen(commands.Cog):
         brief='Generate a preset without the race flag enabled.',
         help='Generate a preset without the race flag enabled.  Find a list of presets at https://l.synack.live/presets',
         invoke_without_command=True,
+        aliases=['nonracepreset']
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def nonracepreset(self, ctx, preset, hints=False):
+    async def norace(self, ctx, preset, hints=False):
         seed, preset_dict = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
         if not seed:
             raise SahasrahBotException(
@@ -81,14 +77,14 @@ class AlttprGen(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
-    @nonracepreset.command(
+    @norace.command(
         name='custom',
         brief='Generate a custom preset.',
         help='Generate a custom preset.  This file should be attached to the message.'
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def nonracepreset_custom(self, ctx, tournament: bool = True):
+    async def norace_custom(self, ctx, tournament: bool = True):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             preset_dict = yaml.safe_load(content)
@@ -118,8 +114,8 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
-    async def random(self, ctx, weightset='weighted', tournament: bool = True):
-        await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=False)
+    async def random(self, ctx, weightset='weighted'):
+        await randomgame(ctx=ctx, weightset=weightset, tournament=False, spoilers="on", festive=False)
 
     @random.command(
         name='custom',
@@ -128,11 +124,11 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def random_custom(self, ctx, tournament: bool = True):
+    async def random_custom(self, ctx):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             weights = yaml.safe_load(content)
-            await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=tournament, spoilers="off", festive=False)
+            await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=False, spoilers="on", festive=False)
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
 
@@ -160,15 +156,6 @@ class AlttprGen(commands.Cog):
             await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=True, spoilers="mystery", festive=False)
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
-
-    @commands.command(
-        brief='Generate a mystery game.',
-        help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights'
-    )
-    @commands.is_owner()
-    async def mysterytest(self, ctx, weightset='bot_testing'):
-        resp = await generate_test_game(weightset=weightset)
-        await ctx.send(file=discord.File(io.StringIO(json.dumps(resp, indent=4)), filename=f"{weightset}.txt"))
 
     @commands.command(
         brief='Verify a game was generated by SahasrahBot.',
