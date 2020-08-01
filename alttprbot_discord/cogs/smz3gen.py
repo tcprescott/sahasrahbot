@@ -1,3 +1,5 @@
+import asyncio
+
 from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
@@ -24,6 +26,24 @@ class smz3gen(commands.Cog):
                 f'Code: {seed.code}'
             ))
 
+    # @commands.command()
+    # async def smz3multi(self, ctx, preset):
+    #     msg = await ctx.send("react to this message to proceed")
+    #     await msg.add_reaction("✅")
+    #     await msg.add_reaction('👍')
+
+    #     def check(reaction, user):
+    #         return user == ctx.author and str(reaction.emoji) == '✅' and reaction.message.id == msg.id
+
+    #     try:
+    #         reaction, user = await self.bot.wait_for('reaction_add', timeout=900, check=check)
+    #     except asyncio.TimeoutError:
+    #         await ctx.message.add_reaction('👎')
+    #     else:
+    #         await ctx.message.add_reaction('👍')
+    #     print(reaction)
+    #     print(user)
+    #     print("done")
 
 def setup(bot):
     bot.add_cog(smz3gen(bot))
