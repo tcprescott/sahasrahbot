@@ -216,7 +216,7 @@ settings:
         MirrorShield: 0
         MoonPearl: 1
         Mushroom: 1
-        Nothing: 1
+        Nothing: 0
         OcarinaActive: 0
         OcarinaInactive: 1
         OneHundredRupees: 1
