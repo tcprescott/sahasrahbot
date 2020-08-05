@@ -9,9 +9,6 @@ class PresetNotFoundException(SahasrahBotException):
     pass
 
 async def generate_multiworld(preset, players, tournament=False):
-    if len(players) < 2:
-        raise SahasrahBotException("You must have at least two players to join create a multiworld.")
-
     preset_dict = await fetch_preset(preset, randomizer='smz3')
 
     settings = preset_dict['settings']

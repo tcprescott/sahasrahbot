@@ -38,7 +38,10 @@ class SuperMetroidComboRandomizer(commands.Cog):
                 f'Code: {seed.code}'
             ))
 
-    @commands.command()
+    @commands.command(
+        help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 900 seconds later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
+        brief='Initiate a SMZ3 Multiworld Game.',
+    )
     async def smz3multi(self, ctx, preset):
         await fetch_preset(preset, randomizer='smz3')
 
@@ -46,27 +49,30 @@ class SuperMetroidComboRandomizer(commands.Cog):
             title='SMZ3 Multiworld Game',
             description=(
                 'A new multiworld game has been initiated, react with 👍 to join.\n'
-                'When everyone is ready, the game creator can react with ✅ to create a session.'
+                'When everyone is ready, the game creator can react with ✅ to create a session.\n'
+                'The game creator can react with ❌ to cancel this game.'
             ),
             color=discord.Color.dark_blue()
         )
-        embed.add_field(name="Status", value="Open for entry", inline=False)
-        embed.add_field(name="Preset", value=preset, inline=False)
+        embed.add_field(name="Status", value="👍 Open for entry", inline=False)
+        embed.add_field(name="Preset", value=f"[{preset}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/{preset}.yaml)", inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
         msg = await ctx.send(embed=embed)
 
         await msg.add_reaction('👍')
         await msg.add_reaction("✅")
+        await msg.add_reaction("❌")
 
         def add_check(reaction, user):
-            return str(reaction.emoji) in ['👍', '✅'] and reaction.message.id == msg.id and not user.id == self.bot.user.id
+            return str(reaction.emoji) in ['👍', '✅', '❌'] and reaction.message.id == msg.id and not user.id == self.bot.user.id
 
         def remove_check(reaction, user):
             return str(reaction.emoji) == '👍' and reaction.message.id == msg.id and not user.id == self.bot.user.id
 
         timeout_start = time.time()
         close = False
+        roll = True
         timeout = 900
         while time.time() < timeout_start + timeout and not close:
             try:
@@ -83,6 +89,9 @@ class SuperMetroidComboRandomizer(commands.Cog):
                     reaction, user = await task
                     if str(reaction.emoji) == '✅' and user == ctx.author:
                         close = True
+                    if str(reaction.emoji) == '❌' and user == ctx.author:
+                        close = True
+                        roll = False
                     elif str(reaction.emoji) == '👍':
                         r = discord.utils.get(reaction.message.reactions, emoji='👍')
                         players = await r.users().flatten()
@@ -93,26 +102,36 @@ class SuperMetroidComboRandomizer(commands.Cog):
                             embed.set_field_at(2, name="Players", value='No players yet.')
             except asyncio.TimeoutError:
                 pass
-            embed.set_field_at(0, name="Status", value=f"Open for entry, auto-close in {round((timeout_start + timeout) - time.time(), 0)}s")
+            embed.set_field_at(0, name="Status", value=f"👍 Open for entry, auto-close in {round((timeout_start + timeout) - time.time(), 0)}s")
             await msg.edit(embed=embed)
 
-        embed.set_field_at(0, name="Status", value="Game closed for entry.  Rolling...")
+        if not roll:
+            embed.set_field_at(0, name="Status", value="❌ Cancelled.")
+            await msg.edit(embed=embed)
+            return
+
+        embed.set_field_at(0, name="Status", value="⌚ Game closed for entry.  Rolling...")
         await msg.edit(embed=embed)
 
         r = discord.utils.get(reaction.message.reactions, emoji='👍')
-        players = await r.users().flatten()
+        reaction_users = await r.users().flatten()
 
-        seed = await generate_multiworld(preset, [p.name for p in players if not p.id == self.bot.user.id], tournament=False)
+        if len(reaction_users) < 3:
+            embed.set_field_at(0, name="Status", value="❌ Too few players.  Cancelled.")
+            await msg.edit(embed=embed)
+            raise SahasrahBotException("You must have at least two players to create a multiworld.")
+
+        players = [p for p in players if not p.id == self.bot.user.id]
+
+        seed = await generate_multiworld(preset, [p.name for p in players], tournament=False)
 
         dm_embed = discord.Embed(
             title="SMZ3 Multiworld Game"
         )
-        dm_embed.add_field(name="Players", value='\n'.join([p.name for p in players if not p.id == self.bot.user.id]), inline=False)
+        dm_embed.add_field(name="Players", value='\n'.join([p.name for p in players]), inline=False)
         dm_embed.add_field(name="Game Room", value=seed.url, inline=False)
 
         for player in players:
-            if player.id == self.bot.user.id:
-                continue
             try:
                 await player.send(embed=dm_embed)
             except discord.HTTPException:
