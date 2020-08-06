@@ -13,6 +13,7 @@ from alttprbot.util import http
 
 urlextractor = URLExtract()
 
+
 class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -45,15 +46,15 @@ class Moderation(commands.Cog):
                 elif attachment.filename.endswith(('.sfc', '.smc')) and await config.get(message.guild.id, 'DeleteRoms') == "true":
                     await message.delete()
                     await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
-    
 
 
 async def inspect_zip(url):
     binary = await http.request_generic(url, returntype='binary')
     with zipfile.ZipFile(io.BytesIO(binary), "r") as thezip:
         zippedfiles = thezip.namelist()
-    
+
     return zippedfiles
+
 
 async def should_delete_message(guild_id):
     deleteroms = await config.get_parameter(guild_id, 'DeleteRoms')
@@ -61,6 +62,7 @@ async def should_delete_message(guild_id):
         return True
     else:
         return False
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

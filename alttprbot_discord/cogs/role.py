@@ -67,7 +67,8 @@ class Role(commands.Cog):
                 'No more than 20 roles can be on a group.  Please create a new group.')
 
         if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
-            raise SahasrahBotException('Custom emoji is not available to this bot.')
+            raise SahasrahBotException(
+                'Custom emoji is not available to this bot.')
 
         await role.create_role(ctx.guild.id, group_id, role_name.id, name, emoji, description, protect_mentions)
         await refresh_bot_message(ctx, group_id)

@@ -1,6 +1,7 @@
 from discord.ext import commands
 from alttprbot.database import config
 
+
 class League(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -28,6 +29,7 @@ class League(commands.Cog):
         guildid = ctx.guild.id if ctx.guild else 0
         week = await config.get(guildid, 'AlttprLeagueWeek')
         await ctx.send(f"This is Week {week}")
+
 
 def setup(bot):
     bot.add_cog(League(bot))

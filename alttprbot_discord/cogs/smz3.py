@@ -18,31 +18,33 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def smz3(self, ctx):
         if ctx.invoked_subcommand is None:
-            raise SahasrahBotException('Try providing a valid subcommand.  Use "$help smz3" for assistance.')
+            raise SahasrahBotException(
+                'Try providing a valid subcommand.  Use "$help smz3" for assistance.')
 
     @smz3.command()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def race(self, ctx, preset="normal"):
         seed, preset_dict = await get_preset(preset, randomizer='smz3', tournament=True)
         await ctx.send((
-                f'Permalink: {seed.url}\n'
-                f'Code: {seed.code}'
-            ))
+            f'Permalink: {seed.url}\n'
+            f'Code: {seed.code}'
+        ))
 
     @smz3.command()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def norace(self, ctx, preset="normal"):
         seed, preset_dict = await get_preset(preset, randomizer='smz3', tournament=False)
         await ctx.send((
-                f'Permalink: {seed.url}\n'
-                f'Code: {seed.code}'
-            ))
+            f'Permalink: {seed.url}\n'
+            f'Code: {seed.code}'
+        ))
 
     @commands.group()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm(self, ctx):
         if ctx.invoked_subcommand is None:
-            raise SahasrahBotException('Try providing a valid subcommand.  Use "$help smz3" for assistance.')
+            raise SahasrahBotException(
+                'Try providing a valid subcommand.  Use "$help smz3" for assistance.')
 
     @sm.command(
         name='race'
@@ -51,9 +53,9 @@ class SuperMetroidComboRandomizer(commands.Cog):
     async def sm_race(self, ctx, preset="normal"):
         seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=True)
         await ctx.send((
-                f'Permalink: {seed.url}\n'
-                f'Code: {seed.code}'
-            ))
+            f'Permalink: {seed.url}\n'
+            f'Code: {seed.code}'
+        ))
 
     @sm.command(
         name='norace'
@@ -62,9 +64,9 @@ class SuperMetroidComboRandomizer(commands.Cog):
     async def sm_norace(self, ctx, preset="normal"):
         seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=False)
         await ctx.send((
-                f'Permalink: {seed.url}\n'
-                f'Code: {seed.code}'
-            ))
+            f'Permalink: {seed.url}\n'
+            f'Code: {seed.code}'
+        ))
 
     @commands.command(
         help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
@@ -93,7 +95,8 @@ class SuperMetroidComboRandomizer(commands.Cog):
             color=discord.Color.dark_blue()
         )
         embed.add_field(name="Status", value="👍 Open for entry", inline=False)
-        embed.add_field(name="Preset", value=f"[{preset.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{randomizer.lower()}/{preset.lower()}.yaml)", inline=False)
+        embed.add_field(
+            name="Preset", value=f"[{preset.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{randomizer.lower()}/{preset.lower()}.yaml)", inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
         msg = await ctx.send(embed=embed)
@@ -131,16 +134,21 @@ class SuperMetroidComboRandomizer(commands.Cog):
                         close = True
                         roll = False
                     elif str(reaction.emoji) == '👍':
-                        r = discord.utils.get(reaction.message.reactions, emoji='👍')
+                        r = discord.utils.get(
+                            reaction.message.reactions, emoji='👍')
                         players = await r.users().flatten()
-                        p_list = [p.name for p in players if not p.id == self.bot.user.id]
+                        p_list = [
+                            p.name for p in players if not p.id == self.bot.user.id]
                         if len(p_list) > 0:
-                            embed.set_field_at(2, name="Players", value='\n'.join(p_list))
+                            embed.set_field_at(
+                                2, name="Players", value='\n'.join(p_list))
                         else:
-                            embed.set_field_at(2, name="Players", value='No players yet.')
+                            embed.set_field_at(
+                                2, name="Players", value='No players yet.')
             except asyncio.TimeoutError:
                 pass
-            embed.set_field_at(0, name="Status", value=f"👍 Open for entry, auto-close in {round((timeout_start + timeout) - time.time(), 0)}s")
+            embed.set_field_at(
+                0, name="Status", value=f"👍 Open for entry, auto-close in {round((timeout_start + timeout) - time.time(), 0)}s")
             await msg.edit(embed=embed)
 
         if not roll:
@@ -148,16 +156,19 @@ class SuperMetroidComboRandomizer(commands.Cog):
             await msg.edit(embed=embed)
             return
 
-        embed.set_field_at(0, name="Status", value="⌚ Game closed for entry.  Rolling...")
+        embed.set_field_at(
+            0, name="Status", value="⌚ Game closed for entry.  Rolling...")
         await msg.edit(embed=embed)
 
         r = discord.utils.get(reaction.message.reactions, emoji='👍')
         reaction_users = await r.users().flatten()
 
         if len(reaction_users) < 3:
-            embed.set_field_at(0, name="Status", value="❌ Too few players.  Cancelled.")
+            embed.set_field_at(
+                0, name="Status", value="❌ Too few players.  Cancelled.")
             await msg.edit(embed=embed)
-            raise SahasrahBotException("You must have at least two players to create a multiworld.")
+            raise SahasrahBotException(
+                "You must have at least two players to create a multiworld.")
 
         players = [p for p in players if not p.id == self.bot.user.id]
 
@@ -166,7 +177,8 @@ class SuperMetroidComboRandomizer(commands.Cog):
         dm_embed = discord.Embed(
             title=f'{randomizer.upper()} Multiworld Game'
         )
-        dm_embed.add_field(name="Players", value='\n'.join([p.name for p in players]), inline=False)
+        dm_embed.add_field(name="Players", value='\n'.join(
+            [p.name for p in players]), inline=False)
         dm_embed.add_field(name="Game Room", value=seed.url, inline=False)
 
         for player in players:
@@ -175,8 +187,10 @@ class SuperMetroidComboRandomizer(commands.Cog):
             except discord.HTTPException:
                 await ctx.send(f"Unable to send DM to {player.mention}!")
 
-        embed.set_field_at(0, name="Status", value="✅ Game started!  Check your DMs.")
+        embed.set_field_at(
+            0, name="Status", value="✅ Game started!  Check your DMs.")
         await msg.edit(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(SuperMetroidComboRandomizer(bot))

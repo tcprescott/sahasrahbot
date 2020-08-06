@@ -15,6 +15,7 @@ from alttprbot_discord.util.alttpr_discord import alttpr
 class WeightsetNotFoundException(SahasrahBotException):
     pass
 
+
 async def generate_test_game(weightset='weighted', festive=False):
     weights = await get_weights(weightset)
 
@@ -27,6 +28,7 @@ async def generate_test_game(weightset='weighted', festive=False):
 
     return settings
 
+
 async def get_weights(weightset='weighted'):
     basename = os.path.basename(f'{weightset}.yaml')
 
@@ -36,8 +38,9 @@ async def get_weights(weightset='weighted'):
     except FileNotFoundError as err:
         raise WeightsetNotFoundException(
             f'Could not find weightset {weightset}.  See a list of available weights at https://l.synack.live/weights') from err
-    
+
     return weights
+
 
 async def generate_random_game(weightset='weighted', weights=None, tournament=True, spoilers="off", festive=False):
     if weights is None:
@@ -76,6 +79,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
     )
     return seed
 
+
 def festive_generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings = {
         "glitches": pyz3r.mystery.get_random_option(weights['glitches_required']),
@@ -94,6 +98,7 @@ def festive_generate_random_settings(weights, tournament=True, spoilers="mystery
     }
 
     return settings, False
+
 
 async def generate_random_settings(weights, festive=False, spoilers="mystery"):
     if festive:

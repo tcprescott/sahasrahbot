@@ -16,6 +16,7 @@ async def request_generic(url, method='get', reqparams=None, data=None, header=N
             elif returntype == 'yaml':
                 return yaml.safe_load(await resp.read())
 
+
 async def request_json_post(url, data, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=auth, raise_for_status=True) as session:
         async with session.post(url=url, json=data, auth=auth) as resp:
@@ -27,6 +28,7 @@ async def request_json_post(url, data, auth=None, returntype='text'):
                 return await resp.read()
             elif returntype == 'yaml':
                 return yaml.safe_load(await resp.read())
+
 
 async def request_json_put(url, data, auth=None, returntype='text'):
     async with aiohttp.ClientSession(auth=auth, raise_for_status=True) as session:

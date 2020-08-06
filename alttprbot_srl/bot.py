@@ -110,7 +110,6 @@ async def message_logger(msgtype, target, source, message):
 
     # write event to channel log
 
-
     msg = f'{datetime.datetime.now()} - {msgtype} - {target} - {source} - "{message}"\n'
     if target == c.SRL_NICK:
         fileloc = f'/var/log/sahasrahbot/srl/{source}.txt'

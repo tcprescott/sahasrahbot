@@ -38,7 +38,8 @@ class Audit(commands.Cog):
             audit_channel_id = await config.get(guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_delete(guild, channel, payload.message_id)
-                audit_channel = discord.utils.get(guild.channels, id=int(audit_channel_id))
+                audit_channel = discord.utils.get(
+                    guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
                 await audit.set_deleted(payload.message_id)
@@ -56,7 +57,8 @@ class Audit(commands.Cog):
             for message_id in payload.message_ids:
                 if audit_channel_id:
                     embed = await audit_embed_delete(guild, channel, message_id)
-                    audit_channel = discord.utils.get(guild.channels, id=int(audit_channel_id))
+                    audit_channel = discord.utils.get(
+                        guild.channels, id=int(audit_channel_id))
 
                     await audit_channel.send(embed=embed)
                     await audit.set_deleted(payload.message_id)
@@ -76,7 +78,8 @@ class Audit(commands.Cog):
             audit_channel_id = await config.get(message.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_edit(old_message, message)
-                audit_channel = discord.utils.get(message.guild.channels, id=int(audit_channel_id))
+                audit_channel = discord.utils.get(
+                    message.guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
 
@@ -110,7 +113,8 @@ class Audit(commands.Cog):
             audit_channel_id = await config.get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_joined(member)
-                audit_channel = discord.utils.get(member.guild.channels, id=int(audit_channel_id))
+                audit_channel = discord.utils.get(
+                    member.guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
 
@@ -122,7 +126,8 @@ class Audit(commands.Cog):
             audit_channel_id = await config.get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_left(member)
-                audit_channel = discord.utils.get(member.guild.channels, id=int(audit_channel_id))
+                audit_channel = discord.utils.get(
+                    member.guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
 
@@ -166,7 +171,8 @@ class Audit(commands.Cog):
             audit_channel_id = await config.get(user.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_banned(user)
-                audit_channel = discord.utils.get(user.guild.channels, id=int(audit_channel_id))
+                audit_channel = discord.utils.get(
+                    user.guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
 
@@ -190,6 +196,7 @@ class Audit(commands.Cog):
 #     embed.set_thumbnail(url=member.avatar_url)
 #     return embed
 
+
 async def audit_embed_member_joined(member):
     embed = discord.Embed(
         title="Member Joined",
@@ -199,6 +206,7 @@ async def audit_embed_member_joined(member):
     )
     embed.set_thumbnail(url=member.avatar_url)
     return embed
+
 
 async def audit_embed_member_left(member):
     embed = discord.Embed(
@@ -210,6 +218,7 @@ async def audit_embed_member_left(member):
     embed.set_thumbnail(url=member.avatar_url)
     return embed
 
+
 async def audit_embed_member_banned(member):
     embed = discord.Embed(
         title="Member Banned",
@@ -220,12 +229,13 @@ async def audit_embed_member_banned(member):
     embed.set_thumbnail(url=member.avatar_url)
     return embed
 
+
 async def audit_embed_edit(old_message, message):
     if not old_message:
         old_content = '??? err unknown ???'
     else:
         old_content = old_message[-1]['content']
-    
+
     old_content = '*empty*' if old_content == '' else old_content
     new_content = '*empty*' if message.content == '' else message.content
 
@@ -236,11 +246,14 @@ async def audit_embed_edit(old_message, message):
         timestamp=datetime.datetime.now()
     )
 
-    embed.add_field(name='Old Message', value=old_content[:1000] + ('..' if len(old_content) > 1000 else ''), inline=False)
-    embed.add_field(name='New Message', value=new_content[:1000] + ('..' if len(new_content) > 1000 else ''))
+    embed.add_field(name='Old Message', value=old_content[:1000] + (
+        '..' if len(old_content) > 1000 else ''), inline=False)
+    embed.add_field(name='New Message',
+                    value=new_content[:1000] + ('..' if len(new_content) > 1000 else ''))
     embed.set_footer(text="Logged at")
 
     return embed
+
 
 async def audit_embed_delete(guild, channel, message_id, bulk=False):
     old_message = await audit.get_cached_messages(message_id)
@@ -254,7 +267,7 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
         old_content = old_message[-1]['content']
         old_attachment_url = old_message[-1]['attachment']
         original_timestamp = f"{old_message[0]['message_date']} UTC"
-    
+
     old_content = '*empty*' if old_content == '' else old_content
 
     embed = discord.Embed(
@@ -264,13 +277,17 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
         timestamp=datetime.datetime.now()
     )
 
-    embed.add_field(name='Old Message', value=old_content[:1020] + ('...' if len(old_content) > 1020 else ''), inline=False)
+    embed.add_field(name='Old Message', value=old_content[:1020] + (
+        '...' if len(old_content) > 1020 else ''), inline=False)
     if old_attachment_url:
-        embed.add_field(name='Old Attachment', value=old_attachment_url, inline=False)
-    embed.add_field(name='Message Timestamp', value=original_timestamp, inline=False)
+        embed.add_field(name='Old Attachment',
+                        value=old_attachment_url, inline=False)
+    embed.add_field(name='Message Timestamp',
+                    value=original_timestamp, inline=False)
     embed.set_footer(text="Logged at")
 
     return embed
+
 
 async def record_message(message):
     await audit.insert_message(
@@ -282,6 +299,7 @@ async def record_message(message):
         content=message.content,
         attachment=message.attachments[0].url if message.attachments else None
     )
+
 
 def setup(bot):
     bot.add_cog(Audit(bot))

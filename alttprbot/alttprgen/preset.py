@@ -13,10 +13,13 @@ class PresetNotFoundException(SahasrahBotException):
     pass
 
 # this is until I port the existing code over to the new fetch_preset and generate_preset coroutines, or do something else that isn't as terrible
+
+
 async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournament=True, randomizer='alttpr', allow_quickswap=False):
     preset_dict = await fetch_preset(preset, randomizer)
     seed = await generate_preset(preset_dict, preset=preset, hints=hints, nohints=nohints, spoilers=spoilers, tournament=tournament, allow_quickswap=allow_quickswap)
     return seed, preset_dict
+
 
 async def fetch_preset(preset, randomizer='alttpr'):
     preset = preset.lower()
@@ -35,6 +38,7 @@ async def fetch_preset(preset, randomizer='alttpr'):
             f'Could not find preset {preset}.  See a list of available presets at https://l.synack.live/presets') from err
 
     return preset_dict
+
 
 async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False):
     randomizer = preset_dict.get('randomizer', 'alttpr')
@@ -65,7 +69,8 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
         )
         hash_id = seed.slug_id
     else:
-        raise SahasrahBotException(f'Randomizer {randomizer} is not supported.')
+        raise SahasrahBotException(
+            f'Randomizer {randomizer} is not supported.')
 
     await audit.insert_generated_game(
         randomizer=randomizer,

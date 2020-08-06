@@ -14,7 +14,8 @@ class SuperMetroidVaria(commands.Cog):
     @commands.group()
     async def smvaria(self, ctx):
         if ctx.invoked_subcommand is None:
-            raise SahasrahBotException('Try providing a valid subcommand.  Use "$help smvaria" for assistance.')
+            raise SahasrahBotException(
+                'Try providing a valid subcommand.  Use "$help smvaria" for assistance.')
 
     @smvaria.command()
     async def race(self, ctx, skills="regular", settings="default"):
@@ -33,6 +34,7 @@ class SuperMetroidVaria(commands.Cog):
             race=False
         )
         await ctx.send(embed=seed.embed())
+
 
 def setup(bot):
     bot.add_cog(SuperMetroidVaria(bot))

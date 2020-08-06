@@ -22,7 +22,7 @@ class BontaMultiworld(commands.Cog):
               'The use_server_options option, when enabled, will use the server_options embedded in the multidata file, if it exists.\n\n'
               'Returns a "token" that can be used with the $mwmsg command to send commands to the server console.\n\n'
               'Warning: Games are automatically closed after 24 hours.  If you require more time than that, you may re-open the game using $mwresume'
-        ),
+              ),
         brief='Host a multiworld using Bonta\'s multiworld implementation.'
     )
     async def mwhost(self, ctx, use_server_options: bool = False):
@@ -43,10 +43,12 @@ class BontaMultiworld(commands.Cog):
         try:
             multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
         except ClientResponseError as err:
-            raise SahasrahBotException('Unable to generate host using the provided multidata.  Ensure you\'re using the latest version of the mutiworld (<https://github.com/Bonta0/ALttPEntranceRandomizer/tree/multiworld_31>)!') from err
+            raise SahasrahBotException(
+                'Unable to generate host using the provided multidata.  Ensure you\'re using the latest version of the mutiworld (<https://github.com/Bonta0/ALttPEntranceRandomizer/tree/multiworld_31>)!') from err
 
         if not multiworld.get('success', True):
-            raise SahasrahBotException(f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
+            raise SahasrahBotException(
+                f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
 
         await ctx.send(embed=make_embed(multiworld))
 
@@ -65,7 +67,8 @@ class BontaMultiworld(commands.Cog):
             raise SahasrahBotException("That game does not exist.")
 
         if not result['admin']:
-            raise SahasrahBotException('You must be the creator of the game to send messages to it.')
+            raise SahasrahBotException(
+                'You must be the creator of the game to send messages to it.')
 
         data = {
             'msg': msg
@@ -73,7 +76,8 @@ class BontaMultiworld(commands.Cog):
         response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data, returntype='json')
 
         if response.get('success', True) is False:
-            raise SahasrahBotException(response.get('error', 'Unknown error occured while processing message.'))
+            raise SahasrahBotException(response.get(
+                'error', 'Unknown error occured while processing message.'))
 
         if 'resp' in response and response['resp'] is not None:
             await ctx.send(response['resp'])
@@ -86,7 +90,7 @@ class BontaMultiworld(commands.Cog):
         ),
         brief='Resume a multiworld that was previously closed.'
     )
-    async def mwresume(self, ctx, token, port, use_server_options: bool=False):
+    async def mwresume(self, ctx, token, port, use_server_options: bool = False):
         data = {
             'token': token,
             'port': port,
@@ -120,15 +124,17 @@ class BontaMultiworld(commands.Cog):
 
         with zipfile.ZipFile(io.BytesIO(binary), "r") as oldzip:
             with zipfile.ZipFile(zip_buffer, "w") as newzip:
-                bmbp_files = [f for f in oldzip.namelist() if f.endswith('.bmbp')]
+                bmbp_files = [
+                    f for f in oldzip.namelist() if f.endswith('.bmbp')]
                 for bmbp_file in bmbp_files:
                     with oldzip.open(bmbp_file, 'r') as bmbp:
-                        content = yaml.load(lzma.decompress(bmbp.read()), Loader=yaml.SafeLoader)
+                        content = yaml.load(lzma.decompress(
+                            bmbp.read()), Loader=yaml.SafeLoader)
                         try:
                             content['meta']['server'] = hoststring
                         except KeyError:
                             pass
-                    
+
                     new_file = yaml.dump(content).encode(encoding="utf-8-sig")
                     newzip.writestr(bmbp_file, lzma.compress(new_file))
 
@@ -144,12 +150,14 @@ def make_embed(multiworld):
         color=discord.Color.green()
     )
     embed.add_field(name="Game Token", value=multiworld['token'], inline=False)
-    embed.add_field(name="Host", value=f"{c.MultiworldHostBase}:{multiworld['port']}", inline=False)
+    embed.add_field(
+        name="Host", value=f"{c.MultiworldHostBase}:{multiworld['port']}", inline=False)
     for idx, team in enumerate(multiworld.get('players', []), start=1):
         if len(team) < 50:
             embed.add_field(name=f"Team #{idx}", value='\n'.join(team))
 
     return embed
+
 
 def setup(bot):
     bot.add_cog(BontaMultiworld(bot))

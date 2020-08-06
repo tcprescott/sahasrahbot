@@ -2,6 +2,7 @@ from pyz3r.smvaria import SuperMetroidVaria
 import discord
 import datetime
 
+
 class SuperMetroidVariaDiscord(SuperMetroidVaria):
     def embed(self):
         embed = discord.Embed(

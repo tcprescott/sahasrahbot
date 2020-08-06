@@ -11,7 +11,9 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
 
-ACCESSIBLE_RACE_WARNING = ircmessage.style('WARNING: ', bold=True, fg='red') + ircmessage.style('This race is using an accessible ruleset that prohibits most sequence breaking glitches.  Please visit https://link.alttpr.com/accessible for more details!', fg='red')
+ACCESSIBLE_RACE_WARNING = ircmessage.style('WARNING: ', bold=True, fg='red') + ircmessage.style(
+    'This race is using an accessible ruleset that prohibits most sequence breaking glitches.  Please visit https://link.alttpr.com/accessible for more details!', fg='red')
+
 
 async def handler(target, source, message, client):
     if not message[0] == '$':
@@ -34,7 +36,8 @@ async def handler(target, source, message, client):
         race = await srl_races.get_srl_race_by_id(srl_id)
 
         if race:
-            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+            raise SahasrahBotException(
+                "There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
             randomizer = 'alttpr'
@@ -58,7 +61,7 @@ async def handler(target, source, message, client):
                 goal = f"{goal} - accessible ruleset"
                 await client.message(target, ACCESSIBLE_RACE_WARNING)
                 post_start_message = ACCESSIBLE_RACE_WARNING
-        
+
         pre_race_goal = goal
         if srl['game']['abbrev'] == 'alttphacks':
             pre_race_goal = f'vt8 randomizer - {pre_race_goal}'
@@ -66,7 +69,8 @@ async def handler(target, source, message, client):
 
         pre_race_goal += f" - {seed.url}"
         if seed.code is not None:
-            pre_race_goal += f" - ({'/'.join(seed.code)})" if isinstance(seed.code, list) else f" - ({seed.code})"
+            pre_race_goal += f" - ({'/'.join(seed.code)})" if isinstance(
+                seed.code, list) else f" - ({seed.code})"
             if args.command == "$quickswaprace":
                 pre_race_goal += " - Quickswap Enabled"
 
@@ -79,7 +83,8 @@ async def handler(target, source, message, client):
 
     if args.command in ['$mystery', '$festivemystery'] and target.startswith('#srl-'):
         mode = "mystery"
-        festive = True if args.command in ['$festivemystery'] and festivemode else False
+        festive = True if args.command in [
+            '$festivemystery'] and festivemode else False
 
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
@@ -87,7 +92,8 @@ async def handler(target, source, message, client):
         race = await srl_races.get_srl_race_by_id(srl_id)
 
         if race:
-            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+            raise SahasrahBotException(
+                "There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
             seed = await mystery.generate_random_game(
@@ -126,7 +132,8 @@ async def handler(target, source, message, client):
         race = await srl_races.get_srl_race_by_id(srl_id)
 
         if race:
-            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+            raise SahasrahBotException(
+                "There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
         if srl['game']['abbrev'] == 'alttphacks':
             seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(args.preset)

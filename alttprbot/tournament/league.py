@@ -100,16 +100,20 @@ SETTINGSMAP = {
     'Swordless': 'swordless'
 }
 
+
 class WeekNotFoundException(SahasrahBotException):
     pass
 
+
 class SettingsSubmissionNotFoundException(SahasrahBotException):
     pass
+
 
 async def settings_sheet(episodeid):
     sheet = SettingsSheet(episodeid)
     await sheet._init()
     return sheet
+
 
 class SettingsSheet():
     def __init__(self, episodeid):
@@ -172,10 +176,12 @@ class SettingsSheet():
             }
         }
 
+
 async def league_race(episodeid: int, week=None):
     race = LeagueRace(episodeid, week)
     await race._init()
     return race
+
 
 class LeagueRace():
     def __init__(self, episodeid: int, week=None):
@@ -194,11 +200,11 @@ class LeagueRace():
 
         self.episode = await speedgaming.get_episode(self.episodeid)
 
-
         if self.week == 'playoffs':
             sheet_settings = await settings_sheet(self.episodeid)
             self.type = PLAYOFFDATA[sheet_settings.row['Game Number']]['type']
-            self.friendly_name = PLAYOFFDATA[sheet_settings.row['Game Number']]['friendly_name']
+            self.friendly_name = PLAYOFFDATA[sheet_settings.row['Game Number']
+                                             ]['friendly_name']
             self.spoiler_log_url = None
 
             if self.type == 'preset':
@@ -235,7 +241,8 @@ class LeagueRace():
                 self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
                 self.goal_after_start = f"vt8 randomizer - spoiler {self.preset_dict.get('goal_name', 'unknown')}"
             else:
-                raise SahasrahBotException('Week type not found, something went horribly wrong...')
+                raise SahasrahBotException(
+                    'Week type not found, something went horribly wrong...')
 
             if WEEKDATA[self.week].get('coop', False):
                 self.goal_after_start += ' - DO NOT RECORD'
@@ -248,12 +255,15 @@ class LeagueRace():
             for player in self.episode[match]['players']:
                 try:
                     if not player.get('discordId', '') == '':
-                        member = self.guild.get_member(int(player['discordId']))
+                        member = self.guild.get_member(
+                            int(player['discordId']))
                     else:
-                        member = self.guild.get_member_named(player['discordTag'])
-                    
+                        member = self.guild.get_member_named(
+                            player['discordTag'])
+
                     if member is None:
-                        raise SahasrahBotException(f"Unable to resolve Discord User for {player['displayName']} ({player['discordTag']}).  Please contact a moderator for help.")
+                        raise SahasrahBotException(
+                            f"Unable to resolve Discord User for {player['displayName']} ({player['discordTag']}).  Please contact a moderator for help.")
                     player_list.append(member)
                 except discord.HTTPException:
                     pass
@@ -303,8 +313,8 @@ async def process_league_race(target, args, client):
         emojis=discordbot.emojis
     )
 
-
-    broadcast_channels = [a['name'] for a in generated_league_race.episode['channels'] if not a['name'] == 'No Stream']
+    broadcast_channels = [
+        a['name'] for a in generated_league_race.episode['channels'] if not a['name'] == 'No Stream']
 
     for channel in broadcast_channels:
         await twitch_command_text.insert_command_text(channel.lower(), "mode", generated_league_race.twitch_mode_command)
@@ -335,7 +345,6 @@ async def process_league_race(target, args, client):
     if generated_league_race.type == 'spoiler':
         await spoiler_races.insert_spoiler_race(srl_id, generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
 
-
     await srl_races.insert_srl_race(srl_id, generated_league_race.goal_after_start)
     await tournament_results.insert_tournament_race(
         srl_id=srl_id,
@@ -348,6 +357,7 @@ async def process_league_race(target, args, client):
 
     await client.message(target, "Seed has been generated, you should have received a DM in Discord.  Please contact a League Moderator if you haven't received the DM.")
 
+
 async def process_league_race_finish(target, client):
     srl_id = srl.srl_race_id(target)
     srl_race = await srl.get_race(srl_id)
@@ -356,6 +366,7 @@ async def process_league_race_finish(target, client):
         srl_id=srl_id,
         results_json=json.dumps(srl_race['entrants'])
     )
+
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,

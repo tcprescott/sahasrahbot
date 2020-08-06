@@ -5,6 +5,7 @@ from ..util import orm
 
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
+
 async def get_role_by_group_emoji(channel_id, message_id, emoji, guild_id):
     roles = await orm.select(
         'SELECT rr.role_id from reaction_group rg LEFT JOIN reaction_role rr ON rr.reaction_group_id = rg.id WHERE rg.channel_id=%s AND rg.message_id=%s AND rg.guild_id=%s and rr.emoji=%s;',
@@ -64,7 +65,8 @@ async def create_group(guild_id, channel_id, message_id, name, description, bot_
     )
 
     if len(existing_groups) > 0:
-        raise SahasrahBotException('Group already exists for specified message.')
+        raise SahasrahBotException(
+            'Group already exists for specified message.')
 
     await orm.execute(
         'INSERT into reaction_group (`guild_id`,`channel_id`,`message_id`,`name`,`description`,`bot_managed`) values (%s, %s, %s, %s, %s, %s)',
@@ -106,7 +108,8 @@ async def create_role(guild_id, reaction_group_id, role_id, name, emoji, descrip
 
     await orm.execute(
         'INSERT into reaction_role (`guild_id`, `reaction_group_id`, `role_id`, `name`, `emoji`, `description`, `protect_mentions`) values (%s, %s, %s, %s, %s, %s, %s)',
-        [guild_id, reaction_group_id, role_id, name, emoji, description, protect_mentions]
+        [guild_id, reaction_group_id, role_id, name,
+            emoji, description, protect_mentions]
     )
     await aiocache.SimpleMemoryCache().clear(namespace="role")
 

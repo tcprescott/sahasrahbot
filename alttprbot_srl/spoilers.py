@@ -3,6 +3,7 @@ from alttprbot.database import spoiler_races
 import math
 import ircmessage
 
+
 async def send_spoiler_log(srl_id, client, target):
     race = await spoiler_races.get_spoiler_race_by_id(srl_id)
     if race:
@@ -18,6 +19,7 @@ async def send_spoiler_log(srl_id, client, target):
             beginmessage=True,
         )
         await spoiler_races.delete_spoiler_race(srl_id)
+
 
 async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage=False):
     loop = asyncio.get_running_loop()

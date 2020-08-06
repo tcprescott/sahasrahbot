@@ -30,6 +30,7 @@ srl_game_whitelist = [
     'A Link to the Past & Super Metroid Combo Randomizer'
 ]
 
+
 async def topic_change_handler(target, source, message, client):
     if not (source == 'RaceBot' or source == 'synack'):
         return
@@ -37,6 +38,7 @@ async def topic_change_handler(target, source, message, client):
     if target.startswith('#srl-') and racedone.search(message):
         await asyncio.sleep(5)
         await league.process_league_race_finish(target, client)
+
 
 async def handler(target, source, message, client):
     if not (source == 'RaceBot' or source == 'synack'):
@@ -51,7 +53,8 @@ async def handler(target, source, message, client):
             asyncio.create_task(set_goal(srl_id, client, target))
 
         if go.match(message) or message == 'test go':
-            asyncio.create_task(spoilers.send_spoiler_log(srl_id, client, target))
+            asyncio.create_task(
+                spoilers.send_spoiler_log(srl_id, client, target))
             asyncio.create_task(discord_integration.discord_race_start(srl_id))
             asyncio.create_task(alt_hunter.check_race(srl_id))
 
@@ -60,7 +63,9 @@ async def handler(target, source, message, client):
 
         result = runnerdone.search(message)
         if result:
-            asyncio.create_task(discord_integration.discord_race_finish(result.group(1), srl_id))
+            asyncio.create_task(
+                discord_integration.discord_race_finish(result.group(1), srl_id))
+
 
 async def join_srl_room(client, message):
     result = newroom.search(message)
@@ -72,6 +77,7 @@ async def join_srl_room(client, message):
             await client.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live")
         else:
             print(f'would have joined {result.group(2)}')
+
 
 async def set_goal(srl_id, client, target):
     race = await srl_races.get_srl_race_by_id(srl_id)
@@ -90,6 +96,7 @@ async def set_goal(srl_id, client, target):
             if result is not None:
                 seed = await alttpr_discord.alttpr(hash_id=result.group(1))
                 await client.message(target, f".setgoal vt8 randomizer - {seed.generated_goal}")
+
 
 async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage=False):
     loop = asyncio.get_running_loop()

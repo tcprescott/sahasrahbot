@@ -12,6 +12,7 @@ from discord.ext import commands
 from alttprbot.database import config
 from discord_sentry_reporting import use_sentry
 
+
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
@@ -47,6 +48,7 @@ if importlib.util.find_spec('jishaku'):
 if importlib.util.find_spec('sahasrahbot_private.stupid_memes'):
     discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
+
 @discordbot.event
 async def on_command_error(ctx, error):
     riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
@@ -65,7 +67,8 @@ async def on_command_error(ctx, error):
     else:
         if riplink is None:
             riplink = '👎'
-        error_to_display = error.original if hasattr(error, 'original') else error
+        error_to_display = error.original if hasattr(
+            error, 'original') else error
 
         await ctx.message.add_reaction(riplink)
 
@@ -74,6 +77,7 @@ async def on_command_error(ctx, error):
             raise error_to_display
         else:
             await ctx.send(error_to_display)
+
 
 @discordbot.event
 async def on_command(ctx):
