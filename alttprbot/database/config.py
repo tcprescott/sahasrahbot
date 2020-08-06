@@ -4,6 +4,7 @@ from ..util import orm
 
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
+
 async def get_parameter(guild_id, parameter):
     if await CACHE.exists(f'{parameter}_{guild_id}_config'):
         results = await CACHE.get(f'{parameter}_{guild_id}_config')

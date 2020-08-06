@@ -35,14 +35,15 @@ class Misc(commands.Cog):
         commands.has_permissions(administrator=True),
         commands.has_permissions(manage_guild=True)
     )
-    async def memberinfo(self, ctx, member: discord.Member=None):
+    async def memberinfo(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         embed = discord.Embed(
             title=f"Member info for {member.name}#{member.discriminator}",
             color=member.color
         )
-        embed.add_field(name='Created at', value=member.created_at, inline=False)
+        embed.add_field(name='Created at',
+                        value=member.created_at, inline=False)
         embed.add_field(name='Joined at', value=member.joined_at, inline=False)
         embed.add_field(name="Discord ID", value=member.id, inline=False)
         embed.set_thumbnail(url=member.avatar_url)
@@ -88,12 +89,14 @@ class Misc(commands.Cog):
 
         embed = discord.Embed(
             title=holyimage.image.get('title'),
-            description=html2markdown.convert(holyimage.image['desc']) if 'desc' in holyimage.image else None,
+            description=html2markdown.convert(
+                holyimage.image['desc']) if 'desc' in holyimage.image else None,
             color=discord.Colour.from_rgb(0xFF, 0xAF, 0x00)
         )
 
         if 'url' in holyimage.image:
-            url = urljoin('http://alttp.mymm1.com/holyimage/', holyimage.image['url'])
+            url = urljoin('http://alttp.mymm1.com/holyimage/',
+                          holyimage.image['url'])
             if holyimage.image.get('mode', '') == 'redirect':
                 embed.add_field(name='Link', value=url, inline=False)
             else:
@@ -118,21 +121,29 @@ class Misc(commands.Cog):
             return
         episode = sg_schedule[0]
         when = dateutil.parser.parse(episode['when'])
-        when_central = when.astimezone(pytz.timezone('US/Eastern')).strftime('%m-%d %I:%M %p')
-        when_europe = when.astimezone(pytz.timezone('Europe/Berlin')).strftime('%m-%d %I:%M %p')
+        when_central = when.astimezone(pytz.timezone(
+            'US/Eastern')).strftime('%m-%d %I:%M %p')
+        when_europe = when.astimezone(pytz.timezone(
+            'Europe/Berlin')).strftime('%m-%d %I:%M %p')
         difference = when - datetime.datetime.now(when.tzinfo)
         embed = discord.Embed(
             title=episode['event']['name'],
             description=f"**Mode:** {'*TBD*' if episode['match1']['title'] == '' else episode['match1']['title']}"
         )
-        embed.set_thumbnail(url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
+        embed.set_thumbnail(
+            url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
 
-        embed.add_field(name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
-        broadcast_channels = [a['name'] for a in episode['channels'] if not a['name'] == 'No Stream']
+        embed.add_field(
+            name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
+        broadcast_channels = [a['name']
+                              for a in episode['channels'] if not a['name'] == 'No Stream']
         if broadcast_channels:
-            embed.add_field(name="Twitch Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
-        embed.add_field(name="Daily Schedule", value="http://speedgaming.org/alttprdaily", inline=False)
+            embed.add_field(name="Twitch Channels", value=', '.join(
+                [f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+        embed.add_field(name="Daily Schedule",
+                        value="http://speedgaming.org/alttprdaily", inline=False)
         await ctx.send(embed=embed)
+
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def get_json(url):

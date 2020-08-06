@@ -26,5 +26,6 @@ if __name__ == '__main__':
     loop.create_task(twitchbot.start())
     loop.create_task(racetime_alttpr.start())
     loop.create_task(racetime_smz3.start())
-    loop.create_task(sahasrahbotapi.run(host='127.0.0.1', port=5001, use_reloader=False, loop=loop))
+    loop.create_task(sahasrahbotapi.run(host='127.0.0.1',
+                                        port=5001, use_reloader=False, loop=loop))
     loop.run_forever()

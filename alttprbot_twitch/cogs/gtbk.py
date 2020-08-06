@@ -50,14 +50,18 @@ async def whitelisted(ctx):
 
     return False
 
+
 async def is_synack(ctx):
     return ctx.author.name == 'the_synack'
+
 
 async def is_broadcastor(ctx):
     return ctx.author.name == ctx.channel.name
 
+
 async def is_mod(ctx):
     return ctx.author.is_mod or ctx.author.name == ctx.channel.name
+
 
 @commands.core.cog()
 class Gtbk():
@@ -75,9 +79,9 @@ class Gtbk():
     async def start(self, ctx):
         await gtbk.start_game(ctx.channel.name)
         await ctx.send(
-            'Get your GTBK guesses in!  The first viewer who guesses closest ' \
-            'to the actual key location gets a place on the leaderboard!  ' \
-            'Points are scored based on the number of participants in the game.  ' \
+            'Get your GTBK guesses in!  The first viewer who guesses closest '
+            'to the actual key location gets a place on the leaderboard!  '
+            'Points are scored based on the number of participants in the game.  '
             'Only your last guess counts.'
         )
 
@@ -93,13 +97,13 @@ class Gtbk():
             await ctx.send("Game had no guesses.  This game is now completed.")
             await gtbk.update_game_status(ctx.channel.name, "COMPLETED")
 
-
     @commands.command(aliases=['key'])
     @commands.check(whitelisted)
     async def bigkey(self, ctx, key: int):
         game = await gtbk.get_current_active_game(ctx.channel.name)
         if not game:
-            raise gtbk.GtbkGuessingGameException("This channel does not have an active GTBK game!")
+            raise gtbk.GtbkGuessingGameException(
+                "This channel does not have an active GTBK game!")
 
         points = await calculate_score(ctx.channel.name)
 
@@ -170,6 +174,7 @@ class Gtbk():
         await aiocache.SimpleMemoryCache().clear(namespace="gtbk_whitelist")
         await ctx.send('cleared gtbk status cache')
 
+
 async def calculate_score(channel):
     guessdict = await gtbk.get_active_game_guesses(channel)
     cnt = len(guessdict)
@@ -180,10 +185,12 @@ async def calculate_score(channel):
 
     return score
 
+
 async def get_winner(key: int, channel):
     guessdict = await gtbk.get_active_game_guesses(channel)
     value = min(guessdict, key=lambda kv: abs(kv['guess'] - key))
     return value
+
 
 async def get_runnerups(key: int, channel, winner):
     guessdict = await gtbk.get_active_game_guesses(channel)
@@ -192,6 +199,7 @@ async def get_runnerups(key: int, channel, winner):
         if guess['guess'] == key and not guess['twitch_user'] == winner['twitch_user']:
             runners_up.append(guess)
     return runners_up
+
 
 @aiocache.cached(ttl=900, cache=aiocache.SimpleMemoryCache, namespace="gtbk_whitelist")
 async def get_whitelist_users(sluglist):
@@ -206,6 +214,7 @@ async def get_whitelist_users(sluglist):
 
     return(list(set(whitelist)))
 
+
 def get_approved_crew(crewlist):
     approved_crew = []
     for crew in crewlist:
@@ -215,6 +224,7 @@ def get_approved_crew(crewlist):
             else:
                 approved_crew.append(crew['publicStream'].lower())
     return(approved_crew)
+
 
 def setup(bot):
     bot.add_cog(Gtbk(bot))

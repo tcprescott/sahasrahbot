@@ -1,8 +1,4 @@
-import asyncio
-import math
-
-from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import spoiler_races
+from alttprbot.alttprgen import preset
 from config import Config as c
 from racetime_bot import RaceHandler
 
@@ -50,7 +46,7 @@ class Smz3Handler(RaceHandler):
                 'I already rolled a seed!'
             )
             return
-        
+
         try:
             preset_name = args[0]
         except IndexError:
@@ -65,7 +61,7 @@ class Smz3Handler(RaceHandler):
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))
             return
-        
+
         race_info = f"{preset_name} - {seed.url} - ({seed.code})"
         await self.set_raceinfo(race_info)
         await self.send_message(seed.url)

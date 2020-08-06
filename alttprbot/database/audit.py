@@ -2,11 +2,14 @@ import json
 
 from ..util import orm
 
+
 async def insert_message(guild_id: int, message_id: int, user_id: int, channel_id: int, message_date, content, attachment):
     await orm.execute(
         'INSERT INTO audit_messages (guild_id, message_id, user_id, channel_id, message_date, content, attachment) values (%s, %s, %s, %s, %s, %s, %s)',
-        [guild_id, message_id, user_id, channel_id, message_date, content, attachment]
+        [guild_id, message_id, user_id, channel_id,
+            message_date, content, attachment]
     )
+
 
 async def get_cached_messages(message_id: int):
     result = await orm.select(
@@ -15,17 +18,21 @@ async def get_cached_messages(message_id: int):
     )
     return result
 
+
 async def set_deleted(message_id: int):
     await orm.execute(
         'UPDATE audit_messages SET deleted=1 WHERE message_id=%s',
         [message_id]
     )
 
+
 async def insert_generated_game(randomizer, hash_id, permalink, settings, gentype, genoption, customizer=0):
     await orm.execute(
         'INSERT INTO audit_generated_games (randomizer, hash_id, permalink, settings, gentype, genoption, customizer) values (%s, %s, %s, %s, %s, %s, %s)',
-        [randomizer, hash_id, permalink, json.dumps(settings), gentype, genoption, customizer]
+        [randomizer, hash_id, permalink, json.dumps(
+            settings), gentype, genoption, customizer]
     )
+
 
 async def get_generated_game(hash_id):
     results = await orm.select(

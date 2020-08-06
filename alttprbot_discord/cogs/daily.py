@@ -39,7 +39,6 @@ class Daily(commands.Cog):
         await update_daily(hash_id)
         await ctx.send(embed=embed)
 
-
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
         daily_challenge = await find_daily_hash()
@@ -73,6 +72,7 @@ async def update_daily(hash_id):
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash_id):
     return await alttpr(hash_id=hash_id)
+
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def find_daily_hash():

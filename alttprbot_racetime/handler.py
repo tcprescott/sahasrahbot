@@ -44,14 +44,14 @@ class AlttprHandler(RaceHandler):
 
     async def ex_quickswaprace(self, args, message):
         await self.roll_game(args, message, allow_quickswap=True)
-        
+
     async def ex_spoiler(self, args, message):
         if self.seed_rolled:
             await self.send_message(
                 'I already rolled a seed!'
             )
             return
-        
+
         try:
             preset_name = args[0]
         except IndexError:
@@ -129,12 +129,13 @@ class AlttprHandler(RaceHandler):
         loop = asyncio.get_running_loop()
 
         reminders = [1800, 1500, 1200, 900, 600, 300,
-                    120, 60, 30, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+                     120, 60, 30, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
         start_time = loop.time()
         end_time = loop.time() + duration_in_seconds
         while True:
             # print(datetime.datetime.now())
-            timeleft = math.ceil(start_time - loop.time() + duration_in_seconds)
+            timeleft = math.ceil(
+                start_time - loop.time() + duration_in_seconds)
             # print(timeleft)
             if timeleft in reminders:
                 minutes = math.floor(timeleft/60)
@@ -159,7 +160,7 @@ class AlttprHandler(RaceHandler):
                 'I already rolled a seed!'
             )
             return
-        
+
         try:
             preset_name = args[0]
         except IndexError:
@@ -174,7 +175,7 @@ class AlttprHandler(RaceHandler):
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))
             return
-        
+
         race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
         if allow_quickswap:
             race_info += " - Quickswap Enabled"

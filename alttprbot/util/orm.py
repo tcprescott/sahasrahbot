@@ -4,6 +4,7 @@ from . import console
 
 __pool = None
 
+
 async def create_pool(loop):
     console.info('creating connection pool')
     global __pool

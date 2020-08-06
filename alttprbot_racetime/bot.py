@@ -18,6 +18,7 @@ handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(handler)
 
+
 class AlttprBot(Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,6 +39,7 @@ class AlttprBot(Bot):
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
 
+
 class Smz3Bot(Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,6 +59,7 @@ class Smz3Bot(Bot):
     async def start(self):
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
+
 
 racetime_alttpr = AlttprBot(
     category_slug='ALttPR',

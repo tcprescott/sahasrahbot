@@ -14,6 +14,7 @@ from . import http
 class SGEpisodeNotFoundException(SahasrahBotException):
     pass
 
+
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     now = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
     sched_from = now - timedelta(hours=hours_past)
@@ -25,6 +26,7 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     }
     result = await http.request_generic(f'{c.SgApiEndpoint}/schedule', reqparams=params, returntype='json')
     return result
+
 
 async def get_episode(episodeid: int, complete=False):
     # if we're developing locally, we want to have some artifical data to use that isn't from SpeedGaming
@@ -39,7 +41,7 @@ async def get_episode(episodeid: int, complete=False):
             async with aiofiles.open('test_input/sg_3.json', 'r') as f:
                 result = json.loads(await f.read(), strict=False)
         elif episodeid == 0:
-           result = {"error":"Failed to find episode with id 0."}
+            result = {"error": "Failed to find episode with id 0."}
         else:
             result = await http.request_generic(f'{c.SgApiEndpoint}/episode', reqparams={'id': episodeid}, returntype='json')
     else:

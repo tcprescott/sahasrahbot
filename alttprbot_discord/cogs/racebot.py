@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+
 class RaceBot(commands.Cog):
     @commands.command(aliases=['enter'])
     async def join(self, ctx):
@@ -57,6 +58,7 @@ class RaceBot(commands.Cog):
     @racemod.command()
     async def remove(self, ctx, player: discord.Member):
         pass
+
 
 def setup(bot):
     bot.add_cog(RaceBot(bot))

@@ -18,9 +18,9 @@ settings = customizer.convert2settings(
     customizer_settings, tournament=True)
 
 data = dict(
-    goal_name = args.goal_name,
-    customizer = True,
-    settings = settings,
+    goal_name=args.goal_name,
+    customizer=True,
+    settings=settings,
 )
 
 with open(f'presets/{args.preset_name}.yaml', 'w+') as outfile:

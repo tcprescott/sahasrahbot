@@ -46,7 +46,8 @@ async def check_race(srl_id):
             )
 
             if twitch_info is not None:
-                created_at = datetime.datetime.strptime(twitch_info['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                created_at = datetime.datetime.strptime(
+                    twitch_info['created_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
                 embed.add_field(
                     name='Twitch Nickname',
                     value=f"[{twitch_nick}](https://twitch.tv/{twitch_nick})",
@@ -70,6 +71,7 @@ async def check_race(srl_id):
                 channel = discordbot.get_channel(int(configguild['value']))
 
                 await channel.send(embed=embed)
+
 
 async def get_twitch_user(twitch_user_id):
     headers = {

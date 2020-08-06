@@ -9,6 +9,7 @@ from alttprbot_srl.bot import srlbot
 
 sahasrahbotapi = Quart(__name__)
 
+
 @sahasrahbotapi.route('/srl/verification/<string:nick>/<int:key>', methods=['GET'])
 async def verify_srl_user(nick, key):
     result = await nick_verifier.verify_nick(nick, key)
@@ -18,6 +19,7 @@ async def verify_srl_user(nick, key):
         return "We have successfully verified your SRL nick!"
     else:
         return "Unable to verify your SRL nick.  Please request another key and try again.  Contact Synack if this persists."
+
 
 @sahasrahbotapi.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
@@ -29,6 +31,7 @@ async def mysterygen():
         endpoint='/api/customizer' if customizer else '/api/randomizer'
     )
 
+
 @sahasrahbotapi.route('/api/settingsgen/mystery/<string:weightset>', methods=['GET'])
 async def mysterygenwithweights(weightset):
     weights = await get_weights(weightset)
@@ -39,6 +42,7 @@ async def mysterygenwithweights(weightset):
         endpoint='/api/customizer' if customizer else '/api/randomizer'
     )
 
+
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
     if discordbot.is_closed():
@@ -46,10 +50,10 @@ async def healthcheck():
 
     appinfo = await discordbot.application_info()
     await discordbot.fetch_user(appinfo.owner.id)
-    
+
     if not srlbot.connected:
         abort(500, description="Connection to SRL id closed.")
-    
+
     info = await srlbot.whois(os.environ['SRL_NICK'])
     if not info['identified']:
         abort(500, description="SRL bot is not identified with Nickserv.")
@@ -57,6 +61,7 @@ async def healthcheck():
     return jsonify(
         success=True
     )
+
 
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
 async def robots():
