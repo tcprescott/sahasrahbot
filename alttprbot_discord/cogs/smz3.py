@@ -38,15 +38,53 @@ class SuperMetroidComboRandomizer(commands.Cog):
                 f'Code: {seed.code}'
             ))
 
+    @commands.group()
+    @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
+    async def sm(self, ctx):
+        if ctx.invoked_subcommand is None:
+            raise SahasrahBotException('Try providing a valid subcommand.  Use "$help smz3" for assistance.')
+
+    @sm.command(
+        name='race'
+    )
+    @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
+    async def sm_race(self, ctx, preset="normal"):
+        seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=True)
+        await ctx.send((
+                f'Permalink: {seed.url}\n'
+                f'Code: {seed.code}'
+            ))
+
+    @sm.command(
+        name='norace'
+    )
+    @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
+    async def sm_norace(self, ctx, preset="normal"):
+        seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=False)
+        await ctx.send((
+                f'Permalink: {seed.url}\n'
+                f'Code: {seed.code}'
+            ))
+
     @commands.command(
-        help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 900 seconds later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
+        help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
         brief='Initiate a SMZ3 Multiworld Game.',
     )
     async def smz3multi(self, ctx, preset):
-        await fetch_preset(preset, randomizer='smz3')
+        await self.handle_multiworld(ctx, preset, randomizer='smz3')
+
+    @commands.command(
+        help='Initiates an SM Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
+        brief='Initiate a SM Multiworld Game.',
+    )
+    async def smmulti(self, ctx, preset):
+        await self.handle_multiworld(ctx, preset, randomizer='sm')
+
+    async def handle_multiworld(self, ctx, preset, randomizer):
+        await fetch_preset(preset, randomizer=randomizer)
 
         embed = discord.Embed(
-            title='SMZ3 Multiworld Game',
+            title=f'{randomizer.upper()} Multiworld Game',
             description=(
                 'A new multiworld game has been initiated, react with 👍 to join.\n'
                 'When everyone is ready, the game creator can react with ✅ to create a session.\n'
@@ -55,7 +93,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
             color=discord.Color.dark_blue()
         )
         embed.add_field(name="Status", value="👍 Open for entry", inline=False)
-        embed.add_field(name="Preset", value=f"[{preset}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/{preset}.yaml)", inline=False)
+        embed.add_field(name="Preset", value=f"[{preset.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{randomizer.lower()}/{preset.lower()}.yaml)", inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
         msg = await ctx.send(embed=embed)
@@ -73,7 +111,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
         timeout_start = time.time()
         close = False
         roll = True
-        timeout = 900
+        timeout = 1800
         while time.time() < timeout_start + timeout and not close:
             try:
                 pending_tasks = [
@@ -123,10 +161,10 @@ class SuperMetroidComboRandomizer(commands.Cog):
 
         players = [p for p in players if not p.id == self.bot.user.id]
 
-        seed = await generate_multiworld(preset, [p.name for p in players], tournament=False)
+        seed = await generate_multiworld(preset, [p.name for p in players], tournament=False, randomizer=randomizer)
 
         dm_embed = discord.Embed(
-            title="SMZ3 Multiworld Game"
+            title=f'{randomizer.upper()} Multiworld Game'
         )
         dm_embed.add_field(name="Players", value='\n'.join([p.name for p in players]), inline=False)
         dm_embed.add_field(name="Game Room", value=seed.url, inline=False)

@@ -19,6 +19,8 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
     return seed, preset_dict
 
 async def fetch_preset(preset, randomizer='alttpr'):
+    preset = preset.lower()
+
     # make sure someone isn't trying some path traversal shennaniganons
     basename = os.path.basename(f'{preset}.yaml')
 
