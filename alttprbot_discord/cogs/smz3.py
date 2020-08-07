@@ -18,39 +18,54 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def smz3(self, ctx):
         if ctx.invoked_subcommand is None:
-            raise SahasrahBotException(
-                'Try providing a valid subcommand.  Use "$help smz3" for assistance.')
+            await ctx.send('Please specify a subcommand!')
 
-    @smz3.command()
+    @smz3.command(
+        help='Generates a SMZ3 Race.\nThis game will not have a spoiler log.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
+        brief='Generates a SMZ3 Race.'
+    )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
-    async def race(self, ctx, preset="normal"):
+    async def race(self, ctx, preset):
         seed, preset_dict = await get_preset(preset, randomizer='smz3', tournament=True)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
 
-    @smz3.command()
+    @smz3.command(
+        help='Generates a SMZ3 Game.\nThis game will have a spoiler log.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
+        brief='Generates a SMZ3 Game.'
+    )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
-    async def norace(self, ctx, preset="normal"):
+    async def norace(self, ctx, preset):
         seed, preset_dict = await get_preset(preset, randomizer='smz3', tournament=False)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
 
+    @smz3.command(
+        name='multi',
+        help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
+        brief='Initiate a SMZ3 Multiworld Game.',
+    )
+    @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
+    async def multi(self, ctx, preset):
+        await self.handle_multiworld(ctx, preset, randomizer='smz3')
+
     @commands.group()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm(self, ctx):
         if ctx.invoked_subcommand is None:
-            raise SahasrahBotException(
-                'Try providing a valid subcommand.  Use "$help smz3" for assistance.')
+            await ctx.send('Please specify a subcommand!')
 
     @sm.command(
-        name='race'
+        name='race',
+        help='Generates a SM Race.\nThis game will not have a spoiler log.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
+        brief='Generates a SM Race.'
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
-    async def sm_race(self, ctx, preset="normal"):
+    async def sm_race(self, ctx, preset):
         seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=True)
         await ctx.send((
             f'Permalink: {seed.url}\n'
@@ -58,19 +73,31 @@ class SuperMetroidComboRandomizer(commands.Cog):
         ))
 
     @sm.command(
-        name='norace'
+        name='norace',
+        help='Generates a SM Game.\nThis game will have a spoiler log.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
+        brief='Generates a SM Game.'
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
-    async def sm_norace(self, ctx, preset="normal"):
+    async def sm_norace(self, ctx, preset):
         seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=False)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
 
+    @sm.command(
+        name='multi',
+        help='Initiates an SM Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
+        brief='Initiate a SM Multiworld Game.',
+    )
+    @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
+    async def sm_multi(self, ctx, preset):
+        await self.handle_multiworld(ctx, preset, randomizer='sm')
+
     @commands.command(
         help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
         brief='Initiate a SMZ3 Multiworld Game.',
+        hidden=True,
     )
     async def smz3multi(self, ctx, preset):
         await self.handle_multiworld(ctx, preset, randomizer='smz3')
@@ -78,6 +105,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @commands.command(
         help='Initiates an SM Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
         brief='Initiate a SM Multiworld Game.',
+        hidden=True,
     )
     async def smmulti(self, ctx, preset):
         await self.handle_multiworld(ctx, preset, randomizer='sm')

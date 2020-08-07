@@ -10,6 +10,7 @@ import discord
 from discord.ext import commands
 
 from alttprbot.database import config
+from alttprbot_discord.util.embed_help_command import EmbedHelpCommand
 from discord_sentry_reporting import use_sentry
 
 
@@ -22,10 +23,12 @@ async def determine_prefix(bot, message):
 
 
 discordbot = commands.Bot(
-    command_prefix=determine_prefix
+    command_prefix=determine_prefix,
+    help_command=EmbedHelpCommand()
 )
 
-use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
+if os.environ.get("SENTRY_URL"):
+    use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
 discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
@@ -45,7 +48,7 @@ discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
 
-if importlib.util.find_spec('sahasrahbot_private.stupid_memes'):
+if importlib.util.find_spec('sahasrahbot_private'):
     discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
 

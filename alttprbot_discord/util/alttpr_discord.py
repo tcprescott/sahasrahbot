@@ -1,10 +1,10 @@
 import datetime
+import os
 
 import discord
 import html2markdown
-from pyz3r.alttpr import alttprClass
 
-from config import Config as c
+from pyz3r.alttpr import alttprClass
 
 emoji_code_map = {
     'Bow': 'Bow',
@@ -52,17 +52,19 @@ async def alttpr(settings=None, hash_id=None, customizer=False, festive=False):
 class alttprDiscordClass(alttprClass):
     def __init__(self, *args, **kwargs):
         super(alttprDiscordClass, self).__init__(*args, **kwargs)
-        self.seed_baseurl = c.seed_baseurl
-        self.baseurl = c.baseurl
-        self.username = c.username
-        self.password = c.password
+        self.baseurl = os.environ.get(
+            "ALTTPR_BASEURL", 'https://alttpr.com')
+        self.seed_baseurl = os.environ.get(
+            "ALTTPR_SEED_BASEURL", "https://s3.us-east-2.amazonaws.com/alttpr-patches")
+        self.username = os.environ.get("ALTTPR_USERNAME", None)
+        self.password = os.environ.get("ALTTPR_PASSWORD", None)
 
     @property
     def generated_goal(self):
         settings_list = []
-        meta = self.data['spoiler']['meta']
+        meta = self.data['spoiler'].get('meta', {})
 
-        if meta['spoilers'] == 'mystery':
+        if meta.get('spoilers', 'off') == 'mystery':
             return 'mystery'
 
         settings = {
@@ -145,95 +147,73 @@ class alttprDiscordClass(alttprClass):
         return " ".join(settings_list)
 
     async def embed(self, emojis=False, name=False, notes=False):
-        if not name:
-            try:
-                name = self.data['spoiler']['meta']['name']
-            except KeyError:
-                name = 'Requested Seed'
-
-        if not notes:
-            try:
-                notes = html2markdown.convert(
-                    self.data['spoiler']['meta']['notes'])
-            except KeyError:
-                notes = ""
-
         settings_map = await self.randomizer_settings()
 
+        meta = self.data['spoiler'].get('meta', {})
+
         embed = discord.Embed(
-            title=name,
-            description=notes,
+            title=meta.get('name', 'Requested Seed') if not name else name,
+            description=html2markdown.convert(
+                meta.get('notes', '')) if not notes else notes,
             color=discord.Colour.dark_red(),
             timestamp=datetime.datetime.fromisoformat(self.data['generated'])
         )
 
-        if self.data['spoiler']['meta'].get('special', False):
+        if meta.get('special', False):
             embed.add_field(
                 name='Festive Randomizer',
                 value="This game is a festive randomizer.  Happy holidays!",
                 inline=False)
 
-        if self.data['spoiler']['meta'].get('spoilers', 'off') == "mystery":
+        if meta.get('spoilers', 'off') == "mystery":
             embed.add_field(
                 name='Mystery Game',
                 value="No meta information is available for this game.",
                 inline=False)
             embed.add_field(
                 name='Item Placement',
-                value=f"**Logic:** {self.data['spoiler']['meta']['logic']}",
+                value=f"**Logic:** {meta['logic']}",
                 inline=True)
         else:
             embed.add_field(
                 name='Item Placement',
                 value="**Logic:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
-                    logic=self.data['spoiler']['meta']['logic'],
-                    item_placement=settings_map['item_placement'][self.data['spoiler']
-                                                                  ['meta']['item_placement']],
-                    dungeon_items=settings_map['dungeon_items'][self.data['spoiler']
-                                                                ['meta']['dungeon_items']],
-                    accessibility=settings_map['accessibility'][self.data['spoiler']
-                                                                ['meta']['accessibility']],
+                    logic=meta['logic'],
+                    item_placement=settings_map['item_placement'][meta['item_placement']],
+                    dungeon_items=settings_map['dungeon_items'][meta['dungeon_items']],
+                    accessibility=settings_map['accessibility'][meta['accessibility']],
                 ),
                 inline=True)
 
             embed.add_field(
                 name='Goal',
                 value="**Goal:** {goal}\n**Open Tower:** {tower}\n**Ganon Vulnerable:** {ganon}".format(
-                    goal=settings_map['goals'][self.data['spoiler']
-                                               ['meta']['goal']],
-                    tower=self.data['spoiler']['meta'].get(
+                    goal=settings_map['goals'][meta['goal']],
+                    tower=meta.get(
                         'entry_crystals_tower', 'unknown'),
-                    ganon=self.data['spoiler']['meta'].get(
+                    ganon=meta.get(
                         'entry_crystals_ganon', 'unknown'),
                 ),
                 inline=True)
             embed.add_field(
                 name='Gameplay',
                 value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Hints:** {hints}".format(
-                    mode=settings_map['world_state'][self.data['spoiler']
-                                                     ['meta']['mode']],
-                    entrance=settings_map['entrance_shuffle'][self.data['spoiler']['meta']
-                                                              ['shuffle']] if 'shuffle' in self.data['spoiler']['meta'] else "None",
-                    boss=settings_map['boss_shuffle'][self.data['spoiler']
-                                                      ['meta']['enemizer.boss_shuffle']],
-                    enemy=settings_map['enemy_shuffle'][self.data['spoiler']
-                                                        ['meta']['enemizer.enemy_shuffle']],
-                    hints=self.data['spoiler']['meta']['hints']
+                    mode=settings_map['world_state'][meta['mode']],
+                    entrance=settings_map['entrance_shuffle'][meta['shuffle']
+                                                              ] if 'shuffle' in meta else "None",
+                    boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
+                    enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
+                    hints=meta['hints']
                 ),
                 inline=True)
             embed.add_field(
                 name='Difficulty',
                 value="**Swords:** {weapons}\n**Item Pool:** {pool}\n**Item Functionality:** {functionality}\n**Enemy Damage:** {damage}\n**Enemy Health:** {health}".format(
-                    weapons=settings_map['weapons'][self.data['spoiler']
-                                                    ['meta']['weapons']],
-                    pool=settings_map['item_pool'][self.data['spoiler']
-                                                   ['meta']['item_pool']],
-                    functionality=settings_map['item_functionality'][self.data['spoiler']
-                                                                     ['meta']['item_functionality']],
-                    damage=settings_map['enemy_damage'][self.data['spoiler']
-                                                        ['meta']['enemizer.enemy_damage']],
-                    health=settings_map['enemy_health'][self.data['spoiler']
-                                                        ['meta']['enemizer.enemy_health']],
+                    weapons=settings_map['weapons'][meta['weapons']],
+                    pool=settings_map['item_pool'][meta['item_pool']],
+                    functionality=settings_map['item_functionality'][meta['item_functionality']],
+                    damage=settings_map['enemy_damage'][meta['enemizer.enemy_damage']],
+                    health=settings_map['enemy_health'][meta['enemizer.enemy_health']],
                 ),
                 inline=True)
 
@@ -247,46 +227,36 @@ class alttprDiscordClass(alttprClass):
         return embed
 
     async def tournament_embed(self, emojis=False, name=False, notes=False):
-        if not name:
-            try:
-                name = self.data['spoiler']['meta']['name']
-            except KeyError:
-                name = 'Requested Seed'
-
-        if not notes:
-            try:
-                notes = html2markdown.convert(
-                    self.data['spoiler']['meta']['notes'])
-            except KeyError:
-                notes = ""
-
         settings_map = await self.randomizer_settings()
 
+        meta = self.data['spoiler'].get('meta', {})
+
         embed = discord.Embed(
-            title=name,
-            description=notes,
+            title=meta.get('name', 'Requested Seed') if not name else name,
+            description=html2markdown.convert(
+                meta.get('notes', '')) if not notes else notes,
             color=discord.Colour.dark_gold(),
             timestamp=datetime.datetime.fromisoformat(self.data['generated'])
         )
 
-        if self.data['spoiler']['meta'].get('spoilers', 'off') == "mystery":
+        if meta.get('spoilers', 'off') == "mystery":
             embed.add_field(
                 name='Mystery Game',
                 value="No meta information is available for this game.",
                 inline=False)
             embed.add_field(
                 name='Item Placement',
-                value=f"**Logic:** {self.data['spoiler']['meta']['logic']}",
+                value=f"**Logic:** {meta['logic']}",
                 inline=True)
         else:
             embed.add_field(
                 name='Settings',
                 value=(
-                    f"**Logic:** {self.data['spoiler']['meta']['logic']}\n"
-                    f"**Dungeon Items:** {settings_map['dungeon_items'][self.data['spoiler']['meta']['dungeon_items']]}\n"
-                    f"**Goal:** {settings_map['goals'][self.data['spoiler']['meta']['goal']]}\n"
-                    f"**World State:** {settings_map['world_state'][self.data['spoiler']['meta']['mode']]}\n"
-                    f"**Swords:** {settings_map['weapons'][self.data['spoiler']['meta']['weapons']]}"
+                    f"**Logic:** {meta['logic']}\n"
+                    f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
+                    f"**Goal:** {settings_map['goals'][meta['goal']]}\n"
+                    f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
+                    f"**Swords:** {settings_map['weapons'][meta['weapons']]}"
                 )
             )
 

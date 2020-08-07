@@ -65,7 +65,8 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
         preset_dict['settings']['race'] = "true" if tournament else "false"
         seed = await pyz3r.sm(
             randomizer=randomizer,
-            settings=preset_dict['settings']
+            settings=preset_dict['settings'],
+            baseurl='https://sm.samus.link' if randomizer == 'sm' else 'https://samus.link'
         )
         hash_id = seed.slug_id
     else:

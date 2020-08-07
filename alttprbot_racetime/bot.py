@@ -1,9 +1,7 @@
 import logging
 import ssl
 import sys
-
-import websockets
-
+import requests
 from config import Config as c
 from racetime_bot import Bot
 
@@ -12,6 +10,7 @@ from .handler_smz3 import Smz3Handler
 
 logger = logging.getLogger()
 handler = logging.StreamHandler(sys.stdout)
+
 
 handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(name)s (%(levelname)s) :: %(message)s'
@@ -61,16 +60,24 @@ class Smz3Bot(Bot):
         self.loop.create_task(self.refresh_races())
 
 
-racetime_alttpr = AlttprBot(
-    category_slug='ALttPR',
-    client_id=c.RACETIME_CLIENT_ID,
-    client_secret=c.RACETIME_CLIENT_SECRET,
-    logger=logger,
-)
+try:
+    racetime_alttpr = AlttprBot(
+        category_slug='ALttPR',
+        client_id=c.RACETIME_CLIENT_ID,
+        client_secret=c.RACETIME_CLIENT_SECRET,
+        logger=logger,
+    )
+except requests.exceptions.HTTPError:
+    logger.warning('Unable to authorize alttpr.')
+    racetime_alttpr = None
 
-racetime_smz3 = Smz3Bot(
-    category_slug='smz3',
-    client_id=c.RACETIME_CLIENT_ID_SMZ3,
-    client_secret=c.RACETIME_CLIENT_SECRET_SMZ3,
-    logger=logger
-)
+try:
+    racetime_smz3 = Smz3Bot(
+        category_slug='smz3',
+        client_id=c.RACETIME_CLIENT_ID_SMZ3,
+        client_secret=c.RACETIME_CLIENT_SECRET_SMZ3,
+        logger=logger
+    )
+except requests.exceptions.HTTPError:
+    logger.warning('Unable to authorize smz3.')
+    racetime_alttpr = None
