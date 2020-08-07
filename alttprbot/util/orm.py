@@ -1,4 +1,7 @@
+import os
+
 import aiomysql
+
 from config import Config as c
 from . import console
 
@@ -9,11 +12,11 @@ async def create_pool(loop):
     console.info('creating connection pool')
     global __pool
     __pool = await aiomysql.create_pool(
-        host=c.DB_HOST,
-        port=c.DB_PORT,
-        user=c.DB_USER,
-        db=c.DB_NAME,
-        password=c.DB_PASS,
+        host=os.environ.get("DB_HOST", "localhost"),
+        port=int(os.environ.get("DB_PORT", "3306")),
+        user=os.environ.get("DB_USER", "user"),
+        db=os.environ.get("DB_NAME", "sahasrahbot"),
+        password=os.environ.get("DB_PASS", "pass"),
         program_name='alttprbot',
         charset='utf8mb4',
         autocommit=True,

@@ -20,6 +20,7 @@ async def generate_multiworld(preset, players, tournament=False, randomizer='smz
 
     seed = await pyz3r.sm(
         randomizer=randomizer,
-        settings=settings
+        settings=settings,
+        baseurl='https://sm.samus.link' if randomizer == 'sm' else 'https://samus.link'
     )
     return seed
