@@ -1,17 +1,15 @@
-import os
 import asyncio
 import importlib
+import os
 import random
-import sys
-import traceback
-from alttprbot.exceptions import SahasrahBotException
 
 import discord
 from discord.ext import commands
+from discord_sentry_reporting import use_sentry
 
 from alttprbot.database import config
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.embed_help_command import EmbedHelpCommand
-from discord_sentry_reporting import use_sentry
 
 
 async def determine_prefix(bot, message):
