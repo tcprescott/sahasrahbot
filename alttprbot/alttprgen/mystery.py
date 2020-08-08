@@ -3,7 +3,7 @@ import os
 import aiofiles
 import yaml
 from aiohttp.client_exceptions import ClientResponseError
-from tenacity import RetryError, Retrying, stop_after_attempt, retry_if_exception_type
+from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
 import pyz3r
 from alttprbot.alttprgen.preset import fetch_preset
@@ -47,7 +47,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
         weights = await get_weights(weightset)
 
     try:
-        for attempt in Retrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
+        async for attempt in AsyncRetrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
             with attempt:
                 try:
                     settings, customizer = await generate_random_settings(weights, festive=festive, spoilers=spoilers)

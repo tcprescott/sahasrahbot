@@ -1,15 +1,13 @@
+import asyncio
 import os
 
 import aiomysql
-
-from config import Config as c
-from . import console
 
 __pool = None
 
 
 async def create_pool(loop):
-    console.info('creating connection pool')
+    print('creating connection pool')
     global __pool
     __pool = await aiomysql.create_pool(
         host=os.environ.get("DB_HOST", "localhost"),
@@ -28,6 +26,9 @@ async def create_pool(loop):
 
 async def select(sql, args=[], size=None):
     global __pool
+    if __pool is None:
+        loop = asyncio.get_event_loop()
+        await create_pool(loop)
     with (await __pool) as conn:
         cur = await conn.cursor(aiomysql.DictCursor)
         await cur.execute(sql.replace('?', '%s'), args or ())
@@ -41,6 +42,9 @@ async def select(sql, args=[], size=None):
 
 async def execute(sql, args=[]):
     global __pool
+    if __pool is None:
+        loop = asyncio.get_event_loop()
+        await create_pool(loop)
     with (await __pool) as conn:
         try:
             cur = await conn.cursor()

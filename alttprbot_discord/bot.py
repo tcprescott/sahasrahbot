@@ -22,7 +22,12 @@ async def determine_prefix(bot, message):
 
 discordbot = commands.Bot(
     command_prefix=determine_prefix,
-    help_command=EmbedHelpCommand()
+    help_command=EmbedHelpCommand(),
+    allowed_mentions=discord.AllowedMentions(
+        everyone=False,
+        users=True,
+        roles=True
+    )
 )
 
 if os.environ.get("SENTRY_URL"):
