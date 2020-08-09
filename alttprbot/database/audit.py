@@ -1,5 +1,8 @@
 import json
 
+from alttprbot.tables import t_audit_messages, t_audit_generated_games
+from sqlalchemy import select, insert, update, delete
+
 from ..util import orm
 
 

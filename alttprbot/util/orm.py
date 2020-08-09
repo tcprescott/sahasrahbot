@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import aiomysql
+from aiomysql.sa import create_engine
 
 __pool = None
 
@@ -9,7 +10,7 @@ __pool = None
 async def create_pool(loop):
     print('creating connection pool')
     global __pool
-    __pool = await aiomysql.create_pool(
+    __pool = await create_engine(
         host=os.environ.get("DB_HOST", "localhost"),
         port=int(os.environ.get("DB_PORT", "3306")),
         user=os.environ.get("DB_USER", "user"),
@@ -30,14 +31,12 @@ async def select(sql, args=[], size=None):
         loop = asyncio.get_event_loop()
         await create_pool(loop)
     with (await __pool) as conn:
-        cur = await conn.cursor(aiomysql.DictCursor)
-        await cur.execute(sql.replace('?', '%s'), args or ())
-        if size:
-            rs = await cur.fecthmany(size)
-        else:
-            rs = await cur.fetchall()
-        await cur.close()
-        return rs
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(sql.replace('?', '%s'), args or ())
+            if size:
+                return await cur.fecthmany(size)
+            else:
+                return await cur.fetchall()
 
 
 async def execute(sql, args=[]):
@@ -46,11 +45,7 @@ async def execute(sql, args=[]):
         loop = asyncio.get_event_loop()
         await create_pool(loop)
     with (await __pool) as conn:
-        try:
-            cur = await conn.cursor()
+        async with conn.cursor() as cur:
             await cur.execute(sql.replace('?', '%s'), args)
-            affected = cur.rowcount
-            await cur.close()
-        except BaseException:
-            raise
-        return affected
+            return cur.rowcount
+

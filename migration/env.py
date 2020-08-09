@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 sys.path.append(os.getcwd())
 
-import alttprbot.models
+import alttprbot.tables
 
 load_dotenv()
 
@@ -37,7 +37,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = alttprbot.models.Base.metadata
+target_metadata = alttprbot.tables.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
