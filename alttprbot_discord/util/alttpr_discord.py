@@ -1,6 +1,7 @@
 import datetime
 import os
 
+import aiohttp
 import discord
 import html2markdown
 
@@ -56,8 +57,9 @@ class alttprDiscordClass(alttprClass):
             "ALTTPR_BASEURL", 'https://alttpr.com')
         self.seed_baseurl = os.environ.get(
             "ALTTPR_SEED_BASEURL", "https://s3.us-east-2.amazonaws.com/alttpr-patches")
-        self.username = os.environ.get("ALTTPR_USERNAME", None)
-        self.password = os.environ.get("ALTTPR_PASSWORD", None)
+        username = os.environ.get("ALTTPR_USERNAME", None)
+        password = os.environ.get("ALTTPR_PASSWORD", None)
+        self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
 
     @property
     def generated_goal(self):
@@ -197,12 +199,13 @@ class alttprDiscordClass(alttprClass):
                 inline=True)
             embed.add_field(
                 name='Gameplay',
-                value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Hints:** {hints}".format(
+                value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Pot Shuffle:** {pot}\n**Hints:** {hints}".format(
                     mode=settings_map['world_state'][meta['mode']],
                     entrance=settings_map['entrance_shuffle'][meta['shuffle']
                                                               ] if 'shuffle' in meta else "None",
                     boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
                     enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
+                    pot=meta.get('enemizer.pot_shuffle', 'off'),
                     hints=meta['hints']
                 ),
                 inline=True)
