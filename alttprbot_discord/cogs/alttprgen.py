@@ -46,6 +46,19 @@ class AlttprGen(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.send(embed=embed)
 
+    @commands.command(
+        brief='Generate a quickswap race.',
+        help='Generate a quickswap race.  Find a list of presets at https://l.synack.live/presets'
+    )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def quickswaprace(self, ctx, preset, hints=False):
+        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=True)
+        if not seed:
+            raise SahasrahBotException(
+                'Could not generate game.  Maybe preset does not exist?')
+        embed = await seed.embed(emojis=self.bot.emojis)
+        await ctx.send(embed=embed)
+
     @race.command(
         name='custom',
         brief='Generate a custom preset.',
