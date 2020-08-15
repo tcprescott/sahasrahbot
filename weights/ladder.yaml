@@ -1,5 +1,7 @@
-description: Season two mystery weights for ALTTPR Ladder.  https://discord.gg/Jy7Srva
+description: Season three mystery weights for ALTTPR Ladder.  https://discord.gg/Jy7Srva
 allow_quickswap: True
+options:
+  FillItemPoolWith: TwentyRupees2
 glitches_required: "none"
 item_placement: "advanced"
 dungeon_items:
@@ -41,8 +43,7 @@ world_state:
   retro: 10
 entrance_shuffle:
   none: 70
-  full: 10
-  crossed: 20
+  crossed: 30
 boss_shuffle:
   none: 70
   full: 30
@@ -67,3 +68,15 @@ item_functionality:
   expert: 10
 enemy_damage: "default"
 enemy_health: "default"
+customizer:
+  eq:
+    "PegasusBoots":
+      True: 50
+      False: 50
+    "OcarinaActive":
+      True: 30
+      False: 70
+  custom:
+    prize.crossWorld:
+      True: 70
+      False: 30
