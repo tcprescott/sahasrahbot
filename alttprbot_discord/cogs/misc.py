@@ -25,9 +25,10 @@ class Misc(commands.Cog):
         if message.content.lower() == '!role furaime':
             await message.add_reaction('👀')
         if discord.utils.get(message.role_mentions, id=524738280630124574):
-            if random.choice([True, False]):
+            async with message.channel.typing():
                 await asyncio.sleep((random.random()*30)+30)
-                await message.channel.send(f'@{message.author.mention}')
+                if random.choice([True, False]):
+                    await message.channel.send(f'@{message.author.mention}')
 
     @commands.command(aliases=['joineddate'])
     @commands.check_any(
