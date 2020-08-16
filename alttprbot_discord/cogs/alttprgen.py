@@ -8,12 +8,13 @@ from discord.ext import commands
 from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 
 import pyz3r
+from pyz3r.ext.priestmode import create_priestmode
 from alttprbot.alttprgen.mystery import (generate_random_game)
 from alttprbot.alttprgen.preset import get_preset, generate_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttpr_discord import alttpr, alttprDiscordClass
 
 from ..util import checks
 
@@ -346,6 +347,31 @@ class AlttprGen(commands.Cog):
             )
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
+
+    @commands.command(
+        brief="Create a series of \"Kiss Priest\" games.",
+        help=(
+            'Create a series a \"Kiss Priest\" games.  This was created by hycutype.'
+        )
+    )
+    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    async def kisspriest(self, ctx, count=10):
+        if count > 10 or count < 1:
+            raise SahasrahBotException(
+                "Number of games generated must be between 1 and 10.")
+
+        seeds = await create_priestmode(count=count, genclass=alttprDiscordClass)
+        embed = discord.Embed(
+            title='Kiss Priest Games',
+            color=discord.Color.blurple()
+        )
+        for idx, seed in enumerate(seeds):
+            embed.add_field(
+                name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
+                value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
+                inline=False
+            )
+        await ctx.send(embed=embed)
 
 
 async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off", festive=False):
