@@ -1,10 +1,7 @@
 import asyncio
-import json
 import random
 from urllib.parse import urljoin
 
-import aiocache
-import aiohttp
 import discord
 import html2markdown
 from discord.ext import commands
@@ -49,11 +46,6 @@ class Misc(commands.Cog):
         embed.add_field(name="Discord ID", value=member.id, inline=False)
         embed.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()
-    async def throwerror(self, ctx):
-        raise Exception('omg')
 
     @commands.command()
     async def prng(self, ctx):
@@ -144,15 +136,6 @@ class Misc(commands.Cog):
         embed.add_field(name="Daily Schedule",
                         value="http://speedgaming.org/alttprdaily", inline=False)
         await ctx.send(embed=embed)
-
-
-@aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
-async def get_json(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            text = await resp.read()
-
-    return json.loads(text)
 
 
 def setup(bot):

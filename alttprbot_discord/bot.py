@@ -26,7 +26,7 @@ discordbot = commands.Bot(
     allowed_mentions=discord.AllowedMentions(
         everyone=False,
         users=True,
-        roles=True
+        roles=False
     )
 )
 
@@ -103,8 +103,9 @@ async def on_message(message):
     if message.author.bot and not message.author.id == 344251539931660288:
         return
 
-    ctx = await discordbot.get_context(message)
-    await discordbot.invoke(ctx)
+    async with message.channel.typing():
+        ctx = await discordbot.get_context(message)
+        await discordbot.invoke(ctx)
 
     if discordbot.user in message.mentions:
         emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')

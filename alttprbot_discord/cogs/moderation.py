@@ -5,7 +5,6 @@ import datetime
 from urllib.parse import urlparse
 from urlextract import URLExtract
 
-import discord
 from discord.ext import commands
 
 from alttprbot.database import config
