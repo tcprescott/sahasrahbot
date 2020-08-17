@@ -121,7 +121,7 @@ async def on_message(message):
             await ctx.command.dispatch_error(ctx, exc)
         else:
             discordbot.dispatch('command_completion', ctx)
-    elif ctx.invoked_with:
-        exc = errors.CommandNotFound(
-            'Command "{}" is not found'.format(ctx.invoked_with))
-        discordbot.dispatch('command_error', ctx, exc)
+    # elif ctx.invoked_with:
+    #     exc = errors.CommandNotFound(
+    #         'Command "{}" is not found'.format(ctx.invoked_with))
+    #     discordbot.dispatch('command_error', ctx, exc)
