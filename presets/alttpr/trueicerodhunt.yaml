@@ -403,7 +403,7 @@ settings:
         PowerGlove: 0
         SmallMagic: 0
         ThreeBombs: 0
-        TitansMitt: 0
+        TitansMitt: 1
         CaneOfByrna: 0
         FiftyRupees: 0
         MagicMirror: 0
@@ -492,3 +492,4 @@ settings:
   item_placement: advanced
   spoilers: "off"
   hints: "off"
+  allow_quickswap: true

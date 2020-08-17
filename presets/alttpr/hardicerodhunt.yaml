@@ -404,3 +404,4 @@ settings:
   item_placement: advanced
   spoilers: "off"
   hints: "off"
+  allow_quickswap: true
