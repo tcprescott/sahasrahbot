@@ -5,6 +5,7 @@ import random
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import errors
 from discord_sentry_reporting import use_sentry
 
 from alttprbot.database import config
@@ -103,12 +104,24 @@ async def on_message(message):
     if message.author.bot and not message.author.id == 344251539931660288:
         return
 
-    async with message.channel.typing():
-        ctx = await discordbot.get_context(message)
-        await discordbot.invoke(ctx)
+    ctx = await discordbot.get_context(message)
 
-    if discordbot.user in message.mentions:
-        emoji = discord.utils.get(discordbot.emojis, name='SahasrahBot')
-        if emoji:
-            await asyncio.sleep(random.random()*5)
-            await message.add_reaction(emoji)
+    # replace the bot's invoke coroutine a modified version
+    # this allows the bot to begin "typing" when processing a command
+    if ctx.command is not None:
+        discordbot.dispatch('command', ctx)
+        try:
+            if await discordbot.can_run(ctx, call_once=True):
+                async with ctx.typing():
+                    await ctx.command.invoke(ctx)
+            else:
+                raise errors.CheckFailure(
+                    'The global check once functions failed.')
+        except errors.CommandError as exc:
+            await ctx.command.dispatch_error(ctx, exc)
+        else:
+            discordbot.dispatch('command_completion', ctx)
+    elif ctx.invoked_with:
+        exc = errors.CommandNotFound(
+            'Command "{}" is not found'.format(ctx.invoked_with))
+        discordbot.dispatch('command_error', ctx, exc)
