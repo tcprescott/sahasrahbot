@@ -16,9 +16,10 @@ class SuperMetroidVariaDiscord(SuperMetroidVaria):
             value=self.url,
             inline=False
         )
-        embed.add_field(
-            name="Warnings",
-            value=self.data.get('errorMsg', None),
-            inline=False
-        )
+        if self.data.get('errorMsg', '') != '':
+            embed.add_field(
+                name="Warnings",
+                value=self.data.get('errorMsg', ''),
+                inline=False
+            )
         return embed
