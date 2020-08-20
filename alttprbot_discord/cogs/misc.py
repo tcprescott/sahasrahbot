@@ -1,16 +1,16 @@
 import asyncio
+import datetime
 import random
 from urllib.parse import urljoin
 
+import dateutil.parser
 import discord
 import html2markdown
-from discord.ext import commands
-import dateutil.parser
 import pytz
-import datetime
+from discord.ext import commands
 
-from alttprbot.util.holyimage import holy
 from alttprbot.util import speedgaming
+from alttprbot.util.holyimage import holy
 
 
 class Misc(commands.Cog):
