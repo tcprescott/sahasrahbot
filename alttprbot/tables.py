@@ -51,6 +51,7 @@ t_daily = Table(
 t_discord_server_list = Table(
     'discord_server_lists', metadata,
     Column('id', INTEGER(11), primary_key=True),
+    Column('server_description', String(200), nullable=False),
     Column('invite_id', String(45), nullable=False),
     Column('category_id', INTEGER(11))
 )
