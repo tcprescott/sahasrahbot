@@ -1,15 +1,16 @@
 from ..util import orm
 
-async def get_server_list():
+async def get_categories(guild_id):
     result = await orm.select(
-        'SELECT hash FROM daily ORDER BY id DESC LIMIT 1;',
-        []
+        'SELECT * FROM `discord_server_categories` WHERE guild_id=%s ORDER BY `order` asc, `id` asc;',
+        [guild_id]
     )
-    return result[0]
+    return result
 
 
-async def set_new_daily(hash_id):
-    await orm.execute(
-        'INSERT INTO daily (`hash`) values (%s)',
-        [hash_id]
+async def get_servers_for_category(category_id):
+    result = await orm.select(
+        'SELECT * FROM `discord_server_lists` WHERE `category_id`=%s ORDER BY `id` asc;',
+        [category_id]
     )
+    return result

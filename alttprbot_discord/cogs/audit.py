@@ -44,24 +44,24 @@ class Audit(commands.Cog):
                 await audit_channel.send(embed=embed)
                 await audit.set_deleted(payload.message_id)
 
-    @commands.Cog.listener()
-    async def on_raw_bulk_message_delete(self, payload):
-        if payload.guild_id is None:
-            return
-        guild = self.bot.get_guild(payload.guild_id)
-        channel = self.bot.get_channel(payload.channel_id)
-        if payload.message_id == self.bot.user.id:
-            return
-        if await config.get(guild.id, 'AuditLogging') == 'true':
-            audit_channel_id = await config.get(guild.id, 'AuditLogChannel')
-            for message_id in payload.message_ids:
-                if audit_channel_id:
-                    embed = await audit_embed_delete(guild, channel, message_id)
-                    audit_channel = discord.utils.get(
-                        guild.channels, id=int(audit_channel_id))
+    # @commands.Cog.listener()
+    # async def on_raw_bulk_message_delete(self, payload):
+    #     if payload.guild_id is None:
+    #         return
+    #     guild = self.bot.get_guild(payload.guild_id)
+    #     channel = self.bot.get_channel(payload.channel_id)
+    #     # if payload.message_id == self.bot.user.id:
+    #     #     return
+    #     if await config.get(guild.id, 'AuditLogging') == 'true':
+    #         audit_channel_id = await config.get(guild.id, 'AuditLogChannel')
+    #         for message_id in payload.message_ids:
+    #             if audit_channel_id:
+    #                 embed = await audit_embed_delete(guild, channel, message_id)
+    #                 audit_channel = discord.utils.get(
+    #                     guild.channels, id=int(audit_channel_id))
 
-                    await audit_channel.send(embed=embed)
-                    await audit.set_deleted(payload.message_id)
+    #                 await audit_channel.send(embed=embed)
+    #                 await audit.set_deleted(payload.message_id)
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
