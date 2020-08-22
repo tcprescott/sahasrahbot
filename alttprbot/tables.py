@@ -48,6 +48,21 @@ t_daily = Table(
     Column('hash', String(45, 'utf8_bin'), nullable=False)
 )
 
+t_discord_server_list = Table(
+    'discord_server_lists', metadata,
+    Column('id', INTEGER(11), primary_key=True),
+    Column('invite_id', String(45), nullable=False),
+    Column('category_id', INTEGER(11))
+)
+
+t_discord_server_categories = Table(
+    'discord_server_categories', metadata,
+    Column('id', INTEGER(11), primary_key=True),
+    Column('guild_id', BIGINT(20), nullable=False),
+    Column('channel_id', BIGINT(20), nullable=False),
+    Column('category_title', String(200), nullable=False),
+    Column('category_description', String(200)),
+)
 
 t_gtbk_games = Table(
     'gtbk_games', metadata,
