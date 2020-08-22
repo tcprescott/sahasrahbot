@@ -57,16 +57,7 @@ class Misc(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=embed)
 
-<<<<<<< HEAD
     @commands.command()
-=======
-    @commands.command(hidden=True)
-    @commands.is_owner()
-    async def throwerror(self, ctx):
-        raise Exception('omg')
-
-    @commands.command(hidden=True)
->>>>>>> sql_overhaul
     async def prng(self, ctx):
         await ctx.send("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
 
