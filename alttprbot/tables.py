@@ -58,6 +58,7 @@ t_discord_server_list = Table(
 t_discord_server_categories = Table(
     'discord_server_categories', metadata,
     Column('id', INTEGER(11), primary_key=True),
+    Column('order', INTEGER(11), nullable=False, server_default=text("'0'")),
     Column('guild_id', BIGINT(20), nullable=False),
     Column('channel_id', BIGINT(20), nullable=False),
     Column('category_title', String(200), nullable=False),
