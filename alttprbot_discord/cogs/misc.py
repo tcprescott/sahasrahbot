@@ -12,6 +12,8 @@ from discord.ext import commands
 from alttprbot.util import speedgaming
 from alttprbot.util.holyimage import holy
 
+from ..util import checks
+
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -38,7 +40,8 @@ class Misc(commands.Cog):
     @commands.check_any(
         commands.has_any_role(523276397679083520, 307883683526868992),
         commands.has_permissions(administrator=True),
-        commands.has_permissions(manage_guild=True)
+        commands.has_permissions(manage_guild=True),
+        checks.has_any_channel_id(608008164356653066)
     )
     async def memberinfo(self, ctx, member: discord.Member = None):
         if member is None:
@@ -54,7 +57,16 @@ class Misc(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=embed)
 
+<<<<<<< HEAD
     @commands.command()
+=======
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def throwerror(self, ctx):
+        raise Exception('omg')
+
+    @commands.command(hidden=True)
+>>>>>>> sql_overhaul
     async def prng(self, ctx):
         await ctx.send("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
 
