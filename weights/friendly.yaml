@@ -76,10 +76,7 @@ item_pool:
   hard: 20
   expert: 0
   crowd_control: 0
-item_functionality:
-  normal: 80
-  hard: 20
-  expert: 0
+item_functionality: "normal"
 enemy_damage:
   default: 80
   shuffled: 20
