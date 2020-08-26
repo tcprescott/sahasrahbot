@@ -1,0 +1,173 @@
+description: This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Three winner Furaime.
+allow_quickswap: True
+glitches_required: "none"
+item_placement:
+  basic: 33
+  advanced: 67
+dungeon_items:
+  standard: 30
+  mc: 15
+  mcs: 25
+  full: 30
+accessibility:
+  items: 55
+  locations: 10
+  none: 35
+goals:
+  ganon: 25
+  fast_ganon: 32
+  dungeons: 20
+  pedestal: 13
+  triforce-hunt: 10
+tower_open:
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 10
+  "7": 30
+  random: 20
+ganon_open:
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 15
+  "7": 25
+  random: 20
+world_state:
+  standard: 40
+  open: 25
+  inverted: 20
+  retro: 15
+entrance_shuffle:
+  none: 60
+  simple: 0
+  restricted: 1
+  full: 0
+  crossed: 30
+  insanity: 9
+boss_shuffle:
+  none: 60
+  simple: 5
+  full: 5
+  random: 30
+enemy_shuffle:
+  none: 65
+  shuffled: 33
+  random: 2
+hints:
+  "on": 33
+  "off": 67
+weapons:
+  randomized: 45
+  assured: 25
+  vanilla: 20
+  swordless: 10
+item_pool:
+  normal: 50
+  hard: 30
+  expert: 20
+  crowd_control: 0
+item_functionality:
+  normal: 55
+  hard: 45
+  expert: 0
+enemy_damage:
+  default: 60
+  shuffled: 20
+  random: 20
+enemy_health:
+  default: 60
+  easy: 0
+  hard: 20
+  expert: 20
+customizer:
+  timed-ohko:
+    forced_settings:
+      item_placement: basic
+      item:
+        functionality: normal
+      enemizer:
+        enemy_damage: default
+        enemy_health: default
+        boss_shuffle: none
+        enemy_shuffle: none
+      custom:
+        item.require.Lamp: False
+    timerStart: [900, 1500]
+    clock:
+      GreenClock:
+        value: [180, 300]
+        pool: [12, 16]
+      BlueClock:
+        value: [300, 600]
+        pool: [0, 2]
+      RedClock:
+        value: [-600, 300]
+        pool: [0, 3]
+  triforce-hunt:
+    goal: [30, 60]
+    pool: [30, 70]
+    min_difference:
+      0: 50
+      10: 50
+  eq:
+    "PegasusBoots":
+      True: 70
+      False: 30
+  custom:
+    customPrizePacks:
+      True: 50
+      False: 50
+    # item.require.Lamp is actually backwards (True enables dark room navigation)
+    # if this is True, enemy_shuffle and enemy_damage are set to defaults
+    item.require.Lamp:
+      True: 5
+      False: 95
+    prize.shufflePendants:
+      True: 95
+      False: 5
+    prize.shuffleCrystals:
+      True: 95
+      False: 5
+    # any of these being in here will set dungeon_items to standard
+    region.wildMaps:
+      True: 50
+      False: 50
+    region.wildCompasses:
+      True: 50
+      False: 50
+    region.wildKeys:
+      True: 50
+      False: 50
+    region.wildBigKeys:
+      True: 50
+      False: 50
+    # 0: nothing, 16: items outside their dungeons, 255: everything
+    rom.freeItemText:
+      0: 10
+      16: 70
+      255: 20
+    rom.dungeonCount:
+      "pickup": 50
+      "off": 50
+    rom.mapOnPickup:
+      True: 50
+      False: 50
+    rom.timerMode:
+      "countdown-ohko": 5
+      "off": 95
+    rom.rupeeBow:
+      True: 10
+      False: 90
+    rom.genericKeys:
+      True: 5
+      False: 95
+    spoil.BootsLocation:
+      True: 70
+      False: 30
