@@ -47,13 +47,7 @@ world_state:
   open: 35
   inverted: 20
   retro: 10
-entrance_shuffle:
-  none: 100
-  simple: 0
-  restricted: 0
-  full: 0
-  crossed: 0
-  insanity: 0
+entrance_shuffle: "none"
 boss_shuffle:
   none: 60
   simple: 10
@@ -76,10 +70,7 @@ item_pool:
   hard: 20
   expert: 0
   crowd_control: 0
-item_functionality:
-  normal: 80
-  hard: 20
-  expert: 0
+item_functionality: "normal"
 enemy_damage:
   default: 80
   shuffled: 20
