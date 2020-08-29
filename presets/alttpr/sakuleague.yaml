@@ -1,6 +1,7 @@
 ---
 goal_name: open basic placement
 customizer: false
+description: "An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa)."
 settings:
   goal: ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'on'
+  hints: "on"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

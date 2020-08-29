@@ -1,6 +1,7 @@
 ---
 goal_name: casual
 customizer: false
+description: "Standard with a starting weapon."
 settings:
   goal: ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: standard
-  hints: 'off'
+  hints: "off"
   weapons: assured
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

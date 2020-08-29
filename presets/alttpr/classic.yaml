@@ -1,10 +1,11 @@
 customizer: true
 goal_name: classic
+description: "Attempts to closely mimic the feel of v18.  No progressive items, etc."
 settings:
   accessibility: items
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   custom:
     canBombJump: false
     canBootsClip: false
@@ -177,12 +178,12 @@ settings:
         Triforce: 0
         TriforcePiece: 0
         TwentyRupees: 28
-    item.Goal.Required: ''
+    item.Goal.Required: ""
     item.require.Lamp: false
-    item.value.BlueClock: ''
-    item.value.GreenClock: ''
-    item.value.RedClock: ''
-    item.value.Rupoor: ''
+    item.value.BlueClock: ""
+    item.value.GreenClock: ""
+    item.value.RedClock: ""
+    item.value.Rupoor: ""
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
@@ -191,100 +192,100 @@ settings:
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
-    rom.dungeonCount: 'off'
+    rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.genericKeys: false
     rom.logicMode: NoGlitches
     rom.mapOnPickup: false
     rom.rupeeBow: false
-    rom.timerMode: 'off'
-    rom.timerStart: ''
-    rom.GanonAgRNG: 'none'
+    rom.timerMode: "off"
+    rom.timerStart: ""
+    rom.GanonAgRNG: "none"
     spoil.BootsLocation: false
   drops:
-    '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     crab:
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
     fish:
-    - auto_fill
+      - auto_fill
     pull:
-    - auto_fill
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     stun:
-    - auto_fill
+      - auto_fill
   dungeon_items: standard
   eq:
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
   glitches: none
   goal: ganon
-  hints: 'off'
+  hints: "off"
   item:
     functionality: normal
     pool: normal
@@ -295,6 +296,6 @@ settings:
   mode: standard
   name: Classic Randomizer
   notes: Kids these days and their fancy progressive upgrades and lack of bomb/arrow upgrades in the item pool. Dang nabbit! (oh and no Ganon/Aga RNG)
-  spoilers: 'off'
+  spoilers: "off"
   tournament: true
   weapons: randomized

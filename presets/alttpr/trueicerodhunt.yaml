@@ -1,195 +1,195 @@
 ---
 goal_name: "True Ice Rod Hunt"
 customizer: True
-shuffle_prize_packs: false
+description: "You get every **every**, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)"
 settings:
   l:
     VHVydGxlIFJvY2sgLSBCb3NzOjE=: Triforce:1
   eq:
-  - ProgressiveArmor
-  - ProgressiveArmor
-  - ProgressiveSword
-  - ProgressiveSword
-  - ProgressiveSword
-  - ProgressiveSword
-  - ProgressiveShield
-  - ProgressiveShield
-  - ProgressiveShield
-  - MoonPearl
-  - BowAndSilverArrows
-  - Boomerang
-  - RedBoomerang
-  - Hookshot
-  - Mushroom
-  - Powder
-  - FireRod
-  - Bombos
-  - Ether
-  - Quake
-  - Lamp
-  - Hammer
-  - Shovel
-  - BugCatchingNet
-  - BookOfMudora
-  - BottleWithRedPotion
-  - BottleWithGreenPotion
-  - BottleWithBluePotion
-  - BottleWithFairy
-  - CaneOfSomaria
-  - CaneOfByrna
-  - Cape
-  - MagicMirror
-  - PegasusBoots
-  - ProgressiveGlove
-  - ProgressiveGlove
-  - Flippers
-  - OcarinaActive
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - ThreeHundredRupees
-  - FiftyRupees
-  - TwentyRupees
-  - TwentyRupees
-  - FiveRupees
-  - OneRupee
-  - OneRupee
-  - OneRupee
-  - OneRupee
-  - TenBombs
-  - TenBombs
-  - TenBombs
-  - TenBombs
-  - TenBombs
-  - BombUpgrade10
-  - BombUpgrade10
-  - BombUpgrade10
-  - BombUpgrade10
-  - ArrowUpgrade10
-  - ArrowUpgrade10
-  - ArrowUpgrade10
-  - ArrowUpgrade10
-  - TenArrows
-  - TenArrows
-  - TenArrows
-  - TenArrows
-  - TenArrows
-  - TenArrows
-  - TenArrows
-  - HalfMagic
-  - QuarterMagic
-  - MapA2
-  - MapD7
-  - MapD4
-  - MapP3
-  - MapD5
-  - MapD3
-  - MapD6
-  - MapD1
-  - MapD2
-  - MapP2
-  - MapP1
-  - MapH2
-  - CompassA2
-  - CompassD7
-  - CompassD4
-  - CompassP3
-  - CompassD5
-  - CompassD3
-  - CompassD6
-  - CompassD1
-  - CompassD2
-  - CompassP2
-  - CompassP1
-  - BigKeyA2
-  - BigKeyD7
-  - BigKeyD4
-  - BigKeyP3
-  - BigKeyD5
-  - BigKeyD3
-  - BigKeyD6
-  - BigKeyD1
-  - BigKeyD2
-  - BigKeyP2
-  - BigKeyP1
-  - KeyH2
-  - KeyP2
-  - KeyA1
-  - KeyA1
-  - KeyD2
-  - KeyD1
-  - KeyD1
-  - KeyD1
-  - KeyD1
-  - KeyD1
-  - KeyD1
-  - KeyD6
-  - KeyD6
-  - KeyD6
-  - KeyD3
-  - KeyD3
-  - KeyD3
-  - KeyD5
-  - KeyD5
-  - KeyP3
-  - KeyD4
-  - KeyD7
-  - KeyD7
-  - KeyD7
-  - KeyD7
-  - KeyA2
-  - KeyA2
-  - KeyA2
-  - KeyA2
+    - ProgressiveArmor
+    - ProgressiveArmor
+    - ProgressiveSword
+    - ProgressiveSword
+    - ProgressiveSword
+    - ProgressiveSword
+    - ProgressiveShield
+    - ProgressiveShield
+    - ProgressiveShield
+    - MoonPearl
+    - BowAndSilverArrows
+    - Boomerang
+    - RedBoomerang
+    - Hookshot
+    - Mushroom
+    - Powder
+    - FireRod
+    - Bombos
+    - Ether
+    - Quake
+    - Lamp
+    - Hammer
+    - Shovel
+    - BugCatchingNet
+    - BookOfMudora
+    - BottleWithRedPotion
+    - BottleWithGreenPotion
+    - BottleWithBluePotion
+    - BottleWithFairy
+    - CaneOfSomaria
+    - CaneOfByrna
+    - Cape
+    - MagicMirror
+    - PegasusBoots
+    - ProgressiveGlove
+    - ProgressiveGlove
+    - Flippers
+    - OcarinaActive
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - ThreeHundredRupees
+    - FiftyRupees
+    - TwentyRupees
+    - TwentyRupees
+    - FiveRupees
+    - OneRupee
+    - OneRupee
+    - OneRupee
+    - OneRupee
+    - TenBombs
+    - TenBombs
+    - TenBombs
+    - TenBombs
+    - TenBombs
+    - BombUpgrade10
+    - BombUpgrade10
+    - BombUpgrade10
+    - BombUpgrade10
+    - ArrowUpgrade10
+    - ArrowUpgrade10
+    - ArrowUpgrade10
+    - ArrowUpgrade10
+    - TenArrows
+    - TenArrows
+    - TenArrows
+    - TenArrows
+    - TenArrows
+    - TenArrows
+    - TenArrows
+    - HalfMagic
+    - QuarterMagic
+    - MapA2
+    - MapD7
+    - MapD4
+    - MapP3
+    - MapD5
+    - MapD3
+    - MapD6
+    - MapD1
+    - MapD2
+    - MapP2
+    - MapP1
+    - MapH2
+    - CompassA2
+    - CompassD7
+    - CompassD4
+    - CompassP3
+    - CompassD5
+    - CompassD3
+    - CompassD6
+    - CompassD1
+    - CompassD2
+    - CompassP2
+    - CompassP1
+    - BigKeyA2
+    - BigKeyD7
+    - BigKeyD4
+    - BigKeyP3
+    - BigKeyD5
+    - BigKeyD3
+    - BigKeyD6
+    - BigKeyD1
+    - BigKeyD2
+    - BigKeyP2
+    - BigKeyP1
+    - KeyH2
+    - KeyP2
+    - KeyA1
+    - KeyA1
+    - KeyD2
+    - KeyD1
+    - KeyD1
+    - KeyD1
+    - KeyD1
+    - KeyD1
+    - KeyD1
+    - KeyD6
+    - KeyD6
+    - KeyD6
+    - KeyD3
+    - KeyD3
+    - KeyD3
+    - KeyD5
+    - KeyD5
+    - KeyP3
+    - KeyD4
+    - KeyD7
+    - KeyD7
+    - KeyD7
+    - KeyD7
+    - KeyA2
+    - KeyA2
+    - KeyA2
+    - KeyA2
   goal: triforce-hunt
   item:
     pool: normal
@@ -198,80 +198,80 @@ settings:
   mode: open
   name: True Super Ice Rod Hunt 9000x32
   drops:
-    '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     crab:
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
     fish:
-    - auto_fill
+      - auto_fill
     pull:
-    - auto_fill
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     stun:
-    - auto_fill
+      - auto_fill
   notes: |-
     Some other Link already spent a bunch of time trying to find the Ice Rod in Hyrule, just to forfeit his race without finding it.
 
@@ -457,34 +457,34 @@ settings:
     rom.timerMode: none
     canBunnyRevive: false
     canFakeFlipper: false
-    rom.timerStart: ''
+    rom.timerStart: ""
     region.wildKeys: true
     region.wildMaps: true
     rom.genericKeys: false
     rom.mapOnPickup: false
     canDungeonRevive: false
     prize.crossWorld: true
-    rom.dungeonCount: 'on'
+    rom.dungeonCount: "on"
     rom.freeItemMenu: true
     rom.freeItemText: false
     canOneFrameClipOW: false
     item.require.Lamp: false
-    item.value.Rupoor: ''
-    item.Goal.Required: ''
+    item.value.Rupoor: ""
+    item.Goal.Required: ""
     region.wildBigKeys: true
     canWaterFairyRevive: false
-    item.value.RedClock: ''
+    item.value.RedClock: ""
     spoil.BootsLocation: false
-    item.value.BlueClock: ''
+    item.value.BlueClock: ""
     region.wildCompasses: true
-    item.value.GreenClock: ''
+    item.value.GreenClock: ""
     prize.shuffleCrystals: true
     prize.shufflePendants: true
     region.bossNormalLocation: true
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '0'
+    ganon: "7"
+    tower: "0"
   glitches: none
   tournament: true
   accessibility: none

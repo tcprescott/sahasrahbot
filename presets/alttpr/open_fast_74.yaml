@@ -1,6 +1,7 @@
 ---
 goal_name: open fast ganon 7/4
 customizer: false
+description: "Four crystals required for Ganon, but 7 for GT.  Keeps GT effectively locked out."
 settings:
   goal: fast_ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '4'
-    tower: '7'
+    ganon: "4"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

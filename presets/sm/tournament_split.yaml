@@ -1,6 +1,6 @@
-randomizer: 'sm'
-goal_name: beat the game (v11 beta)
-use_new: True
+randomizer: "sm"
+goal_name: beat the game
+description: "Casual logic and a major/minor item split."
 settings:
     logic: Tournament
     goal: defeatmb

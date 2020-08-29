@@ -1,8 +1,5 @@
 # SahasrahBot
 
-* Table of contents
-{:toc}
-
 ## Help
 1. [SRL Command List](srl.md)
 2. [RaceTime.gg Commands](rtgg.md)

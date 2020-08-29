@@ -1,5 +1,6 @@
-randomizer: 'smz3'
+randomizer: "smz3"
 goal_name: beat the games
+description: "Normal logic, but Sword and Morph are early."
 settings:
     smlogic: normal
     goal: defeatboth

@@ -1,6 +1,7 @@
 ---
 goal_name: fast ganon standard
 customizer: false
+description: "Standard world state, randomized weapons, Aghanim 2 not required."
 settings:
   goal: fast_ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: standard
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

@@ -1,6 +1,7 @@
 ---
 goal_name: casual open random crystals
 customizer: false
+description: "Random GT and Ganon crystal requirements."
 settings:
   goal: ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: 'random'
-    tower: 'random'
+    ganon: "random"
+    tower: "random"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

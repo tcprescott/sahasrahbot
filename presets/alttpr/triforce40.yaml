@@ -1,94 +1,95 @@
 ---
 goal_name: "40/50 triforce hunt"
 customizer: true
+description: "A Triforce Hunt, except there are 40 pieces required, and 50 in the item pool."
 settings:
   l: {}
   eq:
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
   goal: triforce-hunt
   item:
     pool: normal
     functionality: normal
   lang: en
   mode: open
-  name: ''
+  name: ""
   drops:
-    '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     crab:
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
     fish:
-    - auto_fill
+      - auto_fill
     pull:
-    - auto_fill
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     stun:
-    - auto_fill
+      - auto_fill
   notes: 40/50 Triforce Hunt
   custom:
     customPrizePacks: false
@@ -264,10 +265,10 @@ settings:
     canWaterWalk: false
     item.Goal.Required: 40
     item.require.Lamp: false
-    item.value.BlueClock: ''
-    item.value.GreenClock: ''
-    item.value.RedClock: ''
-    item.value.Rupoor: ''
+    item.value.BlueClock: ""
+    item.value.GreenClock: ""
+    item.value.RedClock: ""
+    item.value.Rupoor: ""
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
@@ -276,19 +277,19 @@ settings:
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
-    rom.dungeonCount: 'off'
+    rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.genericKeys: false
     rom.mapOnPickup: false
     rom.rupeeBow: false
-    rom.timerMode: 'off'
-    rom.timerStart: ''
+    rom.timerMode: "off"
+    rom.timerStart: ""
     spoil.BootsLocation: false
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   glitches: none
   tournament: true
   accessibility: items

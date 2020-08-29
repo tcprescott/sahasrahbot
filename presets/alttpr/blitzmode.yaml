@@ -1,11 +1,11 @@
 customizer: true
 goal_name: fast ganon open 4/4 w/ starting items
-shuffle_prize_packs: true
+description: "4/4 fast ganon. Start with Boots, Activated Flute, Pearl, Mitts, Master Sword, and Lamp"
 settings:
   accessibility: items
   crystals:
-    ganon: '4'
-    tower: '4'
+    ganon: "4"
+    tower: "4"
   custom:
     customPrizePacks: false
     canBombJump: false
@@ -178,12 +178,12 @@ settings:
         Triforce: 0
         TriforcePiece: 0
         TwentyRupees: 28
-    item.Goal.Required: ''
+    item.Goal.Required: ""
     item.require.Lamp: false
-    item.value.BlueClock: ''
-    item.value.GreenClock: ''
-    item.value.RedClock: ''
-    item.value.Rupoor: ''
+    item.value.BlueClock: ""
+    item.value.GreenClock: ""
+    item.value.RedClock: ""
+    item.value.Rupoor: ""
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
@@ -192,103 +192,103 @@ settings:
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
-    rom.dungeonCount: 'off'
+    rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.genericKeys: false
     rom.mapOnPickup: false
     rom.rupeeBow: false
-    rom.timerMode: 'off'
-    rom.timerStart: ''
+    rom.timerMode: "off"
+    rom.timerStart: ""
     spoil.BootsLocation: false
   drops:
-    '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     crab:
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
     fish:
-    - auto_fill
+      - auto_fill
     pull:
-    - auto_fill
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     stun:
-    - auto_fill
+      - auto_fill
   dungeon_items: standard
   eq:
-  - ProgressiveSword
-  - ProgressiveSword
-  - MoonPearl
-  - Lamp
-  - PegasusBoots
-  - ProgressiveGlove
-  - ProgressiveGlove
-  - OcarinaActive
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
+    - ProgressiveSword
+    - ProgressiveSword
+    - MoonPearl
+    - Lamp
+    - PegasusBoots
+    - ProgressiveGlove
+    - ProgressiveGlove
+    - OcarinaActive
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
   glitches: none
   goal: fast_ganon
   item:
@@ -299,7 +299,8 @@ settings:
   lang: en
   mode: open
   name: BlitzMode
-  notes: 4/4 fast ganon. start with Boots, Activated Flute, Pearl, Mitts, Master Sword,
+  notes:
+    4/4 fast ganon. start with Boots, Activated Flute, Pearl, Mitts, Master Sword,
     Lamp
   spoilers: "off"
   tournament: true

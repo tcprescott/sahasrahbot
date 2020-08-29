@@ -1,96 +1,96 @@
 ---
 goal_name: "standard w/ boots start"
 customizer: true
-shuffle_prize_packs: true
+description: "Standard world state, randomized weapons, and you get boots!"
 settings:
   l: {}
   eq:
-  - PegasusBoots
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
+    - PegasusBoots
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
   goal: ganon
   item:
     pool: normal
     functionality: normal
   lang: en
   mode: standard
-  name: ''
+  name: ""
   drops:
-    '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     crab:
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
     fish:
-    - auto_fill
+      - auto_fill
     pull:
-    - auto_fill
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     stun:
-    - auto_fill
+      - auto_fill
   notes: Open w/ Boots Start
   custom:
     customPrizePacks: false
@@ -260,37 +260,37 @@ settings:
     canMirrorWrap: false
     canSuperBunny: false
     canSuperSpeed: false
-    rom.timerMode: 'off'
+    rom.timerMode: "off"
     canBunnyRevive: false
     canFakeFlipper: false
-    rom.timerStart: ''
+    rom.timerStart: ""
     region.wildKeys: false
     region.wildMaps: false
     rom.genericKeys: false
     rom.mapOnPickup: false
     canDungeonRevive: false
     prize.crossWorld: true
-    rom.dungeonCount: 'off'
+    rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
     canOneFrameClipOW: false
     item.require.Lamp: false
-    item.value.Rupoor: ''
-    item.Goal.Required: ''
+    item.value.Rupoor: ""
+    item.Goal.Required: ""
     region.wildBigKeys: false
     canWaterFairyRevive: false
-    item.value.RedClock: ''
+    item.value.RedClock: ""
     spoil.BootsLocation: false
-    item.value.BlueClock: ''
+    item.value.BlueClock: ""
     region.wildCompasses: false
-    item.value.GreenClock: ''
+    item.value.GreenClock: ""
     prize.shuffleCrystals: true
     prize.shufflePendants: true
     region.bossNormalLocation: true
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   tournament: true
   accessibility: items
   dungeon_items: standard

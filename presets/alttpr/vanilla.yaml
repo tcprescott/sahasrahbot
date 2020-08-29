@@ -3,14 +3,15 @@
 customizer: true
 goal_name: vanilla
 randomizer: alttpr
+description: "The vanilla game, but with all of the quality life additions of the randomizer."
 settings:
   accessibility: none
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   custom:
     customPrizePacks: true
-    rom.GanonAgRNG: 'none'
+    rom.GanonAgRNG: "none"
     canBombJump: false
     canBootsClip: false
     canBunnyRevive: false
@@ -182,12 +183,12 @@ settings:
         Triforce: 0
         TriforcePiece: 0
         TwentyRupees: 0
-    item.Goal.Required: ''
+    item.Goal.Required: ""
     item.require.Lamp: false
-    item.value.BlueClock: ''
-    item.value.GreenClock: ''
-    item.value.RedClock: ''
-    item.value.Rupoor: ''
+    item.value.BlueClock: ""
+    item.value.GreenClock: ""
+    item.value.RedClock: ""
+    item.value.Rupoor: ""
     prize.crossWorld: false
     prize.shuffleCrystals: false
     prize.shufflePendants: false
@@ -196,91 +197,91 @@ settings:
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
-    rom.dungeonCount: 'off'
+    rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.genericKeys: false
-    rom.logicMode: 'MajorGlitches'
+    rom.logicMode: "MajorGlitches"
     rom.mapOnPickup: false
     rom.rupeeBow: false
-    rom.timerMode: 'off'
-    rom.timerStart: ''
+    rom.timerMode: "off"
+    rom.timerStart: ""
     spoil.BootsLocation: false
   drops:
-    '0':
-    - Heart
-    - Heart
-    - Heart
-    - Heart
-    - RupeeGreen
-    - Heart
-    - Heart
-    - RupeeGreen
-    '1':
-    - RupeeBlue
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeRed
-    - RupeeBlue
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeBlue
-    '2':
-    - MagicRefillFull
-    - MagicRefillSmall
-    - MagicRefillSmall
-    - RupeeBlue
-    - MagicRefillFull
-    - MagicRefillSmall
-    - Heart
-    - MagicRefillSmall
-    '3':
-    - BombRefill1
-    - BombRefill1
-    - BombRefill1
-    - BombRefill4
-    - BombRefill1
-    - BombRefill1
-    - BombRefill8
-    - BombRefill1
-    '4':
-    - ArrowRefill5
-    - Heart
-    - ArrowRefill5
-    - ArrowRefill10
-    - ArrowRefill5
-    - Heart
-    - ArrowRefill5
-    - ArrowRefill10
-    '5':
-    - MagicRefillSmall
-    - RupeeGreen
-    - Heart
-    - ArrowRefill5
-    - MagicRefillSmall
-    - BombRefill1
-    - RupeeGreen
-    - Heart
-    '6':
-    - Heart
-    - Fairy
-    - MagicRefillFull
-    - RupeeRed
-    - BombRefill8
-    - Heart
-    - RupeeRed
-    - ArrowRefill10
+    "0":
+      - Heart
+      - Heart
+      - Heart
+      - Heart
+      - RupeeGreen
+      - Heart
+      - Heart
+      - RupeeGreen
+    "1":
+      - RupeeBlue
+      - RupeeGreen
+      - RupeeBlue
+      - RupeeRed
+      - RupeeBlue
+      - RupeeGreen
+      - RupeeBlue
+      - RupeeBlue
+    "2":
+      - MagicRefillFull
+      - MagicRefillSmall
+      - MagicRefillSmall
+      - RupeeBlue
+      - MagicRefillFull
+      - MagicRefillSmall
+      - Heart
+      - MagicRefillSmall
+    "3":
+      - BombRefill1
+      - BombRefill1
+      - BombRefill1
+      - BombRefill4
+      - BombRefill1
+      - BombRefill1
+      - BombRefill8
+      - BombRefill1
+    "4":
+      - ArrowRefill5
+      - Heart
+      - ArrowRefill5
+      - ArrowRefill10
+      - ArrowRefill5
+      - Heart
+      - ArrowRefill5
+      - ArrowRefill10
+    "5":
+      - MagicRefillSmall
+      - RupeeGreen
+      - Heart
+      - ArrowRefill5
+      - MagicRefillSmall
+      - BombRefill1
+      - RupeeGreen
+      - Heart
+    "6":
+      - Heart
+      - Fairy
+      - MagicRefillFull
+      - RupeeRed
+      - BombRefill8
+      - Heart
+      - RupeeRed
+      - ArrowRefill10
     crab:
-    - RupeeGreen
-    - RupeeRed
+      - RupeeGreen
+      - RupeeRed
     fish:
-    - RupeeRed
+      - RupeeRed
     pull:
-    - RupeeGreen
-    - RupeeBlue
-    - RupeeRed
+      - RupeeGreen
+      - RupeeBlue
+      - RupeeRed
     stun:
-    - RupeeGreen
+      - RupeeGreen
   dungeon_items: standard
   enemizer:
     boss_shuffle: none
@@ -288,12 +289,12 @@ settings:
     enemy_health: default
     enemy_shuffle: none
   eq:
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
   glitches: no_logic
   goal: ganon
-  hints: 'off'
+  hints: "off"
   item:
     functionality: normal
     pool: normal
@@ -532,12 +533,13 @@ settings:
   lang: en
   mode: standard
   name: Vanilla Settings v31
-  notes: 'Use this as a base if you want most of your settings to be vanilla (e.g.
+  notes:
+    "Use this as a base if you want most of your settings to be vanilla (e.g.
     vanilla item locations, changed prize packs and vice versa).
 
 
     This can also be used as a learning guide for ALttP in terms of understanding
-    where items are normally and how the puzzles work and how the prize packs work.'
-  spoilers: 'off'
+    where items are normally and how the puzzles work and how the prize packs work."
+  spoilers: "off"
   tournament: false
   weapons: randomized

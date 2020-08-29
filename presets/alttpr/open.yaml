@@ -1,6 +1,7 @@
 ---
 goal_name: casual open
 customizer: false
+description: "Open mode, thats pretty much it."
 settings:
   goal: ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

@@ -1,5 +1,6 @@
 ---
 goal_name: "normal open keysanity + entrance shuffle"
+description: "Crossworld entrance with keysanity."
 customizer: false
 settings:
   goal: fast_ganon
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

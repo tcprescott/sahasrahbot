@@ -1,6 +1,7 @@
 ---
 goal_name: swordless
 customizer: false
+description: "Swords are overrated anyway."
 settings:
   goal: ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: swordless
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

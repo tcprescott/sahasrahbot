@@ -1,6 +1,7 @@
 ---
 goal_name: retro
 customizer: false
+description: "A throwback to Zelda 1."
 settings:
   goal: ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: retro
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

@@ -1,6 +1,7 @@
 ---
 goal_name: open fast ganon owg (vt)
 customizer: false
+description: "Overworld glitches, [Veetorp's](https://twitch.tv/veetorp) style."
 settings:
   goal: fast_ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'on'
+  hints: "on"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

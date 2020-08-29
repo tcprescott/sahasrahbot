@@ -1,6 +1,7 @@
 ---
 goal_name: "open beatable 0/0 fast ganon"
 customizer: false
+description: "Find your equipment and defeat Ganon as quick as you can!"
 settings:
   goal: fast_ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: assured
   crystals:
-    ganon: '0'
-    tower: '0'
+    ganon: "0"
+    tower: "0"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

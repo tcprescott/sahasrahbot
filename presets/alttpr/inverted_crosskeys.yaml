@@ -1,6 +1,7 @@
 ---
 goal_name: "inverted keysanity + entrance shuffle"
 customizer: false
+description: "Cross world entrance shuffle, but also using the inverted world state."
 settings:
   goal: fast_ganon
   item:
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: inverted
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: none
     enemy_damage: default

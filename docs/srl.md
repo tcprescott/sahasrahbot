@@ -2,6 +2,8 @@
 # Feel free to add content and custom Front Matter to this file.
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 ---
+* Table of contents
+{:toc}
 # SahasrahBot SRL Commands
 ## $preset/$race/$quickswaprace
 Use this command in the SRL race room.

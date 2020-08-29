@@ -1,5 +1,6 @@
 ---
 goal_name: open boss shuffle
+description: "Some good ol' boss shuffle."
 customizer: false
 settings:
   goal: ganon
@@ -8,11 +9,11 @@ settings:
     functionality: normal
   lang: en
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   enemizer:
     boss_shuffle: random
     enemy_damage: default
