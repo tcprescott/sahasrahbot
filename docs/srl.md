@@ -14,7 +14,7 @@ Example: `$preset open`
 
 If `$quickswaprace` is the command, the item quickswap feature is enabled for the race.  Quickswap is always available for entrance randomizer races.
 
-Currently supported presets can be found <https://l.synack.live/presets>.  The preset name will be the name of the file without the .yaml extension.
+Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
 You can append `--hints` to the command to enable hints.  All presets have hints disabled by default, with a few exceptions (see preset for details).
 
@@ -27,7 +27,7 @@ Supported for both alttphacks and smz3 games.  For smz3, only the normal and har
 
 Use this command in an SRL race room.
 
-Currently supported weights can be found at <https://l.synack.live/weights>.  The preset name will be the name of the file without the .yaml extension.
+Here is a [list of currently supported weights](mystery.md).  The weightset name will be the name of the file without the .yaml extension.
 
 Example: `$mystery weighted`
 
@@ -41,7 +41,7 @@ Use this command in the SRL race room.
 
 This allows you to generate a spoiler race game using a pre-defined combination of settings.
 
-Currently supported presets can be found <https://l.synack.live/presets>.  The preset name will be the name of the file without the .yaml extension.
+Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
 Example: `$spoiler open`
 
