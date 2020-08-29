@@ -1,4 +1,6 @@
-description: This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Four winner Kyong.
+description: |
+  This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Four winner Kyong.
+  A detailed explaination of these weights can be found at https://docs.google.com/document/d/e/2PACX-1vRBDSdm-_vulcTkcZS-eP7vOTmTJzmpNjfsbKxR9hSqf7vcssDRzf_6qyoWpLciVf86sBTgJXS9_Vlr/pub
 allow_quickswap: true
 glitches_required: "none"
 item_functionality: "normal"
