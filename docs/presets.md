@@ -3,7 +3,7 @@
 # SahasrahBot Presets
 ## ALTTPR
 | Preset | Description | Special |
-|:--|:--|:--|
+|:--------|:-------|:-------|
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) | All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) | Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) | Open, except the randomizer only ensures it can be beaten.|   |
@@ -64,14 +64,14 @@
 | [vanilla_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla_inverted.yaml) | An inverted version of the vanilla game.   This requires major glitch knowledge to beat!| *Customizer*  |
 ## SM
 | Preset | Description | Special |
-|:--------|:-------:|:-------:|
+|:--------|:-------|:-------|
 | [casual_full](https://github.com/tcprescott/sahasrahbot/blob/master/presets/sm/casual_full.yaml) | Casual logic and full item placement.|   |
 | [casual_split](https://github.com/tcprescott/sahasrahbot/blob/master/presets/sm/casual_split.yaml) | Casual logic and a major/minor item split.|   |
 | [tournament_full](https://github.com/tcprescott/sahasrahbot/blob/master/presets/sm/tournament_full.yaml) | Tournament logic and full item placement.|   |
 | [tournament_split](https://github.com/tcprescott/sahasrahbot/blob/master/presets/sm/tournament_split.yaml) | Casual logic and a major/minor item split.|   |
 ## SMZ3
 | Preset | Description | Special |
-|:--------|:-------:|:-------:|
+|:--------|:-------|:-------|
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casual.yaml) | Normal logic, but Sword and Morph are early.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) | Hard logic, sword and morph are fully randomized.|   |
 | [normal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normal.yaml) | Normal logic, sword and morph are fully randomized.|   |
