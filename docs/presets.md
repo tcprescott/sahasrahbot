@@ -3,7 +3,7 @@
 # SahasrahBot Presets
 ## ALTTPR
 | Preset | Description | Special |
-|:--------|:-------:|:-------:|
+|:--|:--|:--|
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) | All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) | Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) | Open, except the randomizer only ensures it can be beaten.|   |

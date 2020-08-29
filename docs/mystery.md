@@ -2,7 +2,7 @@
 {: toc}
 # SahasrahBot Mystery Weightsets
 | Preset | Description | Special |
-|:--------|:-------:|:-------:|
+|:--|:--|:--|
 | [bigjon](https://github.com/tcprescott/sahasrahbot/blob/master/weights/bigjon.yaml) | BigJon's favorite |   |
 | [bot_testing](https://github.com/tcprescott/sahasrahbot/blob/master/weights/bot_testing.yaml) | The default.  Offers every setting, but with some balance. | *Customizer* *Subweights* |
 | [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/weights/chaos.yaml) | Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld) | *Customizer*  |
