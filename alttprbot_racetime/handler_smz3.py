@@ -22,7 +22,7 @@ class Smz3Handler(RaceHandler):
         """
         if not self.state.get('intro_sent') and not c.DEBUG:
             await self.send_message(
-                f"Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller! Use {self.command_prefix}help to see what I can do!"
+                f"Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller! Use {self.command_prefix}help to see what I can do!   Check out https://sahasrahbot.synack.live/rtgg.html for more info."
             )
             self.state['intro_sent'] = True
 
@@ -33,7 +33,7 @@ class Smz3Handler(RaceHandler):
         await self.roll_game(args, message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!preset <preset>\" to generate a race preset.")
+        await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
 
     async def ex_cancel(self, args, message):
         self.seed_rolled = False

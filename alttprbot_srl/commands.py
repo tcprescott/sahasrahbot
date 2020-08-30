@@ -181,7 +181,7 @@ async def handler(target, source, message, client):
         await client.message(target, "For the ALTTPR accessible racing rules, visit https://link.alttpr.com/accessible")
 
     if args.command == '$help':
-        await client.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live")
+        await client.message(target, "For documentation on using this bot, visit https://sahasrahbot.synack.live/srl.html")
 
     if args.command == '$joinroom':
         await client.join(args.channel)

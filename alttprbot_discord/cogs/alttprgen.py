@@ -34,7 +34,7 @@ class AlttprGen(commands.Cog):
 
     @commands.group(
         brief='Generate a race preset.',
-        help='Generate a race preset.  Find a list of presets at https://l.synack.live/presets',
+        help='Generate a race preset.  Find a list of presets at https://sahasrahbot.synack.live/presets.html',
         invoke_without_command=True,
         aliases=['racepreset', 'preset']
     )
@@ -49,7 +49,7 @@ class AlttprGen(commands.Cog):
 
     @commands.command(
         brief='Generate a quickswap race.',
-        help='Generate a quickswap race.  Find a list of presets at https://l.synack.live/presets'
+        help='Generate a quickswap race.  Find a list of presets at https://sahasrahbot.synack.live/presets.html'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def quickswaprace(self, ctx, preset, hints=False):
@@ -79,7 +79,7 @@ class AlttprGen(commands.Cog):
 
     @commands.group(
         brief='Generate a preset without the race flag enabled.',
-        help='Generate a preset without the race flag enabled.  Find a list of presets at https://l.synack.live/presets',
+        help='Generate a preset without the race flag enabled.  Find a list of presets at https://sahasrahbot.synack.live/presets.html',
         invoke_without_command=True,
         aliases=['nonracepreset']
     )
@@ -111,7 +111,7 @@ class AlttprGen(commands.Cog):
 
     @commands.command(
         brief='Generate a spoiler game.',
-        help='Generate a spoiler game.  Find a list of presets at https://l.synack.live/presets'
+        help='Generate a spoiler game.  Find a list of presets at https://sahasrahbot.synack.live/presets.html'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def spoiler(self, ctx, preset):
@@ -124,7 +124,7 @@ class AlttprGen(commands.Cog):
 
     @commands.group(
         brief='Generate a game with randomized settings.',
-        help='Generate a game with randomized settings.  Find a list of weights at https://l.synack.live/weights',
+        help='Generate a game with randomized settings.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html',
         invoke_without_command=True,
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -149,7 +149,7 @@ class AlttprGen(commands.Cog):
 
     @commands.group(
         brief='Generate a mystery game.',
-        help='Generate a mystery game.  Find a list of weights at https://l.synack.live/weights',
+        help='Generate a mystery game.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html',
         invoke_without_command=True,
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
@@ -211,7 +211,7 @@ class AlttprGen(commands.Cog):
 
     @commands.group(
         brief='Generate a festive game with randomized settings.',
-        help='Generate a festive game with randomized settings.  Find a list of weights at https://l.synack.live/weights'
+        help='Generate a festive game with randomized settings.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @checks.restrict_command_globally('FestiveMode')
@@ -221,7 +221,7 @@ class AlttprGen(commands.Cog):
 
     @commands.group(
         brief='Generate a festive mystery game.',
-        help='Generate a festive mystery game.  Find a list of weights at https://l.synack.live/weights'
+        help='Generate a festive mystery game.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html'
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @checks.restrict_command_globally('FestiveMode')

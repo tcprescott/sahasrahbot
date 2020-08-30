@@ -32,10 +32,10 @@ async def fetch_preset(preset, randomizer='alttpr'):
             preset_dict = yaml.safe_load(await f.read())
         if preset_dict.get('festive') and not await config.get(0, 'FestiveMode') == "true":
             raise PresetNotFoundException(
-                f'Could not find preset {preset}.  See a list of available presets at https://l.synack.live/presets')
+                f'Could not find preset {preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html')
     except FileNotFoundError as err:
         raise PresetNotFoundException(
-            f'Could not find preset {preset}.  See a list of available presets at https://l.synack.live/presets') from err
+            f'Could not find preset {preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
     return preset_dict
 
