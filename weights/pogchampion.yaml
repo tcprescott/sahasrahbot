@@ -252,7 +252,7 @@ subweights:
   triforce-ohko:
     chance: 10
     weights:
-      item_placement: "basic"
+      item_placement: "advanced"
       dungeon_items: "standard"
       accessibility:
         items: 75
