@@ -20,14 +20,14 @@ If `!quickswaprace` is the command, the item quickswap feature is enabled for th
 Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
 ### !mystery
-Use this command in an SRL race room.
+Use this command in an RaceTime.gg race room.
 
 Here is a [list of currently supported weights](mystery.md).  The weightset name will be the name of the file without the .yaml extension.
 
 Example: `!mystery weighted`
 
 ### !spoiler
-Use this command in the SRL race room.
+Use this command in the RaceTime.gg race room.
 
 This allows you to generate a spoiler race game using a pre-defined combination of settings.
 
@@ -35,7 +35,7 @@ Here is a [list of currently supported presets](presets.md).  The preset name wi
 
 Example: `!spoiler open`
 
-SahasrahBot, after the start of the race in SRL, will post the spoiler log in chat and will automatically begin counting down 900s minutes.
+SahasrahBot, after the start of the race in RaceTime.gg, will post the spoiler log in chat and will automatically begin counting down 900s minutes.
 
 This bot will inform you when you're ready to begin racing.
 
