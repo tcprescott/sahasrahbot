@@ -252,7 +252,7 @@ subweights:
   triforce-ohko:
     chance: 10
     weights:
-      item_placement: "advanced"
+      item_placement: "basic"
       dungeon_items: "standard"
       accessibility:
         items: 75
@@ -302,6 +302,7 @@ subweights:
           "PegasusBoots":
             True: 75
             False: 25
+          BossHeartContainer: 1
         custom:
           customPrizePacks:
             True: 50
@@ -325,11 +326,11 @@ subweights:
           rom.genericKeys:
             True: 2
             False: 98
+          item.overflow.count.Armor: 0
+          item.overflow.count.BossHeartContainer: 0
+          item.overflow.count.PieceOfHeart: 0
         pool: # All health/armor is converted into rupees
-          "BossHeartContainer": 0
           "HeartContainer": 0
-          "PieceOfHeart": 0
-          "ProgressiveArmor": 0
   timed-ohko:
     chance: 7
     weights:
