@@ -365,4 +365,4 @@ This is a basic overview of how a mystery game is currently generated.  There ar
     6. Determine if there is less than 216 items in the pool, and fill the remainder of the pool with the `FillItemPoolWith` option to get it to 216 (a `Nothing` item by default).
     7. If the goal is `pedestal` or `dungeons`, `prize.crossWorld` is forced to True.
 9. Since entrance randomizer on the website doesn't support Map/Compass (MC) and Map/Compass/Small Key (MCS) dungeon item shuffles, those are set to "Standard" and "Keysanity" respectively for Entrance Randomizer.
-10. If weapons is `swordless` or `randomized`, and the world state is `standard`, set `enemy_shuffle`, `enemy_damage` and `enemy_health`, set weapons to `assured` instead.  This makes an enemized escape possible most of the time.
+10. If weapons is `swordless` or `randomized`, the world state is `standard`, and `enemy_shuffle`, `enemy_damage` and `enemy_health` are something other than default, then force weapons to `assured`.  This makes an enemized escape possible most of the time.
