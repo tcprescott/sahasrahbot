@@ -1,0 +1,92 @@
+description: Season 5 Pogchampion, but just the triforce-ohko subweight
+allow_quickswap: true
+glitches_required: "none"
+item_functionality: "normal"
+item_placement:
+  basic: 33
+  advanced: 67
+options:
+  FillItemPoolWith: TwentyRupees2
+subweights:
+  triforce-ohko:
+    chance: 10
+    weights:
+      item_placement: "basic"
+      dungeon_items: "standard"
+      accessibility:
+        items: 75
+        locations: 25
+        none: 0 # No beatable only Triforce Hunt
+      goals: "triforce-hunt"
+      tower_open: "random"
+      ganon_open: "random"
+      world_state:
+        standard: 5
+        open: 70
+        inverted: 15
+        retro: 10
+      entrance_shuffle: "none"
+      hints:
+        "on": 33
+        "off": 67
+      weapons:
+        randomized: 35
+        assured: 35
+        vanilla: 20
+        swordless: 10
+      item_pool:
+        normal: 70
+        hard: 20
+        expert: 10
+        crowd_control: 0
+      enemy_damage: "default"
+      enemy_health: "default"
+      boss_shuffle: "none"
+      enemy_shuffle: "none"
+      customizer:
+        timed-ohko:
+          timerStart: 0
+          clock:
+            GreenClock:
+              pool: 0
+            BlueClock:
+              pool: 0
+            RedClock:
+              pool: 0
+        triforce-hunt:
+          goal: [30, 60]
+          pool: [40, 70]
+          min_difference: 10
+        eq:
+          "PegasusBoots":
+            True: 75
+            False: 25
+          BossHeartContainer: 1
+        custom:
+          customPrizePacks:
+            True: 50
+            False: 50
+          region.wildMaps:
+            True: 60
+            False: 40
+          region.wildCompasses:
+            True: 60
+            False: 40
+          region.wildKeys:
+            True: 60
+            False: 40
+          region.wildBigKeys:
+            True: 60
+            False: 40
+          rom.timerMode: "countdown-ohko"
+          rom.rupeeBow:
+            True: 5
+            False: 95
+          rom.genericKeys:
+            True: 2
+            False: 98
+          item.overflow.count.Armor: 0
+          item.overflow.count.BossHeartContainer: 0
+          item.overflow.count.PieceOfHeart: 0
+        pool: # All health/armor is converted into rupees
+          "HeartContainer": 0
