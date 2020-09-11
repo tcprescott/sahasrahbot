@@ -9,6 +9,7 @@ title:  Presets
 
 | Preset | Description | |
 |---|---|---|
+| [adinvertedenemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adinvertedenemizer.yaml) | Some good ol' enemy and boss shuffle, but its also inverted... and all dungeons.  Only fearagent would ask for something like this.|   |
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) | All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) | Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) | Open, except the randomizer only ensures it can be beaten.|   |
