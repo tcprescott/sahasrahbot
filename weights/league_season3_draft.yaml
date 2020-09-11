@@ -34,7 +34,7 @@ enemy_health: "default"
 
 subweights:
   entrance:
-    chance: 25
+    chance: 30
     weights:
       dungeon_items:
         standard: 30
