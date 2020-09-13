@@ -1,0 +1,81 @@
+description: "Weights for the first Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS)"
+glitches_required: "none"
+item_placement: "advanced"
+dungeon_items:
+  standard: 30
+  mc: 20
+  mcs: 20
+  full: 30
+accessibility: "items"
+goals:
+  ganon: 35
+  fast_ganon: 35
+  dungeons: 20
+  pedestal: 7
+  triforce-hunt: 3
+tower_open:
+  "0": 5
+  "1": 5
+  "2": 10
+  "3": 15
+  "4": 15
+  "5": 20
+  "6": 15
+  "7": 15
+ganon_open:
+  "0": 0
+  "1": 0
+  "2": 5
+  "3": 10
+  "4": 10
+  "5": 25
+  "6": 25
+  "7": 25
+world_state:
+  standard: 30
+  open: 35
+  inverted: 25
+  retro: 10
+entrance_shuffle:
+  none: 60
+  restricted: 15
+  crossed: 25
+boss_shuffle:
+  none: 60
+  full: 25
+  random: 15
+enemy_shuffle:
+  none: 70
+  shuffled: 15
+  random: 15
+hints:
+  "on": 25
+  "off": 75
+weapons:
+  randomized: 50
+  assured: 20
+  vanilla: 15
+  swordless: 15
+item_pool:
+  normal: 60
+  hard: 25
+  expert: 15
+item_functionality:
+  normal: 75
+  hard: 20
+  expert: 5
+enemy_damage: "default"
+enemy_health:
+  default: 90
+  easy: 10
+customizer:
+  eq:
+    "SilverArrowUpgrade":
+      True: 10
+      False: 90
+    "TenBombs":
+      True: 30
+      False: 70
+    "PegasusBoots":
+      True: 177
+      False: 823
