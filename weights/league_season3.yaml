@@ -1,4 +1,6 @@
-description: Draft weights for season 3 of ALTTPR League.  *THESE ARE NOT FINAL OR OFFICIAL PLEASE DO NOT CONSTRUE THEM AS SUCH*.
+description: "Season Three weights for [ALTTPR League](https://alttprleague.com)"
+
+# Season 3 of ALTTPR League always allows quickswap, even in non-entrance.
 allow_quickswap: true
 
 # If the item pool is < 216, fill the remainder of the pool with this item to
@@ -17,6 +19,12 @@ item_placement: "advanced"
 
 # never play with hints
 hints: "off"
+
+weapons:
+  randomized: 45
+  assured: 25
+  vanilla: 20
+  swordless: 10
 
 # boss shuffle settings are global
 boss_shuffle:
@@ -78,11 +86,6 @@ subweights:
       entrance_shuffle:
         simple: 31
         crossed: 69 # nice
-      weapons:
-        randomized: 45
-        assured: 25
-        vanilla: 20
-        swordless: 10
       item_pool:
         normal: 90
         hard: 10
@@ -126,11 +129,6 @@ subweights:
         inverted: 10
         retro: 0 # non-entrance retro isn't much fun, so lets not do that
       entrance_shuffle: "none" # this subweight will never be ER
-      weapons:
-        randomized: 45
-        assured: 25
-        vanilla: 20
-        swordless: 10
       item_pool:
         normal: 70
         hard: 25
@@ -203,11 +201,6 @@ subweights:
         inverted: 10
         retro: 0 # non-entrance retro isn't much fun, so lets not do that
       entrance_shuffle: "none"
-      weapons:
-        randomized: 45
-        assured: 25
-        vanilla: 20
-        swordless: 10
       item_pool:
         normal: 70
         hard: 25

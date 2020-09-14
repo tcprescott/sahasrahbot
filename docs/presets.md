@@ -86,6 +86,9 @@ title:  Presets
 | Preset | Description | |
 |---|---|---|
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casual.yaml) | Normal logic, but Sword and Morph are early.|   |
+| [casualkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casualkeys.yaml) | Keysanity.  Normal logic, but Sword and Morph are early.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) | Hard logic, sword and morph are fully randomized.|   |
+| [hardkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardkeys.yaml) | Keysanity.  Hard logic, sword and morph are fully randomized.|   |
 | [normal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normal.yaml) | Normal logic, sword and morph are fully randomized.|   |
+| [normalkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normalkeys.yaml) | Keysanity.  Normal logic, sword and morph are fully randomized.|   |
 
