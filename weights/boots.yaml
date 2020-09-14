@@ -1,0 +1,78 @@
+description: A boots weightset.  Designed for those who like boots.
+glitches_required: "none"
+allow_quickswap: true
+item_placement:
+  basic: 33
+  advanced: 67
+dungeon_items:
+  standard: 40
+  mc: 15
+  mcs: 15
+  full: 20
+accessibility:
+  items: 70
+  locations: 0
+  none: 30
+goals:
+  ganon: 35
+  fast_ganon: 40
+  dungeons: 10
+  pedestal: 10
+  triforce-hunt: 5
+tower_open:
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 20
+  "7": 40
+  random: 0
+ganon_open:
+  "0": 5
+  "1": 5
+  "2": 5
+  "3": 5
+  "4": 10
+  "5": 10
+  "6": 20
+  "7": 40
+  random: 0
+world_state:
+  standard: 35
+  open: 35
+  inverted: 20
+  retro: 10
+entrance_shuffle: "none"
+boss_shuffle:
+  none: 60
+  simple: 10
+  full: 10
+  random: 20
+enemy_shuffle:
+  none: 80
+  shuffled: 10
+  random: 10
+hints:
+  "on": 50
+  "off": 50
+weapons:
+  randomized: 40
+  assured: 40
+  vanilla: 10
+  swordless: 5
+item_pool:
+  normal: 80
+  hard: 20
+item_functionality: "normal"
+enemy_damage:
+  default: 80
+  shuffled: 20
+enemy_health:
+  default: 80
+  easy: 10
+  hard: 10
+customizer:
+  eq:
+    "PegasusBoots": 1
