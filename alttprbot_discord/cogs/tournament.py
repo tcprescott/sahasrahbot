@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 
-from alttprbot.database import srlnick
+from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.tournament import main, secondary
 from alttprbot.util import speedgaming
-from config import Config as c
+from alttprbot.alttprgen.mystery import generate_random_game
+from alttprbot.alttprgen.preset import generate_preset, fetch_preset
 
 from ..util import checks
 
@@ -20,71 +20,84 @@ class Tournament(commands.Cog):
     async def cog_check(self, ctx):
         if ctx.guild is None:
             return False
-        if ctx.guild.id in c.Tournament:
+
+        if await config.get(ctx.guild.id, 'TournamentEnabled') == 'true':
             return True
         else:
             return False
 
-    @commands.command()
-    @commands.has_any_role('Admin', 'Admins', 'Bot Admin')
-    async def ccloadreg(self, ctx):
-        if c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
-            await secondary.loadnicks(ctx)
-        else:
-            raise SahasrahBotException(
-                'This command only works for the Challenge Cup.')
-
     @commands.command(
-        help="Generate a tournament race.",
-        aliases=['restreamrace', 'tournyrace', 'tounyrace']
+        help="Generate a tournament race."
     )
-    @checks.has_any_channel('testing', 'console', 'lobby', 'restreamers', 'sg-races', 'bot-console', 'bot-testing', 'bot-commands')
     async def tourneyrace(self, ctx, episode_number):
-        logging_channel = discord.utils.get(
-            ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['logging_channel'])
+        if await config.get(ctx.guild.id, 'TournamentAuditChannel'):
+            audit_channel_id = int(await config.get(ctx.guild.id, 'TournamentAuditChannel'))
+            audit_channel = discord.utils.get(
+                ctx.guild.text_channels, id=audit_channel_id)
+        else:
+            audit_channel = None
 
-        if c.Tournament[ctx.guild.id]['tournament'] == 'main':
-            try:
-                seed, game_number, players = await main.generate_game(episode_number, ctx.guild.id)
-            except main.SettingsSubmissionNotFoundException:
-                await dm_all_players_sg(ctx, episode_number, f"Settings submission not found at <https://docs.google.com/spreadsheets/d/1GHBnuxdLgBcx4llvHepQjwd8Q1ASbQ_4J8ubblyG-0c/edit#gid=941774009>.  Please submit settings at <http://bit.ly/2Dbr9Kr> for episode `{episode_number}`!  Once complete, re-run `$tourneyrace` command or contact your setup helper to have command re-ran.")
-                raise
-            except main.InvalidSettingsException:
-                await dm_all_players_sg(ctx, episode_number, f"Settings submitted for episode `{episode_number}` are invalid!  Please contact a tournament administrator for assistance.")
-                raise
-        elif c.Tournament[ctx.guild.id]['tournament'] == 'secondary':
-            seed, game_number, players = await secondary.generate_game(episode_number, ctx.guild.id)
+        episode = await speedgaming.get_episode(int(episode_number))
+
+        sg_event_slug = await config.get(ctx.guild.id, 'TournamentSGEventSlug')
+        if sg_event_slug:
+            if not episode['event']['slug'] == sg_event_slug:
+                raise SahasrahBotException(
+                    f'SG Episode ID provided is not an event for {sg_event_slug}')
+
+        gentype = await config.get(ctx.guild.id, 'TournamentGameType')
+        randomizer = await config.get(ctx.guild.id, 'TournamentRandomizer')
+
+        if gentype == 'preset':
+            preset = await config.get(ctx.guild.id, 'TournametPreset')
+            if preset == False:
+                raise SahasrahBotException(
+                    'A preset is not set for this server\'s tournament.  Please contact Synack for help.')
+            preset_dict = await fetch_preset(preset, randomizer)
+            seed = await generate_preset(preset_dict, preset=preset, tournament=True, spoilers='off')
+
+        elif gentype == 'mystery':
+            weightset = await config.get(ctx.guild.id, 'TournamentWeightset')
+            if weightset == False:
+                raise SahasrahBotException(
+                    'A weightset is not set for this server\'s tournament.  Please contact Synack for help.')
+            seed = await generate_random_game(weightset=weightset, tournament=True, spoilers='mystery')
         else:
             raise SahasrahBotException(
-                'This should not have happened.  Ping Synack.')
+                'TournamentGenType is not properly set for this tournament.  Please contact Synack for help.')
+
+        players = episode['match1']['players']
 
         embed = await seed.embed(
-            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number} - {episode_number}",
+            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {episode_number}",
             emojis=self.bot.emojis
         )
         tournament_embed = await seed.tournament_embed(
-            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {game_number} - {episode_number}",
+            name=f"{players[0]['displayName']} vs. {players[1]['displayName']} - {episode_number}",
             notes="The permalink for this seed was sent via direct message to each runner.",
             emojis=self.bot.emojis
         )
 
-        if c.Tournament[ctx.guild.id]['tournament'] == 'main' and 'commentary_channel' in c.Tournament[ctx.guild.id]:
-            episode = await speedgaming.get_episode(int(episode_number))
-            broadcast_channels = []
-            for channel in episode['channels']:
-                if not channel['name'] == "No Stream":
-                    broadcast_channels.append(channel['name'])
-            if len(broadcast_channels) > 0:
-                commentary_channel = discord.utils.get(
-                    ctx.guild.text_channels, id=c.Tournament[ctx.guild.id]['commentary_channel'])
-                tournament_embed.insert_field_at(
-                    0, name="Broadcast Channels", value=f"*{', '.join(broadcast_channels)}*", inline=False)
-                embed.insert_field_at(
-                    0, name="Broadcast Channels", value=f"*{', '.join(broadcast_channels)}*", inline=False)
-                await commentary_channel.send(embed=tournament_embed)
+        broadcast_channels = [
+            a['name'] for a in episode['channels'] if not a['name'] == 'No Stream']
+        if len(broadcast_channels) > 0:
+            twitch_channels = ', '.join(
+                [f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels])
+            tournament_embed.insert_field_at(
+                0, name="Broadcast Channels", value=twitch_channels, inline=False)
+            embed.insert_field_at(
+                0, name="Broadcast Channels", value=twitch_channels, inline=False)
 
-        await logging_channel.send(embed=embed)
-        await ctx.send(embed=tournament_embed)
+        if audit_channel:
+            await audit_channel.send(embed=embed)
+        else:
+            await ctx.send(embed=embed)
+
+        if await config.get(ctx.guild.id, 'TournamentCommentaryChannel'):
+            commentary_channel_id = int(await config.get(ctx.guild.id, 'TournamentCommentaryChannel'))
+            commentary_channel = discord.utils.get(
+                ctx.guild.text_channels, id=commentary_channel_id)
+            await commentary_channel.send(embed=tournament_embed)
 
         for player in players:
             try:
@@ -94,37 +107,9 @@ class Tournament(commands.Cog):
                     member = await commands.MemberConverter().convert(ctx, player['discordTag'])
                 await member.send(embed=embed)
             except discord.HTTPException:
-                await logging_channel.send(f"@here Unable to send DM to {player['displayName']}")
+                if audit_channel:
+                    await audit_channel.send(f"@here Unable to send DM to {player['displayName']}")
                 await ctx.send(f"Unable to send DM to {player['displayName']}")
-
-    @commands.command()
-    @commands.has_any_role('Admin', 'Admins', 'Bot Admin')
-    async def loadroles(self, ctx, role: discord.Role, names):
-        namelist = names.splitlines()
-
-        for name in namelist:
-            discord_users = await srlnick.get_discord_id(name)
-            if discord_users is False:
-                continue
-            else:
-                for discord_user in discord_users:
-                    member = ctx.guild.get_member(
-                        discord_user['discord_user_id'])
-                    if member is not None:
-                        await member.add_roles(role)
-
-
-async def dm_all_players_sg(ctx, episode_number, msg):
-    episode = await speedgaming.get_episode(int(episode_number))
-    for player in episode['match1']['players']:
-        try:
-            if not player.get('discordId', '') == '':
-                member = ctx.guild.get_member(int(player['discordId']))
-            else:
-                member = await commands.MemberConverter().convert(ctx, player['discordTag'])
-            await member.send(msg)
-        except discord.HTTPException:
-            pass
 
 
 def setup(bot):

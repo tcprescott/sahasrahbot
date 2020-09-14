@@ -19,6 +19,8 @@ title:  Mystery Weights
 | [ladder_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season2.yaml) | Season two mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |   |
 | [ladder_season3](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season3.yaml) | Season three mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Customizer*  |
 | [league](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league.yaml) | Season One weights for [ALTTPR League](https://alttprleague.com) |   |
+| [league_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league_season2.yaml) | Season One weights for [ALTTPR League](https://alttprleague.com) |   |
+| [league_season3_draft](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league_season3_draft.yaml) | Draft weights for season 3 of ALTTPR League.  *THESE ARE NOT FINAL OR OFFICIAL PLEASE DO NOT CONSTRUE THEM AS SUCH*. |  *Subweights* |
 | [mg](https://github.com/tcprescott/sahasrahbot/blob/master/weights/mg.yaml) | This'll always be MG.  Always. |   |
 | [nologic](https://github.com/tcprescott/sahasrahbot/blob/master/weights/nologic.yaml) | Anything can be anywhere and nothing maters anymore. |   |
 | [owg](https://github.com/tcprescott/sahasrahbot/blob/master/weights/owg.yaml) | This'll always be OWG.  Always. |   |
