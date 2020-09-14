@@ -1,9 +1,10 @@
 import os
+import random
 
 import aiofiles
-import pyz3r
 import yaml
 
+import pyz3r
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
@@ -42,33 +43,40 @@ async def fetch_preset(preset, randomizer='alttpr'):
 
 async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False):
     randomizer = preset_dict.get('randomizer', 'alttpr')
+    settings = preset_dict['settings']
 
     if randomizer == 'alttpr':
         if hints:
-            preset_dict['settings']['hints'] = 'on'
+            settings['hints'] = 'on'
         elif nohints:
-            preset_dict['settings']['hints'] = 'off'
+            settings['hints'] = 'off'
 
-        preset_dict['settings']['tournament'] = tournament
-        preset_dict['settings']['spoilers'] = spoilers
+        settings['tournament'] = tournament
+        settings['spoilers'] = spoilers
 
         if allow_quickswap:
-            preset_dict['settings']['allow_quickswap'] = True
+            settings['allow_quickswap'] = True
+
+        if preset_dict.get('customizer', False):
+            for i in preset_dict.get('forced_locations', {}):
+                settings['l'][random.choice(i['locations'])] = i['item']
 
         seed = await alttpr(
             customizer=preset_dict.get('customizer', False),
             festive=preset_dict.get('festive', False),
-            settings=preset_dict['settings']
+            settings=settings
         )
         hash_id = seed.hash
+
     elif randomizer in ['sm', 'smz3']:
-        preset_dict['settings']['race'] = "true" if tournament else "false"
+        settings['race'] = "true" if tournament else "false"
         seed = await pyz3r.sm(
             randomizer=randomizer,
-            settings=preset_dict['settings'],
+            settings=settings,
             baseurl='https://sm.samus.link' if randomizer == 'sm' else 'https://samus.link'
         )
         hash_id = seed.slug_id
+
     else:
         raise SahasrahBotException(
             f'Randomizer {randomizer} is not supported.')
@@ -77,7 +85,7 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
         randomizer=randomizer,
         hash_id=hash_id,
         permalink=seed.url,
-        settings=preset_dict['settings'],
+        settings=settings,
         gentype='preset',
         genoption=preset,
         customizer=1 if preset_dict.get('customizer', False) else 0
