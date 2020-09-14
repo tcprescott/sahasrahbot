@@ -9,6 +9,7 @@ title:  Mystery Weights
 | Preset | Description | |
 |---|---|---|
 | [bigjon](https://github.com/tcprescott/sahasrahbot/blob/master/weights/bigjon.yaml) | BigJon's favorite |   |
+| [boots](https://github.com/tcprescott/sahasrahbot/blob/master/weights/boots.yaml) | A boots weightset.  Designed for those who like boots. | *Customizer*  |
 | [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/weights/chaos.yaml) | Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld) | *Customizer*  |
 | [daily](https://github.com/tcprescott/sahasrahbot/blob/master/weights/daily.yaml) | Uses the weights currently in use for generating the daily games. |   |
 | [friendly](https://github.com/tcprescott/sahasrahbot/blob/master/weights/friendly.yaml) | A friendlier weightset.  Designed for those who don't want something extreme (or entrance). | *Customizer*  |
@@ -36,6 +37,7 @@ title:  Mystery Weights
 | [pogchampion_season5_timedohko](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season5_timedohko.yaml) | Season 5 Pogchampion, but just the timed-ohko subweight |  *Subweights* |
 | [pogchampion_season5_triforceohko](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season5_triforceohko.yaml) | Season 5 Pogchampion, but just the triforce-ohko subweight |  *Subweights* |
 | [timed_ohko](https://github.com/tcprescott/sahasrahbot/blob/master/weights/timed_ohko.yaml) | a test weightset for timed ohko | *Customizer*  |
+| [tournament_de](https://github.com/tcprescott/sahasrahbot/blob/master/weights/tournament_de.yaml) | Weights for the first Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS) | *Customizer*  |
 | [unweighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/unweighted.yaml) | Every option is equally possible.  GLHF. |   |
 | [veetorp](https://github.com/tcprescott/sahasrahbot/blob/master/weights/veetorp.yaml) | Maybe Veetorp's favorite? IDK. | *Customizer*  |
 | [weighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/weighted.yaml) | The default.  Offers every setting, but with some balance. | *Customizer*  |
