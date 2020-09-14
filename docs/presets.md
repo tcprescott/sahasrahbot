@@ -35,6 +35,7 @@ title:  Presets
 | [inverted_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_crosskeys.yaml) | Cross world entrance shuffle, but also using the inverted world state.|   |
 | [inverted_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_keys.yaml) | Inverted world state and keysanity.|   |
 | [invrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/invrosia.yaml) | Inverted with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Big Keys are shuffled in the wild, except GTBK is guarenteed to be in GT.| *Customizer*  |
+| [invrosia_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/invrosia_boots.yaml) | Inverted with a pre-equipped sword and boots.  Dungeon bosses have a guaranteed non-dungeon item.  Big Keys are shuffled in the wild, except GTBK is guarenteed to be in GT.| *Customizer*  |
 | [keysanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keysanity.yaml) | Open keysanity|   |
 | [lightspeed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/lightspeed.yaml) | Complete the 3 Light World pendant dungeons to ascend Agahnim''s Tower and grab the Triforce on the Pyramid Ledge.| *Customizer*  |
 | [mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mc.yaml) | Only maps and compasses are shuffled in the world.|   |
