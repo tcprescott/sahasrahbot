@@ -1,6 +1,6 @@
 customizer: true
 goal_name: ambrosia
-description: "Inverted with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  GTBK is guarenteed to be in GT."
+description: "Inverted with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Big Keys are shuffled in the wild, except GTBK is guarenteed to be in GT."
 forced_locations:
   - item: "BigKeyA2:1"
     locations:
