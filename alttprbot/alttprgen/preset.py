@@ -9,6 +9,21 @@ from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
+SMZ3_ENVIRONMENTS = {
+    'live': {
+        'smz3': 'https://samus.link',
+        'sm': 'https://sm.samus.link',
+    },
+    'beta': {
+        'smz3': 'https://beta.samus.link',
+        'sm': 'https://sm.samus.link',
+    },
+    'alpha': {
+        'smz3': 'https://alpha.samus.link',
+        'sm': 'https://sm.samus.link',
+    }
+}
+
 
 class PresetNotFoundException(SahasrahBotException):
     pass
@@ -73,7 +88,8 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
         seed = await pyz3r.sm(
             randomizer=randomizer,
             settings=settings,
-            baseurl='https://sm.samus.link' if randomizer == 'sm' else 'https://samus.link'
+            baseurl=SMZ3_ENVIRONMENTS[preset_dict.get(
+                'env', 'live')][randomizer],
         )
         hash_id = seed.slug_id
 
