@@ -25,8 +25,8 @@ boss_shuffle:
 
 # no unkillable theives, because screw those
 enemy_shuffle:
-  none: 85
-  shuffled: 15
+  none: 80
+  shuffled: 20
 
 # no enemy or health shuffle
 enemy_damage: "default"
@@ -45,10 +45,9 @@ subweights:
         none: 25
       goals:
         ganon: 30
-        fast_ganon: 50
+        fast_ganon: 60
         dungeons: 10
         pedestal: 10
-        triforce-hunt: 10
       tower_open: "random"
       ganon_open:
         "0": 2
@@ -80,7 +79,7 @@ subweights:
         crowd_control: 0
 
   normal:
-    chance: 70
+    chance: 60
     weights:
       dungeon_items: "standard" #changed with customizer
       accessibility:
@@ -88,11 +87,10 @@ subweights:
         locations: 10
         none: 35
       goals:
-        ganon: 35
+        ganon: 45
         fast_ganon: 35
         dungeons: 10
         pedestal: 10
-        triforce-hunt: 10
       tower_open:
         "0": 0
         "1": 0
@@ -117,9 +115,84 @@ subweights:
         inverted: 10
         retro: 0
       entrance_shuffle: "none"
-      enemy_shuffle:
-        none: 65
-        shuffled: 35
+      weapons:
+        randomized: 45
+        assured: 25
+        vanilla: 20
+        swordless: 10
+      item_pool:
+        normal: 70
+        hard: 25
+        expert: 5
+        crowd_control: 0
+      customizer:
+        triforce-hunt:
+          goal: [20, 50]
+          pool: [30, 60]
+          min_difference: 10
+        eq:
+          "PegasusBoots":
+            True: 50
+            False: 50
+          "OcarinaActive":
+            True: 50
+            False: 50
+        custom:
+          customPrizePacks: False
+          region.wildMaps:
+            True: 60
+            False: 40
+          region.wildCompasses:
+            True: 60
+            False: 40
+          region.wildKeys:
+            True: 60
+            False: 40
+          region.wildBigKeys:
+            True: 60
+            False: 40
+          rom.rupeeBow:
+            True: 10
+            False: 90
+          rom.genericKeys:
+            True: 10
+            False: 90
+          spoil.BootsLocation:
+            True: 70
+            False: 30
+
+  triforce:
+    chance: 10
+    weights:
+      dungeon_items: "standard" #changed with customizer
+      accessibility:
+        items: 90
+        locations: 10
+      goals: triforce-hunt
+      tower_open:
+        "0": 0
+        "1": 0
+        "2": 0
+        "3": 15
+        "4": 15
+        "5": 20
+        "6": 25
+        "7": 25
+      ganon_open:
+        "0": 0
+        "1": 0
+        "2": 0
+        "3": 10
+        "4": 10
+        "5": 20
+        "6": 20
+        "7": 40
+      world_state:
+        standard: 45
+        open: 45
+        inverted: 10
+        retro: 0
+      entrance_shuffle: "none"
       weapons:
         randomized: 45
         assured: 25
