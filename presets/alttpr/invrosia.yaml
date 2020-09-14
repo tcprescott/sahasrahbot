@@ -315,7 +315,7 @@ settings:
   item_placement: advanced
   l: {}
   lang: en
-  mode: standard
+  mode: inverted
   name: Invrosia
   notes: |
     Ambrosia, but inverted!  Big Keys are shuffled in the wild, except for GT.
