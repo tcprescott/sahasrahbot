@@ -28,6 +28,7 @@ forced_locations:
       - R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgUm9vbSAtIFJpZ2h0OjE= # Big Key Room - Right
 settings:
   accessibility: items
+  allow_quickswap: true
   crystals:
     ganon: "7"
     tower: "7"
