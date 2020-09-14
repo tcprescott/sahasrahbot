@@ -298,6 +298,8 @@ The keysanity menu, when you press start, is automatically updated to reflect wh
 
 This enables a bow that costs rupees, instead of arrows, to fire.
 This is the bow behavior from retro world state.
+
+You'll need to purchase wooden arrows from a shop, just like retro.
 ```yaml
     rom.rupeeBow:
       True: 10
