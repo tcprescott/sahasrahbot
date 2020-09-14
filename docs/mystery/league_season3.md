@@ -6,7 +6,7 @@ title:  League Season 3 Weightset
 {: toc}
 # League Season 3 Weight Explaination
 
-The [ALTTPR League Season 3 Mystery Weights](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league_season3.yaml)
+The [ALTTPR League Season 3 Mystery Weights](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league.yaml) (click the link to view them directly)
 are more complex than the weights for the previous season.  This document outlines
 the meaning of this weightset and how it'll impact you during mystery week.
 
