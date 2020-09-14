@@ -1,6 +1,8 @@
 description: Draft weights for season 3 of ALTTPR League.  *THESE ARE NOT FINAL OR OFFICIAL PLEASE DO NOT CONSTRUE THEM AS SUCH*.
 allow_quickswap: true
 
+# If the item pool is < 216, fill the remainder of the pool with this item to
+# get back to 216.  This prevents "Nothing" items from appearing.
 options:
   FillItemPoolWith: TwentyRupees2
 
@@ -36,6 +38,7 @@ subweights:
   entrance:
     chance: 30
     weights:
+      # ER on alttpr.com only supports standard and full keysanity.  This skews entrance towards keysanity most times.
       dungeon_items:
         standard: 30
         full: 70
@@ -48,7 +51,16 @@ subweights:
         fast_ganon: 60
         dungeons: 10
         pedestal: 10
-      tower_open: "random"
+        triforce-hunt: 0 # never have ER triforce hunt
+      tower_open:
+        "0": 1
+        "1": 1
+        "2": 1
+        "3": 1
+        "4": 1
+        "5": 1
+        "6": 1
+        "7": 1
       ganon_open:
         "0": 2
         "1": 2
@@ -58,15 +70,14 @@ subweights:
         "5": 24
         "6": 20
         "7": 20
-        random: 0
       world_state:
         standard: 30
         open: 35
         inverted: 25
-        retro: 20
+        retro: 10
       entrance_shuffle:
-        simple: 50
-        crossed: 50
+        simple: 31
+        crossed: 69 # nice
       weapons:
         randomized: 45
         assured: 25
@@ -76,12 +87,11 @@ subweights:
         normal: 90
         hard: 10
         expert: 0
-        crowd_control: 0
 
   normal:
     chance: 60
     weights:
-      dungeon_items: "standard" #changed with customizer
+      dungeon_items: "standard" # the wild.* entries in the customizer will define this instead
       accessibility:
         items: 55
         locations: 10
@@ -91,6 +101,7 @@ subweights:
         fast_ganon: 35
         dungeons: 10
         pedestal: 10
+        triforce-hunt: 0 # Triforce hunt is its own subweight, and will always be non-ER
       tower_open:
         "0": 0
         "1": 0
@@ -113,8 +124,8 @@ subweights:
         standard: 45
         open: 45
         inverted: 10
-        retro: 0
-      entrance_shuffle: "none"
+        retro: 0 # non-entrance retro isn't much fun, so lets not do that
+      entrance_shuffle: "none" # this subweight will never be ER
       weapons:
         randomized: 45
         assured: 25
@@ -124,39 +135,45 @@ subweights:
         normal: 70
         hard: 25
         expert: 5
-        crowd_control: 0
       customizer:
-        triforce-hunt:
-          goal: [20, 50]
-          pool: [30, 60]
-          min_difference: 10
+        # pre-equipped items
         eq:
           "PegasusBoots":
             True: 50
             False: 50
           "OcarinaActive":
-            True: 50
+            True: 50 # This will be OcarinaInactive and will require activation if standard world state.
             False: 50
+        # custom settings
         custom:
+          # this forces v31 prize pack shuffle rules
           customPrizePacks: False
+
+          # this independantly lets us shuffle maps, compasses, keys, and big keys
           region.wildMaps:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
           region.wildCompasses:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
           region.wildKeys:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
           region.wildBigKeys:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
+
+          # this will configure the "rupee bow", which is a bow that costs rupees to fire (like in Retro)
           rom.rupeeBow:
             True: 10
             False: 90
+
+          # Generic keys, these will be universal keys that work in any dungeon, similar to retro.
           rom.genericKeys:
             True: 10
             False: 90
+
+          # Uncle spoils boots location.  Only functional in standard world state.
           spoil.BootsLocation:
             True: 70
             False: 30
@@ -168,6 +185,7 @@ subweights:
       accessibility:
         items: 90
         locations: 10
+        none: 0 # Triforce Hunt will never be beatable-only
       goals: triforce-hunt
       tower_open:
         "0": 0
@@ -178,20 +196,12 @@ subweights:
         "5": 20
         "6": 25
         "7": 25
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 0
-        "3": 10
-        "4": 10
-        "5": 20
-        "6": 20
-        "7": 40
+      ganon_open: "7" # this is irrelevent
       world_state:
         standard: 45
         open: 45
         inverted: 10
-        retro: 0
+        retro: 0 # non-entrance retro isn't much fun, so lets not do that
       entrance_shuffle: "none"
       weapons:
         randomized: 45
@@ -202,39 +212,55 @@ subweights:
         normal: 70
         hard: 25
         expert: 5
-        crowd_control: 0
       customizer:
+        # make dorito hunt less bland
         triforce-hunt:
+          # the number of pieces required to win, can range between 20 to 50
           goal: [20, 50]
+          # the number of pieces in the pool, can range between 30 to 60
           pool: [30, 60]
+          # ensures there is at least a 10 piece difference between what is in the pool, and what the goal is
           min_difference: 10
+
+        # pre-equipped items
         eq:
           "PegasusBoots":
             True: 50
             False: 50
           "OcarinaActive":
-            True: 50
+            True: 50 # This will be OcarinaInactive and will require activation if standard world state.
             False: 50
+
+        # custom settings
         custom:
+          # this forces v31 prize pack shuffle rules
           customPrizePacks: False
+
+          # this independantly lets us shuffle maps, compasses, keys, and big keys
           region.wildMaps:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
           region.wildCompasses:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
           region.wildKeys:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
           region.wildBigKeys:
-            True: 60
-            False: 40
+            True: 40
+            False: 60
+
+          # this will configure the "rupee bow", which is a bow that costs rupees to fire (like in Retro)
           rom.rupeeBow:
             True: 10
             False: 90
+
+          # Generic keys, these will be universal keys that work in any dungeon, similar to retro.
           rom.genericKeys:
             True: 10
             False: 90
+
+          # Uncle spoils boots location.  Only functional in standard world state.
           spoil.BootsLocation:
             True: 70
             False: 30
