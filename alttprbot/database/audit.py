@@ -22,6 +22,22 @@ async def get_cached_messages(message_id: int):
     return result
 
 
+async def get_deleted_messages_for_user(guild_id: int, user_id: int, limit=500):
+    result = await orm.select(
+        'SELECT message_date, content, attachment, deleted from audit_messages WHERE guild_id=%s and user_id=%s and deleted=1 order by message_date desc LIMIT %s;',
+        [guild_id, user_id, limit]
+    )
+    return result
+
+
+async def get_messages_for_user(guild_id: int, user_id: int, limit=500):
+    result = await orm.select(
+        'SELECT message_date, content, attachment from audit_messages WHERE guild_id=%s and user_id=%s order by message_date desc LIMIT %s;',
+        [guild_id, user_id, limit]
+    )
+    return result
+
+
 async def set_deleted(message_id: int):
     await orm.execute(
         'UPDATE audit_messages SET deleted=1 WHERE message_id=%s',

@@ -4,12 +4,45 @@ import discord
 from discord.ext import commands
 
 from alttprbot.database import audit, config
+import io
+from contextlib import closing
+import csv
 
 
 class Audit(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # self.clean_history.start()
+
+    @commands.command()
+    @commands.has_guild_permissions(manage_messages=True)
+    async def messagehistory(self, ctx, member: discord.Member, limit=500):
+        messages = await audit.get_messages_for_user(guild_id=ctx.guild.id, user_id=member.id, limit=limit)
+
+        fields = ['message_date', 'content', 'attachment', 'deleted']
+        with closing(io.StringIO()) as sio:
+            writer = csv.DictWriter(sio, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(messages)
+            sio.seek(0)
+            discord_file = discord.File(
+                fp=sio, filename=f"{member.id}_history.csv")
+            await ctx.send(file=discord_file)
+
+    @commands.command()
+    @commands.has_guild_permissions(manage_messages=True)
+    async def deletedhistory(self, ctx, member: discord.Member, limit=500):
+        messages = await audit.get_deleted_messages_for_user(guild_id=ctx.guild.id, user_id=member.id, limit=limit)
+
+        fields = ['message_date', 'content', 'attachment', 'deleted']
+        with closing(io.StringIO()) as sio:
+            writer = csv.DictWriter(sio, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(messages)
+            sio.seek(0)
+            discord_file = discord.File(
+                fp=sio, filename=f"{member.id}_deleted.csv")
+            await ctx.send(file=discord_file)
 
     @commands.Cog.listener()
     async def on_message(self, message):
