@@ -1,5 +1,6 @@
 Quart
 TwitchIO
+aioboto3 >= 8.0.5
 aiocache >= 0.11.1
 aiofiles >= 0.4.0
 aiohttp >= 3.5.4
