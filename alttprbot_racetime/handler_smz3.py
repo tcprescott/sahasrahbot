@@ -16,7 +16,10 @@ class Smz3Handler(RaceHandler):
     async def race_data(self, data):
         self.data = data.get('race')
 
-    async def begin(self):
+        if self.data.get('status', {}).get('value') in ['open', 'invitational']:
+            await self.intro()
+
+    async def intro(self):
         """
         Send introduction messages.
         """

@@ -23,13 +23,13 @@ class AlttprHandler(RaceHandler):
         if self.data.get('status', {}).get('value') == 'in_progress':
             await self.in_progress()
 
+        if self.data.get('status', {}).get('value') in ['open', 'invitational']:
+            await self.intro()
+
     async def in_progress(self):
         await self.send_spoiler_log()
 
-    async def begin(self):
-        """
-        Send introduction messages.
-        """
+    async def intro(self):
         if not self.state.get('intro_sent') and not c.DEBUG:
             await self.send_message(
                 f"Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller! Use {self.command_prefix}help to see what I can do!  Check out https://sahasrahbot.synack.live/rtgg.html for more info."
