@@ -4,7 +4,7 @@ import math
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races
 from config import Config as c
-from racetime_bot import RaceHandler
+from racetime_bot import RaceHandler, monitor_cmd
 
 
 class AlttprHandler(RaceHandler):
@@ -16,6 +16,9 @@ class AlttprHandler(RaceHandler):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.seed_rolled = False
+
+    async def error(self, data):
+        await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
 
     async def race_data(self, data):
         self.data = data.get('race')
@@ -37,13 +40,41 @@ class AlttprHandler(RaceHandler):
             self.state['intro_sent'] = True
 
     async def ex_preset(self, args, message):
-        await self.roll_game(args, message, allow_quickswap=False)
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+        await self.roll_game(preset_name=preset_name, allow_quickswap=False)
 
     async def ex_race(self, args, message):
-        await self.roll_game(args, message, allow_quickswap=False)
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+        await self.roll_game(preset_name=preset_name, allow_quickswap=False)
+
+    @monitor_cmd
+    async def ex_sglqual(self, args, message):
+        if self.data.get('status', {}).get('value') == 'open':
+            await self.set_invitational()
+
+        await self.roll_game(preset_name='openboots', allow_quickswap=True)
 
     async def ex_quickswaprace(self, args, message):
-        await self.roll_game(args, message, allow_quickswap=True)
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+        await self.roll_game(preset_name=preset_name, allow_quickswap=True)
 
     async def ex_spoiler(self, args, message):
         if self.seed_rolled:
@@ -154,18 +185,10 @@ class AlttprHandler(RaceHandler):
                 break
             await asyncio.sleep(.5)
 
-    async def roll_game(self, args, message, allow_quickswap=False):
+    async def roll_game(self, preset_name, allow_quickswap=False):
         if self.seed_rolled:
             await self.send_message(
                 'I already rolled a seed!'
-            )
-            return
-
-        try:
-            preset_name = args[0]
-        except IndexError:
-            await self.send_message(
-                'You must specify a preset!'
             )
             return
 
