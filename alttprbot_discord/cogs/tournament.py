@@ -108,7 +108,7 @@ class Tournament(commands.Cog):
                 await member.send(embed=embed)
             except Exception:
                 if audit_channel:
-                    await audit_channel.send(f"@here Unable to send DM to {player['displayName']}")
+                    await audit_channel.send(f"Unable to send DM to {player['displayName']}")
                 await ctx.send(f"Unable to send DM to {player['displayName']}")
 
 
