@@ -79,7 +79,7 @@ class Tournament(commands.Cog):
         )
 
         broadcast_channels = [
-            a['name'] for a in episode['channels'] if not a['name'] == 'No Stream']
+            a['name'] for a in episode['channels'] if not " " in a['name']]
         if len(broadcast_channels) > 0:
             twitch_channels = ', '.join(
                 [f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels])

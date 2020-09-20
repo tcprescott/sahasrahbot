@@ -314,7 +314,7 @@ async def process_league_race(target, args, client):
     )
 
     broadcast_channels = [
-        a['name'] for a in generated_league_race.episode['channels'] if not a['name'] == 'No Stream']
+        a['name'] for a in generated_league_race.episode['channels'] if not " " in a['name']]
 
     for channel in broadcast_channels:
         await twitch_command_text.insert_command_text(channel.lower(), "mode", generated_league_race.twitch_mode_command)

@@ -84,30 +84,29 @@ class Misc(commands.Cog):
 
     @commands.command(hidden=True, aliases=['8ball'])
     async def eightball(self, ctx):
-      msg = random.choice([
-        "It is certain.",
-        "It is decidedly so.",
-        "Without a doubt.",
-        "Yes – definitely.",
-        "You may rely on it.",
-        "As I see it, yes.",
-        "Most likely.",
-        "Outlook good.",
-        "Yes.",
-        "Signs point to yes.",
-        "Reply hazy, try again.",
-        "Ask again later.",
-        "Better not tell you now.",
-        "Cannot predict now.",
-        "Concentrate and ask again.",
-        "Don't count on it.",
-        "My reply is no.",
-        "My sources say no.",
-        "Outlook not so good.",
-        "Very doubtful.",
-      ])
-      await ctx.send(msg)
-
+        msg = random.choice([
+            "It is certain.",
+            "It is decidedly so.",
+            "Without a doubt.",
+            "Yes – definitely.",
+            "You may rely on it.",
+            "As I see it, yes.",
+            "Most likely.",
+            "Outlook good.",
+            "Yes.",
+            "Signs point to yes.",
+            "Reply hazy, try again.",
+            "Ask again later.",
+            "Better not tell you now.",
+            "Cannot predict now.",
+            "Concentrate and ask again.",
+            "Don't count on it.",
+            "My reply is no.",
+            "My sources say no.",
+            "Outlook not so good.",
+            "Very doubtful.",
+        ])
+        await ctx.send(msg)
 
     @commands.command(
         brief="Retrieves a holy image.",
@@ -149,7 +148,7 @@ class Misc(commands.Cog):
         if len(sg_schedule) == 0:
             await ctx.send("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
             return
-        
+
         if get_next == 1:
             embed = discord.Embed(
                 title=sg_schedule[0]['event']['name'],
@@ -173,7 +172,7 @@ class Misc(commands.Cog):
                 embed.add_field(
                     name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
                 broadcast_channels = [a['name']
-                                    for a in episode['channels'] if not a['name'] == 'No Stream']
+                                      for a in episode['channels'] if not " " in a['name']]
                 if broadcast_channels:
                     embed.add_field(name="Twitch Channels", value=', '.join(
                         [f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
