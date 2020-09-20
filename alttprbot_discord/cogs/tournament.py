@@ -106,7 +106,7 @@ class Tournament(commands.Cog):
                 else:
                     member = await commands.MemberConverter().convert(ctx, player['discordTag'])
                 await member.send(embed=embed)
-            except discord.HTTPException:
+            except Exception:
                 if audit_channel:
                     await audit_channel.send(f"@here Unable to send DM to {player['displayName']}")
                 await ctx.send(f"Unable to send DM to {player['displayName']}")
