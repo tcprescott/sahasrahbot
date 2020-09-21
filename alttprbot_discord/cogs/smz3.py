@@ -178,7 +178,10 @@ class SuperMetroidComboRandomizer(commands.Cog):
 
     async def close_mw(self, mw, message, member):
         if not mw['owner_id'] == member.id:
-            await message.remove_reaction('✅', member)
+            try:
+                await message.remove_reaction('✅', member)
+            except discord.Forbidden:
+                pass
             return
 
         embed = message.embeds[0]
@@ -195,7 +198,10 @@ class SuperMetroidComboRandomizer(commands.Cog):
             await message.channel.send(f"{member.mention} You must have at least two players to create a multiworld.  If you wish to cancel this multiworld, click ❌.")
             embed.set_field_at(
                 0, name="Status", value="👍 Open for entry")
-            await message.remove_reaction('✅', member)
+            try:
+                await message.remove_reaction('✅', member)
+            except discord.Forbidden:
+                pass
             await message.edit(embed=embed)
             return
 
@@ -221,7 +227,10 @@ class SuperMetroidComboRandomizer(commands.Cog):
 
     async def cancel_mw(self, mw, message, member):
         if not mw['owner_id'] == member.id:
-            await message.remove_reaction('❌', member)
+            try:
+                await message.remove_reaction('❌', member)
+            except discord.Forbidden:
+                pass
             return
 
         embed = message.embeds[0]
