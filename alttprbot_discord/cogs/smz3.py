@@ -1,18 +1,39 @@
-import asyncio
-
 from discord.ext import commands
 import discord
-import time
 
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot.alttprgen.preset import get_preset, fetch_preset, PresetNotFoundException
+from alttprbot.alttprgen.preset import get_preset, fetch_preset
 from alttprbot.alttprgen.smz3multi import generate_multiworld
+from alttprbot.database import smz3_multiworld
 from ..util import checks
 
 
 class SuperMetroidComboRandomizer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        mw = await smz3_multiworld.fetch(payload.message_id, status="STARTED")
+        if mw and payload.message_id == mw.get('message_id') and not payload.user_id == self.bot.user.id:
+            emoji = str(payload.emoji)
+            channel = await self.bot.fetch_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            if emoji == '👍':
+                await self.update_mw_message(mw, message)
+            elif emoji == '✅':
+                await self.close_mw(mw, message, payload.member)
+            elif emoji == '❌':
+                await self.cancel_mw(mw, message, payload.member)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        mw = await smz3_multiworld.fetch(payload.message_id, status="STARTED")
+        if mw and payload.message_id == mw.get('message_id') and not payload.user_id == self.bot.user.id:
+            emoji = str(payload.emoji)
+            channel = await self.bot.fetch_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            if emoji == '👍':
+                await self.update_mw_message(mw, message)
 
     @commands.group()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
@@ -51,7 +72,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def multi(self, ctx, preset):
-        await self.handle_multiworld(ctx, preset, randomizer='smz3')
+        await self.init_mw(ctx, preset, randomizer='smz3')
 
     @commands.group()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
@@ -92,7 +113,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_multi(self, ctx, preset):
-        await self.handle_multiworld(ctx, preset, randomizer='sm')
+        await self.init_mw(ctx, preset, randomizer='sm')
 
     @commands.command(
         help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
@@ -100,7 +121,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
         hidden=True,
     )
     async def smz3multi(self, ctx, preset):
-        await self.handle_multiworld(ctx, preset, randomizer='smz3')
+        await self.init_mw(ctx, preset, randomizer='smz3')
 
     @commands.command(
         help='Initiates an SM Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
@@ -108,9 +129,9 @@ class SuperMetroidComboRandomizer(commands.Cog):
         hidden=True,
     )
     async def smmulti(self, ctx, preset):
-        await self.handle_multiworld(ctx, preset, randomizer='sm')
+        await self.init_mw(ctx, preset, randomizer='sm')
 
-    async def handle_multiworld(self, ctx, preset, randomizer):
+    async def init_mw(self, ctx, preset, randomizer):
         await fetch_preset(preset, randomizer=randomizer)
 
         embed = discord.Embed(
@@ -129,81 +150,59 @@ class SuperMetroidComboRandomizer(commands.Cog):
 
         msg = await ctx.send(embed=embed)
 
+        await smz3_multiworld.insert(
+            message_id=msg.id,
+            owner_id=ctx.author.id,
+            randomizer=randomizer,
+            preset=preset,
+            status="STARTED",
+        )
+
         await msg.add_reaction('👍')
         await msg.add_reaction("✅")
         await msg.add_reaction("❌")
 
-        def add_check(reaction, user):
-            return str(reaction.emoji) in ['👍', '✅', '❌'] and reaction.message.id == msg.id and not user.id == self.bot.user.id
-
-        def remove_check(reaction, user):
-            return str(reaction.emoji) == '👍' and reaction.message.id == msg.id and not user.id == self.bot.user.id
-
-        timeout_start = time.time()
-        close = False
-        roll = True
-        timeout = 1800
-        while time.time() < timeout_start + timeout and not close:
-            try:
-                pending_tasks = [
-                    self.bot.wait_for('reaction_add', check=add_check),
-                    self.bot.wait_for('reaction_remove', check=remove_check)
-                ]
-                done_tasks, pending_tasks = await asyncio.wait(pending_tasks, return_when=asyncio.FIRST_COMPLETED, timeout=5)
-
-                for task in pending_tasks:
-                    task.cancel()
-
-                for task in done_tasks:
-                    reaction, user = await task
-                    if str(reaction.emoji) == '✅' and user == ctx.author:
-                        close = True
-                    if str(reaction.emoji) == '❌' and user == ctx.author:
-                        close = True
-                        roll = False
-                    elif str(reaction.emoji) == '👍':
-                        r = discord.utils.get(
-                            reaction.message.reactions, emoji='👍')
-                        players = await r.users().flatten()
-                        p_list = [
-                            p.name for p in players if not p.id == self.bot.user.id]
-                        if len(p_list) > 0:
-                            embed.set_field_at(
-                                2, name="Players", value='\n'.join(p_list))
-                        else:
-                            embed.set_field_at(
-                                2, name="Players", value='No players yet.')
-            except asyncio.TimeoutError:
-                pass
+    async def update_mw_message(self, mw, message):
+        embed = message.embeds[0]
+        r = discord.utils.get(message.reactions, emoji='👍')
+        players = await r.users().flatten()
+        p_list = [p.name for p in players if not p.id == self.bot.user.id]
+        if len(p_list) > 0:
             embed.set_field_at(
-                0, name="Status", value=f"👍 Open for entry, auto-close in {round((timeout_start + timeout) - time.time(), 0)}s")
-            await msg.edit(embed=embed)
+                2, name="Players", value='\n'.join(p_list))
+        else:
+            embed.set_field_at(
+                2, name="Players", value='No players yet.')
 
-        if not roll:
-            embed.set_field_at(0, name="Status", value="❌ Cancelled.")
-            await msg.edit(embed=embed)
+        await message.edit(embed=embed)
+
+    async def close_mw(self, mw, message, member):
+        if not mw['owner_id'] == member.id:
+            await message.remove_reaction('✅', member)
             return
 
+        embed = message.embeds[0]
         embed.set_field_at(
             0, name="Status", value="⌚ Game closed for entry.  Rolling...")
-        await msg.edit(embed=embed)
+        await message.edit(embed=embed)
 
-        r = discord.utils.get(reaction.message.reactions, emoji='👍')
+        r = discord.utils.get(message.reactions, emoji='👍')
         reaction_users = await r.users().flatten()
 
-        if len(reaction_users) < 3:
+        players = [p for p in reaction_users if not p.id == self.bot.user.id]
+
+        if len(players) < 2:
+            await message.channel.send(f"{member.mention} You must have at least two players to create a multiworld.  If you wish to cancel this multiworld, click ❌.")
             embed.set_field_at(
-                0, name="Status", value="❌ Too few players.  Cancelled.")
-            await msg.edit(embed=embed)
-            raise SahasrahBotException(
-                "You must have at least two players to create a multiworld.")
+                0, name="Status", value="👍 Open for entry")
+            await message.remove_reaction('✅', member)
+            await message.edit(embed=embed)
+            return
 
-        players = [p for p in players if not p.id == self.bot.user.id]
-
-        seed = await generate_multiworld(preset, [p.name for p in players], tournament=False, randomizer=randomizer)
+        seed = await generate_multiworld(mw['preset'], [p.name for p in players], tournament=False, randomizer=mw['randomizer'])
 
         dm_embed = discord.Embed(
-            title=f'{randomizer.upper()} Multiworld Game'
+            title=f"{mw['randomizer'].upper()} Multiworld Game"
         )
         dm_embed.add_field(name="Players", value='\n'.join(
             [p.name for p in players]), inline=False)
@@ -213,11 +212,22 @@ class SuperMetroidComboRandomizer(commands.Cog):
             try:
                 await player.send(embed=dm_embed)
             except discord.HTTPException:
-                await ctx.send(f"Unable to send DM to {player.mention}!")
+                await message.channel.send(f"Unable to send DM to {player.mention}!")
 
         embed.set_field_at(
             0, name="Status", value="✅ Game started!  Check your DMs.")
-        await msg.edit(embed=embed)
+        await message.edit(embed=embed)
+        await smz3_multiworld.update_status(message.id, "CLOSED")
+
+    async def cancel_mw(self, mw, message, member):
+        if not mw['owner_id'] == member.id:
+            await message.remove_reaction('❌', member)
+            return
+
+        embed = message.embeds[0]
+        embed.set_field_at(0, name="Status", value="❌ Cancelled.")
+        await message.edit(embed=embed)
+        await smz3_multiworld.update_status(message.id, "CANCELLED")
 
 
 def setup(bot):

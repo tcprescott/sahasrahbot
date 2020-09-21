@@ -14,7 +14,8 @@ t_audit_generated_games = Table(
     Column('settings', JSON),
     Column('gentype', String(45)),
     Column('genoption', String(45)),
-    Column('timestamp', DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+    Column('timestamp', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
     Column('customizer', INTEGER(11))
 )
 
@@ -71,7 +72,8 @@ t_gtbk_games = Table(
     Column('game_id', INTEGER(11), primary_key=True),
     Column('channel', String(200)),
     Column('status', String(45)),
-    Column('timestamp', DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    Column('timestamp', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
 )
 
 
@@ -82,7 +84,8 @@ t_gtbk_guesses = Table(
     Column('twitch_user', String(200)),
     Column('guess', INTEGER(11)),
     Column('score', INTEGER(11), server_default=text("'0'")),
-    Column('timestamp', TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")),
+    Column('timestamp', TIMESTAMP, nullable=False,
+           server_default=text("CURRENT_TIMESTAMP")),
     Index('guess_UNIQUE', 'game_id', 'twitch_user', unique=True)
 )
 
@@ -101,7 +104,8 @@ t_mention_counters = Table(
     Column('guild_id', BIGINT(20), nullable=False),
     Column('role_id', BIGINT(20), nullable=False, unique=True),
     Column('counter', INTEGER(11), nullable=False, server_default=text("'1'")),
-    Column('last_used', DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    Column('last_used', DateTime, nullable=False, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
 )
 
 
@@ -149,6 +153,16 @@ t_seed_presets = Table(
 )
 
 
+t_smz3_multiworld = Table(
+    'smz3_multiworld', metadata,
+    Column('message_id', BIGINT(20), primary_key=True),
+    Column('owner_id', BIGINT(20), nullable=False),
+    Column('randomizer', VARCHAR(45), nullable=False),
+    Column('preset', VARCHAR(45), nullable=False),
+    Column('status', VARCHAR(20), nullable=False)
+)
+
+
 t_spoiler_races = Table(
     'spoiler_races', metadata,
     Column('id', INTEGER(11), primary_key=True),
@@ -164,7 +178,8 @@ t_srl_nick_verification = Table(
     Column('srl_nick', String(45, 'utf8_bin'), primary_key=True, unique=True),
     Column('key', BIGINT(20), unique=True),
     Column('discord_user_id', BIGINT(20)),
-    Column('timestamp', DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
+    Column('timestamp', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
 )
 
 
@@ -173,7 +188,8 @@ t_srl_races = Table(
     Column('id', INTEGER(11), primary_key=True),
     Column('srl_id', String(45), nullable=False, unique=True),
     Column('goal', String(200), nullable=False),
-    Column('timestamp', DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+    Column('timestamp', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
     Column('message', String(200))
 )
 
@@ -215,7 +231,8 @@ t_twitch_command_text = Table(
     Column('channel', String(200, 'utf8_bin')),
     Column('command', String(45, 'utf8_bin')),
     Column('content', String(200, 'utf8_bin')),
-    Index('idx_twitch_command_text_channel_command', 'channel', 'command', unique=True)
+    Index('idx_twitch_command_text_channel_command',
+          'channel', 'command', unique=True)
 )
 
 
