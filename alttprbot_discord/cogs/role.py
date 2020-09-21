@@ -1,5 +1,7 @@
 
 import re
+import csv
+import io
 
 import discord
 from discord.ext import commands
@@ -130,6 +132,28 @@ class Role(commands.Cog):
         else:
             groups = await role.get_guild_group_by_id(group_id, ctx.guild.id)
         await ctx.send(embed=await embed_formatter.reaction_group_list(ctx, groups))
+
+    @commands.command()
+    @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
+    async def importroles(self, ctx):
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            role_import_list = csv.DictReader(
+                io.StringIO(content.decode()))
+            for i in role_import_list:
+                try:
+                    role_obj = await commands.RoleConverter().convert(ctx, i['role'])
+                except commands.BadArgument:
+                    await ctx.send(f"Failed to find role identified by {i['role']}")
+
+                try:
+                    member_obj = await commands.MemberConverter().convert(ctx, i['member'])
+                except commands.BadArgument:
+                    await ctx.send(f"Failed to find member identified by {i['member']}")
+
+                await member_obj.add_roles(role_obj)
+        else:
+            raise SahasrahBotException("You must supply a valid csv file.")
 
 
 async def refresh_bot_message(ctx, group_id):
