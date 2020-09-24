@@ -67,7 +67,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
 
     @smz3.command(
         name='multi',
-        help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
+        help='Initiates an SMZ3 Multiworld Game.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
         brief='Initiate a SMZ3 Multiworld Game.',
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
@@ -108,7 +108,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
 
     @sm.command(
         name='multi',
-        help='Initiates an SM Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
+        help='Initiates an SM Multiworld Game.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
         brief='Initiate a SM Multiworld Game.',
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
@@ -116,20 +116,16 @@ class SuperMetroidComboRandomizer(commands.Cog):
         await self.init_mw(ctx, preset, randomizer='sm')
 
     @commands.command(
-        help='Initiates an SMZ3 Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
-        brief='Initiate a SMZ3 Multiworld Game.',
         hidden=True,
     )
     async def smz3multi(self, ctx, preset):
-        await self.init_mw(ctx, preset, randomizer='smz3')
+        await ctx.send(f"Please use `$smz3 multi {preset}` instead.")
 
     @commands.command(
-        help='Initiates an SM Multiworld Game.  The game will auto-close and roll 30 minutes later.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/sm>.',
-        brief='Initiate a SM Multiworld Game.',
         hidden=True,
     )
     async def smmulti(self, ctx, preset):
-        await self.init_mw(ctx, preset, randomizer='sm')
+        await ctx.send(f"Please use `$smz3 multi {preset}` instead.")
 
     async def init_mw(self, ctx, preset, randomizer):
         await fetch_preset(preset, randomizer=randomizer)
@@ -166,7 +162,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
         embed = message.embeds[0]
         r = discord.utils.get(message.reactions, emoji='👍')
         players = await r.users().flatten()
-        p_list = [p.name for p in players if not p.id == self.bot.user.id]
+        p_list = [p.mention for p in players if not p.id == self.bot.user.id]
         if len(p_list) > 0:
             embed.set_field_at(
                 2, name="Players", value='\n'.join(p_list))
@@ -189,6 +185,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
             0, name="Status", value="⌚ Game closed for entry.  Rolling...")
         await message.edit(embed=embed)
 
+        await self.update_mw_message(mw, message)
         r = discord.utils.get(message.reactions, emoji='👍')
         reaction_users = await r.users().flatten()
 
