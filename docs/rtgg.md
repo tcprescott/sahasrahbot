@@ -51,6 +51,18 @@ Example: `!race normal`
 Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
 ## Global Commands
+### !lock
+
+This command prevents any seed rolling from occuring, except by a race monitor or a category moderator.
+
+*This command is only available to race monitors.*
+
+### !unlock
+
+This command allows anyone to roll again.
+
+*This command is only available to race monitors.*
+
 ### !help
 
 Provides a link to this document.
@@ -58,3 +70,5 @@ Provides a link to this document.
 ### !cancel
 
 Cancels the current race and clears the race info.  This allows you to roll a different game, in case there was a mistake.
+
+*This command is only available to race monitors.*

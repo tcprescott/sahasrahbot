@@ -4,7 +4,7 @@ import math
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races
 from config import Config as c
-from racetime_bot import RaceHandler, monitor_cmd
+from racetime_bot import RaceHandler, monitor_cmd, can_monitor
 
 
 class AlttprHandler(RaceHandler):
@@ -16,6 +16,9 @@ class AlttprHandler(RaceHandler):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.seed_rolled = False
+
+    async def begin(self):
+        self.state['locked'] = False
 
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
@@ -47,7 +50,7 @@ class AlttprHandler(RaceHandler):
                 'You must specify a preset!'
             )
             return
-        await self.roll_game(preset_name=preset_name, allow_quickswap=False)
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
     async def ex_race(self, args, message):
         try:
@@ -57,7 +60,7 @@ class AlttprHandler(RaceHandler):
                 'You must specify a preset!'
             )
             return
-        await self.roll_game(preset_name=preset_name, allow_quickswap=False)
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
     @monitor_cmd
     async def ex_sglqual(self, args, message):
@@ -115,6 +118,11 @@ class AlttprHandler(RaceHandler):
                 'I already rolled a seed!'
             )
             return
+        if self.state.get('locked') and not can_monitor(message):
+            await self.send_message(
+                'Seed rolling is locked in this room.  Only the creator of this room, a race monitor, or a moderator can roll.'
+            )
+            return
         weightset = args[0] if args else 'weighted'
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -133,6 +141,7 @@ class AlttprHandler(RaceHandler):
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
+    @monitor_cmd
     async def ex_cancel(self, args, message):
         self.seed_rolled = False
         await self.set_raceinfo("New Race", overwrite=True)
@@ -140,6 +149,31 @@ class AlttprHandler(RaceHandler):
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.\n\"!mystery <weightset>\" to generate a mystery game.\n\"!spoiler <preset>\" to generate a spoiler race.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+
+    async def ex_register(self, args, message):
+        await self.send_message("Lazy Kid ain't got nothing compared to me.")
+
+    @monitor_cmd
+    async def ex_lock(self, args, message):
+        """
+        Handle !lock commands.
+        Prevent seed rolling unless user is a race monitor.
+        """
+        self.state['locked'] = True
+        await self.send_message(
+            'Lock initiated. I will now only roll seeds for race monitors.'
+        )
+
+    @monitor_cmd
+    async def ex_unlock(self, args, message):
+        """
+        Handle !unlock commands.
+        Remove lock preventing seed rolling unless user is a race monitor.
+        """
+        self.state['locked'] = False
+        await self.send_message(
+            'Lock released. Anyone may now roll a seed.'
+        )
 
     async def send_spoiler_log(self):
         name = self.data.get('name')
@@ -185,10 +219,15 @@ class AlttprHandler(RaceHandler):
                 break
             await asyncio.sleep(.5)
 
-    async def roll_game(self, preset_name, allow_quickswap=False):
+    async def roll_game(self, preset_name, message, allow_quickswap=False):
         if self.seed_rolled:
             await self.send_message(
-                'I already rolled a seed!'
+                'I already rolled a seed! Use !cancel to clear the currently rolled game'
+            )
+            return
+        if self.state.get('locked') and not can_monitor(message):
+            await self.send_message(
+                'Seed rolling is locked in this room.  Only the creator of this room, a race monitor, or a moderator can roll.'
             )
             return
 
