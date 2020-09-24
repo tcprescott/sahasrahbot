@@ -67,7 +67,7 @@ class AlttprHandler(RaceHandler):
         if self.data.get('status', {}).get('value') == 'open':
             await self.set_invitational()
 
-        await self.roll_game(preset_name='openboots', allow_quickswap=True)
+        await self.roll_game(preset_name='openboots', message=message, allow_quickswap=True)
 
     async def ex_quickswaprace(self, args, message):
         try:
@@ -77,7 +77,7 @@ class AlttprHandler(RaceHandler):
                 'You must specify a preset!'
             )
             return
-        await self.roll_game(preset_name=preset_name, allow_quickswap=True)
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
 
     async def ex_spoiler(self, args, message):
         if self.seed_rolled:
