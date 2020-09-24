@@ -16,11 +16,11 @@ SMZ3_ENVIRONMENTS = {
     },
     'beta': {
         'smz3': 'https://beta.samus.link',
-        'sm': 'https://sm.samus.link',
+        'sm': 'https://sm.beta.samus.link',
     },
     'alpha': {
         'smz3': 'https://alpha.samus.link',
-        'sm': 'https://sm.samus.link',
+        'sm': 'https://sm.beta.samus.link',
     }
 }
 
