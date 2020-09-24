@@ -135,7 +135,7 @@ class Role(commands.Cog):
 
     @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
-    async def importroles(self, ctx):
+    async def importroles(self, ctx, mode=None):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             role_import_list = csv.DictReader(
@@ -151,7 +151,8 @@ class Role(commands.Cog):
                 except commands.BadArgument:
                     await ctx.send(f"Failed to find member identified by {i['member']}")
 
-                await member_obj.add_roles(role_obj)
+                if not mode == "dry":
+                    await member_obj.add_roles(role_obj)
         else:
             raise SahasrahBotException("You must supply a valid csv file.")
 
