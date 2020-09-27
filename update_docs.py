@@ -19,7 +19,8 @@ for game in [d for d in sorted(os.listdir('presets')) if os.path.isdir(os.path.j
         with open(os.path.join('presets', game, preset)) as f:
             preset_file = yaml.load(f, Loader=yaml.FullLoader)
         description = preset_file.get('description', '').replace('\n', ' ')
-        markdown_contents += f"| [{preset.split('.')[0]}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{game}/{preset}) | {description}| {'*Customizer*' if preset_file.get('customizer', False) else ''} {'*Festive-only*' if preset_file.get('festive', False) else ''} |\n"
+        markdown_contents += f"| [{preset.split('.')[0]}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{game}/{preset}) |"
+        markdown_contents += f"{description}| {'*Customizer*' if preset_file.get('customizer', False) else ''} {'*Festive-only*' if preset_file.get('festive', False) else ''} |\n"
     markdown_contents += "\n"
 
 with open(os.path.join('docs', 'presets.md'), mode='w+') as f:
