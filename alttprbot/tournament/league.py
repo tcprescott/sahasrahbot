@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import random
 
 import aiohttp
 import discord
@@ -69,8 +70,8 @@ PLAYOFFDATA = {
     },
     2: {
         'type': 'preset',
-        'preset': 'ambrosia',
-        'friendly_name': 'Playoffs Game 2 - Ambrosia'
+        'preset': 'casualboots',
+        'friendly_name': 'Playoffs Game 2 - Standard w/ Sword and Boots'
     },
     3: {
         'type': 'gsheet',
@@ -99,7 +100,13 @@ SETTINGSMAP = {
     'Randomized': 'randomized',
     'Assured': 'assured',
     'Vanilla': 'vanilla',
-    'Swordless': 'swordless'
+    'Swordless': 'swordless',
+    'Hard': 'hard',
+    'Normal': 'normal',
+    'Off': 'off',
+    'Enemy Shuffle': 'enemies',
+    'Boss Shuffle': 'bosses',
+    'Enemies and Bosses': 'full_enemizer'
 }
 
 
@@ -149,30 +156,47 @@ class SettingsSheet():
 
     @property
     def settings(self):
+        goal = random.choice(['dungeons', 'ganon', 'fast_ganon']) if self.row['Goal'] == 'Random' else SETTINGSMAP[self.row['Goal']]
+        world_state = random.choice(['open', 'standard', 'inverted']) if self.row['World State'] == 'Random' else SETTINGSMAP[self.row['World State']]
+        swords = random.choice(['assured','randomized', 'vanilla', 'swordless']) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
+        enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [50, 16, 16, 16]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
+        dungeon_items = random.choice(['standard', 'mc', 'mcs', 'full']) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
+        item_pool = random.choice(['normal', 'hard']) if self.row['Item Pool'] == 'Random' else SETTINGSMAP[self.row['Item Pool']]
+
+        boss_shuffle = 'none'
+        enemy_shuffle = 'none'
+
+        if enemizer in ['enemies', 'full_enemizer']:
+            enemy_shuffle = 'shuffled'
+
+        if enemizer in ['bosses', 'full_enemizer']:
+            boss_shuffle = 'full'
+
         return {
+            "allow_quickswap": True,
             "glitches": "none",
             "item_placement": "advanced",
-            "dungeon_items": SETTINGSMAP[self.row['Dungeon Item Shuffle']],
+            "dungeon_items": dungeon_items,
             "accessibility": "items",
-            "goal": SETTINGSMAP[self.row['Goal']],
+            "goal": goal,
             "crystals": {
                 "ganon": '7',
                 "tower": '7',
             },
-            "mode": SETTINGSMAP[self.row['World State']],
+            "mode": world_state,
             "entrances": "none",
             "hints": "off",
-            "weapons": SETTINGSMAP[self.row['Swords']],
+            "weapons": swords,
             "item": {
-                "pool": "normal",
+                "pool": item_pool,
                 "functionality": "normal"
             },
             "tournament": True,
             "spoilers": "off",
             "lang": "en",
             "enemizer": {
-                    "boss_shuffle": "none",
-                    "enemy_shuffle": "none",
+                    "boss_shuffle": boss_shuffle,
+                    "enemy_shuffle": enemy_shuffle,
                     "enemy_damage": "default",
                     "enemy_health": "default"
             }
