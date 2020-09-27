@@ -2,7 +2,8 @@ import asyncio
 import math
 
 from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import spoiler_races
+from alttprbot.database import spoiler_races, tournament_results
+from alttprbot.tournament import league
 from config import Config as c
 from racetime_bot import RaceHandler, monitor_cmd, can_monitor
 
@@ -34,6 +35,7 @@ class AlttprHandler(RaceHandler):
 
     async def in_progress(self):
         await self.send_spoiler_log()
+        await league.process_league_race_start(self)
 
     async def intro(self):
         if not self.state.get('intro_sent') and not c.DEBUG:
@@ -68,6 +70,18 @@ class AlttprHandler(RaceHandler):
             await self.set_invitational()
 
         await self.roll_game(preset_name='openboots', message=message, allow_quickswap=True)
+
+    async def ex_leaguerace(self, args, message):
+        if self.seed_rolled:
+            await self.send_message(
+                'I already rolled a seed!'
+            )
+            return
+        await league.process_league_race(
+            handler=self,
+            episodeid=args[0],
+            week=args[1] if len(args) == 2 else None
+        )
 
     async def ex_quickswaprace(self, args, message):
         try:
@@ -145,6 +159,7 @@ class AlttprHandler(RaceHandler):
     async def ex_cancel(self, args, message):
         self.seed_rolled = False
         await self.set_raceinfo("New Race", overwrite=True)
+        await tournament_results.delete_active_touranment_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
 
     async def ex_help(self, args, message):

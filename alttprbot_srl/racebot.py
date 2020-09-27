@@ -5,7 +5,7 @@ import re
 import ircmessage
 
 from alttprbot.database import spoiler_races, srl_races
-from alttprbot.tournament import league
+# from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
 from alttprbot_srl import alt_hunter, discord_integration, spoilers
 from alttprbot_discord.util import alttpr_discord
@@ -35,9 +35,9 @@ async def topic_change_handler(target, source, message, client):
     if not (source == 'RaceBot' or source == 'synack'):
         return
 
-    if target.startswith('#srl-') and racedone.search(message):
-        await asyncio.sleep(5)
-        await league.process_league_race_finish(target, client)
+    # if target.startswith('#srl-') and racedone.search(message):
+    #     await asyncio.sleep(5)
+    #     await league.process_league_race_finish(target, client)
 
 
 async def handler(target, source, message, client):

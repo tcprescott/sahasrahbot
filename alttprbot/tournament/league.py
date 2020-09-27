@@ -1,19 +1,20 @@
 import datetime
 import json
+import os
 
+import aiohttp
 import discord
 import gspread_asyncio
-from oauth2client.service_account import ServiceAccountCredentials
-from pytz import timezone
-
 from alttprbot.alttprgen import mystery, preset, spoilers
-from alttprbot.database import (config, spoiler_races, srl_races,
-                                tournament_results, twitch_command_text)
+from alttprbot.database import (config, spoiler_races, tournament_results,
+                                twitch_command_text)
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.util import srl
+# from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
-from config import Config as c
+from config import Config as c  # pylint: disable=no-name-in-module
+from oauth2client.service_account import ServiceAccountCredentials
+from pytz import timezone
 
 from ..util import speedgaming
 
@@ -22,40 +23,41 @@ tz = timezone('US/Eastern')
 WEEKDATA = {
     '1': {
         'type': 'preset',
-        'preset': 'open',
-        'friendly_name': 'Week 1 - Open'
+        'preset': 'dungeons',
+        'coop': True,
+        'friendly_name': 'Week 1 - All Dungeons Co-op Info Share'
     },
     '2': {
         'type': 'preset',
-        'preset': 'ambrosia',
-        'friendly_name': 'Week 2 - Ambrosia'
+        'preset': 'open',
+        'friendly_name': 'Week 2 - Open'
     },
     '3': {
         'type': 'preset',
-        'preset': 'enemizer',
+        'preset': 'casualboots',
         'friendly_name': 'Week 3 - Enemizer'
     },
     '4': {
-        'type': 'mystery',
-        'weightset': 'league',
-        'friendly_name': 'Week 4 - Mystery'
-    },
-    '5': {
-        'type': 'preset',
-        'preset': 'crosskeys',
-        'friendly_name': 'Week 5 - Crosskeys'
-    },
-    '6': {
         'type': 'spoiler',
         'preset': 'keysanity',
         'studyperiod': 0,
-        'friendly_name': 'Week 6 - Piloted Spoiler Keysanity'
+        'friendly_name': 'Week 4 - Piloted Spoiler Keysanity'
+    },
+    '5': {
+        'type': 'mystery',
+        'weightset': 'league',
+        'friendly_name': 'Week 5 - Mystery'
+    },
+    '6': {
+        'type': 'preset',
+        'preset': 'adkeys',
+        'friendly_name': 'Week 6 - All Dungeons Keysanity'
     },
     '7': {
         'type': 'preset',
-        'preset': 'dungeons',
+        'preset': 'enemizer',
         'coop': True,
-        'friendly_name': 'Week 7 - All Dungeons Co-op Info Share'
+        'friendly_name': 'Week 7 - Enemizer Co-op Info Share'
     }
 }
 
@@ -201,6 +203,7 @@ class LeagueRace():
         self.episode = await speedgaming.get_episode(self.episodeid)
 
         if self.week == 'playoffs':
+            # TODO: Redo playoff workflow
             sheet_settings = await settings_sheet(self.episodeid)
             self.type = PLAYOFFDATA[sheet_settings.row['Game Number']]['type']
             self.friendly_name = PLAYOFFDATA[sheet_settings.row['Game Number']
@@ -209,8 +212,7 @@ class LeagueRace():
 
             if self.type == 'preset':
                 self.preset = PLAYOFFDATA[sheet_settings.row['Game Number']]['preset']
-                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
-                self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'vt8 randomizer - misc')}"
+                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
                 self.twitch_mode_command = f"The preset for this race is {self.preset}!  It is game number {sheet_settings.row['Game Number']} of this series."
             elif self.type == 'gsheet':
                 self.preset = None
@@ -218,34 +220,29 @@ class LeagueRace():
                 self.seed = await alttpr_discord.alttpr(
                     settings=sheet_settings.settings
                 )
-                self.goal_after_start = f"vt8 randomizer - {self.seed.generated_goal}"
                 self.twitch_mode_command = f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {sheet_settings.row['Game Number']} of this series."
             await sheet_settings.write_gen_date()
         else:
             self.type = WEEKDATA[self.week]['type']
             self.friendly_name = WEEKDATA[self.week]['friendly_name']
             self.spoiler_log_url = None
-            self.twitch_mode_command = "THIS IS A PLACEHOLDER DO SOMETHING HERE"
 
             if self.type == 'preset':
                 self.preset = WEEKDATA[self.week]['preset']
-                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True)
-                self.goal_after_start = f"vt8 randomizer - {self.preset_dict.get('goal_name', 'unknown')}"
+                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
+                self.twitch_mode_command = f"The preset for this race is {self.preset}!"
             elif self.type == 'mystery':
                 self.weightset = WEEKDATA[self.week]['weightset']
                 self.seed = await mystery.generate_random_game(weightset=self.weightset, spoilers="mystery", tournament=True)
-                self.goal_after_start = f"vt8 randomizer - mystery {self.weightset}"
+                self.twitch_mode_command = f"The weightset for this race is {self.weightset}!"
             elif self.type == 'spoiler':
                 self.preset = WEEKDATA[self.week]['preset']
                 self.studyperiod = WEEKDATA[self.week]['studyperiod']
                 self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
-                self.goal_after_start = f"vt8 randomizer - spoiler {self.preset_dict.get('goal_name', 'unknown')}"
+                self.twitch_mode_command = f"The preset for this race is {self.preset}!"
             else:
                 raise SahasrahBotException(
                     'Week type not found, something went horribly wrong...')
-
-            if WEEKDATA[self.week].get('coop', False):
-                self.goal_after_start += ' - DO NOT RECORD'
 
     def get_player_discords(self):
         player_list = []
@@ -281,26 +278,14 @@ class LeagueRace():
         return player_list
 
 
-async def process_league_race(target, args, client):
-    srl_id = srl.srl_race_id(target)
-    srl_race = await srl.get_race(srl_id)
+async def process_league_race(handler, episodeid, week=None):
+    await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
-    if not srl_race['game']['abbrev'] == 'alttphacks':
-        await client.message(target, "This must be an alttphacks race.")
-        return
-
-    await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-    race = await srl_races.get_srl_race_by_id(srl_id)
-
-    if race:
-        await client.message(target, "There is already a game generated for this room.  To cancel it, use the $cancel command.")
-        return
-
-    generated_league_race = await league_race(episodeid=args.episodeid, week=args.week)
+    generated_league_race = await league_race(episodeid=episodeid, week=week)
     player_names = generated_league_race.get_player_names()
     player_discords = generated_league_race.get_player_discords()
     goal = f"ALTTPR League - {', '.join(player_names)} - {generated_league_race.friendly_name}"
-    await client.message(target, f".setgoal {goal}")
+    await handler.set_raceinfo(goal, overwrite=True)
 
     embed = await generated_league_race.seed.embed(
         name=goal,
@@ -343,30 +328,45 @@ async def process_league_race(target, args, client):
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}")
 
     if generated_league_race.type == 'spoiler':
-        await spoiler_races.insert_spoiler_race(srl_id, generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
+        await spoiler_races.insert_spoiler_race(handler.data.get('name'), generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
 
-    await srl_races.insert_srl_race(srl_id, generated_league_race.goal_after_start)
     await tournament_results.insert_tournament_race(
-        srl_id=srl_id,
+        srl_id=handler.data.get('name'),
         episode_id=generated_league_race.episodeid,
         permalink=generated_league_race.seed.url,
-        event='alttprleague',
+        event='alttprleague_s3',
         week=generated_league_race.week,
         spoiler=generated_league_race.spoiler_log_url if generated_league_race.spoiler_log_url else None
     )
 
-    await client.message(target, "Seed has been generated, you should have received a DM in Discord.  Please contact a League Moderator if you haven't received the DM.")
+    await handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a League Moderator if you haven't received the DM.")
 
 
-async def process_league_race_finish(target, client):
-    srl_id = srl.srl_race_id(target)
-    srl_race = await srl.get_race(srl_id)
+async def process_league_race_start(handler):
+    race_id = handler.data.get('name')
 
-    await tournament_results.record_tournament_results(
-        srl_id=srl_id,
-        results_json=json.dumps(srl_race['entrants'])
-    )
+    if race_id is None:
+        return
 
+    race = await tournament_results.get_active_tournament_race(race_id)
+
+    if race is None:
+        return
+
+    if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
+        await aiohttp.request(
+            method='get',
+            url='https://alttprleague.com/json_ep/submit-game',
+            params={
+                'slug': race_id,
+                'sgl': race['episode_id'],
+                'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
+            }
+        )
+    else:
+        print(f"Would have reported match {race_id} for episode {race['episode_id']}")
+
+    await tournament_results.update_tournament_results(race_id, status="STARTED")
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,

@@ -8,7 +8,7 @@ from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, srl_races,
                                 tournament_results)
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.tournament import league
+# from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
 
 ACCESSIBLE_RACE_WARNING = ircmessage.style('WARNING: ', bold=True, fg='red') + ircmessage.style(
@@ -163,8 +163,8 @@ async def handler(target, source, message, client):
         await srl_races.insert_srl_race(srl_id, goal, post_start_message)
         await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url, studytime)
 
-    if args.command == '$leaguerace' and target.startswith('#srl-'):
-        await league.process_league_race(target, args, client)
+    # if args.command == '$leaguerace' and target.startswith('#srl-'):
+    #     await league.process_league_race(target, args, client)
 
     if args.command == '$cancel' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
@@ -239,9 +239,9 @@ async def parse_args(message):
         parser_festivemystery.add_argument('--silent', action='store_true')
         parser_preset.add_argument('--accessible', action='store_true')
 
-    parser_leaguerace = subparsers.add_parser('$leaguerace')
-    parser_leaguerace.add_argument('episodeid')
-    parser_leaguerace.add_argument('--week', default=None)
+    # parser_leaguerace = subparsers.add_parser('$leaguerace')
+    # parser_leaguerace.add_argument('episodeid')
+    # parser_leaguerace.add_argument('--week', default=None)
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')
