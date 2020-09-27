@@ -1,0 +1,28 @@
+---
+goal_name: open fast ganon 6/6
+customizer: false
+description: "Fast ganon, slightly reduced crystals (6 for GT, 6 for Ganon)"
+settings:
+  goal: fast_ganon
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: open
+  hints: "off"
+  weapons: randomized
+  crystals:
+    ganon: "6"
+    tower: "6"
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: standard
+  item_placement: advanced
