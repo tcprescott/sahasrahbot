@@ -145,11 +145,13 @@ class Role(commands.Cog):
                     role_obj = await commands.RoleConverter().convert(ctx, i['role'])
                 except commands.BadArgument:
                     await ctx.send(f"Failed to find role identified by {i['role']}")
+                    continue
 
                 try:
                     member_obj = await commands.MemberConverter().convert(ctx, i['member'])
                 except commands.BadArgument:
                     await ctx.send(f"Failed to find member identified by {i['member']}")
+                    continue
 
                 if not mode == "dry":
                     await member_obj.add_roles(role_obj)
