@@ -275,11 +275,7 @@ subweights:
         assured: 35
         vanilla: 20
         swordless: 10
-      item_pool:
-        normal: 70
-        hard: 20
-        expert: 10
-        crowd_control: 0
+      item_pool: "normal"
       enemy_damage: "default"
       enemy_health: "default"
       boss_shuffle: "none"
