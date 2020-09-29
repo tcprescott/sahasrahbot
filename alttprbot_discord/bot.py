@@ -28,7 +28,8 @@ discordbot = commands.Bot(
         everyone=False,
         users=True,
         roles=False
-    )
+    ),
+    intents=discord.Intents.all()
 )
 
 if os.environ.get("SENTRY_URL"):
