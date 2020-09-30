@@ -116,7 +116,7 @@ class AlttprHandler(RaceHandler):
             return
 
         try:
-            studytime = args[1]
+            studytime = int(args[1])
         except IndexError:
             studytime = preset_dict.get('studytime', 900)
 
@@ -160,6 +160,7 @@ class AlttprHandler(RaceHandler):
         self.seed_rolled = False
         await self.set_raceinfo("New Race", overwrite=True)
         await tournament_results.delete_active_touranment_race(self.data.get('name'))
+        await spoiler_races.delete_spoiler_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
 
     async def ex_help(self, args, message):
