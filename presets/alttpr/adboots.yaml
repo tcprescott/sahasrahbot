@@ -9,12 +9,12 @@ settings:
     - BossHeartContainer
     - BossHeartContainer
     - BossHeartContainer
-  goal: ganon
+  goal: dungeons
   item:
     pool: normal
     functionality: normal
   lang: en
-  mode: dungeons
+  mode: open
   name: ""
   drops:
     "0":
