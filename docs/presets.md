@@ -10,6 +10,7 @@ title:  Presets
 | Preset | Description | |
 |---|---|---|
 | [168hunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/168hunt.yaml) |Go check every single chest, because why not.| *Customizer*  |
+| [adboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adboots.yaml) |Defeat every dungeon, but you at least get to start with Pegasus Boots!| *Customizer*  |
 | [adinvertedenemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adinvertedenemizer.yaml) |Some good ol' enemy and boss shuffle, but its also inverted... and all dungeons.  Only fearagent would ask for something like this.|   |
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) |All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) |Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
@@ -22,7 +23,6 @@ title:  Presets
 | [classic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/classic.yaml) |Attempts to closely mimic the feel of v18.  No progressive items, etc.| *Customizer*  |
 | [crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys.yaml) |Crossworld entrance with keysanity.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
-| [dungeons_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons_boots.yaml) |Defeat every dungeon, but you at least get to start with Pegasus Boots!| *Customizer*  |
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
