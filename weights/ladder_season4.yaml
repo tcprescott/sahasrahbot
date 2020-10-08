@@ -36,6 +36,9 @@ world_state:
 boss_shuffle:
   none: 70
   full: 30
+enemy_shuffle:
+  none: 70
+  shuffled: 30
 hints:
   "on": 10
   "off": 90
