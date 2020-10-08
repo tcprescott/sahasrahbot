@@ -10,6 +10,7 @@ title:  Presets
 | Preset | Description | |
 |---|---|---|
 | [168hunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/168hunt.yaml) |Go check every single chest, because why not.| *Customizer*  |
+| [adboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adboots.yaml) |Defeat every dungeon, but you at least get to start with Pegasus Boots!| *Customizer*  |
 | [adinvertedenemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adinvertedenemizer.yaml) |Some good ol' enemy and boss shuffle, but its also inverted... and all dungeons.  Only fearagent would ask for something like this.|   |
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) |All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) |Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
