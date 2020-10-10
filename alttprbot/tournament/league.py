@@ -373,7 +373,7 @@ async def process_league_race(handler, episodeid, week=None):
     broadcast_channels = [
         a['name'] for a in generated_league_race.episode['channels'] if not " " in a['name']]
 
-    if broadcast_channels:
+    if len(broadcast_channels) > 0:
         twitch_mode_text = generated_league_race.twitch_mode_command
         twitch_teams_text = f"This race is between {' vs. '.join(generated_league_race.team_names)}.  Check out rankings for division(s) {', '.join(generated_league_race.division_names)} at {' '.join(generated_league_race.division_urls)}"
 
@@ -381,7 +381,6 @@ async def process_league_race(handler, episodeid, week=None):
             await twitch_command_text.insert_command_text(channel.lower(), "mode", twitch_mode_text)
             await twitch_command_text.insert_command_text(channel.lower(), "teams", twitch_teams_text)
 
-    if len(broadcast_channels) > 0:
         tournament_embed.insert_field_at(
             0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
         embed.insert_field_at(
