@@ -400,13 +400,15 @@ async def process_league_race(handler, episodeid, week=None):
 
     for name, player in generated_league_race.player_discords:
         if player is None:
-            await audit_channel.send(f"@here could not send DM to {name}")
+            await audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True))
+            await handler.send_message(f"Could not send DM to {name}.  Please contact a League Moderator for assistance.")
             continue
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
             if audit_channel is not None:
-                await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}")
+                await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
+                await handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a League Moderator for assistance.")
 
     if generated_league_race.type == 'spoiler':
         await spoiler_races.insert_spoiler_race(handler.data.get('name'), generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
