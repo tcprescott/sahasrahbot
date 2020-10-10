@@ -259,7 +259,7 @@ class alttprDiscordClass(alttprClass):
                     f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
                     f"**Goal:** {settings_map['goals'][meta['goal']]}\n"
                     f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
-                    f"**Swords:** {settings_map['weapons'][meta['weapons']]}"
+                    f"**Swords:** {settings_map['weapons'][meta['weapons']]}}\n"
                     f"**Enemy Shuffle:** {settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']]}\n"
                     f"**Boss Shuffle:** {settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']]}\n"
                 )
