@@ -16,6 +16,15 @@ class League():
         if result is not None:
             await ctx.send(result['content'])
 
+    @commands.command()
+    async def teams(self, ctx):
+        result = await twitch_command_text.get_command_text(
+            channel=ctx.channel.name.lower(),
+            command="teams"
+        )
+        if result is not None:
+            await ctx.send(result['content'])
+
 
 def setup(bot):
     bot.add_cog(League(bot))

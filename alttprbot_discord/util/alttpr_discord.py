@@ -260,8 +260,8 @@ class alttprDiscordClass(alttprClass):
                     f"**Goal:** {settings_map['goals'][meta['goal']]}\n"
                     f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
                     f"**Swords:** {settings_map['weapons'][meta['weapons']]}"
-                    f"**Enemy Shuffle:** {settings_map['enemizer']['enemy_shuffle'][meta['enemy_shuffle']]}\n"
-                    f"**Boss Shuffle:** {settings_map['enemizer']['boss_shuffle'][meta['boss_shuffle']]}\n"
+                    f"**Enemy Shuffle:** {settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']]}\n"
+                    f"**Boss Shuffle:** {settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']]}\n"
                 )
             )
 

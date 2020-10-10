@@ -208,11 +208,45 @@ async def league_race(episodeid: int, week=None):
     await race._init()
     return race
 
+class LeaguePlayer():
+    def __init__(self):
+        pass
+
+    @classmethod
+    async def construct(cls, name, guild, name_type='twitch'):
+        playerobj = cls()
+
+        async with aiohttp.request(
+            method='get',
+            url='https://alttprleague.com/json_ep/player/',
+            params={
+                name_type: name,
+            }
+        ) as resp:
+            r = await resp.json()
+            players = r['results']
+
+        if players is not None:
+            if name_type == 'twitch':
+                player = [p for p in players if p['twitch_name'].lower() == name.lower()][0]
+            elif name_type == 'discord':
+                player = [p for p in players if p['discord'] == name][0]
+            elif name_type == 'rtgg':
+                player = [p for p in players if p['rtgg_name'] == name][0]
+            else:
+                raise Exception('Invalid name type.')
+
+            playerobj.data = player
+
+            playerobj.discord_user = guild.get_member_named(player['discord'])
+
+        return playerobj
 
 class LeagueRace():
     def __init__(self, episodeid: int, week=None):
         self.episodeid = int(episodeid)
         self.week = week
+        self.players = []
 
     async def _init(self):
         guild_id = await config.get(0, 'AlttprLeagueServer')
@@ -226,26 +260,29 @@ class LeagueRace():
 
         self.episode = await speedgaming.get_episode(self.episodeid)
 
+        twitch_names = [p['streamingFrom'] if p['publicStream'] == '' else p['publicStream'] for p in self.episode['match1']['players']]
+        for twitch_name in twitch_names:
+            self.players.append(
+                await LeaguePlayer.construct(name=twitch_name, guild=self.guild, name_type='twitch')
+            )
+
         if self.week == 'playoffs':
-            # TODO: Redo playoff workflow
-            sheet_settings = await settings_sheet(self.episodeid)
-            self.type = PLAYOFFDATA[sheet_settings.row['Game Number']]['type']
-            self.friendly_name = PLAYOFFDATA[sheet_settings.row['Game Number']
+            self.sheet_settings = await settings_sheet(self.episodeid)
+            self.type = PLAYOFFDATA[self.sheet_settings.row['Game Number']]['type']
+            self.friendly_name = PLAYOFFDATA[self.sheet_settings.row['Game Number']
                                              ]['friendly_name']
             self.spoiler_log_url = None
 
             if self.type == 'preset':
-                self.preset = PLAYOFFDATA[sheet_settings.row['Game Number']]['preset']
+                self.preset = PLAYOFFDATA[self.sheet_settings.row['Game Number']]['preset']
                 self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
-                self.twitch_mode_command = f"The preset for this race is {self.preset}!  It is game number {sheet_settings.row['Game Number']} of this series."
             elif self.type == 'gsheet':
                 self.preset = None
                 self.preset_dict = None
                 self.seed = await alttpr_discord.alttpr(
-                    settings=sheet_settings.settings
+                    settings=self.sheet_settings.settings
                 )
-                self.twitch_mode_command = f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {sheet_settings.row['Game Number']} of this series."
-            await sheet_settings.write_gen_date()
+            await self.sheet_settings.write_gen_date()
         else:
             self.type = WEEKDATA[self.week]['type']
             self.friendly_name = WEEKDATA[self.week]['friendly_name']
@@ -254,79 +291,95 @@ class LeagueRace():
             if self.type == 'preset':
                 self.preset = WEEKDATA[self.week]['preset']
                 self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
-                self.twitch_mode_command = f"The preset for this race is {self.preset}!"
             elif self.type == 'mystery':
                 self.weightset = WEEKDATA[self.week]['weightset']
                 self.seed = await mystery.generate_random_game(weightset=self.weightset, spoilers="mystery", tournament=True)
-                self.twitch_mode_command = f"The weightset for this race is {self.weightset}!"
             elif self.type == 'spoiler':
                 self.preset = WEEKDATA[self.week]['preset']
                 self.studyperiod = WEEKDATA[self.week]['studyperiod']
                 self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
-                self.twitch_mode_command = f"The preset for this race is {self.preset}!"
+                
             else:
                 raise SahasrahBotException(
                     'Week type not found, something went horribly wrong...')
 
-    def get_player_discords(self):
-        player_list = []
-        for match in ['match1', 'match2']:
-            if self.episode[match] is None:
-                continue
-            for player in self.episode[match]['players']:
-                try:
-                    if not player.get('discordId', '') == '':
-                        member = self.guild.get_member(
-                            int(player['discordId']))
-                    else:
-                        member = self.guild.get_member_named(
-                            player['discordTag'])
+    @property
+    def player_discords(self):
+        return [(p.data['name'], p.discord_user) for p in self.players]
 
-                    if member is None:
-                        raise SahasrahBotException(
-                            f"Unable to resolve Discord User for {player['displayName']} ({player['discordTag']}).  Please contact a moderator for help.")
-                    player_list.append(member)
-                except discord.HTTPException:
-                    pass
+    @property
+    def player_names(self):
+        return [p.data['name'] for p in self.players]
 
-        return player_list
+    @property
+    def team_names(self):
+        return list(set([p.data['team_name'] for p in self.players]))
 
-    def get_player_names(self):
-        player_list = []
-        for match in ['match1', 'match2']:
-            if self.episode[match] is None:
-                continue
-            for player in self.episode[match]['players']:
-                player_list.append(player['displayName'])
+    @property
+    def division_names(self):
+        return list(set([p.data['division_name'] for p in self.players]))
 
-        return player_list
+    @property
+    def division_urls(self):
+        return list(set([p.data['division_url'] for p in self.players]))
+
+    @property
+    def players_by_team(self):
+        result = {}
+        for team in self.team_names:
+            result[team] = [p for p in self.players if p.data['team_name'] == team]
+        return result
+
+    @property
+    def twitch_mode_command(self):
+        if self.week == 'playoffs':
+            return f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {self.sheet_settings.row['Game Number']} of this series."
+        else:
+            if self.type == 'preset':
+                return f"The preset for this race is {self.preset}."
+            elif self.type == 'spoiler':
+                return f"This is a {self.preset} spoiler race."
+            elif self.type == 'mystery':
+                return f"The weightset for this race is {self.weightset}."
 
 
 async def process_league_race(handler, episodeid, week=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
     generated_league_race = await league_race(episodeid=episodeid, week=week)
-    player_names = generated_league_race.get_player_names()
-    player_discords = generated_league_race.get_player_discords()
-    goal = f"ALTTPR League - {', '.join(player_names)} - {generated_league_race.friendly_name}"
+    teams = generated_league_race.players_by_team
+
+    t = []
+    for team in teams:
+        t.append(' and '.join([p.data['name'] for p in teams[team]]))
+
+    goal = f"ALTTPR League - {' vs. '.join(t)} - {generated_league_race.friendly_name}"
+
+
     await handler.set_raceinfo(goal, overwrite=True)
 
     embed = await generated_league_race.seed.embed(
         name=goal,
+        notes=' vs. '.join(generated_league_race.team_names),
         emojis=discordbot.emojis
     )
 
     tournament_embed = await generated_league_race.seed.tournament_embed(
         name=goal,
-        notes="The permalink for this seed was sent via direct message to each runner.",
+        notes=' vs. '.join(generated_league_race.team_names),
         emojis=discordbot.emojis
     )
 
     broadcast_channels = [
         a['name'] for a in generated_league_race.episode['channels'] if not " " in a['name']]
 
-    for channel in broadcast_channels:
-        await twitch_command_text.insert_command_text(channel.lower(), "mode", generated_league_race.twitch_mode_command)
+    if broadcast_channels:
+        twitch_mode_text = generated_league_race.twitch_mode_command
+        twitch_teams_text = f"This race is between {' vs. '.join(generated_league_race.team_names)}.  Check out rankings for division(s) {', '.join(generated_league_race.division_names)} at {' '.join(generated_league_race.division_urls)}"
+
+        for channel in broadcast_channels:
+            await twitch_command_text.insert_command_text(channel.lower(), "mode", twitch_mode_text)
+            await twitch_command_text.insert_command_text(channel.lower(), "teams", twitch_teams_text)
 
     if len(broadcast_channels) > 0:
         tournament_embed.insert_field_at(
@@ -344,7 +397,10 @@ async def process_league_race(handler, episodeid, week=None):
         commentary_channel = discordbot.get_channel(int(commentary_channel_id))
         await commentary_channel.send(embed=tournament_embed)
 
-    for player in player_discords:
+    for name, player in generated_league_race.player_discords:
+        if player is None:
+            await audit_channel.send(f"@here could not send DM to {name}")
+            continue
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
