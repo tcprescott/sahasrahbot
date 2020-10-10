@@ -334,13 +334,15 @@ class LeagueRace():
     def twitch_mode_command(self):
         if self.week == 'playoffs':
             return f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {self.sheet_settings.row['Game Number']} of this series."
-        else:
-            if self.type == 'preset':
-                return f"The preset for this race is {self.preset}."
-            elif self.type == 'spoiler':
-                return f"This is a {self.preset} spoiler race."
-            elif self.type == 'mystery':
-                return f"The weightset for this race is {self.weightset}."
+
+        if self.type == 'preset':
+            return f"The preset for this race is {self.preset}."
+
+        if self.type == 'spoiler':
+            return f"This is a {self.preset} spoiler race."
+
+        if self.type == 'mystery':
+            return f"The weightset for this race is {self.weightset}."
 
 
 async def process_league_race(handler, episodeid, week=None):
@@ -449,5 +451,5 @@ async def process_league_race_start(handler):
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
-                                                            ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
-                                                             'https://www.googleapis.com/auth/spreadsheets'])
+        ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/spreadsheets'])
