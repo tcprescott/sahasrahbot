@@ -3,6 +3,7 @@ from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
 import aiohttp
 from config import Config as c  # pylint: disable=no-name-in-module
+from alttprbot.database import srlnick
 
 class League(commands.Cog):
     def __init__(self, bot):
@@ -68,15 +69,14 @@ class League(commands.Cog):
                             await ctx.send(f"Could not resolve user {team[pendant]['discord']}, skipping...")
                             continue
                         await team_member.add_roles(division_role, player_role, team_role, pendant_roles[pendant])
-                    
-            # if not mode == "dry":
-            #     await member_obj.add_roles(role_obj)
+                        await srlnick.insert_twitch_name(team_member.id, team[pendant]['twitch_name'])
+
 
 async def find_or_create_role(ctx, role_name):
     try:
         role = await commands.RoleConverter().convert(ctx, role_name)
     except commands.RoleNotFound:
-        role = await ctx.guild.create_role(name=role_name)
+        role = await ctx.guild.create_role(name=role_name, reason=f"Created by a importleagueroles command executed by {ctx.author.name}#{ctx.author.discriminator}")
     
     return role
 
