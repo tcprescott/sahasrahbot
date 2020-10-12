@@ -52,9 +52,10 @@ class League(commands.Cog):
 
         division_funcs = []
         for division in roster['divisions']:
-            division_funcs.append(update_division(ctx, division=division, pendant_roles=pendant_roles))
+            # division_funcs.append(update_division(ctx, division=division, pendant_roles=pendant_roles))
+            await update_division(ctx, division=division, pendant_roles=pendant_roles)
 
-        await asyncio.gather(*division_funcs)
+        # await asyncio.gather(*division_funcs)
 
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")
@@ -73,9 +74,8 @@ async def update_division(ctx, division, pendant_roles):
                 print(f"would have added \"{team[pendant]['discord']}\" to role \"{team_role.name}\"")
                 print(f"would have added \"{team[pendant]['discord']}\" to role \"{pendant_roles[pendant].name}\"")
             else:
-                try:
-                    team_member = await commands.MemberConverter().convert(ctx, team[pendant]['discord'])
-                except commands.MemberNotFound:
+                team_member = ctx.guild.get_member_named(team[pendant]['discord'])
+                if team_member is None:
                     await ctx.send(f"Could not resolve user {team[pendant]['discord']}, skipping...")
                     continue
                 await team_member.add_roles(division_role, player_role, team_role, pendant_roles[pendant])
