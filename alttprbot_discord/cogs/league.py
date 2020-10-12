@@ -80,7 +80,7 @@ async def update_division(ctx, division, pendant_roles):
 
                 if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
                     if not team[pendant].get('discord_id', None) == team_member.id:
-                        await aiohttp.request(
+                        async with aiohttp.request(
                             method='post',
                             url='https://alttprleague.com/json_ep/player/',
                             data={
@@ -88,7 +88,8 @@ async def update_division(ctx, division, pendant_roles):
                                 'discord_id': team_member.id,
                                 'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
                             }
-                        )
+                        ) as resp:
+                            data = resp.json()
                 else:
                     print(f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")
 
