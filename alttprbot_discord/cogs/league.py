@@ -1,9 +1,9 @@
 import asyncio
 import random
+import os
 
 import aiohttp
 from alttprbot.database import config, srlnick
-from alttprbot.exceptions import SahasrahBotException
 from config import Config as c  # pylint: disable=no-name-in-module
 from discord.ext import commands
 
@@ -50,12 +50,9 @@ class League(commands.Cog):
         for pendant in ['courage', 'wisdom', 'power']:
             pendant_roles[pendant] = await find_or_create_role(ctx, pendant)
 
-        division_funcs = []
         for division in roster['divisions']:
-            # division_funcs.append(update_division(ctx, division=division, pendant_roles=pendant_roles))
             await update_division(ctx, division=division, pendant_roles=pendant_roles)
 
-        # await asyncio.gather(*division_funcs)
 
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")
@@ -80,6 +77,20 @@ async def update_division(ctx, division, pendant_roles):
                     continue
                 await team_member.add_roles(division_role, player_role, team_role, pendant_roles[pendant])
                 await srlnick.insert_twitch_name(team_member.id, team[pendant]['twitch_name'])
+
+                if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
+                    if not team[pendant].get('discord_id', None) == team_member.id:
+                        await aiohttp.request(
+                            method='post',
+                            url='https://alttprleague.com/json_ep/player/',
+                            data={
+                                'id': team[pendant]['id'],
+                                'discord_id': team_member.id,
+                                'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
+                            }
+                        )
+                else:
+                    print(f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")
 
 async def find_or_create_role(ctx, role_name):
     try:
