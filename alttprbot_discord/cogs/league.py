@@ -1,9 +1,12 @@
-from discord.ext import commands
-from alttprbot.database import config
-from alttprbot.exceptions import SahasrahBotException
+import asyncio
+import random
+
 import aiohttp
+from alttprbot.database import config, srlnick
+from alttprbot.exceptions import SahasrahBotException
 from config import Config as c  # pylint: disable=no-name-in-module
-from alttprbot.database import srlnick
+from discord.ext import commands
+
 
 class League(commands.Cog):
     def __init__(self, bot):
@@ -47,30 +50,36 @@ class League(commands.Cog):
         for pendant in ['courage', 'wisdom', 'power']:
             pendant_roles[pendant] = await find_or_create_role(ctx, pendant)
 
+        division_funcs = []
         for division in roster['divisions']:
-            division_role = await find_or_create_role(ctx, f"Division - {division['name']}")
-            player_role = await find_or_create_role(
-                ctx,
-                "Racer" if division['invitational'] else "Open Racer"
-            )
-            for team in division['teams']:
-                team_role = await find_or_create_role(ctx, team['name'])
+            division_funcs.append(update_division(ctx, division=division, pendant_roles=pendant_roles))
 
-                for pendant in ['courage', 'wisdom', 'power']:
-                    if c.DEBUG:
-                        print(f"would have added \"{team[pendant]['discord']}\" to role \"{division_role.name}\"")
-                        print(f"would have added \"{team[pendant]['discord']}\" to role \"{player_role.name}\"")
-                        print(f"would have added \"{team[pendant]['discord']}\" to role \"{team_role.name}\"")
-                        print(f"would have added \"{team[pendant]['discord']}\" to role \"{pendant_roles[pendant].name}\"")
-                    else:
-                        try:
-                            team_member = await commands.MemberConverter().convert(ctx, team[pendant]['discord'])
-                        except commands.MemberNotFound:
-                            await ctx.send(f"Could not resolve user {team[pendant]['discord']}, skipping...")
-                            continue
-                        await team_member.add_roles(division_role, player_role, team_role, pendant_roles[pendant])
-                        await srlnick.insert_twitch_name(team_member.id, team[pendant]['twitch_name'])
+        await asyncio.gather(*division_funcs)
 
+async def update_division(ctx, division, pendant_roles):
+    division_role = await find_or_create_role(ctx, f"Division - {division['name']}")
+    player_role = await find_or_create_role(
+        ctx,
+        "Racer" if division['invitational'] else "Open Racer"
+    )
+    for team in division['teams']:
+        team_role = await find_or_create_role(ctx, team['name'])
+
+        for pendant in ['courage', 'wisdom', 'power']:
+            if c.DEBUG:
+                await asyncio.sleep(random.uniform(0, 3))
+                print(f"would have added \"{team[pendant]['discord']}\" to role \"{division_role.name}\"")
+                print(f"would have added \"{team[pendant]['discord']}\" to role \"{player_role.name}\"")
+                print(f"would have added \"{team[pendant]['discord']}\" to role \"{team_role.name}\"")
+                print(f"would have added \"{team[pendant]['discord']}\" to role \"{pendant_roles[pendant].name}\"")
+            else:
+                try:
+                    team_member = await commands.MemberConverter().convert(ctx, team[pendant]['discord'])
+                except commands.MemberNotFound:
+                    await ctx.send(f"Could not resolve user {team[pendant]['discord']}, skipping...")
+                    continue
+                await team_member.add_roles(division_role, player_role, team_role, pendant_roles[pendant])
+                await srlnick.insert_twitch_name(team_member.id, team[pendant]['twitch_name'])
 
 async def find_or_create_role(ctx, role_name):
     try:
