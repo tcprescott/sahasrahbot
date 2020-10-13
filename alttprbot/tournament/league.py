@@ -238,7 +238,10 @@ class LeaguePlayer():
 
             playerobj.data = player
 
-            playerobj.discord_user = guild.get_member_named(player['discord'])
+            if player.get('discord_id', None) is None:
+                playerobj.discord_user = guild.get_member_named(player['discord'])
+            else:
+                playerobj.discord_user = guild.get_member(player['discord_id'])
 
         return playerobj
 
