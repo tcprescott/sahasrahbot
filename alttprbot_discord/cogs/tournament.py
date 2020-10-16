@@ -17,7 +17,7 @@ class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def cog_check(self, ctx):
+    async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
         if ctx.guild is None:
             return False
 

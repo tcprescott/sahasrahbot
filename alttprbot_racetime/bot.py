@@ -1,63 +1,79 @@
+import json
 import logging
+import os
 import ssl
 import sys
+from functools import partial
+
+import aiohttp
 import requests
 from config import Config as c
 from racetime_bot import Bot
 
 from .handler import AlttprHandler
+from .handler_sgl import SGLHandler
 from .handler_smz3 import Smz3Handler
 
 logger = logging.getLogger()
-handler = logging.StreamHandler(sys.stdout)
+logger_handler = logging.StreamHandler(sys.stdout)
 
 
-handler.setFormatter(logging.Formatter(
+logger_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(name)s (%(levelname)s) :: %(message)s'
 ))
-logger.addHandler(handler)
+logger.addHandler(logger_handler)
 
 
-class AlttprBot(Bot):
+class SahasrahBotRaceTimeBot(Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ssl_context = ssl.SSLContext()
 
+    def get_handler_kwargs(self, ws_conn, state):
+        return {
+            'conn': ws_conn,
+            'logger': self.logger,
+            'state': state,
+            'command_prefix': c.RACETIME_COMMAND_PREFIX,
+        }
+
+    async def create_handler_by_room_name(self, room_name):
+        def done(task_name, *args):
+            del self.handlers[task_name]
+
+        async with aiohttp.request(
+            method='get',
+            url=self.http_uri(f'{room_name}/data'),
+            raise_for_status=True
+        ) as resp:
+            race_data = json.loads(await resp.read())
+
+        handler = self.create_handler(race_data)
+        name = race_data.get('name')
+
+        self.handlers[name] = self.loop.create_task(handler.handle())
+        self.handlers[name].add_done_callback(partial(done, name))
+
+        return race_data
+
+    async def start(self):
+        self.loop.create_task(self.reauthorize())
+        self.loop.create_task(self.refresh_races())
+
+
+class AlttprBot(SahasrahBotRaceTimeBot):
     def get_handler_class(self):
         return AlttprHandler
 
-    def get_handler_kwargs(self, ws_conn, state):
-        return {
-            'conn': ws_conn,
-            'logger': self.logger,
-            'state': state,
-            'command_prefix': c.RACETIME_COMMAND_PREFIX,
-        }
 
-    async def start(self):
-        self.loop.create_task(self.reauthorize())
-        self.loop.create_task(self.refresh_races())
-
-
-class Smz3Bot(Bot):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ssl_context = ssl.SSLContext()
-
+class Smz3Bot(SahasrahBotRaceTimeBot):
     def get_handler_class(self):
         return Smz3Handler
 
-    def get_handler_kwargs(self, ws_conn, state):
-        return {
-            'conn': ws_conn,
-            'logger': self.logger,
-            'state': state,
-            'command_prefix': c.RACETIME_COMMAND_PREFIX,
-        }
 
-    async def start(self):
-        self.loop.create_task(self.reauthorize())
-        self.loop.create_task(self.refresh_races())
+class SGLBot(SahasrahBotRaceTimeBot):
+    def get_handler_class(self):
+        return SGLHandler
 
 
 try:
@@ -80,4 +96,18 @@ try:
     )
 except requests.exceptions.HTTPError:
     logger.warning('Unable to authorize smz3.')
-    racetime_alttpr = None
+    racetime_smz3 = None
+
+if os.environ.get('RACETIME_CLIENT_ID_SGL', None):
+    try:
+        racetime_sgl = SGLBot(
+            category_slug='sgl',
+            client_id=os.environ.get('RACETIME_CLIENT_ID_SGL'),
+            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SGL'),
+            logger=logger
+        )
+    except requests.exceptions.HTTPError:
+        logger.warning('Unable to authorize sgl.')
+        racetime_sgl = None
+else:
+    racetime_sgl = None

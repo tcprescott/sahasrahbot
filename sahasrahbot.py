@@ -10,7 +10,7 @@ from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from alttprbot.util import orm
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord.bot import discordbot
-from alttprbot_racetime.bot import racetime_alttpr, racetime_smz3
+from alttprbot_racetime.bot import racetime_alttpr, racetime_smz3, racetime_sgl
 from alttprbot_srl.bot import srlbot
 from alttprbot_twitch.bot import twitchbot
 
@@ -27,6 +27,7 @@ if __name__ == '__main__':
     loop.create_task(twitchbot.start())
     loop.create_task(racetime_alttpr.start())
     loop.create_task(racetime_smz3.start())
+    loop.create_task(racetime_sgl.start())
     loop.create_task(srlbot.connect('irc.speedrunslive.com'))
     loop.create_task(sahasrahbotapi.run(host='127.0.0.1',
                                         port=5001, use_reloader=False, loop=loop))
