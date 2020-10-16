@@ -120,7 +120,9 @@ class AlttprGen(commands.Cog):
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
-        await ctx.send(f'Spoiler log <{spoiler_log_url}>', embed=embed)
+        embed.insert_field_at(0, name="Spoiler Log URL",
+                              value=spoiler_log_url, inline=False)
+        await ctx.send(embed=embed)
 
     @commands.group(
         brief='Generate a game with randomized settings.',
