@@ -4,26 +4,34 @@ import os
 
 import aiohttp
 from alttprbot.database import config, srlnick
+from alttprbot.tournament.league import WEEKDATA
+from alttprbot.alttprgen import mystery, preset, spoilers
 from config import Config as c  # pylint: disable=no-name-in-module
 from discord.ext import commands
 
+from ..util import checks
 
-class League(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
 
-    async def cog_check(self, ctx): # pylint: disable=invalid-overridden-method
+def restrict_league_server():
+    async def predicate(ctx):
         if ctx.guild is None:
             return False
         if ctx.guild.id == int(await config.get(0, 'AlttprLeagueServer')):
             return True
 
         return False
+    return commands.check(predicate)
+
+
+class League(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.command(
         help='Set the ALTTPR League Week.'
     )
     @commands.has_any_role('Admin', 'Mods', 'Bot Overlord')
+    @restrict_league_server()
     async def setleagueweek(self, ctx, week):
         guildid = ctx.guild.id if ctx.guild else 0
         await config.set_parameter(guildid, 'AlttprLeagueWeek', week)
@@ -31,13 +39,41 @@ class League(commands.Cog):
     @commands.command(
         help='Get the league week.'
     )
+    @restrict_league_server()
     async def getleagueweek(self, ctx):
         guildid = ctx.guild.id if ctx.guild else 0
         week = await config.get(guildid, 'AlttprLeagueWeek')
         await ctx.send(f"This is Week {week}")
 
+    @commands.command(
+        brief='Generate a practice seed.',
+        help='Generate a league practice seed for the specified league week.'
+    )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def leaguepractice(self, ctx, week: str):
+        game_type = WEEKDATA[week]['type']
+        friendly_name = WEEKDATA[week]['friendly_name']
+        spoiler_log_url = None
+
+        if game_type == 'preset':
+            seed, preset_dict = await preset.get_preset(WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
+        elif game_type == 'mystery':
+            seed = await mystery.generate_random_game(weightset=WEEKDATA[week]['weightset'], spoilers="mystery", tournament=True)
+        elif game_type == 'spoiler':
+            seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[week]['preset'])
+
+        embed = await seed.embed(
+            name=f"Practice - {friendly_name}",
+            emojis=self.bot.emojis
+        )
+        if spoiler_log_url:
+            embed.insert_field_at(0, name="Spoiler Log URL",
+                                  value=spoiler_log_url, inline=False)
+        await ctx.send(embed=embed)
+
     @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
+    @restrict_league_server()
     async def importleagueroles(self, ctx):
 
         async with aiohttp.request(
@@ -66,12 +102,17 @@ async def update_division(ctx, division, pendant_roles):
         for pendant in ['courage', 'wisdom', 'power']:
             if c.DEBUG:
                 await asyncio.sleep(random.uniform(0, 3))
-                print(f"would have added \"{team[pendant]['discord']}\" to role \"{division_role.name}\"")
-                print(f"would have added \"{team[pendant]['discord']}\" to role \"{player_role.name}\"")
-                print(f"would have added \"{team[pendant]['discord']}\" to role \"{team_role.name}\"")
-                print(f"would have added \"{team[pendant]['discord']}\" to role \"{pendant_roles[pendant].name}\"")
+                print(
+                    f"would have added \"{team[pendant]['discord']}\" to role \"{division_role.name}\"")
+                print(
+                    f"would have added \"{team[pendant]['discord']}\" to role \"{player_role.name}\"")
+                print(
+                    f"would have added \"{team[pendant]['discord']}\" to role \"{team_role.name}\"")
+                print(
+                    f"would have added \"{team[pendant]['discord']}\" to role \"{pendant_roles[pendant].name}\"")
             else:
-                team_member = ctx.guild.get_member_named(team[pendant]['discord'])
+                team_member = ctx.guild.get_member_named(
+                    team[pendant]['discord'])
                 if team_member is None:
                     await ctx.send(f"Could not resolve user {team[pendant]['discord']}, skipping...")
                     continue
@@ -91,15 +132,18 @@ async def update_division(ctx, division, pendant_roles):
                         ) as resp:
                             data = resp.json()
                 else:
-                    print(f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")
+                    print(
+                        f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")
+
 
 async def find_or_create_role(ctx, role_name):
     try:
         role = await commands.RoleConverter().convert(ctx, role_name)
     except commands.RoleNotFound:
         role = await ctx.guild.create_role(name=role_name, reason=f"Created by a importleagueroles command executed by {ctx.author.name}#{ctx.author.discriminator}")
-    
+
     return role
+
 
 def setup(bot):
     bot.add_cog(League(bot))
