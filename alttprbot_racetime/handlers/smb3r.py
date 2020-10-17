@@ -18,7 +18,7 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game("17BAS2LNJ4", message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#super-mario-bros-3-randomizer-smb3r for more info.")
 
     async def roll_game(self, flags, message):
         if await self.is_locked(message):

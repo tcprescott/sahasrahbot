@@ -10,7 +10,7 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(args, message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html#smz3-commands for more info.")
 
     async def roll_game(self, args, message):
         if await self.is_locked(message):
