@@ -3,7 +3,6 @@ import string
 
 from discord.ext import commands
 from alttprbot_racetime.tools import create_race
-from alttprbot.alttprgen.bingosync import create_bingo_card
 from alttprbot.alttprgen import randomizer
 from alttprbot_racetime.bot import racetime_sgl
 from alttprbot.database import config
@@ -48,8 +47,8 @@ class SpeedGamingLive(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def sglbingotest(self, ctx):
-        room_url = await create_bingo_card(
+    async def sglsmobingotest(self, ctx):
+        room_url = await randomizer.create_bingo_card(
             config={
                 'room_name': f'synacktest-{get_random_string(8)}',
                 'passphrase': 'test',

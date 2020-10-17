@@ -27,7 +27,7 @@ logger.addHandler(logger_handler)
 class SahasrahBotRaceTimeBot(Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ssl_context = ssl.SSLContext()
+        self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
     def get_handler_kwargs(self, ws_conn, state):
         return {
