@@ -226,22 +226,26 @@ class LeaguePlayer():
             r = await resp.json()
             players = r['results']
 
-        if players is not None:
-            if name_type == 'twitch':
-                player = [p for p in players if p['twitch_name'].lower() == name.lower()][0]
-            elif name_type == 'discord':
-                player = [p for p in players if p['discord'] == name][0]
-            elif name_type == 'rtgg':
-                player = [p for p in players if p['rtgg_name'] == name][0]
-            else:
-                raise Exception('Invalid name type.')
+        if players is None:
+            return None
 
-            playerobj.data = player
+        if name_type == 'twitch':
+            player = [p for p in players if p['twitch_name'].lower() == name.lower()][0]
+        elif name_type == 'discord':
+            player = [p for p in players if p['discord'] == name][0]
+        elif name_type == 'discord_id':
+            player = [p for p in players if p['discord_id'] == name][0]
+        elif name_type == 'rtgg':
+            player = [p for p in players if p['rtgg_name'] == name][0]
+        else:
+            raise Exception('Invalid name type.')
 
-            if player.get('discord_id', None) is None:
-                playerobj.discord_user = guild.get_member_named(player['discord'])
-            else:
-                playerobj.discord_user = guild.get_member(player['discord_id'])
+        playerobj.data = player
+
+        if player.get('discord_id', None) is None:
+            playerobj.discord_user = guild.get_member_named(player['discord'])
+        else:
+            playerobj.discord_user = guild.get_member(player['discord_id'])
 
         return playerobj
 
@@ -263,11 +267,23 @@ class LeagueRace():
 
         self.episode = await speedgaming.get_episode(self.episodeid)
 
-        twitch_names = [p['streamingFrom'] if p['publicStream'] == '' else p['publicStream'] for p in self.episode['match1']['players']]
-        for twitch_name in twitch_names:
-            self.players.append(
-                await LeaguePlayer.construct(name=twitch_name, guild=self.guild, name_type='twitch')
-            )
+        for player in self.episode['match1']['players']:
+            # first try a more concrete match of using the discord id cached by SG
+            looked_up_player = await LeaguePlayer.construct(name=player['discordId'], guild=self.guild, name_type='discord_id')
+
+            # then, if that doesn't work, try their streamingFrom name
+            if looked_up_player is None:
+                looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=self.guild, name_type='twitch')
+            
+            # finally, try publicStream
+            if looked_up_player is None:
+                looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=self.guild, name_type='twitch')
+
+            # finally, try publicStream
+            if looked_up_player is None:
+                raise Exception(f"Unable to lookup {player['displayName']}")
+
+            self.players.append(looked_up_player)
 
         if self.week == 'playoffs':
             self.sheet_settings = await settings_sheet(self.episodeid)
