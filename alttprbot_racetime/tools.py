@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from alttprbot.exceptions import SahasrahBotException
 
 RTGG_SESSION_TOKEN = os.environ.get('RACETIME_SESSION_TOKEN')
-RTGG_CSRF_TOKEN = os.environ.get('RACETIME_CSRF_TOKEN')
 RTGG_BASE_URL = os.environ.get('RACETIME_BASE_URL', 'https://racetime.gg')
 
 # WARNING: This is incredibly jank and relies on private endpoints within RT.gg
@@ -19,11 +18,11 @@ async def create_race(game, config):
         async with aiohttp.request(
             method='get',
             url=f'{RTGG_BASE_URL}/{game}/startrace',
-            cookies={'sessionid': RTGG_SESSION_TOKEN,
-                     'csrftoken': RTGG_CSRF_TOKEN},
+            cookies={'sessionid': RTGG_SESSION_TOKEN},
             raise_for_status=True
         ) as resp:
             soup = BeautifulSoup(await resp.text(), features="html5lib")
+            cookies = resp.cookies
     except:
         raise SahasrahBotException(
             "Unable to acquire CSRF token.  Please contact Synack for help.")
@@ -33,15 +32,17 @@ async def create_race(game, config):
     config['csrfmiddlewaretoken'] = csrftoken
     config['recordable'] = True
 
+    cookies['sessionid'] = RTGG_SESSION_TOKEN
+
     try:
         async with aiohttp.request(
             method='post',
             url=f'{RTGG_BASE_URL}/{game}/startrace',
-            cookies={'sessionid': RTGG_SESSION_TOKEN,
-                     'csrftoken': RTGG_CSRF_TOKEN},
+            cookies=cookies,
             headers={'Origin': RTGG_BASE_URL,
                      'Referer': f'{RTGG_BASE_URL}/{game}/startrace'},
             allow_redirects=False,
+            raise_for_status=True,
             data=config
         ) as resp:
             if resp.status == 302:
