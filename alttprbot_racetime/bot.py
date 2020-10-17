@@ -10,9 +10,7 @@ import requests
 from config import Config as c
 from racetime_bot import Bot
 
-from .handler import AlttprHandler
-from .handler_sgl import SGLHandler
-from .handler_smz3 import Smz3Handler
+from . import handlers
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -23,10 +21,13 @@ logger_handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(logger_handler)
 
+RACETIME_GAMES = ['alttpr', 'smz3', 'sgl', 'ff1r', 'z1r', 'smb3r']
+
 
 class SahasrahBotRaceTimeBot(Bot):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, handler_class, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.handler_class = handler_class
         self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
     def get_handler_kwargs(self, ws_conn, state):
@@ -56,58 +57,27 @@ class SahasrahBotRaceTimeBot(Bot):
 
         return race_data
 
+    def get_handler_class(self):
+        return self.handler_class
+
     async def start(self):
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
 
 
-class AlttprBot(SahasrahBotRaceTimeBot):
-    def get_handler_class(self):
-        return AlttprHandler
+def start_racetime(loop):
+    for bot in racetime_bots.values():
+        print(f'starting {bot}')
+        loop.create_task(bot.start())
 
 
-class Smz3Bot(SahasrahBotRaceTimeBot):
-    def get_handler_class(self):
-        return Smz3Handler
-
-
-class SGLBot(SahasrahBotRaceTimeBot):
-    def get_handler_class(self):
-        return SGLHandler
-
-
-try:
-    racetime_alttpr = AlttprBot(
-        category_slug='ALttPR',
-        client_id=c.RACETIME_CLIENT_ID,
-        client_secret=c.RACETIME_CLIENT_SECRET,
+racetime_bots = {}
+for slug in RACETIME_GAMES:
+    print(f'creating {slug}')
+    racetime_bots[slug] = SahasrahBotRaceTimeBot(
+        category_slug=slug,
+        client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
+        client_secret=os.environ.get(f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
         logger=logger,
+        handler_class=eval(f"handlers.{slug}.GameHandler")  # pylint: disable=eval-used
     )
-except requests.exceptions.HTTPError:
-    logger.warning('Unable to authorize alttpr.')
-    racetime_alttpr = None
-
-try:
-    racetime_smz3 = Smz3Bot(
-        category_slug='smz3',
-        client_id=c.RACETIME_CLIENT_ID_SMZ3,
-        client_secret=c.RACETIME_CLIENT_SECRET_SMZ3,
-        logger=logger
-    )
-except requests.exceptions.HTTPError:
-    logger.warning('Unable to authorize smz3.')
-    racetime_smz3 = None
-
-if os.environ.get('RACETIME_CLIENT_ID_SGL', None):
-    try:
-        racetime_sgl = SGLBot(
-            category_slug='sgl',
-            client_id=os.environ.get('RACETIME_CLIENT_ID_SGL'),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SGL'),
-            logger=logger
-        )
-    except requests.exceptions.HTTPError:
-        logger.warning('Unable to authorize sgl.')
-        racetime_sgl = None
-else:
-    racetime_sgl = None

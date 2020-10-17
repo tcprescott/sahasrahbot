@@ -3,7 +3,7 @@ import string
 
 from alttprbot.alttprgen import randomizer
 from alttprbot.database import config
-from alttprbot_racetime.bot import racetime_sgl
+from alttprbot_racetime.bot import racetime_bots
 from alttprbot_racetime.tools import create_race
 from discord.ext import commands
 
@@ -42,7 +42,7 @@ class SpeedGamingLive(commands.Cog):
                 'allow_non_entrant_chat': 'off',
                 'chat_message_delay': 0})
 
-        await racetime_sgl.create_handler_by_room_name(room_name)
+        await racetime_bots['sgl'].create_handler_by_room_name(room_name)
         await ctx.send(f'https://racetime.gg{room_name}')
 
     @commands.command()

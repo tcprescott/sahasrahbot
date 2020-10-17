@@ -74,7 +74,7 @@ async def join_srl_room(client, message):
             await asyncio.sleep(1)
             await client.join(result.group(2))
             await asyncio.sleep(60)
-            await client.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and ALTTPR/SMZ3 seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
+            await client.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
         else:
             print(f'would have joined {result.group(2)}')
 
