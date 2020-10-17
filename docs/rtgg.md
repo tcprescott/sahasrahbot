@@ -57,6 +57,8 @@ Use this command to roll a seed number and put the seed and flags in the race in
 
 Example `!flags 17BAS2LNJ4`
 
+Please be aware that the flag string is not validated.
+
 ### !sglpractice
 Provides a seed and flags for the SpeedGamingLive 2020 tournament.
 
@@ -67,6 +69,8 @@ Use this command to roll a seed number and put the seed and flags in the race in
 
 Example `!flags VlWlIEwJ1MsKkaOCWhlit2veXNSffs`
 
+Please be aware that the flag string is not validated.
+
 ### !sglpractice
 Provides a seed and flags for the SpeedGamingLive 2020 tournament.
 
@@ -76,6 +80,8 @@ Provides a seed and flags for the SpeedGamingLive 2020 tournament.
 Use this command to roll a seed number and post a link to the seed in the race info and chat.
 
 Example `!flags yGcifaseK8fJxIkkAzUzYAzx32UoP5toiyJrTE864J9FEyMsXe5XhM5T94nANOh1T6wJN7BZU4p3r3WORe9o7vyXSpZD`
+
+Please be aware that the flag string is not validated.
 
 ### !sglpods
 Provides a URL to a seed using the SpeedGamingLive 2020 pod stage flags.
