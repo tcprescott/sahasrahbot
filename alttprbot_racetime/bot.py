@@ -21,7 +21,7 @@ logger_handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(logger_handler)
 
-RACETIME_GAMES = ['alttpr', 'smz3', 'sgl', 'ff1r', 'z1r', 'smb3r']
+RACETIME_GAMES = ['alttpr', 'smz3', 'sgl', 'ff1r', 'z1r', 'smb3r', 'smr']
 
 
 class SahasrahBotRaceTimeBot(Bot):

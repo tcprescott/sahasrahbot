@@ -89,6 +89,29 @@ Provides a URL to a seed using the SpeedGamingLive 2020 pod stage flags.
 ### !sglbrackets
 Provides a URL to a seed using the SpeedGamingLive 2020 bracket stage flags.
 
+## Super Metroid Randomizer (SMR)
+
+### !totalrace
+Generate a seed using Total's Super Metroid Randomizer at https://sm.samus.link
+
+Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
+
+Example `!totalrace casual_full`
+
+### !variarace
+Generate a seed using the Super Metroid VARIA Randomizer at https://randommetroidsolver.pythonanywhere.com/
+
+First argument is the settings preset, and the second argument is the skills preset.  Lists of both presets can be found on the randomizer's website.
+
+Example `!totalrace default regular`
+
+**This is currently broken and will not function.**  There's no ETA on a fix.
+
+### !dashrace
+Generate a seed using the Super Metroid DASH Randomizer, found at https://dashrando.github.io/
+
+Example `!dashrace`
+
 ## Global Commands
 ### !lock
 
