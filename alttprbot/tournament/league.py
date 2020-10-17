@@ -36,7 +36,7 @@ WEEKDATA = {
     '3': {
         'type': 'preset',
         'preset': 'casualboots',
-        'friendly_name': 'Week 3 - Enemizer'
+        'friendly_name': 'Week 3 - Casual Boots'
     },
     '4': {
         'type': 'spoiler',
