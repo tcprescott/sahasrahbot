@@ -4,26 +4,24 @@ from .core import SahasrahBotCoreHandler
 
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_flags(self, args, message):
-        await self.roll_game(args, message)
-
-    async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
-
-    async def ex_cancel(self, args, message):
-        self.seed_rolled = False
-        await self.set_raceinfo("New Race", overwrite=True)
-        await self.send_message("Reseting bot state.  You may now roll a new game.")
-
-    async def roll_game(self, args, message):
-        if await self.is_locked(message):
-            return
-
         try:
             flags = args[0]
         except IndexError:
             await self.send_message(
                 'You must specify a set of flags!'
             )
+            return
+
+        await self.roll_game(flags, message)
+
+    async def ex_sglpractice(self, args, message):
+        await self.roll_game("17BAS2LNJ4", message)
+
+    async def ex_help(self, args, message):
+        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+
+    async def roll_game(self, flags, message):
+        if await self.is_locked(message):
             return
 
         seed, flags = roll_smb3r(flags)
