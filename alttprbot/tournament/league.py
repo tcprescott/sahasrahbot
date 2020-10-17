@@ -271,6 +271,10 @@ class LeagueRace():
             # first try a more concrete match of using the discord id cached by SG
             looked_up_player = await LeaguePlayer.construct(name=player['discordId'], guild=self.guild, name_type='discord_id')
 
+            # then, if that doesn't work, try their discord tag kept by SG
+            if looked_up_player is None:
+                looked_up_player = await LeaguePlayer.construct(name=player['discordTag'], guild=self.guild, name_type='discord')
+
             # then, if that doesn't work, try their streamingFrom name
             if looked_up_player is None:
                 looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=self.guild, name_type='twitch')
@@ -279,7 +283,7 @@ class LeagueRace():
             if looked_up_player is None:
                 looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=self.guild, name_type='twitch')
 
-            # finally, try publicStream
+            # and failing all that, bomb
             if looked_up_player is None:
                 raise Exception(f"Unable to lookup {player['displayName']}")
 
