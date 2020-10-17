@@ -1,11 +1,11 @@
 import random
 import string
 
-from discord.ext import commands
-from alttprbot_racetime.tools import create_race
 from alttprbot.alttprgen import randomizer
-from alttprbot_racetime.bot import racetime_sgl
 from alttprbot.database import config
+from alttprbot_racetime.bot import racetime_sgl
+from alttprbot_racetime.tools import create_race
+from discord.ext import commands
 
 
 class SpeedGamingLive(commands.Cog):
@@ -18,8 +18,8 @@ class SpeedGamingLive(commands.Cog):
 
         if await config.get(ctx.guild.id, 'SpeedGamingLiveEnabled') == 'true':
             return True
-        else:
-            return False
+
+        return False
 
     @commands.command(
         help="Generate a SGL race room on racetime."
@@ -56,7 +56,27 @@ class SpeedGamingLive(commands.Cog):
                 'game_type': 45,
                 'variant_type': 45,
                 'custom_json': '',
-                'lockout_mode': 2,
+                'lockout_mode': 1,
+                'seed': '',
+                'is_spectator': 'on',
+                'hide_card': 'on'
+            }
+        )
+
+        await ctx.send(room_url)
+
+    @commands.command()
+    @commands.is_owner()
+    async def sglsmdabbingotest(self, ctx):
+        room_url = await randomizer.create_bingo_card(
+            config={
+                'room_name': f'synacktest-{get_random_string(8)}',
+                'passphrase': 'test',
+                'nickname': 'Synack',
+                'game_type': 4,
+                'variant_type': 164,
+                'custom_json': '',
+                'lockout_mode': 1,
                 'seed': '',
                 'is_spectator': 'on',
                 'hide_card': 'on'
