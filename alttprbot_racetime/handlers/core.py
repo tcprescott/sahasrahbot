@@ -23,6 +23,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
+        raise Exception(data.get('errors'))
 
     async def intro(self):
         """
@@ -65,6 +66,10 @@ class SahasrahBotCoreHandler(RaceHandler):
         )
 
     async def is_locked(self, message):
+        """
+        Check if room is locked or seed already exists.
+        Post in chat if that is the case.
+        """
         if self.seed_rolled:
             await self.send_message(
                 'I already rolled a seed!  Use !cancel to clear the currently rolled game.'
