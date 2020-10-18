@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import random
 
@@ -274,7 +273,7 @@ class LeagueRace():
             # then, if that doesn't work, try their streamingFrom name
             if looked_up_player is None:
                 looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=self.guild, name_type='twitch')
-            
+
             # finally, try publicStream
             if looked_up_player is None:
                 looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=self.guild, name_type='twitch')

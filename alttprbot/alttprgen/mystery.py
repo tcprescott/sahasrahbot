@@ -20,10 +20,10 @@ async def generate_test_game(weightset='weighted', festive=False):
     weights = await get_weights(weightset)
 
     if festive:
-        settings, customizer = festive_generate_random_settings(
+        settings, _ = festive_generate_random_settings(
             weights=weights)
     else:
-        settings, customizer = pyz3r.mystery.generate_random_settings(
+        settings, _ = pyz3r.mystery.generate_random_settings(
             weights=weights)
 
     return settings

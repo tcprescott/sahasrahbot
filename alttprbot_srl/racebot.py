@@ -4,7 +4,7 @@ import re
 
 import ircmessage
 
-from alttprbot.database import spoiler_races, srl_races
+from alttprbot.database import srl_races
 # from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
 from alttprbot_srl import alt_hunter, discord_integration, spoilers

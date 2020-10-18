@@ -40,7 +40,7 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race(self, ctx, preset, hints=False):
-        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off")
+        seed, _ = await get_preset(preset, hints=hints, spoilers="off")
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -53,7 +53,7 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def quickswaprace(self, ctx, preset, hints=False):
-        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=True)
+        seed, _ = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=True)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -67,7 +67,7 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def race_custom(self, ctx, tournament: bool = True):
+    async def race_custom(self, ctx):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             preset_dict = yaml.safe_load(content)
@@ -85,7 +85,7 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def norace(self, ctx, preset, hints=False):
-        seed, preset_dict = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
+        seed, _ = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -99,7 +99,7 @@ class AlttprGen(commands.Cog):
     )
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def norace_custom(self, ctx, tournament: bool = True):
+    async def norace_custom(self, ctx):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             preset_dict = yaml.safe_load(content)
@@ -115,7 +115,7 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def spoiler(self, ctx, preset):
-        seed, preset_dict, spoiler_log_url = await generate_spoiler_game(preset)
+        seed, _, spoiler_log_url = await generate_spoiler_game(preset)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -344,7 +344,7 @@ class AlttprGen(commands.Cog):
             await ctx.send(
                 file=discord.File(
                     io.StringIO(yaml.dump(preset_dict)),
-                    filename=f"output.yaml"
+                    filename="output.yaml"
                 )
             )
         else:

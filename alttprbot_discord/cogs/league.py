@@ -56,11 +56,11 @@ class League(commands.Cog):
         spoiler_log_url = None
 
         if game_type == 'preset':
-            seed, preset_dict = await preset.get_preset(WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
+            seed, _ = await preset.get_preset(WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
         elif game_type == 'mystery':
             seed = await mystery.generate_random_game(weightset=WEEKDATA[week]['weightset'], spoilers="mystery", tournament=True)
         elif game_type == 'spoiler':
-            seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[week]['preset'])
+            seed, _, spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[week]['preset'])
 
         embed = await seed.embed(
             name=f"Practice - {friendly_name}",
@@ -129,8 +129,8 @@ async def update_division(ctx, division, pendant_roles):
                                 'discord_id': team_member.id,
                                 'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
                             }
-                        ) as resp:
-                            data = resp.json()
+                        ) as _:
+                            pass
                 else:
                     print(
                         f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")

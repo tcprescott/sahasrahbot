@@ -7,7 +7,6 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
-from alttprbot.util import orm
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import start_racetime

@@ -14,7 +14,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def begin(self):
         self.state['locked'] = False
-        
+
     async def race_data(self, data):
         self.data = data.get('race')
 
@@ -80,5 +80,5 @@ class SahasrahBotCoreHandler(RaceHandler):
                 'Seed rolling is locked in this room.  Only the creator of this room, a race monitor, or a moderator can roll.'
             )
             return True
-        
+
         return False

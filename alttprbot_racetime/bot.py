@@ -6,11 +6,10 @@ import sys
 from functools import partial
 
 import aiohttp
-import requests
 from config import Config as c
 from racetime_bot import Bot
 
-from . import handlers
+from . import handlers # pylint: disable=unused-import
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -66,13 +65,11 @@ class SahasrahBotRaceTimeBot(Bot):
 
 def start_racetime(loop):
     for bot in racetime_bots.values():
-        print(f'starting {bot}')
         loop.create_task(bot.start())
 
 
 racetime_bots = {}
 for slug in RACETIME_GAMES:
-    print(f'creating {slug}')
     racetime_bots[slug] = SahasrahBotRaceTimeBot(
         category_slug=slug,
         client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),

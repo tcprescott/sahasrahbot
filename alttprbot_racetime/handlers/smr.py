@@ -19,7 +19,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
-            seed, preset_dict = await preset.get_preset(preset_name, randomizer='sm', spoilers="off")
+            seed, _ = await preset.get_preset(preset_name, randomizer='sm', spoilers="off")
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))
             return

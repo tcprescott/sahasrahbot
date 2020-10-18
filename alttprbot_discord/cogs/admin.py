@@ -1,4 +1,3 @@
-import aiocache
 from discord.ext import commands
 
 from alttprbot.database import config

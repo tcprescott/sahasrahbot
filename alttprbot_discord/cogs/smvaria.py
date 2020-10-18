@@ -1,10 +1,7 @@
-import asyncio
-
 from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.smvaria import generate_preset
-from ..util import checks
 
 
 class SuperMetroidVaria(commands.Cog):
