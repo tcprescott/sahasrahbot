@@ -131,7 +131,7 @@ class SettingsSheet():
 
     async def _init(self):
         self.agc = await self.agcm.authorize()
-        self.wb = await self.agc.open_by_key('1K3_Eccv8fG-ZPXhbX4J6bNV-9sQf9_IiJzl6ycvPtGE')
+        self.wb = await self.agc.open_by_key('1ZDlb_d2jdYqvRf9p_HPMjtKw9hOF3xeu9028eu8Df5A')
         self.wks = await self.wb.get_worksheet(0)
 
         self.headers = await self.wks.row_values(1)
@@ -142,7 +142,7 @@ class SettingsSheet():
                 self.row = row
                 return row
         raise SettingsSubmissionNotFoundException(
-            'Settings submission not found at <https://docs.google.com/spreadsheets/d/1K3_Eccv8fG-ZPXhbX4J6bNV-9sQf9_IiJzl6ycvPtGE/edit#gid=1883794426>.  Please submit settings.')
+            'Settings submission not found at <https://docs.google.com/spreadsheets/d/1ZDlb_d2jdYqvRf9p_HPMjtKw9hOF3xeu9028eu8Df5A/edit#gid=1883794426>.  Please submit settings.')
 
     async def write_gen_date(self):
         date_gen_column = self.headers.index('Date Generated')+1
@@ -159,18 +159,10 @@ class SettingsSheet():
         goal = random.choice(['dungeons', 'ganon', 'fast_ganon']) if self.row['Goal'] == 'Random' else SETTINGSMAP[self.row['Goal']]
         world_state = random.choice(['open', 'standard', 'inverted']) if self.row['World State'] == 'Random' else SETTINGSMAP[self.row['World State']]
         swords = random.choice(['assured','randomized', 'vanilla', 'swordless']) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
-        enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [50, 16, 16, 16]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
-        dungeon_items = random.choice(['standard', 'mc', 'mcs', 'full']) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
+        enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [40, 20, 20, 20]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
+        dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [40, 20, 20, 20]) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
         item_pool = random.choice(['normal', 'hard']) if self.row['Item Pool'] == 'Random' else SETTINGSMAP[self.row['Item Pool']]
 
-        boss_shuffle = 'none'
-        enemy_shuffle = 'none'
-
-        if enemizer in ['enemies', 'full_enemizer']:
-            enemy_shuffle = 'shuffled'
-
-        if enemizer in ['bosses', 'full_enemizer']:
-            boss_shuffle = 'full'
 
         return {
             "allow_quickswap": True,
@@ -195,8 +187,8 @@ class SettingsSheet():
             "spoilers": "off",
             "lang": "en",
             "enemizer": {
-                    "boss_shuffle": boss_shuffle,
-                    "enemy_shuffle": enemy_shuffle,
+                    "boss_shuffle": "full" if enemizer in ["bosses", "full_enemizer"] else "none",
+                    "enemy_shuffle": "shuffled" if enemizer in ["enemies", "full_enemizer"] else "none",
                     "enemy_damage": "default",
                     "enemy_health": "default"
             }
@@ -385,7 +377,7 @@ async def process_league_race(handler, episodeid, week=None):
     goal = f"ALTTPR League - {' vs. '.join(t)} - {generated_league_race.friendly_name}"
 
 
-    await handler.set_raceinfo(goal, overwrite=True)
+    await handler.set_raceinfo(f"{goal} - ({'/'.join(generated_league_race.seed.code)})", overwrite=True)
 
     embed = await generated_league_race.seed.embed(
         name=goal,
