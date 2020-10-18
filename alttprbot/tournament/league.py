@@ -464,7 +464,7 @@ async def process_league_race_start(handler):
         return
 
     if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
-        await aiohttp.request(
+        async with aiohttp.request(
             method='get',
             url='https://alttprleague.com/json_ep/submit-game',
             params={
@@ -472,7 +472,8 @@ async def process_league_race_start(handler):
                 'sgl': race['episode_id'],
                 'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
             }
-        )
+        ) as resp:
+            pass
     else:
         print(f"Would have reported match {race_id} for episode {race['episode_id']}")
 
