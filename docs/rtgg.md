@@ -103,7 +103,7 @@ Generate a seed using the Super Metroid VARIA Randomizer at https://randommetroi
 
 First argument is the settings preset, and the second argument is the skills preset.  Lists of both presets can be found on the randomizer's website.
 
-Example `!totalrace default regular`
+Example `!variarace default regular`
 
 **This is currently broken and will not function.**  There's no ETA on a fix.
 
