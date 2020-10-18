@@ -43,10 +43,9 @@ class SahasrahBotRaceTimeBot(Bot):
             del self.handlers[task_name]
 
         async with aiohttp.request(
-            method='get',
-            url=self.http_uri(f'{room_name}/data'),
-            raise_for_status=True
-        ) as resp:
+                method='get',
+                url=self.http_uri(f'{room_name}/data'),
+                raise_for_status=True) as resp:
             race_data = json.loads(await resp.read())
 
         handler = self.create_handler(race_data)
