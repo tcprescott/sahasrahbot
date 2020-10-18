@@ -269,11 +269,11 @@ class LeagueRace():
         self.episode = await speedgaming.get_episode(self.episodeid)
 
         for player in self.episode['match1']['players']:
-            looked_up_player = None
-
             # first try a more concrete match of using the discord id cached by SG
-            if not player.get('discordId', '') == '':
+            try:
                 looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=self.guild, name_type='discord_id')
+            except ValueError:
+                looked_up_player = None
 
             # then, if that doesn't work, try their discord tag kept by SG
             if looked_up_player is None:
