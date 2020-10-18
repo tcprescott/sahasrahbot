@@ -221,7 +221,8 @@ class LeaguePlayer():
             url='https://alttprleague.com/json_ep/player/',
             params={
                 name_type: name,
-            }
+            },
+            raise_for_status=True
         ) as resp:
             r = await resp.json()
             players = r['results']
@@ -269,7 +270,7 @@ class LeagueRace():
 
         for player in self.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
-            looked_up_player = await LeaguePlayer.construct(name=player['discordId'], guild=self.guild, name_type='discord_id')
+            looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=self.guild, name_type='discord_id')
 
             # then, if that doesn't work, try their discord tag kept by SG
             if looked_up_player is None:
