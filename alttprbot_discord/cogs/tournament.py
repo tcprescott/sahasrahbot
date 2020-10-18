@@ -7,7 +7,6 @@ from alttprbot.util import speedgaming
 from alttprbot.alttprgen.mystery import generate_random_game
 from alttprbot.alttprgen.preset import generate_preset, fetch_preset
 
-from ..util import checks
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future

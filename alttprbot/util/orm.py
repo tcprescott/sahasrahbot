@@ -24,11 +24,15 @@ async def create_pool(loop):
     )
 
 
-async def select(sql, args=[], size=None):
+async def select(sql, args=None, size=None):
     global __pool
     if __pool is None:
         loop = asyncio.get_event_loop()
         await create_pool(loop)
+
+    if args is None:
+        args = []
+
     with (await __pool) as conn:
         cur = await conn.cursor(aiomysql.DictCursor)
         await cur.execute(sql.replace('?', '%s'), args or ())
@@ -40,11 +44,15 @@ async def select(sql, args=[], size=None):
         return rs
 
 
-async def execute(sql, args=[]):
+async def execute(sql, args=None):
     global __pool
     if __pool is None:
         loop = asyncio.get_event_loop()
         await create_pool(loop)
+
+    if args is None:
+        args = []
+
     with (await __pool) as conn:
         try:
             cur = await conn.cursor()

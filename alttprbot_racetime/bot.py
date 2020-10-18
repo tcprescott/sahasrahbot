@@ -9,7 +9,7 @@ import aiohttp
 from config import Config as c
 from racetime_bot import Bot
 
-from . import handlers # pylint: disable=unused-import
+from . import handlers
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -75,5 +75,5 @@ for slug in RACETIME_GAMES:
         client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
         client_secret=os.environ.get(f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
         logger=logger,
-        handler_class=eval(f"handlers.{slug}.GameHandler")  # pylint: disable=eval-used
+        handler_class=getattr(handlers, slug).GameHandler
     )

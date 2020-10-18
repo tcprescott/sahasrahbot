@@ -316,7 +316,6 @@ class LeagueRace():
                 self.preset = WEEKDATA[self.week]['preset']
                 self.studyperiod = WEEKDATA[self.week]['studyperiod']
                 self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
-                
             else:
                 raise SahasrahBotException(
                     'Week type not found, something went horribly wrong...')
@@ -463,7 +462,7 @@ async def process_league_race_start(handler):
                 'sgl': race['episode_id'],
                 'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
             }
-        ) as resp:
+        ) as _:
             pass
     else:
         print(f"Would have reported match {race_id} for episode {race['episode_id']}")

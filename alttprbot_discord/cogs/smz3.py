@@ -47,7 +47,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def race(self, ctx, preset):
-        seed, preset_dict = await get_preset(preset, randomizer='smz3', tournament=True)
+        seed, _ = await get_preset(preset, randomizer='smz3', tournament=True)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
@@ -59,7 +59,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def norace(self, ctx, preset):
-        seed, preset_dict = await get_preset(preset, randomizer='smz3', tournament=False)
+        seed, _ = await get_preset(preset, randomizer='smz3', tournament=False)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
@@ -87,7 +87,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_race(self, ctx, preset):
-        seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=True)
+        seed, _ = await get_preset(preset, randomizer='sm', tournament=True)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
@@ -100,7 +100,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_norace(self, ctx, preset):
-        seed, preset_dict = await get_preset(preset, randomizer='sm', tournament=False)
+        seed, _ = await get_preset(preset, randomizer='sm', tournament=False)
         await ctx.send((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'

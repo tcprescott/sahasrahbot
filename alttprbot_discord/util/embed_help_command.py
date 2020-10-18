@@ -1,10 +1,9 @@
-from discord.ext import commands
 import discord
 
 # From https://gist.github.com/Rapptz/31a346ed1eb545ddeb0d451d81a60b3b
 
 
-class EmbedHelpCommand(commands.HelpCommand):
+class EmbedHelpCommand(discord.ext.commands.HelpCommand):
     """This is an example of a HelpCommand that utilizes embeds.
     It's pretty basic but it lacks some nuances that people might expect.
     1. It breaks if you have more than 25 cogs or more than 25 subcommands. (Most people don't reach this)
@@ -22,7 +21,7 @@ class EmbedHelpCommand(commands.HelpCommand):
     def get_ending_note(self):
         return 'Use {0}{1} [command] for more info on a command.'.format(self.clean_prefix, self.invoked_with)
 
-    def get_command_signature(self, command):
+    def get_command_signature(self, command): # pylint: disable=no-self-use
         return '{0.qualified_name} {0.signature}'.format(command)
 
     async def send_bot_help(self, mapping):
@@ -66,7 +65,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         if group.help:
             embed.description = group.help
 
-        if isinstance(group, commands.Group):
+        if isinstance(group, discord.ext.commands.Group):
             filtered = await self.filter_commands(group.commands, sort=True)
             for command in filtered:
                 embed.add_field(name=f'{self.clean_prefix}{self.get_command_signature(command)}',
