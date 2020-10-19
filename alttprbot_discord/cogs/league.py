@@ -6,6 +6,7 @@ import aiohttp
 from alttprbot.database import config, srlnick
 from alttprbot.tournament.league import WEEKDATA, create_league_race_room
 from alttprbot.alttprgen import mystery, preset, spoilers
+from alttprbot.util import speedgaming
 from config import Config as c  # pylint: disable=no-name-in-module
 from discord.ext import commands
 
@@ -97,6 +98,13 @@ class League(commands.Cog):
         for division in roster['divisions']:
             await update_division(ctx, division=division, pendant_roles=pendant_roles)
 
+    @commands.command()
+    @restrict_league_server()
+    @commands.is_owner()
+    async def leaguetestschedule(self, ctx):
+        sg_schedule = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.5)
+        import json
+        print(json.dumps(sg_schedule))
 
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")

@@ -1,14 +1,12 @@
-import datetime
 import json
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import aiofiles
+import aiohttp
 import pytz
 
 from alttprbot.exceptions import SahasrahBotException
-from config import Config as c
-
-from . import http
+from config import Config as c  # pylint: disable=no-name-in-module
 
 
 class SGEpisodeNotFoundException(SahasrahBotException):
@@ -16,7 +14,7 @@ class SGEpisodeNotFoundException(SahasrahBotException):
 
 
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
-    now = datetime.datetime.now(tz=pytz.timezone('US/Eastern'))
+    now = datetime.now(tz=pytz.timezone('US/Eastern'))
     sched_from = now - timedelta(hours=hours_past)
     sched_to = now + timedelta(hours=hours_future)
     params = {
@@ -24,8 +22,13 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         'from': sched_from.isoformat(),
         'to': sched_to.isoformat()
     }
-    result = await http.request_generic(f'{c.SgApiEndpoint}/schedule', reqparams=params, returntype='json')
-    return result
+    async with aiohttp.request(
+        method='get',
+        url=f'{c.SgApiEndpoint}/schedule',
+        params=params,
+    ) as resp:
+        print(resp.url)
+        return await resp.json(content_type='text/html')
 
 
 async def get_episode(episodeid: int, complete=False):
@@ -43,9 +46,19 @@ async def get_episode(episodeid: int, complete=False):
         elif episodeid == 0:
             result = {"error": "Failed to find episode with id 0."}
         else:
-            result = await http.request_generic(f'{c.SgApiEndpoint}/episode', reqparams={'id': episodeid}, returntype='json')
+            async with aiohttp.request(
+                method='get',
+                url=f'{c.SgApiEndpoint}/episode',
+                params={'id': episodeid},
+            ) as resp:
+                result = await resp.json(content_type='text/html')
     else:
-        result = await http.request_generic(f'{c.SgApiEndpoint}/episode', reqparams={'id': episodeid}, returntype='json')
+        async with aiohttp.request(
+            method='get',
+            url=f'{c.SgApiEndpoint}/episode',
+            params={'id': episodeid},
+        ) as resp:
+            result = await resp.json(content_type='text/html')
 
     if 'error' in result:
         raise SGEpisodeNotFoundException(result["error"])
