@@ -50,14 +50,12 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(preset_name='openboots', message=message, allow_quickswap=True)
 
     async def ex_leaguerace(self, args, message):
-        if self.seed_rolled:
-            await self.send_message(
-                'I already rolled a seed!'
-            )
+        if await self.is_locked(message):
             return
+
         await league.process_league_race(
             handler=self,
-            episodeid=args[0],
+            episodeid=args[0] if len(args) >= 1 else None,
             week=args[1] if len(args) == 2 else None
         )
 
@@ -127,7 +125,7 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_cancel(self, args, message):
         self.seed_rolled = False
         await self.set_raceinfo("New Race", overwrite=True)
-        await tournament_results.delete_active_touranment_race(self.data.get('name'))
+        await tournament_results.delete_active_tournament_race(self.data.get('name'))
         await spoiler_races.delete_spoiler_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
 

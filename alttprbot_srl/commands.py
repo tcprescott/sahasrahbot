@@ -170,7 +170,7 @@ async def handler(target, source, message, client):
         srl_id = srl_race_id(target)
         await srl_races.delete_srl_race(srl_id)
         await spoiler_races.delete_spoiler_race(srl_id)
-        await tournament_results.delete_active_touranment_race(srl_id)
+        await tournament_results.delete_active_tournament_race(srl_id)
         await client.message(target, "Current race cancelled.")
         await client.message(target, f".setgoal new race")
 

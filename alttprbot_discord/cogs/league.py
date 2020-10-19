@@ -4,7 +4,7 @@ import os
 
 import aiohttp
 from alttprbot.database import config, srlnick
-from alttprbot.tournament.league import WEEKDATA
+from alttprbot.tournament.league import WEEKDATA, create_league_race_room
 from alttprbot.alttprgen import mystery, preset, spoilers
 from config import Config as c  # pylint: disable=no-name-in-module
 from discord.ext import commands
@@ -35,6 +35,14 @@ class League(commands.Cog):
     async def setleagueweek(self, ctx, week):
         guildid = ctx.guild.id if ctx.guild else 0
         await config.set_parameter(guildid, 'AlttprLeagueWeek', week)
+
+    @commands.command(
+        help='Create League RT.gg Race Room.'
+    )
+    @commands.has_any_role('Admin', 'Mods', 'Bot Overlord')
+    @restrict_league_server()
+    async def leaguecreate(self, ctx, episodeid: int):
+        await create_league_race_room(episodeid)
 
     @commands.command(
         help='Get the league week.'

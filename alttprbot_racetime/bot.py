@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -6,10 +7,15 @@ import sys
 from functools import partial
 
 import aiohttp
+from alttprbot.exceptions import SahasrahBotException
+from bs4 import BeautifulSoup
 from config import Config as c
 from racetime_bot import Bot
 
 from . import handlers
+
+RTGG_SESSION_TOKEN = os.environ.get('RACETIME_SESSION_TOKEN')
+RTGG_BASE_URL = os.environ.get('RACETIME_BASE_URL', 'https://racetime.gg')
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -53,10 +59,63 @@ class SahasrahBotRaceTimeBot(Bot):
         self.handlers[name] = self.loop.create_task(handler.handle())
         self.handlers[name].add_done_callback(partial(done, name))
 
-        return race_data
+        count = 0
+        while handler.ws is None:
+            await asyncio.sleep(1)
+            count += 1
+            if count > 30:
+                raise Exception("Bot took too long to establish connection with room websocket.")
+
+        return handler
 
     def get_handler_class(self):
         return self.handler_class
+
+    async def create_race(self, config):
+        try:
+            async with aiohttp.request(
+                method='get',
+                url=f'{RTGG_BASE_URL}/{self.category_slug}/startrace',
+                cookies={'sessionid': RTGG_SESSION_TOKEN},
+                raise_for_status=True
+            ) as resp:
+                soup = BeautifulSoup(await resp.text(), features="html5lib")
+                cookies = resp.cookies
+        except:
+            raise SahasrahBotException(
+                "Unable to acquire CSRF token.  Please contact Synack for help.")
+
+        csrftoken = soup.find('input', {'name': 'csrfmiddlewaretoken'})['value']
+
+        config['csrfmiddlewaretoken'] = csrftoken
+        config['recordable'] = True
+
+        cookies['sessionid'] = RTGG_SESSION_TOKEN
+
+        try:
+            async with aiohttp.request(
+                method='post',
+                url=f'{RTGG_BASE_URL}/{self.category_slug}/startrace',
+                cookies=cookies,
+                headers={'Origin': RTGG_BASE_URL,
+                        'Referer': f'{RTGG_BASE_URL}/{self.category_slug}/startrace'},
+                allow_redirects=False,
+                raise_for_status=True,
+                data=config
+            ) as resp:
+                print(await resp.text())
+                if resp.status == 302:
+                    room_path = resp.headers['Location']
+        except:
+            # raise SahasrahBotException(
+            #     "Unable to create the race room.  Please contact Synack for help.")
+            print(await resp.text())
+            raise
+
+        race_handler = await self.create_handler_by_room_name(room_path)
+
+        return race_handler
+
 
     async def start(self):
         self.loop.create_task(self.reauthorize())

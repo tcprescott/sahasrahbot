@@ -5,16 +5,17 @@ import random
 import aiohttp
 import discord
 import gspread_asyncio
+from oauth2client.service_account import ServiceAccountCredentials
+from pytz import timezone
+
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, tournament_results,
                                 twitch_command_text)
 from alttprbot.exceptions import SahasrahBotException
-# from alttprbot.util import srl
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
+from alttprbot_racetime.bot import racetime_bots
 from config import Config as c  # pylint: disable=no-name-in-module
-from oauth2client.service_account import ServiceAccountCredentials
-from pytz import timezone
 
 from ..util import speedgaming
 
@@ -157,7 +158,7 @@ class SettingsSheet():
     def settings(self):
         goal = random.choice(['dungeons', 'ganon', 'fast_ganon']) if self.row['Goal'] == 'Random' else SETTINGSMAP[self.row['Goal']]
         world_state = random.choice(['open', 'standard', 'inverted']) if self.row['World State'] == 'Random' else SETTINGSMAP[self.row['World State']]
-        swords = random.choice(['assured','randomized', 'vanilla', 'swordless']) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
+        swords = random.choice(['assured', 'randomized', 'vanilla', 'swordless']) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
         enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [40, 20, 20, 20]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
         dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [40, 20, 20, 20]) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
         item_pool = random.choice(['normal', 'hard']) if self.row['Item Pool'] == 'Random' else SETTINGSMAP[self.row['Item Pool']]
@@ -194,10 +195,10 @@ class SettingsSheet():
         }
 
 
-async def league_race(episodeid: int, week=None):
-    race = LeagueRace(episodeid, week)
-    await race._init()
-    return race
+# async def league_race(episodeid: int, week=None):
+#     race = LeagueRace(episodeid, week)
+#     await race._init()
+#     return race
 
 class LeaguePlayer():
     def __init__(self):
@@ -242,83 +243,127 @@ class LeaguePlayer():
         return playerobj
 
 class LeagueRace():
-    def __init__(self, episodeid: int, week=None):
+    def __init__(self, episodeid: int, week=None, create_seed=True):
         self.episodeid = int(episodeid)
         self.week = week
+        self.create_seed = create_seed
         self.players = []
 
-    async def _init(self):
+    @classmethod
+    async def construct(cls, episodeid, week=None, create_seed=True):
+        league_race = cls(episodeid, week, create_seed)
         guild_id = await config.get(0, 'AlttprLeagueServer')
-        self.guild = discordbot.get_guild(int(guild_id))
+        league_race.guild = discordbot.get_guild(int(guild_id))
 
-        if self.week is None:
-            self.week = await config.get(guild_id, 'AlttprLeagueWeek')
+        if league_race.week is None:
+            league_race.week = await config.get(guild_id, 'AlttprLeagueWeek')
 
-        if self.week not in WEEKDATA and not self.week == 'playoffs':
-            raise WeekNotFoundException(f'Week {self.week} was not found!')
+        if league_race.week not in WEEKDATA and not league_race.week == 'playoffs':
+            raise WeekNotFoundException(f'Week {league_race.week} was not found!')
 
-        self.episode = await speedgaming.get_episode(self.episodeid)
+        league_race.episode = await speedgaming.get_episode(league_race.episodeid)
 
-        for player in self.episode['match1']['players']:
+        for player in league_race.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
             try:
-                looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=self.guild, name_type='discord_id')
+                looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=league_race.guild, name_type='discord_id')
             except ValueError:
                 looked_up_player = None
 
             # then, if that doesn't work, try their discord tag kept by SG
-            if looked_up_player is None:
-                looked_up_player = await LeaguePlayer.construct(name=player['discordTag'], guild=self.guild, name_type='discord')
+            if looked_up_player is None and not player['discordTag'] == '':
+                looked_up_player = await LeaguePlayer.construct(name=player['discordTag'], guild=league_race.guild, name_type='discord')
 
             # then, if that doesn't work, try their streamingFrom name
-            if looked_up_player is None:
-                looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=self.guild, name_type='twitch')
+            if looked_up_player is None and not player['streamingFrom'] == '':
+                looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=league_race.guild, name_type='twitch')
 
             # finally, try publicStream
-            if looked_up_player is None:
-                looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=self.guild, name_type='twitch')
+            if looked_up_player is None and not player['publicStream'] == '':
+                looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=league_race.guild, name_type='twitch')
 
             # and failing all that, bomb
             if looked_up_player is None:
                 raise Exception(f"Unable to lookup {player['displayName']}")
 
-            self.players.append(looked_up_player)
+            league_race.players.append(looked_up_player)
 
-        if self.week == 'playoffs':
-            self.sheet_settings = await settings_sheet(self.episodeid)
-            self.type = PLAYOFFDATA[self.sheet_settings.row['Game Number']]['type']
-            self.friendly_name = PLAYOFFDATA[self.sheet_settings.row['Game Number']
-                                             ]['friendly_name']
-            self.spoiler_log_url = None
-
-            if self.type == 'preset':
-                self.preset = PLAYOFFDATA[self.sheet_settings.row['Game Number']]['preset']
-                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
-            elif self.type == 'gsheet':
-                self.preset = None
-                self.preset_dict = None
-                self.seed = await alttpr_discord.alttpr(
-                    settings=self.sheet_settings.settings
-                )
-            await self.sheet_settings.write_gen_date()
-        else:
-            self.type = WEEKDATA[self.week]['type']
-            self.friendly_name = WEEKDATA[self.week]['friendly_name']
-            self.spoiler_log_url = None
-
-            if self.type == 'preset':
-                self.preset = WEEKDATA[self.week]['preset']
-                self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
-            elif self.type == 'mystery':
-                self.weightset = WEEKDATA[self.week]['weightset']
-                self.seed = await mystery.generate_random_game(weightset=self.weightset, spoilers="mystery", tournament=True)
-            elif self.type == 'spoiler':
-                self.preset = WEEKDATA[self.week]['preset']
-                self.studyperiod = WEEKDATA[self.week]['studyperiod']
-                self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
+        if league_race.create_seed:
+            if league_race.is_playoff:
+                await league_race._roll_playoffs()
             else:
-                raise SahasrahBotException(
-                    'Week type not found, something went horribly wrong...')
+                await league_race._roll_general()
+
+        return league_race
+
+    async def _roll_playoffs(self):
+        self.sheet_settings = await settings_sheet(self.episodeid)
+        self.spoiler_log_url = None
+
+        if self.gen_type == 'preset':
+            self.preset = PLAYOFFDATA[self.sheet_settings.row['Game Number']]['preset']
+            self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
+        elif self.gen_type == 'gsheet':
+            self.preset = None
+            self.preset_dict = None
+            self.seed = await alttpr_discord.alttpr(
+                settings=self.sheet_settings.settings
+            )
+        await self.sheet_settings.write_gen_date()
+
+    async def _roll_general(self):
+        self.spoiler_log_url = None
+
+        if self.gen_type == 'preset':
+            self.preset = WEEKDATA[self.week]['preset']
+            self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
+        elif self.gen_type == 'mystery':
+            self.weightset = WEEKDATA[self.week]['weightset']
+            self.seed = await mystery.generate_random_game(weightset=self.weightset, spoilers="mystery", tournament=True)
+        elif self.gen_type == 'spoiler':
+            self.preset = WEEKDATA[self.week]['preset']
+            self.studyperiod = WEEKDATA[self.week]['studyperiod']
+            self.seed, self.preset_dict, self.spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[self.week]['preset'])
+        else:
+            raise SahasrahBotException(
+                'Week type not found, something went horribly wrong...')
+
+    @property
+    def is_playoff(self):
+        return self.week == 'playoffs'
+
+    @property
+    def friendly_name(self):
+        if self.is_playoff:
+            return PLAYOFFDATA[self.sheet_settings.row['Game Number']]['friendly_name']
+
+        return WEEKDATA[self.week]['friendly_name']
+
+    @property
+    def gen_type(self):
+        if self.is_playoff:
+            return PLAYOFFDATA[self.sheet_settings.row['Game Number']]['type']
+
+        return WEEKDATA[self.week]['type']
+
+    @property
+    def coop(self):
+        if self.week == 'playoffs':
+            return False
+
+        return WEEKDATA[self.week].get('coop', False)
+
+    @property
+    def versus(self):
+        t = []
+        for team in self.players_by_team:
+            t.append(' and '.join([p.data['name'] for p in self.players_by_team[team]]))
+
+        return ' vs. '.join(t)
+
+    @property
+    def team_versus(self):
+        return ' vs. '.join(self.team_names)
 
     @property
     def player_discords(self):
@@ -352,49 +397,55 @@ class LeagueRace():
         if self.week == 'playoffs':
             return f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {self.sheet_settings.row['Game Number']} of this series."
 
-        if self.type == 'preset':
+        if self.gen_type == 'preset':
             return f"The preset for this race is {self.preset}."
 
-        if self.type == 'spoiler':
+        if self.gen_type == 'spoiler':
             return f"This is a {self.preset} spoiler race."
 
-        if self.type == 'mystery':
+        if self.gen_type == 'mystery':
             return f"The weightset for this race is {self.weightset}."
 
 
-async def process_league_race(handler, episodeid, week=None):
+async def process_league_race(handler, episodeid=None, week=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
-    generated_league_race = await league_race(episodeid=episodeid, week=week)
-    teams = generated_league_race.players_by_team
+    race = await tournament_results.get_active_tournament_race(handler.data.get('name'))
+    if race:
+        episodeid = race.get('episode_id')
+    if race is None and episodeid is None:
+        await handler.send_message("Please provide an SG episode ID.")
+        return
+
+    league_race = await LeagueRace.construct(episodeid=episodeid, week=week)
+    teams = league_race.players_by_team
 
     t = []
     for team in teams:
         t.append(' and '.join([p.data['name'] for p in teams[team]]))
 
-    goal = f"ALTTPR League - {' vs. '.join(t)} - {generated_league_race.friendly_name}"
+    goal = f"ALTTPR League - {league_race.versus} - {league_race.team_versus} - {league_race.friendly_name}"
 
+    await handler.set_raceinfo(f"{goal} - ({'/'.join(league_race.seed.code)})", overwrite=True)
 
-    await handler.set_raceinfo(f"{goal} - ({'/'.join(generated_league_race.seed.code)})", overwrite=True)
-
-    embed = await generated_league_race.seed.embed(
+    embed = await league_race.seed.embed(
         name=goal,
-        notes=' vs. '.join(generated_league_race.team_names),
+        notes=league_race.team_versus,
         emojis=discordbot.emojis
     )
 
-    tournament_embed = await generated_league_race.seed.tournament_embed(
+    tournament_embed = await league_race.seed.tournament_embed(
         name=goal,
-        notes=' vs. '.join(generated_league_race.team_names),
+        notes=league_race.team_versus,
         emojis=discordbot.emojis
     )
 
     broadcast_channels = [
-        a['name'] for a in generated_league_race.episode['channels'] if not " " in a['name']]
+        a['name'] for a in league_race.episode['channels'] if not " " in a['name']]
 
     if len(broadcast_channels) > 0:
-        twitch_mode_text = generated_league_race.twitch_mode_command
-        twitch_teams_text = f"This race is between {' vs. '.join(generated_league_race.team_names)}.  Check out rankings for division(s) {', '.join(generated_league_race.division_names)} at {' '.join(generated_league_race.division_urls)}"
+        twitch_mode_text = league_race.twitch_mode_command
+        twitch_teams_text = f"This race is between {league_race.team_versus}.  Check out rankings for division(s) {', '.join(league_race.division_names)} at {' '.join(league_race.division_urls)}"
 
         for channel in broadcast_channels:
             await twitch_command_text.insert_command_text(channel.lower(), "mode", twitch_mode_text)
@@ -405,17 +456,17 @@ async def process_league_race(handler, episodeid, week=None):
         embed.insert_field_at(
             0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
 
-    audit_channel_id = await config.get(generated_league_race.guild.id, 'AlttprLeagueAuditChannel')
+    audit_channel_id = await config.get(league_race.guild.id, 'AlttprLeagueAuditChannel')
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(int(audit_channel_id))
         await audit_channel.send(embed=embed)
 
-    commentary_channel_id = await config.get(generated_league_race.guild.id, 'AlttprLeagueCommentaryChannel')
+    commentary_channel_id = await config.get(league_race.guild.id, 'AlttprLeagueCommentaryChannel')
     if commentary_channel_id is not None and len(broadcast_channels) > 0:
         commentary_channel = discordbot.get_channel(int(commentary_channel_id))
         await commentary_channel.send(embed=tournament_embed)
 
-    for name, player in generated_league_race.player_discords:
+    for name, player in league_race.player_discords:
         if player is None:
             await audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True))
             await handler.send_message(f"Could not send DM to {name}.  Please contact a League Moderator for assistance.")
@@ -427,19 +478,27 @@ async def process_league_race(handler, episodeid, week=None):
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
                 await handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a League Moderator for assistance.")
 
-    if generated_league_race.type == 'spoiler':
-        await spoiler_races.insert_spoiler_race(handler.data.get('name'), generated_league_race.spoiler_log_url, generated_league_race.studyperiod)
+    if league_race.gen_type == 'spoiler':
+        await spoiler_races.insert_spoiler_race(handler.data.get('name'), league_race.spoiler_log_url, league_race.studyperiod)
 
-    await tournament_results.insert_tournament_race(
-        srl_id=handler.data.get('name'),
-        episode_id=generated_league_race.episodeid,
-        permalink=generated_league_race.seed.url,
-        event='alttprleague_s3',
-        week=generated_league_race.week,
-        spoiler=generated_league_race.spoiler_log_url if generated_league_race.spoiler_log_url else None
-    )
+    if race is None:
+        await tournament_results.insert_tournament_race(
+            srl_id=handler.data.get('name'),
+            episode_id=league_race.episodeid,
+            permalink=league_race.seed.url,
+            event='alttprleague_s3',
+            week=league_race.week,
+            spoiler=league_race.spoiler_log_url if league_race.spoiler_log_url else None
+        )
+    else:
+        await tournament_results.update_tournament_results_rolled(
+            srl_id=handler.data.get('name'),
+            permalink=league_race.seed.url,
+            week=league_race.week,
+        )
 
     await handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a League Moderator if you haven't received the DM.")
+    handler.seed_rolled = True
 
 
 async def process_league_race_start(handler):
@@ -469,7 +528,42 @@ async def process_league_race_start(handler):
 
     await tournament_results.update_tournament_results(race_id, status="STARTED")
 
+async def create_league_race_room(episodeid):
+    league_race = await LeagueRace.construct(episodeid=episodeid, create_seed=False)
+
+    handler = await racetime_bots['alttpr'].create_race(
+        config={
+            'goal': '' if league_race.coop else 2,
+            'custom_goal': 'Co-op Info Share' if league_race.coop else '',
+            'invitational': 'on',
+            'unlisted': 'off',
+            # 'info': f"ALTTPR League - {league_race.versus} - {league_race.team_versus}",
+            'info': "bot testing",
+            'start_delay': 15,
+            'time_limit': 24,
+            'streaming_required': 'on',
+            'allow_comments': 'on',
+            'allow_midrace_chat': 'on',
+            'allow_non_entrant_chat': 'off',
+            'chat_message_delay': 0})
+
+    print(handler.data.get('name'))
+    await handler.send_message('this is a custom message!  it worked :O')
+    await tournament_results.insert_tournament_race(
+        srl_id=handler.data.get('name'),
+        episode_id=league_race.episodeid,
+        event='alttprleague_s3'
+    )
+
+    for rtggid in [p.data['rtgg_id'] for p in league_race.players]:
+        await handler.invite_user(rtggid)
+
 def get_creds():
-    return ServiceAccountCredentials.from_json_keyfile_dict(c.gsheet_api_oauth,
-        ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive',
-            'https://www.googleapis.com/auth/spreadsheets'])
+    return ServiceAccountCredentials.from_json_keyfile_dict(
+        c.gsheet_api_oauth,
+        [
+            'https://spreadsheets.google.com/feeds',
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/spreadsheets'
+        ]
+    )
