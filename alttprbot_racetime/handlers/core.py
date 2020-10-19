@@ -82,3 +82,24 @@ class SahasrahBotCoreHandler(RaceHandler):
             return True
 
         return False
+
+    async def chat_message(self, data):
+        message = data.get('message', {})
+
+        if message.get('is_bot') or message.get('is_system'):
+            self.logger.info('Ignoring bot/system message.')
+            return
+
+        words = message.get('message', '').split(' ')
+        if words and words[0].startswith(self.command_prefix):
+            method = 'ex_' + words[0][len(self.command_prefix):]
+            args = words[1:]
+            if hasattr(self, method):
+                self.logger.info('[%(race)s] Calling handler for %(word)s' % {
+                    'race': self.data.get('name'),
+                    'word': words[0],
+                })
+                try:
+                    await getattr(self, method)(args, message)
+                except Exception as e:
+                    self.logger.error('Command raised exception.', exc_info=True)

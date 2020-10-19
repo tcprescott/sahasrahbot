@@ -10,7 +10,7 @@ from pytz import timezone
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, tournament_results,
-                                twitch_command_text)
+                                twitch_command_text, srlnick)
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
@@ -557,6 +557,31 @@ async def create_league_race_room(episodeid):
 
     for rtggid in [p.data['rtgg_id'] for p in league_race.players]:
         await handler.invite_user(rtggid)
+
+async def gatekeep_checker(handler, rtgg_user):
+    race = await tournament_results.get_active_tournament_race(handler.data.get('name'))
+    if race and race['event'] == 'alttprleague_s3':
+        guild_id = await config.get(0, 'AlttprLeagueServer')
+        guild = discordbot.get_guild(int(guild_id))
+        nicknames = srlnick.get_nicknames(rtgg_user['id'])
+
+        if not nicknames:
+            await handler.send_messaage('I was unable to lookup your discord tag.')
+            return
+
+        discord_user = guild.get_member(nicknames[0]['discord_user_id'])
+
+        if not discord_user:
+            await handler.send_messaage('I was unable to find you on the League discord server.')
+            return
+
+        if discord.utils.find(lambda m: m.name in ['Admin', 'Mods', 'Restream Mod', 'Crew Mod', 'Reporting Mod', 'SG Mods', 'Bot Overlord', 'Speedgaming', 'Restreamers'], discord_user.roles):
+            await handler.send_message(f"{rtgg_user['name']}, you are authorized.  Please accept request to join race.")
+            await handler.invite_user(rtgg_user['id'])
+            # await srlnick.insert_rtgg_id(discord_user.id, rtggid)
+            return
+
+        await handler.send_message('You do not have an authorized role on the League discord server.')
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(

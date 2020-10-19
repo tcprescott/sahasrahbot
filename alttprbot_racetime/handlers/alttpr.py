@@ -59,6 +59,13 @@ class GameHandler(SahasrahBotCoreHandler):
             week=args[1] if len(args) == 2 else None
         )
 
+    async def ex_leaguegatekeep(self, args, message):
+        await league.gatekeep_checker(
+            handler=self,
+            discord_tag=args[0],
+            rtggid=message['user']
+        )
+
     async def ex_quickswaprace(self, args, message):
         try:
             preset_name = args[0]

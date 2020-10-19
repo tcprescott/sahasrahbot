@@ -199,6 +199,7 @@ t_srlnick = Table(
     Column('discord_user_id', BIGINT(20), primary_key=True),
     Column('srl_nick', String(200), index=True),
     Column('twitch_name', String(200), index=True),
+    Column('rtgg_id', String(200), index=True),
     Column('srl_verified', BIT(1))
 )
 

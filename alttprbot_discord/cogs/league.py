@@ -126,6 +126,7 @@ async def update_division(ctx, division, pendant_roles):
                     continue
                 await team_member.add_roles(division_role, player_role, team_role, pendant_roles[pendant])
                 await srlnick.insert_twitch_name(team_member.id, team[pendant]['twitch_name'])
+                await srlnick.insert_rtgg_id(team_member.id, team[pendant]['rtgg_id'])
 
                 if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
                     if not team[pendant].get('discord_id', None) == team_member.id:
