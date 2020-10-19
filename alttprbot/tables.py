@@ -231,7 +231,7 @@ t_twitch_command_text = Table(
     Column('id', INTEGER(11), primary_key=True),
     Column('channel', String(200, 'utf8_bin')),
     Column('command', String(45, 'utf8_bin')),
-    Column('content', String(200, 'utf8_bin')),
+    Column('content', String(4000, 'utf8_bin')),
     Index('idx_twitch_command_text_channel_command',
           'channel', 'command', unique=True)
 )
