@@ -102,9 +102,9 @@ class League(commands.Cog):
     @restrict_league_server()
     @commands.is_owner()
     async def leaguetestschedule(self, ctx):
-        sg_schedule = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.5)
-        import json
-        print(json.dumps(sg_schedule))
+        episodes = await speedgaming.get_upcoming_episodes_by_event('test', hours_past=0, hours_future=.75)
+        for episode in episodes:
+            await create_league_race_room(episode['id'])
 
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")

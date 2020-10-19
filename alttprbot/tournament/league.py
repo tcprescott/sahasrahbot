@@ -208,11 +208,20 @@ class LeaguePlayer():
     async def construct(cls, name, guild, name_type='twitch'):
         playerobj = cls()
 
+        name_type_map = {
+            'twitch': 'twitch',
+            'discord': 'discord',
+            'display_name': 'discord',
+            'discord_id': 'discord_id',
+            'rtgg': 'rtgg_name',
+            'rtgg_id': 'rtgg_id',
+        }
+
         async with aiohttp.request(
             method='get',
             url='https://alttprleague.com/json_ep/player/',
             params={
-                name_type: name,
+                name_type_map[name_type]: name,
             },
             raise_for_status=True
         ) as resp:
@@ -226,6 +235,8 @@ class LeaguePlayer():
             player = [p for p in players if p['twitch_name'].lower() == name.lower()][0]
         elif name_type == 'discord':
             player = [p for p in players if p['discord'] == name][0]
+        elif name_type == 'display_name':
+            player = players[0]
         elif name_type == 'discord_id':
             player = [p for p in players if p['discord_id'] == name][0]
         elif name_type == 'rtgg':
@@ -265,27 +276,7 @@ class LeagueRace():
 
         for player in league_race.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
-            try:
-                looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=league_race.guild, name_type='discord_id')
-            except ValueError:
-                looked_up_player = None
-
-            # then, if that doesn't work, try their discord tag kept by SG
-            if looked_up_player is None and not player['discordTag'] == '':
-                looked_up_player = await LeaguePlayer.construct(name=player['discordTag'], guild=league_race.guild, name_type='discord')
-
-            # then, if that doesn't work, try their streamingFrom name
-            if looked_up_player is None and not player['streamingFrom'] == '':
-                looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=league_race.guild, name_type='twitch')
-
-            # finally, try publicStream
-            if looked_up_player is None and not player['publicStream'] == '':
-                looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=league_race.guild, name_type='twitch')
-
-            # and failing all that, bomb
-            if looked_up_player is None:
-                raise Exception(f"Unable to lookup {player['displayName']}")
-
+            looked_up_player = await league_race.make_league_player_from_sg(player)
             league_race.players.append(looked_up_player)
 
         if league_race.create_seed:
@@ -295,6 +286,35 @@ class LeagueRace():
                 await league_race._roll_general()
 
         return league_race
+
+
+    async def make_league_player_from_sg(self, player):
+        try:
+            looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=self.guild, name_type='discord_id')
+        except ValueError:
+            looked_up_player = None
+
+        # then, if that doesn't work, try their discord tag kept by SG
+        if looked_up_player is None and not player['discordTag'] == '':
+            looked_up_player = await LeaguePlayer.construct(name=player['discordTag'], guild=self.guild, name_type='discord')
+
+        # then, if that doesn't work, try their streamingFrom name
+        if looked_up_player is None and not player['streamingFrom'] == '':
+            looked_up_player = await LeaguePlayer.construct(name=player['streamingFrom'], guild=self.guild, name_type='twitch')
+
+        # finally, try publicStream
+        if looked_up_player is None and not player['publicStream'] == '':
+            looked_up_player = await LeaguePlayer.construct(name=player['publicStream'], guild=self.guild, name_type='twitch')
+
+        # a final hail mary pass
+        if looked_up_player is None and not player['displayName'] == '':
+            looked_up_player = await LeaguePlayer.construct(name=player['displayName'], guild=self.guild, name_type='display_name')
+
+        # and failing all that, bomb
+        if looked_up_player is None:
+            raise Exception(f"Unable to lookup {player['displayName']}")
+
+        return looked_up_player
 
     async def _roll_playoffs(self):
         self.sheet_settings = await settings_sheet(self.episodeid)
@@ -529,6 +549,10 @@ async def process_league_race_start(handler):
     await tournament_results.update_tournament_results(race_id, status="STARTED")
 
 async def create_league_race_room(episodeid):
+    race = await tournament_results.get_active_tournament_race_by_episodeid(episodeid)
+    if race:
+        return
+
     league_race = await LeagueRace.construct(episodeid=episodeid, create_seed=False)
 
     handler = await racetime_bots['alttpr'].create_race(
@@ -537,8 +561,7 @@ async def create_league_race_room(episodeid):
             'custom_goal': 'Co-op Info Share' if league_race.coop else '',
             'invitational': 'on',
             'unlisted': 'off',
-            # 'info': f"ALTTPR League - {league_race.versus} - {league_race.team_versus}",
-            'info': "bot testing",
+            'info': f"ALTTPR League - {league_race.versus} - {league_race.team_versus}",
             'start_delay': 15,
             'time_limit': 24,
             'streaming_required': 'on',
@@ -548,7 +571,7 @@ async def create_league_race_room(episodeid):
             'chat_message_delay': 0})
 
     print(handler.data.get('name'))
-    await handler.send_message('this is a custom message!  it worked :O')
+    await handler.send_message('This race room was automatically created by SahasrahBot.')
     await tournament_results.insert_tournament_race(
         srl_id=handler.data.get('name'),
         episode_id=league_race.episodeid,
@@ -557,6 +580,25 @@ async def create_league_race_room(episodeid):
 
     for rtggid in [p.data['rtgg_id'] for p in league_race.players]:
         await handler.invite_user(rtggid)
+
+    embed = discord.Embed(
+        title=f"RT.gg Room Opened - {league_race.versus} - {league_race.team_versus}",
+        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at https://racetime.gg{handler.data['url']}\n\nEnjoy!",
+        color=discord.Colour.blue(),
+        timestamp=datetime.datetime.now()
+    )
+
+    for name, player in league_race.player_discords:
+        if player is None:
+            print(f'Could not DM {name}')
+            continue
+        try:
+            await player.send(embed=embed)
+        except discord.HTTPException:
+            print(f'Could not send room opening DM to {name}')
+            continue
+
+    return handler.data
 
 async def gatekeep_checker(handler, rtgg_user):
     race = await tournament_results.get_active_tournament_race(handler.data.get('name'))

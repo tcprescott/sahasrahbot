@@ -49,6 +49,12 @@ async def get_active_tournament_race(srl_id: str):
         await CACHE.set(key, results)
     return results[0] if results else None
 
+async def get_active_tournament_race_by_episodeid(episode_id: str):
+    results = await orm.select(
+        'SELECT * from tournament_results where episode_id=%s;',
+        [episode_id]
+    )
+    return results[0] if results else None
 
 async def delete_active_tournament_race(srl_id: str):
     key = f'tournament_race_{srl_id}'
