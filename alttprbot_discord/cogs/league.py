@@ -45,6 +45,8 @@ class League(commands.Cog):
             print(episode['id'])
             await create_league_race_room(episode['id'])
 
+        print('done')
+
     @commands.command(
         help='Set the ALTTPR League Week.'
     )
