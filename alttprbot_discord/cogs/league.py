@@ -9,6 +9,7 @@ from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.util import speedgaming
 from config import Config as c  # pylint: disable=no-name-in-module
 from discord.ext import commands, tasks
+import discord
 
 from ..util import checks
 
@@ -94,6 +95,21 @@ class League(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.is_owner()
+    @restrict_league_server()
+    async def importleaguehelper(self, ctx, user: discord.Member, rtgg_tag):
+        async with aiohttp.request(method='get',
+                                   url='https://racetime.gg/user/search',
+                                   params={'term': rtgg_tag}) as resp:
+            results = await resp.json()
+
+        if len(results['results']) > 0:
+            for result in results['results']:
+                await srlnick.insert_rtgg_id(user.id, result['id'])
+        else:
+            await ctx.send("Could not map RT.gg tag")
+
+    @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     @restrict_league_server()
     async def importleagueroles(self, ctx):
@@ -110,6 +126,7 @@ class League(commands.Cog):
 
         for division in roster['divisions']:
             await update_division(ctx, division=division, pendant_roles=pendant_roles)
+
 
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")
