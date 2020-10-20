@@ -560,7 +560,6 @@ async def create_league_race_room(episodeid):
             'goal': '' if league_race.coop else 2,
             'custom_goal': 'Co-op Info Share' if league_race.coop else '',
             'invitational': 'on',
-            'unlisted': 'off',
             'info': f"ALTTPR League - {league_race.versus} - {league_race.team_versus}",
             'start_delay': 15,
             'time_limit': 24,
@@ -571,7 +570,7 @@ async def create_league_race_room(episodeid):
             'chat_message_delay': 0})
 
     print(handler.data.get('name'))
-    await handler.send_message('This race room was automatically created by SahasrahBot.')
+    await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll!')
     await tournament_results.insert_tournament_race(
         srl_id=handler.data.get('name'),
         episode_id=league_race.episodeid,
@@ -600,30 +599,29 @@ async def create_league_race_room(episodeid):
 
     return handler.data
 
-async def gatekeep_checker(handler, rtgg_user):
-    race = await tournament_results.get_active_tournament_race(handler.data.get('name'))
+async def is_league_race(name):
+    race = await tournament_results.get_active_tournament_race(name)
     if race and race['event'] == 'alttprleague_s3':
-        guild_id = await config.get(0, 'AlttprLeagueServer')
-        guild = discordbot.get_guild(int(guild_id))
-        nicknames = srlnick.get_nicknames(rtgg_user['id'])
+        return True
+    return False
 
-        if not nicknames:
-            await handler.send_messaage('I was unable to lookup your discord tag.')
-            return
+async def can_gatekeep(rtgg_id):
+    guild_id = await config.get(0, 'AlttprLeagueServer')
+    guild = discordbot.get_guild(int(guild_id))
+    nicknames = await srlnick.get_discord_id_by_rtgg(rtgg_id)
 
-        discord_user = guild.get_member(nicknames[0]['discord_user_id'])
+    if not nicknames:
+        return False
 
-        if not discord_user:
-            await handler.send_messaage('I was unable to find you on the League discord server.')
-            return
+    discord_user = guild.get_member(nicknames[0]['discord_user_id'])
 
-        if discord.utils.find(lambda m: m.name in ['Admin', 'Mods', 'Restream Mod', 'Crew Mod', 'Reporting Mod', 'SG Mods', 'Bot Overlord', 'Speedgaming', 'Restreamers'], discord_user.roles):
-            await handler.send_message(f"{rtgg_user['name']}, you are authorized.  Please accept request to join race.")
-            await handler.invite_user(rtgg_user['id'])
-            # await srlnick.insert_rtgg_id(discord_user.id, rtggid)
-            return
+    if not discord_user:
+        return False
 
-        await handler.send_message('You do not have an authorized role on the League discord server.')
+    if discord.utils.find(lambda m: m.name in ['Admin', 'Mods', 'Restream Mod', 'Crew Mod', 'Reporting Mod', 'SG Mods', 'Bot Overlord', 'Speedgaming', 'Restreamers'], discord_user.roles):
+        return True
+
+    return False
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(

@@ -8,7 +8,7 @@ from alttprbot.tournament.league import WEEKDATA, create_league_race_room
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.util import speedgaming
 from config import Config as c  # pylint: disable=no-name-in-module
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from ..util import checks
 
@@ -27,6 +27,19 @@ def restrict_league_server():
 class League(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        # if not c.DEBUG:
+        #     self.create_races.start()
+
+    @tasks.loop(minutes=5, reconnect=True)
+    async def create_races(self):
+        episodes_invite = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.75)
+        episodes_open = await speedgaming.get_upcoming_episodes_by_event('alttprleague', hours_past=0, hours_future=.75)
+
+        for episode in episodes_invite:
+            await create_league_race_room(episode['id'])
+
+        for episode in episodes_open:
+            await create_league_race_room(episode['id'])
 
     @commands.command(
         help='Set the ALTTPR League Week.'
@@ -97,14 +110,6 @@ class League(commands.Cog):
 
         for division in roster['divisions']:
             await update_division(ctx, division=division, pendant_roles=pendant_roles)
-
-    @commands.command()
-    @restrict_league_server()
-    @commands.is_owner()
-    async def leaguetestschedule(self, ctx):
-        episodes = await speedgaming.get_upcoming_episodes_by_event('test', hours_past=0, hours_future=.75)
-        for episode in episodes:
-            await create_league_race_room(episode['id'])
 
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")

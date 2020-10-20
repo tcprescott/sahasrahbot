@@ -18,6 +18,12 @@ class GameHandler(SahasrahBotCoreHandler):
         if self.data.get('status', {}).get('value') in ['open', 'invitational']:
             await self.intro()
 
+        pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
+        for entrant in pending_entrants:
+            if await league.can_gatekeep(entrant['user']['id']):
+                await self.accept_request(entrant['user']['id'])
+                await self.add_monitor(entrant['user']['id'])
+
     async def in_progress(self):
         await self.send_spoiler_log()
         await league.process_league_race_start(self)
@@ -59,12 +65,6 @@ class GameHandler(SahasrahBotCoreHandler):
             week=args[1] if len(args) == 2 else None
         )
 
-    async def ex_leaguegatekeep(self, args, message):
-        await league.gatekeep_checker(
-            handler=self,
-            discord_tag=args[0],
-            rtggid=message['user']
-        )
 
     async def ex_quickswaprace(self, args, message):
         try:
