@@ -38,10 +38,12 @@ class League(commands.Cog):
         episodes_open = await speedgaming.get_upcoming_episodes_by_event('alttprleague', hours_past=0, hours_future=.75)
 
         for episode in episodes_invite:
-            await create_league_race_room(episode['id'])
+            if episode.get('approved', True):
+                await create_league_race_room(episode['id'])
 
         for episode in episodes_open:
-            await create_league_race_room(episode['id'])
+            if episode.get('approved', True):
+                await create_league_race_room(episode['id'])
 
     @commands.command(
         help='Set the ALTTPR League Week.'
