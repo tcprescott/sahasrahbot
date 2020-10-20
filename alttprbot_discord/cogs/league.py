@@ -29,11 +29,12 @@ def restrict_league_server():
 class League(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # if not c.DEBUG:
-        #     self.create_races.start()
+        if not c.DEBUG:
+            self.create_races.start()
 
     @tasks.loop(minutes=5, reconnect=True)
     async def create_races(self):
+        print("scanning SG schedule for races to create")
         episodes_invite = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.75)
         episodes_open = await speedgaming.get_upcoming_episodes_by_event('alttprleague', hours_past=0, hours_future=.75)
 
