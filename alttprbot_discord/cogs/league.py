@@ -1,6 +1,8 @@
 import asyncio
 import os
 import random
+import traceback
+import logging
 
 import aiohttp
 import discord
@@ -32,20 +34,33 @@ class League(commands.Cog):
         if not c.DEBUG:
             self.create_races.start()
 
-    @tasks.loop(minutes=5, reconnect=True)
+    @tasks.loop(minutes=.25, reconnect=True)
     async def create_races(self):
         print("scanning SG schedule for races to create")
-        episodes_invite = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.75)
-        for episode in episodes_invite:
-            print(episode['id'])
-            await create_league_race_room(episode['id'])
+        try:
+            episodes_invite = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.75)
+            for episode in episodes_invite:
+                print(episode['id'])
+                await create_league_race_room(episode['id'])
 
-        episodes_open = await speedgaming.get_upcoming_episodes_by_event('alttprleague', hours_past=0, hours_future=.75)
-        for episode in episodes_open:
-            print(episode['id'])
-            await create_league_race_room(episode['id'])
+            episodes_open = await speedgaming.get_upcoming_episodes_by_event('alttprleague', hours_past=0, hours_future=.75)
+            for episode in episodes_open:
+                print(episode['id'])
+                await create_league_race_room(episode['id'])
+        except Exception as e:
+            logging.exception("Encountered a problem when attempting to create RT.gg race room.")
+            guild_id = await config.get(0, 'AlttprLeagueServer')
+            audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
+            audit_channel = self.bot.get_channel(int(audit_channel_id))
+            if audit_channel:
+                await audit_channel.send(f"<@185198185990324225> There was an error while automatically creating a race room:\n```{repr(e)}```")
 
         print('done')
+
+    @create_races.before_loop
+    async def before_printer(self):
+        print('create_races loop waiting...')
+        await self.bot.wait_until_ready()
 
     @commands.command(
         help='Set the ALTTPR League Week.'
