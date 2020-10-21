@@ -390,6 +390,14 @@ class LeagueRace():
         return ' vs. '.join(t)
 
     @property
+    def versus_and_team(self):
+        t = []
+        for team in self.players_by_team:
+            t.append(f"{' and '.join([p.data['name']for p in self.players_by_team[team]])} ({team})")
+
+        return ' vs. '.join(t)
+
+    @property
     def team_versus(self):
         return ' vs. '.join(self.team_names)
 
@@ -453,7 +461,7 @@ async def process_league_race(handler, episodeid=None, week=None):
     for team in teams:
         t.append(' and '.join([p.data['name'] for p in teams[team]]))
 
-    goal = f"ALTTPR League - {league_race.versus} - {league_race.team_versus} - {league_race.friendly_name}"
+    goal = f"ALTTPR League - {league_race.versus_and_team} - {league_race.friendly_name}"
 
     await handler.set_raceinfo(f"{goal} - ({'/'.join(league_race.seed.code)})", overwrite=True)
 
@@ -500,8 +508,8 @@ async def process_league_race(handler, episodeid=None, week=None):
         parameter='AlttprLeagueCommentaryChannel' if league_race.episode['event'].get(
             'slug', 'invleague') == 'invleague' else 'AlttprLeagueOpenCommChannel'
     )
-    if commentary_channel_id is not None and len(broadcast_channels) > 0:
-        commentary_channel = discordbot.get_channel(int(commentary_channel_id))
+    commentary_channel = discordbot.get_channel(int(commentary_channel_id))
+    if commentary_channel and len(broadcast_channels) > 0:
         await commentary_channel.send(embed=tournament_embed)
 
     for name, player in league_race.player_discords:
@@ -580,7 +588,7 @@ async def create_league_race_room(episodeid):
             'goal': '' if league_race.coop else 2,
             'custom_goal': 'Co-op Info Share' if league_race.coop else '',
             'invitational': 'on',
-            'info': f"ALTTPR League - {league_race.versus} - {league_race.team_versus}",
+            'info': f"ALTTPR League - {league_race.versus_and_team}",
             'start_delay': 15,
             'time_limit': 24,
             'streaming_required': 'on',
@@ -600,7 +608,7 @@ async def create_league_race_room(episodeid):
         await handler.invite_user(rtggid)
 
     embed = discord.Embed(
-        title=f"RT.gg Room Opened - {league_race.versus} - {league_race.team_versus}",
+        title=f"RT.gg Room Opened - {league_race.versus_and_team}",
         description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at https://racetime.gg{handler.data['url']}\n\nEnjoy!",
         color=discord.Colour.blue(),
         timestamp=datetime.datetime.now()
