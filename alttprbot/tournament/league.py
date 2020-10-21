@@ -495,7 +495,11 @@ async def process_league_race(handler, episodeid=None, week=None):
         audit_channel = discordbot.get_channel(int(audit_channel_id))
         await audit_channel.send(embed=embed)
 
-    commentary_channel_id = await config.get(league_race.guild.id, 'AlttprLeagueCommentaryChannel')
+    commentary_channel_id = await config.get(
+        guild_id=league_race.guild.id,
+        parameter='AlttprLeagueCommentaryChannel' if league_race.episode['event'].get(
+            'slug', 'invleague') == 'invleague' else 'AlttprLeagueOpenCommChannel'
+    )
     if commentary_channel_id is not None and len(broadcast_channels) > 0:
         commentary_channel = discordbot.get_channel(int(commentary_channel_id))
         await commentary_channel.send(embed=tournament_embed)
@@ -586,7 +590,6 @@ async def create_league_race_room(episodeid):
             'chat_message_delay': 0})
 
     print(handler.data.get('name'))
-    await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll!')
     await tournament_results.insert_tournament_race(
         srl_id=handler.data.get('name'),
         episode_id=league_race.episodeid,
@@ -613,6 +616,7 @@ async def create_league_race_room(episodeid):
             print(f'Could not send room opening DM to {name}')
             continue
 
+    await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll you rseed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
     return handler.data
 
 
