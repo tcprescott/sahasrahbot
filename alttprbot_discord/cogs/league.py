@@ -37,23 +37,23 @@ class League(commands.Cog):
     @tasks.loop(minutes=5, reconnect=True)
     async def create_races(self):
         print("scanning SG schedule for races to create")
-        try:
-            episodes_invite = await speedgaming.get_upcoming_episodes_by_event('invleague', hours_past=0, hours_future=.75)
-            for episode in episodes_invite:
+        for event in ['alttprleague', 'invleague']:
+            try:
+                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0, hours_future=.75)
+            except Exception as e:
+                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
+                continue
+            for episode in episodes:
                 print(episode['id'])
-                await create_league_race_room(episode['id'])
-
-            episodes_open = await speedgaming.get_upcoming_episodes_by_event('alttprleague', hours_past=0, hours_future=.75)
-            for episode in episodes_open:
-                print(episode['id'])
-                await create_league_race_room(episode['id'])
-        except Exception as e:
-            logging.exception("Encountered a problem when attempting to create RT.gg race room.")
-            guild_id = await config.get(0, 'AlttprLeagueServer')
-            audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
-            audit_channel = self.bot.get_channel(int(audit_channel_id))
-            if audit_channel:
-                await audit_channel.send(f"<@185198185990324225> There was an error while automatically creating a race room:\n```{repr(e)}```")
+                try:
+                    await create_league_race_room(episode['id'])
+                except Exception as e:
+                    logging.exception("Encountered a problem when attempting to create RT.gg race room.")
+                    guild_id = await config.get(0, 'AlttprLeagueServer')
+                    audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
+                    audit_channel = self.bot.get_channel(int(audit_channel_id))
+                    if audit_channel:
+                        await audit_channel.send(f"<@185198185990324225> There was an error while automatically creating a race room for {episode['id']}.")
 
         print('done')
 
