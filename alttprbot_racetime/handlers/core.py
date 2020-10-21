@@ -23,7 +23,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
-        raise Exception(data.get('errors'))
+        # raise Exception(data.get('errors'))
 
     async def intro(self):
         """
@@ -102,4 +102,5 @@ class SahasrahBotCoreHandler(RaceHandler):
                 try:
                     await getattr(self, method)(args, message)
                 except Exception as e:
-                    self.logger.error('Command raised exception.', exc_info=True)
+                    self.logger.error(
+                        'Command raised exception.', exc_info=True)

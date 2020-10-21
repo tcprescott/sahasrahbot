@@ -156,13 +156,18 @@ class SettingsSheet():
 
     @property
     def settings(self):
-        goal = random.choice(['dungeons', 'ganon', 'fast_ganon']) if self.row['Goal'] == 'Random' else SETTINGSMAP[self.row['Goal']]
-        world_state = random.choice(['open', 'standard', 'inverted']) if self.row['World State'] == 'Random' else SETTINGSMAP[self.row['World State']]
-        swords = random.choice(['assured', 'randomized', 'vanilla', 'swordless']) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
-        enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [40, 20, 20, 20]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
-        dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [40, 20, 20, 20]) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
-        item_pool = random.choice(['normal', 'hard']) if self.row['Item Pool'] == 'Random' else SETTINGSMAP[self.row['Item Pool']]
-
+        goal = random.choice(['dungeons', 'ganon', 'fast_ganon']
+                             ) if self.row['Goal'] == 'Random' else SETTINGSMAP[self.row['Goal']]
+        world_state = random.choice(
+            ['open', 'standard', 'inverted']) if self.row['World State'] == 'Random' else SETTINGSMAP[self.row['World State']]
+        swords = random.choice(['assured', 'randomized', 'vanilla', 'swordless']
+                               ) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
+        enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [
+                                  40, 20, 20, 20]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
+        dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [
+                                       40, 20, 20, 20]) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
+        item_pool = random.choice(
+            ['normal', 'hard']) if self.row['Item Pool'] == 'Random' else SETTINGSMAP[self.row['Item Pool']]
 
         return {
             "allow_quickswap": True,
@@ -232,7 +237,8 @@ class LeaguePlayer():
             return None
 
         if name_type == 'twitch':
-            player = [p for p in players if p['twitch_name'].lower() == name.lower()][0]
+            player = [p for p in players if p['twitch_name'].lower()
+                      == name.lower()][0]
         elif name_type == 'discord':
             player = [p for p in players if p['discord'] == name][0]
         elif name_type == 'display_name':
@@ -253,6 +259,7 @@ class LeaguePlayer():
 
         return playerobj
 
+
 class LeagueRace():
     def __init__(self, episodeid: int, week=None, create_seed=True):
         self.episodeid = int(episodeid)
@@ -270,7 +277,8 @@ class LeagueRace():
             league_race.week = await config.get(guild_id, 'AlttprLeagueWeek')
 
         if league_race.week not in WEEKDATA and not league_race.week == 'playoffs':
-            raise WeekNotFoundException(f'Week {league_race.week} was not found!')
+            raise WeekNotFoundException(
+                f'Week {league_race.week} was not found!')
 
         league_race.episode = await speedgaming.get_episode(league_race.episodeid)
 
@@ -286,7 +294,6 @@ class LeagueRace():
                 await league_race._roll_general()
 
         return league_race
-
 
     async def make_league_player_from_sg(self, player):
         try:
@@ -377,7 +384,8 @@ class LeagueRace():
     def versus(self):
         t = []
         for team in self.players_by_team:
-            t.append(' and '.join([p.data['name'] for p in self.players_by_team[team]]))
+            t.append(' and '.join([p.data['name']
+                                   for p in self.players_by_team[team]]))
 
         return ' vs. '.join(t)
 
@@ -409,7 +417,8 @@ class LeagueRace():
     def players_by_team(self):
         result = {}
         for team in self.team_names:
-            result[team] = [p for p in self.players if p.data['team_name'] == team]
+            result[team] = [
+                p for p in self.players if p.data['team_name'] == team]
         return result
 
     @property
@@ -459,6 +468,11 @@ async def process_league_race(handler, episodeid=None, week=None):
         notes=league_race.team_versus,
         emojis=discordbot.emojis
     )
+
+    tournament_embed.insert_field_at(
+        0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
+    embed.insert_field_at(
+        0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
 
     broadcast_channels = [
         a['name'] for a in league_race.episode['channels'] if not " " in a['name']]
@@ -544,9 +558,11 @@ async def process_league_race_start(handler):
         ) as _:
             pass
     else:
-        print(f"Would have reported match {race_id} for episode {race['episode_id']}")
+        print(
+            f"Would have reported match {race_id} for episode {race['episode_id']}")
 
     await tournament_results.update_tournament_results(race_id, status="STARTED")
+
 
 async def create_league_race_room(episodeid):
     race = await tournament_results.get_active_tournament_race_by_episodeid(episodeid)
@@ -599,11 +615,13 @@ async def create_league_race_room(episodeid):
 
     return handler.data
 
+
 async def is_league_race(name):
     race = await tournament_results.get_active_tournament_race(name)
     if race and race['event'] == 'alttprleague_s3':
         return True
     return False
+
 
 async def can_gatekeep(rtgg_id):
     guild_id = await config.get(0, 'AlttprLeagueServer')
@@ -622,6 +640,7 @@ async def can_gatekeep(rtgg_id):
         return True
 
     return False
+
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(
