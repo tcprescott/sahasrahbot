@@ -34,7 +34,7 @@ class League(commands.Cog):
         if not c.DEBUG:
             self.create_races.start()
 
-    @tasks.loop(minutes=.25, reconnect=True)
+    @tasks.loop(minutes=5, reconnect=True)
     async def create_races(self):
         print("scanning SG schedule for races to create")
         try:
