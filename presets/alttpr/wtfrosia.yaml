@@ -3,6 +3,7 @@ goal_name: "wtfrosia"
 customizer: true
 description: "Walther wanted this, for reasons.  AD Keys, Assured Sword, Inverted Enemizer w/ boots start"
 settings:
+  allow_quickswap: True
   l: {}
   eq:
     - PegasusBoots
