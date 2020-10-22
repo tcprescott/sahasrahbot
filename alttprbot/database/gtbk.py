@@ -74,6 +74,26 @@ async def get_active_game_guesses(channel):
             "This channel does not have an active GTBK game!")
 
 
+async def get_guesses(game_id):
+    results = await orm.select(
+        'SELECT * from gtbk_guesses where game_id=%s order by timestamp asc, guess_id asc;',
+        [game_id]
+    )
+    return results
+
+async def get_game(game_id):
+    results = await orm.select(
+        'SELECT * from gtbk_games where game_id=%s;',
+        [game_id]
+    )
+    return results
+
+async def clear_scores(game_id):
+    await orm.execute(
+        'UPDATE gtbk_guesses SET score=0 where game_id=%s',
+        [game_id]
+    )
+
 async def update_score(guess_id, score):
     await orm.execute(
         'UPDATE gtbk_guesses SET score=%s where guess_id=%s',
