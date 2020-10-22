@@ -624,7 +624,7 @@ async def create_league_race_room(episodeid):
             print(f'Could not send room opening DM to {name}')
             continue
 
-    await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll you rseed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
+    await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
     return handler.data
 
 
