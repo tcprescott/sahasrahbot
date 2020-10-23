@@ -31,34 +31,43 @@ def restrict_league_server():
 class League(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        if not c.DEBUG:
-            self.create_races.start()
+        self.create_races.start()
 
     @tasks.loop(minutes=5, reconnect=True)
     async def create_races(self):
+        if c.DEBUG:
+            events = ['test']
+        else:
+            events = ['alttprleague', 'invleague']
         print("scanning SG schedule for races to create")
-        for event in ['alttprleague', 'invleague']:
+        for event in events:
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0, hours_future=.75)
             except Exception as e:
-                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
+                logging.exception(
+                    "Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
                 print(episode['id'])
                 try:
                     await create_league_race_room(episode['id'])
                 except Exception as e:
-                    logging.exception("Encountered a problem when attempting to create RT.gg race room.")
+                    logging.exception(
+                        "Encountered a problem when attempting to create RT.gg race room.")
                     guild_id = await config.get(0, 'AlttprLeagueServer')
                     audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
                     audit_channel = self.bot.get_channel(int(audit_channel_id))
                     if audit_channel:
-                        await audit_channel.send(f"<@185198185990324225> There was an error while automatically creating a race room for {episode['id']}.")
+                        await audit_channel.send(
+                            f"@here There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
+                            allowed_mentions=discord.AllowedMentions(
+                                everyone=True)
+                        )
 
         print('done')
 
     @create_races.before_loop
-    async def before_printer(self):
+    async def before_create_races(self):
         print('create_races loop waiting...')
         await self.bot.wait_until_ready()
 
@@ -146,7 +155,6 @@ class League(commands.Cog):
         for division in roster['divisions']:
             await update_division(ctx, division=division, pendant_roles=pendant_roles)
 
-
     @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     @restrict_league_server()
@@ -192,6 +200,7 @@ class League(commands.Cog):
             pendant_role=pendant_role
         )
 
+
 async def update_division(ctx, division, pendant_roles):
     division_role = await find_or_create_role(ctx, f"Division - {division['name']}")
     player_role = await find_or_create_role(
@@ -207,6 +216,7 @@ async def update_team(ctx, team, division_role, player_role, pendant_roles):
 
     for pendant in ['courage', 'wisdom', 'power']:
         await update_player(ctx, team, division_role, player_role, team_role, pendant, pendant_roles[pendant])
+
 
 async def update_player(ctx, team, division_role, player_role, team_role, pendant, pendant_role):
     if c.DEBUG:
@@ -244,6 +254,7 @@ async def update_player(ctx, team, division_role, player_role, team_role, pendan
         else:
             print(
                 f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")
+
 
 async def find_or_create_role(ctx, role_name):
     try:

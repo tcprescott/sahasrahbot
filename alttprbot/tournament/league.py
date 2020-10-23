@@ -1,6 +1,7 @@
 import datetime
 import os
 import random
+import logging
 
 import aiohttp
 import discord
@@ -118,6 +119,10 @@ class SettingsSubmissionNotFoundException(SahasrahBotException):
     pass
 
 
+class UnableToLookupUserException(SahasrahBotException):
+    pass
+
+
 async def settings_sheet(episodeid):
     sheet = SettingsSheet(episodeid)
     await sheet._init()
@@ -200,11 +205,6 @@ class SettingsSheet():
         }
 
 
-# async def league_race(episodeid: int, week=None):
-#     race = LeagueRace(episodeid, week)
-#     await race._init()
-#     return race
-
 class LeaguePlayer():
     def __init__(self):
         pass
@@ -221,6 +221,8 @@ class LeaguePlayer():
             'rtgg': 'rtgg_name',
             'rtgg_id': 'rtgg_id',
         }
+
+        name = name.strip()
 
         async with aiohttp.request(
             method='get',
@@ -319,7 +321,8 @@ class LeagueRace():
 
         # and failing all that, bomb
         if looked_up_player is None:
-            raise Exception(f"Unable to lookup {player['displayName']}")
+            raise UnableToLookupUserException(
+                f"Unable to lookup the player `{player['displayName']}`.  Please contact a league moderator for assistance.")
 
         return looked_up_player
 
@@ -393,7 +396,8 @@ class LeagueRace():
     def versus_and_team(self):
         t = []
         for team in self.players_by_team:
-            t.append(f"{' and '.join([p.data['name']for p in self.players_by_team[team]])} ({team})")
+            t.append(
+                f"{' and '.join([p.data['name']for p in self.players_by_team[team]])} ({team})")
 
         return ' vs. '.join(t)
 
@@ -454,7 +458,12 @@ async def process_league_race(handler, episodeid=None, week=None):
         await handler.send_message("Please provide an SG episode ID.")
         return
 
-    league_race = await LeagueRace.construct(episodeid=episodeid, week=week)
+    try:
+        league_race = await LeagueRace.construct(episodeid=episodeid, week=week)
+    except Exception as e:
+        logging.exception("Problem creating league race.")
+        await handler.send_message(f"Could not process league race: {str(e)}")
+
     teams = league_race.players_by_team
 
     t = []
