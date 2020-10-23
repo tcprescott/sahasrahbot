@@ -223,6 +223,8 @@ class LeaguePlayer():
         }
 
         name = name.strip()
+        if name_type == "discord_id":
+            name = int(name)
 
         async with aiohttp.request(
             method='get',
@@ -299,7 +301,7 @@ class LeagueRace():
 
     async def make_league_player_from_sg(self, player):
         try:
-            looked_up_player = await LeaguePlayer.construct(name=int(player['discordId']), guild=self.guild, name_type='discord_id')
+            looked_up_player = await LeaguePlayer.construct(name=player['discordId'], guild=self.guild, name_type='discord_id')
         except ValueError:
             looked_up_player = None
 
@@ -463,6 +465,7 @@ async def process_league_race(handler, episodeid=None, week=None):
     except Exception as e:
         logging.exception("Problem creating league race.")
         await handler.send_message(f"Could not process league race: {str(e)}")
+        return
 
     teams = league_race.players_by_team
 
