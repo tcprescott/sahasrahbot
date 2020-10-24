@@ -73,6 +73,7 @@ title:  Presets
 | [trueicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trueicerodhunt.yaml) |You get every **every**, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
 | [vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla.yaml) |The vanilla game, but with all of the quality life additions of the randomizer.| *Customizer*  |
 | [vanilla_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla_inverted.yaml) |An inverted version of the vanilla game.   This requires major glitch knowledge to beat!| *Customizer*  |
+| [wtfrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/wtfrosia.yaml) |Walther wanted this, for reasons.  AD Keys, Assured Sword, Inverted Enemizer w/ boots start| *Customizer*  |
 
 ## SM
 
