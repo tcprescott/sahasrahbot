@@ -8,6 +8,7 @@ title:  Mystery Weights
 
 | Preset | Description | |
 |---|---|---|
+| [aqttp](https://github.com/tcprescott/sahasrahbot/blob/master/weights/aqttp.yaml) | A Quebecois to the Past S2 |   |
 | [bigjon](https://github.com/tcprescott/sahasrahbot/blob/master/weights/bigjon.yaml) | BigJon's favorite |   |
 | [boots](https://github.com/tcprescott/sahasrahbot/blob/master/weights/boots.yaml) | A boots weightset.  Designed for those who like boots. | *Customizer*  |
 | [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/weights/chaos.yaml) | Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld) | *Customizer*  |
