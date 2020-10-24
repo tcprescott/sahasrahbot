@@ -14,11 +14,11 @@ class Aqttp(commands.Cog):
         weights = await get_weights('aqttp')
 
         settings_map = await (await alttprClass.create()).randomizer_settings()
-        meta = settings
 
         for c in range(count):
             settings, _ = pyz3r.mystery.generate_random_settings(
                 weights=weights)
+            meta = settings
 
             embed = discord.Embed(
                 title=f"Seed #{c}",
