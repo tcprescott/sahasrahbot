@@ -27,7 +27,7 @@ class Aqttp(commands.Cog):
 
             embed.add_field(
                 name='Item Placement',
-                value="**Logic:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
+                value="**Glitches Required:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
                     logic=meta['glitches'],
                     item_placement=settings_map['item_placement'][meta['item_placement']],
                     dungeon_items=settings_map['dungeon_items'][meta['dungeon_items']],
