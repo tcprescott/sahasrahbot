@@ -12,13 +12,14 @@ class Aqttp(commands.Cog):
     @commands.command()
     async def aqttp(self, ctx, count=3):
         weights = await get_weights('aqttp')
-        settings, _ = pyz3r.mystery.generate_random_settings(
-            weights=weights)
 
         settings_map = await (await alttprClass.create()).randomizer_settings()
         meta = settings
 
         for c in range(count):
+            settings, _ = pyz3r.mystery.generate_random_settings(
+                weights=weights)
+
             embed = discord.Embed(
                 title=f"Seed #{c}",
                 color=discord.Colour.blue()
