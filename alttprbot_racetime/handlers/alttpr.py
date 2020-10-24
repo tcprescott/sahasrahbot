@@ -8,6 +8,7 @@ from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler
 
+
 class GameHandler(SahasrahBotCoreHandler):
     async def race_data(self, data):
         self.data = data.get('race')
@@ -18,7 +19,8 @@ class GameHandler(SahasrahBotCoreHandler):
         if self.data.get('status', {}).get('value') in ['open', 'invitational']:
             await self.intro()
 
-        pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
+        pending_entrants = [e for e in self.data['entrants'] if e.get(
+            'status', {}).get('value', {}) == 'requested']
         for entrant in pending_entrants:
             if await league.can_gatekeep(entrant['user']['id']):
                 await self.accept_request(entrant['user']['id'])
@@ -29,6 +31,9 @@ class GameHandler(SahasrahBotCoreHandler):
         await league.process_league_race_start(self)
 
     async def ex_preset(self, args, message):
+        if league.is_league_race(self.data.get('name')):
+            await self.send_message('This is a league race room, please use !leaguerace to roll')
+            return
         try:
             preset_name = args[0]
         except IndexError:
@@ -39,6 +44,9 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
     async def ex_race(self, args, message):
+        if league.is_league_race(self.data.get('name')):
+            await self.send_message('This is a league race room, please use !leaguerace to roll')
+            return
         try:
             preset_name = args[0]
         except IndexError:
@@ -47,13 +55,6 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             return
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
-
-    @monitor_cmd
-    async def ex_sglqual(self, args, message):
-        if self.data.get('status', {}).get('value') == 'open':
-            await self.set_invitational()
-
-        await self.roll_game(preset_name='openboots', message=message, allow_quickswap=True)
 
     async def ex_leaguerace(self, args, message):
         if await self.is_locked(message):
@@ -64,7 +65,6 @@ class GameHandler(SahasrahBotCoreHandler):
             episodeid=args[0] if len(args) >= 1 else None,
             week=args[1] if len(args) == 2 else None
         )
-
 
     async def ex_quickswaprace(self, args, message):
         try:
@@ -77,6 +77,10 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
 
     async def ex_spoiler(self, args, message):
+        if league.is_league_race(self.data.get('name')):
+            await self.send_message('This is a league race room, please use !leaguerace to roll')
+            return
+
         if await self.is_locked(message):
             return
 
@@ -107,6 +111,10 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_mystery(self, args, message):
+        if league.is_league_race(self.data.get('name')):
+            await self.send_message('This is a league race room, please use !leaguerace to roll')
+            return
+
         if await self.is_locked(message):
             return
 
