@@ -31,9 +31,9 @@ class GameHandler(SahasrahBotCoreHandler):
         await league.process_league_race_start(self)
 
     async def ex_preset(self, args, message):
-        if league.is_league_race(self.data.get('name')):
-            await self.send_message('This is a league race room, please use !leaguerace to roll')
-            return
+        # if league.is_league_race(self.data.get('name')):
+        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
+        #     return
         try:
             preset_name = args[0]
         except IndexError:
@@ -44,9 +44,9 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
     async def ex_race(self, args, message):
-        if league.is_league_race(self.data.get('name')):
-            await self.send_message('This is a league race room, please use !leaguerace to roll')
-            return
+        # if league.is_league_race(self.data.get('name')):
+        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
+        #     return
         try:
             preset_name = args[0]
         except IndexError:
@@ -77,9 +77,9 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
 
     async def ex_spoiler(self, args, message):
-        if league.is_league_race(self.data.get('name')):
-            await self.send_message('This is a league race room, please use !leaguerace to roll')
-            return
+        # if league.is_league_race(self.data.get('name')):
+        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
+        #     return
 
         if await self.is_locked(message):
             return
@@ -111,9 +111,9 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_mystery(self, args, message):
-        if league.is_league_race(self.data.get('name')):
-            await self.send_message('This is a league race room, please use !leaguerace to roll')
-            return
+        # if league.is_league_race(self.data.get('name')):
+        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
+        #     return
 
         if await self.is_locked(message):
             return
