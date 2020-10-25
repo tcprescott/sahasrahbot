@@ -43,7 +43,7 @@ class League(commands.Cog):
         print("scanning SG schedule for races to create")
         for event in events:
             try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=.25, hours_future=.75)
+                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
             except Exception as e:
                 logging.exception(
                     "Encountered a problem when attempting to retrieve SG schedule.")
