@@ -33,10 +33,11 @@ class League(commands.Cog):
         self.bot = bot
         self.create_races.start()
 
-    @tasks.loop(minutes=5, reconnect=True)
+    @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
         if c.DEBUG:
-            events = ['test']
+            return
+            # events = ['test']
         else:
             events = ['alttprleague', 'invleague']
         print("scanning SG schedule for races to create")

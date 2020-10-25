@@ -2,6 +2,7 @@ import datetime
 import os
 import random
 import logging
+import json
 
 import aiohttp
 import discord
@@ -589,13 +590,22 @@ async def process_league_race_start(handler):
 
 
 async def create_league_race_room(episodeid):
+    rtgg_alttpr = racetime_bots['alttpr']
     race = await tournament_results.get_active_tournament_race_by_episodeid(episodeid)
     if race:
-        return
+        async with aiohttp.request(
+                method='get',
+                url=rtgg_alttpr.http_uri(f"/{race['srl_id']}/data"),
+                raise_for_status=True) as resp:
+            race_data = json.loads(await resp.read())
+        status = race_data.get('status', {}).get('value')
+        if not status == 'cancelled':
+            return
+        await tournament_results.delete_active_tournament_race(race['srl_id'])
 
     league_race = await LeagueRace.construct(episodeid=episodeid, create_seed=False)
 
-    handler = await racetime_bots['alttpr'].create_race(
+    handler = await rtgg_alttpr.create_race(
         config={
             'goal': '' if league_race.coop else 2,
             'custom_goal': 'Co-op Info Share' if league_race.coop else '',
