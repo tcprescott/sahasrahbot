@@ -20,38 +20,41 @@ class SpeedGamingLive(commands.Cog):
 
         return False
 
-    # @commands.command(
-    #     help="Generate a SGL race room on racetime."
-    # )
-    # @commands.is_owner()
-    # async def sgltest(self, ctx):
-    #     room_name = await create_race(
-    #         game='sgl',
-    #         config={
-    #             'goal': 1450,
-    #             'custom_goal': '',
-    #             'invitational': 'on',
-    #             'unlisted': 'on',
-    #             'info': 'bot testing',
-    #             'start_delay': 15,
-    #             'time_limit': 24,
-    #             'streaming_required': 'on',
-    #             'allow_comments': 'on',
-    #             'allow_midrace_chat': 'on',
-    #             'allow_non_entrant_chat': 'off',
-    #             'chat_message_delay': 0})
-
-    #     await racetime_bots['sgl'].create_handler_by_room_name(room_name)
-    #     await ctx.send(f'https://racetime.gg{room_name}')
-
-    @commands.command()
+    @commands.group()
     @commands.is_owner()
-    async def sglsmobingotest(self, ctx):
-        room_url = await randomizer.create_bingo_card(
+    async def sgltest(self, ctx):
+        pass
+
+    @sgltest.command(
+        help="Generate a SGL race room on racetime."
+    )
+    @commands.is_owner()
+    async def create(self, ctx):
+        handler = await racetime_bots['sgl'].create_race(
             config={
-                'room_name': f'synacktest-{get_random_string(8)}',
+                'goal': 1450,
+                'custom_goal': '',
+                'invitational': 'on',
+                'unlisted': 'on',
+                'info': 'bot testing',
+                'start_delay': 15,
+                'time_limit': 24,
+                'streaming_required': 'on',
+                'allow_comments': 'on',
+                'allow_midrace_chat': 'on',
+                'allow_non_entrant_chat': 'off',
+                'chat_message_delay': 0})
+
+        await ctx.send(f"https://racetime.gg/{handler.data.get('name')}")
+
+    @sgltest.command()
+    @commands.is_owner()
+    async def smobingo(self, ctx):
+        room_id = await randomizer.bingosync.create_bingo_room(
+            config={
+                'room_name': f'SGL Test {get_random_string(8)}',
                 'passphrase': 'test',
-                'nickname': 'Synack',
+                'nickname': 'SahasrahBot',
                 'game_type': 45,
                 'variant_type': 45,
                 'custom_json': '',
@@ -62,16 +65,32 @@ class SpeedGamingLive(commands.Cog):
             }
         )
 
-        await ctx.send(room_url)
+        await ctx.send(f"https://bingosync.com/room/{room_id}")
 
-    @commands.command()
+    @sgltest.command()
     @commands.is_owner()
-    async def sglsmdabbingotest(self, ctx):
+    async def smoreroll(self, ctx, room_id):
+        result = await randomizer.bingosync.new_card(
+            config={
+                'hide_card': False,
+                'game_type': 45,
+                'variant_type': 45,
+                'custom_json': '',
+                'lockout_mode': 1,
+                'seed': '',
+                'room': room_id
+            }
+        )
+        await ctx.send(result)
+
+    @sgltest.command()
+    @commands.is_owner()
+    async def dabbingo(self, ctx):
         room_url = await randomizer.create_bingo_card(
             config={
-                'room_name': f'synacktest-{get_random_string(8)}',
+                'room_name': f'SGL Test {get_random_string(8)}',
                 'passphrase': 'test',
-                'nickname': 'Synack',
+                'nickname': 'SahasrahBot',
                 'game_type': 4,
                 'variant_type': 164,
                 'custom_json': '',
@@ -84,9 +103,9 @@ class SpeedGamingLive(commands.Cog):
 
         await ctx.send(room_url)
 
-    @commands.command()
+    @sgltest.command()
     @commands.is_owner()
-    async def sglootrtest(self, ctx):
+    async def ootr(self, ctx):
         seed_url = await randomizer.roll_ootr(
             encrypt=True,
             settings={

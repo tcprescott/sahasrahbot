@@ -2,6 +2,7 @@ from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler
 
+
 class GameHandler(SahasrahBotCoreHandler):
     async def intro(self):
         """
@@ -13,7 +14,6 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             self.state['intro_sent'] = True
 
-    @monitor_cmd
     async def ex_roll(self, args, message):
         if await self.is_locked(message):
             return
