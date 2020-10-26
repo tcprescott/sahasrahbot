@@ -56,6 +56,7 @@ title:  Presets
 | [openflute](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openflute.yaml) |You get to start with.. an activated flute?  Sky's the limit!| *Customizer*  |
 | [openmajoritems](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openmajoritems.yaml) |Shuffles only inventory items and heart containers. Keys, dungeon items, ammo, money, and heart pieces remain vanilla.| *Customizer*  |
 | [owg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg.yaml) |Overworld glitches are required.|   |
+| [owg_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_assured.yaml) |Overworld glitches are required.  Start with a sword.|   |
 | [owg_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_fast.yaml) |Overworld glitches are required, but Aghanim 2 is not!|   |
 | [owg_vt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_vt.yaml) |Overworld glitches, [Veetorp's](https://twitch.tv/veetorp) style.|   |
 | [pedestal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/pedestal.yaml) |The goal is the pedestal.|   |

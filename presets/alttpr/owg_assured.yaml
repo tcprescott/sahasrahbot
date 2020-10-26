@@ -1,0 +1,28 @@
+---
+goal_name: open overworld glitches w/ starting sword
+customizer: false
+description: "Overworld glitches are required.  Start with a sword."
+settings:
+  goal: ganon
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: open
+  hints: "off"
+  weapons: assured
+  crystals:
+    ganon: "7"
+    tower: "7"
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: overworld_glitches
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: standard
+  item_placement: advanced
