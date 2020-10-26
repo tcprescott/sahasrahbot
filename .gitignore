@@ -1,12 +1,10 @@
+.env
 /env/
-/env_old/
-/.vscode/
+/deploy.sh
 /pyz3r
 __pycache__
+data/*.cookie
 presets/bot_testing.yaml
-weights/bot_testing.yaml
 public/spoilers
 test_input/
-.env
-data/
-/deploy.sh
+weights/bot_testing.yaml
