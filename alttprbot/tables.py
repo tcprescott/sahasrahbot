@@ -218,6 +218,19 @@ t_tournament_results = Table(
     Column('written_to_gsheet', TINYINT(4))
 )
 
+t_sgl2020_tournament = Table(
+    'sgl2020_tournament', metadata,
+    Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
+    Column('room_name', String(100, 'utf8_bin'), unique=True),
+    Column('event', String(45, 'utf8_bin')),
+    Column('permalink', String(200, 'utf8_bin')),
+    Column('seed', String(200, 'utf8_bin')),
+    Column('status', String(45, 'utf8_bin')),
+    Column('created', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP")),
+    Column('updated', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+)
 
 t_twitch_channels = Table(
     'twitch_channels', metadata,
