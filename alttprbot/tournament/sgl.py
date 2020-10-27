@@ -424,6 +424,7 @@ async def create_sgl_race_room(episode_id):
 
 async def record_episode(race):
     # do a bunch of stuff to write the race to the spreadsheet
+    # sheet_name = race['event'].split("2020")[-1].lower()
     await sgl2020_tournament.update_tournament_race_status(race['episode_id'], "RECORDED")
 
 def get_random_string(length):
