@@ -1,11 +1,11 @@
 from ..util import orm
 
 
-async def insert_tournament_race(episode_id: int, room_name: str, event: str, permalink=None, seed=None, status=None):
+async def insert_tournament_race(episode_id: int, room_name: str, event: str, permalink=None, seed=None, password=None, status=None):
     await orm.execute(
-        'INSERT INTO sgl2020_tournament(episode_id, room_name, event, permalink, seed, status) VALUES (%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE room_name = %s, event = %s, permalink = %s, seed = %s, status = %s;',
-        [episode_id, room_name, event, permalink, seed, status,
-            room_name, event, permalink, seed, status]
+        'INSERT INTO sgl2020_tournament(episode_id, room_name, event, permalink, seed, password, status) VALUES (%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE room_name = %s, event = %s, permalink = %s, seed = %s, password = %s, status = %s;',
+        [episode_id, room_name, event, permalink, seed, password, status,
+            room_name, event, permalink, seed, password, status]
     )
 
 

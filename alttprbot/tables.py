@@ -225,6 +225,7 @@ t_sgl2020_tournament = Table(
     Column('event', String(45, 'utf8_bin')),
     Column('permalink', String(200, 'utf8_bin')),
     Column('seed', String(200, 'utf8_bin')),
+    Column('password', String(200, 'utf8_bin')),
     Column('status', String(45, 'utf8_bin')),
     Column('created', DateTime, server_default=text(
         "CURRENT_TIMESTAMP")),

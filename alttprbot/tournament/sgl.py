@@ -1,6 +1,8 @@
 import datetime
 import json
 import logging
+import string
+import random
 
 import aiohttp
 import discord
@@ -110,7 +112,22 @@ class SGLiveRace():
 
     # SMO
     async def event_sglive2020smo(self):
-        pass
+        self.bingo_password = get_random_string(8)
+        self.seed_id = await randomizer.create_bingo_room(
+            config={
+                'room_name': f'SpeedGamingLive 2020 - {self.versus} - {self.episode_id}',
+                'passphrase': 'test',
+                'nickname': 'SahasrahBot',
+                'game_type': 45,
+                'variant_type': 45,
+                'custom_json': '',
+                'lockout_mode': 1,
+                'seed': '',
+                'is_spectator': 'on',
+                'hide_card': 'on'
+            }
+        )
+        self.permalink = f"https://bingosync.com/room/{self.seed_id}"
 
     # SM Any%
     async def event_sgl2020smany(self):
@@ -151,6 +168,10 @@ class SGLiveRace():
     @property
     def event_name(self):
         return self.episode_data['event']['name']
+
+    @property
+    def episode_id(self):
+        return self.episode_data['id']
 
 async def process_sgl_race(handler, episode_id=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -199,7 +220,7 @@ async def create_sgl_race_room(episode_id):
             return
         await sgl2020_tournament.delete_active_tournament_race(race['room_name'])
 
-    sgl_race = await SGLiveRace.construct(episode_id=episode_id, create_seed=False)
+    sgl_race = await SGLiveRace.construct(episode_id=episode_id)
 
     handler = await rtgg_sgl.create_race(
         config={
@@ -244,3 +265,7 @@ async def create_sgl_race_room(episode_id):
 
     await handler.send_message('Welcome. Use !roll (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
     return handler.data
+
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(length))
