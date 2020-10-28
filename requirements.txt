@@ -21,7 +21,7 @@ pydle >= 0.9.3
 python-dotenv
 pytz
 pyyaml >= 5.1.2
-https://github.com/tcprescott/pyz3r/archive/master.tar.gz
+pyz3r >= 5.3.6
 quart-openapi
 sentry-sdk >= 0.16.1
 six >= 1.14.0
