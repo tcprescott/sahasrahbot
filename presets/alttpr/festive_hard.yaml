@@ -2,15 +2,15 @@
 goal_name: festive hard - DO NOT RECORD
 festive: true
 settings:
-  glitches: none
   item_placement: advanced
   dungeon_items: standard
   accessibility: items
   hints: 'off'
-  weapons: assured
+  mode: 'open'
+  weapons: randomized
   item:
     pool: hard
-    functionality: hard
+    functionality: normal
   tournament: true
   spoilers: 'off'
   lang: en

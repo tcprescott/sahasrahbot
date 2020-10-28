@@ -42,7 +42,7 @@ for weight in [f for f in sorted(os.listdir(f'weights')) if f.endswith('.yaml') 
     with open(os.path.join('weights', weight)) as f:
         weight_file = yaml.safe_load(f)
     description = weight_file.get('description', '').replace('\n', ' ')
-    markdown_contents += f"| [{weight.split('.')[0]}](https://github.com/tcprescott/sahasrahbot/blob/master/weights/{weight}) | {description} | {'*Customizer*' if weight_file.get('customizer', False) else ''} {'*Subweights*' if weight_file.get('subweights', False) else ''} |\n"
+    markdown_contents += f"| [{weight.split('.')[0]}](https://github.com/tcprescott/sahasrahbot/blob/master/weights/{weight}) | {description} | {'*Customizer*' if weight_file.get('customizer', False) else ''}{'*Festive-only*' if weight_file.get('festive', False) else ''}{'*Subweights*' if weight_file.get('subweights', False) else ''} |\n"
 
 with open(os.path.join('docs', 'mystery.md'), mode='w+') as f:
     f.write(markdown_contents)

@@ -132,7 +132,7 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted'):
-        await randomgame(ctx=ctx, weightset=weightset, tournament=False, spoilers="on", festive=False)
+        await randomgame(ctx=ctx, weightset=weightset, tournament=False, spoilers="on")
 
     @random.command(
         name='custom',
@@ -145,7 +145,7 @@ class AlttprGen(commands.Cog):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             weights = yaml.safe_load(content)
-            await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=False, spoilers="on", festive=False)
+            await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=False, spoilers="on")
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
 
@@ -157,7 +157,7 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
-        await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery", festive=False)
+        await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery")
 
     @mystery.command(
         name='custom',
@@ -170,7 +170,7 @@ class AlttprGen(commands.Cog):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             weights = yaml.safe_load(content)
-            await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=True, spoilers="mystery", festive=False)
+            await randomgame(ctx=ctx, weights=weights, weightset='custom', tournament=True, spoilers="mystery")
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
 
@@ -211,26 +211,6 @@ class AlttprGen(commands.Cog):
 
         await ctx.send(file=discord.File(io.StringIO(json.dumps(settings, indent=4)), filename=f"{hash_id}.txt"))
 
-    @commands.group(
-        brief='Generate a festive game with randomized settings.',
-        help='Generate a festive game with randomized settings.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html'
-    )
-    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @checks.restrict_command_globally('FestiveMode')
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
-    async def festiverandom(self, ctx, weightset='weighted', tournament: bool = True):
-        await randomgame(ctx=ctx, weightset=weightset, tournament=tournament, spoilers="off", festive=True)
-
-    @commands.group(
-        brief='Generate a festive mystery game.',
-        help='Generate a festive mystery game.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html'
-    )
-    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @checks.restrict_command_globally('FestiveMode')
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
-    async def festivemystery(self, ctx, weightset='weighted'):
-        await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery", festive=True)
-
     @commands.command(hidden=True, aliases=['festives'])
     async def festive(self, ctx):
         if await config.get(0, 'FestiveMode') == "true":
@@ -239,8 +219,8 @@ class AlttprGen(commands.Cog):
                 description='Latest details of any upcoming festive randomizers.',
                 color=discord.Color.green()
             )
-            embed.add_field(name="Christmas Festive 2019",
-                            value="https://alttpr.com/special")
+            embed.add_field(name="Fall Festive 2020",
+                            value="https://alttpr.com/festive/en/randomizer")
         else:
             embed = discord.Embed(
                 title='Festive Randomizer Information',
@@ -376,13 +356,12 @@ class AlttprGen(commands.Cog):
         await ctx.send(embed=embed)
 
 
-async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off", festive=False):
+async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off"):
     seed = await generate_random_game(
         weightset=weightset,
         weights=weights,
         tournament=tournament,
-        spoilers=spoilers,
-        festive=festive
+        spoilers=spoilers
     )
     embed = await seed.embed(emojis=ctx.bot.emojis, name="Mystery Game")
     await ctx.send(embed=embed)

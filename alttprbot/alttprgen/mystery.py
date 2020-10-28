@@ -7,7 +7,7 @@ from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exc
 
 import pyz3r
 from alttprbot.alttprgen.preset import fetch_preset
-from alttprbot.database import audit
+from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 
@@ -42,9 +42,15 @@ async def get_weights(weightset='weighted'):
     return weights
 
 
-async def generate_random_game(weightset='weighted', weights=None, tournament=True, spoilers="off", festive=False):
+async def generate_random_game(weightset='weighted', weights=None, tournament=True, spoilers="off"):
     if weights is None:
         weights = await get_weights(weightset)
+
+    if festive := weights.get('festive') and not await config.get(0, 'FestiveMode') == "true":
+        raise WeightsetNotFoundException(
+                    f'Could not find weightset {weightset}.  See a list of available weights at https://sahasrahbot.synack.live/mystery.html')
+
+    festive = weights.get('festive', False)
 
     try:
         async for attempt in AsyncRetrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
@@ -82,7 +88,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
 
 def festive_generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings = {
-        "glitches": pyz3r.mystery.get_random_option(weights['glitches_required']),
+        "mode": pyz3r.mystery.get_random_option(weights['world_state']),
         "item_placement": pyz3r.mystery.get_random_option(weights['item_placement']),
         "dungeon_items": pyz3r.mystery.get_random_option(weights['dungeon_items']),
         "accessibility": pyz3r.mystery.get_random_option(weights['accessibility']),
