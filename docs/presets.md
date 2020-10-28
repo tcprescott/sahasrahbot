@@ -27,10 +27,9 @@ title:  Presets
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
 | [festive](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive.yaml) ||  *Festive-only* |
+| [festive_casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_casual.yaml) ||  *Festive-only* |
 | [festive_hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_hard.yaml) ||  *Festive-only* |
 | [festive_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_keys.yaml) ||  *Festive-only* |
-| [festive_nologic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_nologic.yaml) ||  *Festive-only* |
-| [festive_owg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_owg.yaml) ||  *Festive-only* |
 | [hardicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hardicerodhunt.yaml) |You get every item absolutely **required** to beat the game, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
 | [inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted.yaml) |Inverted.  You start in the dark world.|   |
 | [inverted_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_crosskeys.yaml) |Cross world entrance shuffle, but also using the inverted world state.|   |

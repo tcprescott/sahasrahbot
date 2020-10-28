@@ -26,7 +26,6 @@ async def handler(target, source, message, client):
             await client.message(target, err.message)
         return
 
-    festivemode = await config.get(0, 'FestiveMode') == "true"
     post_start_message = None
 
     if args.command in ['$preset', '$race', '$quickswaprace'] and target.startswith('#srl-'):
@@ -81,10 +80,8 @@ async def handler(target, source, message, client):
 
         await srl_races.insert_srl_race(srl_id, goal, post_start_message)
 
-    if args.command in ['$mystery', '$festivemystery'] and target.startswith('#srl-'):
+    if args.command in ['$mystery'] and target.startswith('#srl-'):
         mode = "mystery"
-        festive = True if args.command in [
-            '$festivemystery'] and festivemode else False
 
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
@@ -99,14 +96,10 @@ async def handler(target, source, message, client):
             seed = await mystery.generate_random_game(
                 weightset=args.weightset,
                 tournament=True,
-                spoilers="off" if mode == "random" else "mystery",
-                festive=festive
+                spoilers="off" if mode == "random" else "mystery"
             )
 
-            if festive:
-                goal = f"vt8 randomizer - festive {mode} {args.weightset} - DO NOT RECORD"
-            else:
-                goal = f"vt8 randomizer - {mode} {args.weightset}"
+            goal = f"vt8 randomizer - {mode} {args.weightset}"
 
             if args.accessible and seed.data['spoiler']['meta']['logic'] == 'NoGlitches':
                 goal = f"{goal} - accessible ruleset"
@@ -231,13 +224,6 @@ async def parse_args(message):
     parser_mystery.add_argument('weightset', nargs='?', default="weighted")
     parser_mystery.add_argument('--silent', action='store_true')
     parser_mystery.add_argument('--accessible', action='store_true')
-
-    if await config.get(0, 'FestiveMode') == "true":
-        parser_festivemystery = subparsers.add_parser('$festivemystery')
-        parser_festivemystery.add_argument(
-            'weightset', nargs='?', default="weighted")
-        parser_festivemystery.add_argument('--silent', action='store_true')
-        parser_preset.add_argument('--accessible', action='store_true')
 
     # parser_leaguerace = subparsers.add_parser('$leaguerace')
     # parser_leaguerace.add_argument('episodeid')

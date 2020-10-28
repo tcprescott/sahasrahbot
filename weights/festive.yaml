@@ -1,0 +1,31 @@
+description: The default.  Offers every setting, but with some balance.
+festive: true
+item_placement:
+  basic: 25
+  advanced: 75
+dungeon_items:
+  standard: 60
+  mc: 10
+  mcs: 10
+  full: 20
+accessibility:
+  items: 90
+  locations: 10
+world_state:
+  standard: 50
+  open: 50
+hints:
+  "on": 50
+  "off": 50
+weapons:
+  randomized: 40
+  assured: 40
+  vanilla: 15
+item_pool:
+  normal: 80
+  hard: 15
+  expert: 5
+item_functionality:
+  normal: 100
+  hard: 0
+  expert: 0
