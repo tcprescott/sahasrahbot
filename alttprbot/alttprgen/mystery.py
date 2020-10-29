@@ -88,6 +88,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
 
 def festive_generate_random_settings(weights, tournament=True, spoilers="mystery"):
     settings = {
+        "allow_quickswap": pyz3r.mystery.get_random_option(weights.get('allow_quickswap', False)),
         "mode": pyz3r.mystery.get_random_option(weights['world_state']),
         "item_placement": pyz3r.mystery.get_random_option(weights['item_placement']),
         "dungeon_items": pyz3r.mystery.get_random_option(weights['dungeon_items']),
