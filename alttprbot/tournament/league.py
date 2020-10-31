@@ -7,19 +7,17 @@ import json
 import aiohttp
 import discord
 import gspread_asyncio
-from oauth2client.service_account import ServiceAccountCredentials
 from pytz import timezone
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, tournament_results,
                                 twitch_command_text, srlnick)
+from alttprbot.util import gsheet, speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime.bot import racetime_bots
 from config import Config as c  # pylint: disable=no-name-in-module
-
-from ..util import speedgaming
 
 tz = timezone('US/Eastern')
 
@@ -132,7 +130,7 @@ async def settings_sheet(episodeid):
 
 class SettingsSheet():
     def __init__(self, episodeid):
-        self.agcm = gspread_asyncio.AsyncioGspreadClientManager(get_creds)
+        self.agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
         self.episodeid = episodeid
 
     async def _init(self):
@@ -673,14 +671,3 @@ async def can_gatekeep(rtgg_id):
         return True
 
     return False
-
-
-def get_creds():
-    return ServiceAccountCredentials.from_json_keyfile_dict(
-        c.gsheet_api_oauth,
-        [
-            'https://spreadsheets.google.com/feeds',
-            'https://www.googleapis.com/auth/drive',
-            'https://www.googleapis.com/auth/spreadsheets'
-        ]
-    )

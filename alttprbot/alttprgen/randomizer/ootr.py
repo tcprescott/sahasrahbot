@@ -19,4 +19,4 @@ async def roll_ootr(settings, encrypt=True):
     ) as resp:
         result = await resp.json()
 
-    return f"https://ootrandomizer.com/seed/get?id={result['id']}"
+    return result
