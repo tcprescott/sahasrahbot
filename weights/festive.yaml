@@ -1,31 +1,30 @@
 description: The default.  Offers every setting, but with some balance.
 festive: true
-allow_quickswap: true
 item_placement:
-  basic: 25
-  advanced: 75
+  basic: 1
+  advanced: 1
 dungeon_items:
-  standard: 60
-  mc: 10
-  mcs: 10
-  full: 20
+  standard: 1
+  mc: 1
+  mcs: 1
+  full: 1
 accessibility:
-  items: 90
-  locations: 10
+  items: 1
+  locations: 1
 world_state:
-  standard: 50
-  open: 50
+  standard: 1
+  open: 1
 hints:
-  "on": 50
-  "off": 50
+  "on": 1
+  "off": 1
 weapons:
-  randomized: 40
-  assured: 40
-  vanilla: 15
+  randomized: 1
+  assured: 1
+  vanilla: 1
 item_pool:
   normal: 80
-  hard: 15
-  expert: 5
+  hard: 20
+  expert: 0
 item_functionality:
   normal: 100
   hard: 0
