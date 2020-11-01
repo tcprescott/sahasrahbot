@@ -12,6 +12,7 @@ from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exc
 from bs4 import BeautifulSoup
 from config import Config as c
 from racetime_bot import Bot
+from alttprbot.database import sgl2020_tournament
 
 from . import handlers
 
@@ -129,6 +130,17 @@ class SahasrahBotRaceTimeBot(Bot):
         self.loop.create_task(self.refresh_races())
 
 
+class SGLRaceTimeBot(SahasrahBotRaceTimeBot):
+    async def start(self):
+        self.loop.create_task(self.reauthorize())
+        self.loop.create_task(self.refresh_races())
+
+        races = await sgl2020_tournament.get_unrecorded_races()
+        for race in races:
+            if race['platform'] == 'racetime':
+                await self.create_handler_by_room_name(f"/{race['room_name']}")
+
+
 def start_racetime(loop):
     for bot in racetime_bots.values():
         loop.create_task(bot.start())
@@ -136,10 +148,21 @@ def start_racetime(loop):
 
 racetime_bots = {}
 for slug in RACETIME_GAMES:
-    racetime_bots[slug] = SahasrahBotRaceTimeBot(
-        category_slug=slug,
-        client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
-        client_secret=os.environ.get(f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
-        logger=logger,
-        handler_class=getattr(handlers, slug).GameHandler
-    )
+    if slug == 'sgl':
+        racetime_bots[slug] = SGLRaceTimeBot(
+            category_slug=slug,
+            client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
+            client_secret=os.environ.get(
+                f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
+            logger=logger,
+            handler_class=getattr(handlers, slug).GameHandler
+        )
+    else:
+        racetime_bots[slug] = SGLRaceTimeBot(
+            category_slug=slug,
+            client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
+            client_secret=os.environ.get(
+                f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
+            logger=logger,
+            handler_class=getattr(handlers, slug).GameHandler
+        )

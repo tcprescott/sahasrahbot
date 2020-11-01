@@ -6,7 +6,7 @@ import aiohttp
 import pytz
 
 from alttprbot.exceptions import SahasrahBotException
-from config import Config as c  # pylint: disable=no-name-in-module
+from config import Config as c
 
 
 class SGEpisodeNotFoundException(SahasrahBotException):

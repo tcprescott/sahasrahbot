@@ -1,5 +1,7 @@
 from racetime_bot import monitor_cmd
 
+from alttprbot.tournament import sgl
+
 from .core import SahasrahBotCoreHandler
 
 
@@ -14,8 +16,19 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             self.state['intro_sent'] = True
 
+    async def race_data(self, data):
+        self.data = data.get('race')
+
+        if self.data.get('status', {}).get('value') == 'in_progress':
+            await self.in_progress()
+
+    async def in_progress(self):
+        await sgl.process_sgl_race_start(self)
+
     async def ex_roll(self, args, message):
         if await self.is_locked(message):
             return
 
-        await self.send_message("This doesn't do anything yet. (NYI)")
+        await sgl.process_sgl_race(
+            handler=self
+        )

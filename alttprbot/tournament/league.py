@@ -17,7 +17,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime.bot import racetime_bots
-from config import Config as c  # pylint: disable=no-name-in-module
+# from config import Config as c
 
 tz = timezone('US/Eastern')
 

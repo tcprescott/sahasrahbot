@@ -1,15 +1,13 @@
-import random
-import string
+import asyncio
 
-from alttprbot.alttprgen import randomizer
-from alttprbot.database import config
-from alttprbot_racetime.bot import racetime_bots
-from discord.ext import commands, tasks
-from alttprbot.util import speedgaming
-from config import Config as c  # pylint: disable=no-name-in-module
-from alttprbot.tournament.sgl import create_sgl_race_room
-import logging
 import discord
+from discord.ext import commands, tasks
+
+from alttprbot.database import config, sgl2020_tournament
+from alttprbot.tournament.sgl import create_sgl_match, scan_sgl_schedule, record_episode, race_recording_task
+from alttprbot.util import speedgaming
+from config import Config as c
+
 
 def restrict_sgl_server():
     async def predicate(ctx):
@@ -21,44 +19,73 @@ def restrict_sgl_server():
         return False
     return commands.check(predicate)
 
+
+def restrict_smm2_channel():
+    async def predicate(ctx):
+        if ctx.guild is None:
+            return False
+
+        race = await sgl2020_tournament.get_active_tournament_race(ctx.channel.id)
+        if race:
+            return True
+
+        return False
+    return commands.check(predicate)
+
+
 class SpeedGamingLive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.create_races.start()
+        # self.create_races.start()
+        # self.record_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
-        if c.DEBUG:
-            return
-            # events = ['test']
-        else:
-            events = ['alttprleague', 'invleague']
-        print("scanning SG schedule for races to create")
-        for event in events:
-            try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
-            except Exception as e:
-                logging.exception(
-                    "Encountered a problem when attempting to retrieve SG schedule.")
-                continue
-            for episode in episodes:
-                print(episode['id'])
-                try:
-                    await create_sgl_race_room(episode['id'])
-                except Exception as e:
-                    logging.exception(
-                        "Encountered a problem when attempting to create RT.gg race room.")
-                    guild_id = await config.get(0, 'SGLAuditChannel')
-                    audit_channel_id = await config.get(guild_id, 'SGLAuditChannel')
-                    audit_channel = self.bot.get_channel(int(audit_channel_id))
-                    if audit_channel:
-                        await audit_channel.send(
-                            f"@here There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
-                            allowed_mentions=discord.AllowedMentions(
-                                everyone=True)
-                        )
+        await scan_sgl_schedule()
 
-        print('done')
+    @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
+    async def record_races(self):
+        await race_recording_task()
+
+    @commands.group()
+    @restrict_sgl_server()
+    async def sgl(self, ctx):
+        pass
+
+    @sgl.command()
+    @restrict_sgl_server()
+    @commands.has_any_role('Admin', 'Tournament Admin')
+    async def create(self, ctx, episode_id: int):
+        episode = await speedgaming.get_episode(episode_id)
+        await create_sgl_match(episode)
+
+    # @sgl.command()
+    # @restrict_sgl_server()
+    # @restrict_smm2_channel()
+    # async def smmtimer(self, ctx, round):
+    #     pass
+
+    @sgl.command()
+    @restrict_sgl_server()
+    @restrict_smm2_channel()
+    async def smmclose(self, ctx):
+        await ctx.send("WARNING:  This room will be closing in 10 seconds.  It will become inaccessible to non-admins.")
+        await asyncio.sleep(10)
+        smm2_category_id = int(await config.get(ctx.guild.id, 'SGLSMM2CategoryClosed'))
+        await ctx.channel.edit(
+            sync_permissions=True,
+            category=discord.utils.get(
+                ctx.guild.categories, id=smm2_category_id)
+        )
+        race = await sgl2020_tournament.get_active_tournament_race(ctx.channel.id)
+        await record_episode(race)
+
+    @sgl.command()
+    @restrict_sgl_server()
+    @commands.is_owner()
+    async def record(self, ctx, episode_id):
+        race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
+        await record_episode(race)
 
 
 def setup(bot):

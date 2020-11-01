@@ -223,6 +223,7 @@ t_sgl2020_tournament = Table(
     Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
     Column('room_name', String(100, 'utf8_bin'), unique=True),
     Column('event', String(45, 'utf8_bin')),
+    Column('platform', String(45, 'utf8_bin')),
     Column('permalink', String(200, 'utf8_bin')),
     Column('seed', String(200, 'utf8_bin')),
     Column('password', String(200, 'utf8_bin')),

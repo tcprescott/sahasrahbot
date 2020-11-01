@@ -12,7 +12,7 @@ from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import config, srlnick
 from alttprbot.tournament.league import WEEKDATA, create_league_race_room
 from alttprbot.util import speedgaming
-from config import Config as c  # pylint: disable=no-name-in-module
+from config import Config as c
 
 from ..util import checks
 

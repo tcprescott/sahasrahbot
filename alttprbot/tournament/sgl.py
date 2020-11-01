@@ -3,34 +3,87 @@ import json
 import logging
 import random
 import string
+import asyncio
+import os
 
 import aiohttp
 import discord
 import gspread_asyncio
+from slugify import slugify
+import isodate
 
-from alttprbot.alttprgen import preset
-from alttprbot.alttprgen import randomizer
+from alttprbot.alttprgen import preset, randomizer
 from alttprbot.database import config, sgl2020_tournament
 from alttprbot.util import gsheet, speedgaming
 from alttprbot_discord.bot import discordbot
-from alttprbot_racetime.bot import racetime_bots
+import alttprbot_racetime.bot
+from config import Config as c
 
-GOALS = {
-    'sglive2020alttpr': 1450,
-    'sglive2020aosr': 1458,
-    'sglive2020cv1': 1459,
-    'sglive2020ffr': 1452,
-    'sglive2020mmx': 1462,
-    'sglive2020smz3': 1455,
-    'sglive2020smm2': 1460,
-    'sglive2020smo': 1461,
-    'sgl2020smany': 1453,
-    'sgl2020smdab': 1454,
-    'sglive2020smr': 1456,
-    'sglive2020z1r': 1457,
-    'sglive2020ootr': 1451,
-    'sglive2020smb3': 1463
+SMM2_GDRIVE_TEMPLATE = os.environ.get('SGL_SMM2_GDRIVE_TEMPLATE', None)
+SMM2_GDRIVE_FOLDER = os.environ.get('SGL_SMM2_GDRIVE_FOLDER', None)
+SMM2_SHEET_OWNER = os.environ.get('SGL_SMM2_SHEET_OWNER', None)
+SGL_RESULTS_SHEET = os.environ.get('SGL_RESULTS_SHEET', None)
+
+EVENTS = {
+    'sglive2020alttpr': {
+        "rtgg_goal": 1450,
+        "sheet": "alttpr"
+    },
+    'sglive2020aosr': {
+        "rtgg_goal": 1458,
+        "sheet": "aosr"
+    },
+    'sglive2020cv1': {
+        "rtgg_goal": 1459,
+        "sheet": "cv1"
+    },
+    'sglive2020ffr': {
+        "rtgg_goal": 1452,
+        "sheet": "ffr"
+    },
+    'sglive2020mmx': {
+        "rtgg_goal": 1462,
+        "sheet": "mmx"
+    },
+    'sglive2020smz3': {
+        "rtgg_goal": 1455,
+        "sheet": "smz3"
+    },
+    'sglive2020smm2': {
+        "rtgg_goal": 1460,
+        "sheet": "smm2",
+        "platform": "discord"
+    },
+    'sglive2020smo': {
+        "rtgg_goal": 1461,
+        "sheet": "smo",
+    },
+    'sgl2020smany': {
+        "rtgg_goal": 1453,
+        "sheet": "smany",
+    },
+    'sgl2020smdab': {
+        "rtgg_goal": 1454,
+        "sheet": "smdab",
+    },
+    'sglive2020smr': {
+        "rtgg_goal": 1456,
+        "sheet": "smr",
+    },
+    'sglive2020z1r': {
+        "rtgg_goal": 1457,
+        "sheet": "z1r",
+    },
+    'sglive2020ootr': {
+        "rtgg_goal": 1451,
+        "sheet": "ootr",
+    },
+    'sglive2020smb3': {
+        "rtgg_goal": 1463,
+        "sheet": "smb3",
+    },
 }
+
 
 class SpeedGamingUser():
     def __init__(self, guild, player):
@@ -40,14 +93,18 @@ class SpeedGamingUser():
         self.discord_id = player['discordId']
         self.discord_tag = player['discordTag']
 
-        if member := guild.get_member(int(player['discordId'])):
-            self.discord_user = member
-        elif member := guild.get_member_named(player['discordTag']):
-            self.discord_user = member
-        elif member := guild.get_member_named(player['displayName']):
-            self.discord_user = member
+        self.discord_user = None
+
+        if not player['discordId'] == '':
+            if member := guild.get_member(int(player['discordId'])):
+                self.discord_user = member
+                return
         else:
-            self.discord_user = None
+            if member := guild.get_member_named(player['discordTag']):
+                self.discord_user = member
+            elif member := guild.get_member_named(player['displayName']):
+                self.discord_user = member
+
 
 class SGLiveRace():
     @classmethod
@@ -61,6 +118,8 @@ class SGLiveRace():
         sgl_race.players = []
         for player in sgl_race.episode_data['match1']['players']:
             sgl_race.players.append(SpeedGamingUser(sgl_race.guild, player))
+
+        return sgl_race
 
     async def create_seed(self):
         method = f'event_{self.event_slug}'
@@ -87,7 +146,8 @@ class SGLiveRace():
 
     # AOSR
     async def event_sglive2020aosr(self):
-        self.seed_id, self.permalink = randomizer.roll_aosr(logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', kicker='false')
+        self.seed_id, self.permalink = randomizer.roll_aosr(
+            logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', kicker='false')
         self.goal_postfix = f" - {self.permalink}"
 
     # Castlevania 1
@@ -96,7 +156,8 @@ class SGLiveRace():
 
     # Final Fantasy Randomizer
     async def event_sglive2020ffr(self):
-        self.seed_id, self.permalink = randomizer.roll_ffr(flags='yGcifaseK8fJxIkkAzUzYAzx32UoP5toiyJrTE864J9FEyMsXe5XhM5T94nANOh1T6wJN7BZU4p3r3WORe9o7vyXSpZD')
+        self.seed_id, self.permalink = randomizer.roll_ffr(
+            flags='yGcifaseK8fJxIkkAzUzYAzx32UoP5toiyJrTE864J9FEyMsXe5XhM5T94nANOh1T6wJN7BZU4p3r3WORe9o7vyXSpZD')
         self.goal_postfix = f" - {self.permalink}"
 
     # Megaman X
@@ -114,9 +175,72 @@ class SGLiveRace():
         self.goal_postfix = f" - {self.permalink} - ({self.seed.code})"
 
     # Super Mario Maker 2
-    # TODO: Figure this all out, if possible
+    # TODO: Copy scoring sheet template, populate spreadsheet w/ appropriate data.
     async def event_sglive2020smm2(self):
-        pass
+        loop = asyncio.get_event_loop()
+        copy_workbook = gsheet.drive_service.files().copy(
+            fileId=SMM2_GDRIVE_TEMPLATE,
+            body={
+                'name': f"SMM2 - {self.episode_id} - {self.versus}",
+                'parents': [SMM2_GDRIVE_FOLDER]
+            }
+        )
+        results = await loop.run_in_executor(None, copy_workbook.execute)
+        self.permalink = f"https://docs.google.com/spreadsheets/d/{results['id']}/edit#gid=0"
+        self.seed_id = results['id']
+
+        set_owner = gsheet.drive_service.permissions().create(
+            fileId=self.seed_id,
+            transferOwnership=True,
+            body={
+                'type': 'user',
+                'role': 'owner',
+                'emailAddress': 'tcprescott@gmail.com'
+            }
+        )
+        await loop.run_in_executor(None, set_owner.execute)
+
+        set_anyone = gsheet.drive_service.permissions().create(
+            fileId=self.seed_id,
+            body={
+                'type': 'anyone',
+                'role': 'writer',
+                'allowFileDiscovery': False
+            }
+        )
+        await loop.run_in_executor(None, set_anyone.execute)
+
+        agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
+        agc = await agcm.authorize()
+        wb = await agc.open_by_key(self.seed_id)
+        wks = await wb.get_worksheet(0)
+
+        await wks.batch_update(data=[
+            {
+                'range': 'B3:B5',
+                'values': [[self.players[0].display_name], [self.players[1].display_name], ['']]
+            },
+            {
+                'range': 'E2:G4',
+                'values': [['', '', ''], ['', '', ''], ['', '', '']]
+            },
+            {
+                'range': 'E2:G4',
+                'values': [['', '', ''], ['', '', ''], ['', '', '']]
+            },
+            {
+                'range': 'B10:B11',
+                'values': [[''], ['']]
+            },
+            {
+                'range': 'B14:D15',
+                'values': [['', '', ''], ['', '', '']]
+            },
+            {
+                'range': 'B18:D19',
+                'values': [['', '', ''], ['', '', '']]
+            },
+        ], value_input_option="RAW")
 
     # SMO
     async def event_sglive2020smo(self):
@@ -154,8 +278,9 @@ class SGLiveRace():
 
     # Zelda 1 Randomizer
     async def event_sglive2020z1r(self):
-        self.seed_id, flags = randomizer.roll_z1r('VlWlIEwJ1MsKkaOCWhlit2veXNSffs')
-        self.permalink = f"Seed: {self.seed_id} - Flags: {self.permalink}"
+        self.seed_id, flags = randomizer.roll_z1r(
+            'VlWlIEwJ1MsKkaOCWhlit2veXNSffs')
+        self.permalink = f"Seed: {self.seed_id} - Flags: {flags}"
         self.goal_postfix = f" - {self.permalink}"
 
     # Ocarina of Time Randomizer
@@ -251,8 +376,8 @@ class SGLiveRace():
         self.permalink = f"https://ootrandomizer.com/seed/get?id={self.seed['id']}"
         self.goal_postfix = f" - {self.permalink}"
 
+    # Super Mario Bros 3 Rando
 
-    #Super Mario Bros 3 Rando
     async def event_sglive2020smb3(self):
         self.seed_id, self.permalink = randomizer.roll_smb3r('17BAS2LNJ4')
         self.goal_postfix = f" - Seed: {self.seed_id} - Flags: {self.permalink}"
@@ -266,6 +391,10 @@ class SGLiveRace():
         return [(p.display_name, p.discord_user) for p in self.players]
 
     @property
+    def player_mentionables(self):
+        return [p.discord_user.mention for p in self.players]
+
+    @property
     def event_slug(self):
         return self.episode_data['event']['slug']
 
@@ -276,6 +405,61 @@ class SGLiveRace():
     @property
     def episode_id(self):
         return self.episode_data['id']
+
+
+async def create_smm2_match_discord(episode_id):
+    race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
+    if race:
+        return False
+
+    sgl_race = await SGLiveRace.construct(episode_id=episode_id)
+    await sgl_race.create_seed()
+
+    smm2_category_id = int(await config.get(sgl_race.guild.id, 'SGLSMM2Category'))
+
+    match_channel = await sgl_race.guild.create_text_channel(
+        slugify(f"smm2-{episode_id}-{sgl_race.versus}"),
+        category=discord.utils.get(
+            sgl_race.guild.categories, id=smm2_category_id),
+        topic=f"{sgl_race.event_name} - {sgl_race.versus} - {sgl_race.permalink}"
+    )
+
+    audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
+    if audit_channel_id is not None:
+        audit_channel = discordbot.get_channel(int(audit_channel_id))
+        await audit_channel.send(f"SMM2 Match - Episode {sgl_race.episode_data['id']} - {match_channel.mention}")
+
+    embed = discord.Embed(
+        title=f"SMM2 Match Channel Opened - {sgl_race.event_name} - {sgl_race.versus}",
+        description=f"Greetings!  The discord channel {match_channel.mention} has been opened.\n\nGLHF!",
+        color=discord.Colour.blue(),
+        timestamp=datetime.datetime.now()
+    )
+
+    for name, player in sgl_race.player_discords:
+        if player is None:
+            await audit_channel.send(f'Could not DM {name}. Could not lookup player in SG system.')
+            continue
+        try:
+            await match_channel.set_permissions(player, read_messages=True)
+            await player.send(embed=embed)
+        except discord.HTTPException as e:
+            await audit_channel.send(f'Could not add {name} to channel {match_channel.mention}')
+            continue
+
+    await sgl2020_tournament.insert_tournament_race(
+        room_name=match_channel.id,
+        episode_id=episode_id,
+        permalink=sgl_race.permalink,
+        seed=sgl_race.seed_id,
+        password=None,
+        event=sgl_race.episode_data['event']['slug'],
+        platform='discord'
+    )
+
+    await match_channel.send(f"Welcome {', '.join(sgl_race.player_mentionables)}!  ")
+    return match_channel
+
 
 async def process_sgl_race(handler, episode_id=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -310,7 +494,8 @@ async def process_sgl_race(handler, episode_id=None):
         timestamp=datetime.datetime.now()
     )
     embed.add_field(name="Permalink", value=sgl_race.permalink, inline=False)
-    embed.add_field(name="RT.gg", value=f"https://racetime.gg{handler.data['url']}", inline=False)
+    embed.add_field(
+        name="RT.gg", value=f"https://racetime.gg{handler.data['url']}", inline=False)
 
     audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
     if audit_channel_id is not None:
@@ -319,11 +504,12 @@ async def process_sgl_race(handler, episode_id=None):
 
     await sgl2020_tournament.insert_tournament_race(
         room_name=handler.data.get('name'),
-        episode_id=episode_id,
+        episode_id=episodeid,
         permalink=sgl_race.permalink,
         seed=sgl_race.seed_id,
         password=sgl_race.bingo_password,
         event=sgl_race.episode_data['event']['slug'],
+        platform='racetime'
     )
 
     await handler.send_message("Seed has been generated and should now be in the race info.")
@@ -357,9 +543,10 @@ async def process_sgl_race_start(handler):
     await sgl2020_tournament.update_tournament_race_status(race_id, "STARTED")
     await handler.send_message("Please double check your stream and ensure that it is displaying your game!  GLHF")
 
+
 async def create_sgl_race_room(episode_id):
-    rtgg_sgl = racetime_bots['sgl']
-    race = await sgl2020_tournament.get_active_tournament_race_by_episodeid(episode_id)
+    rtgg_sgl = alttprbot_racetime.bot.racetime_bots['sgl']
+    race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
     if race:
         async with aiohttp.request(
                 method='get',
@@ -375,7 +562,7 @@ async def create_sgl_race_room(episode_id):
 
     handler = await rtgg_sgl.create_race(
         config={
-            'goal': GOALS[sgl_race.event_slug],
+            'goal': EVENTS[sgl_race.event_slug]['rtgg_goal'],
             'custom_goal': '',
             # 'invitational': 'on',
             'unlisted': 'on',
@@ -391,11 +578,9 @@ async def create_sgl_race_room(episode_id):
     await sgl2020_tournament.insert_tournament_race(
         room_name=handler.data.get('name'),
         episode_id=sgl_race.episode_id,
-        event=sgl_race.episode_data['event']['slug']
+        event=sgl_race.episode_data['event']['slug'],
+        platform='racetime'
     )
-
-    # for rtggid in [p.data['rtgg_id'] for p in league_race.players]:
-    #     await handler.invite_user(rtggid)
 
     embed = discord.Embed(
         title=f"RT.gg Room Opened - {sgl_race.event_name} - {sgl_race.versus}",
@@ -419,13 +604,134 @@ async def create_sgl_race_room(episode_id):
             await audit_channel.send(f'Could not send room opening DM to {name}')
             continue
 
-    await handler.send_message('Welcome. Use !roll (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, please ping the SGL Admins.')
     return handler.data
+
+
+async def scan_sgl_schedule():
+    guild_id = await config.get(0, 'SGLAuditChannel')
+    audit_channel_id = await config.get(guild_id, 'SGLAuditChannel')
+    audit_channel = discordbot.get_channel(int(audit_channel_id))
+
+    if c.DEBUG:
+        events = ['test']
+    else:
+        events = EVENTS.keys()
+    print("SGL - scanning SG schedule for races to create")
+    for event in events:
+        try:
+            episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
+        except Exception as e:
+            logging.exception(
+                "Encountered a problem when attempting to retrieve SG schedule.")
+            if audit_channel:
+                await audit_channel.send(
+                    f"There was an error while trying to scan schedule for {event}`.\n\n{str(e)}")
+            continue
+        for episode in episodes:
+            print(episode['id'])
+            try:
+                await create_sgl_match(episode)
+            except Exception as e:
+                logging.exception(
+                    "Encountered a problem when attempting to create RT.gg race room.")
+                if audit_channel:
+                    await audit_channel.send(
+                        f"@here There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
+                        allowed_mentions=discord.AllowedMentions(
+                            everyone=True)
+                    )
+
+    print('done')
+
+
+async def race_recording_task():
+    guild_id = await config.get(0, 'SGLAuditChannel')
+    audit_channel_id = await config.get(guild_id, 'SGLAuditChannel')
+    audit_channel = discordbot.get_channel(int(audit_channel_id))
+
+    races = await sgl2020_tournament.get_unrecorded_races()
+    for race in races:
+        print(race['episode_id'])
+        try:
+            await record_episode(race)
+        except Exception as e:
+            logging.exception(
+                "Encountered a problem when attempting to record a race.")
+            if audit_channel:
+                await audit_channel.send(
+                    f"There was an error while automatically creating a race room for episode `{race['episode_id']}`.\n\n{str(e)}")
+
+    print('done')
+
+
+async def create_sgl_match(episode):
+    if episode['event']['slug'] not in EVENTS.keys():
+        raise Exception(
+            f"{episode['id']} is not an SGL match.  Found {episode['event']['slug']}")
+
+    if episode['event']['slug'] == 'sglive2020smm2':
+        await create_smm2_match_discord(episode['id'])
+    else:
+        await create_sgl_race_room(episode['id'])
+
 
 async def record_episode(race):
     # do a bunch of stuff to write the race to the spreadsheet
-    # sheet_name = race['event'].split("2020")[-1].lower()
-    await sgl2020_tournament.update_tournament_race_status(race['episode_id'], "RECORDED")
+    if race['status'] == "RECORDED":
+        return
+
+    sheet_name = EVENTS[race['event']].get('sheet')
+
+    agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
+    agc = await agcm.authorize()
+    wb = await agc.open_by_key(SGL_RESULTS_SHEET)
+    wks = await wb.worksheet(sheet_name)
+
+    if race['platform'] == 'racetime':
+        async with aiohttp.request(
+                method='get',
+                url=f"https://racetime.gg/{race['room_name']}/data",
+                raise_for_status=True) as resp:
+            race_data = json.loads(await resp.read())
+
+        if race_data['status']['value'] == 'finished':
+            winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
+            runnerup = [e for e in race_data['entrants']
+                        if e['place'] in [2, None]][0]
+
+            await wks.append_row(values=[
+                race['episode_id'],
+                f"https://racetime.gg/{race['room_name']}",
+                winner['user']['name'],
+                runnerup['user']['name'],
+                str(isodate.parse_duration(winner['finish_time'])) if isinstance(
+                    winner['finish_time'], str) else None,
+                str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(
+                    runnerup['finish_time'], str) else None,
+                race['permalink'],
+                race['password'],
+                str(race['created']),
+                str(race['updated'])
+            ])
+        if race_data['status']['value'] == 'cancelled':
+            await sgl2020_tournament.delete_active_tournament_race(race['room_name'])
+    else:
+        episode_data = await speedgaming.get_episode(race['episode_id'])
+        await wks.append_row(values=[
+            race['episode_id'],
+            None,
+            episode_data['match1']['players'][0]['displayName'],
+            episode_data['match1']['players'][1]['displayName'],
+            None,
+            None,
+            race['permalink'],
+            race['password'],
+            str(race['created']),
+            str(race['updated'])
+        ])
+
+    await sgl2020_tournament.update_tournament_race_status(race['room_name'], "RECORDED")
+
 
 def get_random_string(length):
     letters = string.ascii_lowercase
