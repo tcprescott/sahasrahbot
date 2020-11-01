@@ -15,8 +15,11 @@ class SGEpisodeNotFoundException(SahasrahBotException):
 
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     if c.DEBUG and event == 'test':
-        async with aiofiles.open('test_input/sg_event.json', 'r') as f:
-            return json.loads(await f.read(), strict=False)
+        test_schedule = []
+        for episode_id in [1]:
+            episode = await get_episode(episode_id)
+            test_schedule.append(episode)
+        return test_schedule
 
     now = datetime.now(tz=pytz.timezone('US/Eastern'))
     sched_from = now - timedelta(hours=hours_past)

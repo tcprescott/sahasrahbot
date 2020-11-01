@@ -147,7 +147,7 @@ class SGLiveRace():
     # AOSR
     async def event_sglive2020aosr(self):
         self.seed_id, self.permalink = randomizer.roll_aosr(
-            logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', kicker='false')
+            logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', weight="3.5", kicker='false', levelexp='Vanilla')
         self.goal_postfix = f" - {self.permalink}"
 
     # Castlevania 1
@@ -170,7 +170,7 @@ class SGLiveRace():
 
         # Two mandatory values
         self.permalink = self.seed.url
-        self.seed_id = self.seed.hash
+        self.seed_id = self.seed.slug_id
 
         self.goal_postfix = f" - {self.permalink} - ({self.seed.code})"
 
@@ -248,7 +248,7 @@ class SGLiveRace():
         self.seed_id = await randomizer.create_bingo_room(
             config={
                 'room_name': f'SpeedGamingLive 2020 - {self.versus} - {self.episode_id}',
-                'passphrase': 'test',
+                'passphrase': self.bingo_password,
                 'nickname': 'SahasrahBot',
                 'game_type': 45,
                 'variant_type': 45,
@@ -260,7 +260,7 @@ class SGLiveRace():
             }
         )
         self.permalink = f"https://bingosync.com/room/{self.seed_id}"
-        self.goal_postfix = f" - {self.permalink}"
+        self.goal_postfix = f" - {self.permalink} - Password: {self.bingo_password}"
 
     # SM Any%
     # async def event_sgl2020smany(self):
@@ -274,7 +274,7 @@ class SGLiveRace():
     async def event_sglive2020smr(self):
         self.seed_id = randomizer.roll_smdash()
         self.permalink = self.seed_id
-        self.goal_postfix = f" - {self.seed_id}"
+        self.goal_postfix = f" - Seed: {self.seed_id}"
 
     # Zelda 1 Randomizer
     async def event_sglive2020z1r(self):
@@ -377,10 +377,11 @@ class SGLiveRace():
         self.goal_postfix = f" - {self.permalink}"
 
     # Super Mario Bros 3 Rando
-
     async def event_sglive2020smb3(self):
-        self.seed_id, self.permalink = randomizer.roll_smb3r('17BAS2LNJ4')
-        self.goal_postfix = f" - Seed: {self.seed_id} - Flags: {self.permalink}"
+        self.seed_id, flags = randomizer.roll_smb3r(
+            '17BAS2LNJ4')
+        self.permalink = f"Seed: {self.seed_id} - Flags: {flags}"
+        self.goal_postfix = f" - {self.permalink}"
 
     @property
     def versus(self):
@@ -494,6 +495,9 @@ async def process_sgl_race(handler, episode_id=None):
         timestamp=datetime.datetime.now()
     )
     embed.add_field(name="Permalink", value=sgl_race.permalink, inline=False)
+    if sgl_race.bingo_password:
+        embed.add_field(name="Bingosync Password",
+                        value=sgl_race.bingo_password)
     embed.add_field(
         name="RT.gg", value=f"https://racetime.gg{handler.data['url']}", inline=False)
 
@@ -536,7 +540,7 @@ async def process_sgl_race_start(handler):
                 'custom_json': '',
                 'lockout_mode': 1,
                 'seed': '',
-                'room': race['seed_id']
+                'room': race['seed']
             }
         )
 

@@ -59,12 +59,6 @@ class SpeedGamingLive(commands.Cog):
         episode = await speedgaming.get_episode(episode_id)
         await create_sgl_match(episode)
 
-    # @sgl.command()
-    # @restrict_sgl_server()
-    # @restrict_smm2_channel()
-    # async def smmtimer(self, ctx, round):
-    #     pass
-
     @sgl.command()
     @restrict_sgl_server()
     @restrict_smm2_channel()
