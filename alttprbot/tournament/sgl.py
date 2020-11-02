@@ -276,7 +276,7 @@ class SGLiveRace():
         await patch_distribution.update_as_used(result['id'])
         self.seed_id = result['patch_id']
         self.permalink = f"https://sgldash.synack.live/?patch={self.seed_id}"
-        self.goal_postfix = f" - Seed: {self.permalink}"
+        self.goal_postfix = f" - {self.permalink}"
 
     # Zelda 1 Randomizer
     async def event_sglive2020z1r(self):
