@@ -109,6 +109,15 @@ t_mention_counters = Table(
 )
 
 
+t_patch_distribution = Table(
+    'patch_distribution', metadata,
+    Column('id', INTEGER(11), primary_key=True),
+    Column('patch_id', String(45, 'utf8_bin'), index=True),
+    Column('game', String(45, 'utf8_bin')),
+    Column('used', TINYINT(1), index=True)
+)
+
+
 t_permissions = Table(
     'permissions', metadata,
     Column('id', INTEGER(11), primary_key=True),
