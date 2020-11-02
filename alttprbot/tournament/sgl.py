@@ -13,7 +13,7 @@ from slugify import slugify
 import isodate
 
 from alttprbot.alttprgen import preset, randomizer
-from alttprbot.database import config, sgl2020_tournament
+from alttprbot.database import config, sgl2020_tournament, patch_distribution
 from alttprbot.util import gsheet, speedgaming
 from alttprbot_discord.bot import discordbot
 import alttprbot_racetime.bot
@@ -272,9 +272,11 @@ class SGLiveRace():
 
     # Super Metroid Randomizer
     async def event_sglive2020smr(self):
-        self.seed_id = randomizer.roll_smdash()
-        self.permalink = self.seed_id
-        self.goal_postfix = f" - Seed: {self.seed_id}"
+        result = await patch_distribution.select_random_patch('sgldash')
+        await patch_distribution.update_as_used(result['id'])
+        self.seed_id = result['patch_id']
+        self.permalink = f"https://sgldash.synack.live/?patch={self.seed_id}"
+        self.goal_postfix = f" - Seed: {self.permalink}"
 
     # Zelda 1 Randomizer
     async def event_sglive2020z1r(self):
