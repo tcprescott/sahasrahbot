@@ -115,24 +115,33 @@ class SGLiveRace():
         sgl_race.guild = discordbot.get_guild(int(guild_id))
 
         sgl_race.episode_data = await speedgaming.get_episode(episode_id)
+
         sgl_race.players = []
         for player in sgl_race.episode_data['match1']['players']:
             sgl_race.players.append(SpeedGamingUser(sgl_race.guild, player))
+
+        sgl_race.commentators = []
+        for commentator in [c for c in sgl_race.episode_data['commentators'] if c.get('approved', False)]:
+            sgl_race.commentators.append(SpeedGamingUser(sgl_race.guild, commentator))
+
+        sgl_race.trackers = []
+        for tracker in [c for c in sgl_race.episode_data['trackers'] if c.get('approved', False)]:
+            sgl_race.trackers.append(SpeedGamingUser(sgl_race.guild, tracker))
 
         return sgl_race
 
     async def create_seed(self):
         method = f'event_{self.event_slug}'
-        if hasattr(self, method):
-            self.bingo_password = None
-            self.seed_id = None
-            self.permalink = None
-            self.goal_postfix = ""
+        self.bingo_password = None
+        self.seed_id = None
+        self.permalink = None
+        self.goal_postfix = ""
 
+        if hasattr(self, method):
             await getattr(self, method)()
             return True
-        else:
-            return False
+
+        return False
 
     # ALTTPR
     async def event_sglive2020alttpr(self):
@@ -409,10 +418,21 @@ class SGLiveRace():
     def episode_id(self):
         return self.episode_data['id']
 
+    @property
+    def commentator_discords(self):
+        return [(p.display_name, p.discord_user) for p in self.commentators]
 
-async def create_smm2_match_discord(episode_id):
+    @property
+    def tracker_discords(self):
+        return [(p.display_name, p.discord_user) for p in self.trackers]
+
+    @property
+    def broadcast_channels(self):
+        return [a['name'] for a in self.episode_data['channels'] if not " " in a['name']]
+
+async def create_smm2_match_discord(episode_id, force):
     race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
-    if race:
+    if race and not force:
         return False
 
     sgl_race = await SGLiveRace.construct(episode_id=episode_id)
@@ -439,6 +459,10 @@ async def create_smm2_match_discord(episode_id):
         timestamp=datetime.datetime.now()
     )
 
+    if broadcast_channels := sgl_race.broadcast_channels:
+        embed.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+
     for name, player in sgl_race.player_discords:
         if player is None:
             await audit_channel.send(f'Could not DM {name}. Could not lookup player in SG system.')
@@ -447,6 +471,19 @@ async def create_smm2_match_discord(episode_id):
             await match_channel.set_permissions(player, read_messages=True)
             await player.send(embed=embed)
         except discord.HTTPException as e:
+            logging.exception("SGL - Unable to add player to SMM2 match.")
+            await audit_channel.send(f'Could not add {name} to channel {match_channel.mention}')
+            continue
+
+    for name, commentator in sgl_race.commentator_discords:
+        if commentator is None:
+            await audit_channel.send(f'Could not DM {name}. Could not lookup commentator in SG system.')
+            continue
+        try:
+            await match_channel.set_permissions(commentator, read_messages=True)
+            await commentator.send(embed=embed)
+        except discord.HTTPException as e:
+            logging.exception("SGL - Unable to add commentator to SMM2 match.")
             await audit_channel.send(f'Could not add {name} to channel {match_channel.mention}')
             continue
 
@@ -464,15 +501,14 @@ async def create_smm2_match_discord(episode_id):
     return match_channel
 
 
-async def process_sgl_race(handler, episode_id=None):
+async def process_sgl_race(handler):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
     race = await sgl2020_tournament.get_active_tournament_race(handler.data.get('name'))
     if race:
         episodeid = race.get('episode_id')
     if race is None and episodeid is None:
-        await handler.send_message("Please provide an SG episode ID.")
-        return
+        raise Exception("This race should have an SG episode associated with it.  Please contact a Tournament Admin for assistance.")
 
     try:
         sgl_race = await SGLiveRace.construct(episode_id=episodeid)
@@ -550,10 +586,10 @@ async def process_sgl_race_start(handler):
     await handler.send_message("Please double check your stream and ensure that it is displaying your game!  GLHF")
 
 
-async def create_sgl_race_room(episode_id):
+async def create_sgl_race_room(episode_id, force=False):
     rtgg_sgl = alttprbot_racetime.bot.racetime_bots['sgl']
     race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
-    if race:
+    if race and not force:
         async with aiohttp.request(
                 method='get',
                 url=rtgg_sgl.http_uri(f"/{race['room_name']}/data"),
@@ -594,6 +630,18 @@ async def create_sgl_race_room(episode_id):
         color=discord.Colour.blue(),
         timestamp=datetime.datetime.now()
     )
+    embed_tracker = discord.Embed(
+        title=f"RT.gg Room Opened - {sgl_race.event_name} - {sgl_race.versus}",
+        description=f"Greetings!  This is a friendly reminder that a race you're assigned to track will be starting soon.  Please be on the lookout for a DM from a volunteer.",
+        color=discord.Colour.blue(),
+        timestamp=datetime.datetime.now()
+    )
+
+    if broadcast_channels := sgl_race.broadcast_channels:
+        embed.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+        embed_tracker.insert_field_at(
+            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
 
     audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
     if audit_channel_id is not None:
@@ -602,12 +650,22 @@ async def create_sgl_race_room(episode_id):
 
     for name, player in sgl_race.player_discords:
         if player is None:
-            await audit_channel.send(f'Could not DM {name}')
+            await audit_channel.send(f'Could not DM player named {name}')
             continue
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
-            await audit_channel.send(f'Could not send room opening DM to {name}')
+            await audit_channel.send(f'Could not send room opening DM to player named {name}')
+            continue
+
+    for name, tracker in sgl_race.tracker_discords:
+        if tracker is None:
+            await audit_channel.send(f'Could not DM tracker named {name}')
+            continue
+        try:
+            await tracker.send(embed=embed_tracker)
+        except discord.HTTPException:
+            await audit_channel.send(f'Could not send room opening DM to tracker named {name}')
             continue
 
     return handler.data
@@ -670,15 +728,15 @@ async def race_recording_task():
     print('done')
 
 
-async def create_sgl_match(episode):
+async def create_sgl_match(episode, force=False):
     if episode['event']['slug'] not in EVENTS.keys():
         raise Exception(
             f"{episode['id']} is not an SGL match.  Found {episode['event']['slug']}")
 
     if episode['event']['slug'] == 'sglive2020smm2':
-        await create_smm2_match_discord(episode['id'])
+        await create_smm2_match_discord(episode['id'], force)
     else:
-        await create_sgl_race_room(episode['id'])
+        await create_sgl_race_room(episode['id'], force)
 
 
 async def record_episode(race):

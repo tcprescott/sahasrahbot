@@ -55,9 +55,9 @@ class SpeedGamingLive(commands.Cog):
     @sgl.command()
     @restrict_sgl_server()
     @commands.has_any_role('Admin', 'Tournament Admin')
-    async def create(self, ctx, episode_id: int):
+    async def create(self, ctx, episode_id: int, force: bool=False):
         episode = await speedgaming.get_episode(episode_id)
-        await create_sgl_match(episode)
+        await create_sgl_match(episode, force=force)
 
     @sgl.command()
     @restrict_sgl_server()

@@ -448,6 +448,10 @@ class LeagueRace():
         if self.gen_type == 'mystery':
             return f"The weightset for this race is {self.weightset}."
 
+    @property
+    def broadcast_channels(self):
+        return [a['name'] for a in self.episode['channels'] if not " " in a['name']]
+
 
 async def process_league_race(handler, episodeid=None, week=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -474,8 +478,6 @@ async def process_league_race(handler, episodeid=None, week=None):
 
     goal = f"ALTTPR League - {league_race.versus_and_team} - {league_race.friendly_name}"
 
-    await handler.set_raceinfo(f"{goal} - ({'/'.join(league_race.seed.code)})", overwrite=True)
-
     embed = await league_race.seed.embed(
         name=goal,
         notes=league_race.team_versus,
@@ -488,15 +490,14 @@ async def process_league_race(handler, episodeid=None, week=None):
         emojis=discordbot.emojis
     )
 
+    goal += f" - ({'/'.join(league_race.seed.code)})"
+
     tournament_embed.insert_field_at(
         0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
     embed.insert_field_at(
         0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
 
-    broadcast_channels = [
-        a['name'] for a in league_race.episode['channels'] if not " " in a['name']]
-
-    if len(broadcast_channels) > 0:
+    if broadcast_channels := league_race.broadcast_channels:
         twitch_mode_text = league_race.twitch_mode_command
         twitch_teams_text = f"This race is between {league_race.team_versus}.  Check out rankings for division(s) {', '.join(league_race.division_names)} at {' '.join(league_race.division_urls)}"
 
@@ -508,6 +509,10 @@ async def process_league_race(handler, episodeid=None, week=None):
             0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
         embed.insert_field_at(
             0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
+
+        goal += f" - Restream(s) at {', '.join(broadcast_channels)}"
+
+    await handler.set_raceinfo(goal, overwrite=True)
 
     audit_channel_id = await config.get(league_race.guild.id, 'AlttprLeagueAuditChannel')
     if audit_channel_id is not None:
