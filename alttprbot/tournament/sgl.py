@@ -27,60 +27,74 @@ SGL_RESULTS_SHEET = os.environ.get('SGL_RESULTS_SHEET', None)
 EVENTS = {
     'sglive2020alttpr': {
         "rtgg_goal": 1450,
-        "sheet": "alttpr"
+        "sheet": "alttpr",
+        "delay": 20
     },
     'sglive2020aosr': {
         "rtgg_goal": 1458,
-        "sheet": "aosr"
+        "sheet": "aosr",
+        "delay": 0
     },
     'sglive2020cv1': {
         "rtgg_goal": 1459,
-        "sheet": "cv1"
+        "sheet": "cv1",
+        "delay": 0
     },
     'sglive2020ffr': {
         "rtgg_goal": 1452,
-        "sheet": "ffr"
+        "sheet": "ffr",
+        "delay": 15
     },
     'sglive2020mmx': {
         "rtgg_goal": 1462,
-        "sheet": "mmx"
+        "sheet": "mmx",
+        "delay": 0
     },
     'sglive2020smz3': {
         "rtgg_goal": 1455,
-        "sheet": "smz3"
+        "sheet": "smz3",
+        "delay": 10
     },
     'sglive2020smm2': {
         "rtgg_goal": 1460,
         "sheet": "smm2",
-        "platform": "discord"
+        "platform": "discord",
+        "delay": 0
     },
     'sglive2020smo': {
         "rtgg_goal": 1461,
         "sheet": "smo",
+        "delay": 0
     },
     'sgl2020smany': {
         "rtgg_goal": 1453,
         "sheet": "smany",
+        "delay": 0
     },
     'sgl2020smdab': {
         "rtgg_goal": 1454,
         "sheet": "smdab",
+        "delay": 0
     },
     'sglive2020smr': {
         "rtgg_goal": 1456,
         "sheet": "smr",
+        "delay": 0
     },
     'sglive2020z1r': {
         "rtgg_goal": 1457,
         "sheet": "z1r",
+        "delay": 15
     },
     'sglive2020ootr': {
         "rtgg_goal": 1451,
         "sheet": "ootr",
+        "delay": 20
     },
     'sglive2020smb3': {
         "rtgg_goal": 1463,
         "sheet": "smb3",
+        "delay": 5
     },
 }
 
@@ -204,7 +218,7 @@ class SGLiveRace():
             body={
                 'type': 'user',
                 'role': 'owner',
-                'emailAddress': 'tcprescott@gmail.com'
+                'emailAddress': SMM2_SHEET_OWNER
             }
         )
         await loop.run_in_executor(None, set_owner.execute)
@@ -419,6 +433,13 @@ class SGLiveRace():
         return self.episode_data['id']
 
     @property
+    def delay_info(self):
+        if d := EVENTS[self.event_slug].get('delay', 0) == 0:
+            return ""
+
+        return f" - {d} minute delay"
+
+    @property
     def commentator_discords(self):
         return [(p.display_name, p.discord_user) for p in self.commentators]
 
@@ -524,7 +545,7 @@ async def process_sgl_race(handler):
         await handler.send_message(f"Could not process league race: {str(e)}")
         return
 
-    await handler.set_raceinfo(f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.goal_postfix}", overwrite=True)
+    await handler.set_raceinfo(f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.goal_postfix}{sgl_race.delay_info}", overwrite=True)
     await handler.send_message(sgl_race.permalink)
 
     embed = discord.Embed(
@@ -608,7 +629,7 @@ async def create_sgl_race_room(episode_id, force=False):
             'custom_goal': '',
             # 'invitational': 'on',
             'unlisted': 'on',
-            'info': f"{sgl_race.event_name} - {sgl_race.versus}",
+            'info': f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.delay_info}",
             'start_delay': 15,
             'time_limit': 24,
             'streaming_required': 'on',
@@ -778,8 +799,10 @@ async def record_episode(race):
                 str(race['created']),
                 str(race['updated'])
             ])
-        if race_data['status']['value'] == 'cancelled':
+        elif race_data['status']['value'] == 'cancelled':
             await sgl2020_tournament.delete_active_tournament_race(race['room_name'])
+        else:
+            return
     else:
         episode_data = await speedgaming.get_episode(race['episode_id'])
         await wks.append_row(values=[

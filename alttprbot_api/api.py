@@ -3,6 +3,7 @@ import os
 from quart import Quart, abort, jsonify, request
 
 from alttprbot.alttprgen.mystery import get_weights, generate_random_settings
+from alttprbot.database import sgl2020_tournament
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
 from alttprbot_srl.bot import srlbot
@@ -41,6 +42,24 @@ async def mysterygenwithweights(weightset):
         customizer=customizer,
         endpoint='/api/customizer' if customizer else '/api/randomizer'
     )
+
+@sahasrahbotapi.route('/api/sgl/episodes', methods=['GET'])
+async def sgl_episodes():
+    secret = request.args.get("secret")
+    if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
+        abort(401, description="secret required")
+
+    result = await sgl2020_tournament.get_all_tournament_races()
+    return jsonify(results=result)
+
+@sahasrahbotapi.route('/api/sgl/episode/<int:episode>', methods=['GET'])
+async def sgl_episode(episode):
+    secret = request.args.get("secret")
+    if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
+        abort(401, description="secret required")
+
+    result = await sgl2020_tournament.get_tournament_race_by_episodeid(episode)
+    return jsonify(result=result)
 
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])

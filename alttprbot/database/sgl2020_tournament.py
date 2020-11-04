@@ -31,6 +31,11 @@ async def get_tournament_race_by_episodeid(episode_id: str):
     )
     return results[0] if results else None
 
+async def get_all_tournament_races():
+    results = await orm.select(
+        'SELECT * from sgl2020_tournament;'
+    )
+    return results
 
 async def get_unrecorded_races():
     results = await orm.select(
