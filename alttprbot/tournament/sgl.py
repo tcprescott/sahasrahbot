@@ -198,7 +198,6 @@ class SGLiveRace():
         self.goal_postfix = f" - {self.permalink} - ({self.seed.code})"
 
     # Super Mario Maker 2
-    # TODO: Copy scoring sheet template, populate spreadsheet w/ appropriate data.
     async def event_sglive2020smm2(self):
         loop = asyncio.get_event_loop()
         copy_workbook = gsheet.drive_service.files().copy(
@@ -632,9 +631,10 @@ async def create_sgl_race_room(episode_id, force=False):
             'info': f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.delay_info}",
             'start_delay': 15,
             'time_limit': 24,
-            'streaming_required': 'on',
+            # 'streaming_required': 'on',
             'allow_comments': 'on',
             'allow_midrace_chat': 'on',
+            'allow_non_entrant_chat': 'on',
             'chat_message_delay': 0})
 
     print(handler.data.get('name'))
