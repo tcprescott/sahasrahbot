@@ -21,7 +21,7 @@ class Aqttp(commands.Cog):
             meta = settings
 
             embed = discord.Embed(
-                title=f"Seed #{c}",
+                title=f"Seed #{c+1}",
                 color=discord.Colour.blue()
             )
 
