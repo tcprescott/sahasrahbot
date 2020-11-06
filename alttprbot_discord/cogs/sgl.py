@@ -36,7 +36,7 @@ def restrict_smm2_channel():
 class SpeedGamingLive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # self.create_races.start()
+        self.create_races.start()
         self.record_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
