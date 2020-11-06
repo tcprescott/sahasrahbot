@@ -69,7 +69,7 @@ class League(commands.Cog):
 
     @create_races.before_loop
     async def before_create_races(self):
-        print('create_races loop waiting...')
+        print('league create_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @commands.command(

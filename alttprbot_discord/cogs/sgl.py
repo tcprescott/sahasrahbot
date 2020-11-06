@@ -47,6 +47,16 @@ class SpeedGamingLive(commands.Cog):
     async def record_races(self):
         await race_recording_task()
 
+    @create_races.before_loop
+    async def before_create_races(self):
+        print('sgl create_races loop waiting...')
+        await self.bot.wait_until_ready()
+
+    @record_races.before_loop
+    async def before_record_races(self):
+        print('sgl record_races loop waiting...')
+        await self.bot.wait_until_ready()
+
     @commands.group()
     @restrict_sgl_server()
     async def sgl(self, ctx):
