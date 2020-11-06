@@ -433,7 +433,7 @@ class SGLiveRace():
 
     @property
     def delay_info(self):
-        if d := EVENTS[self.event_slug].get('delay', 0) == 0:
+        if (d := EVENTS[self.event_slug].get('delay', 0)) == 0:
             return ""
 
         return f" - {d} minute delay"

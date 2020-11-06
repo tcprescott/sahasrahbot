@@ -77,7 +77,7 @@ class SpeedGamingLive(commands.Cog):
         await asyncio.sleep(10)
         smm2_category_id = int(await config.get(ctx.guild.id, 'SGLSMM2CategoryClosed'))
         await ctx.channel.edit(
-            sync_permissions=True,
+            # sync_permissions=True,
             category=discord.utils.get(
                 ctx.guild.categories, id=smm2_category_id)
         )
