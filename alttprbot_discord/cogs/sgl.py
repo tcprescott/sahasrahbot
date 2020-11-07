@@ -36,7 +36,8 @@ def restrict_smm2_channel():
 class SpeedGamingLive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.create_races.start()
+        if not c.DEBUG:
+            self.create_races.start()
         self.record_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
@@ -77,7 +78,7 @@ class SpeedGamingLive(commands.Cog):
         await asyncio.sleep(10)
         smm2_category_id = int(await config.get(ctx.guild.id, 'SGLSMM2CategoryClosed'))
         await ctx.channel.edit(
-            # sync_permissions=True,
+            sync_permissions=True,
             category=discord.utils.get(
                 ctx.guild.categories, id=smm2_category_id)
         )

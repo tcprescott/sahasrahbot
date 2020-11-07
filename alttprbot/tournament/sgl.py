@@ -468,9 +468,13 @@ async def create_smm2_match_discord(episode_id, force):
     )
 
     audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
-    if audit_channel_id is not None:
-        audit_channel = discordbot.get_channel(int(audit_channel_id))
-        await audit_channel.send(f"SMM2 Match - Episode {sgl_race.episode_data['id']} - {match_channel.mention}")
+    audit_channel = discordbot.get_channel(int(audit_channel_id))
+    await audit_channel.send(f"SMM2 Match - Episode {sgl_race.episode_data['id']} - {match_channel.mention}")
+
+    volunteer_channel_id = await config.get(sgl_race.guild.id, 'SGLVolunteerChannel')
+    if volunteer_channel_id is not None:
+        volunteer_channel = discordbot.get_channel(int(volunteer_channel_id))
+        await volunteer_channel.send(f"{sgl_race.event_name} - {sgl_race.versus} - Episode {sgl_race.episode_data['id']} - {match_channel.mention}")
 
     embed = discord.Embed(
         title=f"SMM2 Match Channel Opened - {sgl_race.event_name} - {sgl_race.versus}",
@@ -525,10 +529,10 @@ async def process_sgl_race(handler):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
     race = await sgl2020_tournament.get_active_tournament_race(handler.data.get('name'))
-    if race:
-        episodeid = race.get('episode_id')
-    if race is None and episodeid is None:
+    if race is None:
         raise Exception("This race should have an SG episode associated with it.  Please contact a Tournament Admin for assistance.")
+
+    episodeid = race.get('episode_id')
 
     try:
         sgl_race = await SGLiveRace.construct(episode_id=episodeid)
@@ -560,9 +564,13 @@ async def process_sgl_race(handler):
         name="RT.gg", value=f"https://racetime.gg{handler.data['url']}", inline=False)
 
     audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
-    if audit_channel_id is not None:
-        audit_channel = discordbot.get_channel(int(audit_channel_id))
-        await audit_channel.send(embed=embed)
+    audit_channel = discordbot.get_channel(int(audit_channel_id))
+    await audit_channel.send(embed=embed)
+
+    if sgl_race.bingo_password and sgl_race.broadcast_channels:
+        admin_channel_id = await config.get(sgl_race.guild.id, 'SGLAdminChannel')
+        admin_channel = discordbot.get_channel(int(admin_channel_id))
+        await admin_channel.send(embed=embed)
 
     await sgl2020_tournament.insert_tournament_race(
         room_name=handler.data.get('name'),
@@ -665,18 +673,22 @@ async def create_sgl_race_room(episode_id, force=False):
             0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
 
     audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
-    if audit_channel_id is not None:
-        audit_channel = discordbot.get_channel(int(audit_channel_id))
-        await audit_channel.send(embed=embed)
+    audit_channel = discordbot.get_channel(int(audit_channel_id))
+    await audit_channel.send(embed=embed)
+
+    volunteer_channel_id = await config.get(sgl_race.guild.id, 'SGLVolunteerChannel')
+    if volunteer_channel_id is not None:
+        volunteer_channel = discordbot.get_channel(int(volunteer_channel_id))
+        await volunteer_channel.send(f"{sgl_race.event_name} - {sgl_race.versus} - Episode {sgl_race.episode_data['id']} - <https://racetime.gg{handler.data['url']}>")
 
     for name, player in sgl_race.player_discords:
         if player is None:
-            await audit_channel.send(f'Could not DM player named {name}')
+            await audit_channel.send(f'@here Could not DM player named {name}', allowed_mentions=discord.AllowedMentions(everyone=True))
             continue
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
-            await audit_channel.send(f'Could not send room opening DM to player named {name}')
+            await audit_channel.send(f'@here Could not send room opening DM to player named {name}', allowed_mentions=discord.AllowedMentions(everyone=True))
             continue
 
     for name, tracker in sgl_race.tracker_discords:
