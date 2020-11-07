@@ -12,6 +12,8 @@ from config import Config as c
 class SGEpisodeNotFoundException(SahasrahBotException):
     pass
 
+class SGEventNotFoundException(SahasrahBotException):
+    pass
 
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     if c.DEBUG and event == 'test':
@@ -35,7 +37,12 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         params=params,
     ) as resp:
         print(resp.url)
-        return await resp.json(content_type='text/html')
+        schedule = await resp.json(content_type='text/html')
+
+    if 'error' in schedule:
+        raise SGEventNotFoundException(f"Unable to retrieve schedule for {event}. {schedule.get('error')}")
+
+    return schedule
 
 
 async def get_episode(episodeid: int, complete=False):
