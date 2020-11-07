@@ -243,6 +243,23 @@ t_sgl2020_tournament = Table(
         "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
 )
 
+t_sgl2020_tournament_bo3 = Table(
+    'sgl2020_tournament_bo3', metadata,
+    Column('id', INTEGER(11), primary_key=True),
+    Column('episode_id', INTEGER(11)),
+    Column('room_name', String(100, 'utf8_bin'), unique=True),
+    Column('event', String(45, 'utf8_bin')),
+    Column('platform', String(45, 'utf8_bin')),
+    Column('permalink', String(200, 'utf8_bin')),
+    Column('seed', String(200, 'utf8_bin')),
+    Column('password', String(200, 'utf8_bin')),
+    Column('status', String(45, 'utf8_bin')),
+    Column('created', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP")),
+    Column('updated', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+)
+
 t_twitch_channels = Table(
     'twitch_channels', metadata,
     Column('channel', String(200), primary_key=True),
