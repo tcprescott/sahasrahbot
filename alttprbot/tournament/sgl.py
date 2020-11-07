@@ -841,7 +841,8 @@ async def create_sgl_match(episode, force=False):
         await create_smm2_match_discord(episode['id'], force)
     else:
         data = await create_sgl_race_room(episode['id'], force)
-        return f"https://racetime.gg/{data['name']}"
+        if data:
+            return f"https://racetime.gg/{data['name']}"
 
 
 async def record_episode(race):
