@@ -12,7 +12,7 @@ from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exc
 from bs4 import BeautifulSoup
 from config import Config as c
 from racetime_bot import Bot
-from alttprbot.database import sgl2020_tournament
+from alttprbot.database import sgl2020_tournament, sgl2020_tournament_bo3
 
 from . import handlers
 
@@ -140,6 +140,10 @@ class SGLRaceTimeBot(SahasrahBotRaceTimeBot):
             if race['platform'] == 'racetime':
                 await self.create_handler_by_room_name(f"/{race['room_name']}")
 
+        races_bo3 = await sgl2020_tournament_bo3.get_unrecorded_races()
+        for race in races_bo3:
+            if race['platform'] == 'racetime':
+                await self.create_handler_by_room_name(f"/{race['room_name']}")
 
 def start_racetime(loop):
     for bot in racetime_bots.values():

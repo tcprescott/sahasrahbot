@@ -257,7 +257,7 @@ t_sgl2020_tournament_bo3 = Table(
     Column('created', DateTime, server_default=text(
         "CURRENT_TIMESTAMP")),
     Column('updated', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
 )
 
 t_twitch_channels = Table(

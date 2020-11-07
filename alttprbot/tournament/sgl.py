@@ -13,7 +13,7 @@ from slugify import slugify
 import isodate
 
 from alttprbot.alttprgen import preset, randomizer
-from alttprbot.database import config, sgl2020_tournament, patch_distribution
+from alttprbot.database import config, sgl2020_tournament, sgl2020_tournament_bo3, patch_distribution
 from alttprbot.util import gsheet, speedgaming
 from alttprbot_discord.bot import discordbot
 import alttprbot_racetime.bot
@@ -38,7 +38,8 @@ EVENTS = {
     'sglive2020cv1': {
         "rtgg_goal": 1459,
         "sheet": "cv1",
-        "delay": 0
+        "delay": 0,
+        "bo3": True
     },
     'sglive2020ffr': {
         "rtgg_goal": 1452,
@@ -79,7 +80,8 @@ EVENTS = {
     'sglive2020smr': {
         "rtgg_goal": 1456,
         "sheet": "smr",
-        "delay": 0
+        "delay": 0,
+        "bo3": True
     },
     'sglive2020z1r': {
         "rtgg_goal": 1457,
@@ -94,7 +96,8 @@ EVENTS = {
     'sglive2020smb3': {
         "rtgg_goal": 1463,
         "sheet": "smb3",
-        "delay": 5
+        "delay": 5,
+        "bo3": True
     },
 }
 
@@ -457,6 +460,10 @@ class SGLiveRace():
     def broadcast_channels(self):
         return [a['name'] for a in self.episode_data['channels'] if not " " in a['name']]
 
+    @property
+    def bo3(self):
+        return EVENTS[self.event_slug].get('bo3', False)
+
 async def create_smm2_match_discord(episode_id, force):
     race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
     if race and not force:
@@ -533,10 +540,17 @@ async def create_smm2_match_discord(episode_id, force):
 
 
 async def process_sgl_race(handler):
+    bo3 = False
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
-    race = await sgl2020_tournament.get_active_tournament_race(handler.data.get('name'))
-    if race is None:
+    race_original = await sgl2020_tournament.get_active_tournament_race(handler.data.get('name'))
+    race_bo3 = await sgl2020_tournament_bo3.get_tournament_race(handler.data.get('name'))
+    if race_original:
+        race = race_original
+    elif race_bo3:
+        race = race_bo3
+        bo3 = True
+    else:
         raise Exception("This race should have an SG episode associated with it.  Please contact a Tournament Admin for assistance.")
 
     episodeid = race.get('episode_id')
@@ -581,29 +595,46 @@ async def process_sgl_race(handler):
         admin_channel = discordbot.get_channel(int(admin_channel_id))
         await admin_channel.send(embed=embed)
 
-    await sgl2020_tournament.insert_tournament_race(
-        room_name=handler.data.get('name'),
-        episode_id=episodeid,
-        permalink=sgl_race.permalink,
-        seed=sgl_race.seed_id,
-        password=sgl_race.bingo_password,
-        event=sgl_race.episode_data['event']['slug'],
-        platform='racetime'
-    )
+    if bo3:
+        await sgl2020_tournament_bo3.insert_tournament_race(
+            room_name=handler.data.get('name'),
+            episode_id=episodeid,
+            permalink=sgl_race.permalink,
+            seed=sgl_race.seed_id,
+            password=sgl_race.bingo_password,
+            event=sgl_race.episode_data['event']['slug'],
+            platform='racetime'
+        )
+    else:
+        await sgl2020_tournament.insert_tournament_race(
+            room_name=handler.data.get('name'),
+            episode_id=episodeid,
+            permalink=sgl_race.permalink,
+            seed=sgl_race.seed_id,
+            password=sgl_race.bingo_password,
+            event=sgl_race.episode_data['event']['slug'],
+            platform='racetime'
+        )
 
     await handler.send_message("Seed has been generated and should now be in the race info.")
     handler.seed_rolled = True
 
 
 async def process_sgl_race_start(handler):
+    bo3 = False
     race_id = handler.data.get('name')
 
     if race_id is None:
         return
 
-    race = await sgl2020_tournament.get_active_tournament_race(race_id)
-
-    if race is None:
+    race_original = await sgl2020_tournament.get_active_tournament_race(race_id)
+    race_bo3 = await sgl2020_tournament_bo3.get_active_tournament_race(race_id)
+    if race_original:
+        race = race_original
+    elif race_bo3:
+        race = race_bo3
+        bo3 = True
+    else:
         return
 
     if race['event'] == 'sglive2020smo':
@@ -619,13 +650,24 @@ async def process_sgl_race_start(handler):
             }
         )
 
-    await sgl2020_tournament.update_tournament_race_status(race_id, "STARTED")
+    if bo3:
+        await sgl2020_tournament_bo3.update_tournament_race_status(race_id, "STARTED")
+    else:
+        await sgl2020_tournament.update_tournament_race_status(race_id, "STARTED")
     await handler.send_message("Please double check your stream and ensure that it is displaying your game!  GLHF")
 
 
 async def create_sgl_race_room(episode_id, force=False):
     rtgg_sgl = alttprbot_racetime.bot.racetime_bots['sgl']
-    race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
+    race_original = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
+    race_bo3 = await sgl2020_tournament_bo3.get_tournament_race_by_episodeid(episode_id)
+    if race_original:
+        race = race_original
+    elif race_bo3:
+        race = race_bo3
+    else:
+        race = None
+
     if race and not force:
         async with aiohttp.request(
                 method='get',
@@ -655,12 +697,20 @@ async def create_sgl_race_room(episode_id, force=False):
             'chat_message_delay': 0})
 
     print(handler.data.get('name'))
-    await sgl2020_tournament.insert_tournament_race(
-        room_name=handler.data.get('name'),
-        episode_id=sgl_race.episode_id,
-        event=sgl_race.episode_data['event']['slug'],
-        platform='racetime'
-    )
+    if sgl_race.bo3:
+        await sgl2020_tournament_bo3.insert_tournament_race(
+            room_name=handler.data.get('name'),
+            episode_id=sgl_race.episode_id,
+            event=sgl_race.episode_data['event']['slug'],
+            platform='racetime'
+        )
+    else:
+        await sgl2020_tournament.insert_tournament_race(
+            room_name=handler.data.get('name'),
+            episode_id=sgl_race.episode_id,
+            event=sgl_race.episode_data['event']['slug'],
+            platform='racetime'
+        )
 
     embed = discord.Embed(
         title=f"RT.gg Room Opened - {sgl_race.event_name} - {sgl_race.versus}",
@@ -790,7 +840,8 @@ async def create_sgl_match(episode, force=False):
     if episode['event']['slug'] == 'sglive2020smm2':
         await create_smm2_match_discord(episode['id'], force)
     else:
-        await create_sgl_race_room(episode['id'], force)
+        data = await create_sgl_race_room(episode['id'], force)
+        return f"https://racetime.gg/{data['name']}"
 
 
 async def record_episode(race):
