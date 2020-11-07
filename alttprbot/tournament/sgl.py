@@ -66,12 +66,12 @@ EVENTS = {
         "sheet": "smo",
         "delay": 0
     },
-    'sgl2020smany': {
+    'sglive2020smany': {
         "rtgg_goal": 1453,
         "sheet": "smany",
         "delay": 0
     },
-    'sgl2020smdab': {
+    'sglive2020smdab': {
         "rtgg_goal": 1454,
         "sheet": "smdab",
         "delay": 0
@@ -285,11 +285,11 @@ class SGLiveRace():
         self.goal_postfix = f" - {self.permalink} - Password: {self.bingo_password}"
 
     # SM Any%
-    # async def event_sgl2020smany(self):
+    # async def event_sglive2020smany(self):
     #     pass
 
     # SM DAB
-    # async def event_sgl2020smdab(self):
+    # async def event_sglive2020smdab(self):
     #     pass
 
     # Super Metroid Randomizer
