@@ -557,7 +557,7 @@ async def process_sgl_race(handler):
 
     await handler.set_raceinfo(f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.goal_postfix}{sgl_race.delay_info}", overwrite=True)
     await handler.send_message(sgl_race.permalink)
-    if not sgl_race.delay_minutes:
+    if sgl_race.delay_minutes:
         await handler.send_message(f"This is a reminder this race has a {sgl_race.delay_minutes} minute stream delay in effect.  Please ensure your delay is correct.  If you need a stream override, please contact an SGL admin for help.")
 
     embed = discord.Embed(
