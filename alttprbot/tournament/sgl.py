@@ -103,7 +103,7 @@ class SpeedGamingUser():
     def __init__(self, guild, player):
         self.display_name = player['displayName']
         self.public_stream = player['publicStream']
-        # self.streaming_from = player['streamingFrom']
+        self.streaming_from = player.get('streamingFrom', None)
         self.discord_id = player['discordId']
         self.discord_tag = player['discordTag']
 
@@ -639,7 +639,7 @@ async def create_sgl_race_room(episode_id, force=False):
             'info': f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.delay_info}",
             'start_delay': 15,
             'time_limit': 24,
-            # 'streaming_required': 'on',
+            'streaming_required': 'on',
             'allow_comments': 'on',
             'allow_midrace_chat': 'on',
             'allow_non_entrant_chat': 'on',
