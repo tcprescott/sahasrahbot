@@ -736,7 +736,8 @@ async def scan_sgl_schedule():
     for event in events:
         await asyncio.sleep(1) # this keeps SG's API from getting rekt
         try:
-            episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
+            delay = EVENTS[event]['delay']/60
+            episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75+delay)
         except Exception as e:
             logging.exception(
                 "Encountered a problem when attempting to retrieve SG schedule.")
