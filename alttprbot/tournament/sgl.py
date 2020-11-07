@@ -170,7 +170,7 @@ class SGLiveRace():
     # AOSR
     async def event_sglive2020aosr(self):
         self.seed_id, self.permalink = randomizer.roll_aosr(
-            logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', weight="3.5", kicker='false', levelexp='Vanilla')
+            logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', weight="2.5", kicker='false', levelexp='Vanilla')
         self.goal_postfix = f" - {self.permalink}"
 
     # Castlevania 1
