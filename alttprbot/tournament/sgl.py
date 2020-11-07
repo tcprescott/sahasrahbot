@@ -691,6 +691,16 @@ async def create_sgl_race_room(episode_id, force=False):
             await audit_channel.send(f'@here Could not send room opening DM to player named {name}', allowed_mentions=discord.AllowedMentions(everyone=True))
             continue
 
+    for name, comm in sgl_race.commentator_discords:
+        if comm is None:
+            await audit_channel.send(f'@here Could not DM commentator named {name}', allowed_mentions=discord.AllowedMentions(everyone=True))
+            continue
+        try:
+            await comm.send(embed=embed)
+        except discord.HTTPException:
+            await audit_channel.send(f'@here Could not send room opening DM to player named {name}', allowed_mentions=discord.AllowedMentions(everyone=True))
+            continue
+
     for name, tracker in sgl_race.tracker_discords:
         if tracker is None:
             await audit_channel.send(f'Could not DM tracker named {name}')
