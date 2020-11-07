@@ -103,7 +103,7 @@ class SpeedGamingUser():
     def __init__(self, guild, player):
         self.display_name = player['displayName']
         self.public_stream = player['publicStream']
-        self.streaming_from = player['streamingFrom']
+        # self.streaming_from = player['streamingFrom']
         self.discord_id = player['discordId']
         self.discord_tag = player['discordTag']
 
