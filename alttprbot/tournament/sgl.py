@@ -135,6 +135,9 @@ class SGLiveRace():
 
         sgl_race.players = []
         for player in sgl_race.episode_data['match1']['players']:
+            if player.get('streamingFrom', '') in ['sssrestream1']:
+                continue
+
             sgl_race.players.append(SpeedGamingUser(sgl_race.guild, player))
 
         sgl_race.commentators = []
