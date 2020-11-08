@@ -39,7 +39,7 @@ async def whitelisted(ctx):
             "speedgamingdeutsch2",
             "speedgamingespanol",
             'the_synack']:
-        whitelist = await get_whitelist_users(['alttpr', 'owg', 'alttprleague', 'invleague', 'alttprfr', 'alttprde', 'sglde', 'alttprmini'])
+        whitelist = await get_whitelist_users(['alttpr', 'owg', 'alttprleague', 'invleague', 'alttprfr', 'alttprde', 'sglde', 'alttprmini', 'sglive2020alttpr'])
         if ctx.author.name.lower() in whitelist:
             return True
 
