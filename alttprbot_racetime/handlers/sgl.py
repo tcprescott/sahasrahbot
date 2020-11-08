@@ -47,8 +47,9 @@ class GameHandler(SahasrahBotCoreHandler):
         )
 
     async def ex_nextgame(self, args, message):
+        await self.send_message("Creating a new race.  Please wait...")
         current_race = await sgl2020_tournament_bo3.get_tournament_race(self.data.get('name'))
         episode_id = current_race['episode_id']
         episode = await speedgaming.get_episode(episode_id)
         url = await sgl.create_sgl_match(episode, force=True)
-        await self.send_message(f"New race at ${url}")
+        await self.send_message(f"New race at {url}")
