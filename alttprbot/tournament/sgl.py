@@ -658,17 +658,23 @@ async def process_sgl_race_start(handler):
 
 
 async def create_sgl_race_room(episode_id, force=False):
+    bo3 = False
     rtgg_sgl = alttprbot_racetime.bot.racetime_bots['sgl']
     race_original = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
     race_bo3 = await sgl2020_tournament_bo3.get_tournament_race_by_episodeid(episode_id)
     if race_original:
+        print(f"detected original race {race_original}")
         race = race_original
     elif race_bo3:
+        print(f"detected bo3 race {race_bo3}")
         race = race_bo3
+        bo3 = True
     else:
         race = None
 
     if race and not force:
+        if bo3:
+            return
         async with aiohttp.request(
                 method='get',
                 url=rtgg_sgl.http_uri(f"/{race['room_name']}/data"),
@@ -786,7 +792,7 @@ async def scan_sgl_schedule():
     for event in events:
         await asyncio.sleep(1) # this keeps SG's API from getting rekt
         try:
-            delay = EVENTS[event]['delay']/60
+            delay = 0 if c.DEBUG else EVENTS[event]['delay']/60
             episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75+delay)
         except Exception as e:
             logging.exception(
