@@ -821,16 +821,19 @@ async def scan_sgl_schedule():
     print('done')
 
 
-async def race_recording_task():
+async def race_recording_task(bo3=False):
     guild_id = await config.get(0, 'SGLAuditChannel')
     audit_channel_id = await config.get(guild_id, 'SGLAuditChannel')
     audit_channel = discordbot.get_channel(int(audit_channel_id))
 
-    races = await sgl2020_tournament.get_unrecorded_races()
+    if bo3:
+        races = await sgl2020_tournament_bo3.get_unrecorded_races()
+    else:
+        races = await sgl2020_tournament.get_unrecorded_races()
     for race in races:
         print(race['episode_id'])
         try:
-            await record_episode(race)
+            await record_episode(race, bo3=bo3)
         except Exception as e:
             logging.exception(
                 "Encountered a problem when attempting to record a race.")
@@ -854,7 +857,7 @@ async def create_sgl_match(episode, force=False):
             return f"https://racetime.gg/{data['name']}"
 
 
-async def record_episode(race):
+async def record_episode(race, bo3=False):
     # do a bunch of stuff to write the race to the spreadsheet
     if race['status'] == "RECORDED":
         return
@@ -893,7 +896,10 @@ async def record_episode(race):
                 str(race['updated'])
             ])
         elif race_data['status']['value'] == 'cancelled':
-            await sgl2020_tournament.delete_active_tournament_race(race['room_name'])
+            if bo3:
+                await sgl2020_tournament_bo3.delete_active_tournament_race(race['room_name'])
+            else:
+                await sgl2020_tournament.delete_active_tournament_race(race['room_name'])
         else:
             return
     else:
@@ -911,7 +917,10 @@ async def record_episode(race):
             str(race['updated'])
         ])
 
-    await sgl2020_tournament.update_tournament_race_status(race['room_name'], "RECORDED")
+    if bo3:
+        await sgl2020_tournament_bo3.update_tournament_race_status(race['room_name'], "RECORDED")
+    else:
+        await sgl2020_tournament.update_tournament_race_status(race['room_name'], "RECORDED")
 
 
 def get_random_string(length):

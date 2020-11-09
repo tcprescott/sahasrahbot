@@ -7,6 +7,7 @@ from alttprbot.database import config, sgl2020_tournament
 from alttprbot.tournament.sgl import create_sgl_match, scan_sgl_schedule, record_episode, race_recording_task
 from alttprbot.util import speedgaming
 from config import Config as c
+import logging
 
 
 def restrict_sgl_server():
@@ -37,7 +38,7 @@ class SpeedGamingLive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # if not c.DEBUG:
-        self.create_races.start()
+        # self.create_races.start()
         self.record_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
@@ -46,7 +47,14 @@ class SpeedGamingLive(commands.Cog):
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def record_races(self):
-        await race_recording_task()
+        try:
+            print("recording normal races")
+            await race_recording_task(bo3=False)
+            print("recording bo3 races")
+            await race_recording_task(bo3=True)
+            print("done recording")
+        except Exception:
+            logging.exception("error recording")
 
     @create_races.before_loop
     async def before_create_races(self):
