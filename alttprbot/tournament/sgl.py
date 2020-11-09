@@ -700,6 +700,7 @@ async def create_sgl_race_room(episode_id, force=False):
             'start_delay': 15,
             'time_limit': 24,
             'streaming_required': 'on',
+            'auto_start': 'on',
             'allow_comments': 'on',
             'allow_midrace_chat': 'on',
             'allow_non_entrant_chat': 'on',
