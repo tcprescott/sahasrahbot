@@ -619,6 +619,7 @@ async def create_league_race_room(episodeid):
             'streaming_required': 'on',
             'allow_comments': 'on',
             'allow_midrace_chat': 'on',
+            'auto_start': 'on',
             'chat_message_delay': 0})
 
     print(handler.data.get('name'))
