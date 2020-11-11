@@ -137,11 +137,15 @@ class SGLRaceTimeBot(SahasrahBotRaceTimeBot):
 
         races = await sgl2020_tournament.get_unrecorded_races()
         for race in races:
+            if race['race_name'] is None:
+                continue
             if race['platform'] == 'racetime':
                 await self.create_handler_by_room_name(f"/{race['room_name']}")
 
         races_bo3 = await sgl2020_tournament_bo3.get_unrecorded_races()
         for race in races_bo3:
+            if race['race_name'] is None:
+                continue
             if race['platform'] == 'racetime':
                 await self.create_handler_by_room_name(f"/{race['room_name']}")
 
