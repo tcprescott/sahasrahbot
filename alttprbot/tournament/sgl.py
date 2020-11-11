@@ -8,9 +8,11 @@ import os
 
 import aiohttp
 import discord
+import dateutil.parser
 import gspread_asyncio
 from slugify import slugify
 import isodate
+import pytz
 
 from alttprbot.alttprgen import preset, randomizer
 from alttprbot.database import config, sgl2020_tournament, sgl2020_tournament_bo3, patch_distribution
@@ -23,6 +25,9 @@ SMM2_GDRIVE_TEMPLATE = os.environ.get('SGL_SMM2_GDRIVE_TEMPLATE', None)
 SMM2_GDRIVE_FOLDER = os.environ.get('SGL_SMM2_GDRIVE_FOLDER', None)
 SMM2_SHEET_OWNER = os.environ.get('SGL_SMM2_SHEET_OWNER', None)
 SGL_RESULTS_SHEET = os.environ.get('SGL_RESULTS_SHEET', None)
+
+SG_DISCORD_WEBHOOK = os.environ.get('SG_DISCORD_WEBHOOK', None)
+SGL_DISCORD_WEBHOOK = os.environ.get('SGL_DISCORD_WEBHOOK', None)
 
 EVENTS = {
     'sglive2020alttpr': {
@@ -464,8 +469,41 @@ class SGLiveRace():
         return [a['name'] for a in self.episode_data['channels'] if not " " in a['name']]
 
     @property
+    def broadcast_channel_links(self):
+        return [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]
+
+    @property
     def bo3(self):
         return EVENTS[self.event_slug].get('bo3', False)
+
+    @property
+    def broadcast_time(self):
+        return dateutil.parser.parse(self.episode_data['when'])
+
+    @property
+    def race_start_time(self):
+        return dateutil.parser.parse(self.episode_data['whenCountdown'])
+
+    @property
+    def minutes_to_restream(self):
+        when = self.broadcast_time
+        return round((when - datetime.datetime.now(when.tzinfo)) / datetime.timedelta(minutes=1))
+
+    def announcement_embed(self):
+        if (minutes := self.minutes_to_restream) > 0:
+            desc = f"{self.versus} in {minutes} minutes!"
+        else:
+            desc = f"{self.versus} now!"
+
+        embed = discord.Embed(
+            title=f"Upcoming {self.event_name} on {', '.join(self.broadcast_channels)}",
+            description=desc,
+            color=discord.Color(5571003),
+            timestamp=self.broadcast_time
+        )
+        embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/738561710415282206/775907483268153344/logo_for_esa.png')
+        embed.add_field(name='Channels', value=', '.join(self.broadcast_channel_links))
+        return embed
 
 async def create_smm2_match_discord(episode_id, force):
     race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
@@ -538,7 +576,27 @@ async def create_smm2_match_discord(episode_id, force):
         platform='discord'
     )
 
-    await match_channel.send(f"Welcome {', '.join(sgl_race.player_mentionables)}!  ")
+    try:
+        await match_channel.send(f"Welcome {', '.join(sgl_race.player_mentionables)}!  ")
+    except Exception:
+        logging.exception("Unable to mention both players for SMM2")
+
+    try:
+        if SGL_DISCORD_WEBHOOK:
+            async with aiohttp.ClientSession() as session:
+                webhook = discord.Webhook.from_url(
+                    url=SGL_DISCORD_WEBHOOK,
+                    adapter=discord.AsyncWebhookAdapter(session))
+                await webhook.send(embed=sgl_race.announcement_embed())
+        if SG_DISCORD_WEBHOOK:
+            async with aiohttp.ClientSession() as session:
+                webhook = discord.Webhook.from_url(
+                    url=SG_DISCORD_WEBHOOK,
+                    adapter=discord.AsyncWebhookAdapter(session))
+                await webhook.send(embed=sgl_race.announcement_embed())
+    except Exception:
+        logging.exception("Could not send announcement webhooks.")
+
     return match_channel
 
 
@@ -572,10 +630,12 @@ async def process_sgl_race(handler):
         await handler.send_message(f"Could not process league race: {str(e)}")
         return
 
-    await handler.set_raceinfo(f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.goal_postfix}{sgl_race.delay_info}", overwrite=True)
+    start_time = sgl_race.race_start_time.astimezone(pytz.timezone('US/Eastern')).strftime('%I:%M %p Eastern')
+
+    await handler.set_raceinfo(f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.goal_postfix}{sgl_race.delay_info} - Scheduled race start at {start_time}", overwrite=True)
     await handler.send_message(sgl_race.permalink)
     if sgl_race.delay_minutes:
-        await handler.send_message(f"This is a reminder this race has a {sgl_race.delay_minutes} minute stream delay in effect.  Please ensure your delay is correct.  If you need a stream override, please contact an SGL admin for help.")
+        await handler.send_message(f"This is a reminder this race has a {sgl_race.delay_minutes} minute stream delay in effect.  Please ensure your delay is correct.  If you need a stream override, please contact a SGL admin for help.")
 
     embed = discord.Embed(
         title=f"{sgl_race.event_name} - {sgl_race.versus}",
@@ -690,13 +750,15 @@ async def create_sgl_race_room(episode_id, force=False):
 
     sgl_race = await SGLiveRace.construct(episode_id=episode_id)
 
+    start_time = sgl_race.race_start_time.astimezone(pytz.timezone('US/Eastern')).strftime('%I:%M %p Eastern')
+
     handler = await rtgg_sgl.create_race(
         config={
             'goal': EVENTS[sgl_race.event_slug]['rtgg_goal'],
             'custom_goal': '',
             # 'invitational': 'on',
             'unlisted': 'on',
-            'info': f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.delay_info}",
+            'info': f"{sgl_race.event_name} - {sgl_race.versus}{sgl_race.delay_info} - Scheduled race start at {start_time}",
             'start_delay': 15,
             'time_limit': 24,
             'streaming_required': 'on',
@@ -780,6 +842,22 @@ async def create_sgl_race_room(episode_id, force=False):
             await audit_channel.send(f'Could not send room opening DM to tracker named {name}')
             continue
 
+    try:
+        if SGL_DISCORD_WEBHOOK:
+            async with aiohttp.ClientSession() as session:
+                webhook = discord.Webhook.from_url(
+                    url=SGL_DISCORD_WEBHOOK,
+                    adapter=discord.AsyncWebhookAdapter(session))
+                await webhook.send(embed=sgl_race.announcement_embed())
+        if SG_DISCORD_WEBHOOK:
+            async with aiohttp.ClientSession() as session:
+                webhook = discord.Webhook.from_url(
+                    url=SG_DISCORD_WEBHOOK,
+                    adapter=discord.AsyncWebhookAdapter(session))
+                await webhook.send(embed=sgl_race.announcement_embed())
+    except Exception:
+        logging.exception("Could not send announcement webhooks.")
+
     return handler.data
 
 
@@ -848,7 +926,7 @@ async def race_recording_task(bo3=False):
 async def create_sgl_match(episode, force=False):
     if episode['event']['slug'] not in EVENTS.keys():
         raise Exception(
-            f"{episode['id']} is not an SGL match.  Found {episode['event']['slug']}")
+            f"{episode['id']} is not a SGL match.  Found {episode['event']['slug']}")
 
     if episode['event']['slug'] == 'sglive2020smm2':
         await create_smm2_match_discord(episode['id'], force)

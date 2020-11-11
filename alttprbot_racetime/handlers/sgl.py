@@ -16,7 +16,7 @@ class GameHandler(SahasrahBotCoreHandler):
         """
         if not self.state.get('intro_sent'):
             await self.send_message(
-                f"Hi!  I'm SahasrahBot. Use {self.command_prefix}roll to roll your seed (if applicable) and get started!  If you need help, please contact an SpeedGaming Live admin for assistance."
+                f"Hi!  I'm SahasrahBot. Use {self.command_prefix}roll to roll your seed (if applicable) and get started!  If you need help, please contact a SpeedGaming Live admin for assistance."
             )
             self.state['intro_sent'] = True
 
