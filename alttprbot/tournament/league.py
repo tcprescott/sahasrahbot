@@ -574,20 +574,20 @@ async def process_league_race_start(handler):
     if race is None:
         return
 
-    if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
-        async with aiohttp.request(
-            method='get',
-            url='https://alttprleague.com/json_ep/submit-game',
-            params={
-                'slug': race_id,
-                'sgl': race['episode_id'],
-                'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
-            }
-        ) as _:
-            pass
-    else:
-        print(
-            f"Would have reported match {race_id} for episode {race['episode_id']}")
+    # if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
+    #     async with aiohttp.request(
+    #         method='get',
+    #         url='https://alttprleague.com/json_ep/submit-game',
+    #         params={
+    #             'slug': race_id,
+    #             'sgl': race['episode_id'],
+    #             'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
+    #         }
+    #     ) as _:
+    #         pass
+    # else:
+    #     print(
+    #         f"Would have reported match {race_id} for episode {race['episode_id']}")
 
     await tournament_results.update_tournament_results(race_id, status="STARTED")
 
@@ -648,6 +648,21 @@ async def create_league_race_room(episodeid):
         except discord.HTTPException:
             print(f'Could not send room opening DM to {name}')
             continue
+
+    if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
+        async with aiohttp.request(
+            method='get',
+            url='https://alttprleague.com/json_ep/submit-game',
+            params={
+                'slug': handler.data.get('name'),
+                'sgl': race['episode_id'],
+                'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
+            }
+        ) as _:
+            pass
+    else:
+        print(
+            f"Would have reported match {handler.data.get('name')} for episode {race['episode_id']}")
 
     await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
     return handler.data
