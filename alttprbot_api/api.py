@@ -74,6 +74,10 @@ async def sgl_message():
     guild = discordbot.get_guild(int(guild_id))
 
     member = guild.get_member_named(payload['discordTag'])
+
+    if member is None:
+        abort(404, description=f"{payload['discordTag']} user not found.")
+
     await member.send(payload['message'])
 
     return jsonify(success=True)
