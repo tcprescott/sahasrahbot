@@ -3,7 +3,7 @@ import os
 from quart import Quart, abort, jsonify, request
 
 from alttprbot.alttprgen.mystery import get_weights, generate_random_settings
-from alttprbot.database import sgl2020_tournament
+from alttprbot.database import sgl2020_tournament, config
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
 from alttprbot_srl.bot import srlbot
@@ -61,6 +61,22 @@ async def sgl_episode(episode):
     result = await sgl2020_tournament.get_tournament_race_by_episodeid(episode)
     return jsonify(result=result)
 
+@sahasrahbotapi.route('/api/sgl/message', methods=['POST'])
+async def sgl_message():
+    secret = request.args.get("secret")
+
+    if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
+        abort(401, description="secret required")
+
+    payload = await request.get_json()
+
+    guild_id = await config.get(0, 'SpeedGamingLiveGuild')
+    guild = discordbot.get_guild(int(guild_id))
+
+    member = guild.get_member_named(payload['discordTag'])
+    await member.send(payload['message'])
+
+    return jsonify(success=True)
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
