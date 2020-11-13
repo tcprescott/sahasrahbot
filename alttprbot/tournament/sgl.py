@@ -190,8 +190,7 @@ class SGLiveRace():
 
     # Final Fantasy Randomizer
     async def event_sglive2020ffr(self):
-        self.seed_id, self.permalink = randomizer.roll_ffr(
-            flags='yGcifaseK8fJxIkkAzUzYAzx32UoP5toiyJrTE864J9FEyMsXe5XhM5T94nANOh1T6wJN7BZU4p3r3WORe9o7vyXSpZD')
+        self.seed_id, self.permalink = randomizer.roll_ffr(flags='yGq4dTUZierDQgQt0W-opZBxIHu3Djls2qM3uv02Y6KFCBgdRRG1fVdgyOD!kw3MO9U-Ez9vU4p3r3WORe9o7vyXSpZD')
         self.goal_postfix = f" - {self.permalink}"
 
     # Megaman X
