@@ -1,61 +1,91 @@
 description: "A Quebecois to the Past S2"
-glitches_required: "none"
-item_placement: "advanced"
+glitches_required:
+  none: 100
+  overworld_glitches: 0
+  major_glitches: 0
+  no_logic: 0
+item_placement:
+  basic: 0
+  advanced: 100
 dungeon_items:
-  standard: 20
-  mc: 30
-  mcs: 25
+  standard: 40
+  mc: 25
+  mcs: 10
   full: 25
 accessibility:
-  items: 45
-  locations: 30
-  none: 25
+  items: 75
+  locations: 15
+  none: 10
 goals:
-  ganon: 30
-  fast_ganon: 25
-  dungeons: 20
-  pedestal: 15
-  triforce-hunt: 10
+  ganon: 40
+  fast_ganon: 35
+  dungeons: 10
+  pedestal: 10
+  triforce-hunt: 5
 tower_open:
+  "0": 0
+  "1": 0
+  "2": 0
+  "3": 0
   "4": 5
   "5": 10
   "6": 10
   "7": 75
+  random: 0
 ganon_open:
+  "0": 0
+  "1": 0
+  "2": 0
+  "3": 0
+  "4": 0
   "5": 5
   "6": 10
   "7": 85
   random: 0
 world_state:
   standard: 35
-  open: 35
+  open: 40
   inverted: 15
-  retro: 15
-entrance_shuffle: "none"
+  retro: 10
+entrance_shuffle:
+  none: 100
+  simple: 0
+  restricted: 0
+  full: 0
+  crossed: 0
+  insanity: 0
 boss_shuffle:
-  none: 25
-  simple: 25
-  full: 25
-  random: 25
+  none: 70
+  simple: 10
+  full: 10
+  random: 10
 enemy_shuffle:
-  none: 40
-  shuffled: 30
-  random: 30
+  none: 70
+  shuffled: 15
+  random: 15
 hints:
-  "on": 45
-  "off": 55
+  "on": 35
+  "off": 65
 weapons:
-  randomized: 35
+  randomized: 40
   assured: 30
   vanilla: 20
-  swordless: 15
+  swordless: 10
 item_pool:
-  normal: 50
-  hard: 30
-  expert: 20
+  normal: 70
+  hard: 20
+  expert: 10
+  crowd_control: 0
 item_functionality:
-  normal: 55
-  hard: 25
-  expert: 20
-enemy_damage: "default"
-enemy_health: "default"
+  normal: 70
+  hard: 20
+  expert: 10
+enemy_damage:
+  default: 100
+  shuffled: 0
+  random: 0
+enemy_health:
+  default: 100
+  easy: 0
+  hard: 0
+  expert: 0
