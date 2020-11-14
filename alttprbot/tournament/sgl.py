@@ -580,22 +580,22 @@ async def create_smm2_match_discord(episode_id, force):
     except Exception:
         logging.exception("Unable to mention both players for SMM2")
 
-    try:
-        if sgl_race.broadcast_channels:
-            if SGL_DISCORD_WEBHOOK:
-                async with aiohttp.ClientSession() as session:
-                    webhook = discord.Webhook.from_url(
-                        url=SGL_DISCORD_WEBHOOK,
-                        adapter=discord.AsyncWebhookAdapter(session))
-                    await webhook.send(embed=sgl_race.announcement_embed())
-            if SG_DISCORD_WEBHOOK:
-                async with aiohttp.ClientSession() as session:
-                    webhook = discord.Webhook.from_url(
-                        url=SG_DISCORD_WEBHOOK,
-                        adapter=discord.AsyncWebhookAdapter(session))
-                    await webhook.send(embed=sgl_race.announcement_embed())
-    except Exception:
-        logging.exception("Could not send announcement webhooks.")
+    # try:
+    #     if sgl_race.broadcast_channels:
+    #         if SGL_DISCORD_WEBHOOK:
+    #             async with aiohttp.ClientSession() as session:
+    #                 webhook = discord.Webhook.from_url(
+    #                     url=SGL_DISCORD_WEBHOOK,
+    #                     adapter=discord.AsyncWebhookAdapter(session))
+    #                 await webhook.send(embed=sgl_race.announcement_embed())
+    #         if SG_DISCORD_WEBHOOK:
+    #             async with aiohttp.ClientSession() as session:
+    #                 webhook = discord.Webhook.from_url(
+    #                     url=SG_DISCORD_WEBHOOK,
+    #                     adapter=discord.AsyncWebhookAdapter(session))
+    #                 await webhook.send(embed=sgl_race.announcement_embed())
+    # except Exception:
+    #     logging.exception("Could not send announcement webhooks.")
 
     return match_channel
 
