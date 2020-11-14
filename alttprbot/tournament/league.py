@@ -655,14 +655,14 @@ async def create_league_race_room(episodeid):
             url='https://alttprleague.com/json_ep/submit-game',
             params={
                 'slug': handler.data.get('name'),
-                'sgl': race['episode_id'],
+                'sgl': episodeid,
                 'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
             }
         ) as _:
             pass
     else:
         print(
-            f"Would have reported match {handler.data.get('name')} for episode {race['episode_id']}")
+            f"Would have reported match {handler.data.get('name')} for episode {episodeid}")
 
     await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
     return handler.data
