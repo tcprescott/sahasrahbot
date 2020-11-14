@@ -652,7 +652,7 @@ async def create_league_race_room(episodeid):
     if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
         async with aiohttp.request(
             method='get',
-            url='https://alttprleague.com/json_ep/submit-game',
+            url='https://alttprleague.com/json_ep/submit-game/',
             params={
                 'slug': handler.data.get('name'),
                 'sg': episodeid,
