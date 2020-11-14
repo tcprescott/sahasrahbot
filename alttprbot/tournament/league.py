@@ -655,7 +655,7 @@ async def create_league_race_room(episodeid):
             url='https://alttprleague.com/json_ep/submit-game',
             params={
                 'slug': handler.data.get('name'),
-                'sgl': episodeid,
+                'sg': episodeid,
                 'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
             }
         ) as _:
