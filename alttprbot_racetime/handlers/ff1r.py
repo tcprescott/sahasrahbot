@@ -2,6 +2,7 @@ from alttprbot.alttprgen.randomizer.ffr import roll_ffr
 
 from .core import SahasrahBotCoreHandler
 
+
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_flags(self, args, message):
         try:
@@ -27,7 +28,7 @@ class GameHandler(SahasrahBotCoreHandler):
         if await self.is_locked(message):
             return
 
-        seed_url = roll_ffr(flags)
+        seed_url, flags = roll_ffr(flags)
 
         await self.set_raceinfo(seed_url)
         await self.send_message(seed_url)
