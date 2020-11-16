@@ -12,7 +12,7 @@ from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exc
 from bs4 import BeautifulSoup
 from config import Config as c
 from racetime_bot import Bot
-from alttprbot.database import sgl2020_tournament, sgl2020_tournament_bo3
+# from alttprbot.database import sgl2020_tournament, sgl2020_tournament_bo3
 
 from . import handlers
 
