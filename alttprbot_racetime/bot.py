@@ -28,7 +28,7 @@ logger_handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(logger_handler)
 
-RACETIME_GAMES = ['alttpr', 'smz3', 'sgl', 'ff1r', 'z1r', 'smb3r', 'smr']
+RACETIME_GAMES = ['alttpr', 'smz3', 'ff1r', 'z1r', 'smb3r', 'smr']
 
 
 class SahasrahBotRaceTimeBot(Bot):
@@ -130,24 +130,24 @@ class SahasrahBotRaceTimeBot(Bot):
         self.loop.create_task(self.refresh_races())
 
 
-class SGLRaceTimeBot(SahasrahBotRaceTimeBot):
-    async def start(self):
-        self.loop.create_task(self.reauthorize())
-        self.loop.create_task(self.refresh_races())
+# class SGLRaceTimeBot(SahasrahBotRaceTimeBot):
+#     async def start(self):
+#         self.loop.create_task(self.reauthorize())
+#         self.loop.create_task(self.refresh_races())
 
-        races = await sgl2020_tournament.get_unrecorded_races()
-        for race in races:
-            if race['platform'] == 'racetime':
-                if race['room_name'] is None:
-                    continue
-                await self.create_handler_by_room_name(f"/{race['room_name']}")
+#         races = await sgl2020_tournament.get_unrecorded_races()
+#         for race in races:
+#             if race['platform'] == 'racetime':
+#                 if race['room_name'] is None:
+#                     continue
+#                 await self.create_handler_by_room_name(f"/{race['room_name']}")
 
-        races_bo3 = await sgl2020_tournament_bo3.get_unrecorded_races()
-        for race in races_bo3:
-            if race['platform'] == 'racetime':
-                if race['room_name'] is None:
-                    continue
-                await self.create_handler_by_room_name(f"/{race['room_name']}")
+#         races_bo3 = await sgl2020_tournament_bo3.get_unrecorded_races()
+#         for race in races_bo3:
+#             if race['platform'] == 'racetime':
+#                 if race['room_name'] is None:
+#                     continue
+#                 await self.create_handler_by_room_name(f"/{race['room_name']}")
 
 def start_racetime(loop):
     for bot in racetime_bots.values():
@@ -156,21 +156,21 @@ def start_racetime(loop):
 
 racetime_bots = {}
 for slug in RACETIME_GAMES:
-    if slug == 'sgl':
-        racetime_bots[slug] = SGLRaceTimeBot(
-            category_slug=slug,
-            client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
-            client_secret=os.environ.get(
-                f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
-            logger=logger,
-            handler_class=getattr(handlers, slug).GameHandler
-        )
-    else:
-        racetime_bots[slug] = SGLRaceTimeBot(
-            category_slug=slug,
-            client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
-            client_secret=os.environ.get(
-                f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
-            logger=logger,
-            handler_class=getattr(handlers, slug).GameHandler
-        )
+    # if slug == 'sgl':
+    racetime_bots[slug] = SahasrahBotRaceTimeBot(
+        category_slug=slug,
+        client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
+        client_secret=os.environ.get(
+            f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
+        logger=logger,
+        handler_class=getattr(handlers, slug).GameHandler
+    )
+    # else:
+    #     racetime_bots[slug] = SGLRaceTimeBot(
+    #         category_slug=slug,
+    #         client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
+    #         client_secret=os.environ.get(
+    #             f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
+    #         logger=logger,
+    #         handler_class=getattr(handlers, slug).GameHandler
+    #     )
