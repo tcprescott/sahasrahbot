@@ -153,6 +153,9 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_vt(self, args, message):
         await self.send_message("You summon Veetorp, he looks around confused and curses your next game with bad (CS)PRNG.")
 
+    async def ex_synack(self, args, message):
+        await self.send_message("You need to be more creative.")
+
     async def send_spoiler_log(self):
         name = self.data.get('name')
         race = await spoiler_races.get_spoiler_race_by_id(name)
