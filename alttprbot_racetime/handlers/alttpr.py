@@ -27,8 +27,8 @@ class GameHandler(SahasrahBotCoreHandler):
                 await self.add_monitor(entrant['user']['id'])
 
     async def in_progress(self):
-        await league.process_league_race_start(self)
         await self.send_spoiler_log()
+        await league.process_league_race_start(self)
 
     async def ex_preset(self, args, message):
         # if league.is_league_race(self.data.get('name')):
