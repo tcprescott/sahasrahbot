@@ -608,19 +608,36 @@ async def create_league_race_room(episodeid):
 
     league_race = await LeagueRace.construct(episodeid=episodeid, create_seed=False)
 
-    handler = await rtgg_alttpr.create_race(
-        config={
-            'goal': '' if league_race.coop else 2,
-            'custom_goal': 'Co-op Info Share' if league_race.coop else '',
-            'invitational': 'on',
-            'info': f"ALTTPR League - {league_race.versus_and_team}",
-            'start_delay': 15,
-            'time_limit': 24,
-            'streaming_required': 'on',
-            'allow_comments': 'on',
-            'allow_midrace_chat': 'on',
-            'auto_start': 'on',
-            'chat_message_delay': 0})
+    if league_race.coop:
+        handler = await rtgg_alttpr.startrace(
+            custom_goal='Co-op Info Share',
+            invitational=True,
+            unlisted=True,
+            info=f"ALTTPR League - {league_race.versus_and_team}",
+            start_delay=15,
+            time_limit=24,
+            streaming_required=True,
+            auto_start=True,
+            allow_comments=True,
+            allow_midrace_chat=True,
+            allow_non_entrant_chat=False,
+            chat_message_delay=0
+        )
+    else:
+        handler = await rtgg_alttpr.startrace(
+            goal="Beat the game",
+            invitational=True,
+            unlisted=True,
+            info=f"ALTTPR League - {league_race.versus_and_team}",
+            start_delay=15,
+            time_limit=24,
+            streaming_required=True,
+            auto_start=True,
+            allow_comments=True,
+            allow_midrace_chat=True,
+            allow_non_entrant_chat=False,
+            chat_message_delay=0
+        )
 
     print(handler.data.get('name'))
     await tournament_results.insert_tournament_race(
@@ -665,6 +682,7 @@ async def create_league_race_room(episodeid):
             f"Would have reported match {handler.data.get('name')} for episode {episodeid}")
 
     await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
+    await handler.edit(unlisted=False)
     return handler.data
 
 

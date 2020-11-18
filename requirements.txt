@@ -10,7 +10,7 @@ py-dateutil >= 2.2
 discord-sentry-reporting
 discord.py >= 1.5.0
 emoji >= 0.5.3
-git+git://github.com/tcprescott/racetime-bot.git@patch-3
+git+git://github.com/tcprescott/racetime-bot.git@aiohttp_update
 gspread_asyncio
 html2markdown
 ircmessage
