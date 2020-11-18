@@ -34,8 +34,9 @@ class SahasrahBotCoreHandler(RaceHandler):
             )
             self.state['intro_sent'] = True
 
-    # async def ex_help(self, args, message):
-    #     await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+    async def end(self):
+        # await self.send_message(f"SahasrahBot is now leaving this race room.  Have a great day!")
+        self.logger.info(f"Leaving race room {self.data.get('name')}")
 
     async def ex_cancel(self, args, message):
         self.seed_rolled = False

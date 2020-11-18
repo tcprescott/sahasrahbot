@@ -27,8 +27,8 @@ class GameHandler(SahasrahBotCoreHandler):
                 await self.add_monitor(entrant['user']['id'])
 
     async def in_progress(self):
-        await self.send_spoiler_log()
         await league.process_league_race_start(self)
+        await self.send_spoiler_log()
 
     async def ex_preset(self, args, message):
         # if league.is_league_race(self.data.get('name')):
@@ -163,10 +163,11 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message(f"This race\'s spoiler log: {race['spoiler_url']}")
             await self.send_message('---------------')
             await self.send_message('GLHF! :mudora:')
-            await self.countdown_timer(
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.countdown_timer(
                 duration_in_seconds=race['studytime'],
                 beginmessage=True,
-            )
+            ))
 
     async def countdown_timer(self, duration_in_seconds, beginmessage=False):
         loop = asyncio.get_running_loop()
