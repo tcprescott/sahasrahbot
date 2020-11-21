@@ -48,6 +48,7 @@ title:  Presets
 | [open_fast_07](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast_07.yaml) |Fast ganon, but GT is open immediately.  Intended to be played in a spoiler race.|   |
 | [open_fast_66](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast_66.yaml) |Fast ganon, slightly reduced crystals (6 for GT, 6 for Ganon)|   |
 | [open_fast_74](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast_74.yaml) |Four crystals required for Ganon, but 7 for GT.  Keeps GT effectively locked out.|   |
+| [open_noprogbows](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_noprogbows.yaml) || *Customizer*  |
 | [open_randomcrystals](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_randomcrystals.yaml) |Random GT and Ganon crystal requirements.|   |
 | [openboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots.yaml) |You get to start with Pegasus Boots!| *Customizer*  |
 | [openboots_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots_fast.yaml) |You get to start with Pegasus Boots! Oh, and you don't need to defeat Aghanim 2.| *Customizer*  |
