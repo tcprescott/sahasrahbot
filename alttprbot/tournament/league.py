@@ -542,6 +542,7 @@ async def process_league_race(handler, episodeid=None, week=None):
 
     if league_race.gen_type == 'spoiler':
         await spoiler_races.insert_spoiler_race(handler.data.get('name'), league_race.spoiler_log_url, league_race.studyperiod)
+        await handler.send_message("The spoiler log will be posted in chat at the start of the race.  ENSURE YOUR PILOT IS WATCHING THE CHAT.")
 
     if race is None:
         await tournament_results.insert_tournament_race(
