@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 import math
 
 from alttprbot.alttprgen import mystery, preset, spoilers
@@ -25,6 +26,21 @@ class GameHandler(SahasrahBotCoreHandler):
             if await league.can_gatekeep(entrant['user']['id']):
                 await self.accept_request(entrant['user']['id'])
                 await self.add_monitor(entrant['user']['id'])
+
+    async def begin(self):
+        self.state['locked'] = False
+
+        # re-establish a spoiler race countdown if bot is restarted/crashes
+        in_progress_spoiler_race = await spoiler_races.get_spoiler_race_by_id_started(self.data.get('name'))
+        if in_progress_spoiler_race:
+            loop = asyncio.get_running_loop()
+            started_time = in_progress_spoiler_race['started']
+            now_time = datetime.utcnow()
+            remaining_duration = (started_time - now_time).total_seconds() + in_progress_spoiler_race['studytime']
+            loop.create_task(self.countdown_timer(
+                duration_in_seconds=remaining_duration,
+                beginmessage=True,
+            ))
 
     async def in_progress(self):
         await self.send_spoiler_log()
@@ -160,7 +176,7 @@ class GameHandler(SahasrahBotCoreHandler):
         name = self.data.get('name')
         race = await spoiler_races.get_spoiler_race_by_id(name)
         if race:
-            await spoiler_races.delete_spoiler_race(name)
+            await spoiler_races.start_spoiler_race(name)
             await self.send_message('Sending spoiler log...')
             await self.send_message('---------------')
             await self.send_message(f"This race\'s spoiler log: {race['spoiler_url']}")

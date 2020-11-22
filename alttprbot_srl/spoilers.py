@@ -18,7 +18,7 @@ async def send_spoiler_log(srl_id, client, target):
             srl_channel=target,
             beginmessage=True,
         )
-        await spoiler_races.delete_spoiler_race(srl_id)
+        await spoiler_races.start_spoiler_race(srl_id)
 
 
 async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage=False):

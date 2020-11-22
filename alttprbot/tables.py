@@ -178,7 +178,8 @@ t_spoiler_races = Table(
     Column('srl_id', String(45, 'utf8_bin'), nullable=False, unique=True),
     Column('spoiler_url', String(255, 'utf8_bin'), nullable=False),
     Column('studytime', INTEGER(11)),
-    Column('date', DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    Column('date', DateTime, server_default=text("CURRENT_TIMESTAMP")),
+    Column('started', DateTime)
 )
 
 
