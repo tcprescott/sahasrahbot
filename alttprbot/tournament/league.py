@@ -635,6 +635,7 @@ async def create_league_race_room(episodeid):
             time_limit=24,
             streaming_required=True,
             auto_start=True,
+            allow_comments=True,
             hide_comments=True,
             allow_midrace_chat=True,
             allow_non_entrant_chat=False,
