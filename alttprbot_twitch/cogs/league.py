@@ -25,6 +25,9 @@ class League():
         if result is not None:
             await ctx.send(result['content'])
 
+    @commands.command()
+    async def leagueweights(self, ctx):
+        await ctx.send("Find the League Mystery weights here: https://alttprleague.com/weights.png")
 
 def setup(bot):
     bot.add_cog(League(bot))
