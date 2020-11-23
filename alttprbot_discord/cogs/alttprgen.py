@@ -124,6 +124,21 @@ class AlttprGen(commands.Cog):
                               value=spoiler_log_url, inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command(
+        brief='Generate a progression spoiler game.',
+        help='Generate a progression spoiler game.  Find a list of presets at https://sahasrahbot.synack.live/presets.html'
+    )
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def progression(self, ctx, preset):
+        seed, _, spoiler_log_url = await generate_spoiler_game(preset, spoiler_type='progression')
+        if not seed:
+            raise SahasrahBotException(
+                'Could not generate game.  Maybe preset does not exist?')
+        embed = await seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Progression Spoiler Log URL",
+                              value=spoiler_log_url, inline=False)
+        await ctx.send(embed=embed)
+
     @commands.group(
         brief='Generate a game with randomized settings.',
         help='Generate a game with randomized settings.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html',

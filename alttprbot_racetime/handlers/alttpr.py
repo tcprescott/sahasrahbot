@@ -36,7 +36,8 @@ class GameHandler(SahasrahBotCoreHandler):
             loop = asyncio.get_running_loop()
             started_time = in_progress_spoiler_race['started']
             now_time = datetime.utcnow()
-            remaining_duration = (started_time - now_time).total_seconds() + in_progress_spoiler_race['studytime']
+            remaining_duration = (
+                started_time - now_time).total_seconds() + in_progress_spoiler_race['studytime']
             loop.create_task(self.countdown_timer(
                 duration_in_seconds=remaining_duration,
                 beginmessage=True,
@@ -123,6 +124,40 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.set_raceinfo(f"spoiler {preset_name} - {seed.url} - ({'/'.join(seed.code)})")
         await self.send_message(seed.url)
         await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+        await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, studytime)
+        self.seed_rolled = True
+
+    async def ex_progression(self, args, message):
+        # if league.is_league_race(self.data.get('name')):
+        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
+        #     return
+
+        if await self.is_locked(message):
+            return
+
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        try:
+            seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(preset_name, spoiler_type='progression')
+        except preset.PresetNotFoundException as e:
+            await self.send_message(str(e))
+            return
+
+        try:
+            studytime = int(args[1])
+        except IndexError:
+            studytime = 300
+
+        await self.set_raceinfo(f"spoiler {preset_name} - {seed.url} - ({'/'.join(seed.code)})")
+        await self.send_message(seed.url)
+        await self.send_message(f"The progression spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, studytime)
         self.seed_rolled = True
 
