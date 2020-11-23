@@ -145,20 +145,15 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
-            seed, preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(preset_name, spoiler_type='progression')
+            seed, _, spoiler_log_url = await spoilers.generate_spoiler_game(preset_name, spoiler_type='progression')
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))
             return
 
-        try:
-            studytime = int(args[1])
-        except IndexError:
-            studytime = 300
-
         await self.set_raceinfo(f"spoiler {preset_name} - {seed.url} - ({'/'.join(seed.code)})")
         await self.send_message(seed.url)
-        await self.send_message(f"The progression spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
-        await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, studytime)
+        await self.send_message(f"The progression spoiler for this race will be sent after the race begins in this room.")
+        await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, 0)
         self.seed_rolled = True
 
     async def ex_mystery(self, args, message):
