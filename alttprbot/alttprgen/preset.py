@@ -73,8 +73,11 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
             settings['allow_quickswap'] = True
 
         if preset_dict.get('customizer', False):
+            if 'l' not in settings:
+                settings['l'] = {}
             for i in preset_dict.get('forced_locations', {}):
-                settings['l'][random.choice(i['locations'])] = i['item']
+                location = random.choice([l for l in i['locations'] if l not in settings['l']])
+                settings['l'][location] = i['item']
 
         seed = await alttpr(
             customizer=preset_dict.get('customizer', False),
