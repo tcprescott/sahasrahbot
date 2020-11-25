@@ -43,6 +43,7 @@ title:  Presets
 | [mg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mg.yaml) |This requires use of major glitches.|   |
 | [msutest](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/msutest.yaml) |This generates a game ideal for MSU-1 pack testing.| *Customizer*  |
 | [nologic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic.yaml) |No Logic.  Anything can be anywhere and nothing really matters.|   |
+| [nologic_keylock](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic_keylock.yaml) |No Logic Keysanity, but Big Keys are stuck on bosses and in the Moldorm 2 chest.| *Customizer*  |
 | [open](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open.yaml) |Open mode, thats pretty much it.|   |
 | [open_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast.yaml) |Open mode, thats pretty much it.|   |
 | [open_fast_07](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast_07.yaml) |Fast ganon, but GT is open immediately.  Intended to be played in a spoiler race.|   |

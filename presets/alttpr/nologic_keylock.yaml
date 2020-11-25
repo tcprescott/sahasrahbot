@@ -1,0 +1,446 @@
+customizer: true
+goal_name: no logic keylock
+description: "No Logic Keysanity, but Big Keys are stuck on bosses and in the Moldorm 2 chest."
+forced_locations:
+  - item: "BigKeyA2:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyP1:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyP2:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyP3:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD1:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD2:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD3:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD4:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD5:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD6:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+  - item: "BigKeyD7:1"
+    locations:
+      - R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==
+      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==
+      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=
+      - SWNlIFBhbGFjZSAtIEJvc3M6MQ==
+      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE=
+      - U2t1bGwgV29vZHMgLSBCb3NzOjE=
+      - U3dhbXAgUGFsYWNlIC0gQm9zczox
+      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox
+      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==
+      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ==
+      - VHVydGxlIFJvY2sgLSBCb3NzOjE=
+settings:
+  accessibility: items
+  allow_quickswap: true
+  crystals:
+    ganon: "7"
+    tower: "7"
+  custom:
+    customPrizePacks: false
+    canBombJump: false
+    canBootsClip: false
+    canBunnyRevive: false
+    canBunnySurf: false
+    canDungeonRevive: false
+    canFakeFlipper: false
+    canMirrorClip: false
+    canMirrorWrap: false
+    canOWYBA: false
+    canOneFrameClipOW: false
+    canSuperBunny: false
+    canSuperSpeed: false
+    canWaterFairyRevive: false
+    canWaterWalk: false
+    drop:
+      count:
+        ArrowRefill10: 3
+        ArrowRefill5: 5
+        Bee: 0
+        BeeGood: 0
+        BombRefill1: 7
+        BombRefill4: 1
+        BombRefill8: 2
+        Fairy: 1
+        Heart: 13
+        MagicRefillFull: 3
+        MagicRefillSmall: 6
+        RupeeBlue: 7
+        RupeeGreen: 9
+        RupeeRed: 6
+    item:
+      count:
+        Arrow: 1
+        ArrowUpgrade10: 0
+        ArrowUpgrade5: 0
+        BigKeyA1: 0
+        BigKeyA2: 0
+        BigKeyD1: 0
+        BigKeyD2: 0
+        BigKeyD3: 0
+        BigKeyD4: 0
+        BigKeyD5: 0
+        BigKeyD6: 0
+        BigKeyD7: 0
+        BigKeyH1: 0
+        BigKeyH2: 0
+        BigKeyP1: 0
+        BigKeyP2: 0
+        BigKeyP3: 0
+        BlueClock: 0
+        BlueMail: 0
+        BlueShield: 0
+        Bomb: 0
+        BombUpgrade10: 0
+        BombUpgrade5: 0
+        Bombos: 1
+        BookOfMudora: 1
+        Boomerang: 1
+        BossHeartContainer: 10
+        Bottle: 0
+        BottleWithBee: 0
+        BottleWithBluePotion: 0
+        BottleWithFairy: 0
+        BottleWithGoldBee: 0
+        BottleWithGreenPotion: 0
+        BottleWithRandom: 4
+        BottleWithRedPotion: 0
+        Bow: 0
+        BowAndArrows: 0
+        BowAndSilverArrows: 0
+        BugCatchingNet: 1
+        CaneOfByrna: 1
+        CaneOfSomaria: 1
+        Cape: 1
+        CompassA1: 0
+        CompassA2: 1
+        CompassD1: 1
+        CompassD2: 1
+        CompassD3: 1
+        CompassD4: 1
+        CompassD5: 1
+        CompassD6: 1
+        CompassD7: 1
+        CompassH1: 0
+        CompassH2: 0
+        CompassP1: 1
+        CompassP2: 1
+        CompassP3: 1
+        Ether: 1
+        FiftyRupees: 7
+        FireRod: 1
+        FiveRupees: 4
+        Flippers: 1
+        GreenClock: 0
+        HalfMagic: 1
+        Hammer: 1
+        Heart: 0
+        HeartContainer: 1
+        Hookshot: 1
+        IceRod: 1
+        KeyA1: 2
+        KeyA2: 4
+        KeyD1: 6
+        KeyD2: 1
+        KeyD3: 3
+        KeyD4: 1
+        KeyD5: 2
+        KeyD6: 3
+        KeyD7: 4
+        KeyH1: 0
+        KeyH2: 1
+        KeyP1: 0
+        KeyP2: 1
+        KeyP3: 1
+        L1Sword: 0
+        L1SwordAndShield: 0
+        L3Sword: 0
+        L4Sword: 0
+        Lamp: 1
+        MagicMirror: 1
+        MapA1: 0
+        MapA2: 1
+        MapD1: 1
+        MapD2: 1
+        MapD3: 1
+        MapD4: 1
+        MapD5: 1
+        MapD6: 1
+        MapD7: 1
+        MapH1: 0
+        MapH2: 1
+        MapP1: 1
+        MapP2: 1
+        MapP3: 1
+        MasterSword: 0
+        MirrorShield: 0
+        MoonPearl: 1
+        Mushroom: 1
+        Nothing: 0
+        OcarinaActive: 0
+        OcarinaInactive: 1
+        OneHundredRupees: 1
+        OneRupee: 2
+        PegasusBoots: 1
+        PieceOfHeart: 24
+        Powder: 1
+        PowerGlove: 0
+        ProgressiveArmor: 2
+        ProgressiveBow: 2
+        ProgressiveGlove: 2
+        ProgressiveShield: 3
+        ProgressiveSword: 4
+        Quake: 1
+        QuarterMagic: 0
+        RedBoomerang: 1
+        RedClock: 0
+        RedMail: 0
+        RedShield: 0
+        Rupoor: 0
+        Shovel: 1
+        SilverArrowUpgrade: 0
+        SmallMagic: 0
+        TenArrows: 12
+        TenBombs: 1
+        ThreeBombs: 16
+        ThreeHundredRupees: 5
+        TitansMitt: 0
+        Triforce: 0
+        TriforcePiece: 0
+        TwentyRupees: 31
+    item.Goal.Required: ""
+    item.require.Lamp: false
+    item.value.BlueClock: ""
+    item.value.GreenClock: ""
+    item.value.RedClock: ""
+    item.value.Rupoor: ""
+    prize.crossWorld: true
+    prize.shuffleCrystals: true
+    prize.shufflePendants: true
+    region.bossNormalLocation: true
+    region.wildBigKeys: true
+    region.wildCompasses: true
+    region.wildKeys: true
+    region.wildMaps: true
+    rom.dungeonCount: "off"
+    rom.freeItemMenu: true
+    rom.freeItemText: true
+    rom.genericKeys: false
+    rom.mapOnPickup: true
+    rom.rupeeBow: false
+    rom.timerMode: "off"
+    rom.timerStart: ""
+    rom.logicMode: None
+    spoil.BootsLocation: true
+  drops:
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    crab:
+      - auto_fill
+      - auto_fill
+    fish:
+      - auto_fill
+    pull:
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    stun:
+      - auto_fill
+  dungeon_items: standard
+  eq:
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
+    - PegasusBoots
+  glitches: no_logic
+  goal: ganon
+  item:
+    functionality: normal
+    pool: normal
+  item_placement: advanced
+  l: {}
+  lang: en
+  mode: open
+  name: no logic keylock
+  notes: |
+    No Logic Keysanity, but Big Keys are stuck on bosses and in the Moldorm 2 chest.
+  spoilers: "off"
+  tournament: true
+  weapons: randomized
+  hints: "off"
