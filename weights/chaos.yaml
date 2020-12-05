@@ -522,7 +522,7 @@ goals:
   fast_ganon: 20
   dungeons: 20
   pedestal: 20
-  triforce-hunt: 20
+  # triforce-hunt: 20
 tower_open:
   "0": 1
   "1": 1
