@@ -1,7 +1,9 @@
 description: "Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld)"
-preset:
-  none: 99.5
-  trueicerodhunt: .5
+# preset:
+#   none: 99.5
+#   trueicerodhunt: .5
+options:
+  FillItemPoolWith: TwentyRupees
 customizer:
   triforce-hunt:
     goal: [30, 60]
@@ -55,10 +57,7 @@ customizer:
       True: 50
       False: 50
     # 0: nothing, 16: items outside their dungeons, 255: everything
-    rom.freeItemText:
-      0: 10
-      16: 70
-      255: 20
+    rom.freeItemText: 255
     rom.freeItemMenu: 255
     rom.dungeonCount:
       "pickup": 40
@@ -154,27 +153,51 @@ customizer:
       4: 60
       5: 20
       6: 20
-      7: 10
-      8: 5
-      9: 5
     "OneHundredRupees":
       1: 80
       2: 10
       3: 5
       4: 5
+    "FiftyRupees":
+      5: 10
+      6: 25
+      7: 40
+      8: 25
+      9: 10
     "Rupoor":
-      0: 30
-      3: 25
-      6: 20
-      9: 15
-      12: 5
-      15: 5
-    "TwentyRupees":
-      5: 5
-      10: 10
-      15: 15
-      20: 20
-      28: 50
+      0: 5
+      3: 2
+      6: 2
+      9: 2
+      12: 1
+      15: 1
+    "TwentyRupees": 0
+    "FiveRupees": 0
+    "OneRupee": 0
+    "BombUpgrade5":
+      0: 80
+      2: 10
+      4: 10
+    "ArrowUpgrade5":
+      0: 80
+      2: 10
+      4: 10
+    "TenArrows":
+      6: 1
+      7: 1
+      8: 1
+      9: 1
+      10: 1
+      11: 1
+      12: 1
+    "ThreeBombs":
+      10: 1
+      11: 1
+      12: 1
+      13: 1
+      14: 1
+      15: 1
+      16: 1
   eq:
     "ProgressiveSword":
       0: 80
@@ -323,169 +346,169 @@ customizer:
       1: 15
     "BigKeyA1": 0
     "BigKeyA2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD1":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD4":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD5":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD6":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyD7":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyH1": 0
     "BigKeyH2": 0
     "BigKeyP1":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyP2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "BigKeyP3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassA1": 0
     "CompassA2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD1":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD4":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD5":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD6":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassD7":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassH1": 0
     "CompassH2": 0
     "CompassP1":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassP2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "CompassP3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "KeyA1":
-      0: 95
-      1: 3
-      2: 2
+      0: 90
+      1: 7
+      2: 3
     "KeyA2":
-      0: 95
-      1: 2
-      2: 1
-      3: 1
-      4: 1
+      0: 90
+      1: 4
+      2: 2
+      3: 2
+      4: 2
     "KeyD1":
-      0: 94
-      1: 1
-      2: 1
-      3: 1
-      4: 1
-      5: 1
-      6: 1
-    "KeyD2":
-      0: 95
-      1: 5
-    "KeyD3":
-      0: 95
+      0: 88
       1: 2
       2: 2
-      3: 1
-    "KeyD4":
-      0: 95
+      3: 2
+      4: 2
+      5: 2
+      6: 2
+    "KeyD2":
+      0: 90
+      1: 10
+    "KeyD3":
+      0: 90
       1: 5
+      2: 3
+      3: 2
+    "KeyD4":
+      0: 90
+      1: 10
     "KeyD5":
-      0: 95
+      0: 90
       1: 5
       2: 5
     "KeyD6":
-      0: 95
-      1: 2
-      2: 2
-      3: 1
+      0: 90
+      1: 5
+      2: 3
+      3: 2
     "KeyD7":
-      0: 95
-      1: 2
-      2: 1
-      3: 1
+      0: 90
+      1: 5
+      2: 2
+      3: 2
       4: 1
     "KeyH1": 0
     "KeyH2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "KeyP1": 0
     "KeyP2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "KeyP3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapA1": 0
     "MapA2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD1":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD4":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD5":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD6":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapD7":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapH1": 0
     "MapH2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapP1":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapP2":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
     "MapP3":
-      0: 95
-      1: 5
+      0: 90
+      1: 10
 glitches_required: "none"
 item_placement: "advanced"
 dungeon_items: "standard"
@@ -508,7 +531,6 @@ tower_open:
   "5": 1
   "6": 1
   "7": 1
-  random: 1
 ganon_open:
   "0": 1
   "1": 1
@@ -518,12 +540,10 @@ ganon_open:
   "5": 1
   "6": 1
   "7": 1
-  random: 1
 world_state:
   standard: 1
   open: 1
   inverted: 1
-  retro: 1
 entrance_shuffle: "none"
 boss_shuffle:
   none: 80
@@ -541,10 +561,5 @@ weapons:
   swordless: 10
 item_pool: "normal" # don't be decieved, this is randomized elsewhere...
 item_functionality: "normal"
-enemy_damage:
-  default: 80
-  shuffled: 20
-enemy_health:
-  default: 80
-  easy: 10
-  hard: 10
+enemy_damage: "default"
+enemy_health: "default"
