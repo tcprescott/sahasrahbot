@@ -1,4 +1,5 @@
 description: Maybe Veetorp's favorite? IDK.
+allow_quickswap: true
 glitches_required:
   none: 100
   overworld_glitches: 0
