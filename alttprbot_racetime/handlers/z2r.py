@@ -1,5 +1,4 @@
-from alttprbot.alttprgen.randomizer.z1r import roll_z1r
-
+import random
 from .core import SahasrahBotCoreHandler
 
 
@@ -16,13 +15,13 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(flags, message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!race <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#the-legend-of-zelda-randomizer-z1r for more info.")
+        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
 
     async def roll_game(self, flags, message):
         if await self.is_locked(message):
             return
 
-        seed, flags = roll_z1r(flags)
+        seed = random.randint(0, 1000000000)
 
         await self.set_raceinfo(f"{seed} - {flags}")
         await self.send_message(f"{seed} - {flags}")

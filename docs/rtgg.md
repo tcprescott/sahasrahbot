@@ -59,9 +59,6 @@ Example `!flags 17BAS2LNJ4`
 
 Please be aware that the flag string is not validated.
 
-### !sglpractice
-Provides a seed and flags for the SpeedGamingLive 2020 tournament.
-
 ## The Legend of Zelda Randomizer (Z1R)
 
 ### !flags
@@ -71,8 +68,14 @@ Example `!flags VlWlIEwJ1MsKkaOCWhlit2veXNSffs`
 
 Please be aware that the flag string is not validated.
 
-### !sglpractice
-Provides a seed and flags for the SpeedGamingLive 2020 tournament.
+## Zelda 2 Randomizer (Z2R)
+
+### !flags
+Use this command to roll a seed number and put the seed and flags in the race info and chat.
+
+Example `!flags jhEhMROm7DZ$MHRBTNBhBAh0PSm`
+
+Please be aware that the flag string is not validated.
 
 ## Final Fantasy Randomizer (FF1R)
 
@@ -82,12 +85,6 @@ Use this command to roll a seed number and post a link to the seed in the race i
 Example `!flags yGcifaseK8fJxIkkAzUzYAzx32UoP5toiyJrTE864J9FEyMsXe5XhM5T94nANOh1T6wJN7BZU4p3r3WORe9o7vyXSpZD`
 
 Please be aware that the flag string is not validated.
-
-### !sglpods
-Provides a URL to a seed using the SpeedGamingLive 2020 pod stage flags.
-
-### !sglbrackets
-Provides a URL to a seed using the SpeedGamingLive 2020 bracket stage flags.
 
 ## Super Metroid Randomizer (SMR)
 
