@@ -24,7 +24,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         seed, flags = roll_smb3r(flags)
 
-        await self.set_raceinfo(f"{seed} - {flags}")
-        await self.send_message(f"{seed} - {flags}")
+        await self.set_raceinfo(f"Seed: {seed} - Flags: {flags}")
+        await self.send_message(f"Seed: {seed} - Flags: {flags}")
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
