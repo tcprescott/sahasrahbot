@@ -43,44 +43,41 @@ async def mysterygenwithweights(weightset):
         endpoint='/api/customizer' if customizer else '/api/randomizer'
     )
 
-@sahasrahbotapi.route('/api/sgl/episodes', methods=['GET'])
-async def sgl_episodes():
-    secret = request.args.get("secret")
-    if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
-        abort(401, description="secret required")
 
-    result = await sgl2020_tournament.get_all_tournament_races()
-    return jsonify(results=result)
+# @sahasrahbotapi.route('/api/sgl/episodes', methods=['GET'])
+# async def sgl_episodes():
+#     secret = request.args.get("secret")
+#     if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
+#         abort(401, description="secret required")
 
-@sahasrahbotapi.route('/api/sgl/episode/<int:episode>', methods=['GET'])
-async def sgl_episode(episode):
-    secret = request.args.get("secret")
-    if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
-        abort(401, description="secret required")
+#     result = await sgl2020_tournament.get_all_tournament_races()
+#     return jsonify(results=result)
 
-    result = await sgl2020_tournament.get_tournament_race_by_episodeid(episode)
-    return jsonify(result=result)
 
-@sahasrahbotapi.route('/api/sgl/message', methods=['POST'])
-async def sgl_message():
-    secret = request.args.get("secret")
+# @sahasrahbotapi.route('/api/sgl/episode/<int:episode>', methods=['GET'])
+# async def sgl_episode(episode):
+#     secret = request.args.get("secret")
+#     if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
+#         abort(401, description="secret required")
 
-    if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
-        abort(401, description="secret required")
+#     result = await sgl2020_tournament.get_tournament_race_by_episodeid(episode)
+#     return jsonify(result=result)
 
+
+@sahasrahbotapi.route('/api/league/playoff', methods=['POST'])
+async def league_playoff():
     payload = await request.get_json()
 
-    guild_id = await config.get(0, 'SpeedGamingLiveGuild')
-    guild = discordbot.get_guild(int(guild_id))
+    if not payload['secret'] == os.environ.get('LEAGUE_DATA_ENDPOINT_SECRET', 'abdkfjskfjssfksjfa'):
+        abort(401, description="secret required")
 
-    member = guild.get_member_named(payload['discordTag'])
+    form = payload['form']
 
-    if member is None:
-        abort(404, description=f"{payload['discordTag']} user not found.")
-
-    await member.send(payload['message'])
+    # do some stuff
+    print(form)
 
     return jsonify(success=True)
+
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
