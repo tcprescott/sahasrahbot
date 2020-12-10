@@ -6,18 +6,16 @@ import json
 
 import aiohttp
 import discord
-import gspread_asyncio
 from pytz import timezone
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, tournament_results,
-                                twitch_command_text, srlnick)
-from alttprbot.util import gsheet, speedgaming
+                                twitch_command_text, srlnick, league_playoffs)
+from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime.bot import racetime_bots
-# from config import Config as c
 
 tz = timezone('US/Eastern')
 
@@ -74,15 +72,15 @@ PLAYOFFDATA = {
         'friendly_name': 'Playoffs Game 2 - Standard w/ Sword and Boots'
     },
     3: {
-        'type': 'gsheet',
+        'type': 'database',
         'friendly_name': 'Playoffs Game 3'
     },
     4: {
-        'type': 'gsheet',
+        'type': 'database',
         'friendly_name': 'Playoffs Game 4'
     },
     5: {
-        'type': 'gsheet',
+        'type': 'database',
         'friendly_name': 'Playoffs Game 5'
     }
 }
@@ -106,7 +104,8 @@ SETTINGSMAP = {
     'Off': 'off',
     'Enemy Shuffle': 'enemies',
     'Boss Shuffle': 'bosses',
-    'Enemies and Bosses': 'full_enemizer'
+    'Enemies and Bosses': 'full_enemizer',
+    'Random': 'random',
 }
 
 
@@ -120,88 +119,6 @@ class SettingsSubmissionNotFoundException(SahasrahBotException):
 
 class UnableToLookupUserException(SahasrahBotException):
     pass
-
-
-async def settings_sheet(episodeid):
-    sheet = SettingsSheet(episodeid)
-    await sheet._init()
-    return sheet
-
-
-class SettingsSheet():
-    def __init__(self, episodeid):
-        self.agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
-        self.episodeid = episodeid
-
-    async def _init(self):
-        self.agc = await self.agcm.authorize()
-        self.wb = await self.agc.open_by_key('1ZDlb_d2jdYqvRf9p_HPMjtKw9hOF3xeu9028eu8Df5A')
-        self.wks = await self.wb.get_worksheet(0)
-
-        self.headers = await self.wks.row_values(1)
-
-        for idx, row in enumerate(await self.wks.get_all_records()):
-            if row['SpeedGaming Episode ID'] == int(self.episodeid):
-                self.rowid = idx+2
-                self.row = row
-                return row
-        raise SettingsSubmissionNotFoundException(
-            'Settings submission not found at <https://docs.google.com/spreadsheets/d/1ZDlb_d2jdYqvRf9p_HPMjtKw9hOF3xeu9028eu8Df5A/edit#gid=1883794426>.  Please submit settings.')
-
-    async def write_gen_date(self):
-        date_gen_column = self.headers.index('Date Generated')+1
-        await self.wks.update_cell(row=self.rowid, col=date_gen_column, value=datetime.datetime.now(tz).isoformat())
-
-    def is_generated(self):
-        if not self.row['Date Generated'] == '':
-            return True
-        else:
-            return False
-
-    @property
-    def settings(self):
-        goal = random.choice(['dungeons', 'ganon', 'fast_ganon']
-                             ) if self.row['Goal'] == 'Random' else SETTINGSMAP[self.row['Goal']]
-        world_state = random.choice(
-            ['open', 'standard', 'inverted']) if self.row['World State'] == 'Random' else SETTINGSMAP[self.row['World State']]
-        swords = random.choice(['assured', 'randomized', 'vanilla', 'swordless']
-                               ) if self.row['Swords'] == 'Random' else SETTINGSMAP[self.row['Swords']]
-        enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [
-                                  40, 20, 20, 20]) if self.row['Enemizer'] == 'Random' else SETTINGSMAP[self.row['Enemizer']]
-        dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [
-                                       40, 20, 20, 20]) if self.row['Dungeon Item Shuffle'] == 'Random' else SETTINGSMAP[self.row['Dungeon Item Shuffle']]
-        item_pool = random.choice(
-            ['normal', 'hard']) if self.row['Item Pool'] == 'Random' else SETTINGSMAP[self.row['Item Pool']]
-
-        return {
-            "allow_quickswap": True,
-            "glitches": "none",
-            "item_placement": "advanced",
-            "dungeon_items": dungeon_items,
-            "accessibility": "items",
-            "goal": goal,
-            "crystals": {
-                "ganon": '7',
-                "tower": '7',
-            },
-            "mode": world_state,
-            "entrances": "none",
-            "hints": "off",
-            "weapons": swords,
-            "item": {
-                "pool": item_pool,
-                "functionality": "normal"
-            },
-            "tournament": True,
-            "spoilers": "off",
-            "lang": "en",
-            "enemizer": {
-                    "boss_shuffle": "full" if enemizer in ["bosses", "full_enemizer"] else "none",
-                    "enemy_shuffle": "shuffled" if enemizer in ["enemies", "full_enemizer"] else "none",
-                    "enemy_damage": "default",
-                    "enemy_health": "default"
-            }
-        }
 
 
 class LeaguePlayer():
@@ -285,10 +202,18 @@ class LeagueRace():
 
         league_race.episode = await speedgaming.get_episode(league_race.episodeid)
 
+        if league_race.episode['event'].get('slug') not in ['invleague', 'alttprleague']:
+            raise Exception('SG Episode ID not for ALTTPR League Race')
+
         for player in league_race.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
             looked_up_player = await league_race.make_league_player_from_sg(player)
             league_race.players.append(looked_up_player)
+
+        if league_race.is_playoff:
+            league_race.playoff_settings = await league_playoffs.get_playoff_by_episodeid_submitted(league_race.episodeid)
+            if league_race.playoff_settings:
+                league_race.week = 'playoffs'
 
         if league_race.create_seed:
             if league_race.is_playoff:
@@ -328,19 +253,18 @@ class LeagueRace():
         return looked_up_player
 
     async def _roll_playoffs(self):
-        self.sheet_settings = await settings_sheet(self.episodeid)
-        self.spoiler_log_url = None
+        if self.playoff_settings is None:
+            raise Exception('Missing playoff settings.  Please submit!')
 
         if self.gen_type == 'preset':
-            self.preset = PLAYOFFDATA[self.sheet_settings.row['Game Number']]['preset']
+            self.preset = self.playoff_settings['preset']
             self.seed, self.preset_dict = await preset.get_preset(self.preset, nohints=True, allow_quickswap=True)
-        elif self.gen_type == 'gsheet':
+        elif self.gen_type == 'database':
             self.preset = None
             self.preset_dict = None
             self.seed = await alttpr_discord.alttpr(
-                settings=self.sheet_settings.settings
+                settings=json.loads(self.playoff_settings['settings'])
             )
-        await self.sheet_settings.write_gen_date()
 
     async def _roll_general(self):
         self.spoiler_log_url = None
@@ -365,15 +289,15 @@ class LeagueRace():
 
     @property
     def friendly_name(self):
-        if self.is_playoff:
-            return PLAYOFFDATA[self.sheet_settings.row['Game Number']]['friendly_name']
+        if self.is_playoff and self.playoff_settings is not None:
+            return PLAYOFFDATA[self.playoff_settings['game_number']]['friendly_name']
 
         return WEEKDATA[self.week]['friendly_name']
 
     @property
     def gen_type(self):
-        if self.is_playoff:
-            return PLAYOFFDATA[self.sheet_settings.row['Game Number']]['type']
+        if self.is_playoff and self.playoff_settings is not None:
+            return self.playoff_settings['type']
 
         return WEEKDATA[self.week]['type']
 
@@ -436,8 +360,8 @@ class LeagueRace():
 
     @property
     def twitch_mode_command(self):
-        if self.week == 'playoffs':
-            return f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {self.sheet_settings.row['Game Number']} of this series."
+        if self.is_playoff and self.playoff_settings:
+            return f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {self.playoff_settings['game_number']} of this series."
 
         if self.gen_type == 'preset':
             return f"The preset for this race is {self.preset}."
@@ -452,6 +376,9 @@ class LeagueRace():
     def broadcast_channels(self):
         return [a['name'] for a in self.episode['channels'] if not " " in a['name']]
 
+    @property
+    def submit_link(self):
+        return f"https://docs.google.com/forms/d/e/1FAIpQLSdwgiOdeDEUUv7S_ZmuJdsV7rYG9LiyvSqQvPZetJByQ6k4XQ/viewform?usp=pp_url&entry.521975083={self.episodeid}"
 
 async def process_league_race(handler, episodeid=None, week=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -469,6 +396,11 @@ async def process_league_race(handler, episodeid=None, week=None):
         logging.exception("Problem creating league race.")
         await handler.send_message(f"Could not process league race: {str(e)}")
         return
+
+    if league_race.is_playoff:
+        if league_race.playoff_settings is None:
+            await handler.send_message("A form has not been submitted for this race.  Please do that.")
+            return
 
     teams = league_race.players_by_team
 
@@ -518,6 +450,8 @@ async def process_league_race(handler, episodeid=None, week=None):
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(int(audit_channel_id))
         await audit_channel.send(embed=embed)
+    else:
+        audit_channel = None
 
     commentary_channel_id = await config.get(
         guild_id=league_race.guild.id,
@@ -659,6 +593,11 @@ async def create_league_race_room(episodeid):
         timestamp=datetime.datetime.now()
     )
 
+    if league_race.is_playoff:
+        if league_race.playoff_settings is None:
+            await handler.send_message("WARNING: A form has not been submitted for this race.  Please check your DMs for details.")
+            embed.add_field(name='WARNING: Missing settings submission!', value=f"Fill this form out as soon as possible <{league_race.submit_link}>.")
+
     for name, player in league_race.player_discords:
         if player is None:
             print(f'Could not DM {name}')
@@ -686,8 +625,131 @@ async def create_league_race_room(episodeid):
 
     await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
     await handler.edit(unlisted=False)
+
     return handler.data
 
+
+async def process_playoff_form(form):
+    episode_id = int(form['SpeedGaming Episode ID'])
+    playoff_round = form['Playoff Round']
+    game_number = int(form['Game Number'])
+
+    league_race = await LeagueRace.construct(episodeid=episode_id, week='playoffs', create_seed=False)
+
+    if PLAYOFFDATA[game_number].get('type') == 'preset':
+        embed = discord.Embed(
+            title=f"ALTTPR League Playoffs - {playoff_round} - Game #{game_number} - {league_race.versus_and_team}",
+            description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a league moderator.',
+            color=discord.Colour.blue()
+        )
+        embed.add_field(name='Preset', value=PLAYOFFDATA[game_number].get('preset'), inline=False)
+
+        print(f"{game_number=}")
+        await league_playoffs.insert_playoff(episode_id=episode_id, playoff_round=playoff_round, game_number=game_number, gen_type='preset', preset=PLAYOFFDATA[game_number].get('preset'))
+
+    elif PLAYOFFDATA[game_number].get('type') == 'database':
+        randomized_fields = []
+
+        if (goal := SETTINGSMAP[form.get('Goal', 'Random')]) == 'random':
+            randomized_fields.append('Goal')
+            goal = random.choice(['dungeons', 'ganon', 'fast_ganon'])
+
+        if (world_state := SETTINGSMAP[form.get('World State', 'Random')]) == 'random':
+            randomized_fields.append('World State')
+            world_state = random.choice(['open', 'standard', 'inverted'])
+
+        if (swords := SETTINGSMAP[form.get('Swords', 'Random')]) == 'random':
+            randomized_fields.append('Swords')
+            swords = random.choice(['assured', 'randomized', 'vanilla', 'swordless'])
+
+        if (enemizer := SETTINGSMAP[form.get('Enemizer', 'Random')]) == 'random':
+            randomized_fields.append('Enemizer')
+            enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [40, 20, 20, 20])
+
+        if (dungeon_items := SETTINGSMAP[form.get('Dungeon Item Shuffle', 'Random')]) == 'random':
+            randomized_fields.append('Dungeon Item Shuffle')
+            dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [40, 20, 20, 20])
+
+        if (item_pool := SETTINGSMAP[form.get('Item Pool')]) == 'random':
+            randomized_fields.append('Item Pool')
+            item_pool = random.choice(['normal', 'hard']) if form['Item Pool'] == 'Random' else SETTINGSMAP[form['Item Pool']]
+
+        if len(randomized_fields) != 3:
+            embed = discord.Embed(
+                title=f"ERROR SETTINGS NOT RECORDED - {playoff_round} - Game #{game_number} - {league_race.versus_and_team}",
+                description='Error, your settings were not recorded!',
+                color=discord.Colour.red()
+            )
+            if randomized_fields:
+                embed.add_field(name="Error!", value=f"Need three settings randomized, but had {', '.join(randomized_fields)}", inline=False)
+            else:
+                embed.add_field(name="Error!", value="No settings were chosen for randomization.  Please resubmit.", inline=False)
+        else:
+            embed = discord.Embed(
+                title=f"ALTTPR League Playoffs - {playoff_round} - Game #{game_number} - {league_race.versus_and_team}",
+                description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a league moderator.',
+                color=discord.Colour.blue()
+            )
+            embed.add_field(name="Settings that were randomized", value=', '.join(randomized_fields), inline=False)
+            embed.add_field(name='Goal', value=goal, inline=True)
+            embed.add_field(name='World State', value=world_state, inline=True)
+            embed.add_field(name='Swords', value=swords, inline=True)
+            embed.add_field(name='Enemizer', value=enemizer, inline=True)
+            embed.add_field(name='Dungeon Item Shuffle', value=dungeon_items, inline=True)
+            embed.add_field(name='Item Pool', value=item_pool, inline=True)
+
+            settings = {
+                "allow_quickswap": True,
+                "glitches": "none",
+                "item_placement": "advanced",
+                "dungeon_items": dungeon_items,
+                "accessibility": "items",
+                "goal": goal,
+                "crystals": {
+                    "ganon": '7',
+                    "tower": '7',
+                },
+                "mode": world_state,
+                "entrances": "none",
+                "hints": "off",
+                "weapons": swords,
+                "item": {
+                    "pool": item_pool,
+                    "functionality": "normal"
+                },
+                "tournament": True,
+                "spoilers": "off",
+                "lang": "en",
+                "enemizer": {
+                        "boss_shuffle": "full" if enemizer in ["bosses", "full_enemizer"] else "none",
+                        "enemy_shuffle": "shuffled" if enemizer in ["enemies", "full_enemizer"] else "none",
+                        "enemy_damage": "default",
+                        "enemy_health": "default"
+                }
+            }
+
+            print(f"{game_number=} {settings=}")
+
+            await league_playoffs.insert_playoff(episode_id=episode_id, playoff_round=playoff_round, game_number=game_number, gen_type='database', settings=settings)
+    else:
+        raise Exception('Unknown playoff game type.  This should never happen.')
+
+    audit_channel_id = await config.get(league_race.guild.id, 'AlttprLeagueAuditChannel')
+    if audit_channel_id is not None:
+        audit_channel = discordbot.get_channel(int(audit_channel_id))
+        await audit_channel.send(embed=embed)
+    else:
+        audit_channel = None
+
+    for name, player in league_race.player_discords:
+        if player is None:
+            await audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+            continue
+        try:
+            await player.send(embed=embed)
+        except discord.HTTPException:
+            if audit_channel is not None:
+                await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
 
 async def is_league_race(name):
     race = await tournament_results.get_active_tournament_race(name)

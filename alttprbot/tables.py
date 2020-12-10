@@ -97,6 +97,20 @@ t_gtbk_whitelist = Table(
     Column('twitch_user', String(200, 'utf8_bin'))
 )
 
+t_league_playoffs = Table(
+    'league_playoffs', metadata,
+    Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
+    Column('playoff_round', VARCHAR(45)),
+    Column('game_number', INTEGER(11)),
+    Column('type', VARCHAR(45)),
+    Column('preset', VARCHAR(45)),
+    Column('settings', JSON),
+    Column('submitted', TINYINT(1)),
+    Column('created', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP")),
+    Column('updated', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+)
 
 t_mention_counters = Table(
     'mention_counters', metadata,

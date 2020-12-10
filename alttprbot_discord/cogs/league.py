@@ -10,7 +10,7 @@ from discord.ext import commands, tasks
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import config, srlnick
-from alttprbot.tournament.league import WEEKDATA, create_league_race_room
+from alttprbot.tournament import league
 from alttprbot.util import speedgaming
 from config import Config as c
 
@@ -51,7 +51,7 @@ class League(commands.Cog):
             for episode in episodes:
                 print(episode['id'])
                 try:
-                    await create_league_race_room(episode['id'])
+                    await league.create_league_race_room(episode['id'])
                 except Exception as e:
                     logging.exception(
                         "Encountered a problem when attempting to create RT.gg race room.")
@@ -87,7 +87,7 @@ class League(commands.Cog):
     @commands.has_any_role('Admin', 'Mods', 'Bot Overlord')
     @restrict_league_server()
     async def leaguecreate(self, ctx, episodeid: int):
-        await create_league_race_room(episodeid)
+        await league.create_league_race_room(episodeid)
 
     @commands.command(
         help='Get the league week.'
@@ -104,16 +104,16 @@ class League(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def leaguepractice(self, ctx, week: str):
-        game_type = WEEKDATA[week]['type']
-        friendly_name = WEEKDATA[week]['friendly_name']
+        game_type = league.WEEKDATA[week]['type']
+        friendly_name = league.WEEKDATA[week]['friendly_name']
         spoiler_log_url = None
 
         if game_type == 'preset':
-            seed, _ = await preset.get_preset(WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
+            seed, _ = await preset.get_preset(league.WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
         elif game_type == 'mystery':
-            seed = await mystery.generate_random_game(weightset=WEEKDATA[week]['weightset'], spoilers="mystery", tournament=True)
+            seed = await mystery.generate_random_game(weightset=league.WEEKDATA[week]['weightset'], spoilers="mystery", tournament=True)
         elif game_type == 'spoiler':
-            seed, _, spoiler_log_url = await spoilers.generate_spoiler_game(WEEKDATA[week]['preset'])
+            seed, _, spoiler_log_url = await spoilers.generate_spoiler_game(league.WEEKDATA[week]['preset'])
 
         embed = await seed.embed(
             name=f"Practice - {friendly_name}",
