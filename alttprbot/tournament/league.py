@@ -670,7 +670,7 @@ async def process_playoff_form(form):
             randomized_fields.append('Dungeon Item Shuffle')
             dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [40, 20, 20, 20])
 
-        if (item_pool := SETTINGSMAP[form.get('Item Pool')]) == 'random':
+        if (item_pool := SETTINGSMAP[form.get('Item Pool', 'Random')]) == 'random':
             randomized_fields.append('Item Pool')
             item_pool = random.choice(['normal', 'hard']) if form['Item Pool'] == 'Random' else SETTINGSMAP[form['Item Pool']]
 
