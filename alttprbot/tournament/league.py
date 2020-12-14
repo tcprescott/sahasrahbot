@@ -672,7 +672,7 @@ async def process_playoff_form(form):
 
         if (item_pool := SETTINGSMAP[form.get('Item Pool', 'Random')]) == 'random':
             randomized_fields.append('Item Pool')
-            item_pool = random.choice(['normal', 'hard']) if form['Item Pool'] == 'Random' else SETTINGSMAP[form['Item Pool']]
+            item_pool = random.choice(['normal', 'hard'])
 
         if len(randomized_fields) != 3:
             embed = discord.Embed(
