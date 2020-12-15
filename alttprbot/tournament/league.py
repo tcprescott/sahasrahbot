@@ -1,12 +1,12 @@
 import datetime
 import os
-import random
 import logging
 import json
 
 import aiohttp
 import discord
 from pytz import timezone
+from pyz3r.mystery import get_random_option
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import (config, spoiler_races, tournament_results,
@@ -652,27 +652,81 @@ async def process_playoff_form(form):
 
         if (goal := SETTINGSMAP[form.get('Goal', 'Random')]) == 'random':
             randomized_fields.append('Goal')
-            goal = random.choice(['dungeons', 'ganon', 'fast_ganon'])
+            goal = get_random_option(
+                {
+                    'dungeons': 1,
+                    'ganon': 1,
+                    'fast_ganon': 1
+                }
+            )
+
 
         if (world_state := SETTINGSMAP[form.get('World State', 'Random')]) == 'random':
             randomized_fields.append('World State')
-            world_state = random.choice(['open', 'standard', 'inverted'])
+            world_state = get_random_option(
+                {
+                    'open': 1,
+                    'standard': 1,
+                    'fast_ganon': 1
+                }
+            )
 
         if (swords := SETTINGSMAP[form.get('Swords', 'Random')]) == 'random':
             randomized_fields.append('Swords')
-            swords = random.choice(['assured', 'randomized', 'vanilla', 'swordless'])
+            swords = get_random_option(
+                {
+                    'assured': 1,
+                    'randomized': 1,
+                    'vanilla': 1,
+                    'swordless': 1
+                }
+            )
 
         if (enemizer := SETTINGSMAP[form.get('Enemizer', 'Random')]) == 'random':
             randomized_fields.append('Enemizer')
-            enemizer = random.choices(['off', 'enemies', 'bosses', 'full_enemizer'], [40, 20, 20, 20])
+            enemizer = get_random_option(
+                {
+                    'off': 40,
+                    'enemies': 20,
+                    'bosses': 20,
+                    'full_enemizer': 20
+                }
+            )
 
         if (dungeon_items := SETTINGSMAP[form.get('Dungeon Item Shuffle', 'Random')]) == 'random':
             randomized_fields.append('Dungeon Item Shuffle')
-            dungeon_items = random.choices(['standard', 'mc', 'mcs', 'full'], [40, 20, 20, 20])
+            dungeon_items = get_random_option(
+                {
+                    'standard': 40,
+                    'mc': 20,
+                    'mcs': 20,
+                    'full': 20
+                }
+            )
 
         if (item_pool := SETTINGSMAP[form.get('Item Pool', 'Random')]) == 'random':
             randomized_fields.append('Item Pool')
-            item_pool = random.choice(['normal', 'hard'])
+            item_pool = get_random_option(
+                {
+                    'normal': 1,
+                    'hard': 1
+                }
+            )
+
+
+        if enemizer in ['enemies', 'full_enemizer'] and world_state == 'standard' and swords in ['swordless', 'randomized']:
+            logging.warning(f"Processing settings conflict for {episode_id}.")
+            if form.get('World State', 'Random') == 'Random':
+                world_state = 'open'
+            elif form.get('Swords', 'Random') == 'Random':
+                swords = 'assured'
+            elif form.get('Enemizer', 'Random') == 'Random':
+                if enemizer == 'full_enemizer':
+                    enemizer = 'bosses'
+                else:
+                    enemizer = 'off'
+            else:
+                logging.warning(f"Detected standard enemizer submission for {episode_id}, not fixing this because it was specifically chosen.")
 
         if len(randomized_fields) != 3:
             embed = discord.Embed(
