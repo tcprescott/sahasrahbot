@@ -805,6 +805,28 @@ async def process_playoff_form(form):
             if audit_channel is not None:
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
 
+async def send_race_submission_form(episodeid):
+    results = await league_playoffs.get_playoff_by_episodeid(episodeid)
+    if results:
+        return
+
+    league_race = await LeagueRace.construct(episodeid=episodeid, week='playoffs', create_seed=False)
+
+    msg = (
+        f"Greetings!  Do not forget to submit settings for your upcoming race: `{league_race.versus_and_team}`!\n\n"
+        f"For your convenience, you visit {league_race.submit_link} to submit the settings for this match after talking to your opponent.\n\n"
+        "As a reminder, settings must be submitted for every match, **including games** 1 and 2!"
+    )
+
+    for name, player in league_race.player_discords:
+        if player is None:
+            continue
+        print(f"Sending league playoff submit reminder to {name}.")
+        await player.send(msg)
+
+    await league_playoffs.insert_playoff(episode_id=episodeid, submitted=0)
+
+
 async def is_league_race(name):
     race = await tournament_results.get_active_tournament_race(name)
     if race and race['event'] == 'alttprleague_s3':

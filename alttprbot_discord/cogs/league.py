@@ -32,6 +32,7 @@ class League(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.create_races.start()
+        self.find_unsubmitted_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
@@ -67,9 +68,38 @@ class League(commands.Cog):
 
         print('done')
 
+    @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
+    async def find_unsubmitted_races(self):
+        print('scanning for unsubmitted races')
+        if c.DEBUG:
+            return
+            # events = ['test']
+        else:
+            events = ['alttprleague', 'invleague']
+
+        for event in events:
+            try:
+                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0, hours_future=72)
+            except Exception as e:
+                logging.exception(
+                    "Encountered a problem when attempting to retrieve SG schedule.")
+                continue
+            for episode in episodes:
+                print(episode['id'])
+                try:
+                    await league.send_race_submission_form(episode['id'])
+                except Exception as e:
+                    logging.exception(
+                        "Encountered a problem when attempting send race submission.")
+
     @create_races.before_loop
     async def before_create_races(self):
         print('league create_races loop waiting...')
+        await self.bot.wait_until_ready()
+
+    @find_unsubmitted_races.before_loop
+    async def before_find_unsubmitted_races(self):
+        print('league find_unsubmitted_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @commands.command(

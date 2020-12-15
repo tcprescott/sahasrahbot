@@ -15,6 +15,13 @@ async def get_playoff_by_episodeid_submitted(episode_id: str):
     )
     return results[0] if results else None
 
+async def get_playoff_by_episodeid(episode_id: str):
+    results = await orm.select(
+        'SELECT * from league_playoffs where episode_id=%s;',
+        [episode_id]
+    )
+    return results[0] if results else None
+
 async def get_all_playoffs():
     results = await orm.select(
         'SELECT * from league_playoffs where submitted=1;'
