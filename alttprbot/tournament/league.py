@@ -667,7 +667,7 @@ async def process_playoff_form(form):
                 {
                     'open': 1,
                     'standard': 1,
-                    'fast_ganon': 1
+                    'inverted': 1
                 }
             )
 
