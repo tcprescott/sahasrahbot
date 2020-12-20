@@ -15,8 +15,8 @@ subweights:
     weights:
       rules:
         - conditions:
-            - Key: weapons
-              Value: swordless
+          - Key: weapons
+            Value: swordless
           actions:
             enemy_health: "default"
             enemy_damage: "default"
@@ -83,8 +83,8 @@ subweights:
     weights:
       rules:
         - conditions:
-            - Key: weapons
-              Value: swordless
+          - Key: weapons
+            Value: swordless
           actions:
             enemy_health: "default"
             enemy_damage: "default"
@@ -151,6 +151,7 @@ subweights:
   enemizer:
     chance: 45
     weights:
+
       subweights:
         health:
           chance: 1
@@ -501,3 +502,12 @@ subweights:
             True: 50
             False: 50
           rom.timerMode: "countdown-ohko"
+	        rom.rupeeBow:
+            True: 0
+            False: 100
+          rom.genericKeys:
+            True: 0
+            False: 100
+          spoil.BootsLocation:
+            True: 0
+            False: 100
