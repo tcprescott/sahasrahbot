@@ -145,8 +145,8 @@ subweights:
         shuffled: 20
         random: 0
       enemy_health:
-        none: 65
-        shuffled: 35
+        default: 90
+        hard: 10
 
   enemizer:
     chance: 45
