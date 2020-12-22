@@ -452,16 +452,10 @@ subweights:
         vanilla: 20
         swordless: 10
       item_pool: "normal"
-      boss_shuffle:
-        none: 70
-        simple: 10
-        full: 10
-        random: 10
-      enemy_shuffle:
-        none: 80
-        shuffled: 20
-      enemy_health: "default"
       enemy_damage: "default"
+      enemy_health: "default"
+      boss_shuffle: "none"
+      enemy_shuffle: "none"
       customizer:
         timed-ohko:
           timerStart: [900, 1500]
