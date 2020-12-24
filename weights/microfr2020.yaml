@@ -29,7 +29,7 @@ tower_open:
   "5": 20
   "6": 25
   "7": 25
-  
+
 ##### Enemizer
 boss_shuffle:
   none: 70
@@ -45,11 +45,10 @@ enemy_shuffle:
 enemy_damage: "default"
 enemy_health: "default"
 
-
 ##### Other parameters
 hints:
-  on: 50
-  off: 50
+  "on": 50
+  "off": 50
 
 weapons:
   randomized: 40
@@ -78,7 +77,7 @@ subweights:
         fast_ganon: 40
         dungeons: 10
         pedestal: 10
-        triforce-hunt: 0 
+        triforce-hunt: 0
 
       ganon_open:
         "0": 0
@@ -97,10 +96,10 @@ subweights:
           "OcarinaActive":
             True: 50
             False: 50
-                  
+
         custom:
           customPrizePacks: False
-          
+
           region.wildMaps:
             True: 40
             False: 60
@@ -125,7 +124,7 @@ subweights:
           spoil.BootsLocation:
             True: 80
             False: 20
-  
+
   triforce:
     chance: 5
     weights:
@@ -139,7 +138,7 @@ subweights:
         fast_ganon: 0
         dungeons: 0
         pedestal: 0
-        triforce-hunt: 100 
+        triforce-hunt: 100
 
       ganon_open: "7"
       customizer:
@@ -147,7 +146,7 @@ subweights:
           goal: [35, 45]
           pool: [45, 55]
           min_difference: 10
-        
+
         eq:
           "PegasusBoots":
             True: 50
@@ -155,10 +154,10 @@ subweights:
           "OcarinaActive":
             True: 50
             False: 50
-                  
+
         custom:
           customPrizePacks: False
-          
+
           region.wildMaps:
             True: 40
             False: 60
