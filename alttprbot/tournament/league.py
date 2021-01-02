@@ -361,7 +361,14 @@ class LeagueRace():
     @property
     def twitch_mode_command(self):
         if self.is_playoff and self.playoff_settings:
-            return f"The settings for this race is \"{self.seed.generated_goal}\"!  It is game number {self.playoff_settings['game_number']} of this series."
+            if self.playoff_settings['game_number'] == 1:
+                mode = "open"
+            elif self.playoff_settings['game_number'] == 2:
+                mode = "standard w/ sword and boots"
+            else:
+                mode = self.seed.generated_goal
+
+            return f"The settings for this race is \"{mode}\"!  It is game number {self.playoff_settings['game_number']} of this series."
 
         if self.gen_type == 'preset':
             return f"The preset for this race is {self.preset}."
@@ -379,6 +386,7 @@ class LeagueRace():
     @property
     def submit_link(self):
         return f"https://docs.google.com/forms/d/e/1FAIpQLSdwgiOdeDEUUv7S_ZmuJdsV7rYG9LiyvSqQvPZetJByQ6k4XQ/viewform?usp=pp_url&entry.521975083={self.episodeid}"
+
 
 async def process_league_race(handler, episodeid=None, week=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -660,7 +668,6 @@ async def process_playoff_form(form):
                 }
             )
 
-
         if (world_state := SETTINGSMAP[form.get('World State', 'Random')]) == 'random':
             randomized_fields.append('World State')
             world_state = get_random_option(
@@ -712,7 +719,6 @@ async def process_playoff_form(form):
                     'hard': 1
                 }
             )
-
 
         if enemizer in ['enemies', 'full_enemizer'] and world_state == 'standard' and swords in ['swordless', 'randomized']:
             logging.warning(f"Processing settings conflict for {episode_id}.")
@@ -804,6 +810,7 @@ async def process_playoff_form(form):
         except discord.HTTPException:
             if audit_channel is not None:
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+
 
 async def send_race_submission_form(episodeid):
     results = await league_playoffs.get_playoff_by_episodeid(episodeid)
