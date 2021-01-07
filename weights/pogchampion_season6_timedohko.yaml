@@ -1,0 +1,94 @@
+description: Season 6 Pogchampion, but just the timed-ohko subweight
+allow_quickswap: true
+glitches_required: "none"
+
+item_functionality: "normal"
+item_placement: "advanced"
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+item_placement: "basic"
+dungeon_items: "standard" #changed with customizer
+accessibility:
+  items: 50
+  locations: 0
+  none: 50
+goals:
+  ganon: 10
+  fast_ganon: 50
+  dungeons: 20
+  pedestal: 10
+tower_open:
+  "0": 0
+  "1": 5
+  "2": 10
+  "3": 15
+  "4": 15
+  "5": 15
+  "6": 20
+  "7": 20
+ganon_open:
+  "0": 10
+  "1": 5
+  "2": 15
+  "3": 20
+  "4": 10
+  "5": 20
+  "6": 10
+  "7": 10
+world_state:
+  standard: 40
+  open: 35
+  inverted: 25
+entrance_shuffle: "none"
+hints: "off"
+weapons:
+  randomized: 45
+  assured: 25
+  vanilla: 20
+  swordless: 10
+item_pool: "normal"
+enemy_damage: "default"
+enemy_health: "default"
+boss_shuffle: "none"
+enemy_shuffle: "none"
+customizer:
+  timed-ohko:
+    timerStart: [900, 1500]
+    clock:
+      GreenClock:
+        value: [180, 300]
+        pool: [12, 16]
+      BlueClock:
+        value: [300, 600]
+        pool: [0, 2]
+      RedClock:
+        value: [-600, 300]
+        pool: [0, 3]
+  eq:
+    "PegasusBoots": True
+  custom:
+    customPrizePacks:
+      True: 50
+      False: 50
+    # any of these being in here will set dungeon_items to standard
+    region.wildMaps:
+      True: 50
+      False: 50
+    region.wildCompasses:
+      True: 50
+      False: 50
+    region.wildKeys:
+      True: 50
+      False: 50
+    region.wildBigKeys:
+      True: 50
+      False: 50
+    rom.dungeonCount:
+      "pickup": 50
+      "off": 50
+    rom.mapOnPickup:
+      True: 50
+      False: 50
+    rom.timerMode: "countdown-ohko"

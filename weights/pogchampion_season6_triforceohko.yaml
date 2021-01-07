@@ -1,0 +1,51 @@
+description: Season 6 Pogchampion, but just the triforce-ohko subweight
+allow_quickswap: true
+glitches_required: "none"
+
+item_functionality: "normal"
+item_placement: "advanced"
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+item_placement: "basic"
+dungeon_items:
+  standard: 80
+  mcs: 20
+accessibility:
+  items: 75
+  locations: 25
+  none: 0 # No beatable only Triforce Hunt
+goals: "triforce-hunt"
+tower_open: "random"
+ganon_open: "random"
+world_state:
+  standard: 15
+  open: 65
+  inverted: 20
+entrance_shuffle: "none"
+hints: "off"
+weapons:
+  randomized: 50
+  assured: 40
+  vanilla: 10
+item_pool: "normal"
+enemy_damage: "default"
+enemy_health: "default"
+boss_shuffle: "none"
+enemy_shuffle: "none"
+customizer:
+  triforce-hunt:
+    goal: [30, 60]
+    pool: [40, 70]
+    min_difference: 10
+  eq:
+    "PegasusBoots": True
+    BossHeartContainer: 1
+  custom:
+    rom.timerMode: "countdown-ohko"
+    item.overflow.count.Armor: 0
+    item.overflow.count.BossHeartContainer: 0
+    item.overflow.count.PieceOfHeart: 0
+  pool: # All health/armor is converted into rupees
+    "HeartContainer": 0

@@ -1,0 +1,75 @@
+description: Season 6 Pogchampion, but just the entrance subweight
+allow_quickswap: true
+glitches_required: "none"
+
+item_functionality: "normal"
+item_placement: "advanced"
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+rules:
+  - conditions:
+      - Key: weapons
+        Value: swordless
+    actions:
+      enemy_health: "default"
+      enemy_damage: "default"
+      item_pool: "normal"
+dungeon_items:
+  standard: 25
+  full: 65
+accessibility:
+  items: 70
+  none: 30
+goals:
+  ganon: 15
+  fast_ganon: 50
+  dungeons: 20
+  pedestal: 15
+  triforce-hunt: 0
+tower_open: "random"
+ganon_open:
+  "0": 8
+  "1": 8
+  "2": 10
+  "3": 12
+  "4": 20
+  "5": 25
+  "6": 12
+  "7": 5
+world_state:
+  standard: 25
+  open: 40
+  inverted: 25
+  retro: 10
+entrance_shuffle:
+  restricted: 10
+  crossed: 90
+boss_shuffle:
+  none: 40
+  simple: 10
+  full: 15
+  random: 35
+enemy_shuffle:
+  none: 75
+  shuffled: 25
+hints: "off"
+weapons:
+  randomized: 25
+  assured: 30
+  vanilla: 5
+  swordless: 15 # TODO *if swordless, enemy health & damage is normal, item pool is normal*
+item_pool:
+  normal: 50
+  hard: 40
+  expert: 10
+enemy_damage:
+  default: 80
+  shuffled: 10
+  random: 10
+enemy_health:
+  default: 90
+  easy: 0
+  hard: 10
+  expert: 10

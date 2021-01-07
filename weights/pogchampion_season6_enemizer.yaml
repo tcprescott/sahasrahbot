@@ -1,0 +1,223 @@
+description: Season 6 Pogchampion, but just the enemizer subweight
+allow_quickswap: true
+glitches_required: "none"
+
+item_functionality: "normal"
+item_placement: "advanced"
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+subweights:
+  health:
+    chance: 1
+    weights:
+      enemy_health:
+        hard: 1
+        expert: 1
+  damage:
+    chance: 1
+    weights:
+      enemy_damage:
+        shuffled: 1
+        random: 1
+  boss:
+    chance: 1
+    weights:
+      boss_shuffle:
+        simple: 1
+        full: 1
+        random: 1
+  enemy:
+    chance: 1
+    weights:
+      enemy_shuffle: "shuffled"
+
+dungeon_items: "standard" #changed with customizer
+accessibility:
+  items: 60
+  locations: 30
+  none: 10
+goals:
+  ganon: 30
+  fast_ganon: 30
+  dungeons: 30
+  pedestal: 10
+tower_open:
+  0: 5
+  1: 5
+  2: 10
+  3: 10
+  4: 10
+  5: 20
+  6: 20
+  7: 20
+ganon_open:
+  0: 5
+  1: 5
+  2: 10
+  3: 10
+  4: 10
+  5: 20
+  6: 20
+  7: 20
+world_state:
+  standard: 40
+  open: 40
+  inverted: 18
+  retro: 2
+entrance_shuffle: "none"
+boss_shuffle:
+  none: 60
+  simple: 5
+  full: 5
+  random: 30
+enemy_shuffle:
+  none: 65
+  shuffled: 35
+hints:
+  "on": 33
+  "off": 67
+weapons:
+  randomized: 40
+  assured: 30
+  vanilla: 20
+  swordless: 10
+item_pool:
+  normal: 50
+  hard: 40
+  expert: 10
+  crowd_control: 0
+enemy_damage:
+  default: 60
+  shuffled: 25
+  random: 15
+enemy_health:
+  default: 60
+  easy: 0
+  hard: 25
+  expert: 15
+customizer:
+  eq:
+    "ProgressiveSword":
+      0: 85
+      1: 12
+      2: 2
+      3: 1
+    "Bottle1":
+      0: 85
+      1: 9
+      2: 1
+      3: 1
+      4: 1
+      5: 1
+      6: 1
+      7: 1
+    "Bombos":
+      0: 85
+      1: 15
+    "BookOfMudora":
+      0: 85
+      1: 15
+    "CaneOfSomaria":
+      0: 85
+      1: 15
+    "Cape":
+      0: 85
+      1: 15
+    "Ether":
+      0: 85
+      1: 15
+    "FireRod":
+      0: 85
+      1: 15
+    "Flippers":
+      0: 85
+      1: 15
+    "Hammer":
+      0: 85
+      1: 15
+    "Hookshot":
+      0: 85
+      1: 15
+    "IceRod":
+      0: 85
+      1: 15
+    "Lamp":
+      0: 85
+      1: 15
+    "MagicMirror":
+      0: 85
+      1: 15
+    "MoonPearl":
+      0: 85
+      1: 15
+    "Mushroom":
+      0: 85
+      1: 15
+    "OcarinaInactive":
+      0: 85
+      1: 15
+    "PegasusBoots": # (this is a 10% change from 75 in season 5)
+      0: 15
+      1: 85
+    "Powder":
+      0: 85
+      1: 15
+    "Quake":
+      0: 85
+      1: 15
+    "Shovel":
+      0: 85
+      1: 15
+    "ProgressiveGlove":
+      0: 85
+      1: 15
+      2: 5
+    "ProgressiveBow":
+      0: 85
+      1: 14
+      2: 1
+    "BugCatchingNet":
+      0: 85
+      1: 15
+    "ProgressiveShield":
+      0: 85
+      1: 12
+      2: 2
+      3: 1
+    "CaneOfByrna":
+      0: 85
+      1: 15
+    "HalfMagic":
+      0: 85
+      1: 15
+    "ProgressiveArmor":
+      0: 85
+      1: 14
+      2: 1
+    "Boomerang":
+      0: 85
+      1: 15
+    "RedBoomerang":
+      0: 85
+      1: 15
+  custom:
+    customPrizePacks:
+      True: 50
+      False: 50
+    region.wildMaps:
+      True: 70
+      False: 30
+    region.wildCompasses:
+      True: 70
+      False: 30
+    region.wildKeys:
+      True: 70
+      False: 30
+    region.wildBigKeys:
+      True: 70
+      False: 30
+    rom.FreeItemText:
+      True: 80
+      False: 20

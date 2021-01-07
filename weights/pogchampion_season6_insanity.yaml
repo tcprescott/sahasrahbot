@@ -1,0 +1,76 @@
+description: Season 6 Pogchampion, but just the insanity subweight
+allow_quickswap: true
+glitches_required: "none"
+
+item_functionality: "normal"
+item_placement: "advanced"
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+rules:
+  - conditions:
+      - Key: weapons
+        Value: swordless
+    actions:
+      enemy_health: "default"
+      enemy_damage: "default"
+      item_pool: "normal"
+dungeon_items:
+  standard: 50
+  full: 50
+accessibility:
+  items: 85
+  locations: 0
+  none: 15
+goals:
+  ganon: 15
+  fast_ganon: 70
+  dungeons: 10
+  pedestal: 5
+  triforce-hunt: 0
+tower_open: "random"
+ganon_open:
+  "0": 10
+  "1": 10
+  "2": 10
+  "3": 5
+  "4": 5
+  "5": 20
+  "6": 20
+  "7": 20
+world_state:
+  standard: 30
+  open: 50
+  inverted: 15
+  retro: 5
+entrance_shuffle: "insanity"
+boss_shuffle:
+  none: 70
+  simple: 10
+  full: 10
+  random: 10
+enemy_shuffle:
+  none: 69
+  shuffled: 31
+  random: 0
+hints:
+  "on": 66
+  "off": 34
+weapons:
+  randomized: 65
+  assured: 20
+  vanilla: 5
+  swordless: 10 # TODO *if swordless, enemy health & damage is normal, item pool is normal*
+item_pool:
+  normal: 75
+  hard: 25
+  expert: 0
+  crowd_control: 0
+enemy_damage:
+  default: 80
+  shuffled: 20
+  random: 0
+enemy_health:
+  default: 90
+  hard: 10

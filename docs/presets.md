@@ -31,6 +31,7 @@ title:  Presets
 | [festive_hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_hard.yaml) ||  *Festive-only* |
 | [festive_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_keys.yaml) ||  *Festive-only* |
 | [hardicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hardicerodhunt.yaml) |You get every item absolutely **required** to beat the game, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
+| [hybridmg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hybridmg.yaml) || *Customizer*  |
 | [inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted.yaml) |Inverted.  You start in the dark world.|   |
 | [inverted_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_crosskeys.yaml) |Cross world entrance shuffle, but also using the inverted world state.|   |
 | [inverted_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_keys.yaml) |Inverted world state and keysanity.|   |
