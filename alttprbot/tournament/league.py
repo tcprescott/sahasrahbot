@@ -734,7 +734,7 @@ async def process_playoff_form(form):
             else:
                 logging.warning(f"Detected standard enemizer submission for {episode_id}, not fixing this because it was specifically chosen.")
 
-        if not len(randomized_fields) in [3, 6]:
+        if not len(randomized_fields) in [0, 3]:
             embed = discord.Embed(
                 title=f"ERROR SETTINGS NOT RECORDED - {playoff_round} - Game #{game_number} - {league_race.versus_and_team}",
                 description='Error, your settings were not recorded!',
@@ -750,7 +750,7 @@ async def process_playoff_form(form):
                 description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a league moderator.',
                 color=discord.Colour.blue()
             )
-            if len(randomized_fields) == 6:
+            if len(randomized_fields) == 0:
                 embed.add_field(name="WARNING", value='No options were randomized by your opponent.', inline=False)
             else:
                 embed.add_field(name="Settings that were randomized", value=', '.join(randomized_fields), inline=False)
