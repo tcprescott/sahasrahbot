@@ -14,11 +14,13 @@ async def insert_twitch_name(discord_user_id, twitch_name):
         [discord_user_id, twitch_name, twitch_name]
     )
 
+
 async def insert_rtgg_id(discord_user_id, rtgg_id):
     await orm.execute(
         'INSERT INTO srlnick(discord_user_id, rtgg_id) VALUES (%s,%s) ON DUPLICATE KEY UPDATE rtgg_id = %s;',
         [discord_user_id, rtgg_id, rtgg_id]
     )
+
 
 async def get_discord_id(srl_nick):
     results = await orm.select(
@@ -35,6 +37,7 @@ async def get_discord_id_by_twitch(twitch_name):
     )
     return results if len(results) > 0 else False
 
+
 async def get_discord_id_by_rtgg(rtgg_id):
     results = await orm.select(
         'SELECT * from srlnick where rtgg_id=%s;',
@@ -42,9 +45,10 @@ async def get_discord_id_by_rtgg(rtgg_id):
     )
     return results if len(results) > 0 else False
 
-async def get_nicknames(discord_user_id):
+
+async def get_nickname(discord_user_id):
     results = await orm.select(
         'SELECT * from srlnick where discord_user_id=%s;',
         [discord_user_id]
     )
-    return results if len(results) > 0 else False
+    return results[0] if results else None

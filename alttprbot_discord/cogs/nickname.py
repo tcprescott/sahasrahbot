@@ -31,9 +31,9 @@ class Nickname(commands.Cog):
         help="List the nicknames registered with SahasrahBot."
     )
     async def getnick(self, ctx):
-        nick = await srlnick.get_nicknames(ctx.author.id)
+        nick = await srlnick.get_nickname(ctx.author.id)
         if nick:
-            await ctx.reply(f"Your currently registered nickname for SRL is `{nick[0]['srl_nick']}`\nYour currently registered nickname for Twitch is `{nick[0]['twitch_name']}`")
+            await ctx.reply(f"Your currently registered nickname for SRL is `{nick['srl_nick']}`\nYour currently registered nickname for Twitch is `{nick[0]['twitch_name']}`")
         else:
             await ctx.reply("You currently do not have any nicknames registered with this bot.  Use the command `$srl yournick` and `$twitch yournick` to do that!")
 

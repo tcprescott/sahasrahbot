@@ -242,6 +242,19 @@ t_tournament_results = Table(
     Column('written_to_gsheet', TINYINT(4))
 )
 
+t_tournaments = Table(
+    'tournaments', metadata,
+    Column('id', INTEGER(11), primary_key=True),
+    Column('schedule_type', String(45)),
+    Column('slug', String(45)),
+    Column('guild_id', BIGINT(20), nullable=False),
+    Column('helper_roles', String(4000)),
+    Column('audit_channel_id', BIGINT(20)),
+    Column('commentary_channel_id', BIGINT(20)),
+    Column('active', TINYINT(1)),
+    Index('idx_tournaments_type_slug', 'schedule_type', 'slug', unique=True)
+)
+
 t_sgl2020_tournament = Table(
     'sgl2020_tournament', metadata,
     Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
