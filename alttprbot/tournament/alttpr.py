@@ -205,14 +205,12 @@ async def process_tournament_race(handler, episodeid=None):
             episode_id=tournament_race.episodeid,
             permalink=tournament_race.seed.url,
             event=tournament_race.event_slug,
-            week=tournament_race.week,
             spoiler=None
         )
     else:
         await tournament_results.update_tournament_results_rolled(
             srl_id=handler.data.get('name'),
-            permalink=tournament_race.seed.url,
-            week=tournament_race.week,
+            permalink=tournament_race.seed.url
         )
 
     await handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")

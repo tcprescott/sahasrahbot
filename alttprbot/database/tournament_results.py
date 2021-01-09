@@ -13,13 +13,15 @@ async def insert_tournament_race(srl_id: str, episode_id: str, event: str, perma
     )
     await CACHE.delete(key)
 
-async def update_tournament_results_rolled(srl_id: str, permalink: str, week, status=None):
+
+async def update_tournament_results_rolled(srl_id: str, permalink: str, week=None, status=None):
     key = f'tournament_race_{srl_id}'
     await orm.execute(
         'UPDATE tournament_results SET status=%s, permalink=%s, week=%s where srl_id=%s and status IS NULL;',
         [status, permalink, week, srl_id]
     )
     await CACHE.delete(key)
+
 
 async def record_tournament_results(srl_id: str, results_json: str):
     key = f'tournament_race_{srl_id}'
@@ -29,6 +31,7 @@ async def record_tournament_results(srl_id: str, results_json: str):
     )
     await CACHE.delete(key)
 
+
 async def update_tournament_results(srl_id: str, status="STARTED"):
     key = f'tournament_race_{srl_id}'
     await orm.execute(
@@ -36,6 +39,7 @@ async def update_tournament_results(srl_id: str, status="STARTED"):
         [status, srl_id]
     )
     await CACHE.delete(key)
+
 
 async def get_active_tournament_race(srl_id: str):
     key = f'tournament_race_{srl_id}'
@@ -49,12 +53,14 @@ async def get_active_tournament_race(srl_id: str):
         await CACHE.set(key, results)
     return results[0] if results else None
 
+
 async def get_active_tournament_race_by_episodeid(episode_id: str):
     results = await orm.select(
         'SELECT * from tournament_results where episode_id=%s;',
         [episode_id]
     )
     return results[0] if results else None
+
 
 async def delete_active_tournament_race(srl_id: str):
     key = f'tournament_race_{srl_id}'
