@@ -39,7 +39,7 @@ class DiscordServers(commands.Cog):
                     value=f"_*Id:*_ {result['id']}\n_*Channel:*_ {channel.mention}",
                     inline=False
                 )
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
 
     @category.command(name='remove')
     @commands.is_owner()
@@ -77,7 +77,7 @@ class DiscordServers(commands.Cog):
                     value=f"_*Id:*_ {result['id']}",
                     inline=False
                 )
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
 
     @server.command(name='remove')
     @commands.is_owner()

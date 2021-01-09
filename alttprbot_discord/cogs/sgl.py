@@ -74,7 +74,7 @@ class SpeedGamingLive(commands.Cog):
     @sgl.command()
     @restrict_sgl_server()
     @commands.has_any_role('Admin', 'Tournament Admin')
-    async def create(self, ctx, episode_id: int, force: bool=False):
+    async def create(self, ctx, episode_id: int, force: bool = False):
         episode = await speedgaming.get_episode(episode_id)
         await create_sgl_match(episode, force=force)
 
@@ -82,7 +82,7 @@ class SpeedGamingLive(commands.Cog):
     @restrict_sgl_server()
     @restrict_smm2_channel()
     async def smmclose(self, ctx):
-        await ctx.send("WARNING:  This room will be closing in 10 seconds.  It will become inaccessible to non-admins.")
+        await ctx.reply("WARNING:  This room will be closing in 10 seconds.  It will become inaccessible to non-admins.")
         await asyncio.sleep(10)
         smm2_category_id = int(await config.get(ctx.guild.id, 'SGLSMM2CategoryClosed'))
         await ctx.channel.edit(

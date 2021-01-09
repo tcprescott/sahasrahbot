@@ -66,7 +66,7 @@ class Aqttp(commands.Cog):
                 ),
                 inline=True)
 
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
 
 
 def setup(bot):

@@ -55,15 +55,15 @@ class Misc(commands.Cog):
         embed.add_field(name='Joined at', value=member.joined_at, inline=False)
         embed.add_field(name="Discord ID", value=member.id, inline=False)
         embed.set_thumbnail(url=member.avatar_url)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command()
     async def prng(self, ctx):
-        await ctx.send("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
+        await ctx.reply("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):
-        await ctx.send("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
+        await ctx.reply("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
 
     @commands.command(
         aliases=['crc32'],
@@ -71,7 +71,7 @@ class Misc(commands.Cog):
         help="Posts instructions on how to verify your ROM is correct, or how to get the permalink to your randomized game."
     )
     async def rom(self, ctx):
-        await ctx.send(
+        await ctx.reply(
             "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALttPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
             "It can also help get the permalink page URL which has access to the Spoiler Log depending on the settings that were chosen. Not all games that are generated have access to the Spoiler Log.\n\n"
             "For legal reasons, we cannot provide help with finding this ROM online.  Please do not ask here for assistance with this.\n"
@@ -80,7 +80,7 @@ class Misc(commands.Cog):
 
     @commands.command(hidden=True)
     async def trpegs(self, ctx):
-        await ctx.send(discord.utils.get(ctx.bot.emojis, name='RIPLink'))
+        await ctx.reply(discord.utils.get(ctx.bot.emojis, name='RIPLink'))
 
     @commands.command(hidden=True, aliases=['8ball'])
     async def eightball(self, ctx):
@@ -106,7 +106,7 @@ class Misc(commands.Cog):
             "Outlook not so good.",
             "Very doubtful.",
         ])
-        await ctx.send(msg)
+        await ctx.reply(msg)
 
     @commands.command(
         brief="Retrieves a holy image.",
@@ -136,7 +136,7 @@ class Misc(commands.Cog):
         if 'credit' in holyimage.image:
             embed.set_footer(text=f"Created by {holyimage.image['credit']}")
 
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command(
         brief="Retrieves the next ALTTPR SG daily race.",
@@ -146,7 +146,7 @@ class Misc(commands.Cog):
     async def sgdaily(self, ctx, get_next=1):
         sg_schedule = await speedgaming.get_upcoming_episodes_by_event('alttprdaily', hours_past=0, hours_future=192)
         if len(sg_schedule) == 0:
-            await ctx.send("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
+            await ctx.reply("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
             return
 
         if get_next == 1:
@@ -189,7 +189,7 @@ class Misc(commands.Cog):
 
         embed.set_thumbnail(
             url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
 
 def setup(bot):

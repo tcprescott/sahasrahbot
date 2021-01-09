@@ -71,7 +71,7 @@ class TournamentQualifier(commands.Cog):
         if race == {}:
             raise SahasrahBotException('That race does not exist.')
         for multi in build_multistream_links(race):
-            await ctx.send(multi)
+            await ctx.reply(multi)
 
     @commands.command()
     @checks.has_any_channel('testing', 'console', 'qual-bot')
@@ -111,19 +111,19 @@ class TournamentQualifier(commands.Cog):
                         unable_to_dm.append(entrant)
 
         if len(bad_nicks) > 0:
-            await ctx.send("We do not have a Discord name for these joined players in #srl-{id}\n```{nicks}```".format(
+            await ctx.reply("We do not have a Discord name for these joined players in #srl-{id}\n```{nicks}```".format(
                 id=race['id'],
                 nicks='\n'.join(bad_nicks),
             ))
         if len(unable_to_dm) > 0:
-            await ctx.send("Bot was unable to DM the following players in #srl-{id}\n```{dms}```".format(
+            await ctx.reply("Bot was unable to DM the following players in #srl-{id}\n```{dms}```".format(
                 id=race['id'],
                 dms='\n'.join(unable_to_dm),
             ))
         if len(unable_to_dm) == 0 and len(bad_nicks) == 0 and checkonly:
-            await ctx.send(f"All users joined to the race in #srl-{race['id']} are able to be resolved.")
+            await ctx.reply(f"All users joined to the race in #srl-{race['id']} are able to be resolved.")
         if (len(unable_to_dm) > 0 or len(bad_nicks) > 0) and not checkonly:
-            await ctx.send(f"Please send this to those who did not receive the DMs.\n```Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n\n{url}\n{code}```")
+            await ctx.reply(f"Please send this to those who did not receive the DMs.\n```Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n\n{url}\n{code}```")
 
     async def run_qual(self, ctx, raceid, hashid):
         date = datetime.datetime.now(timezone('US/Pacific')).date()
@@ -136,15 +136,15 @@ class TournamentQualifier(commands.Cog):
             raise SahasrahBotException('The race is not open for entry.')
 
         await loadnicks(ctx)
-        await ctx.send('Loaded SRL nicks from gsheet.')
+        await ctx.reply('Loaded SRL nicks from gsheet.')
 
         await send_irc_message(raceid, 'NOTICE: The seed for this race will be distributed in 60 seconds.  Please .join if you intend to race.  If you have not joined, you will not receive the seed.')
-        await ctx.send('Sent .join warning in SRL.')
+        await ctx.reply('Sent .join warning in SRL.')
         if not c.DEBUG:
             await asyncio.sleep(60)
         race = await get_race(raceid)
         await send_irc_message(raceid, 'The seed is being generated and distributed.  Please standby.')
-        await ctx.send('Starting seed generation.')
+        await ctx.reply('Starting seed generation.')
 
         if hashid is None:
             seed = await get_preset('open', hints=False, spoilers="off")
@@ -159,13 +159,13 @@ class TournamentQualifier(commands.Cog):
             name=f"Tournament Qualifier - {date}",
             notes='Below is the permalink for this qualifier\'s race.  Please load the rom and ready up as soon as possible.\n\nRemember, Please do not talk in the qualifier race channels except for the necessary race commands.\nAnything that is a spoiler will result in a forfeit and possible removal from the tournament.\nWhat constitutes a spoiler is at the discretion of the tournament admins.\n',
             emojis=self.bot.emojis)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
         await self.send_qualifier_dms(ctx, embed=embed, race=race, url=seed.url, code='/'.join(seed.code))
         await send_irc_message(raceid, 'The seed has been distributed.  Please contact a tournament administrator if you did not receive the seed in Discord.')
         await gsheet_qualifier_start(race=race, date=date)
         for multi in build_multistream_links(race):
-            await ctx.send(multi)
+            await ctx.reply(multi)
 
     async def finish_qual(self, ctx, raceid):
         date = datetime.datetime.now(timezone('US/Pacific')).date()
@@ -200,7 +200,7 @@ async def loadnicks(ctx):
                 await wks.update_cell(idx+2, 6, 'Error')
 
     if len(bad_discord_names) > 0:
-        await ctx.send("Bad discord names.  These names were not processed.\n\n`{names}`".format(
+        await ctx.reply("Bad discord names.  These names were not processed.\n\n`{names}`".format(
             names='\n'.join(bad_discord_names)
         ))
 

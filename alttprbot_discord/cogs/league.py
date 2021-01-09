@@ -126,7 +126,7 @@ class League(commands.Cog):
     async def getleagueweek(self, ctx):
         guildid = ctx.guild.id if ctx.guild else 0
         week = await config.get(guildid, 'AlttprLeagueWeek')
-        await ctx.send(f"This is Week {week}")
+        await ctx.reply(f"This is Week {week}")
 
     @commands.command(
         brief='Generate a practice seed.',
@@ -152,7 +152,7 @@ class League(commands.Cog):
         if spoiler_log_url:
             embed.insert_field_at(0, name="Spoiler Log URL",
                                   value=spoiler_log_url, inline=False)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command()
     @commands.is_owner()
@@ -167,7 +167,7 @@ class League(commands.Cog):
             for result in results['results']:
                 await srlnick.insert_rtgg_id(user.id, result['id'])
         else:
-            await ctx.send("Could not map RT.gg tag")
+            await ctx.reply("Could not map RT.gg tag")
 
     @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
@@ -264,7 +264,7 @@ async def update_player(ctx, team, division_role, player_role, team_role, pendan
         team_member = ctx.guild.get_member_named(
             team[pendant]['discord'])
         if team_member is None:
-            await ctx.send(f"Could not resolve user {team[pendant]['discord']}, skipping...")
+            await ctx.reply(f"Could not resolve user {team[pendant]['discord']}, skipping...")
             return
         await team_member.add_roles(division_role, player_role, team_role, pendant_role)
         await srlnick.insert_twitch_name(team_member.id, team[pendant]['twitch_name'])
