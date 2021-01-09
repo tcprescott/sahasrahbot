@@ -147,13 +147,13 @@ async def process_tournament_race(handler, episodeid=None):
 
     embed = await tournament_race.seed.embed(
         name=goal,
-        notes=tournament_race.team_versus,
+        notes=tournament_race.versus,
         emojis=discordbot.emojis
     )
 
     tournament_embed = await tournament_race.seed.tournament_embed(
         name=goal,
-        notes=tournament_race.team_versus,
+        notes=tournament_race.versus,
         emojis=discordbot.emojis
     )
 

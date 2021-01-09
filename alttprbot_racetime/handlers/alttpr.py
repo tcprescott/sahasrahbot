@@ -4,7 +4,7 @@ import math
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races, tournament_results
-from alttprbot.tournament import league
+from alttprbot.tournament import league, alttpr
 from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler
@@ -80,6 +80,15 @@ class GameHandler(SahasrahBotCoreHandler):
             handler=self,
             episodeid=args[0] if len(args) >= 1 else None,
             week=args[1] if len(args) == 2 else None
+        )
+
+    async def ex_tournamentrace(self, args, message):
+        if await self.is_locked(message):
+            return
+
+        await alttpr.process_tournament_race(
+            handler=self,
+            episodeid=args[0] if len(args) >= 1 else None
         )
 
     async def ex_quickswaprace(self, args, message):
