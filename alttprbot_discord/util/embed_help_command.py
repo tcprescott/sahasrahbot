@@ -21,7 +21,7 @@ class EmbedHelpCommand(discord.ext.commands.HelpCommand):
     def get_ending_note(self):
         return 'Use {0}{1} [command] for more info on a command.'.format(self.clean_prefix, self.invoked_with)
 
-    def get_command_signature(self, command): # pylint: disable=no-self-use
+    def get_command_signature(self, command):  # pylint: disable=no-self-use
         return '{0.qualified_name} {0.signature}'.format(command)
 
     async def send_bot_help(self, mapping):

@@ -34,7 +34,7 @@ class Misc(commands.Cog):
             async with message.channel.typing():
                 await asyncio.sleep((random.random()*30)+30)
                 if random.choice([True, False]):
-                    await message.channel.send(f'@{message.author.mention}')
+                    await message.reply(f'@{message.author.mention}')
 
     @commands.command(aliases=['joineddate'])
     @commands.check_any(

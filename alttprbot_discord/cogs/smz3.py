@@ -192,7 +192,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
         players = [p for p in reaction_users if not p.id == self.bot.user.id]
 
         if len(players) < 2:
-            await message.channel.send(f"{member.mention} You must have at least two players to create a multiworld.  If you wish to cancel this multiworld, click ❌.")
+            await message.reply(f"{member.mention} You must have at least two players to create a multiworld.  If you wish to cancel this multiworld, click ❌.")
             embed.set_field_at(
                 0, name="Status", value="👍 Open for entry")
             try:
@@ -215,7 +215,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
             try:
                 await player.send(embed=dm_embed)
             except discord.HTTPException:
-                await message.channel.send(f"Unable to send DM to {player.mention}!")
+                await message.reply(f"Unable to send DM to {player.mention}!")
 
         embed.set_field_at(
             0, name="Status", value="✅ Game started!  Check your DMs.")
