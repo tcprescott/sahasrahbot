@@ -72,7 +72,7 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.UserInputError):
         if riplink is None:
             riplink = '👎'
-        await ctx.send(error)
+        await ctx.reply(error)
     else:
         if riplink is None:
             riplink = '👎'
@@ -82,10 +82,10 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction(riplink)
 
         if not isinstance(error_to_display, SahasrahBotException):
-            await ctx.send(f"```{repr(error_to_display)}```")
+            await ctx.reply(f"```{repr(error_to_display)}```")
             raise error_to_display
         else:
-            await ctx.send(error_to_display)
+            await ctx.reply(error_to_display)
 
 
 @discordbot.event

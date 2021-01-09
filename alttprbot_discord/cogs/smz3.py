@@ -39,7 +39,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def smz3(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send('Please specify a subcommand!')
+            await ctx.reply('Please specify a subcommand!')
 
     @smz3.command(
         help='Generates a SMZ3 Race.\nThis game will not have a spoiler log.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
@@ -48,7 +48,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def race(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='smz3', tournament=True)
-        await ctx.send((
+        await ctx.reply((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
@@ -60,7 +60,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def norace(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='smz3', tournament=False)
-        await ctx.send((
+        await ctx.reply((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
@@ -78,7 +78,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send('Please specify a subcommand!')
+            await ctx.reply('Please specify a subcommand!')
 
     @sm.command(
         name='race',
@@ -88,7 +88,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_race(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='sm', tournament=True)
-        await ctx.send((
+        await ctx.reply((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
@@ -101,7 +101,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_norace(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='sm', tournament=False)
-        await ctx.send((
+        await ctx.reply((
             f'Permalink: {seed.url}\n'
             f'Code: {seed.code}'
         ))
@@ -119,13 +119,13 @@ class SuperMetroidComboRandomizer(commands.Cog):
         hidden=True,
     )
     async def smz3multi(self, ctx, preset):
-        await ctx.send(f"Please use `$smz3 multi {preset}` instead.")
+        await ctx.reply(f"Please use `$smz3 multi {preset}` instead.")
 
     @commands.command(
         hidden=True,
     )
     async def smmulti(self, ctx, preset):
-        await ctx.send(f"Please use `$smz3 multi {preset}` instead.")
+        await ctx.reply(f"Please use `$smz3 multi {preset}` instead.")
 
     async def init_mw(self, ctx, preset, randomizer):
         await fetch_preset(preset, randomizer=randomizer)
@@ -144,7 +144,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
             name="Preset", value=f"[{preset.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{randomizer.lower()}/{preset.lower()}.yaml)", inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
-        msg = await ctx.send(embed=embed)
+        msg = await ctx.reply(embed=embed)
 
         await smz3_multiworld.insert(
             message_id=msg.id,

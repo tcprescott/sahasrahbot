@@ -27,7 +27,7 @@ class Audit(commands.Cog):
             sio.seek(0)
             discord_file = discord.File(
                 fp=sio, filename=f"{member.id}_history.csv")
-            await ctx.send(file=discord_file)
+            await ctx.reply(file=discord_file)
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
@@ -42,7 +42,7 @@ class Audit(commands.Cog):
             sio.seek(0)
             discord_file = discord.File(
                 fp=sio, filename=f"{member.id}_deleted.csv")
-            await ctx.send(file=discord_file)
+            await ctx.reply(file=discord_file)
 
     @commands.Cog.listener()
     async def on_message(self, message):

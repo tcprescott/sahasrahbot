@@ -30,7 +30,7 @@ class Admin(commands.Cog):
     async def configget(self, ctx):
         guildid = ctx.guild.id if ctx.guild else 0
         result = await config.get_parameters_by_guild(guildid)
-        await ctx.send(embed=embed_formatter.config(ctx, result))
+        await ctx.reply(embed=embed_formatter.config(ctx, result))
 
     @commands.command(
         help='Delete a parameter.'
@@ -79,18 +79,18 @@ class Admin(commands.Cog):
         runnerups = await get_runnerups(key, game_id, winner)
 
         if dry:
-            await ctx.send("would have cleared scores")
+            await ctx.reply("would have cleared scores")
         else:
             await gtbk.clear_scores(game_id)
 
         if dry:
-            await ctx.send(f"would have given {winner['twitch_user']} {points} points")
+            await ctx.reply(f"would have given {winner['twitch_user']} {points} points")
         else:
             await gtbk.update_score(guess_id=winner['guess_id'], score=points)
 
         for runnerup in runnerups:
             if dry:
-                await ctx.send(f"would have given {runnerup['twitch_user']} 5 points")
+                await ctx.reply(f"would have given {runnerup['twitch_user']} 5 points")
             else:
                 await gtbk.update_score(guess_id=runnerup['guess_id'], score=5)
 
@@ -105,6 +105,7 @@ async def calculate_score(game_id):
 
     return score
 
+
 async def get_winner(key: int, game_id):
     guessdict = await gtbk.get_guesses(game_id)
     value = min(guessdict, key=lambda kv: abs(kv['guess'] - key))
@@ -118,6 +119,7 @@ async def get_runnerups(key: int, game_id, winner):
         if guess['guess'] == key and not guess['twitch_user'] == winner['twitch_user']:
             runners_up.append(guess)
     return runners_up
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))

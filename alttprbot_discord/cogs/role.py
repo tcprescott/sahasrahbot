@@ -97,7 +97,7 @@ class Role(commands.Cog):
     @reactionrole.command(name='list', aliases=['l'])
     async def role_list(self, ctx, group_id: int):
         roles = await role.get_group_roles(group_id, ctx.guild.id)
-        await ctx.send(embed=embed_formatter.reaction_role_list(ctx, roles))
+        await ctx.reply(embed=embed_formatter.reaction_role_list(ctx, roles))
 
     @commands.group(aliases=['rg'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
@@ -131,7 +131,7 @@ class Role(commands.Cog):
             groups = await role.get_guild_groups(ctx.guild.id)
         else:
             groups = await role.get_guild_group_by_id(group_id, ctx.guild.id)
-        await ctx.send(embed=await embed_formatter.reaction_group_list(ctx, groups))
+        await ctx.reply(embed=await embed_formatter.reaction_group_list(ctx, groups))
 
     @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
@@ -144,13 +144,13 @@ class Role(commands.Cog):
                 try:
                     role_obj = await commands.RoleConverter().convert(ctx, i['role'])
                 except commands.BadArgument:
-                    await ctx.send(f"Failed to find role identified by {i['role']}")
+                    await ctx.reply(f"Failed to find role identified by {i['role']}")
                     continue
 
                 try:
                     member_obj = await commands.MemberConverter().convert(ctx, i['member'])
                 except commands.BadArgument:
-                    await ctx.send(f"Failed to find member identified by {i['member']}")
+                    await ctx.reply(f"Failed to find member identified by {i['member']}")
                     continue
 
                 if not mode == "dry":
@@ -173,7 +173,7 @@ async def refresh_bot_message(ctx, group_id):
             await message.add_reaction(strip_custom_emoji(item['emoji']))
         except discord.errors.HTTPException as err:
             if err.code == 10014:
-                await ctx.send("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
+                await ctx.reply("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
             else:
                 raise
 

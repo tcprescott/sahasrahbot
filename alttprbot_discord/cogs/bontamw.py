@@ -50,7 +50,7 @@ class BontaMultiworld(commands.Cog):
             raise SahasrahBotException(
                 f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
 
-        await ctx.send(embed=make_embed(multiworld))
+        await ctx.reply(embed=make_embed(multiworld))
 
     @commands.command(
         help=(
@@ -80,7 +80,7 @@ class BontaMultiworld(commands.Cog):
                 'error', 'Unknown error occured while processing message.'))
 
         if 'resp' in response and response['resp'] is not None:
-            await ctx.send(response['resp'])
+            await ctx.reply(response['resp'])
 
     @commands.command(
         help=(
@@ -104,7 +104,7 @@ class BontaMultiworld(commands.Cog):
         }
         multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
 
-        await ctx.send(embed=make_embed(multiworld))
+        await ctx.reply(embed=make_embed(multiworld))
 
     @commands.command(
         help=(
@@ -139,7 +139,7 @@ class BontaMultiworld(commands.Cog):
                     newzip.writestr(bmbp_file, lzma.compress(new_file))
 
         zip_to_send = zip_buffer.getvalue()
-        await ctx.send(file=discord.File(fp=io.BytesIO(zip_to_send), filename=f'Fixed_{ctx.message.attachments[0].filename}'))
+        await ctx.reply(file=discord.File(fp=io.BytesIO(zip_to_send), filename=f'Fixed_{ctx.message.attachments[0].filename}'))
         zip_buffer.close()
 
 

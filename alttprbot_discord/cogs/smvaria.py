@@ -21,7 +21,7 @@ class SuperMetroidVaria(commands.Cog):
             skills=skills,
             race=True
         )
-        await ctx.send(embed=seed.embed())
+        await ctx.reply(embed=seed.embed())
 
     @smvaria.command()
     async def norace(self, ctx, skills="regular", settings="default"):
@@ -30,7 +30,7 @@ class SuperMetroidVaria(commands.Cog):
             skills=skills,
             race=False
         )
-        await ctx.send(embed=seed.embed())
+        await ctx.reply(embed=seed.embed())
 
 
 def setup(bot):

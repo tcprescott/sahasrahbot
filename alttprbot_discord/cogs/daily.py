@@ -37,7 +37,7 @@ class Daily(commands.Cog):
         seed = await get_daily_seed(hash_id)
         embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await update_daily(hash_id)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):

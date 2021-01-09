@@ -90,7 +90,7 @@ class Tournament(commands.Cog):
         if audit_channel:
             await audit_channel.send(embed=embed)
         else:
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
 
         if await config.get(ctx.guild.id, 'TournamentCommentaryChannel'):
             commentary_channel_id = int(await config.get(ctx.guild.id, 'TournamentCommentaryChannel'))
@@ -108,7 +108,7 @@ class Tournament(commands.Cog):
             except Exception:
                 if audit_channel:
                     await audit_channel.send(f"Unable to send DM to {player['displayName']}")
-                await ctx.send(f"Unable to send DM to {player['displayName']}")
+                await ctx.reply(f"Unable to send DM to {player['displayName']}")
 
 
 def setup(bot):
