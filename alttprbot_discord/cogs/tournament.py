@@ -4,7 +4,7 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot.database import config, srlnick
+from alttprbot.database import config, srlnick, tournaments
 from alttprbot.util import speedgaming
 from alttprbot.tournament import alttpr
 from config import Config as c
@@ -21,11 +21,8 @@ class Tournament(commands.Cog):
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
-        if c.DEBUG:
-            # return
-            events = ['test']
-        else:
-            events = ['alttprde']
+        active_tournaments = await tournaments.get_active_tournaments()
+        events = [t['slug'] for t in active_tournaments]
         print("scanning SG schedule for tournament races to create")
         for event in events:
             try:

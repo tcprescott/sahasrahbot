@@ -56,9 +56,9 @@ class TournamentRace():
 
         tournament_race.episode = await speedgaming.get_episode(tournament_race.episodeid)
 
-        tournament_race.data = await tournaments.get_tournament('alttprde')
+        tournament_race.data = await tournaments.get_tournament(tournament_race.episode['event']['slug'])
         if tournament_race.data is None:
-            raise Exception('SG Episode ID not a recognized tournament')
+            raise Exception('SG Episode ID not a recognized event.  This should not have happened.')
         tournament_race.guild = discordbot.get_guild(tournament_race.data['guild_id'])
 
         for player in tournament_race.episode['match1']['players']:
