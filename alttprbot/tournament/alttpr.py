@@ -298,13 +298,15 @@ async def create_tournament_race_room(episodeid):
 
 async def is_tournament_race(name):
     race = await tournament_results.get_active_tournament_race(name)
-    if race and race['event'] == 'alttprde':
+    if race:
         return True
     return False
 
 
-async def can_gatekeep(rtgg_id):
-    tournament = await tournaments.get_tournament('alttprde')
+async def can_gatekeep(rtgg_id, name):
+    race = await tournament_results.get_active_tournament_race(name)
+
+    tournament = await tournaments.get_tournament(race['event'])
     if tournament is None:
         return False
     guild = discordbot.get_guild(tournament['guild_id'])

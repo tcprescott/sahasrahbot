@@ -22,7 +22,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
         for entrant in pending_entrants:
-            if await league.can_gatekeep(entrant['user']['id']):
+            if await league.can_gatekeep(entrant['user']['id']) or await alttpr.can_gatekeep(entrant['user']['id'], self.data['name']):
                 await self.accept_request(entrant['user']['id'])
                 await self.add_monitor(entrant['user']['id'])
 
