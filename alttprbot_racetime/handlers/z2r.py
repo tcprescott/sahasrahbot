@@ -14,6 +14,9 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.roll_game(flags, message)
 
+    async def ex_maxrando(self, args, message):
+        await self.roll_game('iyhqh$j9g7@$ZqTBT!BhOAdES$@', message)
+
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
 
