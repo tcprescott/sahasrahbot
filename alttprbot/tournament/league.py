@@ -642,15 +642,11 @@ async def process_playoff_form(form):
     playoff_round = form['Playoff Round']
     game_number = int(form['Game Number'])
 
-    league_race = await LeagueRace.construct(episodeid=episode_id, week='playoffs', create_seed=False)
-
     existing_playoff_race = await league_playoffs.get_playoff_by_episodeid_submitted(episode_id)
     if existing_playoff_race:
-        embed = discord.Embed(
-            title=f"ERROR SETTINGS NOT RECORDED - {playoff_round} - Game #{game_number} - {league_race.versus_and_team}",
-            description='Settings were not recorded because there is already a submitted race!',
-            color=discord.Colour.red()
-        )
+        return
+
+    league_race = await LeagueRace.construct(episodeid=episode_id, week='playoffs', create_seed=False)
 
     if PLAYOFFDATA[game_number].get('type') == 'preset':
         embed = discord.Embed(
