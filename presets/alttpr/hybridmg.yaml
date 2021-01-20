@@ -291,7 +291,7 @@ settings:
     - BossHeartContainer
   glitches: major_glitches
   goal: ganon
-  hints: "on"
+  hints: "off"
   item:
     functionality: normal
     pool: normal
@@ -300,10 +300,7 @@ settings:
   lang: en
   mode: open
   name: Hybrid Major Glitches
-  notes:
-    It's Overworld Glitches, but underworld clips are in logic too. This allows
-    you to experience the dungeon-bending logic of Major Glitches without the tedium
-    of a wild moon pearl.
+  notes: "This glitched logic lets you experience the dungeon-bending logic of Major Glitches without the tedium of a wild moon pearl. Outside, the logic is identical to OWG. Inside, you may be required to do the following clips: Kikiskip, IP lobby clip, Mire to Hera, and Hera to Swamp."
   spoilers: "off"
   tournament: true
   weapons: randomized
