@@ -36,6 +36,21 @@ class Misc(commands.Cog):
                 if random.choice([True, False]):
                     await message.reply(f'@{message.author.mention}')
 
+    @commands.group()
+    async def welcome(self, ctx):
+        pass
+
+    @welcome.command(aliases=['french'])
+    async def fr(self, ctx):
+        await ctx.send(
+            (
+                'Bienvenue! Ce serveur discord est principalement en anglais. '
+                'Vous trouverez un serveur en français en suivant <https://discord.gg/9cWhQyw>. '
+                'Les membres de ce serveur se feront un plaisir de vous aider.\n'
+                'Merci, et bienvenue encore un fois.'
+            )
+        )
+
     @commands.command(aliases=['joineddate'])
     @commands.check_any(
         commands.has_any_role(523276397679083520, 307883683526868992),
