@@ -47,7 +47,7 @@ class Misc(commands.Cog):
                 'Bienvenue! Ce serveur discord est principalement en anglais.\n'
                 'Vous trouverez un serveur en français en suivant https://discord.gg/9cWhQyw .\n'
                 'Les membres de ce serveur se feront un plaisir de vous aider.\n\n'
-                'Merci, et bienvenue encore un fois.'
+                'Merci, et bienvenue encore une fois.'
             )
         )
 
