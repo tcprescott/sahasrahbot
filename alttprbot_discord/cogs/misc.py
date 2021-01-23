@@ -40,14 +40,24 @@ class Misc(commands.Cog):
     async def welcome(self, ctx):
         pass
 
-    @welcome.command(aliases=['french'])
-    async def fr(self, ctx):
+    @welcome.command(aliases=['fr'])
+    async def french(self, ctx):
         await ctx.send(
             (
                 'Bienvenue! Ce serveur discord est principalement en anglais.\n'
                 'Vous trouverez un serveur en français en suivant https://discord.gg/9cWhQyw .\n'
                 'Les membres de ce serveur se feront un plaisir de vous aider.\n\n'
                 'Merci, et bienvenue encore une fois.'
+            )
+        )
+
+    @welcome.command(aliases=['es'])
+    async def spanish(self, ctx):
+        await ctx.send(
+            (
+                '¡Bienvenidos! Este servidor de Discord es principalmente de habla inglesa.'
+                '¡No tengáis miedo, hay un servidor en Español que podéis encontrar en https://discord.gg/xyHxAFJ donde os pueden ayudar!\n\n'
+                'Gracias y otra vez, bienvenidos.'
             )
         )
 
