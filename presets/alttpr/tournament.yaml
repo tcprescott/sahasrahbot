@@ -1,7 +1,7 @@
 ---
-goal_name: standard
+goal_name: tournament
 customizer: false
-description: "Standard world state, randomized weapons."
+description: "Tournament weights."
 settings:
   allow_quickswap: true
   goal: ganon
