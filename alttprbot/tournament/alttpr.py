@@ -1,16 +1,40 @@
+import copy
 import datetime
 import logging
 import json
+import random
 
 import aiohttp
 import discord
+import pyz3r.customizer
 
 from alttprbot.alttprgen import preset
-from alttprbot.database import (tournament_results, srlnick, tournaments)
+from alttprbot.database import (tournament_results, srlnick, tournaments, tournament_games)
 from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import racetime_bots
+
+SETTINGSMAP = {
+    'Defeat Ganon': 'ganon',
+    'Fast Ganon': 'fast_ganon',
+    'All Dungeons': 'dungeons',
+    'Standard': 'standard',
+    'Open': 'open',
+    'Inverted': 'inverted',
+    'Retro': 'retro',
+    'Randomized': 'randomized',
+    'Assured': 'assured',
+    'Vanilla': 'vanilla',
+    'Swordless': 'swordless',
+    'Shuffled': 'shuffled',
+    'Full': 'full',
+    'Random': 'random',
+    'Hard': 'hard',
+    'Normal': 'normal',
+    'Off': 'off',
+    'On': 'on'
+}
 
 
 class UnableToLookupUserException(SahasrahBotException):
@@ -294,6 +318,146 @@ async def create_tournament_race_room(episodeid):
     await handler.edit(unlisted=False)
 
     return handler.data
+
+
+async def alttprde_process_settings_form(form):
+    episode_id = int(form['SpeedGaming Episode ID'])
+    game_number = int(form['Game Number'])
+
+    existing_playoff_race = await tournament_games.get_game_by_episodeid_submitted(episode_id)
+    if existing_playoff_race:
+        return
+
+    tournament_race = await TournamentRace.construct(episodeid=episode_id, create_seed=False)
+
+    embed = discord.Embed(
+        title=f"ALTTPR DE - Game #{game_number} - {tournament_race.versus}",
+        description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a tournament admin.',
+        color=discord.Colour.blue()
+    )
+
+    if form['Game Number'] == '1':
+        goal = random.choice(['Defeat Ganon', 'Fast Ganon', 'All Dungeons'])
+        crystals = '7/7'
+        world_state = random.choice(['Open', 'Standard'])
+        swords = random.choice(['Assured', 'Randomized'])
+        enemy_shuffle = 'Off'
+        boss_shuffle = 'Off'
+        dungeon_item_shuffle = 'Standard'
+        item_pool = random.choice(['Normal', 'Hard'])
+        item_functionality = 'Normal'
+        extra_start_item = "None"
+        hints = 'Off'
+    else:
+        goal = form['Goal']
+        crystals = form['Tower/Ganon Requirements']
+        world_state = form['World State']
+        swords = form['Swords']
+        enemy_shuffle = form['Enemy Shuffle']
+        boss_shuffle = form['Boss Shuffle']
+        dungeon_item_shuffle = form['Dungeon Item Shuffle']
+        item_pool = form['Item Pool']
+        item_functionality = form['Item Functionality']
+        extra_start_item = form['Extra Start Item']
+        hints = form['Hints']
+
+    embed.add_field(
+        name='Settings',
+        value=(
+            f"**Goal**: {goal}\n"
+            f"**Tower/Ganon Requirements**: {crystals}\n"
+            f"**World State**: {world_state}\n"
+            f"**Swords**: {swords}\n"
+            f"**Enemy Shuffle**: {enemy_shuffle}\n"
+            f"**Boss Shuffle**: {boss_shuffle}\n"
+            f"**Dungeon Item Shuffle**: {dungeon_item_shuffle}\n"
+            f"**Item Pool**: {item_pool}\n"
+            f"**Item Functionality**: {item_functionality}\n"
+            f"**Extra Start Item**: {extra_start_item}\n"
+            f"**Hints**: {hints}"
+        )
+    )
+
+    settings = copy.deepcopy(pyz3r.customizer.BASE_CUSTOMIZER_PAYLOAD)
+
+    settings['custom']['customPrizePacks'] = False
+
+    settings["glitches"] = "none"
+    settings["item_placement"] = "advanced"
+    settings["dungeon_items"] = "standard"
+    settings["accessibility"] = "items"
+    settings['goal'] = SETTINGSMAP[goal]
+    settings["crystals"]["ganon"] = "7" if crystals == "7/7" else "6"
+    settings["crystals"]["tower"] = "7" if crystals == "7/7" else "6"
+    settings["mode"] = SETTINGSMAP[world_state]
+    settings["hints"] = SETTINGSMAP[hints]
+    settings["weapons"] = SETTINGSMAP[swords]
+    settings["item"]["pool"] = SETTINGSMAP[item_pool]
+    settings["item"]["functionality"] = SETTINGSMAP[item_functionality]
+    settings["tournament"] = False
+    settings["spoilers"] = "off"
+    settings["enemizer"]["boss_shuffle"] = SETTINGSMAP[boss_shuffle]
+    settings["enemizer"]["enemy_shuffle"] = SETTINGSMAP[enemy_shuffle]
+    settings["enemizer"]["enemy_damage"] = "default"
+    settings["enemizer"]["enemy_health"] = "default"
+    settings["enemizer"]["pot_shuffle"] = "off"
+    settings["entrances"] = "off"
+    settings["allow_quickswap"] = True
+
+    settings['custom']['region.wildKeys'] = dungeon_item_shuffle in ['Small Keys', 'Keysanity']
+    settings['custom']['region.wildBigKeys'] = dungeon_item_shuffle in ['Big Keys', 'Keysanity']
+    settings['custom']['region.wildCompasses'] = dungeon_item_shuffle in ['Maps/Compasses', 'Keysanity']
+    settings['custom']['region.wildMaps'] = dungeon_item_shuffle in ['Maps/Compasses', 'Keysanity']
+
+    if settings['custom'].get('region.wildKeys', False) or settings['custom'].get('region.wildBigKeys', False) or settings['custom'].get('region.wildCompasses', False) or settings['custom'].get('region.wildMaps', False):
+        settings['custom']['rom.freeItemMenu'] = True
+        settings['custom']['rom.freeItemText'] = True
+
+    if settings['custom'].get('region.wildMaps', False):
+        settings['custom']['rom.mapOnPickup'] = True
+
+    if settings['custom'].get('region.wildCompasses', False):
+        settings['custom']['rom.dungeonCount'] = 'pickup'
+
+    eq = []
+    if extra_start_item == "Boots":
+        eq += ["PegasusBoots"]
+    if extra_start_item == "Flute":
+        eq += ["OcarinaActive"]
+    for item in eq:
+        if item == 'OcarinaActive':
+            item = 'OcarinaInactive'
+
+        settings['custom']['item']['count'][item] = settings['custom']['item']['count'].get(
+            item, 0) - 1 if settings['custom']['item']['count'].get(item, 0) > 0 else 0
+
+    # re-add 3 heart containers as a baseline
+    eq += ['BossHeartContainer'] * 3
+
+    # update the eq section of the settings
+    settings['eq'] = eq
+
+    if settings["mode"] == 'standard':
+        settings['eq'] = [item if item != 'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
+
+    await tournament_games.insert_game(episode_id=episode_id, event='alttprde', game_number=game_number, settings=settings)
+
+    audit_channel_id = tournament_race.data['audit_channel_id']
+    if audit_channel_id is not None:
+        audit_channel = discordbot.get_channel(audit_channel_id)
+        await audit_channel.send(embed=embed)
+    else:
+        audit_channel = None
+
+    for name, player in tournament_race.player_discords:
+        if player is None:
+            await audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+            continue
+        try:
+            await player.send(embed=embed)
+        except discord.HTTPException:
+            if audit_channel is not None:
+                await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
 
 
 async def is_tournament_race(name):

@@ -227,6 +227,18 @@ t_srlnick = Table(
     Column('srl_verified', BIT(1))
 )
 
+t_tournament_games = Table(
+    'tournament_games', metadata,
+    Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
+    Column('event', String(45, 'utf8_bin')),
+    Column('game_number', INTEGER(11)),
+    Column('settings', JSON),
+    Column('submitted', TINYINT(1)),
+    Column('created', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP")),
+    Column('updated', DateTime, server_default=text(
+        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
+)
 
 t_tournament_results = Table(
     'tournament_results', metadata,

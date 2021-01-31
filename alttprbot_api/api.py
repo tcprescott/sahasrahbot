@@ -3,7 +3,7 @@ import os
 from quart import Quart, abort, jsonify, request
 
 from alttprbot.alttprgen.mystery import get_weights, generate_random_settings
-from alttprbot.tournament import league
+from alttprbot.tournament import league, alttpr
 from alttprbot.database import league_playoffs
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl import nick_verifier
@@ -76,15 +76,30 @@ async def league_playoff():
 
     return jsonify(success=True)
 
+
+@sahasrahbotapi.route('/api/alttprde/settings', methods=['POST'])
+async def alttprde_settings():
+    payload = await request.get_json()
+
+    if not payload['secret'] == os.environ.get('LEAGUE_DATA_ENDPOINT_SECRET'):
+        abort(401, description="secret required")
+
+    await alttpr.alttprde_process_settings_form(payload['form'])
+
+    return jsonify(success=True)
+
+
 @sahasrahbotapi.route('/api/league/playoff/<int:episode_id>', methods=['GET'])
 async def get_league_playoff(episode_id):
     results = await league_playoffs.get_playoff_by_episodeid_submitted(episode_id)
     return jsonify(results)
 
+
 @sahasrahbotapi.route('/api/league/playoffs', methods=['GET'])
 async def get_league_playoffs():
     results = await league_playoffs.get_all_playoffs()
     return jsonify(results)
+
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
