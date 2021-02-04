@@ -2,11 +2,17 @@ from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.smvaria import generate_preset
+from alttprbot.alttprgen.randomizer import smdash
 
 
-class SuperMetroidVaria(commands.Cog):
+class SuperMetroid(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot = bot\
+
+    @commands.command()
+    async def smdash(self, ctx, mode):
+        url = await smdash.create_smdash(mode=mode)
+        await ctx.reply(url)
 
     @commands.group()
     async def smvaria(self, ctx):
@@ -34,4 +40,4 @@ class SuperMetroidVaria(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(SuperMetroidVaria(bot))
+    bot.add_cog(SuperMetroid(bot))
