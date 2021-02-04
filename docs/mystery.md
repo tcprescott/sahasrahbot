@@ -17,7 +17,7 @@ title:  Mystery Weights
 | [friendly](https://github.com/tcprescott/sahasrahbot/blob/master/weights/friendly.yaml) | A friendlier weightset.  Designed for those who don't want something extreme (or entrance). | *Customizer* |
 | [funweighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/funweighted.yaml) | Unweighted except no chance of triforce hunts or insanity entrance shuffles. |  |
 | [itemonly](https://github.com/tcprescott/sahasrahbot/blob/master/weights/itemonly.yaml) | No entrance shuffle. |  |
-| [ladder](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder.yaml) | Season three mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Customizer* |
+| [ladder](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder.yaml) | Season four mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
 | [ladder_season1](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season1.yaml) | Pre-season mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |  |
 | [ladder_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season2.yaml) | Season two mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |  |
 | [ladder_season3](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season3.yaml) | Season three mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Customizer* |

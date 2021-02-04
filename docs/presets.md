@@ -16,6 +16,7 @@ title:  Presets
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) |Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) |Open, except the randomizer only ensures it can be beaten.|   |
 | [beginner](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beginner.yaml) |A good start for new players.|   |
+| [black_friday_hell_seed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/black_friday_hell_seed.yaml) || *Customizer*  |
 | [blitzmode](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/blitzmode.yaml) |4/4 fast ganon. Start with Boots, Activated Flute, Pearl, Mitts, Master Sword, and Lamp| *Customizer*  |
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casual.yaml) |Standard with a starting weapon.|   |
 | [casualboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
@@ -71,6 +72,7 @@ title:  Presets
 | [standardmajoritems](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standardmajoritems.yaml) |Standard world state.  Shuffles only inventory items and heart containers. Keys, dungeon items, ammo, money, and heart pieces remain vanilla.| *Customizer*  |
 | [superquick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/superquick.yaml) |Find your equipment and defeat Ganon as quick as you can!|   |
 | [swordless](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/swordless.yaml) |Swords are overrated anyway.|   |
+| [tournament](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament.yaml) |Tournament weights.|   |
 | [triforce30](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce30.yaml) |A Triforce Hunt, except there are 30 pieces required, and 40 in the item pool.| *Customizer*  |
 | [triforce40](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce40.yaml) |A Triforce Hunt, except there are 40 pieces required, and 50 in the item pool.| *Customizer*  |
 | [trueicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trueicerodhunt.yaml) |You get every **every**, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
