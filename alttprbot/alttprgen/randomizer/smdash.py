@@ -1,11 +1,7 @@
-import random
-import tempfile
 import asyncio
 import os
-import bps
-
-# mono /opt/dash-rando-app/dash-rando-app-v10/DASH_Randomizer.exe -q -v -m "full" -p /home/tprescott/super_metroid.sfc
-# https://github.com/dashrando/dash-rando-app/blob/master/DashRandomizerApp/Program.cs
+import random
+import tempfile
 
 ###
 # 1) Make a new temp directory
