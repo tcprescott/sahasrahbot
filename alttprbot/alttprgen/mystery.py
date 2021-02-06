@@ -59,6 +59,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
                     settings, customizer = await generate_random_settings(weights, festive=festive, spoilers=spoilers)
 
                     settings['tournament'] = tournament
+                    settings['allow_quickswap'] = True
                     seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
                 except ClientResponseError:
                     await audit.insert_generated_game(
