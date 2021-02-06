@@ -34,7 +34,8 @@ SETTINGSMAP = {
     'Hard': 'hard',
     'Normal': 'normal',
     'Off': 'off',
-    'On': 'on'
+    'On': 'on',
+    'None': 'none'
 }
 
 
