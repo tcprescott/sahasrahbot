@@ -13,6 +13,7 @@ from alttprbot.database import (tournament_results, srlnick, tournaments, tourna
 from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
+from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime.bot import racetime_bots
 
 SETTINGSMAP = {
@@ -84,6 +85,7 @@ class TournamentRace():
         if tournament_race.data is None:
             raise Exception('SG Episode ID not a recognized event.  This should not have happened.')
         tournament_race.guild = discordbot.get_guild(tournament_race.data['guild_id'])
+        tournament_race.bracket_settings = await tournament_games.get_game_by_episodeid_submitted(episodeid)
 
         for player in tournament_race.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
@@ -91,7 +93,7 @@ class TournamentRace():
             tournament_race.players.append(looked_up_player)
 
         if tournament_race.create_seed:
-            await tournament_race._roll_general()
+            await tournament_race._roll_bracket()
 
         return tournament_race
 
@@ -120,6 +122,22 @@ class TournamentRace():
             self.seed, self.preset_dict = await preset.get_preset('standard', nohints=True, allow_quickswap=True)
         else:
             raise Exception(f"Invalid Match Title, must be Open or Standard!  Please contact a tournament admin for help.")
+
+    async def _roll_bracket(self):
+        if self.bracket_settings is None:
+            raise Exception('Missing bracket settings.  Please submit!')
+
+        self.preset_dict = None
+        self.seed = await alttpr_discord.alttpr(
+            settings=json.loads(self.bracket_settings['settings']),
+            customizer=True
+        )
+
+    @property
+    def game_number(self):
+        if self.bracket_settings:
+            return self.bracket_settings.get('game_number', None)
+        return None
 
     @property
     def event_name(self):
@@ -167,7 +185,10 @@ async def process_tournament_race(handler, episodeid=None):
         await handler.send_message(f"Could not process tournament race: {str(e)}")
         return
 
-    goal = f"{tournament_race.event_name} - {tournament_race.versus} - {tournament_race.friendly_name}"
+    if tournament_race.bracket_settings:
+        goal = f"{tournament_race.event_name} - {tournament_race.versus} - Game #{tournament_race.game_number}"
+    else:
+        goal = f"{tournament_race.event_name} - {tournament_race.versus} - {tournament_race.friendly_name}"
 
     embed = await tournament_race.seed.embed(
         name=goal,
@@ -341,8 +362,8 @@ async def alttprde_process_settings_form(form):
         crystals = '7/7'
         world_state = random.choice(['Open', 'Standard'])
         swords = random.choice(['Assured', 'Randomized'])
-        enemy_shuffle = 'Off'
-        boss_shuffle = 'Off'
+        enemy_shuffle = 'None'
+        boss_shuffle = 'None'
         dungeon_item_shuffle = 'Standard'
         item_pool = random.choice(['Normal', 'Hard'])
         item_functionality = 'Normal'
@@ -394,7 +415,7 @@ async def alttprde_process_settings_form(form):
     settings["weapons"] = SETTINGSMAP[swords]
     settings["item"]["pool"] = SETTINGSMAP[item_pool]
     settings["item"]["functionality"] = SETTINGSMAP[item_functionality]
-    settings["tournament"] = False
+    settings["tournament"] = True
     settings["spoilers"] = "off"
     settings["enemizer"]["boss_shuffle"] = SETTINGSMAP[boss_shuffle]
     settings["enemizer"]["enemy_shuffle"] = SETTINGSMAP[enemy_shuffle]
