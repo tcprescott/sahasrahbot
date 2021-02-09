@@ -11,7 +11,7 @@ import pyz3r
 from pyz3r.ext.priestmode import create_priestmode
 from alttprbot.alttprgen.mystery import (generate_random_game)
 from alttprbot.alttprgen.preset import get_preset, generate_preset
-from alttprbot.alttprgen.spoilers import generate_spoiler_game
+from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr, alttprDiscordClass
@@ -65,7 +65,7 @@ class AlttprGen(commands.Cog):
         brief='Generate a custom preset.',
         help='Generate a custom preset.  This file should be attached to the message.'
     )
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race_custom(self, ctx):
         if ctx.message.attachments:
@@ -97,7 +97,7 @@ class AlttprGen(commands.Cog):
         brief='Generate a custom preset.',
         help='Generate a custom preset.  This file should be attached to the message.'
     )
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def norace_custom(self, ctx):
         if ctx.message.attachments:
@@ -109,9 +109,10 @@ class AlttprGen(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.reply(embed=embed)
 
-    @commands.command(
+    @commands.group(
         brief='Generate a spoiler game.',
-        help='Generate a spoiler game.  Find a list of presets at https://sahasrahbot.synack.live/presets.html'
+        help='Generate a spoiler game.  Find a list of presets at https://sahasrahbot.synack.live/presets.html',
+        invoke_without_command=True
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def spoiler(self, ctx, preset):
@@ -119,6 +120,25 @@ class AlttprGen(commands.Cog):
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
+        embed = await seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Spoiler Log URL",
+                              value=spoiler_log_url, inline=False)
+        await ctx.reply(embed=embed)
+
+    @spoiler.command(
+        name='custom',
+        brief='Generate a custom spoiler race.',
+        help='Generate a custom preset.  This file should be attached to the message.'
+    )
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
+    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    async def spoiler_custom(self, ctx):
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            preset_dict = yaml.safe_load(content)
+            seed, _, spoiler_log_url = await generate_spoiler_game_custom(preset_dict)
+        else:
+            raise SahasrahBotException("You must supply a valid yaml file.")
         embed = await seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL",
                               value=spoiler_log_url, inline=False)
@@ -145,7 +165,7 @@ class AlttprGen(commands.Cog):
         invoke_without_command=True,
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=False, spoilers="on")
 
@@ -154,7 +174,7 @@ class AlttprGen(commands.Cog):
         brief='Generate a mystery game with custom weights.',
         help='Generate a mystery game with custom weights.  This file should be attached to the message.'
     )
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def random_custom(self, ctx):
         if ctx.message.attachments:
@@ -170,7 +190,7 @@ class AlttprGen(commands.Cog):
         invoke_without_command=True,
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery")
 
@@ -179,7 +199,7 @@ class AlttprGen(commands.Cog):
         brief='Generate a mystery game with custom weights.',
         help='Generate a mystery game with custom weights.  This file should be attached to the message.'
     )
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def mystery_custom(self, ctx):
         if ctx.message.attachments:
@@ -351,7 +371,7 @@ class AlttprGen(commands.Cog):
             'Create a series a \"Kiss Priest\" games.  This was created by hycutype.'
         )
     )
-    @commands.cooldown(rate=3, per=900, type=commands.BucketType.user)
+    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def kisspriest(self, ctx, count=10):
         if count > 10 or count < 1:
             raise SahasrahBotException(
