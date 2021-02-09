@@ -20,6 +20,7 @@ SETTINGSMAP = {
     'Defeat Ganon': 'ganon',
     'Fast Ganon': 'fast_ganon',
     'All Dungeons': 'dungeons',
+    'Pedestal': 'pedestal',
     'Standard': 'standard',
     'Open': 'open',
     'Inverted': 'inverted',
