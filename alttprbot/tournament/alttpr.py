@@ -152,6 +152,10 @@ class TournamentRace():
         else:
             raise Exception(f"Invalid Match Title, must be Open or Standard!  Please contact a tournament admin for help.")
 
+    # handle rolling for alttpr main tournament
+    async def roll_alttpr(self):
+        self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
+
     @property
     def game_number(self):
         if self.bracket_settings:
