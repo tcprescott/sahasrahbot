@@ -22,11 +22,11 @@ class Tournament(commands.Cog):
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
         active_tournaments = await tournaments.get_active_tournaments()
-        events = [t['slug'] for t in active_tournaments]
+
         print("scanning SG schedule for tournament races to create")
-        for event in events:
+        for tournament in active_tournaments:
             try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
+                episodes = await speedgaming.get_upcoming_episodes_by_event(tournament['slug'], hours_past=0.5, hours_future=.75)
             except Exception as e:
                 logging.exception(
                     "Encountered a problem when attempting to retrieve SG schedule.")
@@ -38,12 +38,11 @@ class Tournament(commands.Cog):
                 except Exception as e:
                     logging.exception(
                         "Encountered a problem when attempting to create RT.gg race room.")
-                    guild_id = await config.get(0, 'AlttprLeagueServer')
-                    audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
-                    audit_channel = self.bot.get_channel(int(audit_channel_id))
+                    audit_channel_id = tournament['audit_channel_id']
+                    audit_channel = self.bot.get_channel(audit_channel_id)
                     if audit_channel:
                         await audit_channel.send(
-                            f"@here There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
+                            f"There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
                             allowed_mentions=discord.AllowedMentions(
                                 everyone=True)
                         )
