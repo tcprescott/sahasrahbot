@@ -64,7 +64,7 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def srljoinall(self, ctx):
-        await srlbot.join_active_races(['alttphacks', 'alttpsm'])
+        await srlbot.join_active_races(['alttphacks', 'alttpsm', 'supermetroidhacks'])
 
     @commands.command()
     async def gtbkrecalc(self, ctx, game_id: int, key: int, dry: bool = True):

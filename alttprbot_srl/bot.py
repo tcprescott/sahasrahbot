@@ -52,7 +52,7 @@ class SrlBot(pydle.Client):
             await asyncio.sleep(1)
         #     await self.join('#speedrunslive')
         #     await self.join('#alttpr')
-            await self.join_active_races(['alttphacks', 'alttpsm'])
+            await self.join_active_races(['alttphacks', 'alttpsm', 'supermetroidhacks'])
             await self.process_active_races()
         #     if c.DEBUG: await self.join('#srl-synack-testing')
 

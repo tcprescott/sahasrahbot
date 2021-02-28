@@ -1,10 +1,11 @@
 import argparse
 import shlex
 import sys
+import random
 
 import ircmessage
 
-from alttprbot.alttprgen import mystery, preset, spoilers
+from alttprbot.alttprgen import mystery, preset, spoilers, smz3multi
 from alttprbot.database import (config, spoiler_races, srl_races,
                                 tournament_results)
 from alttprbot.exceptions import SahasrahBotException
@@ -42,7 +43,7 @@ async def handler(target, source, message, client):
             randomizer = 'alttpr'
         elif srl['game']['abbrev'] == 'alttpsm':
             randomizer = 'smz3'
-        elif srl['game']['abbrev'] == 'smhacks':
+        elif srl['game']['abbrev'] == 'supermetroidhacks':
             randomizer = 'sm'
         else:
             raise SahasrahBotException("This game is not yet supported.")
@@ -156,8 +157,35 @@ async def handler(target, source, message, client):
         await srl_races.insert_srl_race(srl_id, goal, post_start_message)
         await spoiler_races.insert_spoiler_race(srl_id, spoiler_log_url, studytime)
 
-    # if args.command == '$leaguerace' and target.startswith('#srl-'):
-    #     await league.process_league_race(target, args, client)
+    if args.command == '$smmulti' and target.startswith('#srl-'):
+        srl_id = srl_race_id(target)
+        srl = await get_race(srl_id)
+        await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        race = await srl_races.get_srl_race_by_id(srl_id)
+
+        if race:
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+
+        if srl['game']['abbrev'] == 'supermetroidhacks':
+            # verify team sizes are equal
+            if len({len(t) for t in args.team}) != 1:
+                await client.message(target, "Team sizes are uneven.  Aborting!")
+                return
+
+            seed_number = random.randint(0, 2147483647)
+
+            for team in args.team:
+                seed = await smz3multi.generate_multiworld(args.preset, team, tournament=True, randomizer='sm', seed_number=seed_number)
+                await client.message(target, f"Team {', '.join(team)}: {seed.url}")
+
+            goal = "sm multiworld - DO NOT RECORD"
+        else:
+            raise SahasrahBotException("This game is not supported.")
+
+        await srl_races.insert_srl_race(srl_id, goal)
+
+    if args.command == '$smleague' and target.startswith('#srl-'):
+        pass
 
     if args.command == '$cancel' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
@@ -225,9 +253,17 @@ async def parse_args(message):
     parser_mystery.add_argument('--silent', action='store_true')
     parser_mystery.add_argument('--accessible', action='store_true')
 
-    # parser_leaguerace = subparsers.add_parser('$leaguerace')
-    # parser_leaguerace.add_argument('episodeid')
-    # parser_leaguerace.add_argument('--week', default=None)
+    # Namespace(preset='normal', team=[['player1', 'player2'], ['player3', 'player4']])
+    parser_smmulti = subparsers.add_parser('$smmulti')
+    parser_smmulti.add_argument('preset')
+    parser_smmulti.add_argument('--team', nargs='*', action='append', required=True)
+
+    parser_smvaria = subparsers.add_parser('$smvaria')
+    parser_smvaria.add_argument('skills')
+    parser_smvaria.add_argument('settings')
+
+    parser_smdash = subparsers.add_parser('$smdash')
+    parser_smdash.add_argument('preset')
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')

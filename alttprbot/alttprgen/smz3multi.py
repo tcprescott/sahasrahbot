@@ -6,8 +6,7 @@ from alttprbot.exceptions import SahasrahBotException
 class PresetNotFoundException(SahasrahBotException):
     pass
 
-
-async def generate_multiworld(preset, players, tournament=False, randomizer='smz3'):
+async def generate_multiworld(preset, players, tournament=False, randomizer='smz3', seed_number=None):
     preset_dict = await fetch_preset(preset, randomizer=randomizer)
 
     settings = preset_dict['settings']
@@ -15,6 +14,10 @@ async def generate_multiworld(preset, players, tournament=False, randomizer='smz
     settings['race'] = "true" if tournament else "false"
     settings['gamemode'] = "multiworld"
     settings['players'] = len(players)
+
+    if seed_number:
+        settings['seed'] = str(seed_number)
+
     for idx, player in enumerate(players):
         settings[f'player-{idx}'] = player
 

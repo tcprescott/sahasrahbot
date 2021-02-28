@@ -27,7 +27,8 @@ permalink = re.compile(
 
 srl_game_whitelist = [
     'The Legend of Zelda: A Link to the Past Hacks',
-    'A Link to the Past & Super Metroid Combo Randomizer'
+    'A Link to the Past & Super Metroid Combo Randomizer',
+    'Super Metroid Hacks'
 ]
 
 
