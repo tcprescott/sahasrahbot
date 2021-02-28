@@ -25,7 +25,7 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
             test_schedule.append(episode)
         return test_schedule
 
-    now = datetime.now()
+    now = datetime.utc_now()
     sched_from = now - timedelta(hours=hours_past)
     sched_to = now + timedelta(hours=hours_future)
     params = {
