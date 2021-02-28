@@ -6,6 +6,7 @@ import random
 import ircmessage
 
 from alttprbot.alttprgen import mystery, preset, spoilers, smz3multi
+from alttprbot.alttprgen.randomizer import smdash
 from alttprbot.database import (config, spoiler_races, srl_races,
                                 tournament_results)
 from alttprbot.exceptions import SahasrahBotException
@@ -184,8 +185,23 @@ async def handler(target, source, message, client):
 
         await srl_races.insert_srl_race(srl_id, goal)
 
-    if args.command == '$smleague' and target.startswith('#srl-'):
-        pass
+    if args.command == '$smdash' and target.startswith('#srl-'):
+        srl_id = srl_race_id(target)
+        srl = await get_race(srl_id)
+        await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        race = await srl_races.get_srl_race_by_id(srl_id)
+
+        if race:
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+
+        if srl['game']['abbrev'] == 'supermetroidhacks':
+            url = await smdash.create_smdash(mode=args.preset)
+            goal = "sm dash"
+            await client.message(target, f".goal {goal} - {url}")
+        else:
+            raise SahasrahBotException("This game is not supported.")
+
+        await srl_races.insert_srl_race(srl_id, goal)
 
     if args.command == '$cancel' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
@@ -263,7 +279,7 @@ async def parse_args(message):
     parser_smvaria.add_argument('settings')
 
     parser_smdash = subparsers.add_parser('$smdash')
-    parser_smdash.add_argument('preset')
+    parser_smdash.add_argument('preset', default='mm')
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')
