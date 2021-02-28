@@ -5,7 +5,7 @@ import random
 
 import ircmessage
 
-from alttprbot.alttprgen import mystery, preset, spoilers, smz3multi
+from alttprbot.alttprgen import mystery, preset, spoilers, smz3multi, smvaria
 from alttprbot.alttprgen.randomizer import smdash
 from alttprbot.database import (config, spoiler_races, srl_races,
                                 tournament_results)
@@ -44,7 +44,7 @@ async def handler(target, source, message, client):
             randomizer = 'alttpr'
         elif srl['game']['abbrev'] == 'alttpsm':
             randomizer = 'smz3'
-        elif srl['game']['abbrev'] == 'supermetroidhacks':
+        elif srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
             randomizer = 'sm'
         else:
             raise SahasrahBotException("This game is not yet supported.")
@@ -167,7 +167,7 @@ async def handler(target, source, message, client):
         if race:
             raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
-        if srl['game']['abbrev'] == 'supermetroidhacks':
+        if srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
             # verify team sizes are equal
             if len({len(t) for t in args.team}) != 1:
                 await client.message(target, "Team sizes are uneven.  Aborting!")
@@ -194,10 +194,28 @@ async def handler(target, source, message, client):
         if race:
             raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
 
-        if srl['game']['abbrev'] == 'supermetroidhacks':
+        if srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
             url = await smdash.create_smdash(mode=args.preset)
-            goal = "sm dash"
+            goal = "item randomizer"
             await client.message(target, f".goal {goal} - {url}")
+        else:
+            raise SahasrahBotException("This game is not supported.")
+
+        await srl_races.insert_srl_race(srl_id, goal)
+
+    if args.command == '$smvaria' and target.startswith('#srl-'):
+        srl_id = srl_race_id(target)
+        srl = await get_race(srl_id)
+        await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        race = await srl_races.get_srl_race_by_id(srl_id)
+
+        if race:
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+
+        if srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
+            seed = await smvaria.generate_preset(args.settings, args.skills, race=True)
+            goal = "item randomizer"
+            await client.message(target, f".goal {goal} - {seed.url}")
         else:
             raise SahasrahBotException("This game is not supported.")
 
