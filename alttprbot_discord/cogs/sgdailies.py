@@ -28,7 +28,7 @@ class SgDaily(commands.Cog):
                 logging.error(f"Racetime Bot is not connected to category {sgdaily['racetime_category']}")
                 continue
             try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(sgdaily['slug'], hours_past=1, hours_future=.25)
+                episodes = await speedgaming.get_upcoming_episodes_by_event(sgdaily['slug'], hours_past=.25, hours_future=1)
             except Exception as e:
                 logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                 continue
