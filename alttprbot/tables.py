@@ -267,6 +267,19 @@ t_tournaments = Table(
     Index('idx_tournaments_type_slug', 'schedule_type', 'slug', unique=True)
 )
 
+t_sgdailies = Table(
+    'sgdailies', metadata,
+    Column('id', INTEGER(11), primary_key=True),
+    Column('slug', String(45)),
+    Column('guild_id', BIGINT(20), nullable=False),
+    Column('announce_channel', BIGINT(20), nullable=False),
+    Column('announce_message', VARCHAR(2000), nullable=False),
+    Column('racetime_category', String(45)),
+    Column('racetime_goal', String(45)),
+    Column('race_info', VARCHAR(2000), nullable=False),
+    Column('active', TINYINT(1))
+)
+
 t_sgl2020_tournament = Table(
     'sgl2020_tournament', metadata,
     Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),

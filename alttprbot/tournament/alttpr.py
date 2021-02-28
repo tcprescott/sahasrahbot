@@ -14,7 +14,7 @@ from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
-from alttprbot_racetime.bot import racetime_bots
+from alttprbot_racetime import bot as racetime
 
 SETTINGSMAP = {
     'Defeat Ganon': 'ganon',
@@ -300,7 +300,7 @@ async def process_tournament_race_start(handler):
 
 
 async def create_tournament_race_room(episodeid):
-    rtgg_alttpr = racetime_bots['alttpr']
+    rtgg_alttpr = racetime.racetime_bots['alttpr']
     race = await tournament_results.get_active_tournament_race_by_episodeid(episodeid)
     if race:
         async with aiohttp.request(
