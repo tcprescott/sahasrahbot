@@ -197,7 +197,7 @@ async def handler(target, source, message, client):
         if srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
             url = await smdash.create_smdash(mode=args.preset)
             goal = "item randomizer"
-            await client.message(target, f".goal {goal} - {url}")
+            await client.message(target, f".setgoal {goal} - {url}")
         else:
             raise SahasrahBotException("This game is not supported.")
 
@@ -215,7 +215,7 @@ async def handler(target, source, message, client):
         if srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
             seed = await smvaria.generate_preset(args.settings, args.skills, race=True)
             goal = "item randomizer"
-            await client.message(target, f".goal {goal} - {seed.url}")
+            await client.message(target, f".setgoal {goal} - {seed.url}")
         else:
             raise SahasrahBotException("This game is not supported.")
 
