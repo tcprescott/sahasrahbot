@@ -61,6 +61,15 @@ class Misc(commands.Cog):
             )
         )
 
+    @welcome.command(aliases=['de'])
+    async def german(self, ctx):
+        await ctx.send(
+            (
+                'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben. Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann. Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren'
+                'Vielen Dank und nochmals herzlich willkommen.'
+            )
+        )
+
     @commands.command(aliases=['joineddate'])
     @commands.check_any(
         commands.has_any_role(523276397679083520, 307883683526868992),
