@@ -65,7 +65,7 @@ class Misc(commands.Cog):
     async def german(self, ctx):
         await ctx.send(
             (
-                'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben. Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann. Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren'
+                'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben. Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann. Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren\n\n'
                 'Vielen Dank und nochmals herzlich willkommen.'
             )
         )
