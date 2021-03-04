@@ -8,6 +8,7 @@ import pyz3r
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 SMZ3_ENVIRONMENTS = {
     'live': {
@@ -61,38 +62,54 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
     settings = preset_dict['settings']
 
     if randomizer == 'alttpr':
-        if hints:
-            settings['hints'] = 'on'
-        elif nohints:
-            settings['hints'] = 'off'
+        if preset_dict.get('doors', False):
+            if hints:
+                settings['hints'] = 'on'
+            elif nohints:
+                settings['hints'] = 'off'
 
-        settings['tournament'] = tournament
-        settings['spoilers'] = spoilers
+            if allow_quickswap:
+                settings['quickswap'] = True
 
-        if allow_quickswap:
-            settings['allow_quickswap'] = True
+            seed = await AlttprDoorDiscord.create(
+                settings=settings,
+                spoilers=spoilers == "on"
+            )
+            hash_id = seed.hash
+        else:
+            if hints:
+                settings['hints'] = 'on'
+            elif nohints:
+                settings['hints'] = 'off'
 
-        if preset_dict.get('customizer', False):
-            if 'l' not in settings:
-                settings['l'] = {}
-            for i in preset_dict.get('forced_locations', {}):
-                location = random.choice([l for l in i['locations'] if l not in settings['l']])
-                settings['l'][location] = i['item']
+            settings['tournament'] = tournament
+            settings['spoilers'] = spoilers
 
-        seed = await alttpr(
-            customizer=preset_dict.get('customizer', False),
-            festive=preset_dict.get('festive', False),
-            settings=settings
-        )
-        hash_id = seed.hash
+            if allow_quickswap:
+                settings['allow_quickswap'] = True
+
+            if preset_dict.get('customizer', False):
+                if 'l' not in settings:
+                    settings['l'] = {}
+                for i in preset_dict.get('forced_locations', {}):
+                    location = random.choice([l for l in i['locations'] if l not in settings['l']])
+                    settings['l'][location] = i['item']
+
+            seed = await alttpr(
+                customizer=preset_dict.get('customizer', False),
+                festive=preset_dict.get('festive', False),
+                settings=settings
+            )
+            hash_id = seed.hash
+
+    # elif randomizer == 'alttprdoors':
 
     elif randomizer in ['sm', 'smz3']:
         settings['race'] = "true" if tournament else "false"
         seed = await pyz3r.sm(
             randomizer=randomizer,
             settings=settings,
-            baseurl=SMZ3_ENVIRONMENTS[preset_dict.get(
-                'env', 'live')][randomizer],
+            baseurl=SMZ3_ENVIRONMENTS[preset_dict.get('env', 'live')][randomizer],
         )
         hash_id = seed.slug_id
 

@@ -14,8 +14,10 @@ import tempfile
 # 8) Return with the url for the patch (https://patch.synack.live/?patch=DASH_v10_SF_57677.bps)
 ###
 
+
 def roll_smdash():
     return random.randrange(1000000, 9999999)
+
 
 async def create_smdash(mode="mm"):
     if mode not in ['mm', 'full', 'sgl20', 'vanilla']:
@@ -31,7 +33,7 @@ async def create_smdash(mode="mm"):
                 '-q',
                 '-v',
                 '-m', mode,
-                '-p', '/opt/data/super_metroid.sfc',
+                '-p', os.environ.get('SM_ROM'),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE)
 
@@ -45,13 +47,13 @@ async def create_smdash(mode="mm"):
         print(os.getcwd())
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
-        patchname=os.path.splitext(os.path.basename(smdashrom))[0] + ".bps"
+        patchname = os.path.splitext(os.path.basename(smdashrom))[0] + ".bps"
 
         proc = await asyncio.create_subprocess_exec(
             os.path.join(wd, 'utils', 'flips'),
             '--create',
             '--bps-delta',
-            '/opt/data/super_metroid.sfc',
+            os.environ.get('SM_ROM'),
             smdashrom,
             os.path.join('/var/www/sgldash/bps', patchname),
             stdout=asyncio.subprocess.PIPE,
