@@ -1,7 +1,7 @@
 ---
 goal_name: crisscross doors
 doors: true
-description: "Cross dungeon doors"
+description: "Cross dungeon doors, standard world state."
 settings:
     accessibility: items
     algorithm: balanced
@@ -26,7 +26,7 @@ settings:
     logic: noglitches
     mapshuffle: false
     mixed_travel: prevent
-    mode: open
+    mode: standard
     no_hints: false
     openpyramid: false
     progressive: "on"

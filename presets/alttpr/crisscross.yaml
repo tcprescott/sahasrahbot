@@ -1,7 +1,7 @@
 ---
 goal_name: cross dungeon doors
 doors: true
-description: "Cross dungeon shuffle doors."
+description: "Cross dungeon shuffle doors, crossworld entrance shuffle."
 settings:
     accessibility: items
     algorithm: balanced
