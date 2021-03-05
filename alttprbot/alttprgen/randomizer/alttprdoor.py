@@ -40,27 +40,28 @@ class AlttprDoor():
             with open(settings_file_path, "w") as f:
                 json.dump(self.settings, f)
 
-            wd = os.getcwd()
-            os.chdir(os.environ.get('DOOR_RANDO_HOME'))
+            attempts = 0
             try:
-                async for attempt in AsyncRetrying(stop=stop_after_attempt(10), retry=retry_if_exception_type(Exception)):
+                async for attempt in AsyncRetrying(stop=stop_after_attempt(20), retry=retry_if_exception_type(Exception)):
                     with attempt:
-                        try:
-                            proc = await asyncio.create_subprocess_exec(
-                                'python3',
-                                'DungeonRandomizer.py',
-                                '--settingsfile', settings_file_path,
-                                stdout=asyncio.subprocess.PIPE,
-                                stderr=asyncio.subprocess.PIPE)
-                        finally:
-                            os.chdir(wd)
+                        attempts += 1
+                        proc = await asyncio.create_subprocess_exec(
+                            'python3',
+                            'DungeonRandomizer.py',
+                            '--settingsfile', settings_file_path,
+                            stdout=asyncio.subprocess.PIPE,
+                            stderr=asyncio.subprocess.PIPE,
+                            cwd=os.environ.get('DOOR_RANDO_HOME'))
+
+                        stdout, stderr = await proc.communicate()
+                        print(stdout.decode())
+                        if proc.returncode > 0:
+                            raise Exception(f'Exception while generating game: {stderr.decode()}')
+
             except RetryError as e:
                 raise e.last_attempt._exception from e
 
-            stdout, stderr = await proc.communicate()
-            print(stdout.decode())
-            if proc.returncode > 0:
-                raise Exception(f'Exception while generating game: {stderr.decode()}')
+            self.attempts = attempts
 
             self.patch_name = "DR_" + self.settings['outputname'] + ".bps"
             self.rom_name = "DR_" + self.settings['outputname'] + ".sfc"

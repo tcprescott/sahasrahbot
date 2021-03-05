@@ -82,7 +82,7 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction(riplink)
 
         if not isinstance(error_to_display, SahasrahBotException):
-            await ctx.reply(f"```{repr(error_to_display)}```")
+            await ctx.reply(f"```{repr(error_to_display)[0:2000]}```")
             raise error_to_display
         else:
             await ctx.reply(error_to_display)

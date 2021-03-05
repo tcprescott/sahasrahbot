@@ -65,6 +65,11 @@ class AlttprDoorDiscord(AlttprDoor):
 
         if self.spoilers:
             embed.add_field(name='Spoiler Log', value=self.spoiler_url, inline=False)
+        else:
+            embed.add_field(name="Spoiler Log", value="The spoiler log was kept private.  Contact Synack if you require a copy of the log.", inline=False)
+
+        if self.attempts > 1:
+            embed.add_field(name='Generation Attempts', value=self.attempts, inline=False)
 
         embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed
@@ -89,6 +94,9 @@ class AlttprDoorDiscord(AlttprDoor):
             embed.add_field(name='Spoiler Log', value=self.spoiler_url, inline=False)
         else:
             embed.add_field(name="Spoiler Log", value="The spoiler log was kept private.  Contact Synack if you require a copy of the log.", inline=False)
+
+        if self.attempts > 1:
+            embed.add_field(name='Generation Attempts', value=self.attempts, inline=False)
 
         embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed
