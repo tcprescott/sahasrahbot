@@ -94,12 +94,12 @@ pot_shuffle:
   'on': 50
   'off': 50
 door_shuffle:
-  vanilla: 70
-  basic: 10
-  crossed: 20
+  vanilla: 50
+  basic: 20
+  crossed: 30
 keydropshuffle:
-  False: 80
-  True: 20
+  False: 60
+  True: 40
 intensity:
   1: 20
   2: 50
