@@ -68,6 +68,7 @@ class AlttprDoor():
             self.spoiler_name = "DR_" + self.settings['outputname'] + "_Spoiler.txt"
 
             rom_path = os.path.join(tmp, self.rom_name)
+            patch_path = os.path.join(tmp, self.patch_name)
             spoiler_path = os.path.join(tmp, self.spoiler_name)
 
             proc = await asyncio.create_subprocess_exec(
@@ -76,7 +77,7 @@ class AlttprDoor():
                 '--bps-delta',
                 os.environ.get("ALTTP_ROM"),
                 rom_path,
-                os.path.join('/var/www/sgldash/bps', self.patch_name),
+                patch_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE)
 
@@ -85,20 +86,30 @@ class AlttprDoor():
             if proc.returncode > 0:
                 raise Exception(f'Exception while while creating patch: {stderr.decode()}')
 
+            async with aiofiles.open(patch_path, "rb") as f:
+                patchfile = await f.read()
+
+            async with aioboto3.client('s3') as s3:
+                await s3.put_object(
+                    Bucket=os.environ.get('SAHASRAHBOT_BUCKET'),
+                    Key=f"patch/{self.patch_name}",
+                    Body=patchfile,
+                    ACL='public-read'
+                )
+
+
             async with aiofiles.open(spoiler_path, "rb") as f:
                 self.spoilerfile = await f.read()
 
             async with aioboto3.client('s3') as s3:
                 await s3.put_object(
-                    Bucket=os.environ.get('AWS_SPOILER_BUCKET_NAME'),
-                    Key=f"doorrando/{self.spoiler_name}",
+                    Bucket=os.environ.get('SAHASRAHBOT_BUCKET'),
+                    Key=f"spoiler/{self.spoiler_name}",
                     Body=gzip.compress(self.spoilerfile),
                     ACL='public-read' if self.spoilers else 'private',
                     ContentEncoding='gzip',
                     ContentDisposition='attachment'
                 )
-
-        self.spoiler_url = f"{os.environ.get('SpoilerLogUrlBase')}/doorrando/{self.spoiler_name}"
 
     @classmethod
     async def create(
@@ -112,7 +123,15 @@ class AlttprDoor():
 
     @property
     def url(self):
-        return f"https://patch.synack.live/?patch={self.patch_name}"
+        return f"https://alttprpatch.synack.live/patcher.html?patch={self.patch_url}"
+
+    @property
+    def spoiler_url(self):
+        return f"https://{os.environ.get('SAHASRAHBOT_BUCKET')}.s3.amazonaws.com/spoiler/{self.spoiler_name}"
+
+    @property
+    def patch_url(self):
+        return f"https://{os.environ.get('SAHASRAHBOT_BUCKET')}.s3.amazonaws.com/patch/{self.patch_name}"
 
     # Pull the code from the spoiler file, and translate it to what SahasrahBot expects
     @property
@@ -133,6 +152,10 @@ class AlttprDoor():
         }
         p = list(map(lambda x: code_map.get(x, x), code))
         return [p[0], p[1], p[2], p[3], p[4]]
+
+    @property
+    def version(self):
+        return re.search("ALttP Entrance Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
 
     @property
     def doors(self):
