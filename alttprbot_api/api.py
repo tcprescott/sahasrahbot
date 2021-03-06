@@ -2,7 +2,7 @@ import os
 
 from quart import Quart, abort, jsonify, request
 
-from alttprbot.alttprgen.mystery import get_weights, generate_random_settings
+from alttprbot.alttprgen.mystery import get_weights, generate
 from alttprbot.tournament import league, alttpr
 from alttprbot.database import league_playoffs
 from alttprbot_discord.bot import discordbot
@@ -26,22 +26,36 @@ async def verify_srl_user(nick, key):
 @sahasrahbotapi.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
     weights = await request.get_json()
-    settings, customizer = await generate_random_settings(weights=weights, spoilers="mystery")
+    settings, customizer, doors = await generate(weights=weights, spoilers="mystery")
+    if customizer:
+        endpoint = '/api/customizer'
+    elif doors:
+        endpoint = None
+    else:
+        endpoint = '/api/randomizer'
     return jsonify(
         settings=settings,
         customizer=customizer,
-        endpoint='/api/customizer' if customizer else '/api/randomizer'
+        doors=doors,
+        endpoint=endpoint
     )
 
 
 @sahasrahbotapi.route('/api/settingsgen/mystery/<string:weightset>', methods=['GET'])
 async def mysterygenwithweights(weightset):
     weights = await get_weights(weightset)
-    settings, customizer = await generate_random_settings(weights=weights, spoilers="mystery")
+    settings, customizer, doors = await generate(weights=weights, spoilers="mystery")
+    if customizer:
+        endpoint = '/api/customizer'
+    elif doors:
+        endpoint = None
+    else:
+        endpoint = '/api/randomizer'
     return jsonify(
         settings=settings,
         customizer=customizer,
-        endpoint='/api/customizer' if customizer else '/api/randomizer'
+        doors=doors,
+        endpoint=endpoint
     )
 
 

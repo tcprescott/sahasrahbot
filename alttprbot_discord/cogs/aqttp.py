@@ -16,8 +16,7 @@ class Aqttp(commands.Cog):
         settings_map = await (await alttprClass.create()).randomizer_settings()
 
         for c in range(count):
-            settings, _ = pyz3r.mystery.generate_random_settings(
-                weights=weights)
+            settings, _ = pyz3r.mystery.generate_random_settings(weights=weights)
             meta = settings
 
             embed = discord.Embed(

@@ -1,10 +1,5 @@
-description: Maybe Veetorp's favorite? IDK.
-allow_quickswap: true
-glitches_required:
-  none: 100
-  overworld_glitches: 0
-  major_glitches: 0
-  no_logic: 0
+description: A door randomizer weightset
+glitches_required: none
 item_placement:
   basic: 25
   advanced: 75
@@ -77,29 +72,21 @@ item_pool:
   hard: 15
   expert: 5
   crowd_control: 0
-item_functionality:
-  normal: 80
-  hard: 15
-  expert: 5
+item_functionality: "normal"
 enemy_damage:
   default: 80
-  shuffled: 10
-  random: 10
+  shuffled: 20
 enemy_health:
   default: 80
-  easy: 5
+  easy: 10
   hard: 10
-  expert: 5
-pot_shuffle:
-  'on': 50
-  'off': 50
 door_shuffle:
-  vanilla: 70
-  basic: 10
+  vanilla: 50
+  basic: 30
   crossed: 20
 keydropshuffle:
-  False: 80
-  True: 20
+  False: 60
+  True: 40
 intensity:
   1: 20
   2: 50

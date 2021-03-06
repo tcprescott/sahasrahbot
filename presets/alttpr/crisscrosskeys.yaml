@@ -16,7 +16,7 @@ settings:
     enemy_damage: default
     enemy_health: default
     experimental: false
-    goal: ganon
+    goal: crystals
     hints: true
     intensity: 2
     item_functionality: normal

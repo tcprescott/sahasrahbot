@@ -7,9 +7,11 @@ from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exc
 
 import pyz3r
 from alttprbot.alttprgen.preset import fetch_preset
+from alttprbot.alttprgen.randomizer import mysterydoors
 from alttprbot.database import audit, config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 
 class WeightsetNotFoundException(SahasrahBotException):
@@ -20,11 +22,9 @@ async def generate_test_game(weightset='weighted', festive=False):
     weights = await get_weights(weightset)
 
     if festive:
-        settings, _ = festive_generate_random_settings(
-            weights=weights)
+        settings, _ = festive_generate_random_settings(weights=weights)
     else:
-        settings, _ = pyz3r.mystery.generate_random_settings(
-            weights=weights)
+        settings, _, _ = mysterydoors.generate_doors_mystery(weights=weights)
 
     return settings
 
@@ -56,11 +56,14 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
         async for attempt in AsyncRetrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
             with attempt:
                 try:
-                    settings, customizer = await generate_random_settings(weights, festive=festive, spoilers=spoilers)
+                    settings, customizer, doors = await generate(weights, festive=festive, spoilers=spoilers)
 
-                    settings['tournament'] = tournament
-                    settings['allow_quickswap'] = True
-                    seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
+                    if doors:
+                        seed = await AlttprDoorDiscord.create(settings=settings, spoilers=False)
+                    else:
+                        settings['tournament'] = tournament
+                        settings['allow_quickswap'] = True
+                        seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
                 except ClientResponseError:
                     await audit.insert_generated_game(
                         randomizer='alttpr',
@@ -108,7 +111,7 @@ def festive_generate_random_settings(weights, tournament=True, spoilers="mystery
     return settings, False
 
 
-async def generate_random_settings(weights, festive=False, spoilers="mystery"):
+async def generate(weights, festive=False, spoilers="mystery"):
     if festive:
         settings, customizer = festive_generate_random_settings(
             weights=weights, spoilers=spoilers)
@@ -116,17 +119,16 @@ async def generate_random_settings(weights, festive=False, spoilers="mystery"):
         if 'preset' in weights:
             rolledpreset = pyz3r.mystery.get_random_option(weights['preset'])
             if rolledpreset == 'none':
-                settings, customizer = pyz3r.mystery.generate_random_settings(
-                    weights=weights, spoilers=spoilers)
+                settings, customizer, doors = mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers) # pylint: disable=unbalanced-tuple-unpacking
             else:
                 preset_dict = await fetch_preset(rolledpreset, randomizer='alttpr')
                 settings = preset_dict['settings']
                 customizer = preset_dict.get('customizer', False)
+                doors = preset_dict.get('doors', False)
                 settings.pop('name', None)
                 settings.pop('notes', None)
                 settings['spoilers'] = spoilers
         else:
-            settings, customizer = pyz3r.mystery.generate_random_settings(
-                weights=weights, spoilers=spoilers)
+            settings, customizer, doors = mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers) # pylint: disable=unbalanced-tuple-unpacking
 
-    return settings, customizer
+    return settings, customizer, doors
