@@ -14,6 +14,7 @@ title:  Presets
 | [adinvertedenemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adinvertedenemizer.yaml) |Some good ol' enemy and boss shuffle, but its also inverted... and all dungeons.  Only fearagent would ask for something like this.|   |
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) |All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) |Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
+| [basicdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/basicdoors.yaml) |Basic door shuffle, open world state.|   *Door Randomizer*|
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) |Open, except the randomizer only ensures it can be beaten.|   |
 | [beginner](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beginner.yaml) |A good start for new players.|   |
 | [black_friday_hell_seed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/black_friday_hell_seed.yaml) || *Customizer*  |
@@ -22,6 +23,9 @@ title:  Presets
 | [casualboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
 | [casualboots_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_fast.yaml) |Standard with a starting weapon, but you get boots and Aghanim 2 isn't required.| *Customizer*  |
 | [classic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/classic.yaml) |Attempts to closely mimic the feel of v18.  No progressive items, etc.| *Customizer*  |
+| [crisscross](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscross.yaml) |Cross dungeon shuffle doors, crossworld entrance shuffle.|   *Door Randomizer*|
+| [crisscrosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscrosskeys.yaml) |Cross dungeon doors, crossworld entrance shuffle, plus keysanity.|   *Door Randomizer*|
+| [crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossdoors.yaml) |Cross dungeon doors|   *Door Randomizer*|
 | [crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys.yaml) |Crossworld entrance with keysanity.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
@@ -38,6 +42,8 @@ title:  Presets
 | [inverted_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_keys.yaml) |Inverted world state and keysanity.|   |
 | [invrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/invrosia.yaml) |Inverted with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Big Keys are shuffled in the wild, except GTBK is guarenteed to be in GT.| *Customizer*  |
 | [invrosia_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/invrosia_boots.yaml) |Inverted with a pre-equipped sword and boots.  Dungeon bosses have a guaranteed non-dungeon item.  Big Keys are shuffled in the wild, except GTBK is guarenteed to be in GT.| *Customizer*  |
+| [keydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keydrop.yaml) |Key drop items are shuffled.|   *Door Randomizer*|
+| [keydropsanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keydropsanity.yaml) |Key drop items are shuffled.|   *Door Randomizer*|
 | [keysanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keysanity.yaml) |Open keysanity|   |
 | [lightspeed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/lightspeed.yaml) |Complete the 3 Light World pendant dungeons to ascend Agahnim''s Tower and grab the Triforce on the Pyramid Ledge.| *Customizer*  |
 | [mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mc.yaml) |Only maps and compasses are shuffled in the world.|   |
@@ -65,7 +71,9 @@ title:  Presets
 | [pedestal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/pedestal.yaml) |The goal is the pedestal.|   |
 | [retro](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/retro.yaml) |A throwback to Zelda 1.|   |
 | [sakuleague](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleague.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).|   |
+| [sakuleagueboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleagueboots.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).  With 100% more starting boots!| *Customizer*  |
 | [standard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard.yaml) |Standard world state, randomized weapons.|   |
+| [standard_crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_crossdoors.yaml) |Cross dungeon doors, standard world state.|   *Door Randomizer*|
 | [standard_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_fast.yaml) |Standard world state, randomized weapons, Aghanim 2 not required.|   |
 | [standard_vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_vanilla.yaml) |Standard world state, vanilla weapons.|   |
 | [standardboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standardboots.yaml) |Standard world state, randomized weapons, and you get boots!| *Customizer*  |
@@ -79,6 +87,11 @@ title:  Presets
 | [vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla.yaml) |The vanilla game, but with all of the quality life additions of the randomizer.| *Customizer*  |
 | [vanilla_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla_inverted.yaml) |An inverted version of the vanilla game.   This requires major glitch knowledge to beat!| *Customizer*  |
 | [wtfrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/wtfrosia.yaml) |Walther wanted this, for reasons.  AD Keys, Assured Sword, Inverted Enemizer w/ boots start| *Customizer*  |
+
+## ALTTPRDOORS
+
+| Preset | Description | |
+|---|---|---|
 
 ## SM
 
