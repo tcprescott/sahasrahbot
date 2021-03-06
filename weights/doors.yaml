@@ -81,9 +81,8 @@ enemy_health:
   easy: 10
   hard: 10
 door_shuffle:
-  vanilla: 50
   basic: 30
-  crossed: 20
+  crossed: 70
 keydropshuffle:
   False: 60
   True: 40
@@ -91,8 +90,3 @@ intensity:
   1: 20
   2: 50
   3: 30
-customizer:
-  eq:
-    "PegasusBoots":
-      False: 70
-      True: 30

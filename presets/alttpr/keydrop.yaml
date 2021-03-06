@@ -18,7 +18,7 @@ settings:
     experimental: false
     goal: ganon
     hints: true
-    intensity: 2
+    intensity: 3
     item_functionality: normal
     keydropshuffle: true
     keysanity: false

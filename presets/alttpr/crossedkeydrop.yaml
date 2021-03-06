@@ -1,13 +1,13 @@
 ---
-goal_name: Crisscross Keysanity
+goal_name: keydrop shuffle
 doors: true
-description: Cross dungeon doors, crossworld entrance shuffle, plus keysanity.
+description: "Cross dungeon door shuffle plus key drops."
 settings:
     accessibility: items
     algorithm: balanced
     beemizer: 0
-    bigkeyshuffle: true
-    compassshuffle: true
+    bigkeyshuffle: false
+    compassshuffle: false
     crystals_ganon: "7"
     crystals_gt: "7"
     difficulty: normal
@@ -16,22 +16,22 @@ settings:
     enemy_damage: default
     enemy_health: default
     experimental: false
-    goal: crystals
+    goal: ganon
     hints: true
     intensity: 3
     item_functionality: normal
-    keydropshuffle: false
-    keysanity: true
-    keyshuffle: true
+    keydropshuffle: true
+    keysanity: false
+    keyshuffle: false
     logic: noglitches
-    mapshuffle: true
+    mapshuffle: false
     mixed_travel: prevent
     mode: open
     no_hints: false
     openpyramid: false
     progressive: "on"
     retro: false
-    shuffle: crossed
+    shuffle: vanilla
     shufflebosses: none
     shuffleenemies: none
     shuffleganon: true

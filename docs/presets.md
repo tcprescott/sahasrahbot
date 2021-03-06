@@ -24,8 +24,10 @@ title:  Presets
 | [casualboots_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_fast.yaml) |Standard with a starting weapon, but you get boots and Aghanim 2 isn't required.| *Customizer*  |
 | [classic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/classic.yaml) |Attempts to closely mimic the feel of v18.  No progressive items, etc.| *Customizer*  |
 | [crisscross](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscross.yaml) |Cross dungeon shuffle doors, crossworld entrance shuffle.|   *Door Randomizer*|
+| [crisscrosskeydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscrosskeydrop.yaml) |Cross dungeon shuffle doors, crossworld entrance shuffle, with a touch of keydrop shuffle.|   *Door Randomizer*|
 | [crisscrosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscrosskeys.yaml) |Cross dungeon doors, crossworld entrance shuffle, plus keysanity.|   *Door Randomizer*|
 | [crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossdoors.yaml) |Cross dungeon doors|   *Door Randomizer*|
+| [crossedkeydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossedkeydrop.yaml) |Cross dungeon door shuffle plus key drops.|   *Door Randomizer*|
 | [crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys.yaml) |Crossworld entrance with keysanity.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
@@ -87,11 +89,6 @@ title:  Presets
 | [vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla.yaml) |The vanilla game, but with all of the quality life additions of the randomizer.| *Customizer*  |
 | [vanilla_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla_inverted.yaml) |An inverted version of the vanilla game.   This requires major glitch knowledge to beat!| *Customizer*  |
 | [wtfrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/wtfrosia.yaml) |Walther wanted this, for reasons.  AD Keys, Assured Sword, Inverted Enemizer w/ boots start| *Customizer*  |
-
-## ALTTPRDOORS
-
-| Preset | Description | |
-|---|---|---|
 
 ## SM
 

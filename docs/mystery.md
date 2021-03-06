@@ -13,6 +13,7 @@ title:  Mystery Weights
 | [boots](https://github.com/tcprescott/sahasrahbot/blob/master/weights/boots.yaml) | A boots weightset.  Designed for those who like boots. | *Customizer* |
 | [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/weights/chaos.yaml) | Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld) | *Customizer* |
 | [daily](https://github.com/tcprescott/sahasrahbot/blob/master/weights/daily.yaml) | Uses the weights currently in use for generating the daily games. |  |
+| [doors](https://github.com/tcprescott/sahasrahbot/blob/master/weights/doors.yaml) | A door randomizer weightset | *Customizer* |
 | [festive](https://github.com/tcprescott/sahasrahbot/blob/master/weights/festive.yaml) | The default.  Offers every setting, but with some balance. | *Festive-only* |
 | [friendly](https://github.com/tcprescott/sahasrahbot/blob/master/weights/friendly.yaml) | A friendlier weightset.  Designed for those who don't want something extreme (or entrance). | *Customizer* |
 | [funweighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/funweighted.yaml) | Unweighted except no chance of triforce hunts or insanity entrance shuffles. |  |
