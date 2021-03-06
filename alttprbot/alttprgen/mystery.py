@@ -59,7 +59,10 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
                     settings, customizer, doors = await generate(weights, festive=festive, spoilers=spoilers)
 
                     if doors:
-                        seed = await AlttprDoorDiscord.create(settings=settings, spoilers=False)
+                        seed = await AlttprDoorDiscord.create(
+                            settings=settings,
+                            spoilers=spoilers != "mystery",
+                        )
                     else:
                         settings['tournament'] = tournament
                         settings['allow_quickswap'] = True
