@@ -1,7 +1,6 @@
 randomizer: "smz3"
 goal_name: beat the games
 description: "Keysanity.  Hard logic, sword and morph are fully randomized."
-env: alpha
 settings:
     smlogic: hard
     goal: defeatboth
