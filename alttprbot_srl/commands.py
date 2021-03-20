@@ -8,7 +8,7 @@ import ircmessage
 from alttprbot.alttprgen import mystery, preset, spoilers, smz3multi, smvaria
 from alttprbot.alttprgen.randomizer import smdash
 from alttprbot.database import (config, spoiler_races, srl_races,
-                                tournament_results)
+                                tournament_results, patch_distribution)
 from alttprbot.exceptions import SahasrahBotException
 # from alttprbot.tournament import league
 from alttprbot.util.srl import get_race, srl_race_id
@@ -203,6 +203,30 @@ async def handler(target, source, message, client):
 
         await srl_races.insert_srl_race(srl_id, goal)
 
+    if args.command == '$smleagueroom' and target.startswith('#srl-'):
+        srl_id = srl_race_id(target)
+        srl = await get_race(srl_id)
+        await client.message(target, "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        race = await srl_races.get_srl_race_by_id(srl_id)
+
+        if race:
+            raise SahasrahBotException("There is already a game generated for this room.  To cancel it, use the $cancel command.")
+
+        if srl['game']['abbrev'] in ['supermetroid', 'supermetroidhacks']:
+            result = await patch_distribution.select_random_patch('smleague')
+            if result is None:
+                await client.message(target, "SM Room Seed pool exhaused!  Please contact a Tournament Administrator for assistance.")
+                return
+            await patch_distribution.update_as_used(result['id'])
+            seed_id = result['patch_id']
+            url = f"https://patch.synack.live/?patch={seed_id}"
+            goal = "room randomizer"
+            await client.message(target, f".setgoal {goal} - {url}")
+        else:
+            raise SahasrahBotException("This game is not supported.")
+
+        await srl_races.insert_srl_race(srl_id, goal)
+
     if args.command == '$smvaria' and target.startswith('#srl-'):
         srl_id = srl_race_id(target)
         srl = await get_race(srl_id)
@@ -298,6 +322,8 @@ async def parse_args(message):
 
     parser_smdash = subparsers.add_parser('$smdash')
     parser_smdash.add_argument('preset', default='mm')
+
+    parser_smleagueroom = subparsers.add_parser('$smleagueroom')
 
     parser_join = subparsers.add_parser('$joinroom')
     parser_join.add_argument('channel')
