@@ -71,6 +71,7 @@ class SgDaily(commands.Cog):
                         auto_start=True,
                         allow_comments=True,
                         hide_comments=True,
+                        allow_prerace_chat=True,
                         allow_midrace_chat=True,
                         allow_non_entrant_chat=False,
                         chat_message_delay=0
