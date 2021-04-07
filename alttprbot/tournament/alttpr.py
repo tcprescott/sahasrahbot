@@ -299,8 +299,8 @@ async def process_tournament_race_start(handler):
     await tournament_results.update_tournament_results(race_id, status="STARTED")
 
 
-async def create_tournament_race_room(episodeid):
-    rtgg_alttpr = racetime.racetime_bots['alttpr']
+async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat the game'):
+    rtgg_alttpr = racetime.racetime_bots[category]
     race = await tournament_results.get_active_tournament_race_by_episodeid(episodeid)
     if race:
         async with aiohttp.request(
@@ -316,7 +316,7 @@ async def create_tournament_race_room(episodeid):
     tournament_race = await TournamentRace.construct(episodeid=episodeid, create_seed=False)
 
     handler = await rtgg_alttpr.startrace(
-        goal="Beat the game",
+        goal=goal,
         invitational=True,
         unlisted=True,
         info=f"{tournament_race.event_name} - {tournament_race.versus}",

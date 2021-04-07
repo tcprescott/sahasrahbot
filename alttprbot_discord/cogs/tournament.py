@@ -34,7 +34,7 @@ class Tournament(commands.Cog):
             for episode in episodes:
                 print(episode['id'])
                 try:
-                    await alttpr.create_tournament_race_room(episode['id'])
+                    await alttpr.create_tournament_race_room(episode['id'], tournament['category'], tournament['goal'])
                 except Exception as e:
                     logging.exception(
                         "Encountered a problem when attempting to create RT.gg race room.")
