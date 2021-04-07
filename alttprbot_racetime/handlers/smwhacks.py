@@ -6,9 +6,6 @@ class GameHandler(SahasrahBotCoreHandler):
     async def race_data(self, data):
         self.data = data.get('race')
 
-        if self.data.get('status', {}).get('value') == 'in_progress':
-            await self.in_progress()
-
         if self.data.get('status', {}).get('value') in ['open', 'invitational']:
             await self.intro()
 
