@@ -21,7 +21,7 @@ logger_handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(logger_handler)
 
-RACETIME_GAMES = ['alttpr', 'smz3', 'ff1r', 'z1r', 'smb3r', 'smr', 'z2r']
+RACETIME_GAMES = ['alttpr', 'smz3', 'ff1r', 'z1r', 'smb3r', 'smr', 'z2r', 'smw-hacks']
 
 
 class SahasrahBotRaceTimeBot(Bot):
@@ -74,13 +74,14 @@ def start_racetime(loop):
 racetime_bots = {}
 for slug in RACETIME_GAMES:
     # if slug == 'sgl':
+    stripped_slug = slug.replace('-','')
     racetime_bots[slug] = SahasrahBotRaceTimeBot(
         category_slug=slug,
-        client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
+        client_id=os.environ.get(f"RACETIME_CLIENT_ID_{stripped_slug.upper()}"),
         client_secret=os.environ.get(
-            f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
+            f'RACETIME_CLIENT_SECRET_{stripped_slug.upper()}'),
         logger=logger,
-        handler_class=getattr(handlers, slug).GameHandler
+        handler_class=getattr(handlers, stripped_slug).GameHandler
     )
     # else:
     #     racetime_bots[slug] = SGLRaceTimeBot(
