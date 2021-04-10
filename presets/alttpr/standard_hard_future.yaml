@@ -1,7 +1,7 @@
 ---
 goal_name: "standard with proposed changes to hard difficulty"
 customizer: true
-description: "You get to start with Pegasus Boots!"
+description: "A potential new version of hard difficulty"
 settings:
   l: {}
   eq:
@@ -10,7 +10,7 @@ settings:
     - BossHeartContainer
   goal: ganon
   item:
-    pool: hard
+    pool: normal
     functionality: normal
   lang: en
   mode: open
@@ -111,7 +111,15 @@ settings:
         MagicRefillSmall: 6
     item:
       overflow:
+        count:
+          Sword: 3
+          Armor: 0
+          Bow: 1
+          Shield: 2
+          BossHeartContainer: 5
+          PieceOfHeart: 20
         replacement:
+          Sword: BombUpgrade10
           Bow: ArrowUpgrade10
       count:
         Bow: 0
@@ -206,7 +214,7 @@ settings:
         RedShield: 0
         TenArrows: 12
         BlueShield: 0
-        FiveRupees: 18
+        FiveRupees: 16
         GreenClock: 0
         PowerGlove: 0
         SmallMagic: 0
@@ -221,7 +229,7 @@ settings:
         BowAndArrows: 0
         MirrorShield: 0
         PegasusBoots: 1
-        PieceOfHeart: 16
+        PieceOfHeart: 20
         QuarterMagic: 0
         RedBoomerang: 1
         TwentyRupees: 28
@@ -245,7 +253,7 @@ settings:
         ProgressiveSword: 4
         BottleWithGoldBee: 0
         ProgressiveShield: 2
-        BossHeartContainer: 8
+        BossHeartContainer: 6
         BowAndSilverArrows: 0
         SilverArrowUpgrade: 0
         ThreeHundredRupees: 5
