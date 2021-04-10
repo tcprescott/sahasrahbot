@@ -10,7 +10,7 @@ settings:
     - BossHeartContainer
   goal: ganon
   item:
-    pool: normal
+    pool: hard
     functionality: normal
   lang: en
   mode: open
@@ -90,7 +90,7 @@ settings:
       - auto_fill
     stun:
       - auto_fill
-  notes: Open w/ Boots Start
+  notes: "Standard world state, hard difficulty with some items removed from the pool and replaced with 5 rupees."
   custom:
     customPrizePacks: false
     drop:
