@@ -71,12 +71,15 @@ title:  Presets
 | [owg_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_fast.yaml) |Overworld glitches are required, but Aghanim 2 is not!|   |
 | [owg_vt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_vt.yaml) |Overworld glitches, [Veetorp's](https://twitch.tv/veetorp) style.|   |
 | [pedestal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/pedestal.yaml) |The goal is the pedestal.|   |
+| [potpourri](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/potpourri.yaml) |Ladder Season 7 Potpourri| *Customizer*  |
+| [retrance](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/retrance.yaml) |Retro + Crosskeys|   |
 | [retro](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/retro.yaml) |A throwback to Zelda 1.|   |
 | [sakuleague](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleague.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).|   |
 | [sakuleagueboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleagueboots.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).  With 100% more starting boots!| *Customizer*  |
 | [standard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard.yaml) |Standard world state, randomized weapons.|   |
 | [standard_crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_crossdoors.yaml) |Cross dungeon doors, standard world state.|   *Door Randomizer*|
 | [standard_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_fast.yaml) |Standard world state, randomized weapons, Aghanim 2 not required.|   |
+| [standard_hard_future](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_hard_future.yaml) |A potential new version of hard difficulty| *Customizer*  |
 | [standard_vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_vanilla.yaml) |Standard world state, vanilla weapons.|   |
 | [standardboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standardboots.yaml) |Standard world state, randomized weapons, and you get boots!| *Customizer*  |
 | [standardmajoritems](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standardmajoritems.yaml) |Standard world state.  Shuffles only inventory items and heart containers. Keys, dungeon items, ammo, money, and heart pieces remain vanilla.| *Customizer*  |

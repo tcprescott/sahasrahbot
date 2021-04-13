@@ -1,0 +1,30 @@
+---
+goal_name: retrance
+customizer: false
+description: "Retro + Crosskeys"
+settings:
+  allow_quickswap: true
+  glitches: none
+  item_placement: advanced
+  dungeon_items: full
+  accessibility: items
+  goal: fast_ganon
+  crystals:
+    ganon: '7'
+    tower: '7'
+  mode: retro
+  entrances: crossed
+  hints: 'off'
+  weapons: assured
+  item:
+    pool: normal
+    functionality: normal
+  tournament: true
+  spoilers: 'off'
+  lang: en
+  enemizer:
+    boss_shuffle: none
+    enemy_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+
