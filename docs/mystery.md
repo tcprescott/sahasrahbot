@@ -23,6 +23,7 @@ title:  Mystery Weights
 | [ladder_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season2.yaml) | Season two mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |  |
 | [ladder_season3](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season3.yaml) | Season three mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Customizer* |
 | [ladder_season4](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season4.yaml) | Season four mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
+| [ladder_season7](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season7.yaml) | Season seven mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
 | [league](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league.yaml) | Season Three weights for [ALTTPR League](https://alttprleague.com) | *Subweights* |
 | [league_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league_season2.yaml) | Season Two weights for [ALTTPR League](https://alttprleague.com) |  |
 | [league_season3](https://github.com/tcprescott/sahasrahbot/blob/master/weights/league_season3.yaml) | Season Three weights for [ALTTPR League](https://alttprleague.com) | *Subweights* |
