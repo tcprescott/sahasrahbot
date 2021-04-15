@@ -83,7 +83,7 @@ subweights:
           "Flippers":
             True: 10
             False: 90
-          "Mirror":
+          "MagicMirror":
             True: 10
             False: 90
         custom:
