@@ -1,10 +1,13 @@
 import logging
+import csv
+import io
 
 import aiohttp
 import discord
 from discord.ext import commands, tasks
 
 from alttprbot.database import config, srlnick, tournaments
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import speedgaming
 from alttprbot.tournament import alttpr
 from config import Config as c
@@ -85,6 +88,33 @@ class Tournament(commands.Cog):
 
         await srlnick.insert_twitch_name(user.id, twitch)
 
+    @commands.command()
+    @commands.is_owner()
+    async def importcsv(self, ctx, mode="dry"):
+        if not ctx.message.attachments:
+            raise SahasrahBotException("You must supply a valid csv file.")
+
+        content = await ctx.message.attachments[0].read()
+        role_import_list = csv.DictReader(io.StringIO(content.decode()))
+        for i in role_import_list:
+            rtgg_tag = i['racetime']
+            user = await commands.MemberConverter().convert(ctx, i['discord'])
+            twitch = i['twitch']
+
+            async with aiohttp.request(method='get',
+                                    url='https://racetime.gg/user/search',
+                                    params={'term': rtgg_tag}) as resp:
+                results = await resp.json()
+
+            if len(results['results']) > 0:
+                for result in results['results']:
+                    if mode != "dry":
+                        await srlnick.insert_rtgg_id(user.id, result['id'])
+            else:
+                await ctx.reply(f"Could not map RT.gg tag for record {i['discord']}")
+
+            if mode != "dry" and twitch != "":
+                await srlnick.insert_twitch_name(user.id, twitch)
 
 def setup(bot):
     bot.add_cog(Tournament(bot))
