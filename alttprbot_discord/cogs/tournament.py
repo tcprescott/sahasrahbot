@@ -98,7 +98,11 @@ class Tournament(commands.Cog):
         role_import_list = csv.DictReader(io.StringIO(content.decode()))
         for i in role_import_list:
             rtgg_tag = i['racetime']
-            user = await commands.MemberConverter().convert(ctx, i['discord'])
+            try:
+                user = await commands.MemberConverter().convert(ctx, i['discord'])
+            except Exception as e:
+                await ctx.reply(f"Could not import {i['discord']}")
+                continue
             twitch = i['twitch']
 
             async with aiohttp.request(method='get',
