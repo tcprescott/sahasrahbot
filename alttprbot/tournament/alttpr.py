@@ -72,31 +72,33 @@ class TournamentPlayer():
 
 
 class TournamentRace():
-    def __init__(self, episodeid: int, create_seed=True):
+    def __init__(self, episodeid: int):
         self.episodeid = int(episodeid)
-        self.create_seed = create_seed
         self.players = []
 
     @classmethod
-    async def construct(cls, episodeid, create_seed=True):
-        tournament_race = cls(episodeid, create_seed)
-
-        tournament_race.episode = await speedgaming.get_episode(tournament_race.episodeid)
-
-        tournament_race.data = await tournaments.get_tournament(tournament_race.episode['event']['slug'])
-        if tournament_race.data is None:
-            raise Exception('SG Episode ID not a recognized event.  This should not have happened.')
-        tournament_race.guild = discordbot.get_guild(tournament_race.data['guild_id'])
-        tournament_race.bracket_settings = await tournament_games.get_game_by_episodeid_submitted(episodeid)
-
-        for player in tournament_race.episode['match1']['players']:
-            # first try a more concrete match of using the discord id cached by SG
-            looked_up_player = await tournament_race.make_tournament_player(player)
-            tournament_race.players.append(looked_up_player)
-
-        await tournament_race.roll()
-
+    async def construct(cls, episodeid):
+        tournament_race = cls(episodeid)
+        await tournament_race.update_data()
         return tournament_race
+
+    async def update_data(self):
+        self.episode = await speedgaming.get_episode(self.episodeid)
+
+        self.data = await tournaments.get_tournament(self.episode['event']['slug'])
+
+        if self.data is None:
+            raise Exception('SG Episode ID not a recognized event.  This should not have happened.')
+
+        self.guild = discordbot.get_guild(self.data['guild_id'])
+
+        self.players = []
+        for player in self.episode['match1']['players']:
+            # first try a more concrete match of using the discord id cached by SG
+            looked_up_player = await self.make_tournament_player(player)
+            self.players.append(looked_up_player)
+
+        self.bracket_settings = await tournament_games.get_game_by_episodeid_submitted(self.episodeid)
 
     async def make_tournament_player(self, player):
         if not player['discordId'] == "":
@@ -116,10 +118,9 @@ class TournamentRace():
         return looked_up_player
 
     async def roll(self):
-        if self.create_seed:
-            method = 'roll_' + self.event_slug
-            if hasattr(self, method):
-                await getattr(self, method)()
+        method = 'roll_' + self.event_slug
+        if hasattr(self, method):
+            await getattr(self, method)()
 
     # handle rolling for alttprmini tournament (German)
     async def roll_alttprmini(self):
@@ -144,13 +145,7 @@ class TournamentRace():
 
     # handle rolling for alttprmini tournament (German)
     async def roll_test(self):
-        game_mode = self.episode['match1']['title']
-        if game_mode == 'Open':
-            self.seed, self.preset_dict = await preset.get_preset('open', nohints=True, allow_quickswap=True)
-        elif game_mode == 'Standard':
-            self.seed, self.preset_dict = await preset.get_preset('standard', nohints=True, allow_quickswap=True)
-        else:
-            raise Exception(f"Invalid Match Title, must be Open or Standard!  Please contact a tournament admin for help.")
+        self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
 
     # handle rolling for alttpr main tournament
     async def roll_alttpr(self):
@@ -183,6 +178,10 @@ class TournamentRace():
         return [(p.name, p.discord_user) for p in self.players]
 
     @property
+    def player_racetime_ids(self):
+        return [p.data['rtgg_id'] for p in self.players]
+
+    @property
     def player_names(self):
         return [p.name for p in self.players]
 
@@ -195,18 +194,24 @@ async def process_tournament_race(handler, episodeid=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
     race = await tournament_results.get_active_tournament_race(handler.data.get('name'))
-    if race:
-        episodeid = race.get('episode_id')
-    if race is None and episodeid is None:
-        await handler.send_message("Please provide an SG episode ID.")
-        return
+    if isinstance(handler.tournament, TournamentRace):
+        tournament_race = handler.tournament
+        await tournament_race.update_data()
+    else:
+        if race:
+            episodeid = race.get('episode_id')
+        if race is None and episodeid is None:
+            await handler.send_message("Please provide an SG episode ID.")
+            return
 
-    try:
-        tournament_race = await TournamentRace.construct(episodeid=episodeid)
-    except Exception as e:
-        logging.exception("Problem creating tournament race.")
-        await handler.send_message(f"Could not process tournament race: {str(e)}")
-        return
+        try:
+            tournament_race = await TournamentRace.construct(episodeid=episodeid)
+        except Exception as e:
+            logging.exception("Problem creating tournament race.")
+            await handler.send_message(f"Could not process tournament race: {str(e)}")
+            return
+
+    await tournament_race.roll()
 
     if tournament_race.bracket_settings:
         goal = f"{tournament_race.event_name} - {tournament_race.versus} - Game #{tournament_race.game_number}"
@@ -313,7 +318,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
             return
         await tournament_results.delete_active_tournament_race(race['srl_id'])
 
-    tournament_race = await TournamentRace.construct(episodeid=episodeid, create_seed=False)
+    tournament_race = await TournamentRace.construct(episodeid=episodeid)
 
     handler = await rtgg_alttpr.startrace(
         goal=goal,
@@ -332,6 +337,8 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
         chat_message_delay=0
     )
 
+    handler.tournament = tournament_race
+
     print(handler.data.get('name'))
     await tournament_results.insert_tournament_race(
         srl_id=handler.data.get('name'),
@@ -339,7 +346,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
         event=tournament_race.event_slug
     )
 
-    for rtggid in [p.data['rtgg_id'] for p in tournament_race.players]:
+    for rtggid in tournament_race.player_racetime_ids:
         await handler.invite_user(rtggid)
 
     embed = discord.Embed(
@@ -373,7 +380,7 @@ async def alttprde_process_settings_form(form):
     if existing_playoff_race:
         return
 
-    tournament_race = await TournamentRace.construct(episodeid=episode_id, create_seed=False)
+    tournament_race = await TournamentRace.construct(episodeid=episode_id)
 
     embed = discord.Embed(
         title=f"ALTTPR DE - Game #{game_number} - {tournament_race.versus}",

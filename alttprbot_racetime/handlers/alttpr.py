@@ -22,12 +22,21 @@ class GameHandler(SahasrahBotCoreHandler):
 
         pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
         for entrant in pending_entrants:
-            if await league.can_gatekeep(entrant['user']['id']) or await alttpr.can_gatekeep(entrant['user']['id'], self.data['name']):
-                await self.accept_request(entrant['user']['id'])
-                await self.add_monitor(entrant['user']['id'])
+            if self.tournament:
+                if entrant['user']['id'] in self.tournament.player_racetime_ids:
+                    await self.accept_request(entrant['user']['id'])
+
+                elif await alttpr.can_gatekeep(entrant['user']['id'], self.data['name']):
+                    await self.accept_request(entrant['user']['id'])
+                    await self.add_monitor(entrant['user']['id'])
 
     async def begin(self):
         self.state['locked'] = False
+
+        if self.tournament is None:
+            race = await tournament_results.get_active_tournament_race(self.data.get('name'))
+            if race:
+                self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'])
 
         # re-establish a spoiler race countdown if bot is restarted/crashes
         in_progress_spoiler_race = await spoiler_races.get_spoiler_race_by_id_started(self.data.get('name'))
@@ -72,15 +81,15 @@ class GameHandler(SahasrahBotCoreHandler):
             return
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
-    async def ex_leaguerace(self, args, message):
-        if await self.is_locked(message):
-            return
+    # async def ex_leaguerace(self, args, message):
+    #     if await self.is_locked(message):
+    #         return
 
-        await league.process_league_race(
-            handler=self,
-            episodeid=args[0] if len(args) >= 1 else None,
-            week=args[1] if len(args) == 2 else None
-        )
+    #     await league.process_league_race(
+    #         handler=self,
+    #         episodeid=args[0] if len(args) >= 1 else None,
+    #         week=args[1] if len(args) == 2 else None
+    #     )
 
     async def ex_tournamentrace(self, args, message):
         if await self.is_locked(message):
@@ -197,6 +206,9 @@ class GameHandler(SahasrahBotCoreHandler):
         await tournament_results.delete_active_tournament_race(self.data.get('name'))
         await spoiler_races.delete_spoiler_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
+
+    async def ex_cc(self, args, message):
+        await self.roll_game(preset_name="standard", message=message, allow_quickswap=True)
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.\n\"!mystery <weightset>\" to generate a mystery game.\n\"!spoiler <preset>\" to generate a spoiler race.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")

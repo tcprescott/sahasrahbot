@@ -6,6 +6,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     SahasrahBot race handler. Generates seeds, presets, and frustration.
     """
     stop_at = ['cancelled', 'finished']
+    tournament = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
