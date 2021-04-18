@@ -318,7 +318,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
     handler = await rtgg_alttpr.startrace(
         goal=goal,
         invitational=True,
-        unlisted=True,
+        unlisted=False,
         info=f"{tournament_race.event_name} - {tournament_race.versus}",
         start_delay=15,
         time_limit=24,
@@ -360,7 +360,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
             continue
 
     await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR Tournament Discord.')
-    await handler.edit(unlisted=False)
+    # await handler.edit(unlisted=False)
 
     return handler.data
 
