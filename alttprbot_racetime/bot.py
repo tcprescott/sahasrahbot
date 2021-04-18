@@ -14,6 +14,7 @@ RTGG_BASE_URL = os.environ.get('RACETIME_BASE_URL', 'https://racetime.gg')
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
+logger.setLevel(logging.INFO)
 
 
 logger_handler.setFormatter(logging.Formatter(
