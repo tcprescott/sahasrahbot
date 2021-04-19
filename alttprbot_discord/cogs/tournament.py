@@ -21,6 +21,7 @@ class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.create_races.start()
+        self.record_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
@@ -52,9 +53,23 @@ class Tournament(commands.Cog):
 
         print('done')
 
+    @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
+    async def record_races(self):
+        try:
+            logging.info("recording tournament races")
+            await alttpr.race_recording_task()
+            logging.info("done recording")
+        except Exception:
+            logging.exception("error recording")
+
     @create_races.before_loop
     async def before_create_races(self):
-        print('tournament create_races loop waiting...')
+        logging.info('tournament create_races loop waiting...')
+        await self.bot.wait_until_ready()
+
+    @record_races.before_loop
+    async def before_record_races(self):
+        logging.info('sgl record_races loop waiting...')
         await self.bot.wait_until_ready()
 
     async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
@@ -69,8 +84,9 @@ class Tournament(commands.Cog):
     @commands.command(
         help="Generate a tournament race."
     )
-    async def tourneyrace(self, ctx, episode_number: int):
-        await alttpr.create_tournament_race_room(episode_number)
+    @commands.is_owner()
+    async def tourneyrace(self, ctx, episode_number: int, category: str, goal: str):
+        await alttpr.create_tournament_race_room(episode_number, category, goal)
 
     @commands.command()
     @commands.is_owner()

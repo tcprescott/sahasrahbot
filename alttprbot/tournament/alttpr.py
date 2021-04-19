@@ -3,18 +3,23 @@ import datetime
 import logging
 import json
 import random
+import os
+import isodate
 
 import aiohttp
 import discord
 import pyz3r.customizer
+import gspread_asyncio
 
 from alttprbot.alttprgen import preset
 from alttprbot.database import (tournament_results, srlnick, tournaments, tournament_games)
-from alttprbot.util import speedgaming
+from alttprbot.util import gsheet, speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime import bot as racetime
+
+TOURNAMENT_RESULTS_SHEET = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
 
 SETTINGSMAP = {
     'Defeat Ganon': 'ganon',
@@ -541,3 +546,54 @@ async def can_gatekeep(rtgg_id, name):
             return True
 
     return False
+
+async def race_recording_task():
+    races = await tournament_results.get_unrecorded_races()
+    for race in races:
+        logging.info(f"Recording {race['episode_id']}")
+        try:
+            await record_episode(race)
+        except Exception as e:
+            logging.exception("Encountered a problem when attempting to record a race.")
+
+    print('done')
+
+async def record_episode(race):
+    if TOURNAMENT_RESULTS_SHEET is None:
+        return
+
+    sheet_name = race['event']
+
+    agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
+    agc = await agcm.authorize()
+    wb = await agc.open_by_key(TOURNAMENT_RESULTS_SHEET)
+    wks = await wb.worksheet(sheet_name)
+
+    async with aiohttp.request(
+            method='get',
+            url=f"https://racetime.gg/{race['srl_id']}/data",
+            raise_for_status=True) as resp:
+        race_data = json.loads(await resp.read())
+
+    if race_data['status']['value'] == 'finished':
+        winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
+        runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
+
+        await wks.append_row(values=[
+            race['episode_id'],
+            f"https://racetime.gg/{race['srl_id']}",
+            winner['user']['name'],
+            runnerup['user']['name'],
+            str(isodate.parse_duration(winner['finish_time'])) if isinstance(
+                winner['finish_time'], str) else None,
+            str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(
+                runnerup['finish_time'], str) else None,
+            race['permalink'],
+            race['spoiler']
+        ])
+        await tournament_results.update_tournament_race_status(race['srl_id'], "RECORDED")
+        await tournament_results.mark_as_written(race['srl_id'])
+    elif race_data['status']['value'] == 'cancelled':
+        await tournament_results.delete_active_tournament_race_all(race['srl_id'])
+    else:
+        return
