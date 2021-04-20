@@ -594,7 +594,7 @@ async def race_recording_task():
             elif race_data['status']['value'] == 'cancelled':
                 await tournament_results.delete_active_tournament_race_all(race['srl_id'])
             else:
-                return
+                continue
         except Exception as e:
             logging.exception("Encountered a problem when attempting to record a race.")
 
