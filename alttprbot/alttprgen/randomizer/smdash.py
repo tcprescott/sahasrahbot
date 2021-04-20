@@ -2,6 +2,7 @@ import asyncio
 import os
 import random
 import tempfile
+import logging
 
 ###
 # 1) Make a new temp directory
@@ -44,7 +45,7 @@ async def create_smdash(mode="mm"):
             os.chdir(wd)
 
         os.chdir(wd)
-        print(os.getcwd())
+        logging.info(os.getcwd())
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
         patchname = os.path.splitext(os.path.basename(smdashrom))[0] + ".bps"

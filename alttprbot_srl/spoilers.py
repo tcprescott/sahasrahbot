@@ -2,6 +2,7 @@ import asyncio
 from alttprbot.database import spoiler_races
 import math
 import ircmessage
+# import logging
 
 
 async def send_spoiler_log(srl_id, client, target):
@@ -29,9 +30,9 @@ async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage
     start_time = loop.time()
     end_time = loop.time() + duration_in_seconds
     while True:
-        # print(datetime.datetime.now())
+        # logging.info(datetime.datetime.now())
         timeleft = math.ceil(start_time - loop.time() + duration_in_seconds)
-        # print(timeleft)
+        # logging.info(timeleft)
         if timeleft in reminders:
             minutes = math.floor(timeleft/60)
             seconds = math.ceil(timeleft % 60)

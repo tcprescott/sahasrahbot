@@ -1,5 +1,6 @@
 import asyncio
 import os
+import logging
 
 import aiomysql
 
@@ -7,7 +8,7 @@ __pool = None
 
 
 async def create_pool(loop):
-    print('creating connection pool')
+    logging.info('creating connection pool')
     global __pool
     __pool = await aiomysql.create_pool(
         host=os.environ.get("DB_HOST", "localhost"),

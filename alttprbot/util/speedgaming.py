@@ -4,6 +4,7 @@ from datetime import timedelta, datetime
 import aiofiles
 import aiohttp
 import pytz
+import logging
 
 from alttprbot.exceptions import SahasrahBotException
 from config import Config as c
@@ -38,7 +39,7 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         url=f'{c.SgApiEndpoint}/schedule',
         params=params,
     ) as resp:
-        print(resp.url)
+        logging.info(resp.url)
         schedule = await resp.json(content_type='text/html')
 
     if 'error' in schedule:

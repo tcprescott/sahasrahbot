@@ -7,6 +7,7 @@ import random
 import re
 import string
 import tempfile
+import logging
 
 import aioboto3
 import aiofiles
@@ -54,7 +55,7 @@ class AlttprDoor():
                             cwd=os.environ.get('DOOR_RANDO_HOME'))
 
                         stdout, stderr = await proc.communicate()
-                        print(stdout.decode())
+                        logging.info(stdout.decode())
                         if proc.returncode > 0:
                             raise Exception(f'Exception while generating game: {stderr.decode()}')
 
@@ -82,7 +83,7 @@ class AlttprDoor():
                 stderr=asyncio.subprocess.PIPE)
 
             stdout, stderr = await proc.communicate()
-            print(stdout.decode())
+            logging.info(stdout.decode())
             if proc.returncode > 0:
                 raise Exception(f'Exception while while creating patch: {stderr.decode()}')
 

@@ -1,6 +1,7 @@
 import logging
 import csv
 import io
+import logging
 
 import aiohttp
 import discord
@@ -27,7 +28,7 @@ class Tournament(commands.Cog):
     async def create_races(self):
         active_tournaments = await tournaments.get_active_tournaments()
 
-        print("scanning SG schedule for tournament races to create")
+        logging.info("scanning SG schedule for tournament races to create")
         for tournament in active_tournaments:
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(tournament['slug'], hours_past=0.5, hours_future=.75)
@@ -36,7 +37,7 @@ class Tournament(commands.Cog):
                     "Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
-                print(episode['id'])
+                logging.info(episode['id'])
                 try:
                     await alttpr.create_tournament_race_room(episode['id'], tournament['category'], tournament['goal'])
                 except Exception as e:
@@ -51,7 +52,7 @@ class Tournament(commands.Cog):
                                 everyone=True)
                         )
 
-        print('done')
+        logging.info('done')
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def record_races(self):

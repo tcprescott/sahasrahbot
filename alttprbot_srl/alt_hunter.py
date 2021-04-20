@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import aiohttp.client_exceptions
 import discord
@@ -21,10 +22,10 @@ async def check_race(srl_id):
         try:
             pastraces = await srl.get_pastraces(game=race['game']['abbrev'], player=entrant, pagesize=0)
         except aiohttp.client_exceptions.ClientResponseError:
-            print(f'could not get history of {entrant}, skipping...')
+            logging.info(f'could not get history of {entrant}, skipping...')
             continue
         if pastraces['count'] == 0:
-            print(f'{entrant} is new')
+            logging.info(f'{entrant} is new')
             pastraces_all = await srl.get_pastraces(game=None, player=entrant, pagesize=0)
             if pastraces_all['count'] > 50:
                 continue
@@ -35,7 +36,7 @@ async def check_race(srl_id):
                 try:
                     twitch_info = await get_twitch_user(twitch_nick)
                 except aiohttp.client_exceptions.ClientResponseError:
-                    print(f'could not find twitch info for {entrant}')
+                    logging.info(f'could not find twitch info for {entrant}')
                     twitch_info = None
 
             embed = discord.Embed(

@@ -1,6 +1,7 @@
 import asyncio
 import math
 import re
+import logging
 
 import ircmessage
 
@@ -78,7 +79,7 @@ async def join_srl_room(client, message):
             await asyncio.sleep(60)
             await client.message(result.group(2), "Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller.  To see what I can do, visit https://sahasrahbot.synack.live/srl.html")
         else:
-            print(f'would have joined {result.group(2)}')
+            logging.info(f'would have joined {result.group(2)}')
 
 
 async def set_goal(srl_id, client, target):
@@ -108,9 +109,9 @@ async def countdown_timer(ircbot, duration_in_seconds, srl_channel, beginmessage
     start_time = loop.time()
     end_time = loop.time() + duration_in_seconds
     while True:
-        # print(datetime.datetime.now())
+        # logging.info(datetime.datetime.now())
         timeleft = math.ceil(start_time - loop.time() + duration_in_seconds)
-        # print(timeleft)
+        # logging.info(timeleft)
         if timeleft in reminders:
             minutes = math.floor(timeleft/60)
             seconds = math.ceil(timeleft % 60)

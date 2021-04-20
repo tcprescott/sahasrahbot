@@ -41,7 +41,7 @@ class League(commands.Cog):
             # events = ['test']
         else:
             events = ['alttprleague', 'invleague']
-        print("scanning SG schedule for races to create")
+        logging.info("scanning SG schedule for races to create")
         for event in events:
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
@@ -50,7 +50,7 @@ class League(commands.Cog):
                     "Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
-                print(episode['id'])
+                logging.info(episode['id'])
                 try:
                     await league.create_league_race_room(episode['id'])
                 except Exception as e:
@@ -66,11 +66,11 @@ class League(commands.Cog):
                                 everyone=True)
                         )
 
-        print('done')
+        logging.info('done')
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
     async def find_unsubmitted_races(self):
-        print('scanning for unsubmitted races')
+        logging.info('scanning for unsubmitted races')
         if c.DEBUG:
             return
             # events = ['test']
@@ -85,7 +85,7 @@ class League(commands.Cog):
                     "Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
-                print(episode['id'])
+                logging.info(episode['id'])
                 try:
                     await league.send_race_submission_form(episode['id'])
                 except Exception as e:
@@ -94,12 +94,12 @@ class League(commands.Cog):
 
     @create_races.before_loop
     async def before_create_races(self):
-        print('league create_races loop waiting...')
+        logging.info('league create_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @find_unsubmitted_races.before_loop
     async def before_find_unsubmitted_races(self):
-        print('league find_unsubmitted_races loop waiting...')
+        logging.info('league find_unsubmitted_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @commands.command(
@@ -252,13 +252,13 @@ async def update_team(ctx, team, division_role, player_role, pendant_roles):
 async def update_player(ctx, team, division_role, player_role, team_role, pendant, pendant_role):
     if c.DEBUG:
         await asyncio.sleep(random.uniform(0, 3))
-        print(
+        logging.info(
             f"would have added \"{team[pendant]['discord']}\" to role \"{division_role.name}\"")
-        print(
+        logging.info(
             f"would have added \"{team[pendant]['discord']}\" to role \"{player_role.name}\"")
-        print(
+        logging.info(
             f"would have added \"{team[pendant]['discord']}\" to role \"{team_role.name}\"")
-        print(
+        logging.info(
             f"would have added \"{team[pendant]['discord']}\" to role \"{pendant_role.name}\"")
     else:
         team_member = ctx.guild.get_member_named(
@@ -283,7 +283,7 @@ async def update_player(ctx, team, division_role, player_role, team_role, pendan
                 ) as _:
                     pass
         else:
-            print(
+            logging.info(
                 f"Would have updated \"{team[pendant]['discord']}\" ({team[pendant]['id']}) to discord id {team_member.id}")
 
 

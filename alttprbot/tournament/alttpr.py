@@ -10,6 +10,7 @@ import aiohttp
 import discord
 import pyz3r.customizer
 import gspread_asyncio
+import pytz
 
 from alttprbot.alttprgen import preset
 from alttprbot.database import (tournament_results, srlnick, tournaments, tournament_games)
@@ -344,7 +345,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
 
     handler.tournament = tournament_race
 
-    print(handler.data.get('name'))
+    logging.info(handler.data.get('name'))
     await tournament_results.insert_tournament_race(
         srl_id=handler.data.get('name'),
         episode_id=tournament_race.episodeid,
@@ -363,12 +364,12 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
 
     for name, player in tournament_race.player_discords:
         if player is None:
-            print(f'Could not DM {name}')
+            logging.info(f'Could not DM {name}')
             continue
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
-            print(f'Could not send room opening DM to {name}')
+            logging.info(f'Could not send room opening DM to {name}')
             continue
 
     await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR Tournament Discord.')
@@ -548,52 +549,53 @@ async def can_gatekeep(rtgg_id, name):
     return False
 
 async def race_recording_task():
-    races = await tournament_results.get_unrecorded_races()
-    for race in races:
-        logging.info(f"Recording {race['episode_id']}")
-        try:
-            await record_episode(race)
-        except Exception as e:
-            logging.exception("Encountered a problem when attempting to record a race.")
-
-    print('done')
-
-async def record_episode(race):
     if TOURNAMENT_RESULTS_SHEET is None:
         return
 
-    sheet_name = race['event']
+    races = await tournament_results.get_unrecorded_races()
+    if races is None:
+        return
 
     agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
     agc = await agcm.authorize()
     wb = await agc.open_by_key(TOURNAMENT_RESULTS_SHEET)
-    wks = await wb.worksheet(sheet_name)
 
-    async with aiohttp.request(
-            method='get',
-            url=f"https://racetime.gg/{race['srl_id']}/data",
-            raise_for_status=True) as resp:
-        race_data = json.loads(await resp.read())
+    for race in races:
+        logging.info(f"Recording {race['episode_id']}")
+        try:
 
-    if race_data['status']['value'] == 'finished':
-        winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
-        runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
+            sheet_name = race['event']
+            wks = await wb.worksheet(sheet_name)
 
-        await wks.append_row(values=[
-            race['episode_id'],
-            f"https://racetime.gg/{race['srl_id']}",
-            winner['user']['name'],
-            runnerup['user']['name'],
-            str(isodate.parse_duration(winner['finish_time'])) if isinstance(
-                winner['finish_time'], str) else None,
-            str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(
-                runnerup['finish_time'], str) else None,
-            race['permalink'],
-            race['spoiler']
-        ])
-        await tournament_results.update_tournament_race_status(race['srl_id'], "RECORDED")
-        await tournament_results.mark_as_written(race['srl_id'])
-    elif race_data['status']['value'] == 'cancelled':
-        await tournament_results.delete_active_tournament_race_all(race['srl_id'])
-    else:
-        return
+            async with aiohttp.request(
+                    method='get',
+                    url=f"https://racetime.gg/{race['srl_id']}/data",
+                    raise_for_status=True) as resp:
+                race_data = json.loads(await resp.read())
+
+            if race_data['status']['value'] == 'finished':
+                winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
+                runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
+
+                started_at = isodate.parse_datetime(race_data['started_at']).astimezone(pytz.timezone('US/Eastern'))
+                await wks.append_row(values=[
+                    race['episode_id'],
+                    started_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    f"https://racetime.gg/{race['srl_id']}",
+                    winner['user']['name'],
+                    runnerup['user']['name'],
+                    str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'], str) else None,
+                    str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(runnerup['finish_time'], str) else None,
+                    race['permalink'],
+                    race['spoiler']
+                ])
+                await tournament_results.update_tournament_race_status(race['srl_id'], "RECORDED")
+                await tournament_results.mark_as_written(race['srl_id'])
+            elif race_data['status']['value'] == 'cancelled':
+                await tournament_results.delete_active_tournament_race_all(race['srl_id'])
+            else:
+                return
+        except Exception as e:
+            logging.exception("Encountered a problem when attempting to record a race.")
+
+    logging.debug('done')

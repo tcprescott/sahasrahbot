@@ -1,5 +1,6 @@
 import importlib
 import os
+import logging
 
 import discord
 from discord.ext import commands
@@ -62,7 +63,7 @@ if importlib.util.find_spec('sahasrahbot_private'):
 async def on_command_error(ctx, error):
     riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
-    print(error)
+    logging.info(error)
     if isinstance(error, commands.CheckFailure):
         pass
     elif isinstance(error, commands.errors.MissingPermissions):

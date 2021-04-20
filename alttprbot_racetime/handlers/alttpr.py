@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 import math
+# import logging
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races, tournament_results
@@ -246,10 +247,10 @@ class GameHandler(SahasrahBotCoreHandler):
         start_time = loop.time()
         end_time = loop.time() + duration_in_seconds
         while True:
-            # print(datetime.datetime.now())
+            # logging.info(datetime.datetime.now())
             timeleft = math.ceil(
                 start_time - loop.time() + duration_in_seconds)
-            # print(timeleft)
+            # logging.info(timeleft)
             if timeleft in reminders:
                 minutes = math.floor(timeleft/60)
                 seconds = math.ceil(timeleft % 60)

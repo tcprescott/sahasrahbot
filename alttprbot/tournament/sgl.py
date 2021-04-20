@@ -5,6 +5,7 @@ import random
 import string
 import asyncio
 import os
+import logging
 
 import aiohttp
 import discord
@@ -726,10 +727,10 @@ async def create_sgl_race_room(episode_id, force=False):
     race_original = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
     race_bo3 = await sgl2020_tournament_bo3.get_tournament_race_by_episodeid(episode_id)
     if race_original:
-        print(f"detected original race {race_original}")
+        logging.info(f"detected original race {race_original}")
         race = race_original
     elif race_bo3:
-        print(f"detected bo3 race {race_bo3}")
+        logging.info(f"detected bo3 race {race_bo3}")
         race = race_bo3
         bo3 = True
     else:
@@ -768,7 +769,7 @@ async def create_sgl_race_room(episode_id, force=False):
             'allow_non_entrant_chat': 'on',
             'chat_message_delay': 0})
 
-    print(handler.data.get('name'))
+    logging.info(handler.data.get('name'))
     if sgl_race.bo3:
         await sgl2020_tournament_bo3.insert_tournament_race(
             room_name=handler.data.get('name'),
@@ -871,7 +872,7 @@ async def scan_sgl_schedule():
         events = ['test']
     else:
         events = EVENTS.keys()
-    print("SGL - scanning SG schedule for races to create")
+    logging.info("SGL - scanning SG schedule for races to create")
     for event in events:
         await asyncio.sleep(1) # this keeps SG's API from getting rekt
         try:
@@ -885,7 +886,7 @@ async def scan_sgl_schedule():
                     f"There was an error while trying to scan schedule for {event}`.\n\n{str(e)}")
             continue
         for episode in episodes:
-            print(episode['id'])
+            logging.info(episode['id'])
             try:
                 await create_sgl_match(episode)
             except Exception as e:
@@ -898,7 +899,7 @@ async def scan_sgl_schedule():
                             everyone=True)
                     )
 
-    print('done')
+    logging.info('done')
 
 
 async def race_recording_task(bo3=False):
@@ -911,7 +912,7 @@ async def race_recording_task(bo3=False):
     else:
         races = await sgl2020_tournament.get_unrecorded_races()
     for race in races:
-        print(race['episode_id'])
+        logging.info(race['episode_id'])
         try:
             await record_episode(race, bo3=bo3)
         except Exception as e:
@@ -921,7 +922,7 @@ async def race_recording_task(bo3=False):
                 await audit_channel.send(
                     f"There was an error while automatically creating a race room for episode `{race['episode_id']}`.\n\n{str(e)}")
 
-    print('done')
+    logging.info('done')
 
 
 async def create_sgl_match(episode, force=False):

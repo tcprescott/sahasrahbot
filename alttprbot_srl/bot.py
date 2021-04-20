@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import aiofiles
+import logging
 
 import pydle
 
@@ -82,12 +83,12 @@ class SrlBot(pydle.Client):
                 race_id = race['id']
                 if not self.in_channel(f'#srl-{race_id}'):
                     if c.DEBUG:
-                        print(f'would have joined #srl-{race_id}')
+                        logging.info(f'would have joined #srl-{race_id}')
                     else:
                         await self.join(f'#srl-{race_id}')
 
     async def process_active_races(self):
-        print('process active races running')
+        logging.info('process active races running')
         active_races = await srl_races.get_srl_races()
         for active_race in active_races:
             race = await get_race(active_race['srl_id'])

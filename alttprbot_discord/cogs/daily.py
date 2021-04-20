@@ -1,6 +1,7 @@
 import aiocache
 import discord
 from discord.ext import commands, tasks
+import logging
 
 from alttprbot.database import config, daily
 from alttprbot.util import http
@@ -62,7 +63,7 @@ def setup(bot):
 async def update_daily(hash_id):
     latest_daily = await daily.get_latest_daily()
     if not latest_daily['hash'] == hash_id:
-        print('omg new daily')
+        logging.info('omg new daily')
         await daily.set_new_daily(hash_id)
         return True
     else:

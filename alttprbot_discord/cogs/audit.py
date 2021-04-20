@@ -121,22 +121,22 @@ class Audit(commands.Cog):
     # @commands.Cog.listener()
     # async def on_reaction_clear(self, message, reactions):
     #     if await config.get(message.guild.id, 'AuditLogging') == 'true':
-    #         print("cleared reactions")
+    #         logging.info("cleared reactions")
 
     # @commands.Cog.listener()
     # async def on_guild_channel_delete(self, channel):
     #     if await config.get(channel.guild.id, 'AuditLogging') == 'true':
-    #         print("channel delete")
+    #         logging.info("channel delete")
 
     # @commands.Cog.listener()
     # async def on_guild_channel_create(self, channel):
     #     if await config.get(channel.guild.id, 'AuditLogging') == 'true':
-    #         print("channel create")
+    #         logging.info("channel create")
 
     # @commands.Cog.listener()
     # async def on_guild_channel_update(self, before, after):
     #     if await config.get(after.guild.id, 'AuditLogging') == 'true':
-    #         print("channel update")
+    #         logging.info("channel update")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -169,32 +169,32 @@ class Audit(commands.Cog):
     # @commands.Cog.listener()
     # async def on_member_update(self, before, after):
     #     if await config.get(after.guild.id, 'AuditLogging') == 'true':
-    #         print("member update")
+    #         logging.info("member update")
 
     # @commands.Cog.listener()
     # async def on_user_update(self, before, after):
     #     if await config.get(after.guild.id, 'AuditLogging') == 'true':
-    #         print("user update")
+    #         logging.info("user update")
 
     # @commands.Cog.listener()
     # async def on_guild_role_create(self, role):
     #     if await config.get(role.guild.id, 'AuditLogging') == 'true':
-    #         print("role create")
+    #         logging.info("role create")
 
     # @commands.Cog.listener()
     # async def on_guild_role_delete(self, role):
     #     if await config.get(role.guild.id, 'AuditLogging') == 'true':
-    #         print("role delete")
+    #         logging.info("role delete")
 
     # @commands.Cog.listener()
     # async def on_guild_role_update(self, before, after):
     #     if await config.get(after.guild.id, 'AuditLogging') == 'true':
-    #         print("role update")
+    #         logging.info("role update")
 
     # @commands.Cog.listener()
     # async def on_voice_state_update(self, member, before, after):
     #     if await config.get(after.guild.id, 'AuditLogging') == 'true':
-    #         print("voice state change")
+    #         logging.info("voice state change")
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
@@ -212,11 +212,11 @@ class Audit(commands.Cog):
     # @commands.Cog.listener()
     # async def on_member_unban(self, guild, user):
     #     if await config.get(guild.id, 'AuditLogging') == 'true':
-    #         print("member unban")
+    #         logging.info("member unban")
 
     # @tasks.loop(minutes=1, reconnect=True)
     # async def clean_history(self):
-    #     print('history cleaned')
+    #     logging.info('history cleaned')
     #     await audit.clean_history()
 
 # async def audit_embed_member_joined(member):

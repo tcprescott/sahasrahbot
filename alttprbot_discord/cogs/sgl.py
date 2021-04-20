@@ -48,22 +48,22 @@ class SpeedGamingLive(commands.Cog):
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def record_races(self):
         try:
-            print("recording normal races")
+            logging.info("recording normal races")
             await race_recording_task(bo3=False)
-            print("recording bo3 races")
+            logging.info("recording bo3 races")
             await race_recording_task(bo3=True)
-            print("done recording")
+            logging.info("done recording")
         except Exception:
             logging.exception("error recording")
 
     @create_races.before_loop
     async def before_create_races(self):
-        print('sgl create_races loop waiting...')
+        logging.info('sgl create_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @record_races.before_loop
     async def before_record_races(self):
-        print('sgl record_races loop waiting...')
+        logging.info('sgl record_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @commands.group()

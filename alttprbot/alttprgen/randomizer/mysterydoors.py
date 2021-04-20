@@ -1,4 +1,5 @@
 import copy
+import logging
 
 from pyz3r.mystery import get_random_option, generate_random_settings
 
@@ -147,7 +148,7 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
         subweight_name = get_random_option(
             {k: v['chance'] for (k, v) in weights.get('subweights', {}).items()})
 
-        print(f"{subweight_name=}")
+        logging.info(f"{subweight_name=}")
 
         if subweight_name is None:
             break

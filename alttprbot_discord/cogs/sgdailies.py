@@ -1,6 +1,7 @@
 import datetime
 import logging
 import json
+import logging
 
 import aiohttp
 import dateutil.parser
@@ -22,7 +23,7 @@ class SgDaily(commands.Cog):
     async def create_races(self):
         active_sgdailies = await sgdailies.get_active_dailies()
 
-        print("scanning SG dailies for races to create")
+        logging.info("scanning SG dailies for races to create")
         for sgdaily in active_sgdailies:
             if not sgdaily['racetime_category'] in racetime.racetime_bots:
                 logging.error(f"Racetime Bot is not connected to category {sgdaily['racetime_category']}")
@@ -33,7 +34,7 @@ class SgDaily(commands.Cog):
                 logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
-                print(episode['id'])
+                logging.info(episode['id'])
                 try:
                     rtgg_category = racetime.racetime_bots[sgdaily['racetime_category']]
                     race = await tournament_results.get_active_tournament_race_by_episodeid(episode['id'])
@@ -100,11 +101,11 @@ class SgDaily(commands.Cog):
                     logging.exception("Encountered a problem when attempting to create RT.gg race room.")
                     continue
 
-        print('done')
+        logging.info('done')
 
     @create_races.before_loop
     async def before_create_races(self):
-        print('tournament create_races loop waiting...')
+        logging.info('tournament create_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @commands.command(

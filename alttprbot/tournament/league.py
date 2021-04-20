@@ -529,7 +529,7 @@ async def process_league_race_start(handler):
     #     ) as _:
     #         pass
     # else:
-    #     print(
+    #     logging.info(
     #         f"Would have reported match {race_id} for episode {race['episode_id']}")
 
     await tournament_results.update_tournament_results(race_id, status="STARTED")
@@ -586,7 +586,7 @@ async def create_league_race_room(episodeid):
             chat_message_delay=0
         )
 
-    print(handler.data.get('name'))
+    logging.info(handler.data.get('name'))
     await tournament_results.insert_tournament_race(
         srl_id=handler.data.get('name'),
         episode_id=league_race.episodeid,
@@ -610,12 +610,12 @@ async def create_league_race_room(episodeid):
 
     for name, player in league_race.player_discords:
         if player is None:
-            print(f'Could not DM {name}')
+            logging.info(f'Could not DM {name}')
             continue
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
-            print(f'Could not send room opening DM to {name}')
+            logging.info(f'Could not send room opening DM to {name}')
             continue
 
     if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
@@ -630,7 +630,7 @@ async def create_league_race_room(episodeid):
         ) as _:
             pass
     else:
-        print(
+        logging.info(
             f"Would have reported match {handler.data.get('name')} for episode {episodeid}")
 
     await handler.send_message('Welcome. Use !leaguerace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR League Discord.')
@@ -658,7 +658,7 @@ async def process_playoff_form(form):
         )
         embed.add_field(name='Preset', value=PLAYOFFDATA[game_number].get('preset'), inline=False)
 
-        print(f"{game_number=}")
+        logging.info(f"{game_number=}")
         await league_playoffs.insert_playoff(episode_id=episode_id, playoff_round=playoff_round, game_number=game_number, gen_type='preset', preset=PLAYOFFDATA[game_number].get('preset'))
 
     elif PLAYOFFDATA[game_number].get('type') == 'database':
@@ -797,7 +797,7 @@ async def process_playoff_form(form):
                 }
             }
 
-            print(f"{game_number=} {settings=}")
+            logging.info(f"{game_number=} {settings=}")
 
             await league_playoffs.insert_playoff(episode_id=episode_id, playoff_round=playoff_round, game_number=game_number, gen_type='database', settings=settings)
     else:
@@ -837,7 +837,7 @@ async def send_race_submission_form(episodeid):
     for name, player in league_race.player_discords:
         if player is None:
             continue
-        print(f"Sending league playoff submit reminder to {name}.")
+        logging.info(f"Sending league playoff submit reminder to {name}.")
         await player.send(msg)
 
     await league_playoffs.insert_playoff(episode_id=episodeid, submitted=0)
