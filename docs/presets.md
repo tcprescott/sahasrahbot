@@ -33,6 +33,7 @@ title:  Presets
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
+| [fadkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower.| *Customizer*  |
 | [festive](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive.yaml) ||  *Festive-only* |
 | [festive_casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_casual.yaml) ||  *Festive-only* |
 | [festive_hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/festive_hard.yaml) ||  *Festive-only* |
