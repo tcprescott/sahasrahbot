@@ -372,8 +372,8 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
             logging.info(f'Could not send room opening DM to {name}')
             continue
 
-    await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR Tournament Discord.')
-    # await handler.edit(unlisted=False)
+    if category != 'smw-hacks':
+        await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR Tournament Discord.')
 
     return handler.data
 
