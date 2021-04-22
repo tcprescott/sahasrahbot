@@ -49,6 +49,8 @@ SETTINGSMAP = {
 class UnableToLookupUserException(SahasrahBotException):
     pass
 
+class UnableToLookupEpisodeException(SahasrahBotException):
+    pass
 
 class TournamentPlayer():
     def __init__(self):
@@ -94,7 +96,7 @@ class TournamentRace():
         self.data = await tournaments.get_tournament(self.episode['event']['slug'])
 
         if self.data is None:
-            raise Exception('SG Episode ID not a recognized event.  This should not have happened.')
+            raise UnableToLookupEpisodeException('SG Episode ID not a recognized event.  This should not have happened.')
 
         self.guild = discordbot.get_guild(self.data['guild_id'])
 

@@ -37,7 +37,10 @@ class GameHandler(SahasrahBotCoreHandler):
         if self.tournament is None:
             race = await tournament_results.get_active_tournament_race(self.data.get('name'))
             if race:
-                self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'])
+                try:
+                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'])
+                except alttpr.UnableToLookupEpisodeException:
+                    self.logger.exception("Error while association tournament race to handler.")
 
         # re-establish a spoiler race countdown if bot is restarted/crashes
         in_progress_spoiler_race = await spoiler_races.get_spoiler_race_by_id_started(self.data.get('name'))
