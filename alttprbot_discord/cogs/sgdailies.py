@@ -94,7 +94,8 @@ class SgDaily(commands.Cog):
                                 seed_time=seed_time.astimezone(pytz.timezone('US/Eastern')).strftime("%-I:%M %p"),
                                 racetime_url=f"https://racetime.gg{handler.data['url']}",
                                 channel=broadcast_channels
-                            )
+                            ),
+                            allowed_mentions=discord.AllowedMentions(roles=True)
                         )
 
                 except Exception as e:
