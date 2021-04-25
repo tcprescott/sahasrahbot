@@ -2,6 +2,8 @@ import logging
 import csv
 import io
 import logging
+import datetime
+import pytz
 
 import aiohttp
 import discord
@@ -23,6 +25,7 @@ class Tournament(commands.Cog):
         self.bot = bot
         self.create_races.start()
         self.record_races.start()
+        self.scheduling_needs.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
@@ -54,6 +57,84 @@ class Tournament(commands.Cog):
 
         logging.info('done')
 
+    @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
+    async def scheduling_needs(self):
+        active_tournaments = await tournaments.get_active_tournaments()
+
+        logging.info("scanning SG schedule for tournament races to create")
+        for tournament in active_tournaments:
+            if tournament.get('scheduling_needs_channel_id', None) is None:
+                continue
+
+            try:
+                episodes = await speedgaming.get_upcoming_episodes_by_event(tournament['slug'], hours_past=0, hours_future=48)
+            except Exception as e:
+                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
+                continue
+
+            scheduling_needs_channel = self.bot.get_channel(tournament.get('scheduling_needs_channel_id', None))
+
+            comms_needed = []
+            trackers_needed = []
+            broadcasters_needed = []
+
+            for episode in episodes:
+                broadcast_channels = [c['name'] for c in episode['channels'] if c['id'] in [0, 45, 25, 41] and c['language'] == 'en']
+                if not broadcast_channels:
+                    continue
+
+                start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
+                start_time_eastern = start_time.astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d %-I:%M %p") + " Eastern"
+
+                commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == 'en']
+
+                if (c_needed := 2 - len(commentators_approved)) > 0:
+                    comms_needed += [f"*{start_time_eastern}* - Need **{c_needed}** on {', '.join(broadcast_channels)} - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
+
+                trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == 'en']
+
+                if (t_needed := 1 - len(trackers_approved)) > 0:
+                    trackers_needed += [f"*{start_time_eastern}* - Need **{t_needed}** on {', '.join(broadcast_channels)} - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
+
+                if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
+                    broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == 'en']
+
+                    if (b_needed := 1 - len(broadcasters_approved)) > 0:
+                        broadcasters_needed += [f"*{start_time_eastern}* - Need **{b_needed}** on {', '.join(broadcast_channels)} - [Sign Up](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
+
+            embed = discord.Embed(
+                title="Scheduling Needs",
+                description="This is the current scheduling needs for the next 48 hours.",
+                timestamp=datetime.datetime.utcnow()
+            )
+            embed.add_field(
+                name="Commentators Needed",
+                value="\n".join(comms_needed) if comms_needed else "No current needs.",
+                inline=False
+            )
+            embed.add_field(
+                name="Trackers Needed",
+                value="\n".join(trackers_needed) if trackers_needed else "No current needs.",
+                inline=False
+            )
+            if broadcasters_needed:
+                embed.add_field(
+                    name="Broadcasters Needed",
+                    value="\n".join(broadcasters_needed),
+                    inline=False
+                )
+
+            bot_message = False
+            async for message in scheduling_needs_channel.history(limit=50):
+                if message.author == self.bot.user:
+                    bot_message = True
+                    scheduling_needs_message = message
+                    await scheduling_needs_message.edit(embed=embed)
+                    break
+
+            if not bot_message:
+                await scheduling_needs_channel.send(embed=embed)
+
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def record_races(self):
         try:
@@ -70,7 +151,12 @@ class Tournament(commands.Cog):
 
     @record_races.before_loop
     async def before_record_races(self):
-        logging.info('sgl record_races loop waiting...')
+        logging.info('tournament record_races loop waiting...')
+        await self.bot.wait_until_ready()
+
+    @scheduling_needs.before_loop
+    async def before_scheduling_needs(self):
+        logging.info('tournament scheduling_needs loop waiting...')
         await self.bot.wait_until_ready()
 
     async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
