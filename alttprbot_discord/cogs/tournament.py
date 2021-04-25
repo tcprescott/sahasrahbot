@@ -57,7 +57,7 @@ class Tournament(commands.Cog):
 
         logging.info('done')
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
+    @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def scheduling_needs(self):
         active_tournaments = await tournaments.get_active_tournaments()
 
