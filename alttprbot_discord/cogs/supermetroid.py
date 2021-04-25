@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.alttprgen.smvaria import generate_preset
+from alttprbot.alttprgen.smvaria import generate_league_playoff, generate_preset
 from alttprbot.alttprgen.randomizer import smdash
 
 
@@ -38,6 +38,14 @@ class SuperMetroid(commands.Cog):
         )
         await ctx.reply(embed=seed.embed())
 
+    @smvaria.command()
+    async def playoff(self, ctx, majors, area, bosses):
+        seed = await generate_league_playoff(
+            majors=majors,
+            area=area,
+            bosses=bosses
+        )
+        await ctx.reply(embed=seed.embed())
 
 def setup(bot):
     bot.add_cog(SuperMetroid(bot))
