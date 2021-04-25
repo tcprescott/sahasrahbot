@@ -264,6 +264,7 @@ t_tournaments = Table(
     Column('audit_channel_id', BIGINT(20)),
     Column('commentary_channel_id', BIGINT(20)),
     Column('scheduling_needs_channel_id', BIGINT(20)),
+    Column('scheduling_needs_tracker', TINYINT(1)),
     Column('mod_channel_id', BIGINT(20)),
     Column('tracker_roles', String(4000)),
     Column('commentator_roles', String(4000)),
@@ -272,6 +273,7 @@ t_tournaments = Table(
     Column('category', String(200)),
     Column('goal', String(200)),
     Column('active', TINYINT(1)),
+    Column('lang', String(20)),
     Index('idx_tournaments_type_slug', 'schedule_type', 'slug', unique=True)
 )
 

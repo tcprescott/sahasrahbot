@@ -78,26 +78,30 @@ class Tournament(commands.Cog):
             trackers_needed = []
             broadcasters_needed = []
 
+            lang = tournament.get('lang', 'en')
+            if lang is None:
+                lang = 'en'
+
             for episode in episodes:
-                broadcast_channels = [c['name'] for c in episode['channels'] if c['id'] not in [0, 31, 36] and c['language'] == 'en']
+                broadcast_channels = [c['name'] for c in episode['channels'] if c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == lang]
                 if not broadcast_channels:
                     continue
 
                 start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
                 start_time_eastern = start_time.astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d %-I:%M %p") + " Eastern"
 
-                commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == 'en']
+                commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == lang]
 
                 if (c_needed := 2 - len(commentators_approved)) > 0:
                     comms_needed += [f"*{start_time_eastern}* - Need **{c_needed}** on {', '.join(broadcast_channels)} - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
 
-                trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == 'en']
+                trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == lang]
 
                 if (t_needed := 1 - len(trackers_approved)) > 0:
                     trackers_needed += [f"*{start_time_eastern}* - Need **{t_needed}** on {', '.join(broadcast_channels)} - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
 
                 if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
-                    broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == 'en']
+                    broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == lang]
 
                     if (b_needed := 1 - len(broadcasters_approved)) > 0:
                         broadcasters_needed += [f"*{start_time_eastern}* - Need **{b_needed}** on {', '.join(broadcast_channels)} - [Sign Up](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
@@ -112,11 +116,12 @@ class Tournament(commands.Cog):
                 value="\n".join(comms_needed) if comms_needed else "No current needs.",
                 inline=False
             )
-            embed.add_field(
-                name="Trackers Needed",
-                value="\n".join(trackers_needed) if trackers_needed else "No current needs.",
-                inline=False
-            )
+            if tournament.get('scheduling_needs_tracker', None):
+                embed.add_field(
+                    name="Trackers Needed",
+                    value="\n".join(trackers_needed) if trackers_needed else "No current needs.",
+                    inline=False
+                )
             if broadcasters_needed:
                 embed.add_field(
                     name="Broadcasters Needed",
