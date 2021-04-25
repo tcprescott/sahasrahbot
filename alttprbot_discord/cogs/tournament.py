@@ -124,16 +124,20 @@ class Tournament(commands.Cog):
                     inline=False
                 )
 
-            bot_message = False
-            async for message in scheduling_needs_channel.history(limit=50):
-                if message.author == self.bot.user:
-                    bot_message = True
-                    scheduling_needs_message = message
-                    await scheduling_needs_message.edit(embed=embed)
-                    break
+            try:
+                bot_message = False
+                async for message in scheduling_needs_channel.history(limit=50):
+                    if message.author == self.bot.user:
+                        bot_message = True
+                        scheduling_needs_message = message
+                        await scheduling_needs_message.edit(embed=embed)
+                        break
 
-            if not bot_message:
-                await scheduling_needs_channel.send(embed=embed)
+                if not bot_message:
+                    await scheduling_needs_channel.send(embed=embed)
+            except Exception:
+                logging.exception("Unable to update scheduling needs channel.")
+                continue
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def record_races(self):
