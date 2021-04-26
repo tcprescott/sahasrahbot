@@ -1,16 +1,11 @@
 import asyncio
-import datetime
 import random
-from urllib.parse import urljoin
 
-import dateutil.parser
 import discord
-import html2markdown
-import pytz
 from discord.ext import commands
 
-from alttprbot.util import speedgaming
-from alttprbot.util.holyimage import holy
+from alttprbot.database import config
+from alttprbot.util.holyimage import HolyImage
 
 from ..util import checks
 
@@ -149,30 +144,14 @@ class Misc(commands.Cog):
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
     )
-    async def holyimage(self, ctx, slug=None, game='z3r'):
-        holyimage = await holy(slug=slug, game=game)
+    async def holyimage(self, ctx, slug=None, game=None):
+        game = await config.get(ctx.guild.id, "HolyImageDefaultGame")
+        if not game:
+            game = "z3r"
 
-        embed = discord.Embed(
-            title=holyimage.image.get('title'),
-            description=html2markdown.convert(
-                holyimage.image['desc']) if 'desc' in holyimage.image else None,
-            color=discord.Colour.from_rgb(0xFF, 0xAF, 0x00)
-        )
+        holyimage = await HolyImage.construct(slug=slug, game=game)
 
-        if 'url' in holyimage.image:
-            url = urljoin('http://alttp.mymm1.com/holyimage/',
-                          holyimage.image['url'])
-            if holyimage.image.get('mode', '') == 'redirect':
-                embed.add_field(name='Link', value=url, inline=False)
-            else:
-                embed.set_thumbnail(url=url)
-
-        embed.add_field(name="Source", value=holyimage.link)
-
-        if 'credit' in holyimage.image:
-            embed.set_footer(text=f"Created by {holyimage.image['credit']}")
-
-        await ctx.reply(embed=embed)
+        await ctx.reply(embed=holyimage.embed)
 
 
 def setup(bot):
