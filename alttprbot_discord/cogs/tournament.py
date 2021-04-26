@@ -93,18 +93,18 @@ class Tournament(commands.Cog):
                 commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == lang]
 
                 if (c_needed := 2 - len(commentators_approved)) > 0:
-                    comms_needed += [f"*{start_time_eastern}* - Need **{c_needed}** on {', '.join(broadcast_channels)} - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
+                    comms_needed += [f"*{start_time_eastern}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
 
                 trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == lang]
 
                 if (t_needed := 1 - len(trackers_approved)) > 0:
-                    trackers_needed += [f"*{start_time_eastern}* - Need **{t_needed}** on {', '.join(broadcast_channels)} - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
+                    trackers_needed += [f"*{start_time_eastern}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
 
                 if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
                     broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == lang]
 
                     if (b_needed := 1 - len(broadcasters_approved)) > 0:
-                        broadcasters_needed += [f"*{start_time_eastern}* - Need **{b_needed}** on {', '.join(broadcast_channels)} - [Sign Up](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
+                        broadcasters_needed += [f"*{start_time_eastern}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
 
             embed = discord.Embed(
                 title="Scheduling Needs",
@@ -218,8 +218,8 @@ class Tournament(commands.Cog):
             twitch = i['twitch']
 
             async with aiohttp.request(method='get',
-                                    url='https://racetime.gg/user/search',
-                                    params={'term': rtgg_tag}) as resp:
+                                       url='https://racetime.gg/user/search',
+                                       params={'term': rtgg_tag}) as resp:
                 results = await resp.json()
 
             if len(results['results']) > 0:
@@ -231,6 +231,7 @@ class Tournament(commands.Cog):
 
             if mode != "dry" and twitch != "":
                 await srlnick.insert_twitch_name(user.id, twitch)
+
 
 def setup(bot):
     bot.add_cog(Tournament(bot))
