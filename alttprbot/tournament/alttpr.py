@@ -49,8 +49,10 @@ SETTINGSMAP = {
 class UnableToLookupUserException(SahasrahBotException):
     pass
 
+
 class UnableToLookupEpisodeException(SahasrahBotException):
     pass
+
 
 class TournamentPlayer():
     def __init__(self):
@@ -375,7 +377,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
             continue
 
     if category != 'smw-hacks':
-        await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of you race.  If you need help, ping @Mods in the ALTTPR Tournament Discord.')
+        await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.  If you need help, ping @Mods in the ALTTPR Tournament Discord.')
 
     return handler.data
 
@@ -549,6 +551,7 @@ async def can_gatekeep(rtgg_id, name):
             return True
 
     return False
+
 
 async def race_recording_task():
     if TOURNAMENT_RESULTS_SHEET is None:
