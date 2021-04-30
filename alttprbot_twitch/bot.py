@@ -11,7 +11,7 @@ twitchbot = commands.Bot(
     initial_channels=c.SB_TWITCH_CHANNELS
 )
 
-twitchbot.load_module('alttprbot_twitch.cogs.gtbk')
+# twitchbot.load_module('alttprbot_twitch.cogs.gtbk')
 twitchbot.load_module('alttprbot_twitch.cogs.league')
 
 
