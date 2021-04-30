@@ -12,6 +12,7 @@ twitchbot = commands.Bot(
 )
 
 # twitchbot.load_module('alttprbot_twitch.cogs.gtbk')
+twitchbot.load_module('alttprbot_twitch.cogs.gtbkdisabled')
 twitchbot.load_module('alttprbot_twitch.cogs.league')
 
 
