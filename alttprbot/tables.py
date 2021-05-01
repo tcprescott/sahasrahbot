@@ -67,36 +67,6 @@ t_discord_server_categories = Table(
     Column('category_description', String(200)),
 )
 
-t_gtbk_games = Table(
-    'gtbk_games', metadata,
-    Column('game_id', INTEGER(11), primary_key=True),
-    Column('channel', String(200)),
-    Column('status', String(45)),
-    Column('timestamp', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
-)
-
-
-t_gtbk_guesses = Table(
-    'gtbk_guesses', metadata,
-    Column('guess_id', INTEGER(11), primary_key=True),
-    Column('game_id', INTEGER(11)),
-    Column('twitch_user', String(200)),
-    Column('guess', INTEGER(11)),
-    Column('score', INTEGER(11), server_default=text("'0'")),
-    Column('timestamp', TIMESTAMP, nullable=False,
-           server_default=text("CURRENT_TIMESTAMP")),
-    Index('guess_UNIQUE', 'game_id', 'twitch_user', unique=True)
-)
-
-
-t_gtbk_whitelist = Table(
-    'gtbk_whitelist', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('channel', String(200, 'utf8_bin')),
-    Column('twitch_user', String(200, 'utf8_bin'))
-)
-
 t_league_playoffs = Table(
     'league_playoffs', metadata,
     Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
