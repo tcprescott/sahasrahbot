@@ -1,20 +1,18 @@
-import logging
 import csv
+import datetime
 import io
 import logging
-import datetime
-import pytz
 
 import aiohttp
 import discord
+import pytz
 from discord.ext import commands, tasks
 
 from alttprbot.database import config, srlnick, tournaments
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.util import speedgaming
 from alttprbot.tournament import alttpr
+from alttprbot.util import speedgaming
 from config import Config as c
-
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
