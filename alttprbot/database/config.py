@@ -65,9 +65,9 @@ async def delete_parameter(guild_id, parameter):
     await CACHE.delete(f'{guild_id}_guildconfig')
 
 
-async def get(guild_id, parameter):
+async def get(guild_id, parameter, default=False):
     parameter = await get_parameter(guild_id, parameter)
     if parameter is None:
-        return False
+        return default
 
     return parameter['value']

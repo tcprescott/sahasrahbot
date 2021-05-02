@@ -144,10 +144,12 @@ class Misc(commands.Cog):
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
     )
-    async def holyimage(self, ctx, slug=None, game=None):
-        game = await config.get(ctx.guild.id, "HolyImageDefaultGame")
-        if not game:
-            game = "z3r"
+    async def holyimage(self, ctx, slug, game=None):
+        if game is None:
+            if ctx.guild is None:
+                game = "z3r"
+            else:
+                game = await config.get(ctx.guild.id, "HolyImageDefaultGame", "z3r")
 
         holyimage = await HolyImage.construct(slug=slug, game=game)
 
