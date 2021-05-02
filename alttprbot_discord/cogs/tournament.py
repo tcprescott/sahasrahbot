@@ -88,23 +88,26 @@ class Tournament(commands.Cog):
                     continue
 
                 start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
-                start_time_eastern = start_time.astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d %-I:%M %p") + " Eastern"
+                if lang == 'en':
+                    start_time_string = start_time.astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d %-I:%M %p") + " Eastern"
+                elif lang == 'de':
+                    start_time_string = start_time.astimezone(pytz.timezone('Europe/Berlin')).strftime("%m/%d %H:%M %p") + " European"
 
                 commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == lang]
 
                 if (c_needed := 2 - len(commentators_approved)) > 0:
-                    comms_needed += [f"*{start_time_eastern}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
+                    comms_needed += [f"*{start_time_string}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
 
                 trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == lang]
 
                 if (t_needed := 1 - len(trackers_approved)) > 0:
-                    trackers_needed += [f"*{start_time_eastern}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
+                    trackers_needed += [f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
 
                 if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
                     broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == lang]
 
                     if (b_needed := 1 - len(broadcasters_approved)) > 0:
-                        broadcasters_needed += [f"*{start_time_eastern}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
+                        broadcasters_needed += [f"*{start_time_string}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
 
             embed = discord.Embed(
                 title="Scheduling Needs",
