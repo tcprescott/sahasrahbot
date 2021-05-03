@@ -186,7 +186,7 @@ class alttprDiscordClass(alttprClass):
                            f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
                            f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
                            f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
-                          ),
+                           ),
                     inline=False
                 )
             else:
@@ -215,7 +215,7 @@ class alttprDiscordClass(alttprClass):
                     value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Pot Shuffle:** {pot}\n**Hints:** {hints}".format(
                         mode=settings_map['world_state'][meta['mode']],
                         entrance=settings_map['entrance_shuffle'][meta['shuffle']
-                                                                ] if 'shuffle' in meta else "None",
+                                                                  ] if 'shuffle' in meta else "None",
                         boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
                         enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
                         pot=meta.get('enemizer.pot_shuffle', 'off'),
@@ -243,7 +243,7 @@ class alttprDiscordClass(alttprClass):
         return embed
 
     async def tournament_embed(self, emojis=False, name=False, notes=False):
-        settings_map = await self.randomizer_settings()
+        # settings_map = await self.randomizer_settings()
 
         meta = self.data['spoiler'].get('meta', {})
 
@@ -255,28 +255,28 @@ class alttprDiscordClass(alttprClass):
             timestamp=datetime.datetime.fromisoformat(self.data['generated'])
         )
 
-        if meta.get('spoilers', 'off') == "mystery":
-            embed.add_field(
-                name='Mystery Game',
-                value="No meta information is available for this game.",
-                inline=False)
-            embed.add_field(
-                name='Item Placement',
-                value=f"**Glitches Required:** {meta['logic']}",
-                inline=True)
-        else:
-            embed.add_field(
-                name='Settings',
-                value=(
-                    f"**Glitches Required:** {meta['logic']}\n"
-                    f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
-                    f"**Goal:** {settings_map['goals'][meta['goal']]}\n"
-                    f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
-                    f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
-                    f"**Enemy Shuffle:** {settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']]}\n"
-                    f"**Boss Shuffle:** {settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']]}\n"
-                )
-            )
+        # if meta.get('spoilers', 'off') == "mystery":
+        #     embed.add_field(
+        #         name='Mystery Game',
+        #         value="No meta information is available for this game.",
+        #         inline=False)
+        #     embed.add_field(
+        #         name='Item Placement',
+        #         value=f"**Glitches Required:** {meta['logic']}",
+        #         inline=True)
+        # else:
+        #     embed.add_field(
+        #         name='Settings',
+        #         value=(
+        #             f"**Glitches Required:** {meta['logic']}\n"
+        #             f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
+        #             f"**Goal:** {settings_map['goals'][meta['goal']]}\n"
+        #             f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
+        #             f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
+        #             f"**Enemy Shuffle:** {settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']]}\n"
+        #             f"**Boss Shuffle:** {settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']]}\n"
+        #         )
+        #     )
 
         embed.add_field(name='File Select Code', value=self.build_file_select_code(
             emojis=emojis), inline=False)
