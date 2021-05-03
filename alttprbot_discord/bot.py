@@ -9,20 +9,18 @@ from discord_sentry_reporting import use_sentry
 
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.embed_help_command import EmbedHelpCommand
 
 
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
 
-    prefix = await config.get(message.guild.id, "CommandPrefix")
-    return "$" if prefix is False else prefix
+    prefix = await config.get(message.guild.id, "CommandPrefix", "$")
+    return prefix
 
 
 discordbot = commands.Bot(
     command_prefix=determine_prefix,
-    help_command=EmbedHelpCommand(),
     allowed_mentions=discord.AllowedMentions(
         everyone=False,
         users=True,
@@ -30,6 +28,7 @@ discordbot = commands.Bot(
     ),
     intents=discord.Intents.all()
 )
+
 
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
@@ -41,6 +40,7 @@ discordbot.load_extension("alttprbot_discord.cogs.audit")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
 discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
+# discordbot.load_extension("alttprbot_discord.cogs.guildconfig")
 # discordbot.load_extension("alttprbot_discord.cogs.league")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
