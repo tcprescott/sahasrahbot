@@ -64,7 +64,7 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def srljoinall(self, ctx):
-        await srlbot.join_active_races(['alttphacks', 'alttpsm', 'supermetroidhacks', 'supermetroid'])
+        await srlbot.join_active_races(['supermetroidhacks', 'supermetroid'])
 
 
 def setup(bot):

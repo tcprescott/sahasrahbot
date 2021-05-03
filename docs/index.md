@@ -5,8 +5,7 @@ title:  SahasrahBot
 # SahasrahBot
 
 ## Race Command Help
-1. [SRL Command List](srl.md)
-2. [RaceTime.gg Commands](rtgg.md)
+1. [RaceTime.gg Commands](rtgg.md)
 
 ## Presets and Mystery Weights
 1. [Preset Lists](presets.md)

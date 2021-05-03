@@ -17,8 +17,6 @@ class SrlBot(pydle.Client):
         await self.message('NickServ', 'identify ' + c.SRL_PASSWORD)
         await self.join('#speedrunslive')
         await self.join('#alttpr')
-#        await self.join_active_races(['alttphacks', 'alttpsm'])
-#        await self.process_active_races()
         if c.DEBUG:
             await self.join('#srl-synack-testing')
 
@@ -53,7 +51,7 @@ class SrlBot(pydle.Client):
             await asyncio.sleep(1)
         #     await self.join('#speedrunslive')
         #     await self.join('#alttpr')
-            await self.join_active_races(['alttphacks', 'alttpsm', 'supermetroidhacks', 'supermetroid'])
+            await self.join_active_races(['supermetroidhacks', 'supermetroid'])
             await self.process_active_races()
         #     if c.DEBUG: await self.join('#srl-synack-testing')
 
