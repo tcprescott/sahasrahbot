@@ -243,9 +243,9 @@ async def process_tournament_race(handler, episodeid=None):
     goal += f" - ({'/'.join(tournament_race.seed.code)})"
 
     tournament_embed.insert_field_at(
-        0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
+        0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
     embed.insert_field_at(
-        0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
+        0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
 
     if broadcast_channels := tournament_race.broadcast_channels:
         tournament_embed.insert_field_at(

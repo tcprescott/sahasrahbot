@@ -92,7 +92,7 @@ class SgDaily(commands.Cog):
                                 title=episode['match1']['title'],
                                 start_time=start_time.astimezone(pytz.timezone('US/Eastern')).strftime("%-I:%M %p"),
                                 seed_time=seed_time.astimezone(pytz.timezone('US/Eastern')).strftime("%-I:%M %p"),
-                                racetime_url=f"https://racetime.gg{handler.data['url']}",
+                                racetime_url=handler.bot.http_uri(handler.data['url']),
                                 channel=broadcast_channels
                             ),
                             allowed_mentions=discord.AllowedMentions(roles=True)

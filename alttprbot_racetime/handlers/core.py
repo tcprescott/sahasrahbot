@@ -1,6 +1,7 @@
 from racetime_bot import RaceHandler, monitor_cmd, can_monitor
 from config import Config as c
 
+
 class SahasrahBotCoreHandler(RaceHandler):
     """
     SahasrahBot race handler. Generates seeds, presets, and frustration.

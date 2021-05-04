@@ -9,8 +9,6 @@ from racetime_bot import Bot
 
 from . import handlers
 
-RTGG_SESSION_TOKEN = os.environ.get('RACETIME_SESSION_TOKEN')
-RTGG_BASE_URL = os.environ.get('RACETIME_BASE_URL', 'https://racetime.gg')
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -22,14 +20,22 @@ logger_handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(logger_handler)
 
-RACETIME_GAMES = ['alttpr', 'smz3', 'ff1r', 'z1r', 'smb3r', 'smr', 'z2r', 'smw-hacks']
+RACETIME_GAMES = os.environ.get('RACETIME_GAMES', '').split(',')
+RACETIME_HOST = os.environ.get('RACETIME_HOST', 'racetime.gg')
+RACETIME_SECURE = os.environ.get('RACETIME_SECURE', 'true') == 'true'
+RACETIME_PORT = os.environ.get('RACETIME_PORT', None)
 
 
 class SahasrahBotRaceTimeBot(Bot):
+    racetime_host = RACETIME_HOST
+    racetime_port = RACETIME_PORT
+    racetime_secure = RACETIME_SECURE
+
     def __init__(self, handler_class, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.handler_class = handler_class
-        self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        if self.racetime_secure:
+            self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
     def get_handler_kwargs(self, ws_conn, state):
         return {
@@ -75,7 +81,7 @@ def start_racetime(loop):
 racetime_bots = {}
 for slug in RACETIME_GAMES:
     # if slug == 'sgl':
-    stripped_slug = slug.replace('-','')
+    stripped_slug = slug.replace('-', '')
     racetime_bots[slug] = SahasrahBotRaceTimeBot(
         category_slug=slug,
         client_id=os.environ.get(f"RACETIME_CLIENT_ID_{stripped_slug.upper()}"),

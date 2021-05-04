@@ -433,9 +433,9 @@ async def process_league_race(handler, episodeid=None, week=None):
     goal += f" - ({'/'.join(league_race.seed.code)})"
 
     tournament_embed.insert_field_at(
-        0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
+        0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
     embed.insert_field_at(
-        0, name='RaceTime.gg', value=f"https://racetime.gg{handler.data['url']}", inline=False)
+        0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
 
     if broadcast_channels := league_race.broadcast_channels:
         twitch_mode_text = league_race.twitch_mode_command
