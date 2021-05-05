@@ -13,6 +13,7 @@ title:  Presets
 | [adboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adboots.yaml) |Defeat every dungeon, but you at least get to start with Pegasus Boots!| *Customizer*  |
 | [adinvertedenemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adinvertedenemizer.yaml) |Some good ol' enemy and boss shuffle, but its also inverted... and all dungeons.  Only fearagent would ask for something like this.|   |
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) |All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
+| [adkeys_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys_boots.yaml) |All Dungeons Keysanity, but you get boots too!| *Customizer*  |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) |Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
 | [basicdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/basicdoors.yaml) |Basic door shuffle, open world state.|   *Door Randomizer*|
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) |Open, except the randomizer only ensures it can be beaten.|   |
@@ -21,6 +22,7 @@ title:  Presets
 | [blitzmode](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/blitzmode.yaml) |4/4 fast ganon. Start with Boots, Activated Flute, Pearl, Mitts, Master Sword, and Lamp| *Customizer*  |
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casual.yaml) |Standard with a starting weapon.|   |
 | [casualboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
+| [casualboots_dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_dungeons.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
 | [casualboots_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_fast.yaml) |Standard with a starting weapon, but you get boots and Aghanim 2 isn't required.| *Customizer*  |
 | [classic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/classic.yaml) |Attempts to closely mimic the feel of v18.  No progressive items, etc.| *Customizer*  |
 | [crisscross](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscross.yaml) |Cross dungeon shuffle doors, crossworld entrance shuffle.|   *Door Randomizer*|
@@ -30,6 +32,7 @@ title:  Presets
 | [crossedkeydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossedkeydrop.yaml) |Cross dungeon door shuffle plus key drops.|   *Door Randomizer*|
 | [crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys.yaml) |Crossworld entrance with keysanity.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
+| [dungeons_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons_boots.yaml) |All Dungeons, but you get boots too!| *Customizer*  |
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
@@ -56,6 +59,7 @@ title:  Presets
 | [nologic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic.yaml) |No Logic.  Anything can be anywhere and nothing really matters.|   |
 | [nologic_keylock](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic_keylock.yaml) |No Logic Keysanity, but Big Keys are stuck on bosses and in the Moldorm 2 chest.| *Customizer*  |
 | [open](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open.yaml) |Open mode, thats pretty much it.|   |
+| [open_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_assured.yaml) |Open mode with assured sword.|   |
 | [open_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast.yaml) |Open mode, thats pretty much it.|   |
 | [open_fast_07](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast_07.yaml) |Fast ganon, but GT is open immediately.  Intended to be played in a spoiler race.|   |
 | [open_fast_66](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast_66.yaml) |Fast ganon, slightly reduced crystals (6 for GT, 6 for Ganon)|   |
