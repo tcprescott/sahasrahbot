@@ -1,0 +1,28 @@
+---
+goal_name: open assured
+customizer: false
+description: "Open mode with assured sword."
+settings:
+  goal: ganon
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: open
+  hints: "off"
+  weapons: assured
+  crystals:
+    ganon: "7"
+    tower: "7"
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: standard
+  item_placement: advanced
