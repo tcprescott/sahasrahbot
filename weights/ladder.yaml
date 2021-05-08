@@ -1,4 +1,4 @@
-description: Season four mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva)
+description: Season seven mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva)
 allow_quickswap: True
 options:
   FillItemPoolWith: TwentyRupees2
@@ -51,12 +51,12 @@ item_pool:
   normal: 60
   hard: 30
   expert: 10
-item_functionality:
-  normal: 60
-  hard: 30
-  expert: 10
+item_functionality: "normal"
 enemy_damage: "default"
-enemy_health: "default"
+enemy_health:
+  default: 70
+  easy: 15
+  hard: 15
 subweights:
   normal:
     chance: 70
@@ -69,8 +69,23 @@ subweights:
             True: 50
             False: 50
           "OcarinaActive":
-            True: 30
-            False: 70
+            True: 20
+            False: 80
+          "Hookshot":
+            True: 10
+            False: 90
+          "FireRod":
+            True: 10
+            False: 90
+          "IceRod":
+            True: 10
+            False: 90
+          "Flippers":
+            True: 10
+            False: 90
+          "MagicMirror":
+            True: 10
+            False: 90
         custom:
           region.wildMaps:
             True: 60
@@ -87,7 +102,9 @@ subweights:
   entrance:
     chance: 30
     weights:
-      entrance_shuffle: crossed
+      entrance_shuffle:
+        restricted: 10
+        crossed: 20
       dungeon_items:
-        standard: 50
-        full: 50
+        standard: 30
+        full: 70
