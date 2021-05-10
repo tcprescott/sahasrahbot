@@ -50,6 +50,15 @@ Example: `!race normal`
 
 Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
+### !multiworld
+Use this command in the RaceTime.gg race room.
+
+This allows you to generate a multiworld game in a team race room, creating a multiworld for each team.  The race must be a team race.
+
+Example: `!multiworld normal`
+
+Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
+
 ## Super Mario Bros 3 Randomizer (SMB3R)
 
 ### !flags
@@ -110,6 +119,15 @@ Generate a seed using the Super Metroid DASH Randomizer, found at https://dashra
 Valid modes are: mm, full, sgl20, vanilla
 
 Example `!dashrace <mode>`
+
+### !multiworld
+Use this command in the RaceTime.gg race room.
+
+This allows you to generate a multiworld game in a team race room, creating a multiworld for each team.  The race must be a team race.
+
+Example: `!multiworld normal`
+
+Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
 ## Global Commands
 ### !lock

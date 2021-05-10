@@ -1,3 +1,4 @@
+from itertools import groupby
 from racetime_bot import RaceHandler, monitor_cmd, can_monitor
 from config import Config as c
 
@@ -39,6 +40,23 @@ class SahasrahBotCoreHandler(RaceHandler):
     async def end(self):
         # await self.send_message(f"SahasrahBot is now leaving this race room.  Have a great day!")
         self.logger.info(f"Leaving race room {self.data.get('name')}")
+
+    @property
+    def teams(self):
+        if self.data.get('team_race', False) is False:
+            raise Exception('This is not a team race.')
+
+        entrants = [(e['user']['name'],e['team']['name']) for e in self.data['entrants']]
+        return {key : [v[0] for v in val] for key, val in groupby(sorted(entrants, key = lambda ele: ele[1]), key = lambda ele: ele[1])}
+
+    @property
+    def is_equal_teams(self):
+        def all_equal(iterable):
+            g = groupby(iterable)
+            return next(g, True) and not next(g, False)
+
+        teams = self.teams
+        return all_equal([len(teams[t]) for t in teams])
 
     async def ex_cancel(self, args, message):
         self.seed_rolled = False

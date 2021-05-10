@@ -1,10 +1,52 @@
-from alttprbot.alttprgen import preset, smvaria
+import random
+
+from alttprbot.alttprgen import preset, smz3multi, smvaria
 from alttprbot.alttprgen.randomizer import smdash
-from pyz3r.exceptions import UnableToRetrieve, UnableToGenerate
+from pyz3r.exceptions import UnableToGenerate, UnableToRetrieve
 
 from .core import SahasrahBotCoreHandler
 
+
 class GameHandler(SahasrahBotCoreHandler):
+    async def ex_multiworld(self, args, message):
+        if await self.is_locked(message):
+            return
+
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+
+        if self.data.get('team_race', False) is False:
+            await self.send_message('This must be a team race.')
+            return
+
+        if not self.is_equal_teams:
+            await self.send_message("Teams are unequal in size.")
+            return
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+
+        seed_number = random.randint(0, 2147483647)
+
+        try:
+            teams = self.teams
+            for team in teams:
+                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='sm', seed_number=seed_number)
+                await self.send_message(f"Team {team}: {seed.url}")
+                await self.send_message("------")
+        except Exception as e:
+            await self.send_message(str(e))
+            return
+
+        race_info = f"SM Multiworld - {preset_name}"
+        await self.set_raceinfo(race_info)
+        await self.send_message("Seed rolling complete.")
+        self.seed_rolled = True
+
     async def ex_smleagueplayoff(self, args, message):
         if await self.is_locked(message):
             return
@@ -117,4 +159,4 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <mode>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <mode>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
