@@ -505,6 +505,7 @@ class SGLiveRace():
         embed.add_field(name='Channels', value=', '.join(self.broadcast_channel_links))
         return embed
 
+
 async def create_smm2_match_discord(episode_id, force):
     race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
     if race and not force:
@@ -648,7 +649,7 @@ async def process_sgl_race(handler):
         embed.add_field(name="Bingosync Password",
                         value=sgl_race.bingo_password)
     embed.add_field(
-        name="RT.gg", value=f"https://racetime.gg{handler.data['url']}", inline=False)
+        name="RT.gg", value=handler.bot.http_uri(handler.data['url']), inline=False)
 
     audit_channel_id = await config.get(sgl_race.guild.id, 'SGLAuditChannel')
     audit_channel = discordbot.get_channel(int(audit_channel_id))
@@ -874,7 +875,7 @@ async def scan_sgl_schedule():
         events = EVENTS.keys()
     logging.info("SGL - scanning SG schedule for races to create")
     for event in events:
-        await asyncio.sleep(1) # this keeps SG's API from getting rekt
+        await asyncio.sleep(1)  # this keeps SG's API from getting rekt
         try:
             delay = 0 if c.DEBUG else EVENTS[event]['delay']/60
             episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.53+delay)
