@@ -88,14 +88,14 @@ Please be aware that the flag string is not validated.
 
 ## Super Metroid Randomizer (SMR)
 
-### !totalrace
+### !total
 Generate a seed using Total's Super Metroid Randomizer at https://sm.samus.link
 
 Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
 Example `!totalrace casual_full`
 
-### !variarace
+### !varia
 Generate a seed using the Super Metroid VARIA Randomizer at https://randommetroidsolver.pythonanywhere.com/
 
 First argument is the settings preset, and the second argument is the skills preset.  Lists of both presets can be found on the randomizer's website.
@@ -104,10 +104,12 @@ Example `!variarace default regular`
 
 **This is currently broken and will not function.**  There's no ETA on a fix.
 
-### !dashrace
+### !dash
 Generate a seed using the Super Metroid DASH Randomizer, found at https://dashrando.github.io/
 
-Example `!dashrace`
+Valid modes are: mm, full, sgl20, vanilla
+
+Example `!dashrace <mode>`
 
 ## Global Commands
 ### !lock

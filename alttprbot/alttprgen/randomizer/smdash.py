@@ -22,7 +22,7 @@ def roll_smdash():
 
 async def create_smdash(mode="mm"):
     if mode not in ['mm', 'full', 'sgl20', 'vanilla']:
-        raise Exception("Specified mode is not valid.")
+        raise Exception("Specified mode is not valid.  Must be mm, full, sgl20, or vanilla")
 
     with tempfile.TemporaryDirectory() as tmp:
         wd = os.getcwd()
