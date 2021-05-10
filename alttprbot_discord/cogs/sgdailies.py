@@ -113,7 +113,7 @@ class SgDaily(commands.Cog):
         brief="Retrieves the next ALTTPR SG daily race.",
         help="Retrieves the next ALTTPR SG daily race.",
     )
-    @commands.cooldown(rate=1, per=900, type=commands.BucketType.channel)
+    @commands.cooldown(rate=2, per=900, type=commands.BucketType.channel)
     async def sgdaily(self, ctx, get_next=1):
         sg_schedule = await speedgaming.get_upcoming_episodes_by_event('alttprdaily', hours_past=0, hours_future=192)
         if len(sg_schedule) == 0:
