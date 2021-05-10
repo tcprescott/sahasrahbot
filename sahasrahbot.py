@@ -11,7 +11,7 @@ from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import start_racetime
 from alttprbot_srl.bot import srlbot
-from alttprbot_twitch.bot import twitchbot
+# from alttprbot_twitch.bot import twitchbot
 
 if os.environ.get("SENTRY_URL"):
     sentry_sdk.init(
