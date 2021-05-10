@@ -23,7 +23,7 @@ if os.environ.get("SENTRY_URL"):
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.create_task(discordbot.start(os.environ.get("DISCORD_TOKEN")))
-    loop.create_task(twitchbot.start())
+    # loop.create_task(twitchbot.start())
     start_racetime(loop)
     loop.create_task(srlbot.connect('irc.speedrunslive.com'))
     loop.create_task(sahasrahbotapi.run(host='127.0.0.1',
