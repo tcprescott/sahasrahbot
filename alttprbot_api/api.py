@@ -115,9 +115,10 @@ async def return_racetime_verify():
         'client_secret': RACETIME_CLIENT_SECRET_OAUTH,
         'code': code,
         'grant_type': 'authorization_code',
-        'scope': 'read'
+        'scope': 'read',
+        'redirect_uri': f"{APP_URL}/racetime/verify/return"
     }
-    print(data)
+
     async with aiohttp.request(url=f"{RACETIME_URL}/o/token", method="post", data=data, raise_for_status=True) as resp:
         token_data = await resp.json()
 
