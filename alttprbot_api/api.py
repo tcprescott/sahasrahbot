@@ -117,6 +117,7 @@ async def return_racetime_verify():
         'grant_type': 'authorization_code',
         'scope': 'read'
     }
+    print(data)
     async with aiohttp.request(url=f"{RACETIME_URL}/o/token", method="post", data=data, raise_for_status=True) as resp:
         token_data = await resp.json()
 
