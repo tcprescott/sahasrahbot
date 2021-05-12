@@ -167,10 +167,9 @@ t_spoiler_races = Table(
 )
 
 
-t_srl_nick_verification = Table(
-    'srl_nick_verification', metadata,
-    Column('srl_nick', String(45, 'utf8_bin'), primary_key=True, unique=True),
-    Column('key', BIGINT(20), unique=True),
+t_nick_verification = Table(
+    'nick_verification', metadata,
+    Column('key', BIGINT(20), primary_key=True, unique=True, autoincrement=False),
     Column('discord_user_id', BIGINT(20)),
     Column('timestamp', DateTime, server_default=text(
         "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))

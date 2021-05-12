@@ -1,6 +1,8 @@
+from random import randint
+
 from discord.ext import commands
 
-from alttprbot.database import srlnick
+from alttprbot.database import srlnick, nick_verification
 
 
 class Nickname(commands.Cog):
@@ -12,6 +14,14 @@ class Nickname(commands.Cog):
     )
     async def twitch(self, ctx, twitch):
         await srlnick.insert_twitch_name(ctx.author.id, twitch)
+
+    @commands.command(
+        help="Register your SRL nick with SahasrahBot."
+    )
+    async def rtgg(self, ctx):
+        key = randint(0, 999999999999999999)
+        await nick_verification.insert_verification(key, ctx.author.id)
+        await ctx.author.send(f"Please visit <http://localhost:5001/racetime/verification/initiate?key={key}> to verify your RaceTime.gg ID!")
 
     @commands.command(
         help="List the nicknames registered with SahasrahBot."

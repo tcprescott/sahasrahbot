@@ -1,15 +1,22 @@
 import os
 
-from quart import Quart, abort, jsonify, request
+import aiohttp
+from quart import Quart, abort, jsonify, request, session, redirect
+from urllib.parse import quote
 
 from alttprbot.alttprgen.mystery import get_weights, generate
 from alttprbot.tournament import league, alttpr
-from alttprbot.database import league_playoffs
+from alttprbot.database import league_playoffs, nick_verification, srlnick
 from alttprbot_discord.bot import discordbot
 from alttprbot_srl.bot import srlbot
 
 sahasrahbotapi = Quart(__name__)
+sahasrahbotapi.secret_key = os.urandom(24)
 
+RACETIME_CLIENT_ID_OAUTH = os.environ.get('RACETIME_CLIENT_ID_OAUTH')
+RACETIME_CLIENT_SECRET_OAUTH = os.environ.get('RACETIME_CLIENT_SECRET_OAUTH')
+RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
+APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 @sahasrahbotapi.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
@@ -47,26 +54,6 @@ async def mysterygenwithweights(weightset):
     )
 
 
-# @sahasrahbotapi.route('/api/sgl/episodes', methods=['GET'])
-# async def sgl_episodes():
-#     secret = request.args.get("secret")
-#     if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
-#         abort(401, description="secret required")
-
-#     result = await sgl2020_tournament.get_all_tournament_races()
-#     return jsonify(results=result)
-
-
-# @sahasrahbotapi.route('/api/sgl/episode/<int:episode>', methods=['GET'])
-# async def sgl_episode(episode):
-#     secret = request.args.get("secret")
-#     if not secret == os.environ.get('SGL_DATA_ENDPOINT_SECRET'):
-#         abort(401, description="secret required")
-
-#     result = await sgl2020_tournament.get_tournament_race_by_episodeid(episode)
-#     return jsonify(result=result)
-
-
 @sahasrahbotapi.route('/api/league/playoff', methods=['POST'])
 async def league_playoff():
     payload = await request.get_json()
@@ -102,6 +89,49 @@ async def get_league_playoffs():
     results = await league_playoffs.get_all_playoffs()
     return jsonify(results)
 
+
+@sahasrahbotapi.route('/racetime/verification/initiate', methods=['GET'])
+async def racetime_init_verification():
+    key = request.args.get("key")
+    verification = await nick_verification.get_verification(key)
+    if verification is None:
+        return "Invalid verification key provided.  Please re-run the command and contact Synack if this persists."
+
+    session['verification_key'] = key
+    session['discord_user_id'] = verification['discord_user_id']
+
+    redirect_uri = quote(f"{APP_URL}/racetime/verify/return")
+    return redirect(
+        f"{RACETIME_URL}/o/authorize?client_id={RACETIME_CLIENT_ID_OAUTH}&response_type=code&scope=read&redirect_uri={redirect_uri}",
+    )
+
+@sahasrahbotapi.route('/racetime/verify/return', methods=['GET'])
+async def return_racetime_verify():
+    code = request.args.get("code")
+    if code is None:
+        return abort(400, "code is missing")
+    data = {
+        'client_id': RACETIME_CLIENT_ID_OAUTH,
+        'client_secret': RACETIME_CLIENT_SECRET_OAUTH,
+        'code': code,
+        'grant_type': 'authorization_code',
+        'scope': 'read'
+    }
+    async with aiohttp.request(url=f"{RACETIME_URL}/o/token", method="post", data=data, raise_for_status=True) as resp:
+        token_data = await resp.json()
+
+    token = token_data['access_token']
+
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
+        userinfo_data = await resp.json()
+
+    await srlnick.insert_rtgg_id(session['discord_user_id'], userinfo_data['id'])
+    await nick_verification.delete_verification(session['verification_key'])
+
+    return f"Thank you {userinfo_data['name']}, we have verified you successfully."
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
