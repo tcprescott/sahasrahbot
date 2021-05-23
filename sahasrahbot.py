@@ -36,7 +36,10 @@ async def database():
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.create_task(database())
+
+    dbtask = loop.create_task(database())
+    loop.run_until_complete(dbtask)
+
     loop.create_task(discordbot.start(os.environ.get("DISCORD_TOKEN")))
     # loop.create_task(twitchbot.start())
     start_racetime(loop)
