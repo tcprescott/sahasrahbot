@@ -12,8 +12,8 @@ class AuditGeneratedGames(Model):
     settings = fields.JSONField()
     gentype = fields.CharField(45, index=True)
     genoption = fields.CharField(45, index=True)
-    timestamp = fields.DateField(auto_now=True)
-    id = fields.IntField()
+    timestamp = fields.DatetimeField(auto_now=True)
+    customizer = fields.IntField()
 
 class AuditMessages(Model):
     class Meta:
@@ -23,7 +23,7 @@ class AuditMessages(Model):
     guild_id = fields.BigIntField()
     message_id = fields.BigIntField()
     user_id = fields.BigIntField()
-    message_date = fields.DateField(auto_now_add=True)
+    message_date = fields.DatetimeField(auto_now_add=True)
     content = fields.CharField(4000)
     attachment = fields.CharField(2000)
     deleted = fields.IntField(default=0)
@@ -74,9 +74,9 @@ class LeaguePlayoffs(Model):
     type = fields.CharField(45)
     preset = fields.CharField(45)
     settings = fields.JSONField()
-    submitted = fields.BooleanField()
-    created = fields.DateField(auto_now_add=True)
-    modified = fields.DateField(auto_now=True)
+    submitted = fields.SmallIntField()
+    created = fields.DatetimeField(auto_now_add=True)
+    modified = fields.DatetimeField(auto_now=True)
 
 class MentionCounters(Model):
     class Meta:
@@ -86,7 +86,7 @@ class MentionCounters(Model):
     guild_id = fields.BigIntField(null=False)
     role_id = fields.BigIntField(null=False, unique=True)
     counter = fields.IntField(null=False, default=1)
-    last_used = fields.DateField(auto_now=True)
+    last_used = fields.DatetimeField(auto_now=True)
 
 class PatchDistribution(Model):
     class Meta:
@@ -95,7 +95,7 @@ class PatchDistribution(Model):
     id = fields.IntField(pk=True)
     patch_id = fields.CharField(45)
     game = fields.CharField(45)
-    used = fields.BooleanField()
+    used = fields.SmallIntField(index=True)
 
 class ReactionGroup(Model):
     class Meta:
@@ -119,7 +119,7 @@ class ReactionRole(Model):
     role_id = fields.BigIntField()
     name = fields.CharField(45)
     emoji = fields.CharField(200)
-    protect_mentions = fields.BooleanField()
+    protect_mentions = fields.SmallIntField()
 
 
 class SMZ3Multiworld(Model):
@@ -140,8 +140,8 @@ class SpoilerRaces(Model):
     srl_id = fields.CharField(45)
     spoiler_url = fields.CharField(255)
     studytime = fields.IntField()
-    date = fields.DateField(auto_now_add=True)
-    started = fields.DateField()
+    date = fields.DatetimeField(auto_now_add=True)
+    started = fields.DatetimeField()
 
 class NickVerification(Model):
     class Meta:
@@ -149,7 +149,7 @@ class NickVerification(Model):
 
     key = fields.BigIntField(pk=True, generated=False)
     discord_user_id = fields.BigIntField()
-    timestamp = fields.DateField(auto_now=True)
+    timestamp = fields.DatetimeField(auto_now=True)
 
 class SrlRaces(Model):
     class Meta:
@@ -158,7 +158,7 @@ class SrlRaces(Model):
     id = fields.IntField(pk=True)
     srl_id = fields.CharField(45)
     goal = fields.CharField(200)
-    timestamp = fields.DateField(auto_now=True)
+    timestamp = fields.DatetimeField(auto_now=True)
     message = fields.CharField(200)
 
 class SRLNick(Model):
@@ -169,7 +169,7 @@ class SRLNick(Model):
     srl_nick = fields.CharField(200, index=True)
     twitch_name = fields.CharField(200, index=True)
     rtgg_id = fields.CharField(200, index=True)
-    srl_verified = fields.BooleanField()
+    srl_verified = fields.SmallIntField()
 
 class TournamentGames(Model):
     class Meta:
@@ -179,9 +179,9 @@ class TournamentGames(Model):
     event = fields.CharField(45)
     game_number = fields.IntField()
     settings = fields.JSONField()
-    submitted = fields.BooleanField()
-    created = fields.DateField(auto_now_add=True)
-    updated = fields.DateField(auto_now=True)
+    submitted = fields.SmallIntField()
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
 
 class TournamentResults(Model):
     class Meta:
@@ -196,7 +196,7 @@ class TournamentResults(Model):
     status = fields.CharField(45)
     results_json = fields.JSONField()
     week = fields.CharField(45)
-    written_to_gsheet = fields.BooleanField()
+    written_to_gsheet = fields.SmallIntField()
 
 class Tournaments(Model):
     class Meta:
@@ -211,7 +211,7 @@ class Tournaments(Model):
     audit_channel_id = fields.BigIntField()
     commentary_channel_id = fields.BigIntField()
     scheduling_needs_channel_id = fields.BigIntField()
-    scheduling_needs_tracker = fields.BooleanField()
+    scheduling_needs_tracker = fields.SmallIntField()
     mod_channel_id = fields.BigIntField()
     tracker_roles = fields.CharField(4000)
     commentator_roles = fields.CharField(4000)
@@ -219,7 +219,7 @@ class Tournaments(Model):
     admin_roles = fields.CharField(4000)
     category = fields.CharField(200)
     goal = fields.CharField(200)
-    active = fields.BooleanField()
+    active = fields.SmallIntField()
     lang = fields.CharField(20)
 
 class SpeedGamingDailies(Model):
@@ -234,7 +234,7 @@ class SpeedGamingDailies(Model):
     racetime_category = fields.CharField(45)
     racetime_goal = fields.CharField(45)
     race_info = fields.CharField(2000, null=False)
-    active = fields.BooleanField()
+    active = fields.SmallIntField()
 
 class SGL2020Tournament(Model):
     class Meta:
@@ -248,8 +248,8 @@ class SGL2020Tournament(Model):
     seed = fields.CharField(200)
     password = fields.CharField(200)
     status = fields.CharField(45)
-    created = fields.DateField(auto_now_add=True)
-    updated = fields.DateField(auto_now=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
 
 class SGL2020TournamentBO3(Model):
     class Meta:
@@ -264,8 +264,8 @@ class SGL2020TournamentBO3(Model):
     seed = fields.CharField(200)
     password = fields.CharField(200)
     status = fields.CharField(45)
-    created = fields.DateField(auto_now_add=True)
-    updated = fields.DateField(auto_now=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
 
 class TwitchChannels(Model):
     class Meta:
