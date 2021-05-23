@@ -55,6 +55,9 @@ class Daily(commands.Cog):
                         guild.text_channels, name=channel_name)
                     await channel.send(embed=embed)
 
+    @announce_daily.before_loop
+    async def before_create_races(self):
+        await self.bot.wait_until_ready()
 
 def setup(bot):
     bot.add_cog(Daily(bot))

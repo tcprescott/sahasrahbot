@@ -33,3 +33,4 @@ z3r-sramr-py >= 0.2.2
 google-api-python-client >= 1.12.5
 isodate >= 0.6.0
 tortoise-orm[aiomysql] >= 0.17.3
+aerich >= 0.5.3

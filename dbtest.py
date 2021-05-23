@@ -1,9 +1,10 @@
 import asyncio
-from tortoise import Tortoise
-from tortoise.utils import get_schema_sql
 import os
 import urllib.parse
+
 from dotenv import load_dotenv
+from tortoise import Tortoise
+
 from alttprbot.models import Tournaments
 
 load_dotenv()
@@ -19,8 +20,6 @@ async def init():
         db_url=f'mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
-    sql = get_schema_sql(Tortoise.get_connection("default"), safe=False)
-    print(sql)
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
