@@ -6,26 +6,26 @@ class AuditGeneratedGames(Model):
         table="audit_generated_games"
 
     id = fields.IntField(pk=True)
-    randomizer = fields.CharField(45)
-    hash_id = fields.CharField(50, index=True)
-    permalink = fields.CharField(2000)
-    settings = fields.JSONField()
-    gentype = fields.CharField(45, index=True)
-    genoption = fields.CharField(45, index=True)
-    timestamp = fields.DatetimeField(auto_now=True)
-    customizer = fields.IntField()
+    randomizer = fields.CharField(45, null=True)
+    hash_id = fields.CharField(50, index=True, null=True)
+    permalink = fields.CharField(2000, null=True)
+    settings = fields.JSONField(null=True)
+    gentype = fields.CharField(45, index=True, null=True)
+    genoption = fields.CharField(45, index=True, null=True)
+    timestamp = fields.DatetimeField(auto_now=True, null=True)
+    customizer = fields.IntField(null=True)
 
 class AuditMessages(Model):
     class Meta:
         table="audit_messages"
 
     id = fields.IntField(pk=True)
-    guild_id = fields.BigIntField()
-    message_id = fields.BigIntField()
-    user_id = fields.BigIntField()
-    message_date = fields.DatetimeField()
-    content = fields.CharField(4000)
-    attachment = fields.CharField(2000)
+    guild_id = fields.BigIntField(null=True)
+    message_id = fields.BigIntField(null=True)
+    user_id = fields.BigIntField(null=True)
+    message_date = fields.DatetimeField(null=True)
+    content = fields.CharField(4000, null=True)
+    attachment = fields.CharField(1000, null=True)
     deleted = fields.IntField(default=0)
 
 class Config(Model):
@@ -35,14 +35,14 @@ class Config(Model):
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
     parameter = fields.CharField(45, null=False)
-    value = fields.CharField(45)
+    value = fields.CharField(45, null=True)
 
 class Daily(Model):
     class Meta:
         table="daily"
 
     id = fields.IntField(pk=True)
-    hash = fields.CharField(45)
+    hash = fields.CharField(45, null=True)
 
 class DiscordServerLists(Model):
     class Meta:
@@ -51,7 +51,7 @@ class DiscordServerLists(Model):
     id = fields.IntField(pk=True)
     server_description = fields.CharField(200, null=False)
     invite_id = fields.CharField(45, null=False)
-    category_id = fields.IntField()
+    category_id = fields.IntField(null=True)
 
 class DiscordServerCategories(Model):
     class Meta:
@@ -62,19 +62,19 @@ class DiscordServerCategories(Model):
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
     category_title = fields.CharField(200, null=False)
-    category_description = fields.CharField(200)
+    category_description = fields.CharField(200, null=True)
 
 class LeaguePlayoffs(Model):
     class Meta:
         table='league_playoffs'
 
     episode_id = fields.IntField(pk=True, generated=False)
-    playoff_round = fields.CharField(45)
-    game_number = fields.IntField()
-    type = fields.CharField(45)
-    preset = fields.CharField(45)
-    settings = fields.JSONField()
-    submitted = fields.SmallIntField()
+    playoff_round = fields.CharField(45, null=True)
+    game_number = fields.IntField(null=True)
+    type = fields.CharField(45, null=True)
+    preset = fields.CharField(45, null=True)
+    settings = fields.JSONField(null=True)
+    submitted = fields.SmallIntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     modified = fields.DatetimeField(auto_now=True)
 
@@ -93,8 +93,8 @@ class PatchDistribution(Model):
         table='patch_distribution'
 
     id = fields.IntField(pk=True)
-    patch_id = fields.CharField(45)
-    game = fields.CharField(45)
+    patch_id = fields.CharField(45, null=True)
+    game = fields.CharField(45, null=True)
     used = fields.SmallIntField(index=True)
 
 class ReactionGroup(Model):
@@ -105,9 +105,9 @@ class ReactionGroup(Model):
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
     message_id = fields.BigIntField(null=False)
-    name = fields.CharField(400)
-    description = fields.CharField(1000)
-    bot_managed = fields.IntField()
+    name = fields.CharField(400, null=True)
+    description = fields.CharField(1000, null=True)
+    bot_managed = fields.IntField(null=True)
 
 class ReactionRole(Model):
     class Meta:
@@ -115,11 +115,11 @@ class ReactionRole(Model):
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
-    reaction_group_id = fields.BigIntField()
-    role_id = fields.BigIntField()
-    name = fields.CharField(45)
-    emoji = fields.CharField(200)
-    protect_mentions = fields.SmallIntField()
+    reaction_group_id = fields.BigIntField(null=True)
+    role_id = fields.BigIntField(null=True)
+    name = fields.CharField(45, null=True)
+    emoji = fields.CharField(200, null=True)
+    protect_mentions = fields.SmallIntField(null=True)
 
 
 class SMZ3Multiworld(Model):
@@ -127,39 +127,39 @@ class SMZ3Multiworld(Model):
         table='smz3_multiworld'
 
     message_id = fields.BigIntField(pk=True, generated=False)
-    owner_id = fields.BigIntField()
-    randomizer = fields.CharField(45)
-    preset = fields.CharField(45)
-    status = fields.CharField(20)
+    owner_id = fields.BigIntField(null=True)
+    randomizer = fields.CharField(45, null=True)
+    preset = fields.CharField(45, null=True)
+    status = fields.CharField(20, null=True)
 
 class SpoilerRaces(Model):
     class Meta:
         table='spoiler_races'
 
     id = fields.IntField(pk=True)
-    srl_id = fields.CharField(45)
-    spoiler_url = fields.CharField(255)
-    studytime = fields.IntField()
+    srl_id = fields.CharField(45, null=True)
+    spoiler_url = fields.CharField(255, null=True)
+    studytime = fields.IntField(null=True)
     date = fields.DatetimeField(auto_now_add=True)
-    started = fields.DatetimeField()
+    started = fields.DatetimeField(null=True)
 
 class NickVerification(Model):
     class Meta:
         table='nick_verification'
 
     key = fields.BigIntField(pk=True, generated=False)
-    discord_user_id = fields.BigIntField()
-    timestamp = fields.DatetimeField(auto_now=True)
+    discord_user_id = fields.BigIntField(null=True)
+    timestamp = fields.DatetimeField(auto_now=True, null=True)
 
 class SrlRaces(Model):
     class Meta:
         table='srl_races'
 
     id = fields.IntField(pk=True)
-    srl_id = fields.CharField(45)
-    goal = fields.CharField(200)
+    srl_id = fields.CharField(45, null=True)
+    goal = fields.CharField(200, null=True)
     timestamp = fields.DatetimeField(auto_now=True)
-    message = fields.CharField(200)
+    message = fields.CharField(200, null=True)
 
 class SRLNick(Model):
     class Meta:
@@ -169,17 +169,17 @@ class SRLNick(Model):
     srl_nick = fields.CharField(200, index=True)
     twitch_name = fields.CharField(200, index=True)
     rtgg_id = fields.CharField(200, index=True)
-    srl_verified = fields.SmallIntField()
+    srl_verified = fields.SmallIntField(null=True)
 
 class TournamentGames(Model):
     class Meta:
         table='tournament_games'
 
     episode_id = fields.IntField(pk=True, generated=False)
-    event = fields.CharField(45)
-    game_number = fields.IntField()
-    settings = fields.JSONField()
-    submitted = fields.SmallIntField()
+    event = fields.CharField(45, null=True)
+    game_number = fields.IntField(null=True)
+    settings = fields.JSONField(null=True)
+    submitted = fields.SmallIntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
@@ -188,15 +188,15 @@ class TournamentResults(Model):
         table='tournament_results'
 
     id = fields.IntField(pk=True)
-    srl_id = fields.CharField(45)
-    episode_id = fields.CharField(45)
-    permalink = fields.CharField(200)
-    spoiler = fields.CharField(200)
-    event = fields.CharField(45)
-    status = fields.CharField(45)
-    results_json = fields.JSONField()
-    week = fields.CharField(45)
-    written_to_gsheet = fields.SmallIntField()
+    srl_id = fields.CharField(45, null=True)
+    episode_id = fields.CharField(45, null=True)
+    permalink = fields.CharField(200, null=True)
+    spoiler = fields.CharField(200, null=True)
+    event = fields.CharField(45, null=True)
+    status = fields.CharField(45, null=True)
+    results_json = fields.JSONField(null=True)
+    week = fields.CharField(45, null=True)
+    written_to_gsheet = fields.SmallIntField(null=True)
 
 class Tournaments(Model):
     class Meta:
@@ -204,50 +204,50 @@ class Tournaments(Model):
         unique_together=('schedule_type', 'slug')
 
     id = fields.IntField(pk=True)
-    schedule_type = fields.CharField(45)
-    slug = fields.CharField(45)
-    guild_id = fields.BigIntField()
-    helper_roles = fields.CharField(4000)
-    audit_channel_id = fields.BigIntField()
-    commentary_channel_id = fields.BigIntField()
-    scheduling_needs_channel_id = fields.BigIntField()
-    scheduling_needs_tracker = fields.SmallIntField()
-    mod_channel_id = fields.BigIntField()
-    tracker_roles = fields.CharField(4000)
-    commentator_roles = fields.CharField(4000)
-    mod_roles = fields.CharField(4000)
-    admin_roles = fields.CharField(4000)
-    category = fields.CharField(200)
-    goal = fields.CharField(200)
-    active = fields.SmallIntField()
-    lang = fields.CharField(20)
+    schedule_type = fields.CharField(45, null=True)
+    slug = fields.CharField(45, null=True)
+    guild_id = fields.BigIntField(null=True)
+    helper_roles = fields.CharField(2000, null=True)
+    audit_channel_id = fields.BigIntField(null=True)
+    commentary_channel_id = fields.BigIntField(null=True)
+    scheduling_needs_channel_id = fields.BigIntField(null=True)
+    scheduling_needs_tracker = fields.SmallIntField(null=True)
+    mod_channel_id = fields.BigIntField(null=True)
+    tracker_roles = fields.CharField(2000, null=True)
+    commentator_roles = fields.CharField(2000, null=True)
+    mod_roles = fields.CharField(2000, null=True)
+    admin_roles = fields.CharField(2000, null=True)
+    category = fields.CharField(200, null=True)
+    goal = fields.CharField(200, null=True)
+    active = fields.SmallIntField(null=True)
+    lang = fields.CharField(20, null=True)
 
 class SpeedGamingDailies(Model):
     class Meta:
         table = 'sgdailies'
 
     id = fields.IntField(pk=True)
-    slug = fields.CharField(45)
+    slug = fields.CharField(45, null=True)
     guild_id = fields.BigIntField(null=False)
     announce_channel = fields.BigIntField(null=False)
     announce_message = fields.BigIntField(null=False)
-    racetime_category = fields.CharField(45)
-    racetime_goal = fields.CharField(45)
+    racetime_category = fields.CharField(45, null=True)
+    racetime_goal = fields.CharField(45, null=True)
     race_info = fields.CharField(2000, null=False)
-    active = fields.SmallIntField()
+    active = fields.SmallIntField(null=True)
 
 class SGL2020Tournament(Model):
     class Meta:
         table='sgl2020_tournament'
 
     episode_id = fields.IntField(pk=True, generated=False)
-    room_name = fields.CharField(100)
-    event = fields.CharField(45)
-    platform = fields.CharField(45)
-    permalink = fields.CharField(200)
-    seed = fields.CharField(200)
-    password = fields.CharField(200)
-    status = fields.CharField(45)
+    room_name = fields.CharField(100, null=True)
+    event = fields.CharField(45, null=True)
+    platform = fields.CharField(45, null=True)
+    permalink = fields.CharField(200, null=True)
+    seed = fields.CharField(200, null=True)
+    password = fields.CharField(200, null=True)
+    status = fields.CharField(45, null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
@@ -256,14 +256,14 @@ class SGL2020TournamentBO3(Model):
         table='sgl2020_tournament_bo3'
 
     id = fields.IntField(pk=True)
-    episode_id = fields.IntField()
-    room_name = fields.CharField(100)
-    event = fields.CharField(45)
-    platform = fields.CharField(45)
-    permalink = fields.CharField(200)
-    seed = fields.CharField(200)
-    password = fields.CharField(200)
-    status = fields.CharField(45)
+    episode_id = fields.IntField(null=True)
+    room_name = fields.CharField(100, null=True)
+    event = fields.CharField(45, null=True)
+    platform = fields.CharField(45, null=True)
+    permalink = fields.CharField(200, null=True)
+    seed = fields.CharField(200, null=True)
+    password = fields.CharField(200, null=True)
+    status = fields.CharField(45, null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
@@ -280,9 +280,9 @@ class TwitchCommandText(Model):
         unique_together=('channel', 'command')
 
     id = fields.IntField(pk=True)
-    channel = fields.CharField(200)
-    command = fields.CharField(45)
-    content = fields.CharField(4000)
+    channel = fields.CharField(200, null=True)
+    command = fields.CharField(45, null=True)
+    content = fields.CharField(4000, null=True)
 
 class VoiceRole(Model):
     id = fields.IntField(pk=True)
