@@ -1,5 +1,3 @@
-import datetime
-
 from tortoise.models import Model
 from tortoise import fields
 
@@ -100,6 +98,9 @@ class PatchDistribution(Model):
     used = fields.BooleanField()
 
 class ReactionGroup(Model):
+    class Meta:
+        table='reaction_group'
+
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
@@ -108,197 +109,183 @@ class ReactionGroup(Model):
     description = fields.CharField(1000)
     bot_managed = fields.IntField()
 
-t_reaction_role = Table(
-    'reaction_role', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('guild_id', BIGINT(20), nullable=False),
-    Column('reaction_group_id', BIGINT(20)),
-    Column('role_id', BIGINT(20)),
-    Column('name', String(45, 'utf8mb4_unicode_ci'), nullable=False),
-    Column('emoji', VARCHAR(200), nullable=False),
-    Column('description', String(400, 'utf8mb4_unicode_ci')),
-    Column('protect_mentions', TINYINT(1))
-)
+class ReactionRole(Model):
+    class Meta:
+        table='reaction_role'
+
+    id = fields.IntField(pk=True)
+    guild_id = fields.BigIntField(null=False)
+    reaction_group_id = fields.BigIntField()
+    role_id = fields.BigIntField()
+    name = fields.CharField(45)
+    emoji = fields.CharField(200)
+    protect_mentions = fields.BooleanField()
 
 
-t_seed_presets = Table(
-    'seed_presets', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('name', VARCHAR(45), nullable=False, unique=True),
-    Column('randomizer', VARCHAR(45)),
-    Column('customizer', TINYINT(4)),
-    Column('settings', JSON, nullable=False)
-)
+class SMZ3Multiworld(Model):
+    class Meta:
+        table='smz3_multiworld'
 
+    message_id = fields.BigIntField(pk=True, generated=False)
+    owner_id = fields.BigIntField()
+    randomizer = fields.CharField(45)
+    preset = fields.CharField(45)
+    status = fields.CharField(20)
 
-t_smz3_multiworld = Table(
-    'smz3_multiworld', metadata,
-    Column('message_id', BIGINT(20), primary_key=True),
-    Column('owner_id', BIGINT(20), nullable=False),
-    Column('randomizer', VARCHAR(45), nullable=False),
-    Column('preset', VARCHAR(45), nullable=False),
-    Column('status', VARCHAR(20), nullable=False)
-)
+class SpoilerRaces(Model):
+    class Meta:
+        table='spoiler_races'
 
+    id = fields.IntField(pk=True)
+    srl_id = fields.CharField(45)
+    spoiler_url = fields.CharField(255)
+    studytime = fields.IntField()
+    date = fields.DateField(auto_now_add=True)
+    started = fields.DateField()
 
-t_spoiler_races = Table(
-    'spoiler_races', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('srl_id', String(45, 'utf8_bin'), nullable=False, unique=True),
-    Column('spoiler_url', String(255, 'utf8_bin'), nullable=False),
-    Column('studytime', INTEGER(11)),
-    Column('date', DateTime, server_default=text("CURRENT_TIMESTAMP")),
-    Column('started', DateTime)
-)
+class NickVerification(Model):
+    class Meta:
+        table='nick_verification'
 
+    key = fields.BigIntField(pk=True, generated=False)
+    discord_user_id = fields.BigIntField()
+    timestamp = fields.DateField(auto_now=True)
 
-t_nick_verification = Table(
-    'nick_verification', metadata,
-    Column('key', BIGINT(20), primary_key=True, unique=True, autoincrement=False),
-    Column('discord_user_id', BIGINT(20)),
-    Column('timestamp', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
-)
+class SrlRaces(Model):
+    class Meta:
+        table='srl_races'
 
+    id = fields.IntField(pk=True)
+    srl_id = fields.CharField(45)
+    goal = fields.CharField(200)
+    timestamp = fields.DateField(auto_now=True)
+    message = fields.CharField(200)
 
-t_srl_races = Table(
-    'srl_races', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('srl_id', String(45), nullable=False, unique=True),
-    Column('goal', String(200), nullable=False),
-    Column('timestamp', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
-    Column('message', String(200))
-)
+class SRLNick(Model):
+    class Meta:
+        table='srlnick'
 
+    discord_user_id = fields.BigIntField(pk=True, generated=False)
+    srl_nick = fields.CharField(200, index=True)
+    twitch_name = fields.CharField(200, index=True)
+    rtgg_id = fields.CharField(200, index=True)
+    srl_verified = fields.BooleanField()
 
-t_srlnick = Table(
-    'srlnick', metadata,
-    Column('discord_user_id', BIGINT(20), primary_key=True),
-    Column('srl_nick', String(200), index=True),
-    Column('twitch_name', String(200), index=True),
-    Column('rtgg_id', String(200), index=True),
-    Column('srl_verified', BIT(1))
-)
+class TournamentGames(Model):
+    class Meta:
+        table='tournament_games'
 
-t_tournament_games = Table(
-    'tournament_games', metadata,
-    Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
-    Column('event', String(45, 'utf8_bin')),
-    Column('game_number', INTEGER(11)),
-    Column('settings', JSON),
-    Column('submitted', TINYINT(1)),
-    Column('created', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP")),
-    Column('updated', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
-)
+    episode_id = fields.IntField(pk=True, generated=False)
+    event = fields.CharField(45)
+    game_number = fields.IntField()
+    settings = fields.JSONField()
+    submitted = fields.BooleanField()
+    created = fields.DateField(auto_now_add=True)
+    updated = fields.DateField(auto_now=True)
 
-t_tournament_results = Table(
-    'tournament_results', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('srl_id', String(45, 'utf8_bin')),
-    Column('episode_id', String(45, 'utf8_bin')),
-    Column('permalink', String(200, 'utf8_bin')),
-    Column('spoiler', String(200, 'utf8_bin')),
-    Column('event', String(45, 'utf8_bin')),
-    Column('status', String(45, 'utf8_bin')),
-    Column('results_json', JSON),
-    Column('week', String(45, 'utf8_bin')),
-    Column('written_to_gsheet', TINYINT(4))
-)
+class TournamentResults(Model):
+    class Meta:
+        table='tournament_results'
 
-t_tournaments = Table(
-    'tournaments', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('schedule_type', String(45)),
-    Column('slug', String(45)),
-    Column('guild_id', BIGINT(20), nullable=False),
-    Column('helper_roles', String(4000)),
-    Column('audit_channel_id', BIGINT(20)),
-    Column('commentary_channel_id', BIGINT(20)),
-    Column('scheduling_needs_channel_id', BIGINT(20)),
-    Column('scheduling_needs_tracker', TINYINT(1)),
-    Column('mod_channel_id', BIGINT(20)),
-    Column('tracker_roles', String(4000)),
-    Column('commentator_roles', String(4000)),
-    Column('mod_roles', String(4000)),
-    Column('admin_roles', String(4000)),
-    Column('category', String(200)),
-    Column('goal', String(200)),
-    Column('active', TINYINT(1)),
-    Column('lang', String(20)),
-    Index('idx_tournaments_type_slug', 'schedule_type', 'slug', unique=True)
-)
+    id = fields.IntField(pk=True)
+    srl_id = fields.CharField(45)
+    episode_id = fields.CharField(45)
+    permalink = fields.CharField(200)
+    spoiler = fields.CharField(200)
+    event = fields.CharField(45)
+    status = fields.CharField(45)
+    results_json = fields.JSONField()
+    week = fields.CharField(45)
+    written_to_gsheet = fields.BooleanField()
 
-t_sgdailies = Table(
-    'sgdailies', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('slug', String(45)),
-    Column('guild_id', BIGINT(20), nullable=False),
-    Column('announce_channel', BIGINT(20), nullable=False),
-    Column('announce_message', VARCHAR(2000), nullable=False),
-    Column('racetime_category', String(45)),
-    Column('racetime_goal', String(45)),
-    Column('race_info', VARCHAR(2000), nullable=False),
-    Column('active', TINYINT(1))
-)
+class Tournaments(Model):
+    class Meta:
+        table='tournaments'
+        unique_together=('schedule_type', 'slug')
 
-t_sgl2020_tournament = Table(
-    'sgl2020_tournament', metadata,
-    Column('episode_id', INTEGER(11), primary_key=True, autoincrement=False),
-    Column('room_name', String(100, 'utf8_bin'), unique=True),
-    Column('event', String(45, 'utf8_bin')),
-    Column('platform', String(45, 'utf8_bin')),
-    Column('permalink', String(200, 'utf8_bin')),
-    Column('seed', String(200, 'utf8_bin')),
-    Column('password', String(200, 'utf8_bin')),
-    Column('status', String(45, 'utf8_bin')),
-    Column('created', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP")),
-    Column('updated', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")),
-)
+    id = fields.IntField(pk=True)
+    schedule_type = fields.CharField(45)
+    slug = fields.CharField(45)
+    guild_id = fields.BigIntField()
+    helper_roles = fields.CharField(4000)
+    audit_channel_id = fields.BigIntField()
+    commentary_channel_id = fields.BigIntField()
+    scheduling_needs_channel_id = fields.BigIntField()
+    scheduling_needs_tracker = fields.BooleanField()
+    mod_channel_id = fields.BigIntField()
+    tracker_roles = fields.CharField(4000)
+    commentator_roles = fields.CharField(4000)
+    mod_roles = fields.CharField(4000)
+    admin_roles = fields.CharField(4000)
+    category = fields.CharField(200)
+    goal = fields.CharField(200)
+    active = fields.BooleanField()
+    lang = fields.CharField(20)
 
-t_sgl2020_tournament_bo3 = Table(
-    'sgl2020_tournament_bo3', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('episode_id', INTEGER(11)),
-    Column('room_name', String(100, 'utf8_bin'), unique=True),
-    Column('event', String(45, 'utf8_bin')),
-    Column('platform', String(45, 'utf8_bin')),
-    Column('permalink', String(200, 'utf8_bin')),
-    Column('seed', String(200, 'utf8_bin')),
-    Column('password', String(200, 'utf8_bin')),
-    Column('status', String(45, 'utf8_bin')),
-    Column('created', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP")),
-    Column('updated', DateTime, server_default=text(
-        "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))
-)
+class SpeedGamingDailies(Model):
+    class Meta:
+        table = 'sgdailies'
 
-t_twitch_channels = Table(
-    'twitch_channels', metadata,
-    Column('channel', String(200), primary_key=True),
-    Column('group', String(45), nullable=False)
-)
+    id = fields.IntField(pk=True)
+    slug = fields.CharField(45)
+    guild_id = fields.BigIntField(null=False)
+    announce_channel = fields.BigIntField(null=False)
+    announce_message = fields.BigIntField(null=False)
+    racetime_category = fields.CharField(45)
+    racetime_goal = fields.CharField(45)
+    race_info = fields.CharField(2000, null=False)
+    active = fields.BooleanField()
 
+class SGL2020Tournament(Model):
+    class Meta:
+        table='sgl2020_tournament'
 
-t_twitch_command_text = Table(
-    'twitch_command_text', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('channel', String(200, 'utf8_bin')),
-    Column('command', String(45, 'utf8_bin')),
-    Column('content', String(4000, 'utf8_bin')),
-    Index('idx_twitch_command_text_channel_command',
-          'channel', 'command', unique=True)
-)
+    episode_id = fields.IntField(pk=True, generated=False)
+    room_name = fields.CharField(100)
+    event = fields.CharField(45)
+    platform = fields.CharField(45)
+    permalink = fields.CharField(200)
+    seed = fields.CharField(200)
+    password = fields.CharField(200)
+    status = fields.CharField(45)
+    created = fields.DateField(auto_now_add=True)
+    updated = fields.DateField(auto_now=True)
 
+class SGL2020TournamentBO3(Model):
+    class Meta:
+        table='sgl2020_tournament_bo3'
 
-t_voice_role = Table(
-    'voice_role', metadata,
-    Column('id', INTEGER(11), primary_key=True),
-    Column('guild_id', BIGINT(20), nullable=False),
-    Column('voice_channel_id', BIGINT(20), nullable=False),
-    Column('role_id', BIGINT(20), nullable=False)
-)
+    id = fields.IntField(pk=True)
+    episode_id = fields.IntField()
+    room_name = fields.CharField(100)
+    event = fields.CharField(45)
+    platform = fields.CharField(45)
+    permalink = fields.CharField(200)
+    seed = fields.CharField(200)
+    password = fields.CharField(200)
+    status = fields.CharField(45)
+    created = fields.DateField(auto_now_add=True)
+    updated = fields.DateField(auto_now=True)
+
+class TwitchChannels(Model):
+    class Meta:
+        table='twitch_channels'
+
+    channel = fields.CharField(200, pk=True)
+    status = fields.CharField(45, null=False)
+
+class TwitchCommandText(Model):
+    class Meta:
+        table='twitch_command_text'
+        unique_together=('channel', 'command')
+
+    id = fields.IntField(pk=True)
+    channel = fields.CharField(200)
+    command = fields.CharField(45)
+    content = fields.CharField(4000)
+
+class VoiceRole(Model):
+    id = fields.IntField(pk=True)
+    guild_id = fields.BigIntField(null=False)
+    voice_channel_id = fields.BigIntField(null=False)
+    role_id = fields.BigIntField(null=False)
