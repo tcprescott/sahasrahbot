@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `audit_messages` (
     `guild_id` BIGINT,
     `message_id` BIGINT,
     `user_id` BIGINT,
+    `channel_id` BIGINT,
     `message_date` DATETIME(6),
     `content` VARCHAR(4000),
     `attachment` VARCHAR(2000),

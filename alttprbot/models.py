@@ -23,6 +23,7 @@ class AuditMessages(Model):
     guild_id = fields.BigIntField(null=True)
     message_id = fields.BigIntField(null=True)
     user_id = fields.BigIntField(null=True)
+    channel_id = fields.BigIntField(null=True)
     message_date = fields.DatetimeField(null=True)
     content = fields.CharField(4000, null=True)
     attachment = fields.CharField(1000, null=True)

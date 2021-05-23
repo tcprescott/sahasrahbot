@@ -5,7 +5,8 @@ import aiofiles
 import yaml
 
 import pyz3r
-from alttprbot.database import audit, config
+from alttprbot import models
+from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
@@ -117,7 +118,7 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
         raise SahasrahBotException(
             f'Randomizer {randomizer} is not supported.')
 
-    await audit.insert_generated_game(
+    await models.AuditGeneratedGames.create(
         randomizer=randomizer,
         hash_id=hash_id,
         permalink=seed.url,

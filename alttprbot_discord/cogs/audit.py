@@ -3,7 +3,8 @@ import datetime
 import discord
 from discord.ext import commands
 
-from alttprbot.database import audit, config
+from alttprbot import models
+from alttprbot.database import config
 import io
 from contextlib import closing
 import csv
@@ -17,7 +18,7 @@ class Audit(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def messagehistory(self, ctx, member: discord.Member, limit=500):
-        messages = await audit.get_messages_for_user(guild_id=ctx.guild.id, user_id=member.id, limit=limit)
+        messages = await models.AuditMessages.filter(guild_id=ctx.guild.id, user_id=member.id).limit(limit).values()
 
         fields = ['message_date', 'content', 'attachment', 'deleted']
         with closing(io.StringIO()) as sio:
@@ -32,7 +33,7 @@ class Audit(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def deletedhistory(self, ctx, member: discord.Member, limit=500):
-        messages = await audit.get_deleted_messages_for_user(guild_id=ctx.guild.id, user_id=member.id, limit=limit)
+        messages = await models.AuditMessages.filter(guild_id=ctx.guild.id, user_id=member.id, deleted=1).limit(limit).values()
 
         fields = ['message_date', 'content', 'attachment', 'deleted']
         with closing(io.StringIO()) as sio:
@@ -65,8 +66,6 @@ class Audit(commands.Cog):
         if channel and channel.id in [694710452478803968, 694710286455930911]:
             return
 
-        if payload.message_id == self.bot.user.id:
-            return
         if await config.get(guild.id, 'AuditLogging') == 'true':
             audit_channel_id = await config.get(guild.id, 'AuditLogChannel')
             if audit_channel_id:
@@ -75,26 +74,36 @@ class Audit(commands.Cog):
                     guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
-                await audit.set_deleted(payload.message_id)
 
-    # @commands.Cog.listener()
-    # async def on_raw_bulk_message_delete(self, payload):
-    #     if payload.guild_id is None:
-    #         return
-    #     guild = self.bot.get_guild(payload.guild_id)
-    #     channel = self.bot.get_channel(payload.channel_id)
-    #     # if payload.message_id == self.bot.user.id:
-    #     #     return
-    #     if await config.get(guild.id, 'AuditLogging') == 'true':
-    #         audit_channel_id = await config.get(guild.id, 'AuditLogChannel')
-    #         for message_id in payload.message_ids:
-    #             if audit_channel_id:
-    #                 embed = await audit_embed_delete(guild, channel, message_id)
-    #                 audit_channel = discord.utils.get(
-    #                     guild.channels, id=int(audit_channel_id))
+                cached_messages = await models.AuditMessages.filter(message_id=payload.message_id)
+                if cached_messages:
+                    for msg in cached_messages:
+                        msg.deleted = 1
+                        await msg.save(update_fields=['deleted'])
 
-    #                 await audit_channel.send(embed=embed)
-    #                 await audit.set_deleted(payload.message_id)
+    @commands.Cog.listener()
+    async def on_raw_bulk_message_delete(self, payload):
+        if payload.guild_id is None:
+            return
+        guild = self.bot.get_guild(payload.guild_id)
+        channel = self.bot.get_channel(payload.channel_id)
+
+        if not await config.get(guild.id, 'AuditLogging', 'false') == 'true':
+            return
+
+        audit_channel_id = await config.get(guild.id, 'AuditLogChannel')
+        if not audit_channel_id:
+            return
+
+        audit_channel = discord.utils.get(guild.channels, id=int(audit_channel_id))
+
+        for message_id in payload.message_ids:
+            embed = await audit_embed_delete(guild, channel, message_id)
+
+            await audit_channel.send(embed=embed)
+            cached_message = await models.AuditMessages.get(message_id=message_id)
+            cached_message.deleted = 1
+            await cached_message.save()
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
@@ -105,7 +114,7 @@ class Audit(commands.Cog):
         if message.author.id == self.bot.user.id:
             return
         if await config.get(message.guild.id, 'AuditLogging') == 'true':
-            old_message = await audit.get_cached_messages(message.id)
+            old_message = await models.AuditMessages.filter(message_id=message.id).order_by('id').values()
             if old_message[-1]['content'] == message.content:
                 return
             audit_channel_id = await config.get(message.guild.id, 'AuditLogChannel')
@@ -229,7 +238,6 @@ class Audit(commands.Cog):
 #     embed.set_thumbnail(url=member.avatar_url)
 #     return embed
 
-
 async def audit_embed_member_joined(member):
     embed = discord.Embed(
         title="Member Joined",
@@ -289,7 +297,7 @@ async def audit_embed_edit(old_message, message):
 
 
 async def audit_embed_delete(guild, channel, message_id, bulk=False):
-    old_message = await audit.get_cached_messages(message_id)
+    old_message = await models.AuditMessages.filter(message_id=message_id).order_by('id').values()
     if old_message is None:
         author = None
         old_content = '*unknown*'
@@ -323,7 +331,7 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
 
 
 async def record_message(message):
-    await audit.insert_message(
+    await models.AuditMessages.create(
         guild_id=message.guild.id if message.guild else 0,
         message_id=message.id,
         user_id=message.author.id,

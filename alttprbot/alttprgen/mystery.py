@@ -6,9 +6,10 @@ from aiohttp.client_exceptions import ClientResponseError
 from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
 import pyz3r
+from alttprbot import models
 from alttprbot.alttprgen.preset import fetch_preset
 from alttprbot.alttprgen.randomizer import mysterydoors
-from alttprbot.database import audit, config
+from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import alttpr
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
@@ -68,10 +69,8 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
                         settings['allow_quickswap'] = True
                         seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
                 except ClientResponseError:
-                    await audit.insert_generated_game(
+                    await models.AuditGeneratedGames.create(
                         randomizer='alttpr',
-                        hash_id=None,
-                        permalink=None,
                         settings=settings,
                         gentype='mystery failure',
                         genoption=weightset,
@@ -81,7 +80,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
     except RetryError as e:
         raise e.last_attempt._exception from e
 
-    await audit.insert_generated_game(
+    await models.AuditGeneratedGames.create(
         randomizer='alttpr',
         hash_id=seed.hash,
         permalink=seed.url,
