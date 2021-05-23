@@ -42,7 +42,7 @@ class Daily(Model):
         table="daily"
 
     id = fields.IntField(pk=True)
-    hash = fields.CharField(45, null=True)
+    hash = fields.CharField(45, index=True)
 
 class DiscordServerLists(Model):
     class Meta:

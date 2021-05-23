@@ -3,7 +3,8 @@ import discord
 from discord.ext import commands, tasks
 import logging
 
-from alttprbot.database import config, daily
+from alttprbot import models
+from alttprbot.database import config
 from alttprbot.util import http
 
 from ..util.alttpr_discord import alttpr
@@ -64,10 +65,10 @@ def setup(bot):
 
 
 async def update_daily(hash_id):
-    latest_daily = await daily.get_latest_daily()
-    if not latest_daily['hash'] == hash_id:
+    current_daily = await models.Daily.filter(hash=hash_id).order_by('-id').first().values()
+    if not current_daily:
         logging.info('omg new daily')
-        await daily.set_new_daily(hash_id)
+        await models.Daily.create(hash=hash_id)
         return True
     else:
         return False
