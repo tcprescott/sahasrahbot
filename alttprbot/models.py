@@ -115,7 +115,7 @@ class ReactionRole(Model):
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
-    reaction_group_id = fields.BigIntField(null=True)
+    reaction_group = fields.ForeignKeyField('models.ReactionGroup', related_name='reaction_roles')
     role_id = fields.BigIntField(null=True)
     name = fields.CharField(45, null=True)
     emoji = fields.CharField(200, null=True)
