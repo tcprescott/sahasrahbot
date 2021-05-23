@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from alttprbot.database import discord_server_list
+from alttprbot.database import discord_server_lists
 
 
 class DiscordServers(commands.Cog):
@@ -21,12 +21,12 @@ class DiscordServers(commands.Cog):
     @category.command(name='add')
     @commands.is_owner()
     async def category_add(self, ctx, channel: commands.TextChannelConverter, category_title, category_description=None, order=0):
-        await discord_server_list.add_category(ctx.guild.id, channel.id, category_title=category_title, category_description=category_description, order=order)
+        await discord_server_lists.add_category(ctx.guild.id, channel.id, category_title=category_title, category_description=category_description, order=order)
 
     @category.command(name='list')
     @commands.is_owner()
     async def category_list(self, ctx):
-        results = await discord_server_list.get_categories(ctx.guild.id)
+        results = await discord_server_lists.get_categories(ctx.guild.id)
         if results:
             embed = discord.Embed(
                 title="List of categories",
@@ -44,12 +44,12 @@ class DiscordServers(commands.Cog):
     @category.command(name='remove')
     @commands.is_owner()
     async def category_remove(self, ctx, category_id: int):
-        await discord_server_list.remove_category(ctx.guild.id, category_id)
+        await discord_server_lists.remove_category(ctx.guild.id, category_id)
 
     @category.command(name='update')
     @commands.is_owner()
     async def category_update(self, ctx, category_id: int, category_title, category_description=None, order=0):
-        await discord_server_list.update_category(category_id, ctx.guild.id, category_title, category_description, order)
+        await discord_server_lists.update_category(category_id, ctx.guild.id, category_title, category_description, order)
 
     @discordservers.group()
     @commands.is_owner()
@@ -59,12 +59,12 @@ class DiscordServers(commands.Cog):
     @server.command(name='add')
     @commands.is_owner()
     async def server_add(self, ctx, category_id: int, invite: commands.InviteConverter, server_description=None):
-        await discord_server_list.add_server(ctx.guild.id, invite.id, category_id, server_description=server_description)
+        await discord_server_lists.add_server(ctx.guild.id, invite.id, category_id, server_description=server_description)
 
     @server.command(name='list')
     @commands.is_owner()
     async def server_list(self, ctx, category_id: int):
-        results = await discord_server_list.get_servers_for_category(category_id)
+        results = await discord_server_lists.get_servers_for_category(category_id)
 
         if results:
             embed = discord.Embed(
@@ -82,12 +82,12 @@ class DiscordServers(commands.Cog):
     @server.command(name='remove')
     @commands.is_owner()
     async def server_remove(self, ctx, server_id: int):
-        await discord_server_list.remove_server(ctx.guild.id, server_id)
+        await discord_server_lists.remove_server(ctx.guild.id, server_id)
 
     @server.command(name='update')
     @commands.is_owner()
     async def server_update(self, ctx, server_id: int, invite: commands.InviteConverter, category_id: int, server_description=None):
-        await discord_server_list.update_server(ctx.guild.id, server_id, invite.id, category_id, server_description)
+        await discord_server_lists.update_server(ctx.guild.id, server_id, invite.id, category_id, server_description)
 
     @discordservers.command()
     @commands.is_owner()
@@ -95,7 +95,7 @@ class DiscordServers(commands.Cog):
         def is_me(m):
             return m.author == self.bot.user
 
-        categories = await discord_server_list.get_categories(ctx.guild.id)
+        categories = await discord_server_lists.get_categories(ctx.guild.id)
         channels_to_update = list(set([c['channel_id'] for c in categories]))
 
         for c in channels_to_update:
@@ -103,7 +103,7 @@ class DiscordServers(commands.Cog):
             await channel.purge(limit=100, check=is_me)
 
         for category in categories:
-            server_list = await discord_server_list.get_servers_for_category(category['id'])
+            server_list = await discord_server_lists.get_servers_for_category(category['id'])
             channel = discord.utils.get(
                 ctx.guild.channels, id=category['channel_id'])
 

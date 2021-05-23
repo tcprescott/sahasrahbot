@@ -46,7 +46,7 @@ class Daily(Model):
 
 class DiscordServerLists(Model):
     class Meta:
-        table='discord_server_list'
+        table='discord_server_lists'
 
     id = fields.IntField(pk=True)
     server_description = fields.CharField(200, null=False)
@@ -285,6 +285,9 @@ class TwitchCommandText(Model):
     content = fields.CharField(4000, null=True)
 
 class VoiceRole(Model):
+    class Meta:
+        table='voice_role'
+
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
     voice_channel_id = fields.BigIntField(null=False)

@@ -19,17 +19,12 @@ ALTER TABLE `smz3_multiworld` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `spoiler_races` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `tournament_results` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `twitch_command_text` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-ALTER TABLE `aerich` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-ALTER TABLE `discord_server_list` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `seed_presets` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `voice_role` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-ALTER TABLE `voicerole` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `config` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `permissions` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `reaction_group` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
-ALTER TABLE `aerich` MODIFY `version` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
-ALTER TABLE `aerich` MODIFY `app` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `alembic_version` MODIFY `version_num` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `audit_generated_games` MODIFY `randomizer` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ALTER TABLE `audit_generated_games` MODIFY `hash_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
@@ -41,8 +36,6 @@ ALTER TABLE `config` MODIFY `value` varchar(45) CHARACTER SET utf8mb4 COLLATE ut
 ALTER TABLE `daily` MODIFY `hash` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `discord_server_categories` MODIFY `category_title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `discord_server_categories` MODIFY `category_description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-ALTER TABLE `discord_server_list` MODIFY `server_description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
-ALTER TABLE `discord_server_list` MODIFY `invite_id` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `discord_server_lists` MODIFY `invite_id` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `discord_server_lists` MODIFY `server_description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 ALTER TABLE `league_playoffs` MODIFY `playoff_round` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;

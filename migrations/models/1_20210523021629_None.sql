@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `discord_server_categories` (
     `category_title` VARCHAR(200) NOT NULL,
     `category_description` VARCHAR(200)
 ) CHARACTER SET utf8mb4;
-CREATE TABLE IF NOT EXISTS `discord_server_list` (
+CREATE TABLE IF NOT EXISTS `discord_server_lists` (
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `server_description` VARCHAR(200) NOT NULL,
     `invite_id` VARCHAR(45) NOT NULL,
@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `twitch_command_text` (
     `content` VARCHAR(4000),
     UNIQUE KEY `uid_twitch_comm_channel_16ae77` (`channel`, `command`)
 ) CHARACTER SET utf8mb4;
-CREATE TABLE IF NOT EXISTS `voicerole` (
+CREATE TABLE IF NOT EXISTS `voice_role` (
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `guild_id` BIGINT NOT NULL,
     `voice_channel_id` BIGINT NOT NULL,
