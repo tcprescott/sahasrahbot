@@ -7,15 +7,16 @@ from discord.ext import commands
 from discord.ext.commands import errors
 from discord_sentry_reporting import use_sentry
 
-from alttprbot.database import config
+from alttprbot_discord.util import config
 from alttprbot.exceptions import SahasrahBotException
 
+config.init()
 
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
 
-    prefix = await config.get(message.guild.id, "CommandPrefix", "$")
+    prefix = await message.guild.config_get("CommandPrefix", "$")
     return prefix
 
 

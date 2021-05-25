@@ -79,16 +79,6 @@ class LeaguePlayoffs(Model):
     created = fields.DatetimeField(auto_now_add=True)
     modified = fields.DatetimeField(auto_now=True)
 
-class MentionCounters(Model):
-    class Meta:
-        table='mention_counters'
-
-    id = fields.IntField(pk=True)
-    guild_id = fields.BigIntField(null=False)
-    role_id = fields.BigIntField(null=False, unique=True)
-    counter = fields.IntField(null=False, default=1)
-    last_used = fields.DatetimeField(auto_now=True)
-
 class PatchDistribution(Model):
     class Meta:
         table='patch_distribution'

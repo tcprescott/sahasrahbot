@@ -1,43 +1,45 @@
-import logging
-from discord.ext import commands
-import os
+import aiocache
+from discord.guild import Guild
+import tortoise.exceptions
 
-import yaml
+from alttprbot import models
 
+CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
-class GuildConfigBot(commands.Bot):
-    async def wait_until_ready(self):
-        await self._ready.wait()
-        await self.wait_for('guild_configs_loaded')
+async def config_set(self, parameter, value):
+    await models.Config.update_or_create(guild_id=self.id, parameter=parameter, defaults={'value': value})
+    await CACHE.delete(f'{parameter}_{self.id}_config')
+    await CACHE.delete(f'{self.id}_guildconfig')
 
+async def config_get(self, parameter, default=None):
+    if await CACHE.exists(f'{parameter}_{self.id}_config'):
+        value = await CACHE.get(f'{parameter}_{self.id}_config')
+        return value
 
-class GuildConfig():
-    def __init__(self, guild_id):
-        self._configdict = {}
-        self.guild_id = guild_id
-        self.load()
+    try:
+        result = await models.Config.get(guild_id=self.id, parameter=parameter)
+        await CACHE.set(f'{parameter}_{self.id}_config', result.value)
+        return result.value
+    except tortoise.exceptions.DoesNotExist:
+        await CACHE.set(f'{parameter}_{self.id}_config', default)
+        return default
 
-    def set(self, key, val):
-        self._configdict[key] = val
-        self.save()
+async def config_delete(self, parameter):
+    await models.Config.filter(guild_id=self.id, parameter=parameter).delete()
+    await CACHE.delete(f'{parameter}_{self.id}_config')
+    await CACHE.delete(f'{self.id}_guildconfig')
 
-    def get(self, key, default=None):
-        return self._configdict.get(key, default)
+async def config_list(self):
+    if await CACHE.exists(f'{self.id}_guildconfig'):
+        values = await CACHE.get(f'{self.id}_guildconfig').values()
+        return values
 
-    def delete(self, key):
-        del self._configdict[key]
-        self.save()
+    result = await models.Config.filter(guild_id=self.id)
+    await CACHE.set(f'{self.id}_guildconfig', result.values())
+    return result.values()
 
-    def dump(self):
-        return self._configdict
-
-    def load(self):
-        try:
-            with open(os.path.join('data', 'config', f'{self.guild_id}.yaml')) as f:
-                self._configdict = yaml.safe_load(f)
-        except FileNotFoundError:
-            logging.debug(f"No config file for {self.guild_id}, skipping...")
-
-    def save(self):
-        with open(os.path.join('data', 'config', f'{self.guild_id}.yaml'), 'w') as f:
-            yaml.dump(self._configdict, f)
+def init():
+    Guild.config_set = config_set
+    Guild.config_get = config_get
+    Guild.config_delete = config_delete
+    Guild.config_list = config_list

@@ -84,7 +84,7 @@ class SpeedGamingLive(commands.Cog):
     async def smmclose(self, ctx):
         await ctx.reply("WARNING:  This room will be closing in 10 seconds.  It will become inaccessible to non-admins.")
         await asyncio.sleep(10)
-        smm2_category_id = int(await config.get(ctx.guild.id, 'SGLSMM2CategoryClosed'))
+        smm2_category_id = int(await ctx.guild.config_get('SGLSMM2CategoryClosed'))
         await ctx.channel.edit(
             sync_permissions=True,
             category=discord.utils.get(

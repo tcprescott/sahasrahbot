@@ -22,7 +22,7 @@ class Moderation(commands.Cog):
         if message.guild is None:
             return
 
-        if hasattr(message.author, 'joined_at') and message.author.joined_at > datetime.datetime.now()-datetime.timedelta(days=1) and await config.get(message.guild.id, 'ModerateNewMemberContent') == "true":
+        if hasattr(message.author, 'joined_at') and message.author.joined_at > datetime.datetime.now()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true":
             for url in urlextractor.gen_urls(message.content):
                 if urlparse(url).netloc in ['discord.gg']:
                     await message.delete()
@@ -35,14 +35,14 @@ class Moderation(commands.Cog):
         # delete roms if server is configured to do so
         if len(message.attachments) > 0:
             for attachment in message.attachments:
-                if attachment.filename.endswith('.zip') and await config.get(message.guild.id, 'InspectZipArchives') == "true":
+                if attachment.filename.endswith('.zip') and await message.guild.config_get('InspectZipArchives') == "true":
                     zippedfiles = await inspect_zip(attachment.url)
                     for zippedfile in zippedfiles:
-                        if zippedfile.endswith(('.sfc', '.smc')) and await config.get(message.guild.id, 'DeleteRoms') == "true":
+                        if zippedfile.endswith(('.sfc', '.smc')) and await message.guild.config_get('DeleteRoms') == "true":
                             await message.delete()
                             await message.channel.send(f'{message.author.mention}, a ROM was detected in the zip archive posted.  If your message was deleted in error, please contact a moderator.')
 
-                elif attachment.filename.endswith(('.sfc', '.smc')) and await config.get(message.guild.id, 'DeleteRoms') == "true":
+                elif attachment.filename.endswith(('.sfc', '.smc')) and await message.guild.config_get('DeleteRoms') == "true":
                     await message.delete()
                     await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
 

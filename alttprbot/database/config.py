@@ -1,8 +1,5 @@
-import aiocache
-
+from alttprbot_discord.util.config import CACHE
 from ..util import orm
-
-CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
 
 async def get_parameter(guild_id, parameter):

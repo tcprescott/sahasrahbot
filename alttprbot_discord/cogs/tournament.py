@@ -173,7 +173,7 @@ class Tournament(commands.Cog):
         if ctx.guild is None:
             return False
 
-        if await config.get(ctx.guild.id, 'TournamentEnabled') == 'true':
+        if await ctx.guild.config_get('TournamentEnabled') == 'true':
             return True
         else:
             return False

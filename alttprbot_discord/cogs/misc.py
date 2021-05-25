@@ -149,7 +149,7 @@ class Misc(commands.Cog):
             if ctx.guild is None:
                 game = "z3r"
             else:
-                game = await config.get(ctx.guild.id, "HolyImageDefaultGame", "z3r")
+                game = await ctx.guild.config_get("HolyImageDefaultGame", "z3r")
 
         holyimage = await HolyImage.construct(slug=slug, game=game)
 

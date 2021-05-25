@@ -128,10 +128,3 @@ async def update_role(guild_id, role_id, name, description, protect_mentions: in
         [name, description, protect_mentions, guild_id, role_id]
     )
     await aiocache.SimpleMemoryCache().clear(namespace="role")
-
-
-async def increment_mention_count(guild_id, role_id):
-    await orm.execute(
-        'INSERT INTO mention_counters(guild_id,role_id) VALUES (%s,%s) ON DUPLICATE KEY UPDATE counter = counter+1;',
-        [guild_id, role_id]
-    )
