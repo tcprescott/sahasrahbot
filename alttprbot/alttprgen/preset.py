@@ -86,8 +86,8 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
             settings['tournament'] = tournament
             settings['spoilers'] = spoilers
 
-            if allow_quickswap:
-                settings['allow_quickswap'] = True
+            if not 'allow_quickswap' in settings:
+                settings['allow_quickswap'] = allow_quickswap
 
             if preset_dict.get('customizer', False):
                 if 'l' not in settings:
