@@ -19,9 +19,11 @@ async def config_get(self, parameter, default=None):
     try:
         result = await models.Config.get(guild_id=self.id, parameter=parameter)
         await CACHE.set(f'{parameter}_{self.id}_config', result.value)
+        await CACHE.delete(f'{self.id}_guildconfig')
         return result.value
     except tortoise.exceptions.DoesNotExist:
         await CACHE.set(f'{parameter}_{self.id}_config', default)
+        await CACHE.delete(f'{self.id}_guildconfig')
         return default
 
 async def config_delete(self, parameter):
@@ -31,12 +33,12 @@ async def config_delete(self, parameter):
 
 async def config_list(self):
     if await CACHE.exists(f'{self.id}_guildconfig'):
-        values = await CACHE.get(f'{self.id}_guildconfig').values()
+        values = await CACHE.get(f'{self.id}_guildconfig')
         return values
 
-    result = await models.Config.filter(guild_id=self.id)
-    await CACHE.set(f'{self.id}_guildconfig', result.values())
-    return result.values()
+    values = await models.Config.filter(guild_id=self.id).values()
+    await CACHE.set(f'{self.id}_guildconfig', values)
+    return values
 
 def init():
     Guild.config_set = config_set
