@@ -1,6 +1,7 @@
 from itertools import groupby
-from racetime_bot import RaceHandler, monitor_cmd, can_monitor
-from config import Config as c
+
+from alttprbot_discord.bot import discordbot
+from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
 
 class SahasrahBotCoreHandler(RaceHandler):
@@ -9,6 +10,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     """
     stop_at = ['cancelled', 'finished']
     tournament = None
+    status = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -20,18 +22,46 @@ class SahasrahBotCoreHandler(RaceHandler):
     async def race_data(self, data):
         self.data = data.get('race')
 
-        if self.data.get('status', {}).get('value') in ['open', 'invitational']:
-            await self.intro()
+        await self.race_data_hook()
+
+        status = self.data.get('status', {}).get('value')
+        if status != self.status:
+            self.status = status
+            method = f'status_{status}'
+
+            discordbot.dispatch(f"racetime_{status}", self, data)
+
+            if hasattr(self, method):
+                self.logger.debug('[%(race)s] Calling status handler for %(status)s' % {
+                    'race': self.data.get('name'),
+                    'status': status,
+                })
+                await getattr(self, method)()
 
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
         # raise Exception(data.get('errors'))
 
+    async def status_in_progress(self):
+        pass
+
+    async def status_pending(self):
+        pass
+
+    async def status_open(self):
+        await self.intro()
+
+    async def status_invitational(self):
+        await self.intro()
+
+    async def race_data_hook(self):
+        pass
+
     async def intro(self):
         """
         Send introduction messages.
         """
-        if not self.state.get('intro_sent') and not c.DEBUG:
+        if not self.state.get('intro_sent'):
             await self.send_message(
                 f"Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller! Use {self.command_prefix}help to see what I can do!   Check out https://sahasrahbot.synack.live/rtgg.html for more info."
             )

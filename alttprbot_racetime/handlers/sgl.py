@@ -29,7 +29,7 @@ class GameHandler(SahasrahBotCoreHandler):
         if self.data.get('status', {}).get('value') == 'in_progress':
             await self.in_progress()
 
-    async def in_progress(self):
+    async def status_in_progress(self):
         await sgl.process_sgl_race_start(self)
 
     def should_stop(self):

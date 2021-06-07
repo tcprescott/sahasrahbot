@@ -13,15 +13,7 @@ from config import Config as c
 
 
 class GameHandler(SahasrahBotCoreHandler):
-    async def race_data(self, data):
-        self.data = data.get('race')
-
-        if self.data.get('status', {}).get('value') == 'in_progress':
-            await self.in_progress()
-
-        if self.data.get('status', {}).get('value') in ['open', 'invitational']:
-            await self.intro()
-
+    async def race_data_hook(self):
         pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
         for entrant in pending_entrants:
             if self.tournament:
@@ -56,20 +48,9 @@ class GameHandler(SahasrahBotCoreHandler):
                 beginmessage=True,
             ))
 
-    async def in_progress(self):
+    async def status_in_progress(self):
         await self.send_spoiler_log()
-        await league.process_league_race_start(self)
-
-    async def intro(self):
-        if not self.state.get('intro_sent') and not c.DEBUG:
-            await self.send_message(
-                f"Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller! Use {self.command_prefix}help to see what I can do!   Check out https://sahasrahbot.synack.live/rtgg.html for more info."
-            )
-            await self.send_message("NOTICE: Starting June 7th, 2021 this bot will roll games with Quickswap enabled by default.  Please use !noqsrace if you want quickswap disabled.  Thanks!")
-            self.state['intro_sent'] = True
-
-    async def ex_preset(self, args, message):
-        await self.send_message("Please use !race, !quickswaprace, or !noqsrace instead.  This command has been removed.")
+        # await league.process_league_race_start(self)
 
     async def ex_race(self, args, message):
         try:
@@ -79,8 +60,7 @@ class GameHandler(SahasrahBotCoreHandler):
                 'You must specify a preset!'
             )
             return
-        await self.send_message("WARNING:  This command starting June 7th, 2021 roll games with quickswap enabled.  Use !noqsrace instead if you wish to disable quickswap.")
-        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
 
     async def ex_noqsrace(self, args, message):
         try:
@@ -112,15 +92,7 @@ class GameHandler(SahasrahBotCoreHandler):
         )
 
     async def ex_quickswaprace(self, args, message):
-        try:
-            preset_name = args[0]
-        except IndexError:
-            await self.send_message(
-                'You must specify a preset!'
-            )
-            return
-        await self.send_message("WARNING:  This command starting June 7th, 2021 will be deprecated, as !race will roll games with quickswap enabled by default.  Use !noqsrace to disable quickswap.")
-        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
+        await self.send_message("Please use !race instead of this command.")
 
     async def ex_spoiler(self, args, message):
         # if league.is_league_race(self.data.get('name')):
