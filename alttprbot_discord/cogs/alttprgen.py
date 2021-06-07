@@ -37,11 +37,11 @@ class AlttprGen(commands.Cog):
         brief='Generate a race preset.',
         help='Generate a race preset.  Find a list of presets at https://sahasrahbot.synack.live/presets.html',
         invoke_without_command=True,
-        aliases=['racepreset', 'preset']
+        aliases=['racepreset', 'preset', 'quickswaprace']
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race(self, ctx, preset, hints=False):
-        seed, _ = await get_preset(preset, hints=hints, spoilers="off")
+        seed, _ = await get_preset(preset, hints=hints, spoilers="off", allow_quickswap=True)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -56,37 +56,6 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race_custom(self, ctx):
-        if ctx.message.attachments:
-            content = await ctx.message.attachments[0].read()
-            preset_dict = yaml.safe_load(content)
-            seed = await generate_preset(preset_dict, preset='custom', spoilers="off", tournament=True)
-        else:
-            raise SahasrahBotException("You must supply a valid yaml file.")
-        embed = await seed.embed(emojis=self.bot.emojis)
-        await ctx.reply(embed=embed)
-
-    @commands.group(
-        brief='Generate a quickswap race.',
-        help='Generate a quickswap race.  Find a list of presets at https://sahasrahbot.synack.live/presets.html',
-        invoke_without_command=True
-    )
-    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def quickswaprace(self, ctx, preset, hints=False):
-        seed, _ = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=True)
-        if not seed:
-            raise SahasrahBotException(
-                'Could not generate game.  Maybe preset does not exist?')
-        embed = await seed.embed(emojis=self.bot.emojis)
-        await ctx.reply(embed=embed)
-
-    @quickswaprace.command(
-        name='custom',
-        brief='Generate a custom preset.',
-        help='Generate a custom preset.  This file should be attached to the message.'
-    )
-    @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
-    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def qsrace_custom(self, ctx):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             preset_dict = yaml.safe_load(content)
