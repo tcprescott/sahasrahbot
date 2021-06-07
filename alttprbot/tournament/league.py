@@ -598,7 +598,7 @@ async def create_league_race_room(episodeid):
 
     embed = discord.Embed(
         title=f"RT.gg Room Opened - {league_race.versus_and_team}",
-        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at https://racetime.gg{handler.data['url']}\n\nEnjoy!",
+        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at {handler.bot.http_uri(handler.data['url'])}\n\nEnjoy!",
         color=discord.Colour.blue(),
         timestamp=datetime.datetime.now()
     )

@@ -21,6 +21,7 @@ from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime import bot as racetime
 
 TOURNAMENT_RESULTS_SHEET = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
+RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 
 SETTINGSMAP = {
     'Defeat Ganon': 'ganon',
@@ -361,7 +362,7 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
 
     embed = discord.Embed(
         title=f"RT.gg Room Opened - {tournament_race.versus}",
-        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at https://racetime.gg{handler.data['url']}\n\nEnjoy!",
+        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at {handler.bot.http_uri(handler.data['url'])}\n\nEnjoy!",
         color=discord.Colour.blue(),
         timestamp=datetime.datetime.now()
     )
@@ -574,7 +575,7 @@ async def race_recording_task():
 
             async with aiohttp.request(
                     method='get',
-                    url=f"https://racetime.gg/{race['srl_id']}/data",
+                    url=f"{RACETIME_URL}/{race['srl_id']}/data",
                     raise_for_status=True) as resp:
                 race_data = json.loads(await resp.read())
 
@@ -586,7 +587,7 @@ async def race_recording_task():
                 await wks.append_row(values=[
                     race['episode_id'],
                     started_at.strftime("%Y-%m-%d %H:%M:%S"),
-                    f"https://racetime.gg/{race['srl_id']}",
+                    f"{RACETIME_URL}/{race['srl_id']}",
                     winner['user']['name'],
                     runnerup['user']['name'],
                     str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'], str) else None,

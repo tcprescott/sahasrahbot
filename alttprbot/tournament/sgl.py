@@ -788,7 +788,7 @@ async def create_sgl_race_room(episode_id, force=False):
 
     embed = discord.Embed(
         title=f"RT.gg Room Opened - {sgl_race.event_name} - {sgl_race.versus}",
-        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at https://racetime.gg{handler.data['url']}\n\nEnjoy!",
+        description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at {handler.bot.http_uri(handler.data['url'])}\n\nEnjoy!",
         color=discord.Colour.blue(),
         timestamp=datetime.datetime.now()
     )
@@ -812,7 +812,7 @@ async def create_sgl_race_room(episode_id, force=False):
     volunteer_channel_id = await config.get(sgl_race.guild.id, 'SGLVolunteerChannel')
     if volunteer_channel_id is not None:
         volunteer_channel = discordbot.get_channel(int(volunteer_channel_id))
-        await volunteer_channel.send(f"{sgl_race.event_name} - {sgl_race.versus} - Episode {sgl_race.episode_data['id']} - <https://racetime.gg{handler.data['url']}>")
+        await volunteer_channel.send(f"{sgl_race.event_name} - {sgl_race.versus} - Episode {sgl_race.episode_data['id']} - <{handler.bot.http_uri(handler.data['url'])}>")
 
     for name, player in sgl_race.player_discords:
         if player is None:
