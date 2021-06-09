@@ -15,13 +15,12 @@ DB_NAME = os.environ.get("DB_NAME", "sahasrahbot")
 DB_USER = os.environ.get("DB_USER", "user")
 DB_PASS = urllib.parse.quote_plus(os.environ.get("DB_PASS", "pass"))
 
-async def init():
+async def database():
     await Tortoise.init(
         db_url=f'mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
 
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.create_task(init())
-    loop.run_forever()
+loop = asyncio.get_event_loop()
+dbtask = loop.create_task(database())
+loop.run_until_complete(dbtask)

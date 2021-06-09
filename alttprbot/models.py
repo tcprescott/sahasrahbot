@@ -142,6 +142,18 @@ class NickVerification(Model):
     discord_user_id = fields.BigIntField(null=True)
     timestamp = fields.DatetimeField(auto_now=True, null=True)
 
+class RTGGWatcher(Model):
+    id = fields.IntField(pk=True)
+    guild_id = fields.BigIntField(null=False)
+    channel_id = fields.BigIntField(null=False)
+    category = fields.CharField(50, null=False)
+
+class RTGGWatcherPlayer(Model):
+    id = fields.IntField(pk=True)
+    rtgg_watcher = fields.ForeignKeyField('models.RTGGWatcher', related_name='watched_player')
+    racetime_id = fields.CharField(50, null=False)
+    racetime_name = fields.CharField(200, null=False)
+
 class SrlRaces(Model):
     class Meta:
         table='srl_races'
