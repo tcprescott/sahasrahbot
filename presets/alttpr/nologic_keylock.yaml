@@ -345,7 +345,7 @@ settings:
     rom.rupeeBow: false
     rom.timerMode: "off"
     rom.timerStart: ""
-    rom.logicMode: None
+    rom.logicMode: NoLogic
     spoil.BootsLocation: true
   drops:
     "0":
