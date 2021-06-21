@@ -18,7 +18,7 @@ class Nickname(commands.Cog):
         await srlnick.insert_twitch_name(ctx.author.id, twitch)
 
     @commands.command(
-        help="Register your SRL nick with SahasrahBot."
+        help="Register your RaceTime.gg nick with SahasrahBot."
     )
     async def rtgg(self, ctx):
         key = randint(0, 999999999999999999)

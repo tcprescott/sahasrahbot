@@ -13,9 +13,6 @@ class Config:
 
     DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 
-    SRL_NICK = os.environ.get("SRL_NICK")
-    SRL_PASSWORD = os.environ.get("SRL_PASSWORD")
-
     baseurl = os.environ.get("ALTTPR_BASEURL")
     seed_baseurl = os.environ.get("ALTTPR_SEED_BASEURL")
     username = os.environ.get("ALTTPR_USERNAME", None)

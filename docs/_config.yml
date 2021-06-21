@@ -16,7 +16,7 @@
 title: SahasrahBot
 email: tcprescott@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  A Discord/SRL bot for the ALTTPR/SMZ3 communities.
+  A Discord/RaceTime.gg bot for the ALTTPR/SMZ3 communities.
 
 # Build settings
 markdown: kramdown

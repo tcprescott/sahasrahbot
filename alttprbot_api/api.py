@@ -8,7 +8,6 @@ from alttprbot.alttprgen.mystery import get_weights, generate
 from alttprbot.tournament import league, alttpr
 from alttprbot.database import league_playoffs, nick_verification, srlnick
 from alttprbot_discord.bot import discordbot
-from alttprbot_srl.bot import srlbot
 
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = os.urandom(24)
@@ -142,13 +141,6 @@ async def healthcheck():
 
     appinfo = await discordbot.application_info()
     await discordbot.fetch_user(appinfo.owner.id)
-
-    if not srlbot.connected:
-        abort(500, description="Connection to SRL id closed.")
-
-    info = await srlbot.whois(os.environ['SRL_NICK'])
-    if not info['identified']:
-        abort(500, description="SRL bot is not identified with Nickserv.")
 
     return jsonify(
         success=True
