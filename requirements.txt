@@ -20,8 +20,9 @@ pydle >= 0.9.3
 python-dotenv
 pytz
 pyyaml >= 5.1.2
-pyz3r >= 5.4.2
+git+git://github.com/tcprescott/pyz3r.git@6.0.0-dev
 quart-openapi
+Quart-Discord >= 2.1.4
 sentry-sdk >= 0.16.1
 six >= 1.14.0
 python-slugify >= 4.0.1

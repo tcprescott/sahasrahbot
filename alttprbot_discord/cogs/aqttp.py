@@ -1,5 +1,5 @@
 from discord.ext import commands
-from pyz3r.alttpr import alttprClass
+from pyz3r.alttpr import ALTTPR
 from alttprbot.alttprgen.mystery import get_weights
 import pyz3r
 import discord
@@ -13,7 +13,8 @@ class Aqttp(commands.Cog):
     async def aqttp(self, ctx, count=3):
         weights = await get_weights('aqttp')
 
-        settings_map = await (await alttprClass.create()).randomizer_settings()
+        alttprcom = ALTTPR()
+        settings_map = await alttprcom.randomizer_settings()
 
         for c in range(count):
             settings, _ = pyz3r.mystery.generate_random_settings(weights=weights)

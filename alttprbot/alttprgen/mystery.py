@@ -11,7 +11,7 @@ from alttprbot.alttprgen.preset import fetch_preset
 from alttprbot.alttprgen.randomizer import mysterydoors
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 
@@ -65,9 +65,16 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
                             spoilers=spoilers != "mystery",
                         )
                     else:
+                        if customizer:
+                            endpoint = "/api/customizer"
+                        elif festive:
+                            endpoint = "/api/festive"
+                        else:
+                            endpoint = "/api/randomizer"
+
                         settings['tournament'] = tournament
                         settings['allow_quickswap'] = True
-                        seed = await alttpr(settings=settings, customizer=customizer, festive=festive)
+                        seed = await ALTTPRDiscord.generate(settings=settings, endpoint=endpoint)
                 except ClientResponseError:
                     await models.AuditGeneratedGames.create(
                         randomizer='alttpr',

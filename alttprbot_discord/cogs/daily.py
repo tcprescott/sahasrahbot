@@ -7,7 +7,7 @@ from alttprbot import models
 from alttprbot.database import config
 from alttprbot.util import http
 
-from ..util.alttpr_discord import alttpr
+from ..util.alttpr_discord import ALTTPRDiscord
 
 
 def is_daily_channel():
@@ -76,7 +76,7 @@ async def update_daily(hash_id):
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash_id):
-    return await alttpr(hash_id=hash_id)
+    return await ALTTPRDiscord.retrieve(hash_id=hash_id)
 
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)

@@ -262,7 +262,7 @@ class LeagueRace():
         elif self.gen_type == 'database':
             self.preset = None
             self.preset_dict = None
-            self.seed = await alttpr_discord.alttpr(
+            self.seed = await alttpr_discord.ALTTPRDiscord.generate(
                 settings=json.loads(self.playoff_settings['settings'])
             )
 

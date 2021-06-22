@@ -15,7 +15,7 @@ from alttprbot.alttprgen.preset import get_preset, generate_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import alttpr, alttprDiscordClass
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 from ..util import checks
 
@@ -27,7 +27,7 @@ class AlttprGen(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def goalstring(self, ctx, hash_id):
-        seed = await alttpr(hash_id=hash_id)
+        seed = await ALTTPRDiscord.retrieve(hash_id=hash_id)
         await ctx.reply(
             f"goal string: `{seed.generated_goal}`\n"
             f"file select code: {seed.build_file_select_code(emojis=self.bot.emojis)}"
@@ -345,12 +345,11 @@ class AlttprGen(commands.Cog):
                     )
                 )
                 if not parsed.get('hash id', 'none') == 'none':
-                    seed = await alttpr(hash_id=parsed.get('hash id', 'none'))
+                    seed = await ALTTPRDiscord.retrieve(hash_id=parsed.get('hash id', 'none'))
                     embed.add_field(name='File Select Code', value=seed.build_file_select_code(
                         emojis=ctx.bot.emojis
                     ), inline=False)
-                    embed.add_field(name='Permalink',
-                                    value=seed.url, inline=False)
+                    embed.add_field(name='Permalink', value=seed.url, inline=False)
 
                 await ctx.reply(embed=embed)
         else:
@@ -395,7 +394,7 @@ class AlttprGen(commands.Cog):
             raise SahasrahBotException(
                 "Number of games generated must be between 1 and 10.")
 
-        seeds = await create_priestmode(count=count, genclass=alttprDiscordClass)
+        seeds = await create_priestmode(count=count, genclass=ALTTPRDiscord)
         embed = discord.Embed(
             title='Kiss Priest Games',
             color=discord.Color.blurple()

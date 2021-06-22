@@ -103,7 +103,7 @@ class Misc(commands.Cog):
     )
     async def rom(self, ctx):
         await ctx.reply(
-            "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALttPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
+            "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALTTPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
             "It can also help get the permalink page URL which has access to the Spoiler Log depending on the settings that were chosen. Not all games that are generated have access to the Spoiler Log.\n\n"
             "For legal reasons, we cannot provide help with finding this ROM online.  Please do not ask here for assistance with this.\n"
             "See <#543572578787393556> for details."

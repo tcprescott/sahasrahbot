@@ -1,19 +1,17 @@
-import copy
 import datetime
 import logging
 import json
-import random
 import os
 import isodate
 
 import aiohttp
 import discord
-import pyz3r.customizer
 import gspread_asyncio
 import pytz
 
 from alttprbot.alttprgen import preset
 from alttprbot.database import (tournament_results, srlnick, tournaments, tournament_games)
+from alttprbot import models
 from alttprbot.util import gsheet, speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
@@ -46,6 +44,86 @@ SETTINGSMAP = {
     'None': 'none'
 }
 
+ALTTPR_FR_SETTINGS_LIST = [
+    {
+        'key': 'dungeon_items',
+        'label': 'Dungeon Item Shuffle',
+        'settings': {
+            'standard': 'Standard',
+            'mc': 'Maps and Compasses',
+            'mcs': 'Maps, Compasses, and Small Keys',
+            'full': 'Keysanity',
+        }
+    },
+    {
+        'key': 'goal',
+        'label': 'Goal',
+        'settings': {
+            'ganon': 'Defeat Ganon',
+            'fast_ganon': 'Fast Ganon',
+        }
+    },
+    {
+        'key': 'world_state',
+        'label': 'World State',
+        'settings': {
+            'open': 'Open',
+            'standard': 'Standard',
+            'inverted': 'Inverted',
+            'retro': 'Retro',
+        }
+    },
+    {
+        'key': 'boss_shuffle',
+        'label': 'Boss Shuffle',
+        'settings': {
+            'none': 'Off',
+            'random': 'Random'
+        }
+    },
+    {
+        'key': 'enemy_shuffle',
+        'label': 'Enemy Shuffle',
+        'settings': {
+            'none': 'Off',
+            'random': 'Random'
+        }
+    },
+    {
+        'key': 'hints',
+        'label': 'Hints',
+        'settings': {
+            'off': 'Off',
+            'on': 'On'
+        }
+    },
+    {
+        'key': 'swords',
+        'label': 'Swords',
+        'settings': {
+            'randomized': 'Randomized',
+            'assured': 'Assured',
+            'vanilla': 'Vanilla',
+            'swordless': 'Swordless',
+        }
+    },
+    {
+        'key': 'item_pool',
+        'label': 'Item Pool',
+        'settings': {
+            'normal': 'Normal',
+            'hard': 'Hard'
+        }
+    },
+    {
+        'key': 'item_functionality',
+        'label': 'Item Functionality',
+        'settings': {
+            'normal': 'Normal',
+            'hard': 'Hard'
+        }
+    },
+]
 
 class UnableToLookupUserException(SahasrahBotException):
     pass
@@ -90,6 +168,7 @@ class TournamentRace():
     @classmethod
     async def construct(cls, episodeid):
         tournament_race = cls(episodeid)
+        await discordbot.wait_until_ready()
         await tournament_race.update_data()
         return tournament_race
 
@@ -149,9 +228,9 @@ class TournamentRace():
             raise Exception('Missing bracket settings.  Please submit!')
 
         self.preset_dict = None
-        self.seed = await alttpr_discord.alttpr(
+        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
             settings=json.loads(self.bracket_settings['settings']),
-            customizer=True
+            endpoint="/api/customizer"
         )
 
     # handle rolling for alttprmini tournament (German)
@@ -383,127 +462,55 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
     return handler.data
 
 
-async def alttprde_process_settings_form(form):
-    episode_id = int(form['SpeedGaming Episode ID'])
-    game_number = int(form['Game Number'])
-
-    existing_playoff_race = await tournament_games.get_game_by_episodeid_submitted(episode_id)
-    if existing_playoff_race:
-        return
+async def alttprfr_process_settings_form(payload):
+    episode_id = int(payload['episodeid'])
 
     tournament_race = await TournamentRace.construct(episodeid=episode_id)
 
     embed = discord.Embed(
-        title=f"ALTTPR DE - Game #{game_number} - {tournament_race.versus}",
+        title=f"ALTTPR DE - {tournament_race.versus}",
         description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a tournament admin.',
         color=discord.Colour.blue()
     )
 
-    if form['Game Number'] == '1':
-        goal = random.choice(['Defeat Ganon', 'Fast Ganon', 'All Dungeons'])
-        crystals = '7/7'
-        world_state = random.choice(['Open', 'Standard'])
-        swords = random.choice(['Assured', 'Randomized'])
-        enemy_shuffle = 'None'
-        boss_shuffle = 'None'
-        dungeon_item_shuffle = 'Standard'
-        item_pool = random.choice(['Normal', 'Hard'])
-        item_functionality = 'Normal'
-        extra_start_item = "None"
-        hints = 'Off'
-    else:
-        goal = form['Goal']
-        crystals = form['Tower/Ganon Requirements']
-        world_state = form['World State']
-        swords = form['Swords']
-        enemy_shuffle = form['Enemy Shuffle']
-        boss_shuffle = form['Boss Shuffle']
-        dungeon_item_shuffle = form['Dungeon Item Shuffle']
-        item_pool = form['Item Pool']
-        item_functionality = form['Item Functionality']
-        extra_start_item = form['Extra Start Item']
-        hints = form['Hints']
+    settings = {
+        "glitches": "none",
+        "item_placement": "advanced",
+        "dungeon_items": payload.get("dungeon_items", "standard"),
+        "accessibility": "items",
+        "goal": payload.get("goal", "ganon"),
+        "crystals": {
+            "ganon": "7",
+            "tower": "7"
+        },
+        "mode": payload.get("world_state", "mode"),
+        "entrances": "none",
+        "hints": payload.get("hints", "off"),
+        "weapons": payload.get("swords", "randomized"),
+        "item": {
+            "pool": payload.get("item_pool", "normal"),
+            "functionality": payload.get("item_functionality", "normal"),
+        },
+        "tournament": False,
+        "spoilers": "on",
+        "lang": "en",
+        "enemizer": {
+            "boss_shuffle": payload.get("boss_shuffle", "none"),
+            "enemy_shuffle": payload.get("enemy_shuffle", "none"),
+            "enemy_damage": "default",
+            "enemy_health": "default",
+            "pot_shuffle": "off"
+        },
+        "allow_quickswap": False
+    }
 
-    embed.add_field(
-        name='Settings',
-        value=(
-            f"**Goal**: {goal}\n"
-            f"**Tower/Ganon Requirements**: {crystals}\n"
-            f"**World State**: {world_state}\n"
-            f"**Swords**: {swords}\n"
-            f"**Enemy Shuffle**: {enemy_shuffle}\n"
-            f"**Boss Shuffle**: {boss_shuffle}\n"
-            f"**Dungeon Item Shuffle**: {dungeon_item_shuffle}\n"
-            f"**Item Pool**: {item_pool}\n"
-            f"**Item Functionality**: {item_functionality}\n"
-            f"**Extra Start Item**: {extra_start_item}\n"
-            f"**Hints**: {hints}"
-        )
-    )
+    settings_formatted = ""
+    for setting in ALTTPR_FR_SETTINGS_LIST:
+        settings_formatted += f"**{setting['label']}:** {setting['settings'][payload.get(setting['key'])]}\n"
 
-    settings = copy.deepcopy(pyz3r.customizer.BASE_CUSTOMIZER_PAYLOAD)
+    embed.add_field(name="Settings", value=settings_formatted)
 
-    settings['custom']['customPrizePacks'] = False
-
-    settings["glitches"] = "none"
-    settings["item_placement"] = "advanced"
-    settings["dungeon_items"] = "standard"
-    settings["accessibility"] = "items"
-    settings['goal'] = SETTINGSMAP[goal]
-    settings["crystals"]["ganon"] = "7" if crystals == "7/7" else "6"
-    settings["crystals"]["tower"] = "7" if crystals == "7/7" else "6"
-    settings["mode"] = SETTINGSMAP[world_state]
-    settings["hints"] = SETTINGSMAP[hints]
-    settings["weapons"] = SETTINGSMAP[swords]
-    settings["item"]["pool"] = SETTINGSMAP[item_pool]
-    settings["item"]["functionality"] = SETTINGSMAP[item_functionality]
-    settings["tournament"] = True
-    settings["spoilers"] = "off"
-    settings["enemizer"]["boss_shuffle"] = SETTINGSMAP[boss_shuffle]
-    settings["enemizer"]["enemy_shuffle"] = SETTINGSMAP[enemy_shuffle]
-    settings["enemizer"]["enemy_damage"] = "default"
-    settings["enemizer"]["enemy_health"] = "default"
-    settings["enemizer"]["pot_shuffle"] = "off"
-    settings["entrances"] = "off"
-    settings["allow_quickswap"] = True
-
-    settings['custom']['region.wildKeys'] = dungeon_item_shuffle in ['Small Keys', 'Keysanity']
-    settings['custom']['region.wildBigKeys'] = dungeon_item_shuffle in ['Big Keys', 'Keysanity']
-    settings['custom']['region.wildCompasses'] = dungeon_item_shuffle in ['Maps/Compasses', 'Keysanity']
-    settings['custom']['region.wildMaps'] = dungeon_item_shuffle in ['Maps/Compasses', 'Keysanity']
-
-    if settings['custom'].get('region.wildKeys', False) or settings['custom'].get('region.wildBigKeys', False) or settings['custom'].get('region.wildCompasses', False) or settings['custom'].get('region.wildMaps', False):
-        settings['custom']['rom.freeItemMenu'] = True
-        settings['custom']['rom.freeItemText'] = True
-
-    if settings['custom'].get('region.wildMaps', False):
-        settings['custom']['rom.mapOnPickup'] = True
-
-    if settings['custom'].get('region.wildCompasses', False):
-        settings['custom']['rom.dungeonCount'] = 'pickup'
-
-    eq = []
-    if extra_start_item == "Boots":
-        eq += ["PegasusBoots"]
-    if extra_start_item == "Flute":
-        eq += ["OcarinaActive"]
-    for item in eq:
-        if item == 'OcarinaActive':
-            item = 'OcarinaInactive'
-
-        settings['custom']['item']['count'][item] = settings['custom']['item']['count'].get(
-            item, 0) - 1 if settings['custom']['item']['count'].get(item, 0) > 0 else 0
-
-    # re-add 3 heart containers as a baseline
-    eq += ['BossHeartContainer'] * 3
-
-    # update the eq section of the settings
-    settings['eq'] = eq
-
-    if settings["mode"] == 'standard':
-        settings['eq'] = [item if item != 'OcarinaActive' else 'OcarinaInactive' for item in settings.get('eq', {})]
-
-    await tournament_games.insert_game(episode_id=episode_id, event='alttprde', game_number=game_number, settings=settings)
+    await models.TournamentGames.update_or_create(episode_id=episode_id, defaults={'settings': settings, 'event': 'alttprfr'})
 
     audit_channel_id = tournament_race.data['audit_channel_id']
     if audit_channel_id is not None:
@@ -521,7 +528,6 @@ async def alttprde_process_settings_form(form):
         except discord.HTTPException:
             if audit_channel is not None:
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-
 
 async def is_tournament_race(name):
     race = await tournament_results.get_active_tournament_race(name)

@@ -5,7 +5,7 @@ import aiohttp
 import discord
 import html2markdown
 
-from pyz3r.alttpr import alttprClass
+from pyz3r import ALTTPR
 
 emoji_code_map = {
     'Bow': 'Bow',
@@ -42,21 +42,10 @@ emoji_code_map = {
     'Big Key': 'BigKey'
 }
 
-
-async def alttpr(settings=None, hash_id=None, customizer=False, festive=False):
-    seed = alttprDiscordClass(
-        settings=settings, hash_id=hash_id, customizer=customizer, festive=festive)
-    await seed._init()
-    return seed
-
-
-class alttprDiscordClass(alttprClass):
+class ALTTPRDiscord(ALTTPR):
     def __init__(self, *args, **kwargs):
-        super(alttprDiscordClass, self).__init__(*args, **kwargs)
-        self.baseurl = os.environ.get(
-            "ALTTPR_BASEURL", 'https://alttpr.com')
-        self.seed_baseurl = os.environ.get(
-            "ALTTPR_SEED_BASEURL", "https://s3.us-east-2.amazonaws.com/alttpr-patches")
+        super(ALTTPRDiscord, self).__init__(*args, **kwargs)
+        self.baseurl = os.environ.get("ALTTPR_BASEURL", 'https://alttpr.com')
         username = os.environ.get("ALTTPR_USERNAME", None)
         password = os.environ.get("ALTTPR_PASSWORD", None)
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None

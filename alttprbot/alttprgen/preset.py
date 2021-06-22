@@ -8,7 +8,7 @@ import pyz3r
 from alttprbot import models
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import alttpr
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 SMZ3_ENVIRONMENTS = {
@@ -96,10 +96,17 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
                     location = random.choice([l for l in i['locations'] if l not in settings['l']])
                     settings['l'][location] = i['item']
 
-            seed = await alttpr(
-                customizer=preset_dict.get('customizer', False),
-                festive=preset_dict.get('festive', False),
-                settings=settings
+
+            if preset_dict.get('customizer', False):
+                endpoint = "/api/customizer"
+            elif preset_dict.get('festive', False):
+                endpoint = "/api/festive"
+            else:
+                endpoint = "/api/randomizer"
+
+            seed = await ALTTPRDiscord.generate(
+                settings=settings,
+                endpoint=endpoint
             )
             hash_id = seed.hash
 
