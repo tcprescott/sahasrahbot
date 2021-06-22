@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 from alttprbot.alttprgen.mystery import get_weights, generate
 from alttprbot.tournament import league, alttpr
-from alttprbot.database import league_playoffs, nick_verification, srlnick
+from alttprbot.database import league_playoffs, srlnick
 from alttprbot_discord.bot import discordbot
 
 sahasrahbotapi = Quart(__name__)
@@ -27,7 +27,13 @@ discord = DiscordOAuth2Session(sahasrahbotapi)
 
 @sahasrahbotapi.route("/login/")
 async def login():
-    return await discord.create_session(data=dict(redirect=session.get("login_original_path", "/me")))
+    return await discord.create_session(
+        scope=[
+            'guilds',
+            'identify',
+        ],
+        data=dict(redirect=session.get("login_original_path", "/me"))
+    )
 
 @sahasrahbotapi.route("/callback/")
 async def callback():
@@ -135,22 +141,17 @@ async def get_league_playoffs():
 
 
 @sahasrahbotapi.route('/racetime/verification/initiate', methods=['GET'])
+@requires_authorization
 async def racetime_init_verification():
-    key = request.args.get("key")
-    verification = await nick_verification.get_verification(key)
-    if verification is None:
-        return "Invalid verification key provided.  Please re-run the command and contact Synack if this persists."
-
-    session['verification_key'] = key
-    session['discord_user_id'] = verification['discord_user_id']
-
     redirect_uri = quote(f"{APP_URL}/racetime/verify/return")
     return redirect(
         f"{RACETIME_URL}/o/authorize?client_id={RACETIME_CLIENT_ID_OAUTH}&response_type=code&scope=read&redirect_uri={redirect_uri}",
     )
 
 @sahasrahbotapi.route('/racetime/verify/return', methods=['GET'])
+@requires_authorization
 async def return_racetime_verify():
+    user = await discord.fetch_user()
     code = request.args.get("code")
     if code is None:
         return abort(400, "code is missing")
@@ -174,10 +175,9 @@ async def return_racetime_verify():
     async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
-    await srlnick.insert_rtgg_id(session['discord_user_id'], userinfo_data['id'])
-    await nick_verification.delete_verification(session['verification_key'])
+    await srlnick.insert_rtgg_id(user.id, userinfo_data['id'])
 
-    return f"Thank you {userinfo_data['name']}, we have verified you successfully."
+    return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
