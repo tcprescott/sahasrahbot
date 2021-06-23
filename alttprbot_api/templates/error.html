@@ -1,9 +1,9 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-<title>Access denied</title>
+<title>{{ title }}</title>
 {%- endblock head %}
 
 {% block content -%}
-<p>We were unable to log into Discord.</p>
+<p>{{ message }}</p>
 {%- endblock content %}

@@ -20,6 +20,7 @@ from alttprbot_racetime import bot as racetime
 
 TOURNAMENT_RESULTS_SHEET = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
+APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 SETTINGSMAP = {
     'Defeat Ganon': 'ganon',
@@ -233,13 +234,33 @@ class TournamentRace():
             endpoint="/api/customizer"
         )
 
+    # handle rolling for francophone alttpr tournament
+    async def roll_alttprfr(self):
+        if self.bracket_settings is None:
+            raise Exception('Missing bracket settings.  Please submit!')
+
+        self.preset_dict = None
+        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
+            settings=json.loads(self.bracket_settings['settings'])
+        )
+
     # handle rolling for alttprmini tournament (German)
     async def roll_test(self):
-        self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
+        if self.bracket_settings is None:
+            raise Exception('Missing bracket settings.  Please submit!')
+
+        self.preset_dict = None
+        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
+            settings=json.loads(self.bracket_settings['settings'])
+        )
 
     # handle rolling for alttpr main tournament
     async def roll_alttpr(self):
         self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
+
+    @property
+    def submit_link(self):
+        return f"{APP_URL}/{self.event_slug}?episode_id={self.episodeid}"
 
     @property
     def game_number(self):
@@ -491,8 +512,8 @@ async def alttprfr_process_settings_form(payload):
             "pool": payload.get("item_pool", "normal"),
             "functionality": payload.get("item_functionality", "normal"),
         },
-        "tournament": False,
-        "spoilers": "on",
+        "tournament": True,
+        "spoilers": "off",
         "lang": "en",
         "enemizer": {
             "boss_shuffle": payload.get("boss_shuffle", "none"),
@@ -501,7 +522,7 @@ async def alttprfr_process_settings_form(payload):
             "enemy_health": "default",
             "pot_shuffle": "off"
         },
-        "allow_quickswap": False
+        "allow_quickswap": True
     }
 
     settings_formatted = ""
@@ -528,6 +549,8 @@ async def alttprfr_process_settings_form(payload):
         except discord.HTTPException:
             if audit_channel is not None:
                 await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+
+    return tournament_race
 
 async def is_tournament_race(name):
     race = await tournament_results.get_active_tournament_race(name)
@@ -611,3 +634,21 @@ async def race_recording_task():
             logging.exception("Encountered a problem when attempting to record a race.")
 
     logging.debug('done')
+
+async def send_race_submission_form(episodeid):
+    tournament_race = await TournamentRace.construct(episodeid=episodeid)
+    if tournament_race.bracket_settings is not None:
+        return
+
+    msg = (
+        f"Greetings!  Do not forget to submit settings for your upcoming race: `{tournament_race.versus}`!\n\n"
+        f"For your convenience, you visit {tournament_race.submit_link} to submit the settings.\n\n"
+    )
+
+    for name, player in tournament_race.player_discords:
+        if player is None:
+            continue
+        logging.info(f"Sending league playoff submit reminder to {name}.")
+        await player.send(msg)
+
+    await models.TournamentGames.update_or_create(episode_id=episodeid, defaults={'event': tournament_race.event_slug, 'submitted': 1})

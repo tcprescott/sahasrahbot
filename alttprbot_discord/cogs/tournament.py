@@ -24,6 +24,7 @@ class Tournament(commands.Cog):
         self.create_races.start()
         self.record_races.start()
         self.scheduling_needs.start()
+        self.find_unsubmitted_races.start()
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
@@ -54,6 +55,27 @@ class Tournament(commands.Cog):
                         )
 
         logging.info('done')
+
+    @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
+    async def find_unsubmitted_races(self):
+        logging.info('scanning for unsubmitted races')
+        active_tournaments = await tournaments.get_active_tournaments()
+        for tournament in active_tournaments:
+            if not tournament['has_submission']:
+                continue
+            try:
+                episodes = await speedgaming.get_upcoming_episodes_by_event(tournament['slug'], hours_past=0, hours_future=168)
+            except Exception as e:
+                logging.exception(
+                    "Encountered a problem when attempting to retrieve SG schedule.")
+                continue
+            for episode in episodes:
+                logging.info(episode['id'])
+                try:
+                    await alttpr.send_race_submission_form(episode['id'])
+                except Exception as e:
+                    logging.exception(
+                        "Encountered a problem when attempting send race submission.")
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def scheduling_needs(self):
@@ -167,6 +189,11 @@ class Tournament(commands.Cog):
     @scheduling_needs.before_loop
     async def before_scheduling_needs(self):
         logging.info('tournament scheduling_needs loop waiting...')
+        await self.bot.wait_until_ready()
+
+    @find_unsubmitted_races.before_loop
+    async def before_find_unsubmitted_races(self):
+        logging.info('tournament find_unsubmitted_races loop waiting...')
         await self.bot.wait_until_ready()
 
     async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method

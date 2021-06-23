@@ -48,7 +48,19 @@ async def redirect_unauthorized(e):
 
 @sahasrahbotapi.errorhandler(AccessDenied)
 async def access_denied(e):
-    return await render_template('access_denied.html')
+    return await render_template(
+        'error.html',
+        title="Access Denied",
+        message="We were unable to access your Discord account."
+    )
+
+@sahasrahbotapi.errorhandler(alttpr.UnableToLookupEpisodeException)
+async def unable_to_lookup(e):
+    return await render_template(
+        'error.html',
+        title="SpeedGaming Episode Not Found",
+        message="The SpeedGaming Episode ID was not found.  Please double check!"
+    )
 
 @sahasrahbotapi.route("/me/")
 @requires_authorization
@@ -108,25 +120,34 @@ async def league_playoff():
     return jsonify(success=True)
 
 
-@sahasrahbotapi.route("/alttprfr/")
+@sahasrahbotapi.route("/alttprfr", methods=['GET'])
+@sahasrahbotapi.route("/test", methods=['GET'])
 @requires_authorization
 async def alttprfr():
     user = await discord.fetch_user()
+    episode_id = request.args.get("episode_id", "")
     return await render_template(
         'submission.html',
         logged_in=True,
         user=user,
         endpoint=url_for("alttprfr_settings"),
-        settings_list=alttpr.ALTTPR_FR_SETTINGS_LIST
+        settings_list=alttpr.ALTTPR_FR_SETTINGS_LIST,
+        episode_id=episode_id
     )
 
-@sahasrahbotapi.route('/api/alttprfr/settings', methods=['POST'])
+@sahasrahbotapi.route('/alttprfr', methods=['POST'])
+@sahasrahbotapi.route("/test", methods=['POST'])
 @requires_authorization
 async def alttprfr_settings():
     user = await discord.fetch_user()
     payload = await request.form
-    await alttpr.alttprfr_process_settings_form(payload)
-    return await render_template("submission_done.html", logged_in=True, user=user, episode_id=payload.get("episodeid"))
+    tournament_race = await alttpr.alttprfr_process_settings_form(payload)
+    return await render_template(
+        "submission_done.html",
+        logged_in=True,
+        user=user,
+        tournament_race=tournament_race
+    )
 
 @sahasrahbotapi.route('/api/league/playoff/<int:episode_id>', methods=['GET'])
 async def get_league_playoff(episode_id):

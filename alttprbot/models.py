@@ -223,6 +223,7 @@ class Tournaments(Model):
     category = fields.CharField(200, null=True)
     goal = fields.CharField(200, null=True)
     active = fields.SmallIntField(null=True)
+    has_submission = fields.BooleanField(null=True)
     lang = fields.CharField(20, null=True)
 
 class SpeedGamingDailies(Model):
