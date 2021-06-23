@@ -27,7 +27,7 @@ settings:
     mapshuffle: true
     mixed_travel: prevent
     mode: open
-    no_hints: false
+    no_hints: true
     openpyramid: false
     progressive: "on"
     retro: false
