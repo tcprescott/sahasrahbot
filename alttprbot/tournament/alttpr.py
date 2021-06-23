@@ -215,13 +215,7 @@ class TournamentRace():
 
     # handle rolling for alttprmini tournament (German)
     async def roll_alttprmini(self):
-        game_mode = self.episode['match1']['title']
-        if game_mode == 'Open':
-            self.seed, self.preset_dict = await preset.get_preset('open', nohints=True, allow_quickswap=True)
-        elif game_mode == 'Standard':
-            self.seed, self.preset_dict = await preset.get_preset('standard', nohints=True, allow_quickswap=True)
-        else:
-            raise Exception(f"Invalid Match Title, must be Open or Standard!  Please contact a tournament admin for help.")
+        self.seed, self.preset_dict = await preset.get_preset('crossedkeydrop')
 
     # handle rolling for german alttpr tournament
     async def roll_alttprde(self):
