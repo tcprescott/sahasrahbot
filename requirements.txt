@@ -16,7 +16,6 @@ ircmessage
 jishaku
 mysqlclient >= 2.0.1
 oauth2client
-pydle >= 0.9.3
 python-dotenv
 pytz
 pyyaml >= 5.1.2
