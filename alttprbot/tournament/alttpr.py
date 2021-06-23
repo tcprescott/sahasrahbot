@@ -213,20 +213,9 @@ class TournamentRace():
         if hasattr(self, method):
             await getattr(self, method)()
 
-    # handle rolling for alttprmini tournament (German)
-    async def roll_alttprmini(self):
+    # handle rolling for alttprcd tournament (German)
+    async def roll_alttprcd(self):
         self.seed, self.preset_dict = await preset.get_preset('crossedkeydrop')
-
-    # handle rolling for german alttpr tournament
-    async def roll_alttprde(self):
-        if self.bracket_settings is None:
-            raise Exception('Missing bracket settings.  Please submit!')
-
-        self.preset_dict = None
-        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
-            settings=json.loads(self.bracket_settings['settings']),
-            endpoint="/api/customizer"
-        )
 
     # handle rolling for francophone alttpr tournament
     async def roll_alttprfr(self):
@@ -238,7 +227,7 @@ class TournamentRace():
             settings=json.loads(self.bracket_settings['settings'])
         )
 
-    # handle rolling for alttprmini tournament (German)
+    # test
     async def roll_test(self):
         if self.bracket_settings is None:
             raise Exception('Missing bracket settings.  Please submit!')
