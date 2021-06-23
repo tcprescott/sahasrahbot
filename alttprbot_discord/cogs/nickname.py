@@ -42,8 +42,8 @@ class Nickname(commands.Cog):
             if result is None or result.rtgg_id is None:
                 try:
                     await member.send(
-                        (f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n\n"
-                        f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n"
+                        (f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n"
+                        f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
                         "If you have any questions, please contact Synack.  Thank you!")
                     )
                     await ctx.send(f"Send DM to {member.name}#{member.discriminator}")
