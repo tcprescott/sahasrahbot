@@ -50,5 +50,17 @@ class Nickname(commands.Cog):
                 except (discord.Forbidden, discord.HTTPException) as e:
                     await ctx.send(f"Failed to send DM to {member.name}#{member.discriminator}.\n\n{str(e)}")
 
+    @commands.command()
+    @commands.is_owner()
+    async def rtggreport(self, ctx, role_name: discord.Role):
+        msg = []
+        for member in role_name.members:
+            result = await models.SRLNick.get_or_none(discord_user_id=member.id)
+            if result is None or result.rtgg_id is None:
+                msg.append(f"{member.name}#{member.discriminator}")
+
+        if msg:
+            await ctx.reply("\n".join(msg))
+
 def setup(bot):
     bot.add_cog(Nickname(bot))
