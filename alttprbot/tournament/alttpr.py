@@ -508,6 +508,9 @@ async def alttprfr_process_settings_form(payload):
         "allow_quickswap": True
     }
 
+    if settings['enemizer']['enemy_shuffle'] != "none" and settings['mode'] == 'standard':
+        settings['weapons'] = 'assured'
+
     settings_formatted = ""
     for setting in ALTTPR_FR_SETTINGS_LIST:
         settings_formatted += f"**{setting['label']}:** {setting['settings'][payload.get(setting['key'])]}\n"
