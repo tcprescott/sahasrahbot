@@ -87,7 +87,7 @@ ALTTPR_FR_SETTINGS_LIST = [
         'label': 'Enemy Shuffle',
         'settings': {
             'none': 'Off',
-            'random': 'Random'
+            'shuffled': 'Shuffled'
         }
     },
     {
