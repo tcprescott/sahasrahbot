@@ -1,6 +1,6 @@
 ---
 goal_name: swordless
-customizer: false
+customizer: true
 description: "Swords are overrated anyway."
 settings:
   allow_quickswap: true
