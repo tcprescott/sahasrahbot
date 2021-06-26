@@ -87,8 +87,6 @@ class AlttprDoorDiscord(AlttprDoor):
 
         embed.add_field(name='File Select Code', value=self.build_file_select_code(emojis=emojis), inline=False)
 
-        embed.add_field(name='Permalink', value=self.url, inline=False)
-
         if self.spoilers:
             embed.add_field(name='Spoiler Log', value=self.spoiler_url, inline=False)
             if self.attempts > 1:
