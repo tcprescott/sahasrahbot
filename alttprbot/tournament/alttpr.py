@@ -227,6 +227,9 @@ class TournamentRace():
             settings=json.loads(self.bracket_settings['settings'])
         )
 
+    async def roll_alttprhmg(self):
+        self.seed, self.preset_dict = await preset.get_preset('hybridmg')
+
     # test
     async def roll_test(self):
         if self.bracket_settings is None:
