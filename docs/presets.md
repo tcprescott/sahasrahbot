@@ -24,6 +24,7 @@ title:  Presets
 | [casualboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
 | [casualboots_dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_dungeons.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
 | [casualboots_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_fast.yaml) |Standard with a starting weapon, but you get boots and Aghanim 2 isn't required.| *Customizer*  |
+| [champions_swordless](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/champions_swordless.yaml) |Swords are overrated anyway.| *Customizer*  |
 | [classic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/classic.yaml) |Attempts to closely mimic the feel of v18.  No progressive items, etc.| *Customizer*  |
 | [crisscross](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscross.yaml) |Cross dungeon shuffle doors, crossworld entrance shuffle.|   *Door Randomizer*|
 | [crisscrosskeydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscrosskeydrop.yaml) |Cross dungeon shuffle doors, crossworld entrance shuffle, with a touch of keydrop shuffle.|   *Door Randomizer*|
