@@ -66,16 +66,21 @@ class Tournament(commands.Cog):
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(tournament['slug'], hours_past=0, hours_future=168)
             except Exception as e:
-                logging.exception(
-                    "Encountered a problem when attempting to retrieve SG schedule.")
+                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
                 logging.info(episode['id'])
                 try:
                     await alttpr.send_race_submission_form(episode['id'])
                 except Exception as e:
-                    logging.exception(
-                        "Encountered a problem when attempting send race submission.")
+                    logging.exception("Encountered a problem when attempting send race submission.")
+                    audit_channel_id = tournament['audit_channel_id']
+                    audit_channel = self.bot.get_channel(audit_channel_id)
+                    if audit_channel:
+                        await audit_channel.send(
+                            f"There was an error while sending a submission reminder for episode `{episode['id']}`.\n\n{str(e)}",
+                            allowed_mentions=discord.AllowedMentions(everyone=True)
+                        )
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def scheduling_needs(self):
