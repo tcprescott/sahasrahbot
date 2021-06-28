@@ -120,8 +120,8 @@ async def league_playoff():
     return jsonify(success=True)
 
 
+@sahasrahbotapi.route("/submit/alttprfr", methods=['GET'])
 @sahasrahbotapi.route("/alttprfr", methods=['GET'])
-@sahasrahbotapi.route("/test", methods=['GET'])
 @requires_authorization
 async def alttprfr():
     user = await discord.fetch_user()
@@ -135,13 +135,42 @@ async def alttprfr():
         episode_id=episode_id
     )
 
+@sahasrahbotapi.route("/submit/alttprfr", methods=['POST'])
 @sahasrahbotapi.route('/alttprfr', methods=['POST'])
-@sahasrahbotapi.route("/test", methods=['POST'])
 @requires_authorization
 async def alttprfr_settings():
     user = await discord.fetch_user()
     payload = await request.form
     tournament_race = await alttpr.alttprfr_process_settings_form(payload)
+    return await render_template(
+        "submission_done.html",
+        logged_in=True,
+        user=user,
+        tournament_race=tournament_race
+    )
+
+@sahasrahbotapi.route("/submit/alttpres", methods=['GET'])
+@sahasrahbotapi.route("/submit/test", methods=['GET'])
+@requires_authorization
+async def alttpres():
+    user = await discord.fetch_user()
+    episode_id = request.args.get("episode_id", "")
+    return await render_template(
+        'submission.html',
+        logged_in=True,
+        user=user,
+        endpoint=url_for("alttpres_settings"),
+        settings_list=alttpr.ALTTPR_ES_SETTINGS_LIST,
+        episode_id=episode_id
+    )
+
+@sahasrahbotapi.route("/submit/alttpres", methods=['POST'])
+@sahasrahbotapi.route("/submit/test", methods=['POST'])
+@requires_authorization
+async def alttpres_settings():
+    user = await discord.fetch_user()
+    payload = await request.form
+    tournament_race = await alttpr.alttpres_process_settings_form(payload)
     return await render_template(
         "submission_done.html",
         logged_in=True,
