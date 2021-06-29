@@ -2,6 +2,7 @@ import datetime
 import logging
 import json
 import logging
+import re
 
 import aiohttp
 import dateutil.parser
@@ -75,7 +76,8 @@ class SgDaily(commands.Cog):
                         allow_prerace_chat=True,
                         allow_midrace_chat=True,
                         allow_non_entrant_chat=False,
-                        chat_message_delay=0
+                        chat_message_delay=0,
+                        team_race=True if episode['match1']['title'].find("Co-op") >= 0 else False,
                     )
 
                     await tournament_results.insert_tournament_race(
