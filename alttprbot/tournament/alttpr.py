@@ -244,10 +244,10 @@ class TournamentRace():
         )
 
     async def roll_alttprhmg(self):
-        self.seed, self.preset_dict = await preset.get_preset('hybridmg')
+        self.seed, self.preset_dict = await preset.get_preset('hybridmg', allow_quickswap=True)
 
     async def roll_alttpres(self):
-        self.seed, self.preset_dict = await preset.get_preset('open')
+        self.seed, self.preset_dict = await preset.get_preset('open', allow_quickswap=True)
 
     # test
     async def roll_test(self):
