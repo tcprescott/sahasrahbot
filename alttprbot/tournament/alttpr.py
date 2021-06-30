@@ -170,6 +170,8 @@ class TournamentPlayer():
         playerobj = cls()
 
         playerobj.discord_user = guild.get_member_named(discord_name)
+        if playerobj.discord_user is None:
+            raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
         playerobj.name = discord_name
         result = await srlnick.get_nickname(playerobj.discord_user.id)
         playerobj.data = result
