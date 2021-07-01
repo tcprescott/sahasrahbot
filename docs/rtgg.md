@@ -88,12 +88,12 @@ Please be aware that the flag string is not validated.
 
 ## Final Fantasy Randomizer (FF1R)
 
-### !flags
+### !ff1url
 Use this command to roll a seed number and post a link to the seed in the race info and chat.
 
-Example `!flags yGcifaseK8fJxIkkAzUzYAzx32UoP5toiyJrTE864J9FEyMsXe5XhM5T94nANOh1T6wJN7BZU4p3r3WORe9o7vyXSpZD`
+Example `!ff1url https://4-2-0.finalfantasyrandomizer.com/?s=00000000&f=AgJO1tSXqnnX-JaaScPxkw0C.ecQDS8vc3iN9TWsbcTxxkB.we6qcINzOn754c0ATcdYK..B.PZ01XbeTw-tY99fnt-lVvSvLjUusyHE85QbhZxXm2IF.YqCsdaqmyHiUAQsp90Ct.9-B
 
-Please be aware that the flag string is not validated.
+Please be aware that the URL is not validated.
 
 ## Super Metroid Randomizer (SMR)
 
