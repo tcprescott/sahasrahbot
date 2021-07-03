@@ -144,7 +144,7 @@ class SgDaily(commands.Cog):
             if get_next == 1:
                 embed.add_field(
                     name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
-                broadcast_channels = [a['name']
+                broadcast_channels = [a['slug']
                                       for a in episode['channels'] if not " " in a['name']]
                 if broadcast_channels:
                     embed.add_field(name="Twitch Channels", value=', '.join(

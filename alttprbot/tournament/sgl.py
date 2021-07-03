@@ -466,7 +466,7 @@ class SGLiveRace():
 
     @property
     def broadcast_channels(self):
-        return [a['name'] for a in self.episode_data['channels'] if not " " in a['name']]
+        return [a['slug'] for a in self.episode_data['channels'] if not " " in a['name']]
 
     @property
     def broadcast_channel_links(self):

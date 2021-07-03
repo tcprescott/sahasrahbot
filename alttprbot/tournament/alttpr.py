@@ -305,7 +305,7 @@ class TournamentRace():
 
     @property
     def broadcast_channels(self):
-        return [a['name'] for a in self.episode['channels'] if not " " in a['name']]
+        return [a['slug'] for a in self.episode['channels'] if not " " in a['name']]
 
 
 async def process_tournament_race(handler, episodeid=None):

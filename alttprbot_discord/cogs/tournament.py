@@ -108,7 +108,7 @@ class Tournament(commands.Cog):
                 lang = 'en'
 
             for episode in episodes:
-                broadcast_channels = [c['name'] for c in episode['channels'] if c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == lang]
+                broadcast_channels = [c['slug'] for c in episode['channels'] if c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == lang]
                 if not broadcast_channels:
                     continue
 
