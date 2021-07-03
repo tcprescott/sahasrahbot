@@ -20,7 +20,7 @@ APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(os.environ.get("DISCORD_CLIENT_ID"))
 sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = os.environ.get("DISCORD_CLIENT_SECRET")
-sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = os.environ.get("APP_URL") + "/callback/"
+sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = os.environ.get("APP_URL") + "/callback/discord/"
 sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = os.environ.get("DISCORD_TOKEN")
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
@@ -35,7 +35,7 @@ async def login():
         data=dict(redirect=session.get("login_original_path", "/me"))
     )
 
-@sahasrahbotapi.route("/callback/")
+@sahasrahbotapi.route("/callback/discord/")
 async def callback():
     data = await discord.callback()
     redirect_to = data.get("redirect", "/me/")
@@ -43,7 +43,7 @@ async def callback():
 
 @sahasrahbotapi.errorhandler(Unauthorized)
 async def redirect_unauthorized(e):
-    session['login_original_path'] = request.path
+    session['login_original_path'] = request.full_path
     return redirect(url_for("login"))
 
 @sahasrahbotapi.errorhandler(AccessDenied)
