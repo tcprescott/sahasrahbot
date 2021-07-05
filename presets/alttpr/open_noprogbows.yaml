@@ -3,7 +3,6 @@ goal_name: Open 7/7 non-progressive bows
 randomizer: alttpr
 settings:
   accessibility: items
-  allow_quickswap: false
   crystals:
     ganon: '7'
     tower: '7'

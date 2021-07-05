@@ -6,7 +6,6 @@ settings:
   notes: "All Dungeons Keysanity but small keys are in Castle Tower."
   allow_quickswap: true
   accessibility: items
-  allow_quickswap: false
   crystals:
     ganon: '7'
     tower: '7'
