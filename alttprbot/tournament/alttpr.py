@@ -210,14 +210,20 @@ class TournamentRace():
         self.bracket_settings = await tournament_games.get_game_by_episodeid_submitted(self.episodeid)
 
     async def make_tournament_player(self, player):
-        if not player['discordId'] == "":
-            looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
-        else:
+        try:
+            if not player['discordId'] == "":
+                looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
+            else:
+                looked_up_player = None
+        except Exception as e:
             looked_up_player = None
 
         # then, if that doesn't work, try their discord tag kept by SG
-        if looked_up_player is None and not player['discordTag'] == '':
-            looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
+        try:
+            if looked_up_player is None and not player['discordTag'] == '':
+                looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
+        except Exception as e:
+            looked_up_player = None
 
         # and failing all that, bomb
         if looked_up_player is None:
