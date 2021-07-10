@@ -159,6 +159,8 @@ class TournamentPlayer():
         playerobj = cls()
 
         result = await srlnick.get_nickname(discord_id)
+        if result is None:
+            raise UnableToLookupUserException(f"Unable to pull nick data for {discord_id}")
         playerobj.data = result
         playerobj.discord_user = guild.get_member(result['discord_user_id'])
         playerobj.name = playerobj.discord_user.name
@@ -174,6 +176,8 @@ class TournamentPlayer():
             raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
         playerobj.name = discord_name
         result = await srlnick.get_nickname(playerobj.discord_user.id)
+        if result is None:
+            raise UnableToLookupUserException(f"Unable to pull nick data for {discord_name}")
         playerobj.data = result
 
         return playerobj
@@ -210,20 +214,14 @@ class TournamentRace():
         self.bracket_settings = await tournament_games.get_game_by_episodeid_submitted(self.episodeid)
 
     async def make_tournament_player(self, player):
-        try:
-            if not player['discordId'] == "":
-                looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
-            else:
-                looked_up_player = None
-        except Exception as e:
+        if not player['discordId'] == "":
+            looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
+        else:
             looked_up_player = None
 
         # then, if that doesn't work, try their discord tag kept by SG
-        try:
-            if looked_up_player is None and not player['discordTag'] == '':
-                looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
-        except Exception as e:
-            looked_up_player = None
+        if looked_up_player is None and not player['discordTag'] == '':
+            looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
 
         # and failing all that, bomb
         if looked_up_player is None:
@@ -507,6 +505,9 @@ async def alttprfr_process_settings_form(payload):
         color=discord.Colour.blue()
     )
 
+    if payload['enemy_shuffle'] != "none" and payload['world_state'] == 'standard' and payload['swords'] in ['randomized', 'swordless']:
+        payload['swords'] = 'assured'
+
     settings = {
         "glitches": "none",
         "item_placement": "advanced",
@@ -537,9 +538,6 @@ async def alttprfr_process_settings_form(payload):
         },
         "allow_quickswap": True
     }
-
-    if settings['enemizer']['enemy_shuffle'] != "none" and settings['mode'] == 'standard':
-        settings['weapons'] = 'assured'
 
     settings_formatted = ""
     for setting in ALTTPR_FR_SETTINGS_LIST:
