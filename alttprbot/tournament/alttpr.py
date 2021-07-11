@@ -136,6 +136,7 @@ ALTTPR_ES_SETTINGS_LIST = [
             'mcs': 'Maps, Compasses, and Small Keys',
             'open': 'Open',
             'standard': 'Standard',
+            'adkeys': "All Dungeons + Keysanity (Round of 8 only)",
             'dungeons': 'All Dungeons (Round of 8 only)',
             'keysanity': 'Keysanity (Round of 8 only)',
         }
@@ -253,7 +254,13 @@ class TournamentRace():
         self.seed, self.preset_dict = await preset.get_preset('hybridmg', allow_quickswap=True)
 
     async def roll_alttpres(self):
-        self.seed, self.preset_dict = await preset.get_preset('open', allow_quickswap=True)
+        if self.bracket_settings is None:
+            raise Exception('Missing bracket settings.  Please submit!')
+
+        self.preset_dict = None
+        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
+            settings=json.loads(self.bracket_settings['settings'])
+        )
 
     # test
     async def roll_test(self):
