@@ -113,10 +113,7 @@ class Tournament(commands.Cog):
                     continue
 
                 start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
-                if lang == 'en':
-                    start_time_string = start_time.astimezone(pytz.timezone('US/Eastern')).strftime("%m/%d %-I:%M %p") + " Eastern"
-                elif lang == 'de':
-                    start_time_string = start_time.astimezone(pytz.timezone('Europe/Berlin')).strftime("%m/%d %H:%M %p") + " European"
+                start_time_string = f"<t:{round(start_time.timestamp())}:f>"
 
                 commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == lang]
 
