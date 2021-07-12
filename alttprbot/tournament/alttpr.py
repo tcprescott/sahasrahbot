@@ -258,8 +258,10 @@ class TournamentRace():
             raise Exception('Missing bracket settings.  Please submit!')
 
         self.preset_dict = None
+        settings = json.loads(self.bracket_settings['settings'])
         self.seed = await alttpr_discord.ALTTPRDiscord.generate(
-            settings=json.loads(self.bracket_settings['settings'])
+            settings=settings,
+            endpoint='/api/customizer' if 'eq' in settings else '/api/randoimzer',
         )
 
     # test
