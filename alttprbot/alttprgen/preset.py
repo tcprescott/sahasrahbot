@@ -4,27 +4,28 @@ import random
 import aiofiles
 import yaml
 
-import pyz3r
+# import pyz3r
 from alttprbot import models
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
+from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
 
-SMZ3_ENVIRONMENTS = {
-    'live': {
-        'smz3': 'https://samus.link',
-        'sm': 'https://sm.samus.link',
-    },
-    'beta': {
-        'smz3': 'https://beta.samus.link',
-        'sm': 'https://sm.beta.samus.link',
-    },
-    'alpha': {
-        'smz3': 'https://alpha.samus.link',
-        'sm': 'https://sm.beta.samus.link',
-    }
-}
+# SMZ3_ENVIRONMENTS = {
+#     'live': {
+#         'smz3': 'https://samus.link',
+#         'sm': 'https://sm.samus.link',
+#     },
+#     'beta': {
+#         'smz3': 'https://beta.samus.link',
+#         'sm': 'https://sm.beta.samus.link',
+#     },
+#     'alpha': {
+#         'smz3': 'https://alpha.samus.link',
+#         'sm': 'https://sm.beta.samus.link',
+#     }
+# }
 
 
 class PresetNotFoundException(SahasrahBotException):
@@ -112,18 +113,22 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
 
     # elif randomizer == 'alttprdoors':
 
-    elif randomizer in ['sm', 'smz3']:
+    elif randomizer in ['sm']:
         settings['race'] = "true" if tournament else "false"
-        seed = await pyz3r.sm(
-            randomizer=randomizer,
+        seed = await SMDiscord.create(
             settings=settings,
-            baseurl=SMZ3_ENVIRONMENTS[preset_dict.get('env', 'live')][randomizer],
+        )
+        hash_id = seed.slug_id
+
+    elif randomizer in ['smz3']:
+        settings['race'] = "true" if tournament else "false"
+        seed = await SMZ3Discord.create(
+            settings=settings,
         )
         hash_id = seed.slug_id
 
     else:
-        raise SahasrahBotException(
-            f'Randomizer {randomizer} is not supported.')
+        raise SahasrahBotException(f'Randomizer {randomizer} is not supported.')
 
     await models.AuditGeneratedGames.create(
         randomizer=randomizer,

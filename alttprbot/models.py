@@ -225,6 +225,7 @@ class Tournaments(Model):
     active = fields.SmallIntField(null=True)
     has_submission = fields.BooleanField(null=True)
     lang = fields.CharField(20, null=True)
+    coop = fields.BooleanField(null=True)
 
 class SpeedGamingDailies(Model):
     class Meta:

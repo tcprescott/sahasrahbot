@@ -48,10 +48,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def race(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='smz3', tournament=True)
-        await ctx.reply((
-            f'Permalink: {seed.url}\n'
-            f'Code: {seed.code}'
-        ))
+        await ctx.reply(embed=await seed.embed())
 
     @smz3.command(
         help='Generates a SMZ3 Game.\nThis game will have a spoiler log.\nA list of presets can be found at <https://github.com/tcprescott/sahasrahbot/tree/master/presets/smz3>.',
@@ -60,10 +57,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def norace(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='smz3', tournament=False)
-        await ctx.reply((
-            f'Permalink: {seed.url}\n'
-            f'Code: {seed.code}'
-        ))
+        await ctx.reply(embed=await seed.embed())
 
     @smz3.command(
         name='multi',
@@ -88,10 +82,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_race(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='sm', tournament=True)
-        await ctx.reply((
-            f'Permalink: {seed.url}\n'
-            f'Code: {seed.code}'
-        ))
+        await ctx.reply(embed=await seed.embed())
 
     @sm.command(
         name='norace',
@@ -101,10 +92,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_norace(self, ctx, preset):
         seed, _ = await get_preset(preset, randomizer='sm', tournament=False)
-        await ctx.reply((
-            f'Permalink: {seed.url}\n'
-            f'Code: {seed.code}'
-        ))
+        await ctx.reply(embed=await seed.embed())
 
     @sm.command(
         name='multi',

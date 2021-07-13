@@ -1,5 +1,6 @@
-import pyz3r
-from alttprbot.alttprgen.preset import fetch_preset, SMZ3_ENVIRONMENTS
+# import pyz3r
+from alttprbot.alttprgen.preset import fetch_preset
+from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
 from alttprbot.exceptions import SahasrahBotException
 
 
@@ -21,9 +22,15 @@ async def generate_multiworld(preset, players, tournament=False, randomizer='smz
     for idx, player in enumerate(players):
         settings[f'player-{idx}'] = player
 
-    seed = await pyz3r.sm(
-        randomizer=randomizer,
-        settings=settings,
-        baseurl=SMZ3_ENVIRONMENTS[preset_dict.get('env', 'live')][randomizer],
-    )
+
+    settings['race'] = "true" if tournament else "false"
+    if randomizer == 'sm':
+        seed = await SMDiscord.create(
+            settings=settings,
+        )
+    elif randomizer == 'smz3':
+        seed = await SMZ3Discord.create(
+            settings=settings,
+        )
+
     return seed

@@ -10,7 +10,7 @@ import gspread_asyncio
 import pytz
 
 from alttprbot.alttprgen import preset
-from alttprbot.database import (tournament_results, srlnick, tournaments, tournament_games)
+from alttprbot.database import (tournament_results, srlnick, tournament_games)
 from alttprbot import models
 from alttprbot.util import gsheet, speedgaming
 from alttprbot.exceptions import SahasrahBotException
@@ -199,12 +199,12 @@ class TournamentRace():
     async def update_data(self):
         self.episode = await speedgaming.get_episode(self.episodeid)
 
-        self.data = await tournaments.get_tournament(self.episode['event']['slug'])
+        self.data = await models.Tournaments.get_or_none(schedule_type='sg', slug=self.event_slug)
 
         if self.data is None:
             raise UnableToLookupEpisodeException('SG Episode ID not a recognized event.  This should not have happened.')
 
-        self.guild = discordbot.get_guild(self.data['guild_id'])
+        self.guild = discordbot.get_guild(self.data.guild_id)
 
         self.players = []
         for player in self.episode['match1']['players']:
@@ -266,13 +266,10 @@ class TournamentRace():
 
     # test
     async def roll_test(self):
-        if self.bracket_settings is None:
-            raise Exception('Missing bracket settings.  Please submit!')
+        self.seed, self.preset_dict = await preset.get_preset('hard', tournament=True, randomizer='smz3')
 
-        self.preset_dict = None
-        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
-            settings=json.loads(self.bracket_settings['settings'])
-        )
+    async def roll_smz3coop(self):
+        self.seed, self.preset_dict = await preset.get_preset('hard', tournament=True, randomizer='smz3')
 
     # handle rolling for alttpr main tournament
     async def roll_alttpr(self):
@@ -302,7 +299,10 @@ class TournamentRace():
 
     @property
     def versus(self):
-        return ' vs. '.join(self.player_names)
+        separator = ' vs. '
+        if len(self.player_names) > 2:
+            separator = ', '
+        return separator.join(self.player_names)
 
     @property
     def player_discords(self):
@@ -361,7 +361,10 @@ async def process_tournament_race(handler, episodeid=None):
         emojis=discordbot.emojis
     )
 
-    goal += f" - ({'/'.join(tournament_race.seed.code)})"
+    if isinstance(tournament_race.seed.code, list):
+        goal += f" - ({'/'.join(tournament_race.seed.code)})"
+    elif isinstance(tournament_race.seed.code, str):
+        goal += f" - ({tournament_race.seed.code})"
 
     tournament_embed.insert_field_at(
         0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
@@ -378,14 +381,14 @@ async def process_tournament_race(handler, episodeid=None):
 
     await handler.set_raceinfo(goal, overwrite=True)
 
-    audit_channel_id = tournament_race.data['audit_channel_id']
+    audit_channel_id = tournament_race.data.audit_channel_id
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(audit_channel_id)
         await audit_channel.send(embed=embed)
     else:
         audit_channel = None
 
-    commentary_channel_id = tournament_race.data['commentary_channel_id']
+    commentary_channel_id = tournament_race.data.commentary_channel_id
     if commentary_channel_id is not None:
         commentary_channel = discordbot.get_channel(int(commentary_channel_id))
         if commentary_channel and len(broadcast_channels) > 0:
@@ -465,7 +468,8 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
         allow_prerace_chat=True,
         allow_midrace_chat=True,
         allow_non_entrant_chat=False,
-        chat_message_delay=0
+        chat_message_delay=0,
+        team_race=True if tournament_race.data.coop else False,
     )
 
     handler.tournament = tournament_race
@@ -556,7 +560,7 @@ async def alttprfr_process_settings_form(payload):
 
     await models.TournamentGames.update_or_create(episode_id=episode_id, defaults={'settings': settings, 'event': 'alttprfr'})
 
-    audit_channel_id = tournament_race.data['audit_channel_id']
+    audit_channel_id = tournament_race.data.audit_channel_id
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(audit_channel_id)
         await audit_channel.send(embed=embed)
@@ -596,7 +600,7 @@ async def alttpres_process_settings_form(payload):
 
     await models.TournamentGames.update_or_create(episode_id=episode_id, defaults={'settings': preset_dict['settings'], 'event': 'alttpres'})
 
-    audit_channel_id = tournament_race.data['audit_channel_id']
+    audit_channel_id = tournament_race.data.audit_channel_id
     if audit_channel_id is not None:
         audit_channel = discordbot.get_channel(audit_channel_id)
         await audit_channel.send(embed=embed)
@@ -625,10 +629,10 @@ async def is_tournament_race(name):
 async def can_gatekeep(rtgg_id, name):
     race = await tournament_results.get_active_tournament_race(name)
 
-    tournament = await tournaments.get_tournament(race['event'])
+    tournament = await models.Tournaments.get_or_none(race['event'])
     if tournament is None:
         return False
-    guild = discordbot.get_guild(tournament['guild_id'])
+    guild = discordbot.get_guild(tournament.guild_id)
     nicknames = await srlnick.get_discord_id_by_rtgg(rtgg_id)
 
     if not nicknames:
@@ -639,7 +643,7 @@ async def can_gatekeep(rtgg_id, name):
     if not discord_user:
         return False
 
-    if helper_roles := tournament.get('helper_roles', None):
+    if helper_roles := tournament.helper_roles:
         if discord.utils.find(lambda m: m.name in helper_roles.split(','), discord_user.roles):
             return True
 
