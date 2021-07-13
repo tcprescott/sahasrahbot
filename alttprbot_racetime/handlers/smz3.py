@@ -8,17 +8,6 @@ from .core import SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
-    async def race_data_hook(self):
-        pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
-        for entrant in pending_entrants:
-            if self.tournament:
-                if entrant['user']['id'] in self.tournament.player_racetime_ids:
-                    await self.accept_request(entrant['user']['id'])
-
-                elif await alttpr.can_gatekeep(entrant['user']['id'], self.data['name']):
-                    await self.accept_request(entrant['user']['id'])
-                    await self.add_monitor(entrant['user']['id'])
-
     async def begin(self):
         self.state['locked'] = False
 

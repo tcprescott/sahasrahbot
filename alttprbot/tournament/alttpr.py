@@ -629,9 +629,17 @@ async def is_tournament_race(name):
 async def can_gatekeep(rtgg_id, name):
     race = await tournament_results.get_active_tournament_race(name)
 
-    tournament = await models.Tournaments.get_or_none(race['event'])
+    tournament = await models.Tournaments.get_or_none(slug=race['event'])
     if tournament is None:
         return False
+
+    if tournament.schedule_type == 'sg':
+        rtgg_bot = racetime.racetime_bots[tournament.category]
+        team = await rtgg_bot.get_team('sg-volunteers')
+        team_member_ids = [m['id'] for m in team['members']]
+        if rtgg_id in team_member_ids:
+            return True
+
     guild = discordbot.get_guild(tournament.guild_id)
     nicknames = await srlnick.get_discord_id_by_rtgg(rtgg_id)
 
