@@ -263,7 +263,7 @@ class TournamentRace():
         settings = json.loads(self.bracket_settings['settings'])
         self.seed = await alttpr_discord.ALTTPRDiscord.generate(
             settings=settings,
-            endpoint='/api/customizer' if 'eq' in settings else '/api/randoimzer',
+            endpoint='/api/customizer' if 'eq' in settings else '/api/randomizer',
         )
 
     # test
