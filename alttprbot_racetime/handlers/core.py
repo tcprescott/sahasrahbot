@@ -12,7 +12,6 @@ class SahasrahBotCoreHandler(RaceHandler):
     stop_at = ['cancelled', 'finished']
     tournament = None
     status = None
-    pending_entrants = []
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -26,15 +25,15 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         await self.race_data_hook()
 
-        pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
-        for entrant in pending_entrants:
-            entrant_id = entrant['user']['id']
-            if self.tournament and entrant_id not in self.pending_entrants:
-                self.pending_entrants.append(entrant_id)
+        if self.tournament:
+            pending_entrants = [e for e in self.data['entrants'] if e.get('status', {}).get('value', {}) == 'requested']
+            for entrant in pending_entrants:
+                entrant_id = entrant['user']['id']
+
                 if entrant_id in self.tournament.player_racetime_ids:
                     await self.accept_request(entrant_id)
 
-                elif await alttpr.can_gatekeep(entrant_id, self.data['name']):
+                elif await self.tournament.can_gatekeep(entrant_id):
                     await self.accept_request(entrant_id)
                     await self.add_monitor(entrant_id)
 

@@ -200,6 +200,8 @@ class TournamentRace():
         self.episode = await speedgaming.get_episode(self.episodeid)
 
         self.data = await models.Tournaments.get_or_none(schedule_type='sg', slug=self.event_slug)
+        self.rtgg_bot = racetime.racetime_bots[self.data.category]
+        self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
         if self.data is None:
             raise UnableToLookupEpisodeException('SG Episode ID not a recognized event.  This should not have happened.')
@@ -274,6 +276,27 @@ class TournamentRace():
     # handle rolling for alttpr main tournament
     async def roll_alttpr(self):
         self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
+
+    async def can_gatekeep(self, rtgg_id):
+        team_member_ids = [m['id'] for m in self.restream_team['members']]
+        if rtgg_id in team_member_ids:
+            return True
+
+        nicknames = await srlnick.get_discord_id_by_rtgg(rtgg_id)
+
+        if not nicknames:
+            return False
+
+        discord_user = self.guild.get_member(nicknames[0]['discord_user_id'])
+
+        if not discord_user:
+            return False
+
+        if helper_roles := self.data.helper_roles:
+            if discord.utils.find(lambda m: m.name in helper_roles.split(','), discord_user.roles):
+                return True
+
+        return False
 
     @property
     def submit_link(self):
@@ -623,38 +646,6 @@ async def is_tournament_race(name):
     race = await tournament_results.get_active_tournament_race(name)
     if race:
         return True
-    return False
-
-
-async def can_gatekeep(rtgg_id, name):
-    race = await tournament_results.get_active_tournament_race(name)
-
-    tournament = await models.Tournaments.get_or_none(slug=race['event'])
-    if tournament is None:
-        return False
-
-    if tournament.schedule_type == 'sg':
-        rtgg_bot = racetime.racetime_bots[tournament.category]
-        team = await rtgg_bot.get_team('sg-volunteers')
-        team_member_ids = [m['id'] for m in team['members']]
-        if rtgg_id in team_member_ids:
-            return True
-
-    guild = discordbot.get_guild(tournament.guild_id)
-    nicknames = await srlnick.get_discord_id_by_rtgg(rtgg_id)
-
-    if not nicknames:
-        return False
-
-    discord_user = guild.get_member(nicknames[0]['discord_user_id'])
-
-    if not discord_user:
-        return False
-
-    if helper_roles := tournament.helper_roles:
-        if discord.utils.find(lambda m: m.name in helper_roles.split(','), discord_user.roles):
-            return True
-
     return False
 
 
