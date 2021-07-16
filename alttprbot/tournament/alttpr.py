@@ -530,8 +530,9 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
     return handler.data
 
 
-async def alttprfr_process_settings_form(payload):
+async def alttprfr_process_settings_form(payload, submitted_by):
     episode_id = int(payload['episodeid'])
+    adjusted_payload = payload.to_dict(flat=True)
 
     tournament_race = await TournamentRace.construct(episodeid=episode_id)
 
@@ -541,33 +542,33 @@ async def alttprfr_process_settings_form(payload):
         color=discord.Colour.blue()
     )
 
-    if payload['enemy_shuffle'] != "none" and payload['world_state'] == 'standard' and payload['swords'] in ['randomized', 'swordless']:
-        payload['swords'] = 'assured'
+    if adjusted_payload['enemy_shuffle'] != "none" and adjusted_payload['world_state'] == 'standard' and adjusted_payload['swords'] in ['randomized', 'swordless']:
+        adjusted_payload['swords'] = 'assured'
 
     settings = {
         "glitches": "none",
         "item_placement": "advanced",
-        "dungeon_items": payload.get("dungeon_items", "standard"),
+        "dungeon_items": adjusted_payload.get("dungeon_items", "standard"),
         "accessibility": "items",
-        "goal": payload.get("goal", "ganon"),
+        "goal": adjusted_payload.get("goal", "ganon"),
         "crystals": {
             "ganon": "7",
             "tower": "7"
         },
-        "mode": payload.get("world_state", "mode"),
+        "mode": adjusted_payload.get("world_state", "mode"),
         "entrances": "none",
-        "hints": payload.get("hints", "off"),
-        "weapons": payload.get("swords", "randomized"),
+        "hints": adjusted_payload.get("hints", "off"),
+        "weapons": adjusted_payload.get("swords", "randomized"),
         "item": {
-            "pool": payload.get("item_pool", "normal"),
-            "functionality": payload.get("item_functionality", "normal"),
+            "pool": adjusted_payload.get("item_pool", "normal"),
+            "functionality": adjusted_payload.get("item_functionality", "normal"),
         },
         "tournament": True,
         "spoilers": "off",
         "lang": "en",
         "enemizer": {
-            "boss_shuffle": payload.get("boss_shuffle", "none"),
-            "enemy_shuffle": payload.get("enemy_shuffle", "none"),
+            "boss_shuffle": adjusted_payload.get("boss_shuffle", "none"),
+            "enemy_shuffle": adjusted_payload.get("enemy_shuffle", "none"),
             "enemy_damage": "default",
             "enemy_health": "default",
             "pot_shuffle": "off"
@@ -577,9 +578,11 @@ async def alttprfr_process_settings_form(payload):
 
     settings_formatted = ""
     for setting in ALTTPR_FR_SETTINGS_LIST:
-        settings_formatted += f"**{setting['label']}:** {setting['settings'][payload.get(setting['key'])]}\n"
+        settings_formatted += f"**{setting['label']}:** {setting['settings'][adjusted_payload.get(setting['key'])]}\n"
 
-    embed.add_field(name="Settings", value=settings_formatted)
+    embed.add_field(name="Settings", value=settings_formatted, inline=False)
+
+    embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
     await models.TournamentGames.update_or_create(episode_id=episode_id, defaults={'settings': settings, 'event': 'alttprfr'})
 
@@ -602,7 +605,7 @@ async def alttprfr_process_settings_form(payload):
 
     return tournament_race
 
-async def alttpres_process_settings_form(payload):
+async def alttpres_process_settings_form(payload, submitted_by):
     episode_id = int(payload['episodeid'])
 
     tournament_race = await TournamentRace.construct(episodeid=episode_id)
@@ -619,7 +622,9 @@ async def alttpres_process_settings_form(payload):
     preset_dict['allow_quickswap'] = True
     preset_dict['spoilers'] = 'off'
 
-    embed.add_field(name="Preset", value=payload['preset'])
+    embed.add_field(name="Preset", value=payload['preset'], inline=False)
+
+    embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
     await models.TournamentGames.update_or_create(episode_id=episode_id, defaults={'settings': preset_dict['settings'], 'event': 'alttpres'})
 

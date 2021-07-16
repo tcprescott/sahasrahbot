@@ -141,7 +141,7 @@ async def alttprfr():
 async def alttprfr_settings():
     user = await discord.fetch_user()
     payload = await request.form
-    tournament_race = await alttpr.alttprfr_process_settings_form(payload)
+    tournament_race = await alttpr.alttprfr_process_settings_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
     return await render_template(
         "submission_done.html",
         logged_in=True,
@@ -170,7 +170,7 @@ async def alttpres():
 async def alttpres_settings():
     user = await discord.fetch_user()
     payload = await request.form
-    tournament_race = await alttpr.alttpres_process_settings_form(payload)
+    tournament_race = await alttpr.alttpres_process_settings_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
     return await render_template(
         "submission_done.html",
         logged_in=True,
