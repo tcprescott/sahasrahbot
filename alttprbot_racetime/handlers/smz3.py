@@ -8,17 +8,6 @@ from .core import SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
-    async def begin(self):
-        self.state['locked'] = False
-
-        if self.tournament is None:
-            race = await tournament_results.get_active_tournament_race(self.data.get('name'))
-            if race:
-                try:
-                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'])
-                except alttpr.UnableToLookupEpisodeException:
-                    self.logger.exception("Error while association tournament race to handler.")
-
     async def ex_multiworld(self, args, message):
         if await self.is_locked(message):
             return

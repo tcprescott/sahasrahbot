@@ -1,6 +1,7 @@
 from itertools import groupby
 
 from alttprbot_discord.bot import discordbot
+from alttprbot.database import tournament_results
 from alttprbot.tournament import alttpr
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
@@ -19,6 +20,14 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def begin(self):
         self.state['locked'] = False
+
+        if self.tournament is None:
+            race = await tournament_results.get_active_tournament_race(self.data.get('name'))
+            if race:
+                try:
+                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
+                except alttpr.UnableToLookupEpisodeException:
+                    self.logger.exception("Error while association tournament race to handler.")
 
     async def race_data(self, data):
         self.data = data.get('race')
@@ -105,6 +114,15 @@ class SahasrahBotCoreHandler(RaceHandler):
         self.seed_rolled = False
         await self.set_raceinfo("New Race", overwrite=True)
         await self.send_message("Reseting bot state.  You may now roll a new game.")
+
+    async def ex_tournamentrace(self, args, message):
+        if await self.is_locked(message):
+            return
+
+        await alttpr.process_tournament_race(
+            handler=self,
+            episodeid=args[0] if len(args) >= 1 else None
+        )
 
     @monitor_cmd
     async def ex_lock(self, args, message):

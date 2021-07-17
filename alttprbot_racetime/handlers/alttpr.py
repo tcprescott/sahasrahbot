@@ -20,7 +20,7 @@ class GameHandler(SahasrahBotCoreHandler):
             race = await tournament_results.get_active_tournament_race(self.data.get('name'))
             if race:
                 try:
-                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'])
+                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
                 except alttpr.UnableToLookupEpisodeException:
                     self.logger.exception("Error while association tournament race to handler.")
 
@@ -70,15 +70,6 @@ class GameHandler(SahasrahBotCoreHandler):
     #         episodeid=args[0] if len(args) >= 1 else None,
     #         week=args[1] if len(args) == 2 else None
     #     )
-
-    async def ex_tournamentrace(self, args, message):
-        if await self.is_locked(message):
-            return
-
-        await alttpr.process_tournament_race(
-            handler=self,
-            episodeid=args[0] if len(args) >= 1 else None
-        )
 
     async def ex_quickswaprace(self, args, message):
         await self.send_message("Please use !race instead of this command.")

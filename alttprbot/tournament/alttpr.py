@@ -185,13 +185,22 @@ class TournamentPlayer():
 
 
 class TournamentRace():
-    def __init__(self, episodeid: int):
+    def __init__(self, episodeid: int, rtgg_handler):
         self.episodeid = int(episodeid)
+        self.rtgg_handler = rtgg_handler
+
         self.players = []
 
+        self.episode = None
+        self.data = None
+        self.rtgg_bot = None
+        self.restream_team = None
+        self.audit_channel = None
+        self.commentary_channel = None
+
     @classmethod
-    async def construct(cls, episodeid):
-        tournament_race = cls(episodeid)
+    async def construct(cls, episodeid, rtgg_handler):
+        tournament_race = cls(episodeid, rtgg_handler)
         await discordbot.wait_until_ready()
         await tournament_race.update_data()
         return tournament_race
@@ -205,6 +214,12 @@ class TournamentRace():
 
         if self.data is None:
             raise UnableToLookupEpisodeException('SG Episode ID not a recognized event.  This should not have happened.')
+
+        if self.data.audit_channel_id is not None:
+            self.audit_channel = discordbot.get_channel(self.data.audit_channel_id)
+
+        if self.data.commentary_channel_id is not None:
+            self.commentary_channel = discordbot.get_channel(self.data.commentary_channel_id)
 
         self.guild = discordbot.get_guild(self.data.guild_id)
 
@@ -237,6 +252,7 @@ class TournamentRace():
         method = 'roll_' + self.event_slug
         if hasattr(self, method):
             await getattr(self, method)()
+            await self.create_embeds()
 
     # handle rolling for alttprcd tournament (German)
     async def roll_alttprcd(self):
@@ -343,6 +359,77 @@ class TournamentRace():
     def broadcast_channels(self):
         return [a['slug'] for a in self.episode['channels'] if not " " in a['name']]
 
+    @property
+    def broadcast_channel_links(self):
+        return ', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels])
+
+    @property
+    def seed_code(self):
+        if isinstance(self.seed.code, list):
+            return f"({'/'.join(self.seed.code)})"
+        elif isinstance(self.seed.code, str):
+            return f"({self.seed.code})"
+
+        return ""
+
+    @property
+    def race_info(self):
+        info = f"{self.event_name} - {self.versus} - {self.friendly_name}"
+        if self.broadcast_channels:
+            info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
+        return info
+
+    @property
+    def race_info_rolled(self):
+        info = f"{self.event_name} - {self.versus} - {self.friendly_name} - {self.seed_code}"
+        if self.broadcast_channels:
+            info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
+        return info
+
+    async def create_embeds(self):
+        if self.rtgg_handler is None:
+            raise SahasrahBotException("No RaceTime.gg handler associated with this tournament game.")
+
+        self.embed = await self.seed.embed(
+            name=self.race_info,
+            notes=self.versus,
+            emojis=discordbot.emojis
+        )
+
+        self.tournament_embed = await self.seed.tournament_embed(
+            name=self.race_info,
+            notes=self.versus,
+            emojis=discordbot.emojis
+        )
+
+        self.tournament_embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+        self.embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+
+        if self.broadcast_channels:
+            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+
+    async def send_audit_message(self, embed: discord.Embed):
+        if self.audit_channel:
+            await self.audit_channel.send(embed=embed)
+
+    async def send_commentary_message(self, embed: discord.Embed):
+        if self.commentary_channel and len(self.broadcast_channels) > 0:
+            await self.commentary_channel.send(embed=embed)
+
+    async def send_player_message(self, name: str, player: discord.Member, embed: discord.Embed):
+        if self.rtgg_handler is None:
+            raise SahasrahBotException("No RaceTime.gg handler associated with this tournament game.")
+
+        if player is None:
+            await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True))
+            await self.rtgg_handler.send_message(f"Could not send DM to {name}.  Please contact a Tournament Moderator for assistance.")
+        try:
+            await player.send(embed=embed)
+        except discord.HTTPException:
+            if self.audit_channel:
+                await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
+            await self.rtgg_handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a Tournament Moderator for assistance.")
 
 async def process_tournament_race(handler, episodeid=None):
     await handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -359,7 +446,7 @@ async def process_tournament_race(handler, episodeid=None):
             return
 
         try:
-            tournament_race = await TournamentRace.construct(episodeid=episodeid)
+            handler.tournament = await TournamentRace.construct(episodeid=episodeid, rtgg_handler=handler)
         except Exception as e:
             logging.exception("Problem creating tournament race.")
             await handler.send_message(f"Could not process tournament race: {str(e)}")
@@ -367,81 +454,17 @@ async def process_tournament_race(handler, episodeid=None):
 
     await tournament_race.roll()
 
-    if tournament_race.bracket_settings:
-        goal = f"{tournament_race.event_name} - {tournament_race.versus} - Game #{tournament_race.game_number}"
-    else:
-        goal = f"{tournament_race.event_name} - {tournament_race.versus} - {tournament_race.friendly_name}"
+    await handler.set_raceinfo(tournament_race.race_info_rolled, overwrite=True)
 
-    embed = await tournament_race.seed.embed(
-        name=goal,
-        notes=tournament_race.versus,
-        emojis=discordbot.emojis
-    )
-
-    tournament_embed = await tournament_race.seed.tournament_embed(
-        name=goal,
-        notes=tournament_race.versus,
-        emojis=discordbot.emojis
-    )
-
-    if isinstance(tournament_race.seed.code, list):
-        goal += f" - ({'/'.join(tournament_race.seed.code)})"
-    elif isinstance(tournament_race.seed.code, str):
-        goal += f" - ({tournament_race.seed.code})"
-
-    tournament_embed.insert_field_at(
-        0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
-    embed.insert_field_at(
-        0, name='RaceTime.gg', value=handler.bot.http_uri(handler.data['url']), inline=False)
-
-    if broadcast_channels := tournament_race.broadcast_channels:
-        tournament_embed.insert_field_at(
-            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
-        embed.insert_field_at(
-            0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
-
-        goal += f" - Restream(s) at {', '.join(broadcast_channels)}"
-
-    await handler.set_raceinfo(goal, overwrite=True)
-
-    audit_channel_id = tournament_race.data.audit_channel_id
-    if audit_channel_id is not None:
-        audit_channel = discordbot.get_channel(audit_channel_id)
-        await audit_channel.send(embed=embed)
-    else:
-        audit_channel = None
-
-    commentary_channel_id = tournament_race.data.commentary_channel_id
-    if commentary_channel_id is not None:
-        commentary_channel = discordbot.get_channel(int(commentary_channel_id))
-        if commentary_channel and len(broadcast_channels) > 0:
-            await commentary_channel.send(embed=tournament_embed)
+    await tournament_race.send_audit_message(tournament_race.embed)
+    await tournament_race.send_commentary_message(tournament_race.tournament_embed)
 
     for name, player in tournament_race.player_discords:
-        if player is None:
-            await audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True))
-            await handler.send_message(f"Could not send DM to {name}.  Please contact a Tournament Moderator for assistance.")
-            continue
-        try:
-            await player.send(embed=embed)
-        except discord.HTTPException:
-            if audit_channel is not None:
-                await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
-                await handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a Tournament Moderator for assistance.")
+        await tournament_race.send_player_message(name, player, tournament_race.embed)
 
-    if race is None:
-        await tournament_results.insert_tournament_race(
-            srl_id=handler.data.get('name'),
-            episode_id=tournament_race.episodeid,
-            permalink=tournament_race.seed.url,
-            event=tournament_race.event_slug,
-            spoiler=None
-        )
-    else:
-        await tournament_results.update_tournament_results_rolled(
-            srl_id=handler.data.get('name'),
-            permalink=tournament_race.seed.url
-        )
+    tournamentresults, created = await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'), defaults={'episode_id': tournament_race.episodeid, 'event': tournament_race.event_slug, 'spoiler': None})
+    tournamentresults.permalink = tournament_race.seed.url
+    await tournamentresults.save()
 
     await handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
     handler.seed_rolled = True
@@ -475,13 +498,13 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
             return
         await tournament_results.delete_active_tournament_race(race['srl_id'])
 
-    tournament_race = await TournamentRace.construct(episodeid=episodeid)
+    tournament_race = await TournamentRace.construct(episodeid=episodeid, rtgg_handler=None)
 
     handler = await rtgg_alttpr.startrace(
         goal=goal,
         invitational=True,
         unlisted=False,
-        info=f"{tournament_race.event_name} - {tournament_race.versus}",
+        info=tournament_race.race_info,
         start_delay=15,
         time_limit=24,
         streaming_required=True,
@@ -496,13 +519,10 @@ async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat t
     )
 
     handler.tournament = tournament_race
+    tournament_race.rtgg_handler = handler
 
     logging.info(handler.data.get('name'))
-    await tournament_results.insert_tournament_race(
-        srl_id=handler.data.get('name'),
-        episode_id=tournament_race.episodeid,
-        event=tournament_race.event_slug
-    )
+    await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'), defaults={'episode_id': tournament_race.episodeid, 'event': tournament_race.event_slug, 'spoiler': None})
 
     for rtggid in tournament_race.player_racetime_ids:
         await handler.invite_user(rtggid)
@@ -534,7 +554,7 @@ async def alttprfr_process_settings_form(payload, submitted_by):
     episode_id = int(payload['episodeid'])
     adjusted_payload = payload.to_dict(flat=True)
 
-    tournament_race = await TournamentRace.construct(episodeid=episode_id)
+    tournament_race = await TournamentRace.construct(episodeid=episode_id, rtgg_handler=None)
 
     embed = discord.Embed(
         title=f"ALTTPR FR - {tournament_race.versus}",
@@ -608,7 +628,7 @@ async def alttprfr_process_settings_form(payload, submitted_by):
 async def alttpres_process_settings_form(payload, submitted_by):
     episode_id = int(payload['episodeid'])
 
-    tournament_race = await TournamentRace.construct(episodeid=episode_id)
+    tournament_race = await TournamentRace.construct(episodeid=episode_id, rtgg_handler=None)
 
     embed = discord.Embed(
         title=f"ALTTPR ES - {tournament_race.versus}",
@@ -707,7 +727,7 @@ async def race_recording_task():
     logging.debug('done')
 
 async def send_race_submission_form(episodeid):
-    tournament_race = await TournamentRace.construct(episodeid=episodeid)
+    tournament_race = await TournamentRace.construct(episodeid=episodeid, rtgg_handler=None)
     if tournament_race.bracket_settings is not None:
         return
 
