@@ -39,7 +39,8 @@ async def write_json_to_disk(seed, spoiler_type='spoiler'):
 
     payload = gzip.compress(json.dumps(sorteddict, indent=4).encode('utf-8'))
 
-    async with aioboto3.client('s3') as s3:
+    session = aioboto3.Session()
+    async with session.client('s3') as s3:
         await s3.put_object(
             Bucket=os.environ.get('AWS_SPOILER_BUCKET_NAME'),
             Key=filename,

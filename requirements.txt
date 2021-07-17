@@ -1,35 +1,34 @@
 Quart
+Quart-Discord >= 2.1.4
 TwitchIO
-aioboto3 <9.0.0,>= 8.0.5
+aerich >= 0.5.3
+aioboto3 >= 8.0.5
 aiocache >= 0.11.1
 aiofiles >= 0.4.0
 aiohttp  <3.7.0,>=3.6.0
 aiomysql >= 0.0.20
-py-dateutil >= 2.2
 discord-sentry-reporting
 discord.py >= 1.6.0
 emoji >= 0.5.3
+git+git://github.com/tcprescott/pyz3r.git@6.0.0-dev
 git+git://github.com/tcprescott/racetime-bot.git@aiohttp_update
+google-api-python-client >= 1.12.5
 gspread_asyncio
 html2markdown
-ircmessage
+isodate >= 0.6.0
 jishaku
 mysqlclient >= 2.0.1
 oauth2client
+py-dateutil >= 2.2
 python-dotenv
+python-slugify >= 4.0.1
 pytz
 pyyaml >= 5.1.2
-git+git://github.com/tcprescott/pyz3r.git@6.0.0-dev
 quart-openapi
-Quart-Discord >= 2.1.4
 sentry-sdk >= 0.16.1
 six >= 1.14.0
-python-slugify >= 4.0.1
 tenacity
+tortoise-orm[aiomysql] >= 0.17.3
 urlextract
 websockets !=7.0,!=8.0,!=8.0.1,<9.0,>=6.0
 z3r-sramr-py >= 0.2.2
-google-api-python-client >= 1.12.5
-isodate >= 0.6.0
-tortoise-orm[aiomysql] >= 0.17.3
-aerich >= 0.5.3

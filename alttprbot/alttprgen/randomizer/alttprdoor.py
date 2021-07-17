@@ -90,7 +90,8 @@ class AlttprDoor():
             async with aiofiles.open(patch_path, "rb") as f:
                 patchfile = await f.read()
 
-            async with aioboto3.client('s3') as s3:
+            session = aioboto3.Session()
+            async with session.client('s3') as s3:
                 await s3.put_object(
                     Bucket=os.environ.get('SAHASRAHBOT_BUCKET'),
                     Key=f"patch/{self.patch_name}",
@@ -102,7 +103,7 @@ class AlttprDoor():
             async with aiofiles.open(spoiler_path, "rb") as f:
                 self.spoilerfile = await f.read()
 
-            async with aioboto3.client('s3') as s3:
+            async with session.client('s3') as s3:
                 await s3.put_object(
                     Bucket=os.environ.get('SAHASRAHBOT_BUCKET'),
                     Key=f"spoiler/{self.spoiler_name}",
