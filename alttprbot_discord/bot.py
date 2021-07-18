@@ -1,6 +1,7 @@
 import importlib
 import os
 import logging
+import io
 
 import discord
 from discord.ext import commands
@@ -84,7 +85,14 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction(riplink)
 
         if not isinstance(error_to_display, SahasrahBotException):
-            await ctx.reply(f"```{repr(error_to_display)[0:2000]}```")
+            errorstr = repr(error_to_display)
+            if len(errorstr) < 1990:
+                await ctx.reply(f"```{repr(error_to_display)[0:2000]}```")
+            else:
+                await ctx.reply(
+                    content="An error occured, please see attachment for the full message.",
+                    file=discord.File(io.StringIO(error_to_display), filename=f"error.txt")
+                )
             raise error_to_display
         else:
             await ctx.reply(error_to_display)
