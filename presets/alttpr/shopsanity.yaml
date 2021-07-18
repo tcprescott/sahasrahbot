@@ -1,7 +1,6 @@
 ---
-goal_name: keydrop shuffle
 doors: true
-description: "Key drop items are shuffled."
+description: "Regular shopsanity."
 settings:
     accessibility: items
     algorithm: balanced

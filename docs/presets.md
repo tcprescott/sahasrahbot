@@ -82,6 +82,10 @@ title:  Presets
 | [retro](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/retro.yaml) |A throwback to Zelda 1.|   |
 | [sakuleague](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleague.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).|   |
 | [sakuleagueboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleagueboots.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).  With 100% more starting boots!| *Customizer*  |
+| [shopsanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity.yaml) |Regular shopsanity.|   *Door Randomizer*|
+| [shopsanity_crisscrosskeydropsanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity_crisscrosskeydropsanity.yaml) |Shopsanity, crossed doors, crossed entrance, keydrop and keysanity|   *Door Randomizer*|
+| [shopsanity_crisscrosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity_crisscrosskeys.yaml) |Criss-cross keysanity w/ shopsanity.|   *Door Randomizer*|
+| [shopsanity_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity_crosskeys.yaml) |Crosskeys shopsanity.|   *Door Randomizer*|
 | [standard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard.yaml) |Standard world state, randomized weapons.|   |
 | [standard_crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_crossdoors.yaml) |Cross dungeon doors, standard world state.|   *Door Randomizer*|
 | [standard_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_fast.yaml) |Standard world state, randomized weapons, Aghanim 2 not required.|   |
