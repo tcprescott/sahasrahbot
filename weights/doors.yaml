@@ -1,13 +1,23 @@
 description: A door randomizer weightset
 glitches_required: none
+options:
+  force_doors: True
 item_placement:
   basic: 25
   advanced: 75
-dungeon_items:
-  standard: 60
-  mc: 10
-  mcs: 10
-  full: 20
+dungeon_items: "standard"
+mapshuffle:
+  "off": 60
+  "on": 40
+compassshuffle:
+  "off": 60
+  "on": 40
+keyshuffle:
+  "off": 60
+  "on": 40
+bigkeyshuffle:
+  "off": 60
+  "on": 40
 accessibility:
   items: 60
   locations: 10
@@ -84,9 +94,19 @@ door_shuffle:
   basic: 30
   crossed: 70
 keydropshuffle:
-  False: 60
-  True: 40
+  'off': 60
+  'on': 40
+shopsanity:
+  'off': 60
+  'on': 40
 intensity:
   1: 20
   2: 50
   3: 30
+startinventory:
+  "Pegasus Boots":
+    0: 50
+    1: 50
+  "Ocarina":
+    0: 90
+    1: 10

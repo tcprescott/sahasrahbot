@@ -59,8 +59,22 @@ def generate_doors_settings(weights, options):
     options["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
     options['entrance_shuffle'] = get_random_option(weights['entrance_shuffle'])
 
+
+    options["mapshuffle"] = get_random_option(weights.get('mapshuffle', False))
+    options["compassshuffle"] = get_random_option(weights.get('compassshuffle', False))
+    options["keyshuffle"] = get_random_option(weights.get('keyshuffle', False))
+    options["bigkeyshuffle"] = get_random_option(weights.get('bigkeyshuffle', False))
+
     options['intensity'] = get_random_option(weights.get('intensity', 2))
     options['beemizer'] = get_random_option(weights.get('beemizer', 0))
+
+    inventoryweights = weights.get('startinventory', {})
+    startitems = []
+    for item in inventoryweights:
+        count = get_random_option(weights['startinventory'][item])
+        if count > 0:
+            startitems += count * [item]
+    options['startinventory'] = ','.join(startitems)
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
     # Play https://alttpr.com/en/h/30yAqZ99yV if you don't believe me. <3
@@ -114,6 +128,7 @@ def generate_doors_settings(weights, options):
     settings["item_functionality"] = options['item_functionality']
     settings["accessibility"] = options['accessibility']
     settings["openpyramid"] = options['goals'] == 'fast_ganon' if options['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
+    settings["shopsanity"] = options['shopsanity'] == 'on'
     settings["shuffleganon"] = True
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
@@ -121,28 +136,26 @@ def generate_doors_settings(weights, options):
                           'shuffled': 'shuffled',
                           'random': 'chaos'
                           }[options['enemy_shuffle']]
-    settings["shufflebosses"] = {'none': 'none',
-                         'simple': 'basic',
-                         'full': 'normal',
-                         'random': 'chaos'
-                         }[options['boss_shuffle']]
+    settings["shufflebosses"] = options['boss_shuffle']
     settings["enemy_damage"] = {'default': 'default',
                         'shuffled': 'shuffled',
                         'random': 'chaos'
                         }[options['enemy_damage']]
     settings["enemy_health"] = options['enemy_health']
-    settings["keydropshuffle"] = options['keydropshuffle']
+    settings["keydropshuffle"] = options['keydropshuffle'] == 'on'
 
-    settings["mapshuffle"] = options['dungeon_items'] in ['mc', 'mcs', 'full']
-    settings["compassshuffle"] = options['dungeon_items'] in ['mc', 'mcs', 'full']
-    settings["keyshuffle"] = options['dungeon_items'] in ['mcs', 'full']
-    settings["bigkeyshuffle"] = options['dungeon_items'] == 'full'
-    settings["keysanity"] = options['dungeon_items'] == 'full'
+    settings["mapshuffle"] = options['mapshuffle'] == 'on' if 'mapshuffle' in weights else options['dungeon_items'] in ['mc', 'mcs', 'full']
+    settings["compassshuffle"] = options['compassshuffle'] == 'on' if 'compassshuffle' in weights else options['dungeon_items'] in ['mc', 'mcs', 'full']
+    settings["keyshuffle"] = options['keyshuffle'] == 'on' if 'keyshuffle' in weights else options['dungeon_items'] in ['mcs', 'full']
+    settings["bigkeyshuffle"] = options['bigkeyshuffle'] == 'on' if 'bigkeyshuffle' in weights else options['dungeon_items'] == 'full'
+    settings["keysanity"] = options['keysanity'] == 'on' if 'keysanity' in weights else options['dungeon_items'] == 'full'
 
     settings["door_shuffle"] = options['door_shuffle']
     settings["intensity"] = options['intensity']
     settings["hints"] = options['hints'] == 'on'
     settings["beemizer"] = options['beemizer']
+    settings["startinventory"] = options['startinventory']
+    settings["usestartinventory"] = len(startitems) > 0
 
     return settings
 
@@ -164,11 +177,13 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
     options = {}
     options['door_shuffle'] = get_random_option(weights.get('door_shuffle', 'vanilla'))
     options['keydropshuffle'] = get_random_option(weights.get('keydropshuffle', False))
+    options['shopsanity'] = get_random_option(weights.get('shopsanity', False))
 
     doors = options['door_shuffle'] != 'vanilla'
-    keydropshuffle = options['keydropshuffle']
+    keydropshuffle = options['keydropshuffle'] == 'on'
+    shopsanity = options['shopsanity'] == 'on'
 
-    if doors or keydropshuffle:
+    if doors or keydropshuffle or shopsanity or weights.get('options', {}).get('force_doors', False):
         settings = generate_doors_settings(weights, options)
         return settings, False, True
 
