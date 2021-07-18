@@ -98,8 +98,11 @@ door_shuffle:
   basic: 20
   crossed: 30
 keydropshuffle:
-  False: 60
-  True: 40
+  'off': 60
+  'on': 40
+shopsanity:
+  'off': 60
+  'on': 40
 intensity:
   1: 20
   2: 50
