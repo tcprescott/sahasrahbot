@@ -209,7 +209,7 @@ class Audit(commands.Cog):
         if guild is None:
             return
         if await guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await user.guild.config_get('AuditLogChannel')
+            audit_channel_id = await guild.config_get('AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_banned(user)
                 audit_channel = discord.utils.get(

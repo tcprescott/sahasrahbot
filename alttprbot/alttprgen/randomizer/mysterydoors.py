@@ -105,7 +105,11 @@ def generate_doors_settings(weights, options):
 
     settings["crystals_gt"] = options['tower_open']
     settings["crystals_ganon"] = options['tower_open']
-    settings["swords"] = options['weapons']
+    settings["swords"] = {'randomized': 'random',
+                            'assured': 'assured',
+                            'vanilla': 'vanilla',
+                            'swordless': 'swordless'
+                            }[options['weapons']]
     settings["difficulty"] = options['item_pool']
     settings["item_functionality"] = options['item_functionality']
     settings["accessibility"] = options['accessibility']
