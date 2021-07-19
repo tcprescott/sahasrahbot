@@ -5,8 +5,8 @@ settings:
     accessibility: items
     algorithm: balanced
     beemizer: 0
-    bigkeyshuffle: false
-    compassshuffle: false
+    bigkeyshuffle: true
+    compassshuffle: true
     crystals_ganon: "7"
     crystals_gt: "7"
     difficulty: normal
@@ -20,10 +20,10 @@ settings:
     intensity: 3
     item_functionality: normal
     keydropshuffle: false
-    keysanity: false
-    keyshuffle: false
+    keysanity: true
+    keyshuffle: true
     logic: noglitches
-    mapshuffle: false
+    mapshuffle: true
     mixed_travel: prevent
     mode: open
     no_hints: true
