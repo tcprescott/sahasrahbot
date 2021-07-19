@@ -19,7 +19,7 @@ settings:
     hints: false
     intensity: 3
     item_functionality: normal
-    keydropshuffle: false
+    keydropshuffle: true
     keysanity: true
     keyshuffle: true
     logic: noglitches
