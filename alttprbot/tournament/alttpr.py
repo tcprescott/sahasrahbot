@@ -205,7 +205,6 @@ class TournamentRace():
     @classmethod
     async def construct_race_room(cls, episodeid, category='alttpr', goal='Beat the game'):
         rtgg_bot = racetime.racetime_bots[category]
-        # tresults = models.TournamentResults.get_or_none(episodeid=episodeid)
 
         tournament_race = cls(episodeid=episodeid, rtgg_handler=None)
         await discordbot.wait_until_ready()
@@ -515,6 +514,9 @@ class TournamentRace():
 
     async def send_race_submission_form(self):
         if self.bracket_settings is not None:
+            return
+
+        if self.tournament_game and self.tournament_game.submitted:
             return
 
         msg = (
