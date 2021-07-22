@@ -114,7 +114,7 @@ settings:
         Ether: 1
         FiftyRupees: 5
         FireRod: 1
-        FiveRupees: 11
+        FiveRupees: 10
         Flippers: 1
         GreenClock: 0
         HalfMagic: 0
@@ -183,7 +183,7 @@ settings:
         RedShield: 0
         Rupoor: 0
         Shovel: 1
-        SilverArrowUpgrade: 0
+        SilverArrowUpgrade: 1
         SmallMagic: 1
         TenArrows: 12
         TenBombs: 1
