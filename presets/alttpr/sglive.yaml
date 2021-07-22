@@ -43,11 +43,13 @@ settings:
     item:
       overflow:
         replacement:
-          ProgressiveArmor: FiveRupees
-          ProgressiveSword: TwentyRupees2
+          Armor: FiveRupees
+          Sword: TwentyRupees2
+          Bottle: Heart
         count:
-          ProgressiveArmor: 1
-          ProgressiveSword: 3
+          Armor: 1
+          Sword: 3
+          Bottle: 2
       count:
         Arrow: 1
         ArrowUpgrade10: 0
@@ -76,7 +78,7 @@ settings:
         BookOfMudora: 1
         Boomerang: 1
         BossHeartContainer: 2
-        Bottle: 2
+        Bottle: 4
         BottleWithBee: 0
         BottleWithBluePotion: 0
         BottleWithFairy: 0
@@ -106,7 +108,7 @@ settings:
         CompassP2: 1
         CompassP3: 1
         Ether: 1
-        FiftyRupees: 7
+        FiftyRupees: 5
         FireRod: 1
         FiveRupees: 11
         Flippers: 1
