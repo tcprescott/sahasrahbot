@@ -46,10 +46,14 @@ settings:
           Armor: FiveRupees
           Sword: TwentyRupees2
           Bottle: Heart
+          BossHeartContainer: Heart
+          PieceOfHeart: Heart
         count:
           Armor: 1
           Sword: 3
           Bottle: 2
+          BossHeartContainer: 2
+          PieceOfHeart: 32
       count:
         Arrow: 1
         ArrowUpgrade10: 0
