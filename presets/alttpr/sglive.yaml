@@ -48,12 +48,14 @@ settings:
           Bottle: FiveRupees
           BossHeartContainer: Heart
           PieceOfHeart: Heart
+          Shield: FiveRupees
         count:
           Armor: 1
           Sword: 3
           Bottle: 2
           BossHeartContainer: 2
           PieceOfHeart: 32
+          Shield: 1
       count:
         Arrow: 1
         ArrowUpgrade10: 0
@@ -114,7 +116,7 @@ settings:
         Ether: 1
         FiftyRupees: 5
         FireRod: 1
-        FiveRupees: 10
+        FiveRupees: 7
         Flippers: 1
         GreenClock: 0
         HalfMagic: 0
@@ -173,7 +175,7 @@ settings:
         ProgressiveArmor: 2
         ProgressiveBow: 0
         ProgressiveGlove: 2
-        ProgressiveShield: 0
+        ProgressiveShield: 3
         ProgressiveSword: 4
         Quake: 1
         QuarterMagic: 0
