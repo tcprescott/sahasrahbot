@@ -3,7 +3,7 @@ goal_name: sglive
 description: "Draft SpeedGaming Live 2021 Settings, details at <https://gist.github.com/tcprescott/4fe3359cc730ff0aadf490e0105afbec>"
 settings:
   accessibility: items
-  allow_quickswap: false
+  allow_quickswap: true
   crystals:
     ganon: '7'
     tower: '7'
