@@ -48,6 +48,20 @@ async def create_smdash(mode="mm"):
         logging.info(os.getcwd())
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
+        smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
+
+        proc = await asyncio.create_subprocess_exec(
+            'dotnet',
+            '/opt/randocrypt/RandoCryptCli.dll',
+            smdashrom,
+            os.path.join(tmp, smdashromenc),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE)
+
+        _, stderr = await proc.communicate()
+        if proc.returncode > 0:
+            raise Exception(f'Exception while securing game: {stderr.decode()}')
+
         patchname = os.path.splitext(os.path.basename(smdashrom))[0] + ".bps"
 
         proc = await asyncio.create_subprocess_exec(
@@ -55,7 +69,7 @@ async def create_smdash(mode="mm"):
             '--create',
             '--bps-delta',
             os.environ.get('SM_ROM'),
-            smdashrom,
+            os.path.join(tmp, smdashromenc),
             os.path.join('/var/www/sgldash/bps', patchname),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE)
