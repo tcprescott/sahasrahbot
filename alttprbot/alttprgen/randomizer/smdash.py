@@ -1,6 +1,6 @@
 import asyncio
 import os
-import random
+import random, string
 import tempfile
 import logging
 
@@ -62,7 +62,8 @@ async def create_smdash(mode="mm"):
         if proc.returncode > 0:
             raise Exception(f'Exception while securing game: {stderr.decode()}')
 
-        patchname = os.path.splitext(os.path.basename(smdashrom))[0] + ".bps"
+        random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        patchname = f"DASH_{mode.upper()}_{random_id}.bps"
 
         proc = await asyncio.create_subprocess_exec(
             os.path.join(wd, 'utils', 'flips'),
