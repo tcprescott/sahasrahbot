@@ -1,6 +1,7 @@
 from itertools import groupby
 
 from alttprbot_discord.bot import discordbot
+from alttprbot import models
 from alttprbot.database import tournament_results
 from alttprbot.tournament import alttpr
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
@@ -23,7 +24,8 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         if self.tournament is None:
             race = await tournament_results.get_active_tournament_race(self.data.get('name'))
-            if race:
+            tournament = await models.Tournaments.get_or_none(schedule_type='sg', slug=self.event_slug)
+            if race and tournament:
                 try:
                     self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
                 except alttpr.UnableToLookupEpisodeException:
