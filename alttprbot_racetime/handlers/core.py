@@ -24,12 +24,13 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         if self.tournament is None:
             race = await tournament_results.get_active_tournament_race(self.data.get('name'))
-            tournament = await models.Tournaments.get_or_none(schedule_type='sg', slug=self.event_slug)
-            if race and tournament:
-                try:
-                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
-                except alttpr.UnableToLookupEpisodeException:
-                    self.logger.exception("Error while association tournament race to handler.")
+            if race:
+                tournament = await models.Tournaments.get_or_none(slug=race['event'])
+                if tournament:
+                    try:
+                        self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
+                    except alttpr.UnableToLookupEpisodeException:
+                        self.logger.exception("Error while association tournament race to handler.")
 
     async def race_data(self, data):
         self.data = data.get('race')
