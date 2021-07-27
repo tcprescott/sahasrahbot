@@ -21,16 +21,23 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def begin(self):
         self.state['locked'] = False
+        await self.setup_tournament()
 
-        if self.tournament is None:
-            race = await tournament_results.get_active_tournament_race(self.data.get('name'))
-            if race:
-                tournament = await models.Tournaments.get_or_none(slug=race['event'])
-                if tournament:
-                    try:
-                        self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
-                    except alttpr.UnableToLookupEpisodeException:
-                        self.logger.exception("Error while association tournament race to handler.")
+    async def setup_tournament(self):
+        if self.tournament:
+            return
+
+        race = await tournament_results.get_active_tournament_race(self.data.get('name'))
+        if not race:
+            return
+
+        tournament = await models.Tournaments.get_or_none(slug=race['event'])
+        if tournament:
+            try:
+                self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
+            except alttpr.UnableToLookupEpisodeException:
+                self.logger.exception("Error while association tournament race to handler.")
+
 
     async def race_data(self, data):
         self.data = data.get('race')

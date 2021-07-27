@@ -15,14 +15,7 @@ from config import Config as c
 class GameHandler(SahasrahBotCoreHandler):
     async def begin(self):
         self.state['locked'] = False
-
-        if self.tournament is None:
-            race = await tournament_results.get_active_tournament_race(self.data.get('name'))
-            if race:
-                try:
-                    self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
-                except alttpr.UnableToLookupEpisodeException:
-                    self.logger.exception("Error while association tournament race to handler.")
+        await self.setup_tournament()
 
         # re-establish a spoiler race countdown if bot is restarted/crashes
         in_progress_spoiler_race = await spoiler_races.get_spoiler_race_by_id_started(self.data.get('name'))
