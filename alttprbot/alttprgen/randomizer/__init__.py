@@ -4,4 +4,4 @@ from .smb3r import roll_smb3r
 from .z1r import roll_z1r
 from .smdash import roll_smdash
 from .ootr import roll_ootr
-from .bingosync import create_bingo_room, new_card
+from .bingosync import BingoSync
