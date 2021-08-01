@@ -5,8 +5,9 @@ from quart import Quart, abort, jsonify, request, session, redirect, url_for, re
 from quart_discord import DiscordOAuth2Session, requires_authorization, Unauthorized, AccessDenied
 from urllib.parse import quote
 
+from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
+from alttprbot.tournament.core import UnableToLookupEpisodeException
 from alttprbot.alttprgen.mystery import get_weights, generate
-from alttprbot.tournament import league, alttpr
 from alttprbot.database import league_playoffs, srlnick
 from alttprbot_discord.bot import discordbot
 
@@ -54,7 +55,7 @@ async def access_denied(e):
         message="We were unable to access your Discord account."
     )
 
-@sahasrahbotapi.errorhandler(alttpr.UnableToLookupEpisodeException)
+@sahasrahbotapi.errorhandler(UnableToLookupEpisodeException)
 async def unable_to_lookup(e):
     return await render_template(
         'error.html',
@@ -108,69 +109,39 @@ async def mysterygenwithweights(weightset):
     )
 
 
-@sahasrahbotapi.route('/api/league/playoff', methods=['POST'])
-async def league_playoff():
-    payload = await request.get_json()
+# @sahasrahbotapi.route('/api/league/playoff', methods=['POST'])
+# async def league_playoff():
+#     payload = await request.get_json()
 
-    if not payload['secret'] == os.environ.get('LEAGUE_DATA_ENDPOINT_SECRET'):
-        abort(401, description="secret required")
+#     if not payload['secret'] == os.environ.get('LEAGUE_DATA_ENDPOINT_SECRET'):
+#         abort(401, description="secret required")
 
-    await league.process_playoff_form(payload['form'])
+#     await league.process_playoff_form(payload['form'])
 
-    return jsonify(success=True)
+#     return jsonify(success=True)
 
-
-@sahasrahbotapi.route("/submit/alttprfr", methods=['GET'])
-@sahasrahbotapi.route("/alttprfr", methods=['GET'])
+@sahasrahbotapi.route("/submit/<string:event>", methods=['GET'])
 @requires_authorization
-async def alttprfr():
+async def submission_form(event):
     user = await discord.fetch_user()
     episode_id = request.args.get("episode_id", "")
     return await render_template(
         'submission.html',
         logged_in=True,
         user=user,
-        endpoint=url_for("alttprfr_settings"),
-        settings_list=alttpr.ALTTPR_FR_SETTINGS_LIST,
+        event=event,
+        endpoint=url_for("submit"),
+        settings_list=TOURNAMENT_DATA[event].submission_form,
         episode_id=episode_id
     )
 
-@sahasrahbotapi.route("/submit/alttprfr", methods=['POST'])
-@sahasrahbotapi.route('/alttprfr', methods=['POST'])
+@sahasrahbotapi.route("/submit", methods=['POST'])
 @requires_authorization
-async def alttprfr_settings():
+async def submit():
     user = await discord.fetch_user()
     payload = await request.form
-    tournament_race = await alttpr.alttprfr_process_settings_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
-    return await render_template(
-        "submission_done.html",
-        logged_in=True,
-        user=user,
-        tournament_race=tournament_race
-    )
-
-@sahasrahbotapi.route("/submit/alttpres", methods=['GET'])
-@sahasrahbotapi.route("/submit/test", methods=['GET'])
-@requires_authorization
-async def alttpres():
-    user = await discord.fetch_user()
-    episode_id = request.args.get("episode_id", "")
-    return await render_template(
-        'submission.html',
-        logged_in=True,
-        user=user,
-        endpoint=url_for("alttpres_settings"),
-        settings_list=alttpr.ALTTPR_ES_SETTINGS_LIST,
-        episode_id=episode_id
-    )
-
-@sahasrahbotapi.route("/submit/alttpres", methods=['POST'])
-@sahasrahbotapi.route("/submit/test", methods=['POST'])
-@requires_authorization
-async def alttpres_settings():
-    user = await discord.fetch_user()
-    payload = await request.form
-    tournament_race = await alttpr.alttpres_process_settings_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
+    tournament_race = fetch_tournament_handler(payload['event'], int(payload['episodeid']))
+    await tournament_race.process_submission_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
     return await render_template(
         "submission_done.html",
         logged_in=True,

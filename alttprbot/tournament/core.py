@@ -1,24 +1,17 @@
 import datetime
 import logging
-import json
 import os
-import isodate
 
-import aiohttp
 import discord
-import gspread_asyncio
-import pytz
 
-from alttprbot.alttprgen import preset
 from alttprbot import models
-from alttprbot.util import gsheet, speedgaming
+from alttprbot.tournaments import TournamentConfig
+from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util import alttpr_discord
 from alttprbot_racetime import bot as racetime
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
-TOURNAMENT_RESULTS_SHEET = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
 
 class UnableToLookupUserException(SahasrahBotException):
     pass
@@ -60,49 +53,38 @@ class TournamentPlayer(object):
 
 
 class TournamentRace(object):
-    def __init__(self, episodeid: int, rtgg_handler):
+    def __init__(self, tournament_config: TournamentConfig, episodeid: int, rtgg_handler):
         self.episodeid = int(episodeid)
         self.rtgg_handler = rtgg_handler
 
         self.players = []
 
         self.episode = None
-        self.data = None
+        self.data = tournament_config
 
         self.rtgg_bot = None
         self.restream_team = None
 
     @classmethod
-    async def construct(cls, episodeid, rtgg_handler):
-        tournament_race = cls(episodeid, rtgg_handler)
+    async def construct(cls, tournament_config: TournamentConfig, episodeid, rtgg_handler):
+        tournament_race = cls(tournament_config, episodeid, rtgg_handler)
+
         await discordbot.wait_until_ready()
         await tournament_race.update_data()
+
         return tournament_race
 
     @classmethod
-    async def construct_race_room(cls, episodeid, category='alttpr', goal='Beat the game'):
-        rtgg_bot = racetime.racetime_bots[category]
+    async def construct_race_room(cls, tournament_config: TournamentConfig, episodeid):
+        tournament_race = cls(tournament_config, episodeid=episodeid, rtgg_handler=None)
 
-        tournament_race = cls(episodeid=episodeid, rtgg_handler=None)
         await discordbot.wait_until_ready()
         await tournament_race.update_data()
 
-        handler = await rtgg_bot.startrace(
-            goal=goal,
-            invitational=True,
-            unlisted=False,
+        handler = await tournament_race.create_race_room(
+            goal=tournament_race.data.racetime_goal,
             info=tournament_race.race_info,
-            start_delay=15,
-            time_limit=24,
-            streaming_required=True,
-            auto_start=True,
-            allow_comments=True,
-            hide_comments=True,
-            allow_prerace_chat=True,
-            allow_midrace_chat=True,
-            allow_non_entrant_chat=False,
-            chat_message_delay=0,
-            team_race=True if tournament_race.data.coop else False,
+            team_race=tournament_race.data.coop
         )
 
         handler.tournament = tournament_race
@@ -116,8 +98,7 @@ class TournamentRace(object):
 
         await tournament_race.send_player_room_info()
 
-        if category != 'smw-hacks':
-            await handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.')
+        await tournament_race.send_room_welcome()
 
         return handler.data
 
@@ -139,23 +120,36 @@ class TournamentRace(object):
                 logging.info(f'Could not send room opening DM to {name}')
                 continue
 
+    async def send_room_welcome(self):
+        pass
+
+    async def create_race_room(self, goal, info, team_race=False):
+        self.rtgg_handler = await self.rtgg_bot.startrace(
+            goal=goal,
+            invitational=True,
+            unlisted=False,
+            info=info,
+            start_delay=15,
+            time_limit=24,
+            streaming_required=True,
+            auto_start=True,
+            allow_comments=True,
+            hide_comments=True,
+            allow_prerace_chat=True,
+            allow_midrace_chat=True,
+            allow_non_entrant_chat=False,
+            chat_message_delay=0,
+            team_race=team_race,
+        )
+        return self.rtgg_handler
+
     async def update_data(self):
         self.episode = await speedgaming.get_episode(self.episodeid)
 
-        self.data = await models.Tournaments.get_or_none(schedule_type='sg', slug=self.event_slug)
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
 
-        self.rtgg_bot = racetime.racetime_bots[self.data.category]
+        self.rtgg_bot: racetime.SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
-
-        if self.data is None:
-            raise UnableToLookupEpisodeException('SG Episode ID not a recognized event.  This should not have happened.')
-
-        if self.data.audit_channel_id is not None:
-            self.audit_channel = discordbot.get_channel(self.data.audit_channel_id)
-
-        if self.data.commentary_channel_id is not None:
-            self.commentary_channel = discordbot.get_channel(self.data.commentary_channel_id)
 
         self.guild = discordbot.get_guild(self.data.guild_id)
 
@@ -182,9 +176,6 @@ class TournamentRace(object):
 
         return looked_up_player
 
-    async def roll(self):
-        pass
-
     async def can_gatekeep(self, rtgg_id):
         team_member_ids = [m['id'] for m in self.restream_team['members']]
         if rtgg_id in team_member_ids:
@@ -200,11 +191,7 @@ class TournamentRace(object):
         if not discord_user:
             return False
 
-        if helper_roles := self.data.helper_roles:
-            if discord.utils.find(lambda m: m.name in helper_roles.split(','), discord_user.roles):
-                return True
-
-        return False
+        return any([True for x in self.data.helper_roles if x in discord_user.roles])
 
     @property
     def submit_link(self):
@@ -282,13 +269,17 @@ class TournamentRace(object):
         return self.rtgg_handler.data.get('name')
 
     @property
-    def bracket_settings(self):
-        if self.tournament_game:
-            return self.tournament_game.settings
+    def audit_channel(self):
+        return self.data.audit_channel
 
-        return None
+    @property
+    def commentary_channel(self):
+        return self.data.commentary_channel
 
     async def create_embeds(self):
+        pass
+
+    async def process_submission_form(self, payload, submitted_by):
         pass
 
     async def send_audit_message(self, embed: discord.Embed):
@@ -312,71 +303,3 @@ class TournamentRace(object):
             if self.audit_channel:
                 await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
             await self.rtgg_handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a Tournament Moderator for assistance.")
-
-
-
-async def create_tournament_race_room(episodeid, category='alttpr', goal='Beat the game'):
-    rtgg_bot = racetime.racetime_bots[category]
-    race = await models.TournamentResults.get_or_none(episode_id=episodeid)
-    if race:
-        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"), raise_for_status=True) as resp:
-            race_data = json.loads(await resp.read())
-        status = race_data.get('status', {}).get('value')
-        if not status == 'cancelled':
-            return
-        await race.delete()
-
-    await TournamentRace.construct_race_room(episodeid, category=category, goal=goal)
-
-async def race_recording_task():
-    if TOURNAMENT_RESULTS_SHEET is None:
-        return
-
-    races = await models.TournamentResults.filter(written_to_gsheet=None)
-    if races is None:
-        return
-
-    agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
-    agc = await agcm.authorize()
-    wb = await agc.open_by_key(TOURNAMENT_RESULTS_SHEET)
-
-    for race in races:
-        logging.info(f"Recording {race.episode_id}")
-        try:
-
-            sheet_name = race.event
-            wks = await wb.worksheet(sheet_name)
-
-            async with aiohttp.request(
-                    method='get',
-                    url=f"{RACETIME_URL}/{race.srl_id}/data",
-                    raise_for_status=True) as resp:
-                race_data = json.loads(await resp.read())
-
-            if race_data['status']['value'] == 'finished':
-                winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
-                runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
-
-                started_at = isodate.parse_datetime(race_data['started_at']).astimezone(pytz.timezone('US/Eastern'))
-                await wks.append_row(values=[
-                    race.episode_id,
-                    started_at.strftime("%Y-%m-%d %H:%M:%S"),
-                    f"{RACETIME_URL}/{race.srl_id}",
-                    winner['user']['name'],
-                    runnerup['user']['name'],
-                    str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'], str) else None,
-                    str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(runnerup['finish_time'], str) else None,
-                    race.permalink,
-                    race.spoiler
-                ])
-                race.status="RECORDED"
-                race.written_to_gsheet=1
-                await race.save()
-            elif race_data['status']['value'] == 'cancelled':
-                await race.delete()
-            else:
-                continue
-        except Exception as e:
-            logging.exception("Encountered a problem when attempting to record a race.")
-
-    logging.debug('done')
