@@ -1,13 +1,5 @@
-import logging
-
-import discord
-
 from alttprbot.alttprgen import preset
-from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util import alttpr_discord
 
 class SMZ3CoopTournament(ALTTPRTournamentRace):
     async def roll(self):

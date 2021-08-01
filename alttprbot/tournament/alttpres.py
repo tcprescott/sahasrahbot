@@ -58,15 +58,19 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
         else:
             audit_channel = None
 
-        for name, player in tournament_race.player_discords:
+        for name, player in self.player_discords:
             if player is None:
-                await audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                logging.error(f"Could not send DM to {name}")
+                if self.audit_channel:
+                    await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
                 continue
             try:
                 await player.send(embed=embed)
             except discord.HTTPException:
-                if audit_channel is not None:
-                    await audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                logging.exception(f"Could not send DM to {name}")
+                if self.audit_channel:
+                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+
 
         return tournament_race
 

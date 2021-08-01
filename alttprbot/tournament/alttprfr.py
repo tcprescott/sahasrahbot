@@ -4,9 +4,6 @@ import discord
 
 from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot_api.api import sahasrahbotapi
-from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 
 class ALTTPRFRTournament(ALTTPRTournamentRace):

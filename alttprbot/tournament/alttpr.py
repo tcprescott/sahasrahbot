@@ -1,13 +1,10 @@
 import logging
 
-import discord
-
 from alttprbot.alttprgen import preset
 from alttprbot import models
 from alttprbot.tournament.core import TournamentRace
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util import alttpr_discord
 
 class ALTTPRTournamentRace(TournamentRace):
     async def roll(self):
@@ -72,3 +69,21 @@ class ALTTPRTournamentRace(TournamentRace):
         if self.broadcast_channels:
             self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
             self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+
+    async def send_race_submission_form(self):
+        if self.bracket_settings is not None:
+            return
+
+        if self.tournament_game and self.tournament_game.submitted:
+            return
+
+        msg = (
+            f"Greetings!  Do not forget to submit settings for your upcoming race: `{self.versus}`!\n\n"
+            f"For your convenience, you visit {self.submit_link} to submit the settings.\n\n"
+        )
+
+        for name, player in self.player_discords:
+            if player is None:
+                continue
+            logging.info(f"Sending tournament submit reminder to {name}.")
+            await player.send(msg)
