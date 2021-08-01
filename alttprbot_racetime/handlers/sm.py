@@ -33,11 +33,9 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message("No active bingo game.")
 
         await self.bingo.new_card(
-            hide_card=False,
             game_type=4,
             variant_type=4,
-            custom_json="",
-            lockout_mode=1,
-            seed="",
+            hide_card='off',
+            seed=1, # put the actual seed number here later
         )
         await self.send_message(self.bingo.url)
