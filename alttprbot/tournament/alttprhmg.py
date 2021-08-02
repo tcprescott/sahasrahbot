@@ -15,9 +15,9 @@ class ALTTPRHMGTournament(ALTTPRTournamentRace):
             racetime_category='alttpr',
             racetime_goal='Beat the game (glitched)',
             event_slug="alttprhmg",
-            audit_channel=discordbot.get_channel(647966639266201620),
-            commentary_channel=discordbot.get_channel(408347983709470741),
-            scheduling_needs_channel=discordbot.get_channel(434560353461075969),
+            audit_channel=discordbot.get_channel(850226062864023583),
+            commentary_channel=discordbot.get_channel(549709098015391764),
+            scheduling_needs_channel=discordbot.get_channel(863817206452977685),
             scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(549708578731327489),
