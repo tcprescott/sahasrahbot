@@ -129,6 +129,15 @@ Example: `!multiworld normal`
 
 Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
+## Super Metroid (SM)
+
+### !bingo
+Use this command in RaceTime.gg race room.
+
+This allows you to have a bingo card generated via the SRL bingo tool at the time the race starts.
+
+Example: `!bingo`
+
 ## Global Commands
 ### !lock
 
