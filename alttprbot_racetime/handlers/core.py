@@ -2,8 +2,8 @@ from itertools import groupby
 
 from alttprbot_discord.bot import discordbot
 from alttprbot import models
-from alttprbot.database import tournament_results
-from alttprbot.tournament import alttpr
+from alttprbot import tournaments
+from alttprbot.tournament.core import UnableToLookupEpisodeException
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
 
@@ -27,16 +27,18 @@ class SahasrahBotCoreHandler(RaceHandler):
         if self.tournament:
             return
 
-        race = await tournament_results.get_active_tournament_race(self.data.get('name'))
+        race = await models.TournamentResults.get_or_none(srl_id=self.data.get('name'))
         if not race:
             return
 
-        tournament = await models.Tournaments.get_or_none(slug=race['event'])
-        if tournament:
-            try:
-                self.tournament = await alttpr.TournamentRace.construct(episodeid=race['episode_id'], rtgg_handler=self)
-            except alttpr.UnableToLookupEpisodeException:
-                self.logger.exception("Error while association tournament race to handler.")
+        try:
+            self.tournament = await tournaments.fetch_tournament_handler(
+                event=race.event,
+                episodeid=race.episode_id,
+                rtgg_handler=self
+            )
+        except UnableToLookupEpisodeException:
+            self.logger.exception("Error while association tournament race to handler.")
 
 
     async def race_data(self, data):
@@ -129,10 +131,8 @@ class SahasrahBotCoreHandler(RaceHandler):
         if await self.is_locked(message):
             return
 
-        await alttpr.process_tournament_race(
-            handler=self,
-            episodeid=args[0] if len(args) >= 1 else None
-        )
+        if self.tournament:
+            await self.tournament.process_tournament_race()
 
     @monitor_cmd
     async def ex_lock(self, args, message):

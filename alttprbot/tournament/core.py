@@ -5,7 +5,6 @@ import os
 import discord
 
 from alttprbot import models
-from alttprbot.tournaments import TournamentConfig
 from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
@@ -53,7 +52,7 @@ class TournamentPlayer(object):
 
 
 class TournamentRace(object):
-    def __init__(self, tournament_config: TournamentConfig, episodeid: int, rtgg_handler):
+    def __init__(self, tournament_config, episodeid: int, rtgg_handler):
         self.episodeid = int(episodeid)
         self.rtgg_handler = rtgg_handler
 
@@ -66,7 +65,7 @@ class TournamentRace(object):
         self.restream_team = None
 
     @classmethod
-    async def construct(cls, tournament_config: TournamentConfig, episodeid, rtgg_handler):
+    async def construct(cls, tournament_config, episodeid, rtgg_handler):
         tournament_race = cls(tournament_config, episodeid, rtgg_handler)
 
         await discordbot.wait_until_ready()
@@ -75,7 +74,7 @@ class TournamentRace(object):
         return tournament_race
 
     @classmethod
-    async def construct_race_room(cls, tournament_config: TournamentConfig, episodeid):
+    async def construct_race_room(cls, tournament_config, episodeid):
         tournament_race = cls(tournament_config, episodeid=episodeid, rtgg_handler=None)
 
         await discordbot.wait_until_ready()
@@ -121,6 +120,9 @@ class TournamentRace(object):
                 continue
 
     async def send_room_welcome(self):
+        pass
+
+    async def process_tournament_race(self):
         pass
 
     async def create_race_room(self, goal, info, team_race=False):
