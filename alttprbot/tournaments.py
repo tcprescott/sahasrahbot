@@ -11,7 +11,7 @@ from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
-from alttprbot.tournament import test, alttpr, alttprcd, alttpres, alttprfr, alttprhmg, smwde, smz3coop
+from alttprbot.tournament import test, alttpr, alttprcd, alttpres, alttprfr, alttprhmg, smwde, smz3coop, smbingo
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -31,6 +31,7 @@ else:
         'alttprhmg': alttprhmg.ALTTPRHMGTournament,
         'alttpres': alttpres.ALTTPRESTournament,
         'smz3coop': smz3coop.SMZ3CoopTournament,
+        'smbingo': smbingo.SMBingoTournament,
     }
 
 async def fetch_tournament_handler(event, episodeid: int, rtgg_handler=None):

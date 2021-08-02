@@ -35,7 +35,7 @@ class TournamentConfig:
     mod_channel: discord.TextChannel = None
     scheduling_needs_channel: discord.TextChannel = None
 
-    scheduling_needs_tracker = False
+    scheduling_needs_tracker: bool = False
 
     admin_roles: list = None
     helper_roles: list = None

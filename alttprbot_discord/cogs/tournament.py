@@ -130,7 +130,7 @@ class Tournament(commands.Cog):
                 value="\n".join(comms_needed) if comms_needed else "No current needs.",
                 inline=False
             )
-            if event_data.scheduling_needs_tracker:
+            if event_data.data.scheduling_needs_tracker:
                 embed.add_field(
                     name="Trackers Needed",
                     value="\n".join(trackers_needed) if trackers_needed else "No current needs.",
@@ -145,7 +145,7 @@ class Tournament(commands.Cog):
 
             try:
                 bot_message = False
-                async for message in event_data.scheduling_needs_channel.history(limit=50):
+                async for message in event_data.data.scheduling_needs_channel.history(limit=50):
                     if message.author == self.bot.user:
                         bot_message = True
                         scheduling_needs_message = message
@@ -153,7 +153,7 @@ class Tournament(commands.Cog):
                         break
 
                 if not bot_message:
-                    await event_data.scheduling_needs_channel.send(embed=embed)
+                    await event_data.data.scheduling_needs_channel.send(embed=embed)
             except Exception:
                 logging.exception("Unable to update scheduling needs channel.")
                 continue
