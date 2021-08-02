@@ -38,7 +38,7 @@ class SahasrahBotCoreHandler(RaceHandler):
                 rtgg_handler=self
             )
             await self.tournament.on_room_resume()
-        except UnableToLookupEpisodeException:
+        except (UnableToLookupEpisodeException, KeyError):
             self.logger.exception("Error while association tournament race to handler.")
 
 
