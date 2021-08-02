@@ -32,6 +32,9 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_brackets(self, args, message):
         await self.roll_game('hhAhD0j#$78$Jp5HgRAhOA!0P8@', message)
 
+    async def ex_nit(self, args, message):
+        await self.roll_game('hhAhD0j#$78$Jp5Q$dAhOA!0Pz@A', message)
+
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
 
