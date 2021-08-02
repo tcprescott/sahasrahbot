@@ -4,6 +4,8 @@ import discord
 
 from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
+from alttprbot.tournament.core import TournamentConfig
+from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 
 class ALTTPRFRTournament(ALTTPRTournamentRace):
@@ -15,12 +17,111 @@ class ALTTPRFRTournament(ALTTPRTournamentRace):
         self.seed = await alttpr_discord.ALTTPRDiscord.generate(settings=self.bracket_settings)
         await self.create_embeds()
 
+    async def configuration(self):
+        guild = discordbot.get_guild(470200169841950741)
+        return TournamentConfig(
+            guild=guild,
+            racetime_category='alttpr',
+            racetime_goal='Beat the game',
+            event_slug="alttprfr",
+            audit_channel=discordbot.get_channel(856581631241486346),
+            commentary_channel=discordbot.get_channel(470202208261111818),
+            helper_roles=[
+                guild.get_role(482266765137805333),
+                guild.get_role(507932829527703554),
+            ],
+            lang='fr'
+        )
+
     @property
     def bracket_settings(self):
         if self.tournament_game:
             return self.tournament_game.settings
 
         return None
+
+    @property
+    def submission_form(self):
+        return [
+            {
+                'key': 'dungeon_items',
+                'label': 'Dungeon Item Shuffle',
+                'settings': {
+                    'standard': 'Standard',
+                    'mc': 'Maps and Compasses',
+                    'mcs': 'Maps, Compasses, and Small Keys',
+                    'full': 'Keysanity',
+                }
+            },
+            {
+                'key': 'goal',
+                'label': 'Goal',
+                'settings': {
+                    'ganon': 'Defeat Ganon',
+                    'fast_ganon': 'Fast Ganon',
+                }
+            },
+            {
+                'key': 'world_state',
+                'label': 'World State',
+                'settings': {
+                    'open': 'Open',
+                    'standard': 'Standard',
+                    'inverted': 'Inverted',
+                    'retro': 'Retro',
+                }
+            },
+            {
+                'key': 'boss_shuffle',
+                'label': 'Boss Shuffle',
+                'settings': {
+                    'none': 'Off',
+                    'random': 'Random'
+                }
+            },
+            {
+                'key': 'enemy_shuffle',
+                'label': 'Enemy Shuffle',
+                'settings': {
+                    'none': 'Off',
+                    'shuffled': 'Shuffled'
+                }
+            },
+            {
+                'key': 'hints',
+                'label': 'Hints',
+                'settings': {
+                    'off': 'Off',
+                    'on': 'On'
+                }
+            },
+            {
+                'key': 'swords',
+                'label': 'Swords',
+                'settings': {
+                    'randomized': 'Randomized',
+                    'assured': 'Assured',
+                    'vanilla': 'Vanilla',
+                    'swordless': 'Swordless',
+                }
+            },
+            {
+                'key': 'item_pool',
+                'label': 'Item Pool',
+                'settings': {
+                    'normal': 'Normal',
+                    'hard': 'Hard'
+                }
+            },
+            {
+                'key': 'item_functionality',
+                'label': 'Item Functionality',
+                'settings': {
+                    'normal': 'Normal',
+                    'hard': 'Hard'
+                }
+            },
+        ]
 
     async def process_submission_form(self, payload, submitted_by):
         adjusted_payload = payload.to_dict(flat=True)
@@ -66,7 +167,7 @@ class ALTTPRFRTournament(ALTTPRTournamentRace):
         }
 
         settings_formatted = ""
-        for setting in self.data.settings_form:
+        for setting in self.data.submission_form:
             settings_formatted += f"**{setting['label']}:** {setting['settings'][adjusted_payload.get(setting['key'])]}\n"
 
         embed.add_field(name="Settings", value=settings_formatted, inline=False)

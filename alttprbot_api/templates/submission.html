@@ -7,7 +7,7 @@
 {% block content -%}
 <form action="{{ endpoint }}" method="post">
     <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid" value="{{ episode_id }}" required><br><br>
-    <input type="hidden" value="{{ event }}">
+    <input type="hidden" id="event" name="event" value="{{ event }}">
 
     {% for setting in settings_list %}
         <label for="{{ setting['key'] }}">{{ setting['label'] }}:</label>

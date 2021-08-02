@@ -125,13 +125,19 @@ async def mysterygenwithweights(weightset):
 async def submission_form(event):
     user = await discord.fetch_user()
     episode_id = request.args.get("episode_id", "")
+
+    event_config = await TOURNAMENT_DATA[event].get_config()
+    form_data = event_config.submission_form
+    if form_data is None:
+        raise Exception("There is no form submission data for this event.")
+
     return await render_template(
         'submission.html',
         logged_in=True,
         user=user,
         event=event,
         endpoint=url_for("submit"),
-        settings_list=TOURNAMENT_DATA[event].submission_form,
+        settings_list=form_data,
         episode_id=episode_id
     )
 
@@ -140,7 +146,7 @@ async def submission_form(event):
 async def submit():
     user = await discord.fetch_user()
     payload = await request.form
-    tournament_race = fetch_tournament_handler(payload['event'], int(payload['episodeid']))
+    tournament_race = await fetch_tournament_handler(payload['event'], int(payload['episodeid']))
     await tournament_race.process_submission_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
     return await render_template(
         "submission_done.html",

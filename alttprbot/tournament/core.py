@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+from dataclasses import dataclass
 
 import discord
 
@@ -19,6 +20,30 @@ class UnableToLookupUserException(SahasrahBotException):
 class UnableToLookupEpisodeException(SahasrahBotException):
     pass
 
+@dataclass
+class TournamentConfig:
+    guild: discord.Guild
+
+    racetime_category: str
+    racetime_goal: str
+    event_slug: str
+
+    schedule_type: str = "sg"
+
+    audit_channel: discord.TextChannel = None
+    commentary_channel: discord.TextChannel = None
+    mod_channel: discord.TextChannel = None
+    scheduling_needs_channel: discord.TextChannel = None
+
+    scheduling_needs_tracker = False
+
+    admin_roles: list = None
+    helper_roles: list = None
+    commentator_roles: list = None
+    mod_roles: list = None
+
+    lang: str = 'en'
+    coop: bool = False
 
 class TournamentPlayer(object):
     def __init__(self):
@@ -52,32 +77,38 @@ class TournamentPlayer(object):
 
 
 class TournamentRace(object):
-    def __init__(self, tournament_config, episodeid: int, rtgg_handler):
-        self.episodeid = int(episodeid)
+    def __init__(self, episodeid: int=None, rtgg_handler=None):
+        try:
+            self.episodeid = int(episodeid)
+        except TypeError:
+            self.episodeid = episodeid
+
         self.rtgg_handler = rtgg_handler
 
         self.players = []
 
         self.episode = None
-        self.data = tournament_config
+        self.data: TournamentConfig = None
 
         self.rtgg_bot = None
         self.restream_team = None
 
     @classmethod
-    async def construct(cls, tournament_config, episodeid, rtgg_handler):
-        tournament_race = cls(tournament_config, episodeid, rtgg_handler)
+    async def construct(cls, episodeid, rtgg_handler):
+        tournament_race = cls(episodeid, rtgg_handler)
 
         await discordbot.wait_until_ready()
+        tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
 
         return tournament_race
 
     @classmethod
-    async def construct_race_room(cls, tournament_config, episodeid):
-        tournament_race = cls(tournament_config, episodeid=episodeid, rtgg_handler=None)
+    async def construct_race_room(cls, episodeid):
+        tournament_race = cls(episodeid=episodeid, rtgg_handler=None)
 
         await discordbot.wait_until_ready()
+        tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
 
         handler = await tournament_race.create_race_room(
@@ -100,6 +131,17 @@ class TournamentRace(object):
         await tournament_race.send_room_welcome()
 
         return handler.data
+
+    @classmethod
+    async def get_config(cls):
+        tournament_race = cls()
+
+        await discordbot.wait_until_ready()
+        tournament_race.data = await tournament_race.configuration()
+        return tournament_race
+
+    async def configuration(self) -> TournamentConfig:
+        self.data = None
 
     async def send_player_room_info(self):
         embed = discord.Embed(
@@ -153,8 +195,6 @@ class TournamentRace(object):
         self.rtgg_bot: racetime.SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
-        self.guild = discordbot.get_guild(self.data.guild_id)
-
         self.players = []
         for player in self.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
@@ -194,6 +234,18 @@ class TournamentRace(object):
             return False
 
         return any([True for x in self.data.helper_roles if x in discord_user.roles])
+
+    @property
+    def guild(self):
+        return self.data.guild
+
+    @property
+    def submission_form(self):
+        return None
+
+    @property
+    def lang(self):
+        return self.data.lang
 
     @property
     def submit_link(self):

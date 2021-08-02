@@ -3,9 +3,9 @@ import logging
 import discord
 
 from alttprbot.alttprgen import preset
-from alttprbot.tournaments import fetch_tournament_handler
 from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
+from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 
@@ -21,6 +21,24 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
         )
         await self.create_embeds()
 
+    async def configuration(self):
+        guild = discordbot.get_guild(477850508368019486)
+        return TournamentConfig(
+            guild=guild,
+            racetime_category='alttpr',
+            racetime_goal='Beat the game',
+            event_slug="alttpres",
+            audit_channel=discordbot.get_channel(859058002426462211),
+            commentary_channel=discordbot.get_channel(838011943000080395),
+            scheduling_needs_channel=discordbot.get_channel(863771537903714324),
+            scheduling_needs_tracker=True,
+            helper_roles=[
+                guild.get_role(479423657584754698),
+                guild.get_role(477968190606016528),
+            ],
+            lang="es"
+        )
+
     @property
     def bracket_settings(self):
         if self.tournament_game:
@@ -28,13 +46,28 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
 
         return None
 
+    @property
+    def submission_form(self):
+        return [
+            {
+                'key': 'preset',
+                'label': 'Preset',
+                'settings': {
+                    'ambrosia': 'Ambrosia',
+                    'casualboots': 'Casual Boots',
+                    'mcs': 'Maps, Compasses, and Small Keys',
+                    'open': 'Open',
+                    'standard': 'Standard',
+                    'adkeys': "All Dungeons + Keysanity (Round of 8 only)",
+                    'dungeons': 'All Dungeons (Round of 8 only)',
+                    'keysanity': 'Keysanity (Round of 8 only)',
+                }
+            }
+        ]
+
     async def process_submission_form(self, payload, submitted_by):
-        episode_id = int(payload['episodeid'])
-
-        tournament_race = await fetch_tournament_handler("alttpres", episode_id)
-
         embed = discord.Embed(
-            title=f"ALTTPR ES - {tournament_race.versus}",
+            title=f"ALTTPR ES - {self.versus}",
             description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a tournament admin.',
             color=discord.Colour.blue()
         )
@@ -49,14 +82,10 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
 
         embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
-        await models.TournamentGames.update_or_create(episode_id=episode_id, defaults={'settings': preset_dict['settings'], 'event': 'alttpres'})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': preset_dict['settings'], 'event': 'alttpres'})
 
-        audit_channel_id = tournament_race.data.audit_channel_id
-        if audit_channel_id is not None:
-            audit_channel = discordbot.get_channel(audit_channel_id)
-            await audit_channel.send(embed=embed)
-        else:
-            audit_channel = None
+        if self.audit_channel:
+            await self.audit_channel.send(embed=embed)
 
         for name, player in self.player_discords:
             if player is None:
@@ -70,7 +99,3 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
                 logging.exception(f"Could not send DM to {name}")
                 if self.audit_channel:
                     await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-
-
-        return tournament_race
-

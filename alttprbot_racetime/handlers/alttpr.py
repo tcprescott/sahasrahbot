@@ -5,7 +5,6 @@ import math
 
 from alttprbot.alttprgen import mystery, preset, spoilers
 from alttprbot.database import spoiler_races, tournament_results
-from alttprbot.tournament import league, alttpr
 from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler

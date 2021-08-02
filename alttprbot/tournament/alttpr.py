@@ -2,7 +2,7 @@ import logging
 
 from alttprbot.alttprgen import preset
 from alttprbot import models
-from alttprbot.tournament.core import TournamentRace
+from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 
@@ -30,6 +30,27 @@ class ALTTPRTournamentRace(TournamentRace):
 
         await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         self.rtgg_handler.seed_rolled = True
+
+    async def configuration(self):
+        guild = discordbot.get_guild(334795604918272012)
+        return TournamentConfig(
+            guild=guild,
+            racetime_category='alttpr',
+            racetime_goal='Beat the game',
+            event_slug="alttpr",
+            audit_channel=discordbot.get_channel(647966639266201620),
+            commentary_channel=discordbot.get_channel(408347983709470741),
+            scheduling_needs_channel=discordbot.get_channel(434560353461075969),
+            scheduling_needs_tracker=True,
+            helper_roles=[
+                guild.get_role(334797023054397450),
+                guild.get_role(435200206552694794),
+                guild.get_role(482353483853332481),
+                guild.get_role(426487540829388805),
+                guild.get_role(613394561594687499),
+                guild.get_role(334796844750209024)
+            ]
+        )
 
     async def send_room_welcome(self):
         await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.')
@@ -87,3 +108,5 @@ class ALTTPRTournamentRace(TournamentRace):
                 continue
             logging.info(f"Sending tournament submit reminder to {name}.")
             await player.send(msg)
+
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
