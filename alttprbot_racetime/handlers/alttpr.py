@@ -31,7 +31,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
     async def status_in_progress(self):
         await self.send_spoiler_log()
-        # await league.process_league_race_start(self)
+        if self.tournament:
+            await self.tournament.on_race_start()
 
     async def ex_race(self, args, message):
         try:

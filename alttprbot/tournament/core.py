@@ -130,6 +130,8 @@ class TournamentRace(object):
 
         await tournament_race.send_room_welcome()
 
+        await tournament_race.on_room_creation()
+
         return handler.data
 
     @classmethod
@@ -162,6 +164,15 @@ class TournamentRace(object):
                 continue
 
     async def send_room_welcome(self):
+        pass
+
+    async def on_room_creation(self):
+        pass
+
+    async def on_room_resume(self):
+        pass
+
+    async def on_race_start(self):
         pass
 
     async def process_tournament_race(self):
@@ -303,15 +314,6 @@ class TournamentRace(object):
     @property
     def race_info(self):
         info = f"{self.event_name} - {self.versus} - {self.friendly_name}"
-        if self.game_number:
-            info += f" - Game #{self.game_number}"
-        if self.broadcast_channels:
-            info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
-        return info
-
-    @property
-    def race_info_rolled(self):
-        info = f"{self.event_name} - {self.versus} - {self.friendly_name} - {self.seed_code}"
         if self.game_number:
             info += f" - Game #{self.game_number}"
         if self.broadcast_channels:

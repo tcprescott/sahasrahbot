@@ -14,6 +14,7 @@ class ALTTPRTournamentRace(TournamentRace):
     async def process_tournament_race(self):
         await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
+        await self.update_data()
         await self.roll()
 
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
@@ -57,12 +58,16 @@ class ALTTPRTournamentRace(TournamentRace):
 
     @property
     def seed_code(self):
-        if isinstance(self.seed.code, list):
-            return f"({'/'.join(self.seed.code)})"
-        elif isinstance(self.seed.code, str):
-            return f"({self.seed.code})"
+        return f"({'/'.join(self.seed.code)})"
 
-        return ""
+    @property
+    def race_info_rolled(self):
+        info = f"{self.event_name} - {self.versus} - {self.friendly_name} - {self.seed_code}"
+        if self.game_number:
+            info += f" - Game #{self.game_number}"
+        if self.broadcast_channels:
+            info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
+        return info
 
     @property
     def bracket_settings(self):

@@ -37,6 +37,7 @@ class SahasrahBotCoreHandler(RaceHandler):
                 episodeid=race.episode_id,
                 rtgg_handler=self
             )
+            await self.tournament.on_room_resume()
         except UnableToLookupEpisodeException:
             self.logger.exception("Error while association tournament race to handler.")
 
@@ -77,7 +78,8 @@ class SahasrahBotCoreHandler(RaceHandler):
         # raise Exception(data.get('errors'))
 
     async def status_in_progress(self):
-        pass
+        if self.tournament:
+            await self.tournament.on_race_start()
 
     async def status_pending(self):
         pass
