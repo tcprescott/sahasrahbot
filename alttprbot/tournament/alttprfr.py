@@ -167,7 +167,7 @@ class ALTTPRFRTournament(ALTTPRTournamentRace):
         }
 
         settings_formatted = ""
-        for setting in self.data.submission_form:
+        for setting in self.submission_form:
             settings_formatted += f"**{setting['label']}:** {setting['settings'][adjusted_payload.get(setting['key'])]}\n"
 
         embed.add_field(name="Settings", value=settings_formatted, inline=False)
