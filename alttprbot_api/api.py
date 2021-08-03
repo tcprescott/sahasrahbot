@@ -30,7 +30,6 @@ discord = DiscordOAuth2Session(sahasrahbotapi)
 async def login():
     return await discord.create_session(
         scope=[
-            'guilds',
             'identify',
         ],
         data=dict(redirect=session.get("login_original_path", "/me"))
