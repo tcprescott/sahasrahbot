@@ -9,7 +9,7 @@ class ALTTPRHMGTournament(ALTTPRTournamentRace):
         await self.create_embeds()
 
     async def configuration(self):
-        guild = discordbot.get_guild(508335685044928540)
+        guild = discordbot.get_guild(535946014037901333)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
@@ -20,7 +20,7 @@ class ALTTPRHMGTournament(ALTTPRTournamentRace):
             scheduling_needs_channel=discordbot.get_channel(863817206452977685),
             scheduling_needs_tracker=True,
             helper_roles=[
-                guild.get_role(549708578731327489),
+                guild.get_role(549709214000480276),
                 guild.get_role(535962854004883467),
                 guild.get_role(535962802230132737),
             ]

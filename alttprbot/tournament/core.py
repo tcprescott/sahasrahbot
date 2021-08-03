@@ -213,16 +213,14 @@ class TournamentRace(object):
             self.players.append(looked_up_player)
 
     async def make_tournament_player(self, player):
-        # if not player['discordId'] == "":
-        #     looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
-        # else:
-        #     looked_up_player = None
+        if not player['discordId'] == "":
+            looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
+        else:
+            looked_up_player = None
 
-        # # then, if that doesn't work, try their discord tag kept by SG
-        # if looked_up_player is None and not player['discordTag'] == '':
-        #     looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
-
-        looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
+        # then, if that doesn't work, try their discord tag kept by SG
+        if looked_up_player is None and not player['discordTag'] == '':
+            looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
 
         # and failing all that, bomb
         if looked_up_player is None:
