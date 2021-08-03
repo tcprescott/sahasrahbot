@@ -21,7 +21,8 @@ class SMZ3CoopTournament(ALTTPRTournamentRace):
             scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(464497534631542795),
-            ]
+            ],
+            coop=True,
         )
 
     @property
