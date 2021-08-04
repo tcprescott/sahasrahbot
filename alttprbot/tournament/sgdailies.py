@@ -1,12 +1,17 @@
+from alttprbot.tournament.legacy.sgl import SG_DISCORD_WEBHOOK
 import datetime
 
 import discord
+import aiohttp
+import os
+
 from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import speedgaming
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
 
+SG_DISCORD_WEBHOOK = os.environ.get('SG_DISCORD_WEBHOOK', None)
 
 class SGDailyRaceCore(TournamentRace):
     async def configuration(self):
@@ -91,6 +96,10 @@ class SGDailyRaceCore(TournamentRace):
             content=self.announce_message,
             allowed_mentions=discord.AllowedMentions(roles=True)
         )
+
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(SG_DISCORD_WEBHOOK, adapter=discord.AsyncWebhookAdapter(session))
+            await webhook.send(self.announce_message, username="SahasrahBot")
 
     async def update_data(self):
         self.episode = await speedgaming.get_episode(self.episodeid)
