@@ -10,6 +10,8 @@ from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
+import dateutil.parser
+import pytz
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
@@ -111,11 +113,7 @@ class TournamentRace(object):
         tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
 
-        handler = await tournament_race.create_race_room(
-            goal=tournament_race.data.racetime_goal,
-            info=tournament_race.race_info,
-            team_race=tournament_race.data.coop
-        )
+        handler = await tournament_race.create_race_room()
 
         handler.tournament = tournament_race
         tournament_race.rtgg_handler = handler
@@ -178,12 +176,12 @@ class TournamentRace(object):
     async def process_tournament_race(self):
         pass
 
-    async def create_race_room(self, goal, info, team_race=False):
+    async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal=goal,
+            goal=self.data.racetime_goal,
             invitational=True,
             unlisted=False,
-            info=info,
+            info=self.race_info,
             start_delay=15,
             time_limit=24,
             streaming_required=True,
@@ -194,7 +192,7 @@ class TournamentRace(object):
             allow_midrace_chat=True,
             allow_non_entrant_chat=False,
             chat_message_delay=0,
-            team_race=team_race,
+            team_race=self.data.coop,
         )
         return self.rtgg_handler
 
@@ -331,6 +329,30 @@ class TournamentRace(object):
     @property
     def commentary_channel(self):
         return self.data.commentary_channel
+
+    @property
+    def race_start_time(self):
+        return dateutil.parser.parse(self.episode['whenCountdown'])
+
+    @property
+    def race_start_time_restream(self):
+        return dateutil.parser.parse(self.episode['when'])
+
+    # https://c.r74n.com/discord/formatting#Timestamps
+    def discord_time(self, date, time_type="f"):
+        return f"<t:{round(date.timestamp())}:{time_type}>"
+
+    def string_time(self, date):
+        return date.astimezone(self.timezone).strftime("%-I:%M %p")
+
+    @property
+    def timezone(self):
+        return pytz.timezone('US/Eastern')
+
+
+    @property
+    def hours_before_room_open(self):
+        return 0.5
 
     async def create_embeds(self):
         pass

@@ -8,12 +8,14 @@ from alttprbot.tournament.alttprfr import ALTTPRFRTournament
 from alttprbot.tournament.alttpres import ALTTPRESTournament
 from alttprbot.tournament.alttprhmg import ALTTPRHMGTournament
 from alttprbot.tournament.smz3coop import SMZ3CoopTournament
+from alttprbot.tournament.alttprdaily import AlttprSGDailyRace
+from alttprbot.tournament.smz3 import SMZ3DailyRace
 from alttprbot.tournament.smbingo import SMBingoTournament
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(SMBingoTournament):
+class TestTournament(SMZ3DailyRace):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
@@ -30,22 +32,6 @@ class TestTournament(SMBingoTournament):
             ]
         )
 
-    async def create_race_room(self, goal, info, team_race=False):
-        self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal=goal,
-            invitational=True,
-            unlisted=False,
-            info=info,
-            start_delay=15,
-            time_limit=24,
-            streaming_required=False,
-            auto_start=True,
-            allow_comments=True,
-            hide_comments=True,
-            allow_prerace_chat=True,
-            allow_midrace_chat=True,
-            allow_non_entrant_chat=False,
-            chat_message_delay=0,
-            team_race=team_race,
-        )
-        return self.rtgg_handler
+    @property
+    def announce_channel(self):
+        return discordbot.get_channel(508335685044928548)
