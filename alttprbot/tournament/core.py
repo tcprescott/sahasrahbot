@@ -207,6 +207,8 @@ class TournamentRace(object):
         self.players = []
         for player in self.episode['match1']['players']:
             # first try a more concrete match of using the discord id cached by SG
+            if player['publicStream'] == 'ignore':
+                continue
             looked_up_player = await self.make_tournament_player(player)
             self.players.append(looked_up_player)
 
