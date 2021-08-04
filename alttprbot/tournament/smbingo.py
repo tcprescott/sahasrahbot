@@ -10,7 +10,7 @@ from alttprbot_discord.bot import discordbot
 
 class SMBingoTournament(TournamentRace):
     async def configuration(self):
-        guild = discordbot.get_guild(334795604918272012)
+        guild = discordbot.get_guild(155487315530088448)
         return TournamentConfig(
             guild=guild,
             racetime_category='sm',
