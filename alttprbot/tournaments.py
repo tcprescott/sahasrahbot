@@ -3,11 +3,10 @@ import logging
 import os
 
 import aiohttp
-import discord
 import gspread_asyncio
+import gspread.exceptions
 import isodate
 import pytz
-from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
@@ -71,7 +70,10 @@ async def race_recording_task():
         try:
 
             sheet_name = race.event
-            wks = await wb.worksheet(sheet_name)
+            try:
+                wks = await wb.worksheet(sheet_name)
+            except gspread.exceptions.WorksheetNotFound:
+                wks = await wb.add_worksheet(sheet_name)
 
             async with aiohttp.request(
                     method='get',
