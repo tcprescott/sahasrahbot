@@ -28,6 +28,10 @@ class SMBingoTournament(TournamentRace):
             ]
         )
 
+    @property
+    def hours_before_room_open(self):
+        return .35
+
     async def send_room_welcome(self):
         await self.rtgg_handler.send_message('Welcome!  You may start your race when ready.  A link to the bingo card will be posted in chat once the race starts.')
 
