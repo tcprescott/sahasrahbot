@@ -73,7 +73,7 @@ async def race_recording_task():
             try:
                 wks = await wb.worksheet(sheet_name)
             except gspread.exceptions.WorksheetNotFound:
-                wks = await wb.add_worksheet(sheet_name)
+                wks = await wb.add_worksheet(sheet_name, 50, 10)
 
             async with aiohttp.request(
                     method='get',
