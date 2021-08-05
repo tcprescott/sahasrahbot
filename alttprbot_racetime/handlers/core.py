@@ -59,8 +59,14 @@ class SahasrahBotCoreHandler(RaceHandler):
                     await self.accept_request(entrant_id)
                     await self.add_monitor(entrant_id)
 
+        fire_event = False
+
         status = self.data.get('status', {}).get('value')
-        if status != self.status:
+        if status != self.status and self.status is not None:
+            fire_event = True
+
+        self.status = status
+        if fire_event:
             self.status = status
             method = f'status_{status}'
 

@@ -31,7 +31,7 @@ class SMBingoTournament(TournamentRace):
         await self.rtgg_handler.send_message('Setting up bingo cards, please wait...')
 
         self.bingo = await BingoSync.generate(
-            room_name=f"{self.event_name} - {self.versus} - {self.friendly_name}",
+            room_name=f"{self.versus} - {self.friendly_name}"[:30],
             passphrase=''.join(random.choice(string.ascii_lowercase) for i in range(8)),
             game_type=4,
             variant_type=4,
@@ -76,7 +76,7 @@ class SMBingoTournament(TournamentRace):
     async def on_room_resume(self):
         res = await models.TournamentResults.get_or_none(srl_id=self.rtgg_handler.data.get('name'))
         if res is None or res.bingosync_room is None or res.bingosync_password is None:
-            await self.on_room_creation
+            await self.on_room_creation()
         else:
             self.bingo = await BingoSync.retrieve(
                 room_id=res.bingosync_room,

@@ -15,7 +15,7 @@ from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(SMZ3DailyRace):
+class TestTournament(SMBingoTournament):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
