@@ -181,3 +181,9 @@ class SahasrahBotCoreHandler(RaceHandler):
             return True
 
         return False
+
+    async def ex_promote(self, args, message):
+        if self.tournament:
+            racetime_id = message.get('user', {}).get('id', None)
+            if await self.tournament.can_gatekeep(racetime_id):
+                await self.add_monitor(racetime_id)
