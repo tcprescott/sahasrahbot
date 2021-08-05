@@ -1,5 +1,11 @@
-from alttprbot.tournament.sgdailies import TournamentConfig, SGDailyRaceCore
+import os
+
+import aiohttp
+import discord
+from alttprbot.tournament.sgdailies import SGDailyRaceCore, TournamentConfig
 from alttprbot_discord.bot import discordbot
+
+SG_DISCORD_WEBHOOK = os.environ.get('SG_DISCORD_WEBHOOK', None)
 
 
 class AlttprSGDailyRace(SGDailyRaceCore):
@@ -47,3 +53,13 @@ class AlttprSGDailyRace(SGDailyRaceCore):
             seed_time=self.string_time(self.seed_time),
         )
         return msg
+
+    async def send_player_room_info(self):
+        await self.announce_channel.send(
+            content=self.announce_message,
+            allowed_mentions=discord.AllowedMentions(roles=True)
+        )
+
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(SG_DISCORD_WEBHOOK, adapter=discord.AsyncWebhookAdapter(session))
+            await webhook.send(f"<@&399038388964950016> {self.announce_message}", username="SahasrahBot")
