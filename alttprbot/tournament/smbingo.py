@@ -1,12 +1,16 @@
 import string
 import random
+import os
 
+import aiohttp
 import discord
 
 from alttprbot.alttprgen.randomizer.bingosync import BingoSync
 from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot_discord.bot import discordbot
+
+BINGO_COLLAB_DISCORD_WEBHOOK = os.environ.get('BINGO_COLLAB_DISCORD_WEBHOOK', None)
 
 class SMBingoTournament(TournamentRace):
     async def configuration(self):
@@ -57,6 +61,10 @@ class SMBingoTournament(TournamentRace):
         embed.add_field(name="BingoSync Password", value=self.bingo.password, inline=False)
 
         await self.send_audit_message(embed)
+
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(BINGO_COLLAB_DISCORD_WEBHOOK, adapter=discord.AsyncWebhookAdapter(session))
+            await webhook.send(embed=embed, username="SahasrahBot")
 
         await self.rtgg_handler.send_message('BingoSync room has been created and sent to SpeedGaming for setup!')
 

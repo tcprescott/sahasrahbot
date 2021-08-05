@@ -1,0 +1,46 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+quart = "*"
+quart-discord = ">=2.1.4"
+twitchio = "*"
+aerich = ">=0.5.5"
+aioboto3 = ">=8.0.5"
+aiocache = ">=0.11.1"
+aiofiles = ">=0.4.0"
+aiohttp = "<3.7.0,>=3.6.0"
+aiomysql = ">=0.0.20"
+discord-sentry-reporting = "*"
+"discord.py" = ">=1.6.0"
+emoji = ">=0.5.3"
+dataclasses-json = "*"
+gspread-asyncio = "*"
+pyyaml = "*"
+python-dotenv = "*"
+html2markdown = "*"
+z3r-sramr-py = "*"
+urlextract = "*"
+slugify = "*"
+oauth2client = "*"
+google-api-python-client = "*"
+jishaku = "*"
+
+[dev-packages]
+pycodestyle = "*"
+pylint = "*"
+ipython = "*"
+requests = "*"
+
+[requires]
+python_version = "3.8"
+
+[packages.pyz3r]
+git = "https://github.com/tcprescott/pyz3r.git"
+ref = "6.0.0-dev"
+
+[packages.racetime-bot]
+git = "https://github.com/tcprescott/racetime-bot.git"
+ref = "aiohttp_update"

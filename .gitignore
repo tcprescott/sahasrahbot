@@ -8,3 +8,4 @@ presets/bot_testing.yaml
 public/spoilers
 test_input/
 weights/bot_testing.yaml
+.venv/
