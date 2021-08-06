@@ -354,7 +354,7 @@ class TournamentRace(object):
 
     @property
     def hours_before_room_open(self):
-        return 0.5
+        return 0.75
 
     async def create_embeds(self):
         pass
