@@ -32,7 +32,7 @@ class Tournament(commands.Cog):
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
             event_data = await tournament_class.get_config()
             try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=event_data.hours_before_room_open, hours_future=.75)
+                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
             except Exception as e:
                 logging.exception(
                     "Encountered a problem when attempting to retrieve SG schedule.")
