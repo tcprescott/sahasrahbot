@@ -10,7 +10,7 @@ import pytz
 from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
-from alttprbot.tournament import test, alttpr, alttprcd, alttpres, alttprfr, alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily
+from alttprbot.tournament import test, alttpr, alttprcd, alttpres, alttprfr, alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
 

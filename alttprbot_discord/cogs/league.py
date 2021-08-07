@@ -1,7 +1,6 @@
 import asyncio
 import os
 import random
-import traceback
 import logging
 
 import aiohttp
@@ -80,7 +79,7 @@ class League(commands.Cog):
         for event in events:
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0, hours_future=168)
-            except Exception as e:
+            except Exception:
                 logging.exception(
                     "Encountered a problem when attempting to retrieve SG schedule.")
                 continue

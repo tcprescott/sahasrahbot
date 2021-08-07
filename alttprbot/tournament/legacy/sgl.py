@@ -5,8 +5,6 @@ import random
 import string
 import asyncio
 import os
-import logging
-
 import aiohttp
 import discord
 import dateutil.parser
@@ -190,9 +188,9 @@ class SGLiveRace():
     #     pass
 
     # Final Fantasy Randomizer
-    async def event_sglive2020ffr(self):
-        self.seed_id, self.permalink = randomizer.roll_ffr(flags='yGq4dTUZierDQgQt0W-opZBxIHu3Djls2qM3uv02Y6KFCBgdRRG1fVdgyOD!kw3MO9U-Ez9vU4p3r3WORe9o7vyXSpZD')
-        self.goal_postfix = f" - {self.permalink}"
+    # async def event_sglive2020ffr(self):
+    #     self.seed_id, self.permalink = randomizer.roll_ffr(flags='yGq4dTUZierDQgQt0W-opZBxIHu3Djls2qM3uv02Y6KFCBgdRRG1fVdgyOD!kw3MO9U-Ez9vU4p3r3WORe9o7vyXSpZD')
+    #     self.goal_postfix = f" - {self.permalink}"
 
     # Megaman X
     # async def event_sglive2020mmx(self):
@@ -550,7 +548,7 @@ async def create_smm2_match_discord(episode_id, force):
         try:
             await match_channel.set_permissions(player, read_messages=True)
             await player.send(embed=embed)
-        except discord.HTTPException as e:
+        except discord.HTTPException:
             logging.exception("SGL - Unable to add player to SMM2 match.")
             await audit_channel.send(f'Could not add {name} to channel {match_channel.mention}')
             continue

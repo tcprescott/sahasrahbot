@@ -1,8 +1,6 @@
 import random
 
 from alttprbot.alttprgen import preset, smz3multi
-from alttprbot.tournament import alttpr
-from alttprbot.database import tournament_results
 
 from .core import SahasrahBotCoreHandler
 

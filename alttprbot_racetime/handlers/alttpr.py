@@ -8,7 +8,6 @@ from alttprbot.database import spoiler_races, tournament_results
 from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler
-from config import Config as c
 
 
 class GameHandler(SahasrahBotCoreHandler):

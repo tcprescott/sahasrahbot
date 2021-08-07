@@ -1,18 +1,10 @@
 import datetime
-import logging
-import json
-import logging
-import re
 
-import aiohttp
 import dateutil.parser
 import discord
 import pytz
 from alttprbot.util import speedgaming
-from alttprbot.database import sgdailies, tournament_results
-from discord.ext import commands, tasks
-from config import Config as c
-from alttprbot_racetime import bot as racetime
+from discord.ext import commands
 
 
 class SgDaily(commands.Cog):

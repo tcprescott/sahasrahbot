@@ -1,15 +1,9 @@
-import csv
 import datetime
-import io
 import logging
 
-import aiohttp
 import discord
-import pytz
 from discord.ext import commands, tasks
 
-from alttprbot.database import srlnick
-from alttprbot.exceptions import SahasrahBotException
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
 from config import Config as c
@@ -61,14 +55,14 @@ class Tournament(commands.Cog):
                 continue
 
             try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event_data.data.event_slug, hours_past=0, hours_future=168)
+                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
             except Exception as e:
                 logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
                 logging.info(episode['id'])
                 try:
-                    tournament_race = await tournaments.fetch_tournament_handler(event_data.data.event_slug, episode['id'])
+                    tournament_race = await tournaments.fetch_tournament_handler(event_slug, episode['id'])
                     await tournament_race.send_race_submission_form()
                 except Exception as e:
                     logging.exception("Encountered a problem when attempting send race submission.")
@@ -88,7 +82,7 @@ class Tournament(commands.Cog):
 
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=48)
-            except Exception as e:
+            except Exception:
                 logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                 continue
 

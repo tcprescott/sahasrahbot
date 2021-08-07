@@ -5,7 +5,7 @@ import discord
 from alttprbot.alttprgen import preset
 from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.tournament.core import TournamentRace, TournamentConfig
+from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 
