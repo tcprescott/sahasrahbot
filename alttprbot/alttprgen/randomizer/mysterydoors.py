@@ -66,7 +66,7 @@ def generate_doors_settings(weights, options):
 
     options["timer"] = get_random_option(weights.get('timer', 'none'))
     options["dungeon_counters"] = get_random_option(weights.get('dungeon_counters', 'default'))
-    options["pseudoboots"] = get_random_option(weights.get('pseudoboots', 'default'))
+    options["pseudoboots"] = get_random_option(weights.get('pseudoboots', False))
 
     options['intensity'] = get_random_option(weights.get('intensity', 2))
     options['beemizer'] = get_random_option(weights.get('beemizer', 0))
