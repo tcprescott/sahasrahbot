@@ -1,8 +1,8 @@
+import discord
+import pyz3r
+from alttprbot.alttprgen.mystery import get_weights
 from discord.ext import commands
 from pyz3r.alttpr import ALTTPR
-from alttprbot.alttprgen.mystery import get_weights
-import pyz3r
-import discord
 
 
 class Aqttp(commands.Cog):

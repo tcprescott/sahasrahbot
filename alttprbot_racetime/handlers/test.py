@@ -1,6 +1,6 @@
-from .sm import GameHandler as SMGameHandler
+from .alttpr import GameHandler as TestGameHandler
 
-class GameHandler(SMGameHandler):
+class GameHandler(TestGameHandler):
     async def status_invitational(self):
         await self.send_message("switched to invitational status")
 

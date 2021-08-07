@@ -93,31 +93,20 @@ async def mysterygen():
 @sahasrahbotapi.route('/api/settingsgen/mystery/<string:weightset>', methods=['GET'])
 async def mysterygenwithweights(weightset):
     weights = await get_weights(weightset)
-    settings, customizer, doors = await generate(weights=weights, spoilers="mystery")
-    if customizer:
+    mystery = await generate(weights=weights, spoilers="mystery")
+    if mystery.customizer:
         endpoint = '/api/customizer'
-    elif doors:
+    elif mystery.doors:
         endpoint = None
     else:
         endpoint = '/api/randomizer'
     return jsonify(
-        settings=settings,
-        customizer=customizer,
-        doors=doors,
+        settings=mystery.settings,
+        customizer=mystery.customizer,
+        doors=mystery.doors,
         endpoint=endpoint
     )
 
-
-# @sahasrahbotapi.route('/api/league/playoff', methods=['POST'])
-# async def league_playoff():
-#     payload = await request.get_json()
-
-#     if not payload['secret'] == os.environ.get('LEAGUE_DATA_ENDPOINT_SECRET'):
-#         abort(401, description="secret required")
-
-#     await league.process_playoff_form(payload['form'])
-
-#     return jsonify(success=True)
 
 @sahasrahbotapi.route("/submit/<string:event>", methods=['GET'])
 @requires_authorization

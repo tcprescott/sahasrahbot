@@ -3,7 +3,8 @@ from datetime import datetime
 import math
 # import logging
 
-from alttprbot.alttprgen import mystery, preset, spoilers
+from alttprbot.alttprgen import preset, spoilers
+from alttprbot.alttprgen.mystery import generate_random_game, WeightsetNotFoundException
 from alttprbot.database import spoiler_races, tournament_results
 from racetime_bot import monitor_cmd
 
@@ -12,8 +13,7 @@ from .core import SahasrahBotCoreHandler
 
 class GameHandler(SahasrahBotCoreHandler):
     async def begin(self):
-        self.state['locked'] = False
-        await self.setup_tournament()
+        await super().begin()
 
         # re-establish a spoiler race countdown if bot is restarted/crashes
         in_progress_spoiler_race = await spoiler_races.get_spoiler_race_by_id_started(self.data.get('name'))
@@ -53,24 +53,10 @@ class GameHandler(SahasrahBotCoreHandler):
             return
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
-    # async def ex_leaguerace(self, args, message):
-    #     if await self.is_locked(message):
-    #         return
-
-    #     await league.process_league_race(
-    #         handler=self,
-    #         episodeid=args[0] if len(args) >= 1 else None,
-    #         week=args[1] if len(args) == 2 else None
-    #     )
-
     async def ex_quickswaprace(self, args, message):
         await self.send_message("Please use !race instead of this command.")
 
     async def ex_spoiler(self, args, message):
-        # if league.is_league_race(self.data.get('name')):
-        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
-        #     return
-
         if await self.is_locked(message):
             return
 
@@ -101,10 +87,6 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_progression(self, args, message):
-        # if league.is_league_race(self.data.get('name')):
-        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
-        #     return
-
         if await self.is_locked(message):
             return
 
@@ -130,10 +112,6 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_mystery(self, args, message):
-        # if league.is_league_race(self.data.get('name')):
-        #     await self.send_message('This is a league race room, please use !leaguerace to roll')
-        #     return
-
         if await self.is_locked(message):
             return
 
@@ -141,16 +119,22 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
-            seed = await mystery.generate_random_game(
+            mystery = await generate_random_game(
                 weightset=weightset,
                 tournament=True,
                 spoilers="mystery"
             )
-        except mystery.WeightsetNotFoundException as e:
+            seed = mystery.seed
+        except WeightsetNotFoundException as e:
             await self.send_message(str(e))
             return
 
-        await self.set_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+        if mystery.custom_instructions:
+            await self.send_message(f"Instructions: {mystery.custom_instructions}")
+            await self.set_raceinfo(f"Instructions: {mystery.custom_instructions} - mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+        else:
+            await self.set_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True

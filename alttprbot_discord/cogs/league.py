@@ -7,10 +7,11 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot.alttprgen import mystery, preset, spoilers
+# from alttprbot.alttprgen import preset, spoilers
+# from alttprbot.alttprgen.mystery import generate_random_game
 from alttprbot.database import config, srlnick
-from alttprbot.tournament import league
-from alttprbot.util import speedgaming
+# from alttprbot.tournament import league
+# from alttprbot.util import speedgaming
 from config import Config as c
 
 from ..util import checks
@@ -30,76 +31,76 @@ def restrict_league_server():
 class League(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.create_races.start()
-        self.find_unsubmitted_races.start()
+        # self.create_races.start()
+        # self.find_unsubmitted_races.start()
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
-    async def create_races(self):
-        if c.DEBUG:
-            return
-            # events = ['test']
-        else:
-            events = ['alttprleague', 'invleague']
-        logging.info("scanning SG schedule for races to create")
-        for event in events:
-            try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
-            except Exception as e:
-                logging.exception(
-                    "Encountered a problem when attempting to retrieve SG schedule.")
-                continue
-            for episode in episodes:
-                logging.info(episode['id'])
-                try:
-                    await league.create_league_race_room(episode['id'])
-                except Exception as e:
-                    logging.exception(
-                        "Encountered a problem when attempting to create RT.gg race room.")
-                    guild_id = await config.get(0, 'AlttprLeagueServer')
-                    audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
-                    audit_channel = self.bot.get_channel(int(audit_channel_id))
-                    if audit_channel:
-                        await audit_channel.send(
-                            f"@here There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
-                            allowed_mentions=discord.AllowedMentions(
-                                everyone=True)
-                        )
+    # @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
+    # async def create_races(self):
+    #     if c.DEBUG:
+    #         return
+    #         # events = ['test']
+    #     else:
+    #         events = ['alttprleague', 'invleague']
+    #     logging.info("scanning SG schedule for races to create")
+    #     for event in events:
+    #         try:
+    #             episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0.5, hours_future=.75)
+    #         except Exception as e:
+    #             logging.exception(
+    #                 "Encountered a problem when attempting to retrieve SG schedule.")
+    #             continue
+    #         for episode in episodes:
+    #             logging.info(episode['id'])
+    #             try:
+    #                 await league.create_league_race_room(episode['id'])
+    #             except Exception as e:
+    #                 logging.exception(
+    #                     "Encountered a problem when attempting to create RT.gg race room.")
+    #                 guild_id = await config.get(0, 'AlttprLeagueServer')
+    #                 audit_channel_id = await config.get(guild_id, 'AlttprLeagueAuditChannel')
+    #                 audit_channel = self.bot.get_channel(int(audit_channel_id))
+    #                 if audit_channel:
+    #                     await audit_channel.send(
+    #                         f"@here There was an error while automatically creating a race room for episode `{episode['id']}`.\n\n{str(e)}",
+    #                         allowed_mentions=discord.AllowedMentions(
+    #                             everyone=True)
+    #                     )
 
-        logging.info('done')
+    #     logging.info('done')
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
-    async def find_unsubmitted_races(self):
-        logging.info('scanning for unsubmitted races')
-        if c.DEBUG:
-            return
-            # events = ['test']
-        else:
-            events = ['alttprleague', 'invleague']
+    # @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
+    # async def find_unsubmitted_races(self):
+    #     logging.info('scanning for unsubmitted races')
+    #     if c.DEBUG:
+    #         return
+    #         # events = ['test']
+    #     else:
+    #         events = ['alttprleague', 'invleague']
 
-        for event in events:
-            try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0, hours_future=168)
-            except Exception:
-                logging.exception(
-                    "Encountered a problem when attempting to retrieve SG schedule.")
-                continue
-            for episode in episodes:
-                logging.info(episode['id'])
-                try:
-                    await league.send_race_submission_form(episode['id'])
-                except Exception as e:
-                    logging.exception(
-                        "Encountered a problem when attempting send race submission.")
+    #     for event in events:
+    #         try:
+    #             episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=0, hours_future=168)
+    #         except Exception:
+    #             logging.exception(
+    #                 "Encountered a problem when attempting to retrieve SG schedule.")
+    #             continue
+    #         for episode in episodes:
+    #             logging.info(episode['id'])
+    #             try:
+    #                 await league.send_race_submission_form(episode['id'])
+    #             except Exception as e:
+    #                 logging.exception(
+    #                     "Encountered a problem when attempting send race submission.")
 
-    @create_races.before_loop
-    async def before_create_races(self):
-        logging.info('league create_races loop waiting...')
-        await self.bot.wait_until_ready()
+    # @create_races.before_loop
+    # async def before_create_races(self):
+    #     logging.info('league create_races loop waiting...')
+    #     await self.bot.wait_until_ready()
 
-    @find_unsubmitted_races.before_loop
-    async def before_find_unsubmitted_races(self):
-        logging.info('league find_unsubmitted_races loop waiting...')
-        await self.bot.wait_until_ready()
+    # @find_unsubmitted_races.before_loop
+    # async def before_find_unsubmitted_races(self):
+    #     logging.info('league find_unsubmitted_races loop waiting...')
+    #     await self.bot.wait_until_ready()
 
     @commands.command(
         help='Set the ALTTPR League Week.'
@@ -110,13 +111,13 @@ class League(commands.Cog):
         guildid = ctx.guild.id if ctx.guild else 0
         await config.set_parameter(guildid, 'AlttprLeagueWeek', week)
 
-    @commands.command(
-        help='Create League RT.gg Race Room.'
-    )
-    @commands.has_any_role('Admin', 'Mods', 'Bot Overlord')
-    @restrict_league_server()
-    async def leaguecreate(self, ctx, episodeid: int):
-        await league.create_league_race_room(episodeid)
+    # @commands.command(
+    #     help='Create League RT.gg Race Room.'
+    # )
+    # @commands.has_any_role('Admin', 'Mods', 'Bot Overlord')
+    # @restrict_league_server()
+    # async def leaguecreate(self, ctx, episodeid: int):
+    #     await league.create_league_race_room(episodeid)
 
     @commands.command(
         help='Get the league week.'
@@ -127,31 +128,32 @@ class League(commands.Cog):
         week = await config.get(guildid, 'AlttprLeagueWeek')
         await ctx.reply(f"This is Week {week}")
 
-    @commands.command(
-        brief='Generate a practice seed.',
-        help='Generate a league practice seed for the specified league week.'
-    )
-    @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
-    async def leaguepractice(self, ctx, week: str):
-        game_type = league.WEEKDATA[week]['type']
-        friendly_name = league.WEEKDATA[week]['friendly_name']
-        spoiler_log_url = None
+    # @commands.command(
+    #     brief='Generate a practice seed.',
+    #     help='Generate a league practice seed for the specified league week.'
+    # )
+    # @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
+    # async def leaguepractice(self, ctx, week: str):
+    #     game_type = league.WEEKDATA[week]['type']
+    #     friendly_name = league.WEEKDATA[week]['friendly_name']
+    #     spoiler_log_url = None
 
-        if game_type == 'preset':
-            seed, _ = await preset.get_preset(league.WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
-        elif game_type == 'mystery':
-            seed = await mystery.generate_random_game(weightset=league.WEEKDATA[week]['weightset'], spoilers="mystery", tournament=True)
-        elif game_type == 'spoiler':
-            seed, _, spoiler_log_url = await spoilers.generate_spoiler_game(league.WEEKDATA[week]['preset'])
+    #     if game_type == 'preset':
+    #         seed, _ = await preset.get_preset(league.WEEKDATA[week]['preset'], nohints=True, allow_quickswap=True)
+    #     elif game_type == 'mystery':
+    #         mystery = await generate_random_game(weightset=league.WEEKDATA[week]['weightset'], spoilers="mystery", tournament=True)
+    #         seed = mystery.seed
+    #     elif game_type == 'spoiler':
+    #         seed, _, spoiler_log_url = await spoilers.generate_spoiler_game(league.WEEKDATA[week]['preset'])
 
-        embed = await seed.embed(
-            name=f"Practice - {friendly_name}",
-            emojis=self.bot.emojis
-        )
-        if spoiler_log_url:
-            embed.insert_field_at(0, name="Spoiler Log URL",
-                                  value=spoiler_log_url, inline=False)
-        await ctx.reply(embed=embed)
+    #     embed = await seed.embed(
+    #         name=f"Practice - {friendly_name}",
+    #         emojis=self.bot.emojis
+    #     )
+    #     if spoiler_log_url:
+    #         embed.insert_field_at(0, name="Spoiler Log URL",
+    #                               value=spoiler_log_url, inline=False)
+    #     await ctx.reply(embed=embed)
 
     @commands.command()
     @commands.is_owner()

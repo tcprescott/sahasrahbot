@@ -10,7 +10,7 @@ from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 import pyz3r
 from alttprbot import models
 from pyz3r.ext.priestmode import create_priestmode
-from alttprbot.alttprgen.mystery import (generate_random_game)
+from alttprbot.alttprgen.mystery import generate_random_game
 from alttprbot.alttprgen.preset import get_preset, generate_preset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config
@@ -409,13 +409,15 @@ class AlttprGen(commands.Cog):
 
 
 async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off"):
-    seed = await generate_random_game(
+    mystery = await generate_random_game(
         weightset=weightset,
         weights=weights,
         tournament=tournament,
         spoilers=spoilers
     )
-    embed = await seed.embed(emojis=ctx.bot.emojis, name="Mystery Game")
+    embed = await mystery.seed.embed(emojis=ctx.bot.emojis, name="Mystery Game")
+    if mystery.custom_instructions:
+        embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions)
     await ctx.reply(embed=embed)
 
 

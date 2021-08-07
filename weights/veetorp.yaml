@@ -24,46 +24,44 @@ goals:
   pedestal: 20
   triforce-hunt: 10
 tower_open:
-  "0": 5
-  "1": 5
-  "2": 5
-  "3": 5
-  "4": 5
-  "5": 5
-  "6": 5
-  "7": 50
-  random: 15
+  "0": 1
+  "1": 1
+  "2": 1
+  "3": 1
+  "4": 1
+  "5": 1
+  "6": 1
+  "7": 1
 ganon_open:
   "0": 5
   "1": 5
   "2": 5
-  "3": 5
-  "4": 5
-  "5": 5
-  "6": 5
-  "7": 50
-  random: 15
+  "3": 10
+  "4": 10
+  "5": 15
+  "6": 20
+  "7": 30
 world_state:
   standard: 35
   open: 35
   inverted: 20
   retro: 10
 entrance_shuffle:
-  none: 60
-  simple: 7
-  restricted: 10
-  full: 10
-  crossed: 10
-  insanity: 2
+  none: 70
+  simple: 5
+  restricted: 5
+  full: 5
+  crossed: 14
+  insanity: 1
 boss_shuffle:
-  none: 60
+  none: 75
   simple: 10
   full: 10
-  random: 20
+  random: 5
 enemy_shuffle:
-  none: 60
+  none: 75
   shuffled: 20
-  random: 20
+  random: 5
 hints:
   "on": 50
   "off": 50
@@ -78,35 +76,35 @@ item_pool:
   expert: 5
   crowd_control: 0
 item_functionality:
-  normal: 80
-  hard: 15
-  expert: 5
+  normal: 96
+  hard: 3
+  expert: 1
 enemy_damage:
   default: 80
   shuffled: 10
   random: 10
 enemy_health:
-  default: 80
-  easy: 5
-  hard: 10
-  expert: 5
+  default: 95
+  easy: 2
+  hard: 2
+  expert: 1
 pot_shuffle:
-  'on': 50
-  'off': 50
+  'on': 20
+  'off': 80
 door_shuffle:
-  vanilla: 50
-  basic: 20
-  crossed: 30
+  vanilla: 70
+  basic: 10
+  crossed: 20
 keydropshuffle:
-  "off": 60
-  "on": 40
+  "off": 75
+  "on": 25
 shopsanity:
-  "off": 60
-  "on": 40
+  "off": 75
+  "on": 25
 intensity:
-  1: 20
+  1: 10
   2: 50
-  3: 30
+  3: 40
 customizer:
   eq:
     "PegasusBoots":

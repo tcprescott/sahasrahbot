@@ -21,6 +21,10 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def begin(self):
         self.state['locked'] = False
+
+        if self.data.get('status', {}).get('value') in ['open', 'invitational']:
+            await self.intro()
+
         await self.setup_tournament()
 
     async def setup_tournament(self):
@@ -91,10 +95,10 @@ class SahasrahBotCoreHandler(RaceHandler):
         pass
 
     async def status_open(self):
-        await self.intro()
+        pass
 
     async def status_invitational(self):
-        await self.intro()
+        pass
 
     async def race_data_hook(self):
         pass

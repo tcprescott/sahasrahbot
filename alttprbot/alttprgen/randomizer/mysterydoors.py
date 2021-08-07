@@ -59,11 +59,14 @@ def generate_doors_settings(weights, options):
     options["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
     options['entrance_shuffle'] = get_random_option(weights['entrance_shuffle'])
 
-
     options["mapshuffle"] = get_random_option(weights.get('mapshuffle', False))
     options["compassshuffle"] = get_random_option(weights.get('compassshuffle', False))
     options["keyshuffle"] = get_random_option(weights.get('keyshuffle', False))
     options["bigkeyshuffle"] = get_random_option(weights.get('bigkeyshuffle', False))
+
+    options["timer"] = get_random_option(weights.get('timer', 'none'))
+    options["dungeon_counters"] = get_random_option(weights.get('dungeon_counters', 'default'))
+    options["pseudoboots"] = get_random_option(weights.get('pseudoboots', 'default'))
 
     options['intensity'] = get_random_option(weights.get('intensity', 2))
     options['beemizer'] = get_random_option(weights.get('beemizer', 0))
@@ -149,6 +152,10 @@ def generate_doors_settings(weights, options):
     settings["keyshuffle"] = options['keyshuffle'] == 'on' if 'keyshuffle' in weights else options['dungeon_items'] in ['mcs', 'full']
     settings["bigkeyshuffle"] = options['bigkeyshuffle'] == 'on' if 'bigkeyshuffle' in weights else options['dungeon_items'] == 'full'
     settings["keysanity"] = options['keysanity'] == 'on' if 'keysanity' in weights else options['dungeon_items'] == 'full'
+
+    settings["timer"] = options["timer"]
+    settings["dungeon_counters"] = options["dungeon_counters"]
+    settings["pseudoboots"] = options["pseudoboots"]
 
     settings["door_shuffle"] = options['door_shuffle']
     settings["intensity"] = options['intensity']
