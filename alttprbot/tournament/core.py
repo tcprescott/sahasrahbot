@@ -49,34 +49,44 @@ class TournamentConfig:
 
 class TournamentPlayer(object):
     def __init__(self):
-        pass
+        self.data: models.SRLNick = None
+        self.discord_user: discord.Member = None
 
     @classmethod
-    async def construct(cls, discord_id: int, guild):
+    async def construct(cls, discord_id: int, guild: discord.Guild):
         playerobj = cls()
 
         playerobj.data = await models.SRLNick.get_or_none(discord_user_id=discord_id)
         if playerobj.data is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_id}")
         playerobj.discord_user = guild.get_member(int(discord_id))
-        playerobj.name = playerobj.discord_user.name
 
         return playerobj
 
     @classmethod
-    async def construct_discord_name(cls, discord_name: str, guild):
+    async def construct_discord_name(cls, discord_name: str, guild: discord.Guild):
         playerobj = cls()
 
         playerobj.discord_user = guild.get_member_named(discord_name)
         if playerobj.discord_user is None:
             raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
-        playerobj.name = discord_name
         playerobj.data = await models.SRLNick.get_or_none(discord_user_id=playerobj.discord_user.id)
         if playerobj.data is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_name}")
 
         return playerobj
 
+    @property
+    def rtgg_id(self):
+        return self.data.rtgg_id
+
+    @property
+    def twitch_name(self):
+        return self.data.twitch_name
+
+    @property
+    def name(self):
+        return self.discord_user.name
 
 class TournamentRace(object):
     def __init__(self, episodeid: int=None, rtgg_handler=None):
@@ -293,7 +303,7 @@ class TournamentRace(object):
 
     @property
     def player_racetime_ids(self):
-        return [p.data.rtgg_id for p in self.players]
+        return [p.rtgg_id for p in self.players]
 
     @property
     def player_names(self):
