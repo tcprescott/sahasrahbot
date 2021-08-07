@@ -10,7 +10,7 @@ import csv
 
 
 class Audit(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         # self.clean_history.start()
 
@@ -205,15 +205,14 @@ class Audit(commands.Cog):
     #         logging.info("voice state change")
 
     @commands.Cog.listener()
-    async def on_member_ban(self, guild, user):
+    async def on_member_ban(self, guild: discord.Guild, user):
         if guild is None:
             return
         if await guild.config_get('AuditLogging') == 'true':
             audit_channel_id = await guild.config_get('AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_banned(user)
-                audit_channel = discord.utils.get(
-                    user.guild.channels, id=int(audit_channel_id))
+                audit_channel = discord.utils.get(guild.channels, id=int(audit_channel_id))
 
                 await audit_channel.send(embed=embed)
 
