@@ -27,6 +27,10 @@ class SMZ3DailyRace(SGDailyRaceCore):
         if self.broadcast_channels:
             msg += f" on {', '.join(self.broadcast_channels)}"
 
+        msg += " - {racetime_url}".format(
+            racetime_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])
+        )
+
         return msg
 
     @property
