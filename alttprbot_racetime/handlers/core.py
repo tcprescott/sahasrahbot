@@ -1,8 +1,11 @@
 from itertools import groupby
 
+import tortoise.exceptions
+
 from alttprbot_discord.bot import discordbot
 from alttprbot import models
 from alttprbot import tournaments
+from alttprbot_racetime.misc.konot import KONOT
 from alttprbot.tournament.core import UnableToLookupEpisodeException
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
@@ -13,6 +16,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     """
     stop_at = ['cancelled', 'finished']
     tournament = None
+    konot: KONOT = None
     status = None
 
     def __init__(self, **kwargs):
@@ -26,6 +30,7 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.intro()
 
         await self.setup_tournament()
+        await self.setup_konot()
 
     async def setup_tournament(self):
         if self.tournament:
@@ -45,6 +50,14 @@ class SahasrahBotCoreHandler(RaceHandler):
         except (UnableToLookupEpisodeException, KeyError):
             self.logger.exception("Error while association tournament race to handler.")
 
+    async def setup_konot(self):
+        if self.konot:
+            return
+
+        try:
+            self.konot = await KONOT.resume(self)
+        except tortoise.exceptions.DoesNotExist:
+            self.konot = None
 
     async def race_data(self, data):
         self.data = data.get('race')
@@ -100,6 +113,10 @@ class SahasrahBotCoreHandler(RaceHandler):
     async def status_invitational(self):
         pass
 
+    async def status_finished(self):
+        if self.konot:
+            await self.konot.create_next_room()
+
     async def race_data_hook(self):
         pass
 
@@ -145,6 +162,11 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         if self.tournament:
             await self.tournament.process_tournament_race()
+
+    async def ex_konot(self, args, message):
+        await self.send_message("Setting up new KONOT race series!  The last player(s) to finish will be eliminated.  Once this race finishes, a new race will be created and the players advancing will be invited to the new room.")
+        await self.set_raceinfo("KONOT Series, Segment #1")
+        self.konot = await KONOT.create_new(self.data['category']['slug'], self)
 
     @monitor_cmd
     async def ex_lock(self, args, message):

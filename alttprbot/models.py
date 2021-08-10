@@ -88,6 +88,21 @@ class PatchDistribution(Model):
     game = fields.CharField(45, null=True)
     used = fields.SmallIntField(index=True)
 
+class RacetimeKONOTGame(Model):
+    id = fields.IntField(pk=True)
+    category_slug = fields.CharField(50, null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
+class RaceTimeKONOTSegment(Model):
+    id = fields.IntField(pk=True)
+    racetime_room = fields.CharField(200, null=False)
+    game_id = fields.IntField(null=False)
+    segment_number = fields.IntField(null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
 class ReactionGroup(Model):
     class Meta:
         table='reaction_group'
