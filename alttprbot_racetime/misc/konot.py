@@ -51,23 +51,29 @@ class KONOT(object):
 
         next_segment_number = self.segment.segment_number + 1
 
-        handler = await self.rtgg_handler.bot.startrace(
-            goal=self.rtgg_handler.data['goal']['name'],
-            invitational=True,
-            unlisted=False,
-            info=f"KONOT Series, Segment #{next_segment_number}",
-            start_delay=15,
-            time_limit=24,
-            streaming_required=True,
-            auto_start=True,
-            allow_comments=True,
-            hide_comments=False,
-            allow_prerace_chat=True,
-            allow_midrace_chat=True,
-            allow_non_entrant_chat=True,
-            chat_message_delay=0,
-            team_race=False,
-        )
+        params = {
+            'invitational': True,
+            'unlisted': False,
+            'info': f"KONOT Series, Segment #{next_segment_number}",
+            'start_delay': 15,
+            'time_limit': 24,
+            'streaming_required': self.rtgg_handler.data['streaming_required'],
+            'auto_start': self.rtgg_handler.data['auto_start'],
+            'allow_comments': self.rtgg_handler.data['allow_comments'],
+            'hide_comments': self.rtgg_handler.data['hide_comments'],
+            'allow_prerace_chat': self.rtgg_handler.data['allow_prerace_chat'],
+            'allow_midrace_chat': self.rtgg_handler.data['allow_midrace_chat'],
+            'allow_non_entrant_chat': self.rtgg_handler.data['allow_non_entrant_chat'],
+            'chat_message_delay': 0,
+            'team_race': False,
+        }
+
+        if self.rtgg_handler.data['goal']['custom']:
+            params['custom_goal'] = self.rtgg_handler.data['goal']['name']
+        else:
+            params['goal'] = self.rtgg_handler.data['goal']['name']
+
+        handler = await self.rtgg_handler.bot.startrace(**params)
 
         handler.konot = await KONOT.next_segment(handler, self.game, next_segment_number)
 
