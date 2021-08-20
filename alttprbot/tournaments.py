@@ -27,7 +27,7 @@ else:
         # 'alttpr': alttpr.ALTTPRTournamentRace,
         # 'smwde': smwde.SMWDETournament,
         'alttprfr': alttprfr.ALTTPRFRTournament,
-        'alttprhmg': alttprhmg.ALTTPRHMGTournament,
+        # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
         'alttpres': alttpres.ALTTPRESTournament,
         'smz3coop': smz3coop.SMZ3CoopTournament,
         'smbingo': smbingo.SMBingoTournament,
