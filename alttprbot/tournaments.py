@@ -10,7 +10,8 @@ import pytz
 from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
-from alttprbot.tournament import test, alttpr, alttprcd, alttpres, alttprfr, alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily # pylint: disable=unused-import
+from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr, # pylint: disable=unused-import
+    alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily, alttprleague) # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -32,7 +33,9 @@ else:
         'smz3coop': smz3coop.SMZ3CoopTournament,
         'smbingo': smbingo.SMBingoTournament,
         'alttprdaily': alttprdaily.AlttprSGDailyRace,
-        'smz3': smz3.SMZ3DailyRace
+        'smz3': smz3.SMZ3DailyRace,
+        # 'invleague': alttprleague.ALTTPRLeague,
+        # 'alttprleague': alttprleague.ALTTPROpenLeague,
     }
 
 async def fetch_tournament_handler(event, episodeid: int, rtgg_handler=None):

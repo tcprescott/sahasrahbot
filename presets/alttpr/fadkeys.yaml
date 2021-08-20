@@ -294,7 +294,7 @@ settings:
   - BossHeartContainer
   glitches: none
   goal: dungeons
-  hints: 'on'
+  hints: 'off'
   item:
     functionality: normal
     pool: normal
