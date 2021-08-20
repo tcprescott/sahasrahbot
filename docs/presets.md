@@ -68,6 +68,7 @@ title:  Presets
 | [open_noprogbows](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_noprogbows.yaml) || *Customizer*  |
 | [open_randomcrystals](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_randomcrystals.yaml) |Random GT and Ganon crystal requirements.|   |
 | [openboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots.yaml) |You get to start with Pegasus Boots!| *Customizer*  |
+| [openboots_enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots_enemizer.yaml) |Enemizer, and you get to start with Pegasus Boots!| *Customizer*  |
 | [openboots_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots_fast.yaml) |You get to start with Pegasus Boots! Oh, and you don't need to defeat Aghanim 2.| *Customizer*  |
 | [openboots_mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots_mc.yaml) |You get to start with Pegasus Boots! Oh, and you don't need to defeat Aghanim 2.  Maps and compasses are shuffled in the world.| *Customizer*  |
 | [openflute](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openflute.yaml) |You get to start with.. an activated flute?  Sky's the limit!| *Customizer*  |
