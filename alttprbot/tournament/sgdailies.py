@@ -32,7 +32,7 @@ class SGDailyRaceCore(TournamentRace):
             allow_comments=True,
             hide_comments=True,
             allow_prerace_chat=True,
-            allow_midrace_chat=True,
+            allow_midrace_chat=False,
             allow_non_entrant_chat=False,
             chat_message_delay=0,
             team_race=True if self.friendly_name.lower().find("co-op") >= 0 else False,
