@@ -35,7 +35,7 @@ class SGDailyRaceCore(TournamentRace):
             allow_midrace_chat=True,
             allow_non_entrant_chat=False,
             chat_message_delay=0,
-            team_race=True if self.friendly_name.find("Co-op") >= 0 else False,
+            team_race=True if self.friendly_name.lower().find("co-op") >= 0 else False,
         )
         return self.rtgg_handler
 
