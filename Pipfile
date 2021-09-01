@@ -44,5 +44,4 @@ ref = "6.0.0-dev"
 
 [packages.racetime-bot]
 git = "https://github.com/tcprescott/racetime-bot.git"
-editable = true
 ref = "aiohttp_update"
