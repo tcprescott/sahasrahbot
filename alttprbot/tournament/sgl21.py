@@ -15,7 +15,7 @@ class ALTTPRQuals(TournamentRace):
         guild = discordbot.get_guild(307860211333595146)
         return TournamentConfig(
             guild=guild,
-            racetime_category='test',
+            racetime_category='alttpr',
             racetime_goal='Beat the game',
             event_slug="sgl21alttpr",
             coop=False
