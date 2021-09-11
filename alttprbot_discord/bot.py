@@ -50,6 +50,7 @@ discordbot.load_extension("alttprbot_discord.cogs.role")
 discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
 discordbot.load_extension("alttprbot_discord.cogs.supermetroid")
 discordbot.load_extension("alttprbot_discord.cogs.smz3")
+discordbot.load_extension("alttprbot_discord.cogs.sgl")
 discordbot.load_extension("alttprbot_discord.cogs.tournament")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 

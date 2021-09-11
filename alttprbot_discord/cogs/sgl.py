@@ -1,105 +1,45 @@
-import asyncio
+import random
 
-import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 
-from alttprbot.database import config, sgl2020_tournament
-from alttprbot.tournament.sgl import create_sgl_match, scan_sgl_schedule, record_episode, race_recording_task
-from alttprbot.util import speedgaming
+from alttprbot import models
+from alttprbot.alttprgen.preset import generate_preset, fetch_preset
 from config import Config as c
-import logging
 
 
-def restrict_sgl_server():
+def restrict_sgl_channels():
     async def predicate(ctx):
-        if ctx.guild is None:
+        if ctx.channel is None:
             return False
-        if ctx.guild.id == int(await config.get(0, 'SpeedGamingLiveGuild')):
+        if ctx.channel.id in [508335685044928548, 772351829022474260]:
             return True
 
         return False
     return commands.check(predicate)
-
-
-def restrict_smm2_channel():
-    async def predicate(ctx):
-        if ctx.guild is None:
-            return False
-
-        race = await sgl2020_tournament.get_active_tournament_race(ctx.channel.id)
-        if race:
-            return True
-
-        return False
-    return commands.check(predicate)
-
 
 class SpeedGamingLive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        if not c.DEBUG:
-            self.create_races.start()
-        self.record_races.start()
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 4, reconnect=True)
-    async def create_races(self):
-        await scan_sgl_schedule()
+    @commands.command()
+    @restrict_sgl_channels()
+    async def sglqual(self, ctx):
+        triforce_text = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglqual').first()
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
-    async def record_races(self):
-        try:
-            logging.info("recording normal races")
-            await race_recording_task(bo3=False)
-            logging.info("recording bo3 races")
-            await race_recording_task(bo3=True)
-            logging.info("done recording")
-        except Exception:
-            logging.exception("error recording")
+        if triforce_text is None:
+            triforce_texts = await models.TriforceTexts.filter(pool_name='sglqual')
+            triforce_text = random.choice(triforce_texts)
 
-    @create_races.before_loop
-    async def before_create_races(self):
-        logging.info('sgl create_races loop waiting...')
-        await self.bot.wait_until_ready()
+        preset_dict = await fetch_preset('sglive')
+        preset_dict['settings']['texts'] = {}
+        preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + triforce_text.text + "\n{PAUSE9}"
+        seed = await generate_preset(preset_dict)
 
-    @record_races.before_loop
-    async def before_record_races(self):
-        logging.info('sgl record_races loop waiting...')
-        await self.bot.wait_until_ready()
+        embed = await seed.embed(emojis=self.bot.emojis)
+        await ctx.reply(embed=embed)
 
-    @commands.group()
-    @restrict_sgl_server()
-    async def sgl(self, ctx):
-        pass
-
-    @sgl.command()
-    @restrict_sgl_server()
-    @commands.has_any_role('Admin', 'Tournament Admin')
-    async def create(self, ctx, episode_id: int, force: bool = False):
-        episode = await speedgaming.get_episode(episode_id)
-        await create_sgl_match(episode, force=force)
-
-    @sgl.command()
-    @restrict_sgl_server()
-    @restrict_smm2_channel()
-    async def smmclose(self, ctx):
-        await ctx.reply("WARNING:  This room will be closing in 10 seconds.  It will become inaccessible to non-admins.")
-        await asyncio.sleep(10)
-        smm2_category_id = int(await ctx.guild.config_get('SGLSMM2CategoryClosed'))
-        await ctx.channel.edit(
-            sync_permissions=True,
-            category=discord.utils.get(
-                ctx.guild.categories, id=smm2_category_id)
-        )
-        race = await sgl2020_tournament.get_active_tournament_race(ctx.channel.id)
-        await record_episode(race)
-
-    @sgl.command()
-    @restrict_sgl_server()
-    @commands.is_owner()
-    async def record(self, ctx, episode_id):
-        race = await sgl2020_tournament.get_tournament_race_by_episodeid(episode_id)
-        await record_episode(race)
-
+        triforce_text.broadcasted = True
+        await triforce_text.save()
 
 def setup(bot):
     bot.add_cog(SpeedGamingLive(bot))

@@ -244,6 +244,14 @@ class Tournaments(Model):
     lang = fields.CharField(20, null=True)
     coop = fields.BooleanField(null=True)
 
+class TriforceTexts(Model):
+    id = fields.IntField(pk=True)
+    pool_name = fields.CharField(45, null=False)
+    text = fields.CharField(200, null=False)
+    author = fields.CharField(200, null=True)
+    author_credit = fields.CharField(200, null=True)
+    broadcasted = fields.BooleanField(null=False, default=False)
+
 class SpeedGamingDailies(Model):
     class Meta:
         table = 'sgdailies'

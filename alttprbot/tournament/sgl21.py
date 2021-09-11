@@ -1,23 +1,65 @@
 import datetime
+import random
 
 import discord
 
 from alttprbot import models
+from alttprbot.alttprgen.preset import generate_preset, fetch_preset
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import speedgaming
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
 
-
-class SGDailyRaceCore(TournamentRace):
+class ALTTPRQuals(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(307860211333595146)
         return TournamentConfig(
             guild=guild,
-            racetime_category='alttpr',
+            racetime_category='test',
             racetime_goal='Beat the game',
-            event_slug="alttprdaily"
+            event_slug="sgl21alttpr",
+            coop=False
         )
+
+    async def roll(self):
+        triforce_text = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglqual').first()
+
+        if triforce_text is None:
+            triforce_texts = await models.TriforceTexts.filter(pool_name='sglqual')
+            triforce_text = random.choice(triforce_texts)
+
+        self.preset_dict = await fetch_preset('sglive')
+        self.preset_dict['settings']['texts'] = {}
+        self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + triforce_text.text + "\n{PAUSE9}"
+        self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
+
+        await self.create_embeds()
+
+        triforce_text.broadcasted = True
+        await triforce_text.save()
+
+    async def process_tournament_race(self):
+        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+
+        await self.update_data()
+        await self.roll()
+
+        await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
+        await self.rtgg_handler.send_message(self.seed.url)
+
+        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults.permalink = self.seed.url
+        await tournamentresults.save()
+
+        await self.rtgg_handler.send_message("Seed has been generated!  If this isn't correct, please contact Synack")
+        self.rtgg_handler.seed_rolled = True
+
+    @property
+    def race_info_rolled(self):
+        info = f"{self.seed.url} - {self.seed_code} - {self.event_name} - {self.friendly_name} - 20 MINUTE DELAY REQUIRED"
+        if self.broadcast_channels:
+            info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
+        return info
 
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
@@ -31,11 +73,11 @@ class SGDailyRaceCore(TournamentRace):
             auto_start=True,
             allow_comments=True,
             hide_comments=True,
-            allow_prerace_chat=True,
+            allow_prerace_chat=False,
             allow_midrace_chat=False,
             allow_non_entrant_chat=False,
             chat_message_delay=0,
-            team_race=True if self.friendly_name.lower().find("co-op") >= 0 else False,
+            team_race=self.data.coop,
         )
         return self.rtgg_handler
 
@@ -52,8 +94,13 @@ class SGDailyRaceCore(TournamentRace):
         return []
 
     @property
+    def seed_code(self):
+        return f"({'/'.join(self.seed.code)})"
+
+    @property
     def announce_message(self):
-        msg = "SpeedGaming Daily Race Series - {title} at {start_time} ({start_time_remain})".format(
+        msg = "{event_name} - {title} at {start_time} ({start_time_remain})".format(
+            event_name=self.event_name,
             title=self.friendly_name,
             start_time=self.discord_time(self.race_start_time),
             start_time_remain=self.discord_time(self.race_start_time, "R")
@@ -70,7 +117,8 @@ class SGDailyRaceCore(TournamentRace):
 
     @property
     def race_info(self):
-        msg = "SpeedGaming Daily Race Series - {title} at {start_time} Eastern".format(
+        msg = "{event_name} - {title} at {start_time} Eastern - 20 MINUTE DELAY REQUIRED".format(
+            event_name=self.event_name,
             title=self.friendly_name,
             start_time=self.string_time(self.race_start_time)
         )

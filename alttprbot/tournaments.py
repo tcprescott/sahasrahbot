@@ -11,7 +11,7 @@ from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
 from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr, # pylint: disable=unused-import
-    alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily, alttprleague) # pylint: disable=unused-import
+    alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily, alttprleague, sgl21) # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -36,6 +36,30 @@ else:
         'smz3': smz3.SMZ3DailyRace,
         # 'invleague': alttprleague.ALTTPRLeague,
         # 'alttprleague': alttprleague.ALTTPROpenLeague,
+        # 'sgl21ootr': sgl21.OOTR,
+        # 'sgl21twwr': sgl21.TWWR,
+        # 'sgl21messenger': sgl21.Messenger,
+        # 'sgl21deadlytowers': sgl21.DeadlyTowers,
+        # 'sgl21startropics': sgl21.StarTropics,
+        # 'sgl21timespinner': sgl21.Timespinner,
+        # 'sgl21ssr': sgl21.SSR,
+        # 'sgl21smo': sgl21.SMO,
+        # 'sgl21pkmnredrando': sgl21.PokemonRedRando,
+        # 'sgl21mmx': sgl21.MMX,
+        # 'sgl21ffr': sgl21.FFR,
+        # 'sgl21bloodstained': sgl21.Bloodstained,
+        # 'sgl21aosr': sgl21.AOSR,
+        # 'sgl21smb3r': sgl21.SMB3R,
+        # 'sgl21smr': sgl21.SuperMetroidRando,
+        # 'sgl21smz3': sgl21.SMZ3,
+        # 'sgl21factorio-alttpr': sgl21.FactorioALTTP,
+        # 'sgl21minecraft2x': sgl21.Minecraft,
+        # 'sgl21z1r': sgl21.Z1R,
+        # 'sgl21alttpr': sgl21.ALTTPR,
+        # 'sgl21ctjets': sgl21.CTJets,
+        # 'sgl21zelda2rando': sgl21.Z2R,
+        # 'sgl21smany': sgl21.SMAny,
+        'sgl21alttpr': sgl21.ALTTPRQuals,
     }
 
 async def fetch_tournament_handler(event, episodeid: int, rtgg_handler=None):
