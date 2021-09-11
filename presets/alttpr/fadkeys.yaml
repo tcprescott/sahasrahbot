@@ -3,7 +3,6 @@ goal_name: fadkeys
 randomizer: alttpr
 description: "AD Keys, but the Castle Tower Keys are in Castle Tower."
 settings:
-  notes: "All Dungeons Keysanity but small keys are in Castle Tower."
   allow_quickswap: true
   accessibility: items
   crystals:
@@ -305,7 +304,7 @@ settings:
   lang: en
   mode: open
   name: ''
-  notes: ''
+  notes: "All Dungeons Keysanity but small keys are in Castle Tower."
   spoilers: 'off'
   tournament: false
   weapons: randomized

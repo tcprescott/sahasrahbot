@@ -1,3 +1,6 @@
+import logging
+
+import aiohttp
 from alttprbot.alttprgen import preset, spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
@@ -8,11 +11,25 @@ class ALTTPRLeague(ALTTPRTournamentRace):
     async def roll(self):
         if self.week_data.get('spoiler', False):
             self.seed, self.preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(self.week_data['preset'])
-            await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler_log_url, 0)
+            await spoiler_races.insert_spoiler_race(self.rtgg_handler.data.get('name'), spoiler_log_url, 0)
         else:
             self.seed, self.preset_dict = await preset.get_preset(self.week_data['preset'])
 
         await self.create_embeds()
+
+    async def get_week(self):
+        async with aiohttp.request('get', 'https://alttprleague.com/api/week') as req:
+            week_response = await req.json()
+
+        try:
+            self.week_data = week_response.get('weeks', [])[0]
+        except IndexError:
+            logging.exception("No active league week!")
+            await self.rtgg_handler.send_message("No active League Week!  This should not have happened.  Contact a league admin/mod for help.")
+
+    async def update_data(self):
+        await super().update_data()
+        await self.get_week()
 
     async def configuration(self):
         guild = discordbot.get_guild(543577975032119296)
@@ -52,35 +69,6 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             team_race=self.week_data.get('coop', False),
         )
         return self.rtgg_handler
-
-    @property
-    def week_data(self):
-        return {
-            1: {
-                'preset': 'dungeons',
-                'coop': True,
-            },
-            2: {
-                'preset': 'fadkeys',
-            },
-            3: {
-                'preset': 'casualboots',
-            },
-            4: {
-                'preset': 'keysanity',
-                'spoiler': True,
-            },
-            5: {
-                'preset': 'crosskeys',
-            },
-            6: {
-                'preset': 'open',
-            },
-            7: {
-                'preset': 'openboots_enemizer',
-                'coop': True,
-            },
-        }[self.week]
 
 
 class ALTTPROpenLeague(ALTTPRLeague):

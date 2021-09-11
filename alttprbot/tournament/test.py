@@ -1,21 +1,9 @@
-from alttprbot.tournament.alttprfr import ALTTPRFRTournament
-import logging
-
-import discord
-from alttprbot import models
-from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.tournament.alttprfr import ALTTPRFRTournament
-from alttprbot.tournament.alttpres import ALTTPRESTournament
-from alttprbot.tournament.alttprhmg import ALTTPRHMGTournament
-from alttprbot.tournament.smz3coop import SMZ3CoopTournament
-from alttprbot.tournament.alttprdaily import AlttprSGDailyRace
-from alttprbot.tournament.smz3 import SMZ3DailyRace
-from alttprbot.tournament.smbingo import SMBingoTournament
-from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot.tournament.core import TournamentConfig
+from alttprbot.tournament.alttprleague import ALTTPRLeague as Tournament
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(SMBingoTournament):
+class TestTournament(Tournament):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
