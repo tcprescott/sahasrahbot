@@ -51,7 +51,10 @@ class ALTTPRQuals(TournamentRace):
         tournamentresults.permalink = self.seed.url
         await tournamentresults.save()
 
-        await self.rtgg_handler.send_message("Seed has been generated!  If this isn't correct, please contact Synack")
+        await self.rtgg_handler.set_invitational()
+        await self.rtgg_handler.edit(streaming_required=False)
+
+        await self.rtgg_handler.send_message("Seed has been generated!  20 MINUTE STREAM DELAY REQUIRED, please check your delay!")
         self.rtgg_handler.seed_rolled = True
 
     @property
@@ -83,7 +86,7 @@ class ALTTPRQuals(TournamentRace):
 
     @property
     def hours_before_room_open(self):
-        return 1
+        return 1.33
 
     @property
     def announce_channel(self):
