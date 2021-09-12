@@ -203,12 +203,16 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
     keydropshuffle = options['keydropshuffle'] == 'on'
     shopsanity = options['shopsanity'] == 'on'
 
+    custom_instructions = get_random_option(weights.get('custom_instructions', None))
+
     if doors or keydropshuffle or shopsanity or weights.get('options', {}).get('force_doors', False):
         settings = generate_doors_settings(weights, options)
+        customizer = False
+        doors = True
         # return settings, False, True
-
-    settings, customizer = generate_random_settings(weights, tournament=tournament, spoilers=spoilers)
-    custom_instructions = get_random_option(weights.get('custom_instructions', None))
+    else:
+        settings, customizer = generate_random_settings(weights, tournament=tournament, spoilers=spoilers)
+        doors = False
 
     return AlttprMystery(
         weights=weights,
