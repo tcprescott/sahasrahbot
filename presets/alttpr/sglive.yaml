@@ -92,8 +92,8 @@ settings:
         BottleWithGreenPotion: 0
         BottleWithRandom: 0
         BottleWithRedPotion: 0
-        Bow: 0
-        BowAndArrows: 1
+        Bow: 1
+        BowAndArrows: 0
         BowAndSilverArrows: 0
         BugCatchingNet: 1
         CaneOfByrna: 1
