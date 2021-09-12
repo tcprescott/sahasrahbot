@@ -76,17 +76,20 @@ async def logout():
 @sahasrahbotapi.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
     weights = await request.get_json()
-    settings, customizer, doors = await generate(weights=weights, spoilers="mystery")
-    if customizer:
+    mystery = await generate(weights=weights, spoilers="mystery")
+    if mystery.customizer:
         endpoint = '/api/customizer'
-    elif doors:
+    elif mystery.doors:
         endpoint = None
     else:
         endpoint = '/api/randomizer'
+
+    print(mystery.custom_instructions)
+
     return jsonify(
-        settings=settings,
-        customizer=customizer,
-        doors=doors,
+        settings=mystery.settings,
+        customizer=mystery.customizer,
+        doors=mystery.doors,
         endpoint=endpoint
     )
 
@@ -100,6 +103,9 @@ async def mysterygenwithweights(weightset):
         endpoint = None
     else:
         endpoint = '/api/randomizer'
+
+    print(mystery.custom_instructions)
+
     return jsonify(
         settings=mystery.settings,
         customizer=mystery.customizer,

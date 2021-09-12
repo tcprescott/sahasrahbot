@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-from typing import Union
 import os
 
 import aiofiles
@@ -19,16 +17,6 @@ from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 class WeightsetNotFoundException(SahasrahBotException):
     pass
-
-
-@dataclass
-class AlttprMystery:
-    weights: dict
-    settings: dict
-    customizer: bool = False
-    doors: bool = False
-    custom_instructions: str = None
-    seed: Union[AlttprDoorDiscord, ALTTPRDiscord] = None
 
 async def generate_test_game(weightset='weighted', festive=False):
     weights = await get_weights(weightset)
@@ -105,7 +93,7 @@ async def generate(weights, spoilers="mystery"):
     if 'preset' in weights:
         rolledpreset = pyz3r.mystery.get_random_option(weights['preset'])
         if rolledpreset == 'none':
-            settings, customizer, doors = mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers) # pylint: disable=unbalanced-tuple-unpacking
+            return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers) # pylint: disable=unbalanced-tuple-unpacking
         else:
             preset_dict = await fetch_preset(rolledpreset, randomizer='alttpr')
             settings = preset_dict['settings']
@@ -114,15 +102,15 @@ async def generate(weights, spoilers="mystery"):
             settings.pop('name', None)
             settings.pop('notes', None)
             settings['spoilers'] = spoilers
+            custom_instructions = pyz3r.mystery.get_random_option(weights.get('custom_instructions', None))
+
+            return mysterydoors.AlttprMystery(
+                weights=weights,
+                settings=settings,
+                customizer=customizer,
+                doors=doors,
+                custom_instructions=custom_instructions
+            )
     else:
-        settings, customizer, doors = mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers) # pylint: disable=unbalanced-tuple-unpacking
+        return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers) # pylint: disable=unbalanced-tuple-unpacking
 
-    custom_instructions = pyz3r.mystery.get_random_option(weights.get('custom_instructions', None))
-
-    return AlttprMystery(
-        weights=weights,
-        settings=settings,
-        customizer=customizer,
-        doors=doors,
-        custom_instructions=custom_instructions
-    )

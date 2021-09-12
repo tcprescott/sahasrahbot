@@ -1,7 +1,20 @@
 import copy
 import logging
+from dataclasses import dataclass
+from typing import Union
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 from pyz3r.mystery import get_random_option, generate_random_settings
+
+@dataclass
+class AlttprMystery:
+    weights: dict
+    settings: dict
+    customizer: bool = False
+    doors: bool = False
+    custom_instructions: str = None
+    seed: Union[AlttprDoorDiscord, ALTTPRDiscord] = None
 
 BASE_DOORS_PAYLOAD = {
     "retro": False,
@@ -192,7 +205,15 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
 
     if doors or keydropshuffle or shopsanity or weights.get('options', {}).get('force_doors', False):
         settings = generate_doors_settings(weights, options)
-        return settings, False, True
+        # return settings, False, True
 
     settings, customizer = generate_random_settings(weights, tournament=tournament, spoilers=spoilers)
-    return settings, customizer, False
+    custom_instructions = get_random_option(weights.get('custom_instructions', None))
+
+    return AlttprMystery(
+        weights=weights,
+        settings=settings,
+        customizer=customizer,
+        doors=doors,
+        custom_instructions=custom_instructions
+    )
