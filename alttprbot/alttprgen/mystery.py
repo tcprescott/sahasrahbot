@@ -21,9 +21,9 @@ class WeightsetNotFoundException(SahasrahBotException):
 async def generate_test_game(weightset='weighted', festive=False):
     weights = await get_weights(weightset)
 
-    settings, _, _ = mysterydoors.generate_doors_mystery(weights=weights)
+    mystery = mysterydoors.generate_doors_mystery(weights=weights)
 
-    return settings
+    return mystery.settings
 
 
 async def get_weights(weightset='weighted'):
