@@ -1,4 +1,5 @@
 import os
+import logging
 
 import aiofiles
 import yaml
@@ -9,7 +10,6 @@ import pyz3r
 from alttprbot import models
 from alttprbot.alttprgen.preset import fetch_preset
 from alttprbot.alttprgen.randomizer import mysterydoors
-from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
@@ -63,7 +63,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
                         mystery.settings['tournament'] = tournament
                         mystery.settings['allow_quickswap'] = True
                         seed = await ALTTPRDiscord.generate(settings=mystery.settings, endpoint=endpoint)
-                except ClientResponseError:
+                except:
                     await models.AuditGeneratedGames.create(
                         randomizer='alttpr',
                         settings=mystery.settings,
@@ -71,6 +71,7 @@ async def generate_random_game(weightset='weighted', weights=None, tournament=Tr
                         genoption=weightset,
                         customizer=1 if mystery.customizer else 0
                     )
+                    logging.exception("Failed to generate game, retrying...")
                     raise
     except RetryError as e:
         raise e.last_attempt._exception from e

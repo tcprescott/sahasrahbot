@@ -43,7 +43,7 @@ class AlttprDoor():
 
             attempts = 0
             try:
-                async for attempt in AsyncRetrying(stop=stop_after_attempt(20), retry=retry_if_exception_type(Exception)):
+                async for attempt in AsyncRetrying(stop=stop_after_attempt(10), retry=retry_if_exception_type(Exception)):
                     with attempt:
                         attempts += 1
                         proc = await asyncio.create_subprocess_exec(
