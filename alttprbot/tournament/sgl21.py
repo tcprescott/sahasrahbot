@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import random
 
@@ -52,6 +53,8 @@ class ALTTPRQuals(TournamentRace):
         await tournamentresults.save()
 
         await self.rtgg_handler.set_invitational()
+
+        await asyncio.sleep(2)
         await self.rtgg_handler.edit(streaming_required=False)
 
         await self.rtgg_handler.send_message("Seed has been generated!  20 MINUTE STREAM DELAY REQUIRED, please check your delay!")
@@ -112,7 +115,7 @@ class ALTTPRQuals(TournamentRace):
         if self.broadcast_channels:
             msg += f" on {', '.join(self.broadcast_channels)}"
 
-        msg += " - Seed Distributed {seed_time} - {racetime_url}".format(
+        msg += " - Entry Deadline at {seed_time} - {racetime_url}".format(
             seed_time=self.discord_time(self.seed_time, "R"),
             racetime_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])
         )
@@ -120,10 +123,11 @@ class ALTTPRQuals(TournamentRace):
 
     @property
     def race_info(self):
-        msg = "{event_name} - {title} at {start_time} Eastern - 20 MINUTE DELAY REQUIRED".format(
+        msg = "{event_name} - {title} at {start_time} Eastern - Entry Deadline at {seed_time} - 20 MINUTE DELAY REQUIRED".format(
             event_name=self.event_name,
             title=self.friendly_name,
-            start_time=self.string_time(self.race_start_time)
+            start_time=self.string_time(self.race_start_time),
+            seed_time=self.string_time(self.seed_time),
         )
 
         if self.broadcast_channels:
