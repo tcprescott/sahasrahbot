@@ -56,6 +56,13 @@ async def fetch_preset(preset, randomizer='alttpr'):
         raise PresetNotFoundException(
             f'Could not find preset {preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
+    if preset_dict.get('customizer', False) and preset_dict.get('randomizer', 'alttpr') and not preset_dict.get('doors', False):
+        if 'l' not in preset_dict['settings']:
+            preset_dict['settings']['l'] = {}
+        for i in preset_dict.get('forced_locations', {}):
+            location = random.choice([l for l in i['locations'] if l not in preset_dict['settings']['l']])
+            preset_dict['settings']['l'][location] = i['item']
+
     return preset_dict
 
 
@@ -89,14 +96,6 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
 
             if not 'allow_quickswap' in settings:
                 settings['allow_quickswap'] = allow_quickswap
-
-            if preset_dict.get('customizer', False):
-                if 'l' not in settings:
-                    settings['l'] = {}
-                for i in preset_dict.get('forced_locations', {}):
-                    location = random.choice([l for l in i['locations'] if l not in settings['l']])
-                    settings['l'][location] = i['item']
-
 
             if preset_dict.get('customizer', False):
                 endpoint = "/api/customizer"

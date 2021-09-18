@@ -1,0 +1,28 @@
+---
+goal_name: normal inverted dungeons keysanity
+customizer: false
+description: "Inverted world state and keysanity, all dungeons."
+settings:
+  goal: dungeons
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: inverted
+  hints: "off"
+  weapons: randomized
+  crystals:
+    ganon: "7"
+    tower: "7"
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: full
+  item_placement: advanced

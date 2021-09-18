@@ -45,6 +45,7 @@ title:  Presets
 | [hardicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hardicerodhunt.yaml) |You get every item absolutely **required** to beat the game, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
 | [hybridmg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hybridmg.yaml) || *Customizer*  |
 | [inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted.yaml) |Inverted.  You start in the dark world.|   |
+| [inverted_adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_adkeys.yaml) |Inverted world state and keysanity, all dungeons.|   |
 | [inverted_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_crosskeys.yaml) |Cross world entrance shuffle, but also using the inverted world state.|   |
 | [inverted_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_keys.yaml) |Inverted world state and keysanity.|   |
 | [invrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/invrosia.yaml) |Inverted with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Big Keys are shuffled in the wild, except GTBK is guarenteed to be in GT.| *Customizer*  |
