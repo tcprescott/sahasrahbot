@@ -105,7 +105,7 @@ class Tournament(commands.Cog):
 
                 trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == event_data.lang]
 
-                t_needed = 2 if len(episode['match1']['players']) > 2 else 1 - len(trackers_approved)
+                t_needed = (2 if len(episode['match1']['players']) > 2 else 1) - len(trackers_approved)
 
                 if t_needed > 0:
                     trackers_needed += [f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
