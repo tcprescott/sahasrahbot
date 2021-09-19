@@ -105,7 +105,9 @@ class Tournament(commands.Cog):
 
                 trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == event_data.lang]
 
-                if (t_needed := 1 - len(trackers_approved)) > 0:
+                t_needed = 2 if len(episode['match1']['players']) > 2 else 1
+
+                if (t_needed - len(trackers_approved)) > 0:
                     trackers_needed += [f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
 
                 if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
