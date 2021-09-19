@@ -15,25 +15,31 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(flags, message)
 
     async def ex_maxrando(self, args, message):
-        await self.roll_game('iyhqh$j9g7@$ZqTBT!BhOAdES$@', message)
+        await self.roll_game('iyhqh$j9g7@$ZqTBT!BhOAdES$@A', message)
 
     async def ex_groups1(self, args, message):
-        await self.roll_game('jhAhD0L#$Za$LpTBT!AhOA!0P@@', message)
+        await self.roll_game('jhAhD0L#$Za$LpTBT!AhOA!0P@@A', message)
 
     async def ex_groups2(self, args, message):
-        await self.roll_game('jhAhD0L#$Z8$LpTBT!AhOA!0P@@', message)
+        await self.roll_game('jhAhD0L#$Z8$LpTBT!AhOA!0P@@A', message)
 
     async def ex_groups3(self, args, message):
-        await self.roll_game('hhAhD0L#$Za$LpTBT!AhOA!0P@@', message)
+        await self.roll_game('hhAhD0L#$Za$LpTBT!AhOA!0P@@A', message)
 
     async def ex_groups4(self, args, message):
-        await self.roll_game('hhAhD0L#$Z8$LpTBT!AhOA!0P@@', message)
+        await self.roll_game('hhAhD0L#$Z8$LpTBT!AhOA!0P@@A', message)
 
     async def ex_brackets(self, args, message):
-        await self.roll_game('hhAhD0j#$78$Jp5HgRAhOA!0P8@', message)
+        await self.roll_game('hhAhD0j#$78$Jp5HgRAhOA!0P8@A', message)
 
     async def ex_nit(self, args, message):
         await self.roll_game('hhAhD0j#$78$Jp5Q$dAhOA!0Pz@A', message)
+
+    async def ex_sgl(self, args, message):
+        await self.roll_game('jhhhD0j9x78$JpTBT!BhSA!0P@@A', message)
+
+    async def ex_sgl4(self, args, message):
+        await self.roll_game('jhhhD0j9$78$JpTBT!BhSA!0P@@A', message)
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
