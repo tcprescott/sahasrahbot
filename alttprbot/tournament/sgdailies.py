@@ -81,6 +81,7 @@ class SGDailyRaceCore(TournamentRace):
         msg += " - Seed Distributed at {seed_time} Eastern".format(
             seed_time=self.seed_time.astimezone(self.timezone).strftime("%-I:%M %p"),
         )
+        msg += f" - {self.episodeid}"
         return msg
 
     @property

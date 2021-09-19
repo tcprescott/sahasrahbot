@@ -67,6 +67,7 @@ class ALTTPRTournamentRace(TournamentRace):
             info += f" - Game #{self.game_number}"
         if self.broadcast_channels:
             info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
+        info += f" - {self.episodeid}"
         return info
 
     @property

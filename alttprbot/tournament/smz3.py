@@ -43,4 +43,5 @@ class SMZ3DailyRace(SGDailyRaceCore):
         if self.broadcast_channels:
             msg += f" on {', '.join(self.broadcast_channels)}"
 
+        msg += f" - {self.episodeid}"
         return msg

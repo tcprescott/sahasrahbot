@@ -52,6 +52,7 @@ class AlttprSGDailyRace(SGDailyRaceCore):
         msg += " - Seed Distributed at {seed_time} Eastern".format(
             seed_time=self.string_time(self.seed_time),
         )
+        msg += f" - {self.episodeid}"
         return msg
 
     async def send_player_room_info(self):

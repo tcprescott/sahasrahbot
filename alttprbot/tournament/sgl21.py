@@ -64,6 +64,7 @@ class ALTTPRQuals(TournamentRace):
         info = f"{self.seed.url} - {self.seed_code} - {self.event_name} - {self.friendly_name} - 20 MINUTE DELAY REQUIRED"
         if self.broadcast_channels:
             info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
+        info += f" - {self.episodeid}"
         return info
 
     async def create_race_room(self):
@@ -135,6 +136,7 @@ class ALTTPRQuals(TournamentRace):
         msg += " - Seed Distributed at {seed_time} Eastern".format(
             seed_time=self.seed_time.astimezone(self.timezone).strftime("%-I:%M %p"),
         )
+        msg += f" - {self.episodeid}"
         return msg
 
     @property
