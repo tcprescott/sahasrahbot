@@ -134,7 +134,7 @@ def generate_doors_settings(weights, options):
         'triforce-hunt': 'triforcehunt'}[options['goals']]
 
     settings["crystals_gt"] = options['tower_open']
-    settings["crystals_ganon"] = options['tower_open']
+    settings["crystals_ganon"] = options['ganon_open']
     settings["swords"] = {'randomized': 'random',
                             'assured': 'assured',
                             'vanilla': 'vanilla',
