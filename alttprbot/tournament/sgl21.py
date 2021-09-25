@@ -75,7 +75,7 @@ class ALTTPRQuals(TournamentRace):
             invitational=False,
             unlisted=False,
             info=self.race_info,
-            start_delay=15,
+            start_delay=30,
             time_limit=24,
             streaming_required=True,
             auto_start=True,
