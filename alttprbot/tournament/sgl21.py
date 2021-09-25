@@ -29,9 +29,11 @@ class ALTTPRQuals(TournamentRace):
             triforce_texts = await models.TriforceTexts.filter(pool_name='sglqual')
             triforce_text = random.choice(triforce_texts)
 
+        text = triforce_text.text.encode("utf-8").decode("unicode_escape")
+
         self.preset_dict = await fetch_preset('sglive')
         self.preset_dict['settings']['texts'] = {}
-        self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + triforce_text.text + "\n{PAUSE9}"
+        self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
         self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
 
         await self.create_embeds()

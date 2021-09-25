@@ -30,9 +30,11 @@ class SpeedGamingLive(commands.Cog):
             triforce_texts = await models.TriforceTexts.filter(pool_name='sglqual')
             triforce_text = random.choice(triforce_texts)
 
+        text = triforce_text.text.encode("utf-8").decode("unicode_escape")
+
         preset_dict = await fetch_preset('sglive')
         preset_dict['settings']['texts'] = {}
-        preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + triforce_text.text + "\n{PAUSE9}"
+        preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
         seed = await generate_preset(preset_dict)
 
         embed = await seed.embed(emojis=self.bot.emojis)
