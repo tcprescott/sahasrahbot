@@ -47,6 +47,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
                 guild.get_role(543597099649073162),
                 guild.get_role(676530377812082706),
                 guild.get_role(553295025190993930),
+                guild.get_role(674109759179194398),
             ]
         )
 
