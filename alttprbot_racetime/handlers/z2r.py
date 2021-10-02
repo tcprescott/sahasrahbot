@@ -35,10 +35,10 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_nit(self, args, message):
         await self.roll_game('hhAhD0j#$78$Jp5Q$dAhOA!0Pz@A', message)
 
-    async def ex_sgl(self, args, message):
+    async def ex_sgl4(self, args, message):
         await self.roll_game('jhhhD0j9x78$JpTBT!BhSA!0P@@A', message)
 
-    async def ex_sgl4(self, args, message):
+    async def ex_sgl(self, args, message):
         await self.roll_game('jhhhD0j9$78$JpTBT!BhSA!0P@@A', message)
 
     async def ex_help(self, args, message):

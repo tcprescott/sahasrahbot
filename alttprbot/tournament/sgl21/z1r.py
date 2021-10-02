@@ -5,6 +5,8 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from .sglcore import SGLCoreTournamentRace
 
+# flags - VlWlIEwJ1MsKm8TdWgb5iC2DDmd8WW
+
 class Z1R(SGLCoreTournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(590331405624410116)

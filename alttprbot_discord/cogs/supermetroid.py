@@ -27,7 +27,7 @@ class SuperMetroid(commands.Cog):
             skills=skills,
             race=True
         )
-        await ctx.reply(embed=await seed.embed())
+        await ctx.reply(embed=seed.embed())
 
     @smvaria.command()
     async def norace(self, ctx, skills="regular", settings="default"):
@@ -36,7 +36,7 @@ class SuperMetroid(commands.Cog):
             skills=skills,
             race=False
         )
-        await ctx.reply(embed=await seed.embed())
+        await ctx.reply(embed=seed.embed())
 
     @smvaria.command()
     async def playoff(self, ctx, majors, area, bosses):
@@ -45,7 +45,7 @@ class SuperMetroid(commands.Cog):
             area=area,
             bosses=bosses
         )
-        await ctx.reply(embed=await seed.embed())
+        await ctx.reply(embed=seed.embed())
 
 def setup(bot):
     bot.add_cog(SuperMetroid(bot))
