@@ -28,11 +28,11 @@ class Bloodstained(SGLRandomizerTournamentRace):
 
     @property
     def seed_info(self):
-        return f"{self.seed_url} - BingoSync: {self.bingo.url} - Password: {self.bingo.password}"
+        return self.seed_url
 
     @property
     def seed_url(self):
-        return f"Bingo Seed: {self.bingo_seed} - https://sahasrahbot.s3.amazonaws.com/brotn/{self.patch_id}"
+        return f"https://sahasrahbot.s3.amazonaws.com/brotn/{self.patch_id}"
 
     async def roll(self):
         patches = await models.PatchDistribution.filter(game='brotn', used=None)
@@ -41,7 +41,7 @@ class Bloodstained(SGLRandomizerTournamentRace):
         patch.used = 1
         await patch.save()
 
-        self.bingo_seed = random.randint(10000, 99999)
+        # self.bingo_seed = random.randint(10000, 99999)
 
         await self.bingo.new_card(
             game_type=227,
@@ -85,6 +85,18 @@ class Bloodstained(SGLRandomizerTournamentRace):
             await webhook.send(embed=embed, username="SahasrahBot")
 
         await self.rtgg_handler.send_message('Successfully sent BingoSync room to SpeedGaming for setup!')
+
+    async def on_race_start(self):
+        bingoseed = random.randint(10000, 99999)
+        await self.rtgg_handler.send_message(f"-----------------------")
+        await self.rtgg_handler.send_message(f"The seed for this race: {bingoseed}")
+        await self.rtgg_handler.send_message(f"-----------------------")
+
+        await self.bingo.new_card(
+            game_type=227,
+            hide_card='off',
+            seed=bingoseed,
+        )
 
     async def on_room_resume(self):
         res = await models.TournamentResults.get_or_none(srl_id=self.rtgg_handler.data.get('name'))
