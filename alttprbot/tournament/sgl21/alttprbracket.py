@@ -39,5 +39,9 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
         await triforce_text.save()
 
     @property
+    def seed_code(self):
+        return f"({'/'.join(self.seed.code)})"
+
+    @property
     def seed_info(self):
-        return f"{self.seed.url} - {self.seed.code}"
+        return f"{self.seed.url} - {self.seed_code}"

@@ -1,11 +1,12 @@
 import logging
+import random
 
 from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
-from .sglcore import SGLCoreTournamentRace
+from .sglcore import SGLRandomizerTournamentRace
 
-class Z2R(SGLCoreTournamentRace):
+class Z2R(SGLRandomizerTournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(590331405624410116)
         return TournamentConfig(
@@ -17,3 +18,10 @@ class Z2R(SGLCoreTournamentRace):
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False
         )
+
+    async def roll(self):
+        self.seed = random.randint(0, 1000000000)
+
+    @property
+    def seed_info(self):
+        return f"Seed: {self.seed} - Flags: jhhhD0j9$78$JpTBT!BhSA!0P@@A"
