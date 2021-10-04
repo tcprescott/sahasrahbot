@@ -89,16 +89,18 @@ class BingoSync(object):
     #             resp_data = await resp.json()
     #             self.socket_key = resp_data['socket_key']
 
-    async def new_card(self, game_type, variant_type, lockout_mode='1', seed='', custom_json='', hide_card='on'):
+    async def new_card(self, game_type, variant_type=None, lockout_mode='1', seed='', custom_json='', hide_card='on'):
         data = {
             'hide_card': hide_card == 'on',
             'game_type': game_type,
-            'variant_type': variant_type,
             'custom_json': custom_json,
             'lockout_mode': lockout_mode,
             'seed': seed,
             'room': self.room_id
         }
+
+        if variant_type is not None:
+            data['variant_type'] = variant_type
 
         async with aiohttp.ClientSession(cookie_jar=jar) as session:
             async with session.request(
