@@ -15,5 +15,5 @@ class FactorioALTTP(SGLCoreTournamentRace):
             event_slug="sgl21factorio-alttpr",
             audit_channel=discordbot.get_channel(774336581808291863),
             commentary_channel=discordbot.get_channel(631564559018098698),
-            coop=False
+            coop=True
         )
