@@ -19,7 +19,7 @@ class ALTTPRTournamentRace(TournamentRace):
 
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
 
-        await self.send_audit_message(self.embed)
+        await self.send_audit_message(embed=self.embed)
         await self.send_commentary_message(self.tournament_embed)
 
         for name, player in self.player_discords:

@@ -1,18 +1,20 @@
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot.tournament.sgl21 import ALTTPRQuals as Tournament
+from alttprbot.tournament import sgl21
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(Tournament):
+class TestTournament(sgl21.ALTTPRQuals):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
             guild=guild,
             racetime_category='test',
             racetime_goal='Beat the game',
-            event_slug="test"
+            event_slug="test",
+            audit_channel=discordbot.get_channel(537469084527230976),
+            commentary_channel=discordbot.get_channel(659307060499972096),
         )
 
-    @property
-    def announce_channel(self):
-        return discordbot.get_channel(508335685044928548)
+    # @property
+    # def announce_channel(self):
+    #     return discordbot.get_channel(508335685044928548)

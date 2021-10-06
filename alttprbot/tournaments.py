@@ -54,7 +54,7 @@ else:
         # 'sgl21smb3r': sgl21.SMB3R,
         # 'sgl21smo': sgl21.SMO,
         # 'sgl21smr': sgl21.SuperMetroidRando,
-        # 'sgl21smz3': sgl21.SMZ3,
+        'sgl21smz3': sgl21.SMZ3,
         # 'sgl21specter': sgl21.ShovelKnight,
         # 'sgl21ssbsse': sgl21.SmashBros,
         # 'sgl21ssr': sgl21.SSR,

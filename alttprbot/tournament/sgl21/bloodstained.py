@@ -78,7 +78,7 @@ class Bloodstained(SGLRandomizerTournamentRace):
         embed.add_field(name="BingoSync URL", value=self.bingo.url, inline=False)
         embed.add_field(name="BingoSync Password", value=self.bingo.password, inline=False)
 
-        await self.send_audit_message(embed)
+        await self.send_audit_message(embed=embed)
 
         async with aiohttp.ClientSession() as session:
             webhook = discord.Webhook.from_url(BINGO_COLLAB_DISCORD_WEBHOOK, adapter=discord.AsyncWebhookAdapter(session))

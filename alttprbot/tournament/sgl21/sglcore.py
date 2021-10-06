@@ -49,7 +49,7 @@ class SGLCoreTournamentRace(TournamentRace):
         self.rtgg_handler = await self.rtgg_bot.startrace(
             goal=self.data.racetime_goal,
             invitational=False,
-            unlisted=True,
+            unlisted=False,
             info=self.race_info,
             start_delay=15,
             time_limit=24,
@@ -78,7 +78,7 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
         await self.rtgg_handler.send_message(self.seed_info)
 
-        await self.send_audit_message(self.embed)
+        await self.send_audit_message(message=f"Room created: <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}> - {self.event_name} - {self.versus} - Episode {self.episodeid} - {self.seed_info}")
 
         tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed_info

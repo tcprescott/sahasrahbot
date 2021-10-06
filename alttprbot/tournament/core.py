@@ -373,9 +373,9 @@ class TournamentRace(object):
     async def process_submission_form(self, payload, submitted_by):
         pass
 
-    async def send_audit_message(self, embed: discord.Embed):
+    async def send_audit_message(self, message=None, embed: discord.Embed=None):
         if self.audit_channel:
-            await self.audit_channel.send(embed=embed)
+            await self.audit_channel.send(content=message, embed=embed)
 
     async def send_commentary_message(self, embed: discord.Embed):
         if self.commentary_channel and len(self.broadcast_channels) > 0:
