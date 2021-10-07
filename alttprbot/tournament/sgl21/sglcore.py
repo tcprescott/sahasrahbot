@@ -1,8 +1,43 @@
 import logging
 
+import discord
 from alttprbot import models
-from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot.tournament.core import TournamentConfig, TournamentRace, UnableToLookupUserException
 from alttprbot_discord.bot import discordbot
+
+class SGLTournamentPlayer(object):
+    def __init__(self):
+        self.discord_user: discord.Member = None
+
+    @classmethod
+    async def construct(cls, discord_id: int, guild: discord.Guild):
+        playerobj = cls()
+
+        playerobj.discord_user = guild.get_member(int(discord_id))
+
+        return playerobj
+
+    @classmethod
+    async def construct_discord_name(cls, discord_name: str, guild: discord.Guild):
+        playerobj = cls()
+
+        playerobj.discord_user = guild.get_member_named(discord_name)
+        if playerobj.discord_user is None:
+            raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
+
+        return playerobj
+
+    @property
+    def rtgg_id(self):
+        return None
+
+    @property
+    def twitch_name(self):
+        return None
+
+    @property
+    def name(self):
+        return self.discord_user.name
 
 class SGLCoreTournamentRace(TournamentRace):
     async def configuration(self):
@@ -16,6 +51,23 @@ class SGLCoreTournamentRace(TournamentRace):
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False
         )
+
+    async def make_tournament_player(self, player):
+        if not player['discordId'] == "":
+            looked_up_player = await SGLTournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
+        else:
+            looked_up_player = None
+
+        # then, if that doesn't work, try their discord tag kept by SG
+        if looked_up_player is None and not player['discordTag'] == '':
+            looked_up_player = await SGLTournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
+
+        # and failing all that, bomb
+        if looked_up_player is None:
+            raise UnableToLookupUserException(
+                f"Unable to lookup the player `{player['displayName']}`.  Please contact a Tournament moderator for assistance.")
+
+        return looked_up_player
 
     @classmethod
     async def construct_race_room(cls, episodeid):
@@ -41,6 +93,10 @@ class SGLCoreTournamentRace(TournamentRace):
         await tournament_race.on_room_creation()
 
         return handler.data
+
+    @property
+    def player_racetime_ids(self):
+        return []
 
     async def send_audit_room_info(self):
         await self.data.audit_channel.send(f"{self.event_name} - {self.versus} - Episode {self.episodeid} - <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}>")
