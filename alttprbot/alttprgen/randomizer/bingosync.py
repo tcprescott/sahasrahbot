@@ -38,7 +38,7 @@ class BingoSync(object):
         bingo.password = password
         return bingo
 
-    async def create_bingo_room(self, room_name, passphrase, game_type, variant_type, lockout_mode='1', seed='', custom_json='', is_spectator='on', hide_card='on'):
+    async def create_bingo_room(self, room_name, passphrase, game_type, variant_type=None, lockout_mode='1', seed='', custom_json='', is_spectator='on', hide_card='on'):
         csrftoken = await self.get_csrf_token()
         data = {
             'csrfmiddlewaretoken': csrftoken,
@@ -46,13 +46,15 @@ class BingoSync(object):
             'room_name': room_name,
             'passphrase': passphrase,
             'game_type': game_type,
-            'variant_type': variant_type,
             'lockout_mode': lockout_mode,
             'seed': seed,
             'custom_json': custom_json,
             'is_spectator': is_spectator,
             'hide_card': hide_card
         }
+
+        if variant_type is not None:
+            data['variant_type'] = variant_type
 
         async with aiohttp.ClientSession(cookie_jar=jar) as session:
             async with session.request(

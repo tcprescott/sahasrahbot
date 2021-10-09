@@ -208,7 +208,7 @@ class TournamentResults(Model):
     id = fields.IntField(pk=True)
     srl_id = fields.CharField(45, null=True)
     episode_id = fields.CharField(45, null=True)
-    permalink = fields.CharField(200, null=True)
+    permalink = fields.CharField(1000, null=True)
     bingosync_room = fields.CharField(200, null=True)
     bingosync_password = fields.CharField(40, null=True)
     spoiler = fields.CharField(200, null=True)

@@ -41,12 +41,9 @@ class Bloodstained(SGLRandomizerTournamentRace):
         patch.used = 1
         await patch.save()
 
-        # self.bingo_seed = random.randint(10000, 99999)
-
         await self.bingo.new_card(
             game_type=227,
-            hide_card='on',
-            seed=self.bingo_seed
+            hide_card='on'
         )
 
     async def on_room_creation(self):

@@ -16,9 +16,26 @@ class AOSR(SGLRandomizerTournamentRace):
             coop=False
         )
 
-    # TODO confirm flags with admins
     async def roll(self):
-        self.seed_id, self.permalink = roll_aosr(logic='AreaTechTeirs', panther='Rand70Dup', boss='Vanilla', weight="2.5", kicker='false', levelexp='Vanilla')
+        self.seed_id, self.permalink = roll_aosr(
+            logic='AreaTechTiers',
+            nodupes='false',
+            panther='FirstAlways',
+            area='AreaRandom',
+            boss='Dead-endShuffle',
+            enemy='Vanilla',
+            itempool='Standard',
+            weight=2.5,
+            grahm='BookSouls',
+            kicker='false',
+            startshop='Unlocked30k',
+            shopprice='RandHV',
+            shopSouls='Half',
+            levelexp='Vanilla',
+            telestart='false',
+            mapassist='false',
+            doublechaos='false'
+        )
 
     @property
     def seed_info(self):

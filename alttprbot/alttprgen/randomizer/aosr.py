@@ -1,6 +1,7 @@
 import random
 
 
-def roll_aosr(logic, panther, boss, weight, kicker, levelexp):
+def roll_aosr(**kwargs):
     seed = random.randint(-2147483648, 2147483647)
-    return seed, f"https://aosrando.surge.sh/?seed={seed}&logic={logic}&panther={panther}&boss={boss}&weight={weight}&kicker={kicker}&levelexp={levelexp}"
+    flags = [f"{key}={val}" for (key, val) in kwargs.items()]
+    return seed, f"https://aosrando.surge.sh/?seed={seed}&{'&'.join(flags)}"
