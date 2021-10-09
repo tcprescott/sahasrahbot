@@ -22,21 +22,33 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
         )
 
     async def roll(self):
-        triforce_text = random.choice(await models.TriforceTexts.filter(broadcasted=False, pool_name='sglbracket'))
+        try:
+            if self.broadcast_channels:
+                triforce_texts = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglbracket')
+            else:
+                triforce_texts = await models.TriforceTexts.filter(pool_name='sglbracket')
 
-        if triforce_text is None:
-            triforce_texts = random.choice(await models.TriforceTexts.filter(pool_name='sglbracket'))
+            if not triforce_texts:
+                triforce_texts = await models.TriforceTexts.filter(pool_name='sglbracket')
+
             triforce_text = random.choice(triforce_texts)
 
-        text = triforce_text.text.encode("utf-8").decode("unicode_escape")
+            text = triforce_text.text.encode("utf-8").decode("unicode_escape")
 
-        self.preset_dict = await fetch_preset('sglive')
-        self.preset_dict['settings']['texts'] = {}
-        self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
-        self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
+            logging.info(f"Using triforce text: {text}")
 
-        triforce_text.broadcasted = True
-        await triforce_text.save()
+            self.preset_dict = await fetch_preset('sglive')
+            self.preset_dict['settings']['texts'] = {}
+            self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
+            self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
+
+            if self.broadcast_channels:
+                triforce_text.broadcasted = True
+                await triforce_text.save()
+        except IndexError:
+            logging.exception("Could not retrieve any triforce texts, generating this normally instead...")
+            self.preset_dict = await fetch_preset('sglive')
+            self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
 
     @property
     def seed_code(self):

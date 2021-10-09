@@ -37,7 +37,7 @@ else:
         'invleague': alttprleague.ALTTPRLeague,
         'alttprleague': alttprleague.ALTTPROpenLeague,
 
-        'sgl21alttpr': sgl21.ALTTPRQuals,
+        'sgl21alttpr': sgl21.ALTTPRBrackets,
         # 'sgl21aosr': sgl21.AOSR,
         # 'sgl21bloodstained': sgl21.Bloodstained,
         # 'sgl21ctjets': sgl21.CTJets,

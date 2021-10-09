@@ -140,8 +140,11 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         tournamentresults.permalink = self.seed_info
         await tournamentresults.save()
 
-        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
+        await self.rtgg_handler.send_message("Seed has been generated!  GLHF")
         self.rtgg_handler.seed_rolled = True
+
+    async def send_room_welcome(self):
+        await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about ~5 minutes prior to the start of your race.')
 
     @property
     def seed_info(self):
