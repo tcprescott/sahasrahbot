@@ -1,12 +1,11 @@
 import aiohttp
 import os
 
-OOTR_BASE_URL = os.environ.get(
-    'RACETIME_BASE_URL', 'https://ootrandomizer.com')
+OOTR_BASE_URL = os.environ.get('OOTR_BASE_URL', 'https://ootrandomizer.com')
 OOTR_API_KEY = os.environ.get('OOTR_API_KEY')
 
 
-async def roll_ootr(settings, encrypt=True):
+async def roll_ootr(settings, version='6.0.0', encrypt=True):
     async with aiohttp.request(
         method='post',
         url=f"{OOTR_BASE_URL}/api/sglive/seed/create",
@@ -14,6 +13,7 @@ async def roll_ootr(settings, encrypt=True):
         json=settings,
         params={
             "key": OOTR_API_KEY,
+            "version": version,
             "encrypt": str(encrypt).lower()
         }
     ) as resp:
