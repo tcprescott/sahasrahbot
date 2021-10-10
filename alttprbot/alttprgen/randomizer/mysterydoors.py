@@ -150,7 +150,7 @@ def generate_doors_settings(weights, options):
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
     settings["shuffleenemies"] = {'none': 'none',
                           'shuffled': 'shuffled',
-                          'random': 'chaos'
+                          'random': 'random'
                           }[options['enemy_shuffle']]
     settings["shufflebosses"] = options['boss_shuffle']
     settings["enemy_damage"] = {'default': 'default',

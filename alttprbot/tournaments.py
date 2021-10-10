@@ -24,6 +24,8 @@ if c.DEBUG:
     }
 else:
     TOURNAMENT_DATA = {
+        ## REGULAR TOURNEMNTS
+
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         # 'alttpr': alttpr.ALTTPRTournamentRace,
         # 'smwde': smwde.SMWDETournament,
@@ -32,11 +34,16 @@ else:
         # 'alttpres': alttpres.ALTTPRESTournament,
         'smz3coop': smz3coop.SMZ3CoopTournament,
         'smbingo': smbingo.SMBingoTournament,
+
+        ## Dailies
         'alttprdaily': alttprdaily.AlttprSGDailyRace,
         'smz3': smz3.SMZ3DailyRace,
+
+        ## ALTTPR League
         'invleague': alttprleague.ALTTPRLeague,
         'alttprleague': alttprleague.ALTTPROpenLeague,
 
+        ## SGL
         'sgl21alttpr': sgl21.ALTTPRBrackets,
         # 'sgl21aosr': sgl21.AOSR,
         'sgl21bloodstained': sgl21.Bloodstained,
