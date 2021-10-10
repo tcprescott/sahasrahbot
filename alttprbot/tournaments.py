@@ -51,7 +51,7 @@ else:
         'sgl21deadlytowers': sgl21.DeadlyTowers,
         # 'sgl21factorio-alttpr': sgl21.FactorioALTTP,
         'sgl21ffr': sgl21.FFR,
-        'sgl21messenger': sgl21.Messenger,
+        # 'sgl21messenger': sgl21.Messenger,
         'sgl21minecraft2x': sgl21.Minecraft,
         'sgl21mmx': sgl21.MMX,
         'sgl21ootr': sgl21.OOTR,
