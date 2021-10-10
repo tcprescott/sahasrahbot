@@ -82,7 +82,7 @@ class Tournament(commands.Cog):
             event_data: TournamentConfig = await tournament_class.get_config()
 
             if messages and event_data.audit_channel:
-                await event_data.audit_channel.send("\n".join(messages))
+                await event_data.audit_channel.send("<@185198185990324225>\n\n" + "\n".join(messages))
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def scheduling_needs(self):
