@@ -28,6 +28,11 @@ oauth2client = "*"
 google-api-python-client = "*"
 jishaku = "*"
 html5lib = "*"
+shortuuid = "*"
+pygithub = "*"
+pyside2 = "==5.15.2"
+pillow = "==8.0.1"
+nlzss11 = "==1.1"
 
 [dev-packages]
 pycodestyle = "*"

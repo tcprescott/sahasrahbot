@@ -1,9 +1,10 @@
 from tortoise.models import Model
 from tortoise import fields
 
+
 class AuditGeneratedGames(Model):
     class Meta:
-        table="audit_generated_games"
+        table = "audit_generated_games"
 
     id = fields.IntField(pk=True)
     randomizer = fields.CharField(45, null=True)
@@ -15,9 +16,10 @@ class AuditGeneratedGames(Model):
     timestamp = fields.DatetimeField(auto_now=True, null=True)
     customizer = fields.IntField(null=True)
 
+
 class AuditMessages(Model):
     class Meta:
-        table="audit_messages"
+        table = "audit_messages"
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=True)
@@ -29,34 +31,38 @@ class AuditMessages(Model):
     attachment = fields.CharField(1000, null=True)
     deleted = fields.IntField(default=0)
 
+
 class Config(Model):
     class Meta:
-        table="config"
+        table = "config"
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
     parameter = fields.CharField(45, null=False)
     value = fields.CharField(45, null=True)
 
+
 class Daily(Model):
     class Meta:
-        table="daily"
+        table = "daily"
 
     id = fields.IntField(pk=True)
     hash = fields.CharField(45, index=True)
 
+
 class DiscordServerLists(Model):
     class Meta:
-        table='discord_server_lists'
+        table = 'discord_server_lists'
 
     id = fields.IntField(pk=True)
     server_description = fields.CharField(200, null=False)
     invite_id = fields.CharField(45, null=False)
     category = fields.ForeignKeyField('models.DiscordServerCategories', related_name='discord_server_lists')
 
+
 class DiscordServerCategories(Model):
     class Meta:
-        table='discord_server_categories'
+        table = 'discord_server_categories'
 
     id = fields.IntField(pk=True)
     order = fields.IntField(null=False, default=0)
@@ -65,9 +71,10 @@ class DiscordServerCategories(Model):
     category_title = fields.CharField(200, null=False)
     category_description = fields.CharField(200, null=True)
 
+
 class LeaguePlayoffs(Model):
     class Meta:
-        table='league_playoffs'
+        table = 'league_playoffs'
 
     episode_id = fields.IntField(pk=True, generated=False)
     playoff_round = fields.CharField(45, null=True)
@@ -79,14 +86,16 @@ class LeaguePlayoffs(Model):
     created = fields.DatetimeField(auto_now_add=True)
     modified = fields.DatetimeField(auto_now=True)
 
+
 class PatchDistribution(Model):
     class Meta:
-        table='patch_distribution'
+        table = 'patch_distribution'
 
     id = fields.IntField(pk=True)
     patch_id = fields.CharField(45, null=True)
     game = fields.CharField(45, null=True)
     used = fields.SmallIntField(index=True)
+
 
 class RacetimeKONOTGame(Model):
     id = fields.IntField(pk=True)
@@ -103,9 +112,10 @@ class RaceTimeKONOTSegment(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
+
 class ReactionGroup(Model):
     class Meta:
-        table='reaction_group'
+        table = 'reaction_group'
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
@@ -115,9 +125,10 @@ class ReactionGroup(Model):
     description = fields.CharField(1000, null=True)
     bot_managed = fields.IntField(null=True)
 
+
 class ReactionRole(Model):
     class Meta:
-        table='reaction_role'
+        table = 'reaction_role'
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
@@ -130,7 +141,7 @@ class ReactionRole(Model):
 
 class SMZ3Multiworld(Model):
     class Meta:
-        table='smz3_multiworld'
+        table = 'smz3_multiworld'
 
     message_id = fields.BigIntField(pk=True, generated=False)
     owner_id = fields.BigIntField(null=True)
@@ -138,9 +149,10 @@ class SMZ3Multiworld(Model):
     preset = fields.CharField(45, null=True)
     status = fields.CharField(20, null=True)
 
+
 class SpoilerRaces(Model):
     class Meta:
-        table='spoiler_races'
+        table = 'spoiler_races'
 
     id = fields.IntField(pk=True)
     srl_id = fields.CharField(45, null=True)
@@ -149,13 +161,15 @@ class SpoilerRaces(Model):
     date = fields.DatetimeField(auto_now_add=True)
     started = fields.DatetimeField(null=True)
 
+
 class NickVerification(Model):
     class Meta:
-        table='nick_verification'
+        table = 'nick_verification'
 
     key = fields.BigIntField(pk=True, generated=False)
     discord_user_id = fields.BigIntField(null=True)
     timestamp = fields.DatetimeField(auto_now=True, null=True)
+
 
 class RTGGWatcher(Model):
     id = fields.IntField(pk=True)
@@ -163,15 +177,17 @@ class RTGGWatcher(Model):
     channel_id = fields.BigIntField(null=False)
     category = fields.CharField(50, null=False)
 
+
 class RTGGWatcherPlayer(Model):
     id = fields.IntField(pk=True)
     rtgg_watcher = fields.ForeignKeyField('models.RTGGWatcher', related_name='watched_player')
     racetime_id = fields.CharField(50, null=False)
     racetime_name = fields.CharField(200, null=False)
 
+
 class SrlRaces(Model):
     class Meta:
-        table='srl_races'
+        table = 'srl_races'
 
     id = fields.IntField(pk=True)
     srl_id = fields.CharField(45, null=True)
@@ -179,9 +195,10 @@ class SrlRaces(Model):
     timestamp = fields.DatetimeField(auto_now=True)
     message = fields.CharField(200, null=True)
 
+
 class SRLNick(Model):
     class Meta:
-        table='srlnick'
+        table = 'srlnick'
 
     discord_user_id = fields.BigIntField(pk=True, generated=False)
     srl_nick = fields.CharField(200, index=True)
@@ -189,9 +206,10 @@ class SRLNick(Model):
     rtgg_id = fields.CharField(200, index=True)
     srl_verified = fields.SmallIntField(null=True)
 
+
 class TournamentGames(Model):
     class Meta:
-        table='tournament_games'
+        table = 'tournament_games'
 
     episode_id = fields.IntField(pk=True, generated=False)
     event = fields.CharField(45, null=True)
@@ -201,9 +219,10 @@ class TournamentGames(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
+
 class TournamentResults(Model):
     class Meta:
-        table='tournament_results'
+        table = 'tournament_results'
 
     id = fields.IntField(pk=True)
     srl_id = fields.CharField(45, null=True)
@@ -218,10 +237,11 @@ class TournamentResults(Model):
     week = fields.CharField(45, null=True)
     written_to_gsheet = fields.SmallIntField(null=True)
 
+
 class Tournaments(Model):
     class Meta:
-        table='tournaments'
-        unique_together=('schedule_type', 'slug')
+        table = 'tournaments'
+        unique_together = ('schedule_type', 'slug')
 
     id = fields.IntField(pk=True)
     schedule_type = fields.CharField(45, null=True)
@@ -244,6 +264,7 @@ class Tournaments(Model):
     lang = fields.CharField(20, null=True)
     coop = fields.BooleanField(null=True)
 
+
 class TriforceTexts(Model):
     id = fields.IntField(pk=True)
     pool_name = fields.CharField(45, null=False)
@@ -251,6 +272,7 @@ class TriforceTexts(Model):
     author = fields.CharField(200, null=True)
     author_credit = fields.CharField(200, null=True)
     broadcasted = fields.BooleanField(null=False, default=False)
+
 
 class SpeedGamingDailies(Model):
     class Meta:
@@ -266,9 +288,10 @@ class SpeedGamingDailies(Model):
     race_info = fields.CharField(2000, null=False)
     active = fields.SmallIntField(null=True)
 
+
 class SGL2020Tournament(Model):
     class Meta:
-        table='sgl2020_tournament'
+        table = 'sgl2020_tournament'
 
     episode_id = fields.IntField(pk=True, generated=False)
     room_name = fields.CharField(100, null=True)
@@ -281,9 +304,10 @@ class SGL2020Tournament(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
+
 class SGL2020TournamentBO3(Model):
     class Meta:
-        table='sgl2020_tournament_bo3'
+        table = 'sgl2020_tournament_bo3'
 
     id = fields.IntField(pk=True)
     episode_id = fields.IntField(null=True)
@@ -297,26 +321,29 @@ class SGL2020TournamentBO3(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
+
 class TwitchChannels(Model):
     class Meta:
-        table='twitch_channels'
+        table = 'twitch_channels'
 
     channel = fields.CharField(200, pk=True)
     status = fields.CharField(45, null=False)
 
+
 class TwitchCommandText(Model):
     class Meta:
-        table='twitch_command_text'
-        unique_together=('channel', 'command')
+        table = 'twitch_command_text'
+        unique_together = ('channel', 'command')
 
     id = fields.IntField(pk=True)
     channel = fields.CharField(200, null=True)
     command = fields.CharField(45, null=True)
     content = fields.CharField(4000, null=True)
 
+
 class VoiceRole(Model):
     class Meta:
-        table='voice_role'
+        table = 'voice_role'
 
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
