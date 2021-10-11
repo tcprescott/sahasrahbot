@@ -10,8 +10,8 @@ import pytz
 from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
-from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr, # pylint: disable=unused-import
-    alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily, alttprleague, sgl21) # pylint: disable=unused-import
+from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr,  # pylint: disable=unused-import
+                                  alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily, alttprleague, sgl21)  # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -24,7 +24,7 @@ if c.DEBUG:
     }
 else:
     TOURNAMENT_DATA = {
-        ## REGULAR TOURNEMNTS
+        # REGULAR TOURNEMNTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         # 'alttpr': alttpr.ALTTPRTournamentRace,
@@ -35,15 +35,15 @@ else:
         'smz3coop': smz3coop.SMZ3CoopTournament,
         'smbingo': smbingo.SMBingoTournament,
 
-        ## Dailies
+        # Dailies
         'alttprdaily': alttprdaily.AlttprSGDailyRace,
         'smz3': smz3.SMZ3DailyRace,
 
-        ## ALTTPR League
+        # ALTTPR League
         'invleague': alttprleague.ALTTPRLeague,
         'alttprleague': alttprleague.ALTTPROpenLeague,
 
-        ## SGL
+        # SGL
         'sgl21alttpr': sgl21.ALTTPRBrackets,
         'sgl21aosr': sgl21.AOSR,
         'sgl21bloodstained': sgl21.Bloodstained,
@@ -72,8 +72,10 @@ else:
         'sgl21zelda2': sgl21.Z2R,
     }
 
+
 async def fetch_tournament_handler(event, episodeid: int, rtgg_handler=None):
     return await TOURNAMENT_DATA[event].construct(episodeid, rtgg_handler)
+
 
 async def create_tournament_race_room(event, episodeid):
     event_data = await TOURNAMENT_DATA[event].get_config()
@@ -89,6 +91,7 @@ async def create_tournament_race_room(event, episodeid):
 
     handler = await TOURNAMENT_DATA[event].construct_race_room(episodeid)
     return handler
+
 
 async def race_recording_task():
     if TOURNAMENT_RESULTS_SHEET is None:
@@ -134,8 +137,8 @@ async def race_recording_task():
                     race.permalink,
                     race.spoiler
                 ])
-                race.status="RECORDED"
-                race.written_to_gsheet=1
+                race.status = "RECORDED"
+                race.written_to_gsheet = 1
                 await race.save()
             elif race_data['status']['value'] == 'cancelled':
                 await race.delete()

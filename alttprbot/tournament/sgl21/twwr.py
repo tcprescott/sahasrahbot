@@ -19,6 +19,10 @@ class TWWR(SGLCoreTournamentRace):
             coop=False
         )
 
+    @property
+    def hours_before_room_open(self):
+        return 1.5
+
     # async def roll(self):
     #     settings_key = random.choice(twwr.SPOILER_LOG_DEFAULT)
 
