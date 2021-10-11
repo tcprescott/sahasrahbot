@@ -7,6 +7,7 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot.database import spoiler_races
 
+
 class ALTTPRLeague(ALTTPRTournamentRace):
     async def roll(self):
         if self.week_data.get('spoiler', False):
@@ -36,7 +37,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game (assisted)',
             event_slug="invleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(611601587139510322),
@@ -78,7 +79,7 @@ class ALTTPROpenLeague(ALTTPRLeague):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game (assisted)',
             event_slug="alttprleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(611601587139510322),
