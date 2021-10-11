@@ -57,7 +57,7 @@ else:
         'sgl21ootr': sgl21.OOTR,
         'sgl21pkmnredrando': sgl21.PokemonRedRando,
         'sgl21pmdsky': sgl21.PMDSkyRando,
-        # 'sgl21smany': sgl21.SMAny,
+        'sgl21smany': sgl21.SMAny,
         'sgl21smb3r': sgl21.SMB3R,
         'sgl21smo': sgl21.SMO,
         'sgl21smr': sgl21.SuperMetroidRando,
