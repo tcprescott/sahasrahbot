@@ -12,7 +12,7 @@ class SMAny(SGLCoreTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='sgl',
-            racetime_goal="SM Any %",
+            racetime_goal="SM Any%",
             event_slug="sgl21smany",
             audit_channel=discordbot.get_channel(774336581808291863),
             commentary_channel=discordbot.get_channel(631564559018098698),
