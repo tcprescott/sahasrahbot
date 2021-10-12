@@ -5,7 +5,7 @@ settings:
   glitches: none
   item_placement: advanced
   dungeon_items: standard
-  accessibility: items
+  accessibility: none
   goal: triforce-hunt
   crystals:
     ganon: '7'
