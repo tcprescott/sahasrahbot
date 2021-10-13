@@ -3,6 +3,10 @@ import os
 import ssl
 import sys
 
+import aiohttp
+from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type, wait_exponential
+
+from alttprbot import models
 from config import Config as c
 from racetime_bot import Bot
 # from alttprbot.database import sgl2020_tournament, sgl2020_tournament_bo3
@@ -53,25 +57,27 @@ class SahasrahBotRaceTimeBot(Bot):
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
 
+        unlisted_rooms = await models.RTGGUnlistedRooms.filter(category=self.category_slug)
+        for unlisted_room in unlisted_rooms:
+            try:
+                async for attempt in AsyncRetrying(
+                        stop=stop_after_attempt(5),
+                        retry=retry_if_exception_type(aiohttp.ClientResponseError)):
+                    with attempt:
+                        async with self.http.get(
+                            self.http_uri(f'/{unlisted_room.room_name}/data'),
+                            ssl=self.ssl_context,
+                        ) as resp:
+                            race_data = await resp.json()
 
-# class SGLRaceTimeBot(SahasrahBotRaceTimeBot):
-#     async def start(self):
-#         self.loop.create_task(self.reauthorize())
-#         self.loop.create_task(self.refresh_races())
+                if race_data['status']['value'] in ['finished', 'cancelled'] or not race_data['unlisted']:
+                    await unlisted_room.delete()
+                else:
+                    await self.join_race_room(unlisted_room.room_name)
 
-#         races = await sgl2020_tournament.get_unrecorded_races()
-#         for race in races:
-#             if race['platform'] == 'racetime':
-#                 if race['room_name'] is None:
-#                     continue
-#                 await self.create_handler_by_room_name(f"/{race['room_name']}")
+            except RetryError as e:
+                raise e.last_attempt._exception from e
 
-#         races_bo3 = await sgl2020_tournament_bo3.get_unrecorded_races()
-#         for race in races_bo3:
-#             if race['platform'] == 'racetime':
-#                 if race['room_name'] is None:
-#                     continue
-#                 await self.create_handler_by_room_name(f"/{race['room_name']}")
 
 def start_racetime(loop):
     for bot in racetime_bots.values():
@@ -80,7 +86,6 @@ def start_racetime(loop):
 
 racetime_bots = {}
 for slug in RACETIME_GAMES:
-    # if slug == 'sgl':
     stripped_slug = slug.replace('-', '')
     racetime_bots[slug] = SahasrahBotRaceTimeBot(
         category_slug=slug,
@@ -90,12 +95,3 @@ for slug in RACETIME_GAMES:
         logger=logger,
         handler_class=getattr(handlers, stripped_slug).GameHandler
     )
-    # else:
-    #     racetime_bots[slug] = SGLRaceTimeBot(
-    #         category_slug=slug,
-    #         client_id=os.environ.get(f'RACETIME_CLIENT_ID_{slug.upper()}'),
-    #         client_secret=os.environ.get(
-    #             f'RACETIME_CLIENT_SECRET_{slug.upper()}'),
-    #         logger=logger,
-    #         handler_class=getattr(handlers, slug).GameHandler
-    #     )

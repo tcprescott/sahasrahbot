@@ -18,6 +18,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     tournament = None
     konot: KONOT = None
     status = None
+    unlisted = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -96,6 +97,14 @@ class SahasrahBotCoreHandler(RaceHandler):
                 })
                 await getattr(self, method)()
 
+        unlisted = self.data.get('unlisted', False)
+        if unlisted != self.unlisted:
+            if unlisted:
+                await models.RTGGUnlistedRooms.update_or_create(room_name=self.data.get('name'), defaults={'category': self.bot.category_slug})
+            else:
+                await models.RTGGUnlistedRooms.filter(room_name=self.data.get('name')).delete()
+        self.unlisted = unlisted
+
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
         # raise Exception(data.get('errors'))
@@ -139,8 +148,8 @@ class SahasrahBotCoreHandler(RaceHandler):
         if self.data.get('team_race', False) is False:
             raise Exception('This is not a team race.')
 
-        entrants = [(e['user']['name'],e['team']['name']) for e in self.data['entrants']]
-        return {key : [v[0] for v in val] for key, val in groupby(sorted(entrants, key = lambda ele: ele[1]), key = lambda ele: ele[1])}
+        entrants = [(e['user']['name'], e['team']['name']) for e in self.data['entrants']]
+        return {key: [v[0] for v in val] for key, val in groupby(sorted(entrants, key=lambda ele: ele[1]), key=lambda ele: ele[1])}
 
     @property
     def is_equal_teams(self):

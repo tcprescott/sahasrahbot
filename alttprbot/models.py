@@ -171,6 +171,12 @@ class NickVerification(Model):
     timestamp = fields.DatetimeField(auto_now=True, null=True)
 
 
+class RTGGUnlistedRooms(Model):
+    id = fields.IntField(pk=True)
+    room_name = fields.CharField(200, null=False)
+    category = fields.CharField(50, null=False)
+
+
 class RTGGWatcher(Model):
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)

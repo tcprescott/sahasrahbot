@@ -5,6 +5,7 @@ from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig, TournamentRace, UnableToLookupUserException
 from alttprbot_discord.bot import discordbot
 
+
 class SGLTournamentPlayer(object):
     def __init__(self):
         self.discord_user: discord.Member = None
@@ -38,6 +39,7 @@ class SGLTournamentPlayer(object):
     @property
     def name(self):
         return self.discord_user.name
+
 
 class SGLCoreTournamentRace(TournamentRace):
     async def configuration(self):
@@ -105,7 +107,7 @@ class SGLCoreTournamentRace(TournamentRace):
         self.rtgg_handler = await self.rtgg_bot.startrace(
             goal=self.data.racetime_goal,
             invitational=False,
-            unlisted=False,
+            unlisted=True,
             info=self.race_info,
             start_delay=15,
             time_limit=24,
@@ -120,6 +122,7 @@ class SGLCoreTournamentRace(TournamentRace):
             team_race=self.data.coop,
         )
         return self.rtgg_handler
+
 
 class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
     async def roll(self):
