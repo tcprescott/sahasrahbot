@@ -13,6 +13,7 @@ from .sglcore import SGLCoreTournamentRace
 
 BINGO_COLLAB_DISCORD_WEBHOOK = os.environ.get('BINGO_COLLAB_DISCORD_WEBHOOK', None)
 
+
 class SMO(SGLCoreTournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(590331405624410116)
@@ -21,7 +22,7 @@ class SMO(SGLCoreTournamentRace):
             racetime_category='sgl',
             racetime_goal="Super Mario Galaxy Triple Bingo",
             event_slug="sgl21smo",
-            audit_channel=discordbot.get_channel(774336581808291863),
+            audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False
         )
@@ -41,7 +42,6 @@ class SMO(SGLCoreTournamentRace):
         tournamentresults.bingosync_room = self.bingo.room_id
         tournamentresults.bingosync_password = self.bingo.password
         await tournamentresults.save()
-
 
         embed = discord.Embed(
             title=f"{self.event_name} - {self.versus}",

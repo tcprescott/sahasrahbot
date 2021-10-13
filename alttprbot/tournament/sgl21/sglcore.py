@@ -49,7 +49,7 @@ class SGLCoreTournamentRace(TournamentRace):
             racetime_category='sgl',
             racetime_goal="Beat the game",
             event_slug="sgl21alttpr",
-            audit_channel=discordbot.get_channel(774336581808291863),
+            audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False
         )
@@ -97,11 +97,15 @@ class SGLCoreTournamentRace(TournamentRace):
         return handler.data
 
     @property
+    def race_room_log_channel(self):
+        return discordbot.get_channel(774336581808291863)
+
+    @property
     def player_racetime_ids(self):
         return []
 
     async def send_audit_room_info(self):
-        await self.data.audit_channel.send(f"{self.event_name} - {self.versus} - Episode {self.episodeid} - <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}>")
+        await self.race_room_log_channel.send(f"Room created: {self.event_name} - {self.versus} - Episode {self.episodeid} - <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}>")
 
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
@@ -137,7 +141,7 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
         await self.rtgg_handler.send_message(self.seed_info)
 
-        await self.send_audit_message(message=f"Room created: <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}> - {self.event_name} - {self.versus} - Episode {self.episodeid} - {self.seed_info}")
+        await self.send_audit_message(message=f"<{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}> - {self.event_name} - {self.versus} - Episode {self.episodeid} - {self.seed_info}")
 
         tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed_info

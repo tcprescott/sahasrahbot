@@ -15,12 +15,14 @@ import pytz
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
+
 class UnableToLookupUserException(SahasrahBotException):
     pass
 
 
 class UnableToLookupEpisodeException(SahasrahBotException):
     pass
+
 
 @dataclass
 class TournamentConfig:
@@ -46,6 +48,7 @@ class TournamentConfig:
 
     lang: str = 'en'
     coop: bool = False
+
 
 class TournamentPlayer(object):
     def __init__(self):
@@ -88,8 +91,9 @@ class TournamentPlayer(object):
     def name(self):
         return self.discord_user.name
 
+
 class TournamentRace(object):
-    def __init__(self, episodeid: int=None, rtgg_handler=None):
+    def __init__(self, episodeid: int = None, rtgg_handler=None):
         try:
             self.episodeid = int(episodeid)
         except TypeError:
@@ -362,7 +366,6 @@ class TournamentRace(object):
     def timezone(self):
         return pytz.timezone('US/Eastern')
 
-
     @property
     def hours_before_room_open(self):
         return 0.75
@@ -373,7 +376,7 @@ class TournamentRace(object):
     async def process_submission_form(self, payload, submitted_by):
         pass
 
-    async def send_audit_message(self, message=None, embed: discord.Embed=None):
+    async def send_audit_message(self, message=None, embed: discord.Embed = None):
         if self.audit_channel:
             await self.audit_channel.send(content=message, embed=embed)
 
