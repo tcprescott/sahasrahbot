@@ -18,6 +18,7 @@ title:  Mystery Weights
 | [friendly](https://github.com/tcprescott/sahasrahbot/blob/master/weights/friendly.yaml) | A friendlier weightset.  Designed for those who don't want something extreme (or entrance). | *Customizer* |
 | [funweighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/funweighted.yaml) | Unweighted except no chance of triforce hunts or insanity entrance shuffles. |  |
 | [grabbag](https://github.com/tcprescott/sahasrahbot/blob/master/weights/grabbag.yaml) | A grab bag of multiple settings from previous ladder seasons |  |
+| [hmg](https://github.com/tcprescott/sahasrahbot/blob/master/weights/hmg.yaml) | This'll always be HMG.  Always. | *Customizer* |
 | [itemonly](https://github.com/tcprescott/sahasrahbot/blob/master/weights/itemonly.yaml) | No entrance shuffle. |  |
 | [ladder](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder.yaml) | Season seven mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
 | [ladder_season1](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season1.yaml) | Pre-season mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |  |

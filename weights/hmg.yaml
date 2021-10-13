@@ -1,0 +1,101 @@
+description: This'll always be HMG.  Always.
+glitches_required: "major_glitches"
+item_functionality: "normal"
+item_placement: "advanced"
+dungeon_items: standard
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+accessibility:
+  items: 70
+  locations: 0
+  none: 30
+goals:
+  ganon: 40
+  fast_ganon: 20
+  dungeons: 10
+  pedestal: 20
+  triforce-hunt: 10
+tower_open: "random"
+ganon_open:
+  "3": 10
+  "4": 15
+  "5": 20
+  "6": 25
+  "7": 30
+world_state:
+  standard: 15
+  open: 70
+  inverted: 10
+  retro: 5
+entrance_shuffle:
+  none: 100
+  simple: 0
+  restricted: 0
+  full: 0
+  crossed: 0
+  insanity: 0
+boss_shuffle:
+  none: 60
+  simple: 10
+  full: 10
+  random: 20
+enemy_shuffle:
+  none: 60
+  shuffled: 40
+  random: 00
+hints: "off"
+weapons:
+  randomized: 50
+  assured: 25
+  vanilla: 15
+  swordless: 10
+item_pool:
+  normal: 80
+  hard: 15
+  expert: 5
+  crowd_control: 0
+enemy_damage:
+  default: 80
+  shuffled: 20
+  random: 0
+enemy_health:
+  default: 85
+  easy: 5
+  hard: 10
+customizer:
+  eq:
+    "PegasusBoots": true
+  custom:
+    canBombJump: false
+    canTestGlitch: false
+    canBootsClip: true
+    canBunnyRevive: false
+    canBunnySurf: false
+    canDungeonRevive: true
+    canFakeFlipper: true
+    canMirrorClip: true
+    canMirrorWrap: false
+    canOWYBA: false
+    canOneFrameClipOW: false
+    canOneFrameClipUW: true
+    canSuperBunny: true
+    canSuperSpeed: true
+    canWaterFairyRevive: false
+    canWaterWalk: true
+    customPrizePacks: false
+    region.wildMaps:
+      True: 40
+      False: 60
+    region.wildCompasses:
+      True: 40
+      False: 60
+    region.wildKeys:
+      True: 40
+      False: 60
+    region.wildBigKeys:
+      True: 40
+      False: 60
+
+rom.logicMode: MajorGlitches
