@@ -12,8 +12,8 @@ class Minecraft(SGLCoreTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='sgl',
-            racetime_goal="Minecraft Multiworld",
-            event_slug="sgl21minecraft2x",
+            racetime_goal="Minecraft 2v2",
+            event_slug="sgl21minecraft2v2",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=True
