@@ -52,7 +52,7 @@ else:
         'sgl21factorio-alttpr': sgl21.FactorioALTTP,
         'sgl21ffr': sgl21.FFR,
         'sgl21messenger': sgl21.Messenger,
-        'sgl21minecraft2x': sgl21.Minecraft,
+        'sgl21minecraft2v2': sgl21.Minecraft,
         'sgl21mmx': sgl21.MMX,
         'sgl21ootr': sgl21.OOTR,
         'sgl21pkmnredrando': sgl21.PokemonRedRando,
