@@ -7,6 +7,7 @@ from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 from pyz3r.mystery import get_random_option, generate_random_settings
 
+
 @dataclass
 class AlttprMystery:
     weights: dict
@@ -15,6 +16,7 @@ class AlttprMystery:
     doors: bool = False
     custom_instructions: str = None
     seed: Union[AlttprDoorDiscord, ALTTPRDiscord] = None
+
 
 BASE_DOORS_PAYLOAD = {
     "retro": False,
@@ -136,10 +138,10 @@ def generate_doors_settings(weights, options):
     settings["crystals_gt"] = options['tower_open']
     settings["crystals_ganon"] = options['ganon_open']
     settings["swords"] = {'randomized': 'random',
-                            'assured': 'assured',
-                            'vanilla': 'vanilla',
-                            'swordless': 'swordless'
-                            }[options['weapons']]
+                          'assured': 'assured',
+                          'vanilla': 'vanilla',
+                          'swordless': 'swordless'
+                          }[options['weapons']]
     settings["difficulty"] = options['item_pool']
     settings["item_functionality"] = options['item_functionality']
     settings["accessibility"] = options['accessibility']
@@ -149,14 +151,14 @@ def generate_doors_settings(weights, options):
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
     settings["shuffleenemies"] = {'none': 'none',
-                          'shuffled': 'shuffled',
-                          'random': 'random'
-                          }[options['enemy_shuffle']]
+                                  'shuffled': 'shuffled',
+                                  'random': 'random'
+                                  }[options['enemy_shuffle']]
     settings["shufflebosses"] = options['boss_shuffle']
     settings["enemy_damage"] = {'default': 'default',
-                        'shuffled': 'shuffled',
-                        'random': 'chaos'
-                        }[options['enemy_damage']]
+                                'shuffled': 'shuffled',
+                                'random': 'random'
+                                }[options['enemy_damage']]
     settings["enemy_health"] = options['enemy_health']
     settings["keydropshuffle"] = options['keydropshuffle'] == 'on'
 
