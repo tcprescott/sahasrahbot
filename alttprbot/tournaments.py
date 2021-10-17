@@ -67,7 +67,7 @@ else:
         # 'sgl21ssr': sgl21.SSR,
         'sgl21startropics': sgl21.StarTropics,
         'sgl21timespinner': sgl21.Timespinner,
-        # 'sgl21twwr': sgl21.TWWR,
+        'sgl21twwr': sgl21.TWWR,
         'sgl21z1r': sgl21.Z1R,
         'sgl21zelda2': sgl21.Z2R,
     }

@@ -12,7 +12,7 @@ class TWWR(SGLCoreTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='twwr',
-            racetime_goal="The Wind Waker Randomizer",
+            racetime_goal="Spoiler Log Race",
             event_slug="sgl21twwr",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
