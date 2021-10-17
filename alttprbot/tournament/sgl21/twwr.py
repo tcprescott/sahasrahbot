@@ -28,7 +28,7 @@ class TWWR(SGLCoreTournamentRace):
             start_delay=15,
             time_limit=24,
             streaming_required=True,
-            auto_start=True,
+            auto_start=False,
             allow_comments=True,
             hide_comments=True,
             allow_prerace_chat=True,
