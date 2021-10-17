@@ -1,0 +1,11 @@
+randomizer: ctjets
+version: 3.1.0
+description: Hard
+settings:
+  difficulty: hard
+  disable_glitches: on
+  boss_scaling: on
+  locked_chars: on
+  duplicate_char_assignments: 7f7f7f7f7f7f7f
+  shop_prices: Normal
+  tech_rando: Balanced Random

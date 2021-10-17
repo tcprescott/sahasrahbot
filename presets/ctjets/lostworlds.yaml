@@ -1,0 +1,11 @@
+randomizer: ctjets
+version: 3.1.0
+description: Lost Worlds
+settings:
+  difficulty: normal
+  disable_glitches: "on"
+  lost_worlds: "on"
+  zeal: "on"
+  duplicate_char_assignments: 7f7f7f7f7f7f7f
+  shop_prices: Normal
+  tech_rando: Fully Random
