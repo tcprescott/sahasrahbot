@@ -1,4 +1,4 @@
-from alttprbot.tournament.sgdailies import TournamentConfig, SGDailyRaceCore
+from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
 

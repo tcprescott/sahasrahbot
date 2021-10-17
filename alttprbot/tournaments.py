@@ -11,7 +11,7 @@ from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
 from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr,  # pylint: disable=unused-import
-                                  alttprhmg, smwde, smz3coop, smbingo, smz3, alttprdaily, alttprleague, sgl21)  # pylint: disable=unused-import
+                                  alttprhmg, smwde, smz3coop, smbingo, dailies, alttprleague, sgl21)  # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -35,9 +35,9 @@ else:
         # 'smz3coop': smz3coop.SMZ3CoopTournament,
         # 'smbingo': smbingo.SMBingoTournament,
 
-        # Dailies
-        'alttprdaily': alttprdaily.AlttprSGDailyRace,
-        'smz3': smz3.SMZ3DailyRace,
+        # Dailies/Weeklies
+        'alttprdaily': dailies.AlttprSGDailyRace,
+        'smz3': dailies.SMZ3DailyRace,
 
         # ALTTPR League
         'invleague': alttprleague.ALTTPRLeague,

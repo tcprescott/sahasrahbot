@@ -2,7 +2,7 @@ import os
 
 import aiohttp
 import discord
-from alttprbot.tournament.sgdailies import SGDailyRaceCore, TournamentConfig
+from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
 SG_DISCORD_WEBHOOK = os.environ.get('SG_DISCORD_WEBHOOK', None)
