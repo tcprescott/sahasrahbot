@@ -69,7 +69,7 @@ else:
         'sgl21timespinner': sgl21.Timespinner,
         'sgl21twwr': sgl21.TWWR,
         'sgl21z1r': sgl21.Z1R,
-        'sgl21zelda2': sgl21.Z2R,
+        # 'sgl21zelda2': sgl21.Z2R,
     }
 
 
