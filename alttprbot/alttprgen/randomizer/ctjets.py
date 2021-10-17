@@ -9,7 +9,7 @@ jar = aiohttp.CookieJar()
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
-async def generate(settings):
+async def roll_ctjets(**settings):
     # settings = {
     #     'difficulty': 'normal',
     #     'duplicate_char_assignments': '7f7f7f7f7f7f7f',
