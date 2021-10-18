@@ -179,9 +179,10 @@ class PresetNamespaces(Model):
 
 class Presets(Model):
     class Meta:
-        unique_together = ('preset_name', 'namespace')
+        unique_together = ('randomizer', 'preset_name', 'namespace')
 
     id = fields.IntField(pk=True)
+    randomizer = fields.CharField(50)
     preset_name = fields.CharField(50)
     namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='presets')
     content = fields.TextField()
