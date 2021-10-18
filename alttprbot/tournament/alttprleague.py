@@ -37,7 +37,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game (assisted)',
+            racetime_goal='Beat the game',
             event_slug="invleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(611601587139510322),
@@ -79,7 +79,7 @@ class ALTTPROpenLeague(ALTTPRLeague):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game (assisted)',
+            racetime_goal='Beat the game',
             event_slug="alttprleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(611601587139510322),
