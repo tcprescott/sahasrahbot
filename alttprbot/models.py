@@ -171,6 +171,22 @@ class NickVerification(Model):
     timestamp = fields.DatetimeField(auto_now=True, null=True)
 
 
+class PresetNamespaces(Model):
+    id = fields.IntField(pk=True)
+    name = fields.CharField(50, null=False, unique=True)
+    discord_user_id = fields.BigIntField(null=False, unique=True)
+
+
+class Presets(Model):
+    class Meta:
+        unique_together = ('preset_name', 'namespace')
+
+    id = fields.IntField(pk=True)
+    preset_name = fields.CharField(50)
+    namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='presets')
+    content = fields.TextField()
+
+
 class RTGGUnlistedRooms(Model):
     id = fields.IntField(pk=True)
     room_name = fields.CharField(200, null=False)
