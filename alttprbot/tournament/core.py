@@ -47,7 +47,7 @@ class TournamentConfig:
     mod_roles: list = None
 
     stream_delay: int = 0
-    room_open_time: int = 30
+    room_open_time: int = 35
 
     lang: str = 'en'
     coop: bool = False
