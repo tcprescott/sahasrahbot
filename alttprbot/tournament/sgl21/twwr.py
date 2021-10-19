@@ -16,7 +16,8 @@ class TWWR(SGLCoreTournamentRace):
             event_slug="sgl21twwr",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
-            coop=False
+            coop=False,
+            stream_delay=60
         )
 
     async def create_race_room(self):
@@ -38,10 +39,6 @@ class TWWR(SGLCoreTournamentRace):
             team_race=False,
         )
         return self.rtgg_handler
-
-    @property
-    def hours_before_room_open(self):
-        return 1.5
 
     @property
     def race_info(self):

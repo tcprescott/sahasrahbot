@@ -40,10 +40,6 @@ class SGDailyRaceCore(TournamentRace):
         return self.rtgg_handler
 
     @property
-    def hours_before_room_open(self):
-        return 1
-
-    @property
     def announce_channel(self):
         return discordbot.get_channel(307861467838021633)
 

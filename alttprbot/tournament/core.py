@@ -46,6 +46,9 @@ class TournamentConfig:
     commentator_roles: list = None
     mod_roles: list = None
 
+    stream_delay: int = 0
+    room_open_time: int = 30
+
     lang: str = 'en'
     coop: bool = False
 
@@ -368,7 +371,7 @@ class TournamentRace(object):
 
     @property
     def hours_before_room_open(self):
-        return 0.75
+        return ((self.data.stream_delay + self.data.room_open_time)/60)
 
     async def create_embeds(self):
         pass

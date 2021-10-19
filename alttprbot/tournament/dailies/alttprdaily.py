@@ -15,7 +15,8 @@ class AlttprSGDailyRace(SGDailyRaceCore):
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game',
-            event_slug="alttprdaily"
+            event_slug="alttprdaily",
+            room_open_time=60
         )
 
     @property

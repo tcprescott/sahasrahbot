@@ -11,6 +11,7 @@ from alttprbot.util import speedgaming
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
 
+
 class ALTTPRQuals(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(307860211333595146)
@@ -19,7 +20,8 @@ class ALTTPRQuals(TournamentRace):
             racetime_category='alttpr',
             racetime_goal='Beat the game',
             event_slug="sgl21alttpr",
-            coop=False
+            coop=False,
+            stream_delay=20
         )
 
     async def roll(self):
@@ -88,10 +90,6 @@ class ALTTPRQuals(TournamentRace):
             team_race=self.data.coop,
         )
         return self.rtgg_handler
-
-    @property
-    def hours_before_room_open(self):
-        return 1.33
 
     @property
     def announce_channel(self):

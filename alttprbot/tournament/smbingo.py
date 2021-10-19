@@ -12,6 +12,7 @@ from alttprbot_discord.bot import discordbot
 
 BINGO_COLLAB_DISCORD_WEBHOOK = os.environ.get('BINGO_COLLAB_DISCORD_WEBHOOK', None)
 
+
 class SMBingoTournament(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(155487315530088448)
@@ -27,10 +28,6 @@ class SMBingoTournament(TournamentRace):
                 guild.get_role(173917459785449472),
             ]
         )
-
-    @property
-    def hours_before_room_open(self):
-        return .5
 
     async def send_room_welcome(self):
         await self.rtgg_handler.send_message('Welcome!  You may start your race when ready.  A link to the bingo card will be posted in chat once the race starts.')
