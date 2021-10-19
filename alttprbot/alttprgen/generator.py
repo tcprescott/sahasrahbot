@@ -63,6 +63,13 @@ class SahasrahBotPresetCore():
 
         return preset
 
+    @classmethod
+    async def custom_from_dict(cls, preset_dict, preset_name=None):
+        preset = cls(preset_name)
+        preset.preset_data = preset_dict
+
+        return preset
+
     async def fetch(self) -> PresetData:
         if self.preset is None:
             raise NoPresetSpecified("No preset was specified.")

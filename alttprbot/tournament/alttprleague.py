@@ -11,8 +11,8 @@ from alttprbot.database import spoiler_races
 class ALTTPRLeague(ALTTPRTournamentRace):
     async def roll(self):
         if self.week_data.get('spoiler', False):
-            self.seed, self.preset_dict, spoiler_log_url = await spoilers.generate_spoiler_game(self.week_data['preset'])
-            await spoiler_races.insert_spoiler_race(self.rtgg_handler.data.get('name'), spoiler_log_url, 0)
+            spoiler = await spoilers.generate_spoiler_game(self.week_data['preset'])
+            await spoiler_races.insert_spoiler_race(self.rtgg_handler.data.get('name'), spoiler.spoiler_log_url, 0)
         else:
             self.seed, self.preset_dict = await preset.get_preset(self.week_data['preset'], allow_quickswap=True)
 

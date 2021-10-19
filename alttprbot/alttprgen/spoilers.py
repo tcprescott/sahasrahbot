@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import gzip
 import json
 import random
@@ -8,25 +9,44 @@ import aioboto3
 
 # from config import Config as c
 
-from .preset import fetch_preset, generate_preset
-from .ext.progression_spoiler import create_progression_spoiler
+from alttprbot.alttprgen.generator import ALTTPRPreset, PresetData
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler
+
+
+@dataclass
+class ALTTPRSpoilerGame:
+    preset: PresetData
+    spoiler_log_url: str
+    seed: ALTTPRDiscord
 
 
 async def generate_spoiler_game(preset, spoiler_type='spoiler'):
-    preset_dict = await fetch_preset(preset, 'alttpr')
-    seed = await generate_preset(preset_dict, preset=preset, spoilers="generate", tournament=True, allow_quickswap=True)
-    if not seed:
-        return False, False, False
+    preset_data = ALTTPRPreset(preset)
+    await preset_data.fetch()
+    seed = await preset_data.generate(spoilers="generate", tournament=True, allow_quickswap=True)
+
     spoiler_log_url = await write_json_to_disk(seed, spoiler_type)
-    return seed, preset_dict, spoiler_log_url
+
+    return ALTTPRSpoilerGame(
+        preset=preset_data,
+        spoiler_log_url=spoiler_log_url,
+        seed=seed
+    )
 
 
-async def generate_spoiler_game_custom(preset_dict, spoiler_type='spoiler'):
-    seed = await generate_preset(preset_dict, preset="custom", spoilers="generate", tournament=True, allow_quickswap=True)
-    if not seed:
-        return False, False, False
+async def generate_spoiler_game_custom(content, spoiler_type='spoiler'):
+    preset_data = ALTTPRPreset()
+    await preset_data.custom(content)
+    seed = await preset_data.generate(spoilers="generate", tournament=True, allow_quickswap=True)
+
     spoiler_log_url = await write_json_to_disk(seed, spoiler_type)
-    return seed, preset_dict, spoiler_log_url
+
+    return ALTTPRSpoilerGame(
+        preset=preset_data,
+        spoiler_log_url=spoiler_log_url,
+        seed=seed
+    )
 
 
 async def write_json_to_disk(seed, spoiler_type='spoiler'):

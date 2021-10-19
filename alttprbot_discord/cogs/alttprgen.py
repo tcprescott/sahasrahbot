@@ -119,13 +119,11 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def spoiler(self, ctx, preset):
-        seed, _, spoiler_log_url = await generate_spoiler_game(preset)
-        if not seed:
-            raise SahasrahBotException(
-                'Could not generate game.  Maybe preset does not exist?')
-        embed = await seed.embed(emojis=self.bot.emojis)
+        spoiler = await generate_spoiler_game(preset)
+
+        embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL",
-                              value=spoiler_log_url, inline=False)
+                              value=spoiler.spoiler_log_url, inline=False)
         await ctx.reply(embed=embed)
 
     @spoiler.command(
@@ -138,13 +136,12 @@ class AlttprGen(commands.Cog):
     async def spoiler_custom(self, ctx):
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
-            preset_dict = yaml.safe_load(content)
-            seed, _, spoiler_log_url = await generate_spoiler_game_custom(preset_dict)
+            spoiler = await generate_spoiler_game_custom(content)
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
-        embed = await seed.embed(emojis=self.bot.emojis)
+        embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL",
-                              value=spoiler_log_url, inline=False)
+                              value=spoiler.spoiler_log_url, inline=False)
         await ctx.reply(embed=embed)
 
     @commands.command(
@@ -153,13 +150,11 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def progression(self, ctx, preset):
-        seed, _, spoiler_log_url = await generate_spoiler_game(preset, spoiler_type='progression')
-        if not seed:
-            raise SahasrahBotException(
-                'Could not generate game.  Maybe preset does not exist?')
-        embed = await seed.embed(emojis=self.bot.emojis)
+        spoiler = await generate_spoiler_game(preset, spoiler_type='progression')
+
+        embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Progression Spoiler Log URL",
-                              value=spoiler_log_url, inline=False)
+                              value=spoiler.spoiler_log_url, inline=False)
         await ctx.reply(embed=embed)
 
     @commands.group(
