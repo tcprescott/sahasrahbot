@@ -31,7 +31,7 @@ async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, 
     randomizer = preset_dict.get('randomizer', 'alttpr')
 
     preset_class: generator.SahasrahBotPresetCore = GENERATOR_MAPPING[randomizer]
-    data = await preset_class.custom_from_dict(preset_dict, preset=preset)
+    data = await preset_class.custom_from_dict(preset_dict, preset_name=preset)
 
     if randomizer == 'alttpr':
         seed = await data.generate(hints=hints, nohints=nohints, spoilers=spoilers, tournament=tournament, allow_quickswap=allow_quickswap)
