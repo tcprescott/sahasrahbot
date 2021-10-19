@@ -1,4 +1,3 @@
-import logging
 import os
 import aiofiles
 import yaml
@@ -6,12 +5,9 @@ import yaml
 import aiohttp
 from bs4 import BeautifulSoup
 
-from alttprbot.alttprgen.preset import PresetNotFoundException
+# from alttprbot.alttprgen.preset import PresetNotFoundException
 
 jar = aiohttp.CookieJar()
-
-
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
 async def fetch_preset(preset):
@@ -24,7 +20,7 @@ async def fetch_preset(preset):
         async with aiofiles.open(os.path.join(f"presets/ctjets", basename)) as f:
             preset_dict = yaml.safe_load(await f.read())
     except FileNotFoundError as err:
-        raise PresetNotFoundException(f'Could not find preset {preset}.') from err
+        raise Exception(f'Could not find preset {preset}.') from err
 
     return preset_dict
 

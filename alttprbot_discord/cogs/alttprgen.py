@@ -6,12 +6,13 @@ import discord
 import yaml
 from discord.ext import commands
 from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
+from slugify import slugify
 
 import pyz3r
 from alttprbot import models
 from pyz3r.ext.priestmode import create_priestmode
 from alttprbot.alttprgen.mystery import generate_random_game
-from alttprbot.alttprgen.preset import get_preset, generate_preset
+from alttprbot.alttprgen.generator import ALTTPRPreset
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
@@ -41,7 +42,9 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race(self, ctx, preset, hints=False):
-        seed, _ = await get_preset(preset, hints=hints, spoilers="off", allow_quickswap=True)
+        # seed, _ = await get_preset(preset, hints=hints, spoilers="off", allow_quickswap=True)
+        seed = await ALTTPRPreset(preset).generate(hints=hints, spoilers="off", allow_quickswap=True)
+
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -56,14 +59,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race_custom(self, ctx):
-        if ctx.message.attachments:
-            content = await ctx.message.attachments[0].read()
-            preset_dict = yaml.safe_load(content)
-            seed = await generate_preset(preset_dict, preset='custom', spoilers="off", tournament=True, allow_quickswap=True)
-        else:
-            raise SahasrahBotException("You must supply a valid yaml file.")
-        embed = await seed.embed(emojis=self.bot.emojis)
-        await ctx.reply(embed=embed)
+        await self.customgame(ctx, spoilers="off", tournament=True, allow_quickswap=True)
 
     @commands.group(
         brief='Generate a non-quickswap race.',
@@ -72,7 +68,8 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def noqsrace(self, ctx, preset, hints=False):
-        seed, _ = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
+        # seed, _ = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
+        seed = await ALTTPRPreset(preset).generate(hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -87,14 +84,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def noqsrace_custom(self, ctx):
-        if ctx.message.attachments:
-            content = await ctx.message.attachments[0].read()
-            preset_dict = yaml.safe_load(content)
-            seed = await generate_preset(preset_dict, preset='custom', spoilers="off", tournament=True, allow_quickswap=False)
-        else:
-            raise SahasrahBotException("You must supply a valid yaml file.")
-        embed = await seed.embed(emojis=self.bot.emojis)
-        await ctx.reply(embed=embed)
+        await self.customgame(ctx, spoilers="off", tournament=True, allow_quickswap=False)
 
     @commands.group(
         brief='Generate a preset without the race flag enabled.',
@@ -104,7 +94,8 @@ class AlttprGen(commands.Cog):
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def norace(self, ctx, preset, hints=False):
-        seed, _ = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
+        # seed, _ = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
+        seed = await ALTTPRPreset(preset).generate(hints=hints, spoilers="on", tournament=False)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -119,14 +110,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def norace_custom(self, ctx):
-        if ctx.message.attachments:
-            content = await ctx.message.attachments[0].read()
-            preset_dict = yaml.safe_load(content)
-            seed = await generate_preset(preset_dict, preset='custom', spoilers="on", tournament=True)
-        else:
-            raise SahasrahBotException("You must supply a valid yaml file.")
-        embed = await seed.embed(emojis=self.bot.emojis)
-        await ctx.reply(embed=embed)
+        await self.customgame(ctx, spoilers="on", tournament=True)
 
     @commands.group(
         brief='Generate a spoiler game.',
@@ -405,6 +389,34 @@ class AlttprGen(commands.Cog):
                 value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
                 inline=False
             )
+        await ctx.reply(embed=embed)
+
+    @commands.command()
+    async def savepreset(self, ctx, preset):
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=ctx.author.id, defaults={'name': slugify(ctx.author.name, max_length=20)})
+
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            data = await ALTTPRPreset.custom(content, f"{namespace.name}/{preset}")
+            await data.save()
+
+            await ctx.send(f"Preset saved as {data.namespace}/{data.preset}")
+        else:
+            raise SahasrahBotException("You must supply a valid yaml file.")
+
+    async def customgame(self, ctx, spoilers="off", tournament=True, allow_quickswap=False):
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=ctx.author.id, defaults={'name': slugify(ctx.author.name, max_length=20)})
+
+        if ctx.message.attachments:
+            content = await ctx.message.attachments[0].read()
+            data = await ALTTPRPreset.custom(content, f"{namespace.name}/latest")
+            await data.save()
+            seed = await data.generate(spoilers=spoilers, tournament=tournament, allow_quickswap=allow_quickswap)
+        else:
+            raise SahasrahBotException("You must supply a valid yaml file.")
+
+        embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
+        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`")
         await ctx.reply(embed=embed)
 
 

@@ -5,8 +5,6 @@ import random
 import aiofiles
 import yaml
 
-import slugify
-
 from alttprbot import models
 from alttprbot.alttprgen.randomizer import ctjets
 # from alttprbot.database import config
@@ -41,8 +39,9 @@ class PresetData:
 
 
 class SahasrahBotPresetCore():
-    def __init__(self, randomizer: str, preset: str = None):
-        self.randomizer = randomizer
+    randomizer = None
+
+    def __init__(self, preset: str = None):
         self.namespace = None
         self.preset = None
         self.preset_data: dict = None
@@ -52,20 +51,17 @@ class SahasrahBotPresetCore():
             if len(parsed) == 1:
                 # we have a global preset
                 self.namespace = None
-                self.preset = parsed
+                self.preset = preset
             else:
                 self.namespace = parsed[0]
                 self.preset = parsed[1]
 
-    async def custom(self, body) -> PresetData:
-        self.preset_data = yaml.safe_load(body)
+    @classmethod
+    async def custom(cls, content, preset_name=None):
+        preset = cls(preset_name)
+        preset.preset_data = yaml.safe_load(content)
 
-        return PresetData(
-            randomizer=self.randomizer,
-            preset_data=self.preset_data,
-            preset_name=None,
-            namespace=None
-        )
+        return preset
 
     async def fetch(self) -> PresetData:
         if self.preset is None:
@@ -114,10 +110,12 @@ class SahasrahBotPresetCore():
 
 
 class ALTTPRPreset(SahasrahBotPresetCore):
-    def __init__(self, preset: str):
-        super().__init__('alttpr', preset)
+    randomizer = 'alttpr'
 
     async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False):
+        if self.preset_data is None:
+            await self.fetch()
+
         settings = self.preset_data['settings']
         if self.preset_data.get('doors', False):
             if hints:
@@ -135,7 +133,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             hash_id = seed.hash
         else:
             if self.preset_data.get('customizer', False):
-                if 'l' not in self.data.preset_data['settings']:
+                if 'l' not in settings:
                     settings['l'] = {}
                 for i in self.preset_data.get('forced_locations', {}):
                     location = random.choice([l for l in i['locations'] if l not in settings['l']])
@@ -178,10 +176,12 @@ class ALTTPRPreset(SahasrahBotPresetCore):
 
 
 class SMPreset(SahasrahBotPresetCore):
-    def __init__(self, preset: str):
-        super().__init__('sm', preset)
+    randomizer = 'sm'
 
     async def generate(self, tournament=True):
+        if self.preset_data is None:
+            await self.fetch()
+
         settings = self.preset_data['settings']
         settings['race'] = "true" if tournament else "false"
         seed = await SMDiscord.create(
@@ -202,10 +202,12 @@ class SMPreset(SahasrahBotPresetCore):
 
 
 class SMZ3Preset(SahasrahBotPresetCore):
-    def __init__(self, preset: str):
-        super().__init__('smz3', preset)
+    randomizer = 'smz3'
 
     async def generate(self, tournament=True):
+        if self.preset_data is None:
+            await self.fetch()
+
         settings = self.preset_data['settings']
         settings['race'] = "true" if tournament else "false"
         seed = await SMZ3Discord.create(
@@ -226,10 +228,12 @@ class SMZ3Preset(SahasrahBotPresetCore):
 
 
 class CTJetsPreset(SahasrahBotPresetCore):
-    def __init__(self, preset: str):
-        super().__init__('ctjets', preset)
+    randomizer = 'ctjets'
 
     async def generate(self):
+        if self.preset_data is None:
+            await self.fetch()
+
         settings = self.preset_data['settings']
         seed_uri = await ctjets.roll_ctjets(settings, version=self.preset_data.get('version', '3.1.0'))
 
@@ -243,5 +247,3 @@ class CTJetsPreset(SahasrahBotPresetCore):
             customizer=0
         )
         return seed_uri
-
-# class Namespace

@@ -3,7 +3,7 @@ import json
 
 
 class Config:
-    DEBUG = True if os.environ.get("DEBUG", "False") == "True" else False
+    DEBUG = os.environ.get("DEBUG", "False") == "True"
 
     DB_HOST = os.environ.get("DB_HOST", "localhost")
     DB_PORT = int(os.environ.get("DB_PORT", "3306"))
