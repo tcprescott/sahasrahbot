@@ -1,6 +1,5 @@
 import discord
-import pyz3r
-from alttprbot.alttprgen.mystery import get_weights
+from alttprbot.alttprgen.generator import ALTTPRMystery
 from discord.ext import commands
 from pyz3r.alttpr import ALTTPR
 
@@ -11,13 +10,11 @@ class Aqttp(commands.Cog):
 
     @commands.command()
     async def aqttp(self, ctx, count=3):
-        weights = await get_weights('aqttp')
-
-        alttprcom = ALTTPR()
-        settings_map = await alttprcom.randomizer_settings()
+        mystery = await ALTTPRMystery('aqttp').generate_test_game()
+        settings_map = await ALTTPR().randomizer_settings()
 
         for c in range(count):
-            settings, _ = pyz3r.mystery.generate_random_settings(weights=weights)
+            settings = mystery.settings
             meta = settings
 
             embed = discord.Embed(

@@ -3,8 +3,7 @@ from datetime import datetime
 import math
 # import logging
 
-from alttprbot.alttprgen import preset, spoilers
-from alttprbot.alttprgen.mystery import generate_random_game, WeightsetNotFoundException
+from alttprbot.alttprgen import preset, spoilers, generator
 from alttprbot.database import spoiler_races, tournament_results
 from racetime_bot import monitor_cmd
 
@@ -122,13 +121,9 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
-            mystery = await generate_random_game(
-                weightset=weightset,
-                tournament=True,
-                spoilers="mystery"
-            )
+            mystery = await generator.ALTTPRMystery(weightset).generate(tournament=True, spoilers="mystery")
             seed = mystery.seed
-        except WeightsetNotFoundException as e:
+        except generator.WeightsetNotFoundException as e:
             await self.send_message(str(e))
             return
 

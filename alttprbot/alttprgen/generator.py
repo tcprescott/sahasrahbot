@@ -1,13 +1,17 @@
-from dataclasses import dataclass
+import logging
 import os
 import random
+from dataclasses import dataclass
 
 import aiofiles
+from aiohttp.client_exceptions import ClientResponseError
+import pyz3r
+from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
+                      stop_after_attempt)
 import yaml
 
 from alttprbot import models
-from alttprbot.alttprgen.randomizer import ctjets
-# from alttprbot.database import config
+from alttprbot.alttprgen.randomizer import ctjets, mysterydoors
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
@@ -27,6 +31,10 @@ class NamespaceNotFound(SahasrahBotException):
 
 
 class NoPresetSpecified(SahasrahBotException):
+    pass
+
+
+class WeightsetNotFoundException(SahasrahBotException):
     pass
 
 
@@ -75,9 +83,9 @@ class SahasrahBotPresetCore():
             raise NoPresetSpecified("No preset was specified.")
 
         if self.namespace is None:
-            await self.__fetch_global()
+            await self._fetch_global()
         else:
-            await self.__fetch_namespaced()
+            await self._fetch_namespaced()
 
         return PresetData(
             randomizer=self.randomizer,
@@ -98,16 +106,16 @@ class SahasrahBotPresetCore():
 
         await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset, namespace=namespace_data, defaults={'content': body})
 
-    async def __fetch_global(self):
+    async def _fetch_global(self):
         basename = os.path.basename(f'{self.preset}.yaml')
         try:
-            async with aiofiles.open(os.path.join(f"presets/{self.randomizer}", basename)) as f:
+            async with aiofiles.open(os.path.join("presets", self.randomizer, basename)) as f:
                 self.preset_data = yaml.safe_load(await f.read())
         except FileNotFoundError as err:
             raise PresetNotFoundException(
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
-    async def __fetch_namespaced(self):
+    async def _fetch_namespaced(self):
         data = await models.Presets.get_or_none(preset_name=self.preset, namespace__name=self.namespace)
 
         if data is None:
@@ -182,6 +190,77 @@ class ALTTPRPreset(SahasrahBotPresetCore):
         return seed
 
 
+class ALTTPRMystery(SahasrahBotPresetCore):
+    randomizer = 'alttprmystery'
+
+    async def _fetch_global(self):
+        basename = os.path.basename(f'{self.preset}.yaml')
+        try:
+            async with aiofiles.open(os.path.join("weights", basename)) as f:
+                self.preset_data = yaml.safe_load(await f.read())
+        except FileNotFoundError as err:
+            raise PresetNotFoundException(
+                f'Could not find weightset {self.preset}.  See a list of available weights at https://sahasrahbot.synack.live/mystery.html') from err
+
+    async def generate(self, spoilers="off", tournament=True, allow_quickswap=True):
+        if self.preset_data is None:
+            await self.fetch()
+
+        try:
+            async for attempt in AsyncRetrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
+                with attempt:
+                    try:
+                        mystery = await mystery_generate(self.preset_data, spoilers=spoilers)
+
+                        if mystery.doors:
+                            seed = await AlttprDoorDiscord.create(
+                                settings=mystery.settings,
+                                spoilers=spoilers != "mystery",
+                            )
+                        else:
+                            if mystery.customizer:
+                                endpoint = "/api/customizer"
+                            else:
+                                endpoint = "/api/randomizer"
+
+                            mystery.settings['tournament'] = tournament
+                            mystery.settings['allow_quickswap'] = allow_quickswap
+                            seed = await ALTTPRDiscord.generate(settings=mystery.settings, endpoint=endpoint)
+                    except:
+                        await models.AuditGeneratedGames.create(
+                            randomizer='alttpr',
+                            settings=mystery.settings,
+                            gentype='mystery failure',
+                            genoption=self.preset,
+                            customizer=1 if mystery.customizer else 0
+                        )
+                        logging.exception("Failed to generate game, retrying...")
+                        raise
+        except RetryError as e:
+            raise e.last_attempt._exception from e
+
+        await models.AuditGeneratedGames.create(
+            randomizer='alttpr',
+            hash_id=seed.hash,
+            permalink=seed.url,
+            settings=mystery.settings,
+            gentype='mystery',
+            genoption=self.preset,
+            customizer=1 if mystery.customizer else 0
+        )
+
+        mystery.seed = seed
+        return mystery
+
+    async def generate_test_game(self):
+        if self.preset_data is None:
+            await self.fetch()
+
+        mystery = await mystery_generate(weights=self.preset_data)
+
+        return mystery
+
+
 class SMPreset(SahasrahBotPresetCore):
     randomizer = 'sm'
 
@@ -254,3 +333,31 @@ class CTJetsPreset(SahasrahBotPresetCore):
             customizer=0
         )
         return seed_uri
+
+
+async def mystery_generate(weights, spoilers="mystery"):
+    if 'preset' in weights:
+        rolledpreset = pyz3r.mystery.get_random_option(weights['preset'])
+        if rolledpreset == 'none':
+            return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
+        else:
+            data = ALTTPRPreset(rolledpreset)
+            await data.fetch()
+            # preset_dict = await fetch_preset(rolledpreset, randomizer='alttpr')
+            settings = data.preset_data['settings']
+            customizer = data.preset_data.get('customizer', False)
+            doors = data.preset_data.get('doors', False)
+            settings.pop('name', None)
+            settings.pop('notes', None)
+            settings['spoilers'] = spoilers
+            custom_instructions = pyz3r.mystery.get_random_option(weights.get('custom_instructions', None))
+
+            return mysterydoors.AlttprMystery(
+                weights=weights,
+                settings=settings,
+                customizer=customizer,
+                doors=doors,
+                custom_instructions=custom_instructions
+            )
+    else:
+        return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking

@@ -11,8 +11,7 @@ from slugify import slugify
 import pyz3r
 from alttprbot import models
 from pyz3r.ext.priestmode import create_priestmode
-from alttprbot.alttprgen.mystery import generate_random_game
-from alttprbot.alttprgen.generator import ALTTPRPreset
+from alttprbot.alttprgen.generator import ALTTPRPreset, ALTTPRMystery
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
@@ -416,15 +415,18 @@ class AlttprGen(commands.Cog):
 
 
 async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off"):
-    mystery = await generate_random_game(
-        weightset=weightset,
-        weights=weights,
-        tournament=tournament,
-        spoilers=spoilers
-    )
+    if weights:
+        data = await ALTTPRMystery.custom_from_dict(weights, preset_name=weightset)
+    else:
+        data = ALTTPRMystery(weightset)
+
+    mystery = await data.generate(spoilers=spoilers, tournament=tournament)
+
     embed = await mystery.seed.embed(emojis=ctx.bot.emojis, name="Mystery Game")
+
     if mystery.custom_instructions:
         embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions)
+
     await ctx.reply(embed=embed)
 
 

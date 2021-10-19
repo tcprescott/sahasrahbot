@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot.tournament.core import UnableToLookupEpisodeException
-from alttprbot.alttprgen.mystery import get_weights, generate
+from alttprbot.alttprgen.generator import ALTTPRMystery
 from alttprbot.database import league_playoffs, srlnick
 from alttprbot_discord.bot import discordbot
 
@@ -26,6 +26,7 @@ sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = os.environ.get("DISCORD_TOKEN")
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
 
+
 @sahasrahbotapi.route("/login/")
 async def login():
     return await discord.create_session(
@@ -35,16 +36,19 @@ async def login():
         data=dict(redirect=session.get("login_original_path", "/me"))
     )
 
+
 @sahasrahbotapi.route("/callback/discord/")
 async def callback():
     data = await discord.callback()
     redirect_to = data.get("redirect", "/me/")
     return redirect(redirect_to)
 
+
 @sahasrahbotapi.errorhandler(Unauthorized)
 async def redirect_unauthorized(e):
     session['login_original_path'] = request.full_path
     return redirect(url_for("login"))
+
 
 @sahasrahbotapi.errorhandler(AccessDenied)
 async def access_denied(e):
@@ -54,6 +58,7 @@ async def access_denied(e):
         message="We were unable to access your Discord account."
     )
 
+
 @sahasrahbotapi.errorhandler(UnableToLookupEpisodeException)
 async def unable_to_lookup(e):
     return await render_template(
@@ -62,21 +67,26 @@ async def unable_to_lookup(e):
         message="The SpeedGaming Episode ID was not found.  Please double check!"
     )
 
+
 @sahasrahbotapi.route("/me/")
 @requires_authorization
 async def me():
     user = await discord.fetch_user()
     return await render_template('me.html', logged_in=True, user=user)
 
+
 @sahasrahbotapi.route("/logout/")
 async def logout():
     discord.revoke()
     return await render_template('logout.html', logged_in=False)
 
+
 @sahasrahbotapi.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
     weights = await request.get_json()
-    mystery = await generate(weights=weights, spoilers="mystery")
+    data = await ALTTPRMystery.custom_from_dict(weights)
+    mystery = await data.generate_test_game()
+
     if mystery.customizer:
         endpoint = '/api/customizer'
     elif mystery.doors:
@@ -93,10 +103,12 @@ async def mysterygen():
         endpoint=endpoint
     )
 
+
 @sahasrahbotapi.route('/api/settingsgen/mystery/<string:weightset>', methods=['GET'])
 async def mysterygenwithweights(weightset):
-    weights = await get_weights(weightset)
-    mystery = await generate(weights=weights, spoilers="mystery")
+    data = ALTTPRMystery(preset=weightset)
+    mystery = await data.generate_test_game()
+
     if mystery.customizer:
         endpoint = '/api/customizer'
     elif mystery.doors:
@@ -135,6 +147,7 @@ async def submission_form(event):
         episode_id=episode_id
     )
 
+
 @sahasrahbotapi.route("/submit", methods=['POST'])
 @requires_authorization
 async def submit():
@@ -148,6 +161,7 @@ async def submit():
         user=user,
         tournament_race=tournament_race
     )
+
 
 @sahasrahbotapi.route('/api/league/playoff/<int:episode_id>', methods=['GET'])
 async def get_league_playoff(episode_id):
@@ -168,6 +182,7 @@ async def racetime_init_verification():
     return redirect(
         f"{RACETIME_URL}/o/authorize?client_id={RACETIME_CLIENT_ID_OAUTH}&response_type=code&scope=read&redirect_uri={redirect_uri}",
     )
+
 
 @sahasrahbotapi.route('/racetime/verify/return', methods=['GET'])
 @requires_authorization
@@ -199,6 +214,7 @@ async def return_racetime_verify():
     await srlnick.insert_rtgg_id(user.id, userinfo_data['id'])
 
     return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
+
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
