@@ -9,7 +9,8 @@ class SMZ3DailyRace(SGDailyRaceCore):
             guild=guild,
             racetime_category='smz3',
             racetime_goal='Beat the games',
-            event_slug="smz3"
+            event_slug="smz3",
+            room_open_time=60
         )
 
     @property

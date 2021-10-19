@@ -21,7 +21,7 @@ class Bloodstained(SGLRandomizerTournamentRace):
             guild=guild,
             racetime_category='sgl',
             racetime_goal="Bloodstained RotN Rando Bingo",
-            event_slug="sgl21aosr",
+            event_slug="sgl21bloodstained",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False
