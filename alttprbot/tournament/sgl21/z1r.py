@@ -18,7 +18,7 @@ class Z1R(SGLRandomizerTournamentRace):
         )
 
     async def roll(self):
-        self.seed_id, self.flags = roll_z1r('VlWlIEwJ1MsKm8TdWgb5iC2DDmd8WW')
+        self.seed_id, self.flags = roll_z1r('gLMg3JukA0S9sq8tnMpPiZS5CtQHWW')
 
     @property
     def seed_info(self):
