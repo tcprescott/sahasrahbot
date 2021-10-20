@@ -410,13 +410,15 @@ class AlttprGen(commands.Cog):
             raise SahasrahBotException("You must supply a valid yaml file.")
 
         embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
-        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`")
+        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`\n\nExample: `$norace {namespace.name}/latest`", inline=False)
         await ctx.reply(embed=embed)
 
 
 async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off"):
     if weights:
-        data = await generator.ALTTPRMystery.custom_from_dict(weights, preset_name=weightset)
+        namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
+        data = await generator.ALTTPRMystery.custom_from_dict(weights, f"{namespace.name}/latest")
+        await data.save()
     else:
         data = generator.ALTTPRMystery(weightset)
 
@@ -425,7 +427,10 @@ async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoiler
     embed = await mystery.seed.embed(emojis=ctx.bot.emojis, name="Mystery Game")
 
     if mystery.custom_instructions:
-        embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions)
+        embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
+
+    if weights:
+        embed.add_field(name="Saved as custom weightset!", value=f"You can generate this weightset again by using the weightset name of `{namespace.name}/latest`.\n\nExample: `$mystery {namespace.name}/latest`", inline=False)
 
     await ctx.reply(embed=embed)
 
