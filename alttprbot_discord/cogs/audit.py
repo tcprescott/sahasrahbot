@@ -1,7 +1,8 @@
 import datetime
+import logging
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from alttprbot import models
 import io
@@ -12,7 +13,17 @@ import csv
 class Audit(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        # self.clean_history.start()
+        self.clean_history.start()
+
+    @tasks.loop(hours=24, reconnect=True)
+    async def clean_history(self):
+        thirty_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+        await models.AuditMessages.filter(message_date__lte=thirty_days_ago).delete()
+
+    @clean_history.before_loop
+    async def before_clean_history(self):
+        logging.info('tournament clean_history loop waiting...')
+        await self.bot.wait_until_ready()
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
@@ -235,6 +246,7 @@ class Audit(commands.Cog):
 #     )
 #     embed.set_thumbnail(url=member.avatar_url)
 #     return embed
+
 
 async def audit_embed_member_joined(member):
     embed = discord.Embed(
