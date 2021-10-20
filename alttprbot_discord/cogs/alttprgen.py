@@ -42,7 +42,7 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def race(self, ctx, preset, hints=False):
         # seed, _ = await get_preset(preset, hints=hints, spoilers="off", allow_quickswap=True)
-        seed = await ALTTPRPreset(preset).generate(hints=hints, spoilers="off", allow_quickswap=True)
+        seed = await generator.ALTTPRPreset(preset).generate(hints=hints, spoilers="off", allow_quickswap=True)
 
         if not seed:
             raise SahasrahBotException(
@@ -68,7 +68,7 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def noqsrace(self, ctx, preset, hints=False):
         # seed, _ = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
-        seed = await ALTTPRPreset(preset).generate(hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
+        seed = await generator.ALTTPRPreset(preset).generate(hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -94,7 +94,7 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def norace(self, ctx, preset, hints=False):
         # seed, _ = await get_preset(preset, hints=hints, spoilers="on", tournament=False)
-        seed = await ALTTPRPreset(preset).generate(hints=hints, spoilers="on", tournament=False)
+        seed = await generator.ALTTPRPreset(preset).generate(hints=hints, spoilers="on", tournament=False)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
