@@ -1,28 +1,7 @@
-import os
-import aiofiles
-import yaml
-
 import aiohttp
 from bs4 import BeautifulSoup
 
-# from alttprbot.alttprgen.preset import PresetNotFoundException
-
 jar = aiohttp.CookieJar()
-
-
-async def fetch_preset(preset):
-    preset = preset.lower()
-
-    # make sure someone isn't trying some path traversal shennaniganons
-    basename = os.path.basename(f'{preset}.yaml')
-
-    try:
-        async with aiofiles.open(os.path.join(f"presets/ctjets", basename)) as f:
-            preset_dict = yaml.safe_load(await f.read())
-    except FileNotFoundError as err:
-        raise Exception(f'Could not find preset {preset}.') from err
-
-    return preset_dict
 
 
 async def roll_ctjets(settings: dict, version: str = '3_1_0'):

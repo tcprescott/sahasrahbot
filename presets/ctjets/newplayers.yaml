@@ -3,10 +3,10 @@ version: 3.1.0
 description: New Players
 settings:
   difficulty: easy
-  disable_glitches: on
-  early_pendant: on
-  unlocked_magic: on
-  zeal: on
+  disable_glitches: "on"
+  early_pendant: "on"
+  unlocked_magic: "on"
+  zeal: "on"
   duplicate_char_assignments: 7f7f7f7f7f7f7f
   shop_prices: Normal
   tech_rando: Fully Random

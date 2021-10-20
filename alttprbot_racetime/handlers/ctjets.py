@@ -1,4 +1,4 @@
-from alttprbot.alttprgen.randomizer import ctjets
+from alttprbot.alttprgen import generator
 
 from .core import SahasrahBotCoreHandler
 
@@ -18,12 +18,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
-        preset_dict = await ctjets.fetch_preset(preset)
-
-        seed = await ctjets.roll_ctjets(
-            version=preset_dict.get('version', '3.1.0'),
-            settings=preset_dict['settings']
-        )
+        seed = await generator.CTJetsPreset(preset).generate()
 
         await self.send_message(seed)
         await self.set_raceinfo(seed)
