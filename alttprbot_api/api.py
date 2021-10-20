@@ -1,8 +1,9 @@
+from io import BytesIO, StringIO
 import os
 import re
 
 import aiohttp
-from quart import Quart, abort, jsonify, request, session, redirect, url_for, render_template
+from quart import Quart, abort, jsonify, request, session, redirect, url_for, render_template, send_file
 from quart_discord import DiscordOAuth2Session, requires_authorization, Unauthorized, AccessDenied
 from urllib.parse import quote
 
@@ -351,7 +352,6 @@ async def presets_for_namespace_randomizer(namespace, randomizer):
 
 
 @sahasrahbotapi.route('/presets/manage/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
-# @requires_authorization
 async def get_preset(namespace, randomizer, preset):
     try:
         user = await discord.fetch_user()
@@ -368,6 +368,18 @@ async def get_preset(namespace, randomizer, preset):
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
 
     return await render_template('preset_view.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, preset_data=preset_data)
+
+
+@sahasrahbotapi.route('/presets/download/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
+async def download_preset(namespace, randomizer, preset):
+    preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
+
+    return await send_file(
+        BytesIO(preset_data.content.encode()),
+        mimetype="application/octet-stream",
+        attachment_filename=f"{namespace}-{preset}.yaml",
+        as_attachment=True
+    )
 
 
 @sahasrahbotapi.route('/presets/manage/<string:namespace>/<string:randomizer>/<string:preset>', methods=['POST'])
