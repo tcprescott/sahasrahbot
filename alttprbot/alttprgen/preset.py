@@ -1,13 +1,6 @@
 from alttprbot.alttprgen import generator
 from alttprbot.exceptions import SahasrahBotException
 
-GENERATOR_MAPPING = {
-    'alttpr': generator.ALTTPRPreset,
-    'smz3': generator.SMZ3Preset,
-    'sm': generator.SMPreset,
-    'ctjets': generator.CTJetsPreset
-}
-
 
 class PresetNotFoundException(SahasrahBotException):
     pass
@@ -20,7 +13,7 @@ async def get_preset(preset, hints=False, nohints=False, spoilers="off", tournam
 
 
 async def fetch_preset(preset, randomizer='alttpr'):
-    preset_class = GENERATOR_MAPPING[randomizer]
+    preset_class = generator.PRESET_CLASS_MAPPING[randomizer]
     data: generator.SahasrahBotPresetCore = preset_class(preset)
     await data.fetch()
 
@@ -30,7 +23,7 @@ async def fetch_preset(preset, randomizer='alttpr'):
 async def generate_preset(preset_dict, preset=None, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False):
     randomizer = preset_dict.get('randomizer', 'alttpr')
 
-    preset_class: generator.SahasrahBotPresetCore = GENERATOR_MAPPING[randomizer]
+    preset_class: generator.SahasrahBotPresetCore = generator.PRESET_CLASS_MAPPING[randomizer]
     data = await preset_class.custom_from_dict(preset_dict, preset_name=preset)
 
     if randomizer == 'alttpr':

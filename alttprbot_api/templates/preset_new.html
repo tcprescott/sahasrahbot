@@ -1,0 +1,22 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>New Preset</title>
+{%- endblock head %}
+
+{% block content -%}
+<h2>New Preset</h2>
+<hr />
+
+<form enctype=multipart/form-data action="/presets/create" method="post">
+    <p>Randomizer: <select name="randomizer" id="randomizer">
+            {% for randomizer in randomizers %}
+            <option value="{{ randomizer }}">{{ randomizer }}</option>
+            {% endfor %}
+        </select></p>
+    <p>{{ ns_current_user.name }}/<input type="text" id="preset_name" name="preset_name" minlength="1" maxlength="20"
+            pattern="^[a-zA-Z0-9_]*$" placeholder="your_preset_name" /></p>
+    <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
+    <p><input type="submit" value="Save" /></p>
+</form>
+{%- endblock content %}

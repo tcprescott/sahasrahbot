@@ -1,0 +1,24 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Preset {{ ns_data.name }}/{{ preset_data.preset_name }} - {{ preset_data.randomizer }} </title>
+{%- endblock head %}
+
+{% block content -%}
+<h2>Preset &quot;{{ ns_data.name }}/{{ preset_data.preset_name }}&quot; for {{ preset_data.randomizer}}</h2>
+<p><a href="/presets/manage/{{ ns_data.name }}">View presets from {{ ns_data.name }}</a></p>
+<hr />
+{% if is_owner == True %}
+<form enctype=multipart/form-data
+    action="/presets/manage/{{ ns_data.name }}/{{ preset_data.randomizer }}/{{ preset_data.preset_name }}"
+    method="post">
+    <p>Upload a new YAML file to replace this preset</p>
+    <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
+    <p><input id="save" name="save" type="submit" value="Save" /></p>
+    <br />
+    <p><input id="delete" name="delete" type="submit" value="Delete (cannot be undone)" /></p>
+</form>
+<hr />
+{% endif %}
+<pre>{{ preset_data.content }}</pre>
+{%- endblock content %}

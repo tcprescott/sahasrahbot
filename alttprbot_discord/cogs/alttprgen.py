@@ -11,7 +11,7 @@ from slugify import slugify
 import pyz3r
 from alttprbot import models
 from pyz3r.ext.priestmode import create_priestmode
-from alttprbot.alttprgen.generator import ALTTPRPreset, ALTTPRMystery
+from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
@@ -387,11 +387,11 @@ class AlttprGen(commands.Cog):
 
     @commands.command()
     async def savepreset(self, ctx, preset):
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=ctx.author.id, defaults={'name': slugify(ctx.author.name, max_length=20)})
+        namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
 
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
-            data = await ALTTPRPreset.custom(content, f"{namespace.name}/{preset}")
+            data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/{preset}")
             await data.save()
 
             await ctx.send(f"Preset saved as {data.namespace}/{data.preset}")
@@ -399,11 +399,11 @@ class AlttprGen(commands.Cog):
             raise SahasrahBotException("You must supply a valid yaml file.")
 
     async def customgame(self, ctx, spoilers="off", tournament=True, allow_quickswap=False):
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=ctx.author.id, defaults={'name': slugify(ctx.author.name, max_length=20)})
+        namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
 
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
-            data = await ALTTPRPreset.custom(content, f"{namespace.name}/latest")
+            data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/latest")
             await data.save()
             seed = await data.generate(spoilers=spoilers, tournament=tournament, allow_quickswap=allow_quickswap)
         else:
@@ -416,9 +416,9 @@ class AlttprGen(commands.Cog):
 
 async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoilers="off"):
     if weights:
-        data = await ALTTPRMystery.custom_from_dict(weights, preset_name=weightset)
+        data = await generator.ALTTPRMystery.custom_from_dict(weights, preset_name=weightset)
     else:
-        data = ALTTPRMystery(weightset)
+        data = generator.ALTTPRMystery(weightset)
 
     mystery = await data.generate(spoilers=spoilers, tournament=tournament)
 

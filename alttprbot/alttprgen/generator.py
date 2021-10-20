@@ -6,8 +6,10 @@ from dataclasses import dataclass
 import aiofiles
 from aiohttp.client_exceptions import ClientResponseError
 import pyz3r
+from tortoise.exceptions import DoesNotExist
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
+from slugify import slugify
 import yaml
 
 from alttprbot import models
@@ -116,7 +118,7 @@ class SahasrahBotPresetCore():
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
     async def _fetch_namespaced(self):
-        data = await models.Presets.get_or_none(preset_name=self.preset, namespace__name=self.namespace)
+        data = await models.Presets.get_or_none(preset_name=self.preset, randomizer=self.randomizer, namespace__name=self.namespace)
 
         if data is None:
             raise PresetNotFoundException(f'Could not find preset {self.preset} in namespace {self.namespace}.')
@@ -361,3 +363,23 @@ async def mystery_generate(weights, spoilers="mystery"):
             )
     else:
         return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
+
+
+async def create_or_retrieve_namespace(discord_user_id, discord_user_name):
+    tempnamespaceslug = slugify(discord_user_name, max_length=20)
+    try:
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
+    except DoesNotExist:
+        tempnamespaceslug = tempnamespaceslug + str(random.randint(0, 99))
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
+
+    return namespace
+
+
+PRESET_CLASS_MAPPING = {
+    'alttpr': ALTTPRPreset,
+    'alttprmystery': ALTTPRMystery,
+    'ctjets': CTJetsPreset,
+    'smz3': SMZ3Preset,
+    'sm': SMPreset
+}
