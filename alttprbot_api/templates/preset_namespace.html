@@ -17,9 +17,7 @@
     </tr>
     {% for preset in presets %}
     <tr>
-        <td><a
-                href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}/{{ preset.preset_name }}">{{preset.preset_name}}</a>
-        </td>
+        <td>{{ ns_data.name }}/{{preset.preset_name}}</td>
         <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}">{{preset.randomizer}}</a></td>
         <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}/{{ preset.preset_name }}">{% if is_owner
                 ==
