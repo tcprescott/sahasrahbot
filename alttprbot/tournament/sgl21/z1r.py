@@ -14,6 +14,7 @@ class Z1R(SGLRandomizerTournamentRace):
             event_slug="sgl21z1r",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
+            stream_delay=15,
             coop=False
         )
 
