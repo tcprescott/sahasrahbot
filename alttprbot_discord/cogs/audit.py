@@ -1,13 +1,11 @@
+import csv
 import datetime
-import logging
-
-import discord
-from discord.ext import commands, tasks
-
-from alttprbot import models
 import io
 from contextlib import closing
-import csv
+
+import discord
+from alttprbot import models
+from discord.ext import commands, tasks
 
 
 class Audit(commands.Cog):
@@ -22,7 +20,6 @@ class Audit(commands.Cog):
 
     @clean_history.before_loop
     async def before_clean_history(self):
-        logging.info('tournament clean_history loop waiting...')
         await self.bot.wait_until_ready()
 
     @commands.command()
