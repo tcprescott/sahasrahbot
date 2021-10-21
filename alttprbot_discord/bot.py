@@ -12,6 +12,7 @@ from alttprbot_discord.util import config
 
 config.init()
 
+
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
@@ -19,6 +20,8 @@ async def determine_prefix(bot, message):
     prefix = await message.guild.config_get("CommandPrefix", "$")
     return prefix
 
+intents = discord.Intents.default()
+intents.members = True  # pylint: disable=assigning-non-slot
 
 discordbot = commands.Bot(
     command_prefix=determine_prefix,
@@ -27,7 +30,7 @@ discordbot = commands.Bot(
         users=True,
         roles=False
     ),
-    intents=discord.Intents.all()
+    intents=intents
 )
 
 
