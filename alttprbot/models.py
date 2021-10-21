@@ -186,6 +186,8 @@ class Presets(Model):
     preset_name = fields.CharField(50)
     namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='presets')
     content = fields.TextField()
+    modified = fields.DatetimeField(auto_now=True)
+    generated_count = fields.IntField(default=0)
 
 
 class RTGGUnlistedRooms(Model):
