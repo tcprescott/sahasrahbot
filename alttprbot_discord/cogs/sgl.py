@@ -23,7 +23,7 @@ class SpeedGamingLive(commands.Cog):
     async def sglootr(self, ctx):
         seed = await roll_ootr(
             encrypt=True,
-            version='dev_6.0.112',
+            version='dev_6.0.127',
             settings={
                 "world_count": 1,
                 "create_spoiler": True,
