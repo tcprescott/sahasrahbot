@@ -270,6 +270,29 @@ async def all_presets():
     return await render_template('preset_namespaces_all.html', logged_in=logged_in, user=user, namespaces=namespaces)
 
 
+@sahasrahbotapi.route('/purgeme', methods=['GET'])
+async def purge_me():
+    user = await discord.fetch_user()
+
+    return await render_template('purge_me.html', logged_in=True, user=user)
+
+
+@sahasrahbotapi.route('/purgeme', methods=['POST'])
+async def purge_me_action():
+    user = await discord.fetch_user()
+    payload = await request.form
+
+    if payload.get('confirmpurge', 'no') == 'yes':
+        await models.PresetNamespaces.filter(discord_user_id=user.id).delete()
+        await models.NickVerification.filter(discord_user_id=user.id).delete()
+        await models.SRLNick.filter(discord_user_id=user.id).delete()
+        await models.AuditMessages.filter(user_id=user.id)
+
+        return redirect("/logout/")
+
+    return redirect("/me/")
+
+
 @sahasrahbotapi.route('/presets/me', methods=['GET'])
 @requires_authorization
 async def my_presets():
