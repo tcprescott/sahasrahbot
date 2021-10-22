@@ -1,12 +1,11 @@
 import logging
 
 import aiohttp
-
 from alttprbot.alttprgen import preset, spoilers
-from alttprbot.database import spoiler_races
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
+from alttprbot.database import spoiler_races
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):
@@ -27,8 +26,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             self.week_data = week_response.get('weeks', [])[0]
         except IndexError:
             logging.exception("No active league week!")
-            await self.rtgg_handler.send_message(
-                "No active League Week!  This should not have happened.  Contact a league admin/mod for help.")
+            await self.rtgg_handler.send_message("No active League Week!  This should not have happened.  Contact a league admin/mod for help.")
 
     async def update_data(self):
         await super().update_data()

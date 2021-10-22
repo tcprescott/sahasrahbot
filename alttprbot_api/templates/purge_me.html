@@ -1,15 +1,15 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-    <title>Purge my info!</title>
+<title>Purge my info!</title>
 {%- endblock head %}
 
 {% block content -%}
-    <form action="/purgeme" method="post">
-        <p>Purge all of your info from SahasrahBot. This cannot be undone.</p>
-        <p>This will delete any data collected by the bot, any presets you have, your namespace, etc.</p>
-        <p><input type="checkbox" value="yes" id="confirmpurge" name="confirmpurge">Confirm, delete all bot data on
-            me</input></p>
-        <p><input id="save" name="save" type="submit" value="Purge my info"/></p>
-    </form>
+<form action="/purgeme" method="post">
+    <p>Purge all of your info from SahasrahBot. This cannot be undone.</p>
+    <p>This will delete any data collected by the bot, any presets you have, your namespace, etc.</p>
+    <p><input type="checkbox" value="yes" id="confirmpurge" name="confirmpurge">Confirm, delete all bot data on
+        me</input></p>
+    <p><input id="save" name="save" type="submit" value="Purge my info" /></p>
+</form>
 {%- endblock content %}

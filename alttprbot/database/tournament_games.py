@@ -7,7 +7,7 @@ async def insert_game(episode_id: int, event=None, game_number=None, settings=No
     await orm.execute(
         'INSERT INTO tournament_games(episode_id, event, game_number, settings, submitted) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE event = %s, game_number = %s, settings = %s, submitted = %s;',
         [episode_id, event, game_number, json.dumps(settings), submitted,
-         game_number, event, json.dumps(settings), submitted]
+            game_number, event, json.dumps(settings), submitted]
     )
 
 

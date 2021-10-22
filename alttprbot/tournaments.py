@@ -3,17 +3,16 @@ import logging
 import os
 
 import aiohttp
-import gspread.exceptions
 import gspread_asyncio
+import gspread.exceptions
 import isodate
 import pytz
+from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
-from alttprbot.tournament import (test,  # pylint: disable=unused-import
-                                  dailies, alttprleague,
-                                  sgl21)  # pylint: disable=unused-import
+from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr,  # pylint: disable=unused-import
+                                  alttprhmg, smwde, smz3coop, smbingo, dailies, alttprleague, sgl21)  # pylint: disable=unused-import
 from alttprbot.util import gsheet
-from alttprbot_racetime.bot import racetime_bots
 from config import Config as c
 
 TOURNAMENT_RESULTS_SHEET = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
@@ -83,8 +82,7 @@ async def create_tournament_race_room(event, episodeid):
     rtgg_bot = racetime_bots[event_data.data.racetime_category]
     race = await models.TournamentResults.get_or_none(episode_id=episodeid)
     if race:
-        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"),
-                                   raise_for_status=True) as resp:
+        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"), raise_for_status=True) as resp:
             race_data = json.loads(await resp.read())
         status = race_data.get('status', {}).get('value')
         if not status == 'cancelled':
@@ -134,10 +132,8 @@ async def race_recording_task():
                     f"{RACETIME_URL}/{race.srl_id}",
                     winner['user']['name'],
                     runnerup['user']['name'],
-                    str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'],
-                                                                                     str) else None,
-                    str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(runnerup['finish_time'],
-                                                                                       str) else None,
+                    str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'], str) else None,
+                    str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(runnerup['finish_time'], str) else None,
                     race.permalink,
                     race.spoiler
                 ])

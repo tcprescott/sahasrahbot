@@ -1,23 +1,22 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-    <title>Match Submission</title>
+<title>Match Submission</title>
 {%- endblock head %}
 
 {% block content -%}
-    <form action="{{ endpoint }}" method="post">
-        <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid"
-                                                                     value="{{ episode_id }}" required><br><br>
-        <input type="hidden" id="event" name="event" value="{{ event }}">
+<form action="{{ endpoint }}" method="post">
+    <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid" value="{{ episode_id }}" required><br><br>
+    <input type="hidden" id="event" name="event" value="{{ event }}">
 
-        {% for setting in settings_list %}
-            <label for="{{ setting['key'] }}">{{ setting['label'] }}:</label>
-            <select name="{{ setting['key'] }}" id="{{ setting['key'] }}">
-                {% for key, value in setting['settings'].items() %}
-                    <option value="{{ key }}">{{ value }}</option>
-                {% endfor %}
-            </select><br><br>
+    {% for setting in settings_list %}
+        <label for="{{ setting['key'] }}">{{ setting['label'] }}:</label>
+        <select name="{{ setting['key'] }}" id="{{ setting['key'] }}">
+        {% for key, value in setting['settings'].items() %}
+        <option value="{{ key }}">{{ value }}</option>
         {% endfor %}
-        <input type="submit" value="Submit">
-    </form>
+        </select><br><br>
+    {% endfor %}
+    <input type="submit" value="Submit">
+</form>
 {%- endblock content %}

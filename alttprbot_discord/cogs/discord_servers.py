@@ -20,10 +20,8 @@ class DiscordServers(commands.Cog):
 
     @category.command(name='add')
     @commands.is_owner()
-    async def category_add(self, ctx, channel: commands.TextChannelConverter, category_title, category_description=None,
-                           order=0):
-        await discord_server_lists.add_category(ctx.guild.id, channel.id, category_title=category_title,
-                                                category_description=category_description, order=order)
+    async def category_add(self, ctx, channel: commands.TextChannelConverter, category_title, category_description=None, order=0):
+        await discord_server_lists.add_category(ctx.guild.id, channel.id, category_title=category_title, category_description=category_description, order=order)
 
     @category.command(name='list')
     @commands.is_owner()
@@ -51,8 +49,7 @@ class DiscordServers(commands.Cog):
     @category.command(name='update')
     @commands.is_owner()
     async def category_update(self, ctx, category_id: int, category_title, category_description=None, order=0):
-        await discord_server_lists.update_category(category_id, ctx.guild.id, category_title, category_description,
-                                                   order)
+        await discord_server_lists.update_category(category_id, ctx.guild.id, category_title, category_description, order)
 
     @discordservers.group()
     @commands.is_owner()
@@ -62,8 +59,7 @@ class DiscordServers(commands.Cog):
     @server.command(name='add')
     @commands.is_owner()
     async def server_add(self, ctx, category_id: int, invite: commands.InviteConverter, server_description=None):
-        await discord_server_lists.add_server(ctx.guild.id, invite.id, category_id,
-                                              server_description=server_description)
+        await discord_server_lists.add_server(ctx.guild.id, invite.id, category_id, server_description=server_description)
 
     @server.command(name='list')
     @commands.is_owner()
@@ -90,8 +86,7 @@ class DiscordServers(commands.Cog):
 
     @server.command(name='update')
     @commands.is_owner()
-    async def server_update(self, ctx, server_id: int, invite: commands.InviteConverter, category_id: int,
-                            server_description=None):
+    async def server_update(self, ctx, server_id: int, invite: commands.InviteConverter, category_id: int, server_description=None):
         await discord_server_lists.update_server(ctx.guild.id, server_id, invite.id, category_id, server_description)
 
     @discordservers.command()
@@ -112,13 +107,13 @@ class DiscordServers(commands.Cog):
             channel = discord.utils.get(
                 ctx.guild.channels, id=category['channel_id'])
 
-            list_of_servers = [server_list[i:i + 10]
+            list_of_servers = [server_list[i:i+10]
                                for i in range(0, len(server_list), 10)]
 
             for idx, servers in enumerate(list_of_servers):
                 msgs = [
                     f"**__{category['category_title']}__**" if len(
-                        list_of_servers) == 1 else f"**__{category['category_title']} - Part {idx + 1}__**"
+                        list_of_servers) == 1 else f"**__{category['category_title']} - Part {idx+1}__**"
                 ]
                 msgs += [f"{s['server_description']}: https://discord.gg/{s['invite_id']}" for s in servers]
                 await channel.send('\n'.join(msgs))

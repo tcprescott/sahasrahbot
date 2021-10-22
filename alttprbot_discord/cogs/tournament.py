@@ -4,11 +4,10 @@ import logging
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot import tournaments
 from alttprbot.tournament.core import TournamentConfig
+from alttprbot import tournaments
 from alttprbot.util import speedgaming
 from config import Config as c
-
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
@@ -29,8 +28,7 @@ class Tournament(commands.Cog):
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
             event_data = await tournament_class.get_config()
             try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5,
-                                                                            hours_future=event_data.hours_before_room_open)
+                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
             except Exception as e:
                 logging.exception(
                     "Encountered a problem when attempting to retrieve SG schedule.")
@@ -105,38 +103,30 @@ class Tournament(commands.Cog):
             broadcasters_needed = []
 
             for episode in episodes:
-                broadcast_channels = [c['slug'] for c in episode['channels'] if
-                                      c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == event_data.lang]
+                broadcast_channels = [c['slug'] for c in episode['channels'] if c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == event_data.lang]
                 if not broadcast_channels:
                     continue
 
                 start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
                 start_time_string = f"<t:{round(start_time.timestamp())}:f>"
 
-                commentators_approved = [p for p in episode['commentators'] if
-                                         p['approved'] and p['language'] == event_data.lang]
+                commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == event_data.lang]
 
                 if (c_needed := 2 - len(commentators_approved)) > 0:
-                    comms_needed += [
-                        f"*{start_time_string}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
+                    comms_needed += [f"*{start_time_string}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
 
-                trackers_approved = [p for p in episode['trackers'] if
-                                     p['approved'] and p['language'] == event_data.lang]
+                trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == event_data.lang]
 
                 t_needed = (2 if len(episode['match1']['players']) > 2 else 1) - len(trackers_approved)
 
                 if t_needed > 0:
-                    trackers_needed += [
-                        f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
+                    trackers_needed += [f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
 
-                if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3',
-                                             'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
-                    broadcasters_approved = [p for p in episode['broadcasters'] if
-                                             p['approved'] and p['language'] == event_data.lang]
+                if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
+                    broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == event_data.lang]
 
                     if (b_needed := 1 - len(broadcasters_approved)) > 0:
-                        broadcasters_needed += [
-                            f"*{start_time_string}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
+                        broadcasters_needed += [f"*{start_time_string}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
 
             embed = discord.Embed(
                 title="Scheduling Needs",
@@ -244,14 +234,12 @@ class Tournament(commands.Cog):
                             member = None
 
                         if member is None:
-                            member = event_data.guild.get_member_named(player.get('discordTag', ''))
+                            member =  event_data.guild.get_member_named(player.get('discordTag', ''))
 
                         if member is None:
-                            messages.append(
-                                f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
+                            messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
-
 
 def setup(bot):
     bot.add_cog(Tournament(bot))

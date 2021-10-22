@@ -2,9 +2,9 @@ import copy
 import logging
 from dataclasses import dataclass
 from typing import Union
-
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
+
 from pyz3r.mystery import get_random_option, generate_random_settings
 
 
@@ -145,9 +145,7 @@ def generate_doors_settings(weights, options):
     settings["difficulty"] = options['item_pool']
     settings["item_functionality"] = options['item_functionality']
     settings["accessibility"] = options['accessibility']
-    settings["openpyramid"] = options['goals'] == 'fast_ganon' if options['entrance_shuffle'] in ['vanilla',
-                                                                                                  'dungeonsfull',
-                                                                                                  'dungeonssimple'] else False
+    settings["openpyramid"] = options['goals'] == 'fast_ganon' if options['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
     settings["shopsanity"] = options['shopsanity'] == 'on'
     settings["shuffleganon"] = True
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
@@ -164,18 +162,11 @@ def generate_doors_settings(weights, options):
     settings["enemy_health"] = options['enemy_health']
     settings["keydropshuffle"] = options['keydropshuffle'] == 'on'
 
-    settings["mapshuffle"] = options['mapshuffle'] == 'on' if 'mapshuffle' in weights else options['dungeon_items'] in [
-        'mc', 'mcs', 'full']
-    settings["compassshuffle"] = options['compassshuffle'] == 'on' if 'compassshuffle' in weights else options[
-                                                                                                           'dungeon_items'] in [
-                                                                                                           'mc', 'mcs',
-                                                                                                           'full']
-    settings["keyshuffle"] = options['keyshuffle'] == 'on' if 'keyshuffle' in weights else options['dungeon_items'] in [
-        'mcs', 'full']
-    settings["bigkeyshuffle"] = options['bigkeyshuffle'] == 'on' if 'bigkeyshuffle' in weights else options[
-                                                                                                        'dungeon_items'] == 'full'
-    settings["keysanity"] = options['keysanity'] == 'on' if 'keysanity' in weights else options[
-                                                                                            'dungeon_items'] == 'full'
+    settings["mapshuffle"] = options['mapshuffle'] == 'on' if 'mapshuffle' in weights else options['dungeon_items'] in ['mc', 'mcs', 'full']
+    settings["compassshuffle"] = options['compassshuffle'] == 'on' if 'compassshuffle' in weights else options['dungeon_items'] in ['mc', 'mcs', 'full']
+    settings["keyshuffle"] = options['keyshuffle'] == 'on' if 'keyshuffle' in weights else options['dungeon_items'] in ['mcs', 'full']
+    settings["bigkeyshuffle"] = options['bigkeyshuffle'] == 'on' if 'bigkeyshuffle' in weights else options['dungeon_items'] == 'full'
+    settings["keysanity"] = options['keysanity'] == 'on' if 'keysanity' in weights else options['dungeon_items'] == 'full'
 
     settings["timer"] = options["timer"]
     settings["dungeon_counters"] = options["dungeon_counters"]

@@ -1,10 +1,10 @@
 import json
-import logging
 from datetime import timedelta, datetime
 
 import aiofiles
 import aiohttp
 import pytz
+import logging
 
 from alttprbot.exceptions import SahasrahBotException
 from config import Config as c
@@ -35,9 +35,9 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         'to': sched_to.isoformat()
     }
     async with aiohttp.request(
-            method='get',
-            url=f'{c.SgApiEndpoint}/schedule',
-            params=params,
+        method='get',
+        url=f'{c.SgApiEndpoint}/schedule',
+        params=params,
     ) as resp:
         logging.info(resp.url)
         schedule = await resp.json(content_type='text/html')
@@ -64,16 +64,16 @@ async def get_episode(episodeid: int, complete=False):
             result = {"error": "Failed to find episode with id 0."}
         else:
             async with aiohttp.request(
-                    method='get',
-                    url=f'{c.SgApiEndpoint}/episode',
-                    params={'id': episodeid},
+                method='get',
+                url=f'{c.SgApiEndpoint}/episode',
+                params={'id': episodeid},
             ) as resp:
                 result = await resp.json(content_type='text/html')
     else:
         async with aiohttp.request(
-                method='get',
-                url=f'{c.SgApiEndpoint}/episode',
-                params={'id': episodeid},
+            method='get',
+            url=f'{c.SgApiEndpoint}/episode',
+            params={'id': episodeid},
         ) as resp:
             result = await resp.json(content_type='text/html')
 

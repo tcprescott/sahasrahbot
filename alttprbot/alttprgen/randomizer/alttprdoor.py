@@ -1,12 +1,13 @@
+
 import asyncio
 import gzip
 import json
-import logging
 import os
 import random
 import re
 import string
 import tempfile
+import logging
 
 import aioboto3
 import aiofiles
@@ -42,8 +43,7 @@ class AlttprDoor():
 
             attempts = 0
             try:
-                async for attempt in AsyncRetrying(stop=stop_after_attempt(10),
-                                                   retry=retry_if_exception_type(Exception)):
+                async for attempt in AsyncRetrying(stop=stop_after_attempt(10), retry=retry_if_exception_type(Exception)):
                     with attempt:
                         attempts += 1
                         proc = await asyncio.create_subprocess_exec(
@@ -99,6 +99,7 @@ class AlttprDoor():
                     ACL='public-read'
                 )
 
+
             async with aiofiles.open(spoiler_path, "rb") as f:
                 self.spoilerfile = await f.read()
 
@@ -114,9 +115,9 @@ class AlttprDoor():
 
     @classmethod
     async def create(
-            cls,
-            settings,
-            spoilers=True
+        cls,
+        settings,
+        spoilers=True
     ):
         seed = cls(settings=settings, spoilers=spoilers)
         await seed.generate_game()
@@ -156,9 +157,7 @@ class AlttprDoor():
 
     @property
     def version(self):
-        return \
-            re.search("ALttP Entrance Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[
-                0]
+        return re.search("ALttP Entrance Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
 
     @property
     def doors(self):

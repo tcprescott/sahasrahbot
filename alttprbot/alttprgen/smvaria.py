@@ -9,7 +9,6 @@ async def generate_preset(settings, skills, race=False):
     )
     return seed
 
-
 async def generate_league_playoff(majors, area, bosses):
     if majors not in ['FullTraditional', 'FullRandom', 'Major', 'Chozo']:
         raise Exception("Invalid major setting. Must be FullTraditional, FullRandom, Major, or Chozo.")

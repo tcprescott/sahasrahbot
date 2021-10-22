@@ -1,17 +1,17 @@
+from io import BytesIO
 import os
 import re
-from io import BytesIO
-from urllib.parse import quote
 
 import aiohttp
 from quart import Quart, abort, jsonify, request, session, redirect, url_for, render_template, send_file
 from quart_discord import DiscordOAuth2Session, requires_authorization, Unauthorized, AccessDenied
+from urllib.parse import quote
 
 from alttprbot import models
+from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
+from alttprbot.tournament.core import UnableToLookupEpisodeException
 from alttprbot.alttprgen import generator
 from alttprbot.database import league_playoffs, srlnick
-from alttprbot.tournament.core import UnableToLookupEpisodeException
-from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot_discord.bot import discordbot
 
 sahasrahbotapi = Quart(__name__)
@@ -234,14 +234,12 @@ async def return_racetime_verify():
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers,
-                               raise_for_status=True) as resp:
+    async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
     await srlnick.insert_rtgg_id(user.id, userinfo_data['id'])
 
-    return await render_template('racetime_verified.html', logged_in=True, user=user,
-                                 racetime_name=userinfo_data['name'])
+    return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
 
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
@@ -310,8 +308,7 @@ async def new_preset():
     user = await discord.fetch_user()
     ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
 
-    return await render_template('preset_new.html', logged_in=True, user=user, ns_current_user=ns_current_user,
-                                 randomizers=generator.PRESET_CLASS_MAPPING.keys())
+    return await render_template('preset_new.html', logged_in=True, user=user, ns_current_user=ns_current_user, randomizers=generator.PRESET_CLASS_MAPPING.keys())
 
 
 @sahasrahbotapi.route('/presets/create', methods=['POST'])
@@ -323,8 +320,7 @@ async def new_preset_submit():
     ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
 
     if not re.match("^[a-zA-Z0-9_]*$", payload['preset_name']):
-        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized",
-                                     message="Invalid preset name provided.")
+        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="Invalid preset name provided.")
 
     preset_data, _ = await models.Presets.update_or_create(
         preset_name=payload['preset_name'],
@@ -355,8 +351,7 @@ async def presets_for_namespace(namespace):
     ns_data = await models.PresetNamespaces.get(name=namespace)
     presets = await models.Presets.filter(namespace__name=namespace)
 
-    return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner,
-                                 ns_data=ns_data, presets=presets)
+    return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, presets=presets)
 
 
 @sahasrahbotapi.route('/presets/manage/<string:namespace>/<string:randomizer>', methods=['GET'])
@@ -374,11 +369,9 @@ async def presets_for_namespace_randomizer(namespace, randomizer):
         is_owner = False
 
     ns_data = await models.PresetNamespaces.get(name=namespace)
-    presets = await models.Presets.filter(randomizer=randomizer, namespace__name=namespace).only('id', 'preset_name',
-                                                                                                 'randomizer')
+    presets = await models.Presets.filter(randomizer=randomizer, namespace__name=namespace).only('id', 'preset_name', 'randomizer')
 
-    return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner,
-                                 ns_data=ns_data, presets=presets)
+    return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, presets=presets)
 
 
 @sahasrahbotapi.route('/presets/manage/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
@@ -397,8 +390,7 @@ async def get_preset(namespace, randomizer, preset):
     ns_data = await models.PresetNamespaces.get(name=namespace)
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
 
-    return await render_template('preset_view.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data,
-                                 preset_data=preset_data)
+    return await render_template('preset_view.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, preset_data=preset_data)
 
 
 @sahasrahbotapi.route('/presets/download/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
@@ -423,8 +415,7 @@ async def update_preset(namespace, randomizer, preset):
     is_owner = ns_current_user.name == namespace
 
     if not is_owner:
-        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized",
-                                     message="You are not the owner of this preset.")
+        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="You are not the owner of this preset.")
 
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
 
@@ -437,7 +428,6 @@ async def update_preset(namespace, randomizer, preset):
     await preset_data.save()
 
     return redirect(f"/presets/manage/{namespace}/{randomizer}/{preset}")
-
 
 # @sahasrahbotapi.route('/presets/<str:namespace>', methods=['POST'])
 # @requires_authorization

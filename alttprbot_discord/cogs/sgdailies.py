@@ -3,9 +3,8 @@ import datetime
 import dateutil.parser
 import discord
 import pytz
-from discord.ext import commands
-
 from alttprbot.util import speedgaming
+from discord.ext import commands
 
 
 class SgDaily(commands.Cog):
@@ -44,9 +43,7 @@ class SgDaily(commands.Cog):
 
             if get_next == 1:
                 embed.add_field(
-                    name='Time',
-                    value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now",
-                    inline=False)
+                    name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
                 broadcast_channels = [a['slug']
                                       for a in episode['channels'] if not " " in a['name']]
                 if broadcast_channels:

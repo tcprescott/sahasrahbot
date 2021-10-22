@@ -4,7 +4,9 @@ import random
 import discord
 from discord.ext import commands
 
+from alttprbot.database import config
 from alttprbot.util.holyimage import HolyImage
+
 from ..util import checks
 
 
@@ -20,12 +22,12 @@ class Misc(commands.Cog):
         if self.bot.user in message.mentions:
             emoji = discord.utils.get(self.bot.emojis, name='SahasrahBot')
             if emoji:
-                await asyncio.sleep(random.random() * 5)
+                await asyncio.sleep(random.random()*5)
                 await message.add_reaction(emoji)
 
         if discord.utils.get(message.role_mentions, id=524738280630124574):
             async with message.channel.typing():
-                await asyncio.sleep((random.random() * 30) + 30)
+                await asyncio.sleep((random.random()*30)+30)
                 if random.choice([True, False]):
                     await message.reply(f'@{message.author.mention}')
 
@@ -88,13 +90,11 @@ class Misc(commands.Cog):
 
     @commands.command()
     async def prng(self, ctx):
-        await ctx.reply(
-            "PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
+        await ctx.reply("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
 
     @commands.command(hidden=True)
     async def pedestalgoal(self, ctx):
-        await ctx.reply(
-            "> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
+        await ctx.reply("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
 
     @commands.command(
         aliases=['crc32'],

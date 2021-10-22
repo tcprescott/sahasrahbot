@@ -19,8 +19,7 @@ class Timespinner(SGLRandomizerTournamentRace):
         )
 
     async def roll(self):
-        async with aiohttp.request(url='https://tsrandomizerseedgenerator.azurewebsites.net/generate/json',
-                                   method='get', raise_for_status=True) as req:
+        async with aiohttp.request(url='https://tsrandomizerseedgenerator.azurewebsites.net/generate/json', method='get', raise_for_status=True) as req:
             self.seed = await req.json()
 
     @property

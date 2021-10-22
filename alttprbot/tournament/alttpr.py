@@ -1,11 +1,10 @@
 import logging
 
-from alttprbot import models
 from alttprbot.alttprgen import preset
-from alttprbot.exceptions import SahasrahBotException
+from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
+from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
-
 
 class ALTTPRTournamentRace(TournamentRace):
     async def roll(self):
@@ -13,8 +12,7 @@ class ALTTPRTournamentRace(TournamentRace):
         await self.create_embeds()
 
     async def process_tournament_race(self):
-        await self.rtgg_handler.send_message(
-            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
         await self.roll()
@@ -27,14 +25,11 @@ class ALTTPRTournamentRace(TournamentRace):
         for name, player in self.player_discords:
             await self.send_player_message(name, player, self.embed)
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(
-            srl_id=self.rtgg_handler.data.get('name'),
-            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed.url
         await tournamentresults.save()
 
-        await self.rtgg_handler.send_message(
-            "Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
+        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         self.rtgg_handler.seed_rolled = True
 
     async def configuration(self):
@@ -59,8 +54,7 @@ class ALTTPRTournamentRace(TournamentRace):
         )
 
     async def send_room_welcome(self):
-        await self.rtgg_handler.send_message(
-            'Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.')
+        await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.')
 
     @property
     def seed_code(self):
@@ -96,17 +90,12 @@ class ALTTPRTournamentRace(TournamentRace):
             emojis=discordbot.emojis
         )
 
-        self.tournament_embed.insert_field_at(0, name='RaceTime.gg',
-                                              value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']),
-                                              inline=False)
-        self.embed.insert_field_at(0, name='RaceTime.gg',
-                                   value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+        self.tournament_embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+        self.embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
 
         if self.broadcast_channels:
-            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
-                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
-            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
-                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
 
     async def send_race_submission_form(self):
         if self.bracket_settings is not None:
@@ -126,5 +115,4 @@ class ALTTPRTournamentRace(TournamentRace):
             logging.info(f"Sending tournament submit reminder to {name}.")
             await player.send(msg)
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
-                                                      defaults={'event': self.event_slug, 'submitted': 1})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})

@@ -22,7 +22,6 @@ async def database():
         modules={'models': ['alttprbot.models']}
     )
 
-
 loop = asyncio.get_event_loop()
 dbtask = loop.create_task(database())
 loop.run_until_complete(dbtask)

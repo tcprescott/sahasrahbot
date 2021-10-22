@@ -1,5 +1,4 @@
 from collections import OrderedDict
-
 from pyz3r.spoiler import mw_filter
 
 REGIONLIST = [

@@ -6,15 +6,17 @@ import discord
 import yaml
 from discord.ext import commands
 from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
+from slugify import slugify
 
 import pyz3r
 from alttprbot import models
+from pyz3r.ext.priestmode import create_priestmode
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from pyz3r.ext.priestmode import create_priestmode
+
 from ..util import checks
 
 
@@ -66,8 +68,7 @@ class AlttprGen(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def noqsrace(self, ctx, preset, hints=False):
         # seed, _ = await get_preset(preset, hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
-        seed = await generator.ALTTPRPreset(preset).generate(hints=hints, spoilers="off", tournament=True,
-                                                             allow_quickswap=False)
+        seed = await generator.ALTTPRPreset(preset).generate(hints=hints, spoilers="off", tournament=True, allow_quickswap=False)
         if not seed:
             raise SahasrahBotException(
                 'Could not generate game.  Maybe preset does not exist?')
@@ -335,8 +336,8 @@ class AlttprGen(commands.Cog):
     @commands.command(
         brief='Make a SahasrahBot preset file from a customizer save.',
         help=(
-                'Take a customizer settings save and create a SahasrahBot preset file from it.\n'
-                'This can then be fed into SahasrahBot using the "$preset custom" command.\n\n'
+            'Take a customizer settings save and create a SahasrahBot preset file from it.\n'
+            'This can then be fed into SahasrahBot using the "$preset custom" command.\n\n'
         )
     )
     async def convertcustomizer(self, ctx):
@@ -362,7 +363,7 @@ class AlttprGen(commands.Cog):
     @commands.command(
         brief="Create a series of \"Kiss Priest\" games.",
         help=(
-                'Create a series a \"Kiss Priest\" games.  This was created by hycutype.'
+            'Create a series a \"Kiss Priest\" games.  This was created by hycutype.'
         )
     )
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
@@ -409,9 +410,7 @@ class AlttprGen(commands.Cog):
             raise SahasrahBotException("You must supply a valid yaml file.")
 
         embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
-        embed.add_field(name="Saved as preset!",
-                        value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`\n\nExample: `$norace {namespace.name}/latest`",
-                        inline=False)
+        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`\n\nExample: `$norace {namespace.name}/latest`", inline=False)
         await ctx.reply(embed=embed)
 
 
@@ -431,9 +430,7 @@ async def randomgame(ctx, weightset=None, weights=None, tournament=True, spoiler
         embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
 
     if weights:
-        embed.add_field(name="Saved as custom weightset!",
-                        value=f"You can generate this weightset again by using the weightset name of `{namespace.name}/latest`.\n\nExample: `$mystery {namespace.name}/latest`",
-                        inline=False)
+        embed.add_field(name="Saved as custom weightset!", value=f"You can generate this weightset again by using the weightset name of `{namespace.name}/latest`.\n\nExample: `$mystery {namespace.name}/latest`", inline=False)
 
     await ctx.reply(embed=embed)
 

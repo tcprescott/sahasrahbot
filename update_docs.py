@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-import os
-
 import yaml
+import os
 
 # update presets
 

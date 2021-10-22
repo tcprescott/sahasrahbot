@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from alttprbot_discord.util import config
+
 from ..util import embed_formatter
 
 

@@ -1,10 +1,8 @@
 import asyncio
-import logging
 import os
-import random
-import string
+import random, string
 import tempfile
-
+import logging
 
 ###
 # 1) Make a new temp directory

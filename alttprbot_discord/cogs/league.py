@@ -1,11 +1,11 @@
 import asyncio
-import logging
 import os
 import random
+import logging
 
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 # from alttprbot.alttprgen import preset, spoilers
 # from alttprbot.alttprgen.mystery import generate_random_game
@@ -13,6 +13,8 @@ from alttprbot.database import config, srlnick
 # from alttprbot.tournament import league
 # from alttprbot.util import speedgaming
 from config import Config as c
+
+from ..util import checks
 
 
 def restrict_league_server():
@@ -23,7 +25,6 @@ def restrict_league_server():
             return True
 
         return False
-
     return commands.check(predicate)
 
 
@@ -69,8 +70,8 @@ class League(commands.Cog):
     @restrict_league_server()
     async def importleagueroles(self, ctx):
         async with aiohttp.request(
-                method='get',
-                url='https://alttprleague.com/json_ep/roster/'
+            method='get',
+            url='https://alttprleague.com/json_ep/roster/'
         ) as resp:
             roster = await resp.json()
 
@@ -86,23 +87,23 @@ class League(commands.Cog):
     @restrict_league_server()
     async def leagueroles(self, ctx, member_tag):
         async with aiohttp.request(
-                method='get',
-                url='https://alttprleague.com/json_ep/player/',
-                params={
-                    'discord': member_tag,
-                },
-                raise_for_status=True
+            method='get',
+            url='https://alttprleague.com/json_ep/player/',
+            params={
+                'discord': member_tag,
+            },
+            raise_for_status=True
         ) as resp:
             r = await resp.json()
             player = r['results'][0]
 
         async with aiohttp.request(
-                method='get',
-                url='https://alttprleague.com/json_ep/team/',
-                params={
-                    'name': player['team_name'],
-                },
-                raise_for_status=True
+            method='get',
+            url='https://alttprleague.com/json_ep/team/',
+            params={
+                'name': player['team_name'],
+            },
+            raise_for_status=True
         ) as resp:
             r = await resp.json()
             team = r['results'][0]
@@ -168,13 +169,13 @@ async def update_player(ctx, team, division_role, player_role, team_role, pendan
         if os.environ.get("LEAGUE_SUBMIT_GAME_SECRET"):
             if not team[pendant].get('discord_id', None) == team_member.id:
                 async with aiohttp.request(
-                        method='post',
-                        url='https://alttprleague.com/json_ep/player/',
-                        data={
-                            'id': team[pendant]['id'],
-                            'discord_id': team_member.id,
-                            'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
-                        }
+                    method='post',
+                    url='https://alttprleague.com/json_ep/player/',
+                    data={
+                        'id': team[pendant]['id'],
+                        'discord_id': team_member.id,
+                        'secret': os.environ.get("LEAGUE_SUBMIT_GAME_SECRET")
+                    }
                 ) as _:
                     pass
         else:
@@ -186,8 +187,7 @@ async def find_or_create_role(ctx, role_name):
     try:
         role = await commands.RoleConverter().convert(ctx, role_name)
     except commands.RoleNotFound:
-        role = await ctx.guild.create_role(name=role_name,
-                                           reason=f"Created by a importleagueroles command executed by {ctx.author.name}#{ctx.author.discriminator}")
+        role = await ctx.guild.create_role(name=role_name, reason=f"Created by a importleagueroles command executed by {ctx.author.name}#{ctx.author.discriminator}")
 
     return role
 

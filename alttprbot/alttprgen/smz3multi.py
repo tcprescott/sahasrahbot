@@ -1,12 +1,11 @@
 # import pyz3r
 from alttprbot.alttprgen.preset import fetch_preset
-from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
+from alttprbot.exceptions import SahasrahBotException
 
 
 class PresetNotFoundException(SahasrahBotException):
     pass
-
 
 async def generate_multiworld(preset, players, tournament=False, randomizer='smz3', seed_number=None):
     preset_dict = await fetch_preset(preset, randomizer=randomizer)
@@ -22,6 +21,7 @@ async def generate_multiworld(preset, players, tournament=False, randomizer='smz
 
     for idx, player in enumerate(players):
         settings[f'player-{idx}'] = player
+
 
     settings['race'] = "true" if tournament else "false"
     if randomizer == 'sm':

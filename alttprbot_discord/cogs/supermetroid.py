@@ -1,16 +1,15 @@
 from discord.ext import commands
 
-from alttprbot.alttprgen.randomizer import smdash
-from alttprbot.alttprgen.smvaria import generate_league_playoff, generate_preset
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.alttprgen.smvaria import generate_league_playoff, generate_preset
+from alttprbot.alttprgen.randomizer import smdash
 
 
 class SuperMetroid(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot \
- \
-                   @ commands.command()
+        self.bot = bot\
 
+    @commands.command()
     async def smdash(self, ctx, mode):
         url = await smdash.create_smdash(mode=mode)
         await ctx.reply(url)
@@ -47,7 +46,6 @@ class SuperMetroid(commands.Cog):
             bosses=bosses
         )
         await ctx.reply(embed=seed.embed())
-
 
 def setup(bot):
     bot.add_cog(SuperMetroid(bot))

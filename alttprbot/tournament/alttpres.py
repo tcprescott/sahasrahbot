@@ -2,13 +2,12 @@ import logging
 
 import discord
 
-from alttprbot import models
 from alttprbot.alttprgen import preset
+from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
-
 
 class ALTTPRESTournament(ALTTPRTournamentRace):
     async def roll(self):
@@ -83,9 +82,7 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
 
         embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
-                                                      defaults={'settings': preset_dict['settings'],
-                                                                'event': 'alttpres'})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': preset_dict['settings'], 'event': 'alttpres'})
 
         if self.audit_channel:
             await self.audit_channel.send(embed=embed)
@@ -94,13 +91,11 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
             if player is None:
                 logging.error(f"Could not send DM to {name}")
                 if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {name}",
-                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                    await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
                 continue
             try:
                 await player.send(embed=embed)
             except discord.HTTPException:
                 logging.exception(f"Could not send DM to {name}")
                 if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}",
-                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)

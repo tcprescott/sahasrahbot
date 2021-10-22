@@ -1,9 +1,9 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-    <title>About {{ user.name }}#{{ user.discriminator }}</title>
+<title>About {{ user.name }}#{{ user.discriminator }}</title>
 {%- endblock head %}
 
 {% block content -%}
-    <img src='{{ user.avatar_url }}'/>
+<img src='{{ user.avatar_url }}' />
 {%- endblock content %}

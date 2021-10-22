@@ -1,7 +1,7 @@
 import importlib
-import io
-import logging
 import os
+import logging
+import io
 
 import discord
 from discord.ext import commands
@@ -20,7 +20,6 @@ async def determine_prefix(bot, message):
     prefix = await message.guild.config_get("CommandPrefix", "$")
     return prefix
 
-
 intents = discord.Intents.default()
 intents.members = True  # pylint: disable=assigning-non-slot
 
@@ -33,6 +32,7 @@ discordbot = commands.Bot(
     ),
     intents=intents
 )
+
 
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))

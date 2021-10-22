@@ -1,5 +1,4 @@
 import random
-
 from .core import SahasrahBotCoreHandler
 
 
@@ -43,8 +42,7 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game('jhhhD0j9$78$JpTBT!BhSA!0P@@A', message)
 
     async def ex_help(self, args, message):
-        await self.send_message(
-            "Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
+        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
 
     async def roll_game(self, flags, message):
         if await self.is_locked(message):

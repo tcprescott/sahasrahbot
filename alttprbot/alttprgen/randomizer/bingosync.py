@@ -1,5 +1,5 @@
-import logging
 import os
+import logging
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -13,7 +13,6 @@ try:
     jar.load('data/bingosync.cookie')
 except FileNotFoundError:
     logging.warning("No bingosync cookie file found.  Will skip loading...")
-
 
 # WARNING: This is incredibly jank and relies on private endpoints within Bingosync
 # that are not intended for public consumption.
@@ -39,8 +38,7 @@ class BingoSync(object):
         bingo.password = password
         return bingo
 
-    async def create_bingo_room(self, room_name, passphrase, game_type, variant_type=None, lockout_mode='1', seed='',
-                                custom_json='', is_spectator='on', hide_card='on'):
+    async def create_bingo_room(self, room_name, passphrase, game_type, variant_type=None, lockout_mode='1', seed='', custom_json='', is_spectator='on', hide_card='on'):
         csrftoken = await self.get_csrf_token()
         data = {
             'csrfmiddlewaretoken': csrftoken,
@@ -60,13 +58,13 @@ class BingoSync(object):
 
         async with aiohttp.ClientSession(cookie_jar=jar) as session:
             async with session.request(
-                    method='post',
-                    url=BINGOSYNC_BASE_URL,
-                    headers={'Origin': BINGOSYNC_BASE_URL,
-                             'Referer': BINGOSYNC_BASE_URL},
-                    allow_redirects=False,
-                    raise_for_status=True,
-                    data=data
+                method='post',
+                url=BINGOSYNC_BASE_URL,
+                headers={'Origin': BINGOSYNC_BASE_URL,
+                        'Referer': BINGOSYNC_BASE_URL},
+                allow_redirects=False,
+                raise_for_status=True,
+                data=data
             ) as resp:
                 jar.save('data/bingosync.cookie')
                 print(await resp.text())
@@ -108,10 +106,10 @@ class BingoSync(object):
 
         async with aiohttp.ClientSession(cookie_jar=jar) as session:
             async with session.request(
-                    method='put',
-                    url=f"{BINGOSYNC_BASE_URL}/api/new-card",
-                    raise_for_status=True,
-                    json=data
+                method='put',
+                url=f"{BINGOSYNC_BASE_URL}/api/new-card",
+                raise_for_status=True,
+                json=data
             ) as resp:
                 return await resp.text()
 
@@ -123,9 +121,9 @@ class BingoSync(object):
         async with aiohttp.ClientSession(cookie_jar=jar) as session:
             try:
                 async with session.request(
-                        method='get',
-                        url=self.base_url,
-                        raise_for_status=True
+                    method='get',
+                    url=self.base_url,
+                    raise_for_status=True
                 ) as resp:
                     soup = BeautifulSoup(await resp.text(), features="html5lib")
             except Exception as e:

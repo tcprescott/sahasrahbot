@@ -3,11 +3,10 @@ import os
 import discord
 from discord.ext import commands
 
-from alttprbot import models
 from alttprbot.database import srlnick
+from alttprbot import models
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
-
 
 class Nickname(commands.Cog):
     def __init__(self, bot):
@@ -33,8 +32,7 @@ class Nickname(commands.Cog):
         if nick:
             await ctx.reply(f"Your currently registered nickname for Twitch is `{nick[0]['twitch_name']}`")
         else:
-            await ctx.reply(
-                "You currently do not have any nicknames registered with this bot.  Use the command `$twitch yournick` to do that!")
+            await ctx.reply("You currently do not have any nicknames registered with this bot.  Use the command `$twitch yournick` to do that!")
 
     @commands.command()
     @commands.is_owner()
@@ -44,10 +42,9 @@ class Nickname(commands.Cog):
             if result is None or result.rtgg_id is None:
                 try:
                     await member.send(
-                        (
-                            f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n"
-                            f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
-                            "If you have any questions, please contact Synack.  Thank you!")
+                        (f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n"
+                        f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
+                        "If you have any questions, please contact Synack.  Thank you!")
                     )
                     await ctx.send(f"Send DM to {member.name}#{member.discriminator}")
                 except (discord.Forbidden, discord.HTTPException) as e:
@@ -64,7 +61,6 @@ class Nickname(commands.Cog):
 
         if msg:
             await ctx.reply("\n".join(msg))
-
 
 def setup(bot):
     bot.add_cog(Nickname(bot))

@@ -3,6 +3,7 @@ import random
 from alttprbot.alttprgen import preset, smz3multi, smvaria
 from alttprbot.alttprgen.randomizer import smdash
 from pyz3r.exceptions import UnableToGenerate, UnableToRetrieve
+
 from .core import SahasrahBotCoreHandler
 
 
@@ -34,8 +35,7 @@ class GameHandler(SahasrahBotCoreHandler):
         try:
             teams = self.teams
             for team in teams:
-                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='sm',
-                                                           seed_number=seed_number)
+                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='sm', seed_number=seed_number)
                 await self.send_message(f"Team {team}: {seed.url}")
                 await self.send_message("------")
         except Exception as e:
@@ -159,5 +159,4 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_help(self, args, message):
-        await self.send_message(
-            "Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <mode>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <mode>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")

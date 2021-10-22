@@ -4,9 +4,8 @@ import io
 from contextlib import closing
 
 import discord
-from discord.ext import commands, tasks
-
 from alttprbot import models
+from discord.ext import commands, tasks
 
 
 class Audit(commands.Cog):
@@ -41,8 +40,7 @@ class Audit(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def deletedhistory(self, ctx, member: discord.Member, limit=500):
-        messages = await models.AuditMessages.filter(guild_id=ctx.guild.id, user_id=member.id, deleted=1).limit(
-            limit).values()
+        messages = await models.AuditMessages.filter(guild_id=ctx.guild.id, user_id=member.id, deleted=1).limit(limit).values()
 
         fields = ['message_date', 'content', 'attachment', 'deleted']
         with closing(io.StringIO()) as sio:
@@ -235,7 +233,6 @@ class Audit(commands.Cog):
     # async def clean_history(self):
     #     logging.info('history cleaned')
     #     await audit.clean_history()
-
 
 # async def audit_embed_member_joined(member):
 #     embed = discord.Embed(
