@@ -5,7 +5,7 @@ settings:
   glitches: none
   item_placement: advanced
   dungeon_items: standard
-  accessibility: none
+  accessibility: beatable
   goal: triforce-hunt
   crystals:
     ganon: '7'
@@ -28,85 +28,85 @@ settings:
   notes: ''
   l: {}
   eq:
-    - PegasusBoots
-    - BossHeartContainer
-    - BossHeartContainer
-    - BossHeartContainer
+  - PegasusBoots
+  - BossHeartContainer
+  - BossHeartContainer
+  - BossHeartContainer
   drops:
     '0':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '1':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '2':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '3':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '4':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '5':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     '6':
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     pull:
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     crab:
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
     stun:
-      - auto_fill
+    - auto_fill
     fish:
-      - auto_fill
+    - auto_fill
   custom:
     item.Goal.Required: '49'
     item.require.Lamp: false
@@ -114,6 +114,7 @@ settings:
     item.value.GreenClock: ''
     item.value.RedClock: ''
     item.value.Rupoor: ''
+    customPrizePacks: false
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
