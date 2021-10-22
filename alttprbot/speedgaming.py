@@ -1,13 +1,13 @@
-import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
 from typing import List
+from datetime import datetime, timedelta
+import logging
 
-import aiofiles
 import aiohttp
-import pytz
+import aiofiles
 from dataclasses_json import LetterCase, dataclass_json, config
 from marshmallow import fields
+import pytz
 
 from alttprbot.exceptions import SahasrahBotException
 from config import Config as c
@@ -31,7 +31,6 @@ class SpeedGamingPlayer:
     discord_id: str
     discord_tag: str
 
-
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class SpeedGamingCrew:
@@ -45,7 +44,6 @@ class SpeedGamingCrew:
     public_stream: str
     approved: bool
 
-
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class SpeedGamingMatch:
@@ -53,7 +51,6 @@ class SpeedGamingMatch:
     note: str
     players: List[SpeedGamingPlayer]
     title: str
-
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
@@ -68,7 +65,6 @@ class SpeedGamingEvent:
     srl: str
     slug: str
 
-
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class SpeedGamingChannel:
@@ -77,7 +73,6 @@ class SpeedGamingChannel:
     initials: str
     name: str
     slug: str
-
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
@@ -112,7 +107,6 @@ class SpeedGamingEpisode:
         )
     )
 
-
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     if c.DEBUG and event == 'test':
         test_schedule = []
@@ -130,9 +124,9 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         'to': sched_to.isoformat()
     }
     async with aiohttp.request(
-            method='get',
-            url=f'{c.SgApiEndpoint}/schedule',
-            params=params,
+        method='get',
+        url=f'{c.SgApiEndpoint}/schedule',
+        params=params,
     ) as resp:
         logging.info(resp.url)
         schedule = await resp.json(content_type='text/html')
@@ -159,16 +153,16 @@ async def get_episode(episodeid: int, complete=False):
             result = {"error": "Failed to find episode with id 0."}
         else:
             async with aiohttp.request(
-                    method='get',
-                    url=f'{c.SgApiEndpoint}/episode',
-                    params={'id': episodeid},
+                method='get',
+                url=f'{c.SgApiEndpoint}/episode',
+                params={'id': episodeid},
             ) as resp:
                 result = await resp.text()
     else:
         async with aiohttp.request(
-                method='get',
-                url=f'{c.SgApiEndpoint}/episode',
-                params={'id': episodeid},
+            method='get',
+            url=f'{c.SgApiEndpoint}/episode',
+            params={'id': episodeid},
         ) as resp:
             result = await resp.text()
 
