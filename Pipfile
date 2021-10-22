@@ -30,7 +30,7 @@ html5lib = "*"
 shortuuid = "*"
 PyGithub = "*"
 PySide2 = "==5.15.2"
-Pillow = "==8.0.1"
+Pillow = "==8.3.2"
 nlzss11 = "==1.1"
 python-slugify = "*"
 
