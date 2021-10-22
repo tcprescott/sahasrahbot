@@ -7,11 +7,13 @@ async def insert_spoiler_race(srl_id, spoiler_url, studytime=900):
         [srl_id, spoiler_url, studytime, spoiler_url, studytime]
     )
 
+
 async def start_spoiler_race(srl_id):
     await orm.execute(
         'UPDATE spoiler_races SET started=CURRENT_TIMESTAMP() where srl_id=%s',
         [srl_id]
     )
+
 
 async def delete_spoiler_race(srl_id):
     await orm.execute(
@@ -33,6 +35,7 @@ async def get_spoiler_race_by_id(srl_id):
         [srl_id]
     )
     return results[0] if len(results) > 0 else False
+
 
 async def get_spoiler_race_by_id_started(srl_id):
     results = await orm.select(

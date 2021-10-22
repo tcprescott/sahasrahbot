@@ -1,6 +1,3 @@
-import logging
-
-from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from .sglcore import SGLCoreTournamentRace

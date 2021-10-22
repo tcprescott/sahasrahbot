@@ -1,17 +1,18 @@
-from dataclasses import dataclass
 import gzip
 import json
+import os
 import random
 import string
-import os
+from dataclasses import dataclass
 
 import aioboto3
 
-# from config import Config as c
-
+from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler
 from alttprbot.alttprgen.generator import ALTTPRPreset, PresetData
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler
+
+
+# from config import Config as c
 
 
 @dataclass

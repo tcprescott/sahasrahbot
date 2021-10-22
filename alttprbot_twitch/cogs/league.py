@@ -1,4 +1,5 @@
 from twitchio.ext import commands
+
 from alttprbot.database import twitch_command_text
 
 
@@ -28,6 +29,7 @@ class League():
     @commands.command()
     async def leagueweights(self, ctx):
         await ctx.send("Find the League Mystery weights here: https://alttprleague.com/weights.png")
+
 
 def setup(bot):
     bot.add_cog(League(bot))

@@ -1,12 +1,12 @@
+import logging
+
 import aiocache
 import discord
 from discord.ext import commands, tasks
-import logging
 
 from alttprbot import models
 from alttprbot.database import config
 from alttprbot.util import http
-
 from ..util.alttpr_discord import ALTTPRDiscord
 
 
@@ -20,6 +20,7 @@ def is_daily_channel():
             if ctx.channel.name in channels:
                 return True
         return False
+
     return commands.check(predicate)
 
 
@@ -37,7 +38,8 @@ class Daily(commands.Cog):
         daily_challenge = await find_daily_hash()
         hash_id = daily_challenge['hash']
         seed = await get_daily_seed(hash_id)
-        embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+        embed = await seed.embed(emojis=self.bot.emojis,
+                                 notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await update_daily(hash_id)
         await ctx.reply(embed=embed)
 
@@ -47,7 +49,8 @@ class Daily(commands.Cog):
         hash_id = daily_challenge['hash']
         if await update_daily(hash_id):
             seed = await get_daily_seed(hash_id)
-            embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+            embed = await seed.embed(emojis=self.bot.emojis,
+                                     notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             daily_announcer_channels = await config.get_all_parameters_by_name('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
                 guild = self.bot.get_guild(result['guild_id'])
@@ -59,6 +62,7 @@ class Daily(commands.Cog):
     @announce_daily.before_loop
     async def before_create_races(self):
         await self.bot.wait_until_ready()
+
 
 def setup(bot):
     bot.add_cog(Daily(bot))

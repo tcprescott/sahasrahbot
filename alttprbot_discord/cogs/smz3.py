@@ -1,5 +1,5 @@
-from discord.ext import commands
 import discord
+from discord.ext import commands
 
 from alttprbot.alttprgen.preset import get_preset, fetch_preset
 from alttprbot.alttprgen.smz3multi import generate_multiworld
@@ -129,7 +129,9 @@ class SuperMetroidComboRandomizer(commands.Cog):
         )
         embed.add_field(name="Status", value="👍 Open for entry", inline=False)
         embed.add_field(
-            name="Preset", value=f"[{preset.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{randomizer.lower()}/{preset.lower()}.yaml)", inline=False)
+            name="Preset",
+            value=f"[{preset.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{randomizer.lower()}/{preset.lower()}.yaml)",
+            inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
         msg = await ctx.reply(embed=embed)
@@ -180,7 +182,8 @@ class SuperMetroidComboRandomizer(commands.Cog):
         players = [p for p in reaction_users if not p.id == self.bot.user.id]
 
         if len(players) < 2:
-            await message.reply(f"{member.mention} You must have at least two players to create a multiworld.  If you wish to cancel this multiworld, click ❌.")
+            await message.reply(
+                f"{member.mention} You must have at least two players to create a multiworld.  If you wish to cancel this multiworld, click ❌.")
             embed.set_field_at(
                 0, name="Status", value="👍 Open for entry")
             try:
@@ -190,7 +193,8 @@ class SuperMetroidComboRandomizer(commands.Cog):
             await message.edit(embed=embed)
             return
 
-        seed = await generate_multiworld(mw['preset'], [p.name for p in players], tournament=False, randomizer=mw['randomizer'])
+        seed = await generate_multiworld(mw['preset'], [p.name for p in players], tournament=False,
+                                         randomizer=mw['randomizer'])
 
         dm_embed = discord.Embed(
             title=f"{mw['randomizer'].upper()} Multiworld Game"

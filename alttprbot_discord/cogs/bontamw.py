@@ -1,9 +1,9 @@
 import io
 import lzma
 import zipfile
-import yaml
 
 import discord
+import yaml
 from aiohttp import ClientResponseError
 from discord.ext import commands
 
@@ -54,9 +54,9 @@ class BontaMultiworld(commands.Cog):
 
     @commands.command(
         help=(
-            'Sends a command to the multiworld server.\n'
-            'The msg should be wrapped in quotes.  For example: $mwmsg abc123 "/kick Synack"\n'
-            'Only the creator of the game, or the owner of this bot, may send commands.'
+                'Sends a command to the multiworld server.\n'
+                'The msg should be wrapped in quotes.  For example: $mwmsg abc123 "/kick Synack"\n'
+                'Only the creator of the game, or the owner of this bot, may send commands.'
         ),
         brief='Send a command to the multiworld server.'
     )
@@ -73,7 +73,8 @@ class BontaMultiworld(commands.Cog):
         data = {
             'msg': msg
         }
-        response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data, returntype='json')
+        response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data,
+                                               returntype='json')
 
         if response.get('success', True) is False:
             raise SahasrahBotException(response.get(
@@ -84,9 +85,9 @@ class BontaMultiworld(commands.Cog):
 
     @commands.command(
         help=(
-            'Resume an existing multiworld that was previously closed.\n'
-            'Specify the existing token, and port number.\n\n'
-            'Multidata and multisave file are removed from the server after 7 days.'
+                'Resume an existing multiworld that was previously closed.\n'
+                'Specify the existing token, and port number.\n\n'
+                'Multidata and multisave file are removed from the server after 7 days.'
         ),
         brief='Resume a multiworld that was previously closed.'
     )
@@ -108,9 +109,9 @@ class BontaMultiworld(commands.Cog):
 
     @commands.command(
         help=(
-            "Attach a zip file that contains the bmbp patches you wish to update.\n"
-            "Command will return a zip file with corrected patch files.\n\n"
-            "The hoststring should be in \"hostname:port\" format."
+                "Attach a zip file that contains the bmbp patches you wish to update.\n"
+                "Command will return a zip file with corrected patch files.\n\n"
+                "The hoststring should be in \"hostname:port\" format."
         ),
         brief="Update hostname in a zip file of bmbp patches."
     )
@@ -139,7 +140,8 @@ class BontaMultiworld(commands.Cog):
                     newzip.writestr(bmbp_file, lzma.compress(new_file))
 
         zip_to_send = zip_buffer.getvalue()
-        await ctx.reply(file=discord.File(fp=io.BytesIO(zip_to_send), filename=f'Fixed_{ctx.message.attachments[0].filename}'))
+        await ctx.reply(
+            file=discord.File(fp=io.BytesIO(zip_to_send), filename=f'Fixed_{ctx.message.attachments[0].filename}'))
         zip_buffer.close()
 
 

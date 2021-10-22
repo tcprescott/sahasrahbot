@@ -1,6 +1,7 @@
 import logging
 
 import discord
+
 from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig, TournamentRace, UnableToLookupUserException
 from alttprbot_discord.bot import discordbot
@@ -62,7 +63,8 @@ class SGLCoreTournamentRace(TournamentRace):
 
         # then, if that doesn't work, try their discord tag kept by SG
         if looked_up_player is None and not player['discordTag'] == '':
-            looked_up_player = await SGLTournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
+            looked_up_player = await SGLTournamentPlayer.construct_discord_name(discord_name=player['discordTag'],
+                                                                                guild=self.guild)
 
         # and failing all that, bomb
         if looked_up_player is None:
@@ -85,7 +87,9 @@ class SGLCoreTournamentRace(TournamentRace):
         tournament_race.rtgg_handler = handler
 
         logging.info(handler.data.get('name'))
-        await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'), defaults={'episode_id': tournament_race.episodeid, 'event': tournament_race.event_slug, 'spoiler': None})
+        await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'),
+                                                        defaults={'episode_id': tournament_race.episodeid,
+                                                                  'event': tournament_race.event_slug, 'spoiler': None})
 
         await tournament_race.send_player_room_info()
         await tournament_race.send_audit_room_info()
@@ -105,7 +109,8 @@ class SGLCoreTournamentRace(TournamentRace):
         return []
 
     async def send_audit_room_info(self):
-        await self.race_room_log_channel.send(f"Room created: {self.event_name} - {self.versus} - Episode {self.episodeid} - <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}>")
+        await self.race_room_log_channel.send(
+            f"Room created: {self.event_name} - {self.versus} - Episode {self.episodeid} - <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}>")
 
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
@@ -133,7 +138,8 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         pass
 
     async def process_tournament_race(self):
-        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message(
+            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
         await self.roll()
@@ -141,9 +147,12 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
         await self.rtgg_handler.send_message(self.seed_info)
 
-        await self.send_audit_message(message=f"<{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}> - {self.event_name} - {self.versus} - Episode {self.episodeid} - {self.seed_info}")
+        await self.send_audit_message(
+            message=f"<{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}> - {self.event_name} - {self.versus} - Episode {self.episodeid} - {self.seed_info}")
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(
+            srl_id=self.rtgg_handler.data.get('name'),
+            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed_info
         await tournamentresults.save()
 
@@ -151,7 +160,8 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         self.rtgg_handler.seed_rolled = True
 
     async def send_room_welcome(self):
-        await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about ~5 minutes prior to the start of your race.')
+        await self.rtgg_handler.send_message(
+            'Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about ~5 minutes prior to the start of your race.')
 
     @property
     def seed_info(self):

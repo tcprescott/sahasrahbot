@@ -1,5 +1,3 @@
-import logging
-
 from alttprbot.alttprgen.preset import get_preset
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot

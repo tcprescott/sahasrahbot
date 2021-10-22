@@ -1,6 +1,6 @@
-from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
+from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 from .sglcore import SGLRandomizerTournamentRace
 
 

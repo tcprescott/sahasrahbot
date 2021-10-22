@@ -16,7 +16,8 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(url, message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!ff1url <url>\" to generate seed.  Check out https://sahasrahbot.synack.live/rtgg.html#final-fantasy-randomizer-ff1r for more info.")
+        await self.send_message(
+            "Available commands:\n\"!ff1url <url>\" to generate seed.  Check out https://sahasrahbot.synack.live/rtgg.html#final-fantasy-randomizer-ff1r for more info.")
 
     async def roll_game(self, flags, message):
         if await self.is_locked(message):

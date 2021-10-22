@@ -4,14 +4,14 @@ import random
 from dataclasses import dataclass
 
 import aiofiles
+import yaml
 from aiohttp.client_exceptions import ClientResponseError
-import pyz3r
-from tortoise.exceptions import DoesNotExist
+from slugify import slugify
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
-from slugify import slugify
-import yaml
+from tortoise.exceptions import DoesNotExist
 
+import pyz3r
 from alttprbot import models
 from alttprbot.alttprgen.randomizer import ctjets, mysterydoors
 from alttprbot.exceptions import SahasrahBotException
@@ -106,7 +106,8 @@ class SahasrahBotPresetCore():
         body = yaml.dump(self.preset_data)
         namespace_data = await models.PresetNamespaces.get(name=self.namespace)
 
-        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset, namespace=namespace_data, defaults={'content': body})
+        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset,
+                                              namespace=namespace_data, defaults={'content': body})
 
     async def _fetch_global(self):
         basename = os.path.basename(f'{self.preset}.yaml')
@@ -118,7 +119,8 @@ class SahasrahBotPresetCore():
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
     async def _fetch_namespaced(self):
-        data = await models.Presets.get_or_none(preset_name=self.preset, randomizer=self.randomizer, namespace__name=self.namespace)
+        data = await models.Presets.get_or_none(preset_name=self.preset, randomizer=self.randomizer,
+                                                namespace__name=self.namespace)
 
         if data is None:
             raise PresetNotFoundException(f'Could not find preset {self.preset} in namespace {self.namespace}.')
@@ -209,7 +211,8 @@ class ALTTPRMystery(SahasrahBotPresetCore):
             await self.fetch()
 
         try:
-            async for attempt in AsyncRetrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
+            async for attempt in AsyncRetrying(stop=stop_after_attempt(5),
+                                               retry=retry_if_exception_type(ClientResponseError)):
                 with attempt:
                     try:
                         mystery = await mystery_generate(self.preset_data, spoilers=spoilers)
@@ -341,7 +344,8 @@ async def mystery_generate(weights, spoilers="mystery"):
     if 'preset' in weights:
         rolledpreset = pyz3r.mystery.get_random_option(weights['preset'])
         if rolledpreset == 'none':
-            return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
+            return mysterydoors.generate_doors_mystery(weights=weights,
+                                                       spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
         else:
             data = ALTTPRPreset(rolledpreset)
             await data.fetch()
@@ -362,16 +366,19 @@ async def mystery_generate(weights, spoilers="mystery"):
                 custom_instructions=custom_instructions
             )
     else:
-        return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
+        return mysterydoors.generate_doors_mystery(weights=weights,
+                                                   spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
 
 
 async def create_or_retrieve_namespace(discord_user_id, discord_user_name):
     tempnamespaceslug = slugify(discord_user_name, max_length=20)
     try:
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id,
+                                                                   defaults={'name': tempnamespaceslug})
     except DoesNotExist:
         tempnamespaceslug = tempnamespaceslug + str(random.randint(0, 99))
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id,
+                                                                   defaults={'name': tempnamespaceslug})
 
     return namespace
 

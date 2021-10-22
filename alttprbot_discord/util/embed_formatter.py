@@ -26,7 +26,8 @@ async def reaction_group_list(ctx, reaction_groups):
             name=item['name']
         )
         value = 'Description: {description}\n\nChannel: {channel}\nMessage Link: {messagelink}\nBot Managed: {botmanaged}'.format(
-            description=item['description'], channel=channel.mention, messagelink=message.jump_url, botmanaged='something')
+            description=item['description'], channel=channel.mention, messagelink=message.jump_url,
+            botmanaged='something')
         embed.add_field(name=name, value=value, inline=False)
     return embed
 

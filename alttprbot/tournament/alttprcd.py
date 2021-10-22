@@ -1,7 +1,8 @@
+from alttprbot.alttprgen import preset
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot.alttprgen import preset
 from alttprbot_discord.bot import discordbot
+
 
 class ALTTPRCDTournament(ALTTPRTournamentRace):
     async def roll(self):

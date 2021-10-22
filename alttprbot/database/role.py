@@ -109,7 +109,7 @@ async def create_role(guild_id, reaction_group_id, role_id, name, emoji, descrip
     await orm.execute(
         'INSERT into reaction_role (`guild_id`, `reaction_group_id`, `role_id`, `name`, `emoji`, `description`, `protect_mentions`) values (%s, %s, %s, %s, %s, %s, %s)',
         [guild_id, reaction_group_id, role_id, name,
-            emoji, description, protect_mentions]
+         emoji, description, protect_mentions]
     )
     await aiocache.SimpleMemoryCache().clear(namespace="role")
 

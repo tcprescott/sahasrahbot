@@ -68,7 +68,6 @@ class AlttprDoorDiscord(AlttprDoor):
             if self.attempts > 1:
                 embed.add_field(name='Generation Attempts', value=self.attempts, inline=False)
 
-
         embed.add_field(name="Version", value=self.version)
         embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed

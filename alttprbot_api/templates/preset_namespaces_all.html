@@ -1,18 +1,18 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-<title>All Namespaces</title>
+    <title>All Namespaces</title>
 {%- endblock head %}
 
 {% block content -%}
 
-<a href="/presets/me">Access your namespace or create a new namespace (requires login).</a>
+    <a href="/presets/me">Access your namespace or create a new namespace (requires login).</a>
 
-<p>All namespaces</p>
-<ul>
-    {% for namespace in namespaces %}
-    <li><a href="/presets/manage/{{namespace.name}}">{{ namespace.name }}</a></li>
-    {% endfor %}
-</ul>
+    <p>All namespaces</p>
+    <ul>
+        {% for namespace in namespaces %}
+            <li><a href="/presets/manage/{{ namespace.name }}">{{ namespace.name }}</a></li>
+        {% endfor %}
+    </ul>
 
 {%- endblock content %}

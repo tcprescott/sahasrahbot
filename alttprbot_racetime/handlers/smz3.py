@@ -1,7 +1,6 @@
 import random
 
 from alttprbot.alttprgen import preset, smz3multi
-
 from .core import SahasrahBotCoreHandler
 
 
@@ -33,7 +32,8 @@ class GameHandler(SahasrahBotCoreHandler):
         try:
             teams = self.teams
             for team in teams:
-                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='smz3', seed_number=seed_number)
+                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='smz3',
+                                                           seed_number=seed_number)
                 await self.send_message(f"Team {team}: {seed.url}")
                 await self.send_message("------")
         except Exception as e:
@@ -52,7 +52,8 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(args, message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!race <preset>, !multiworld <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html#smz3-commands for more info.")
+        await self.send_message(
+            "Available commands:\n\"!race <preset>, !multiworld <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html#smz3-commands for more info.")
 
     async def roll_game(self, args, message):
         if await self.is_locked(message):

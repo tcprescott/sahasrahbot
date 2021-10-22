@@ -1,6 +1,7 @@
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
+
 class SMWDETournament(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(753727862229565612)

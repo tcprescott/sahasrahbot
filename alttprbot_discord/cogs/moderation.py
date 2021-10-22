@@ -1,11 +1,10 @@
+import datetime
 import io
 import zipfile
-import datetime
-
 from urllib.parse import urlparse
-from urlextract import URLExtract
 
 from discord.ext import commands
+from urlextract import URLExtract
 
 from alttprbot.database import config
 from alttprbot.util import http
@@ -22,29 +21,38 @@ class Moderation(commands.Cog):
         if message.guild is None:
             return
 
-        if hasattr(message.author, 'joined_at') and message.author.joined_at > datetime.datetime.now()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true":
+        if hasattr(message.author,
+                   'joined_at') and message.author.joined_at > datetime.datetime.now() - datetime.timedelta(
+            days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true":
             for url in urlextractor.gen_urls(message.content):
                 if urlparse(url).netloc in ['discord.gg']:
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, you must be on this server for longer than 24 hours before posting discord invite links.  Please contact a moderator if you want to post an invite link.')
+                    await message.channel.send(
+                        f'{message.author.mention}, you must be on this server for longer than 24 hours before posting discord invite links.  Please contact a moderator if you want to post an invite link.')
             for attachment in message.attachments:
                 if attachment.filename.endswith(('.bat', '.exe', '.sh', '.py')):
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, please do not upload executable files.  If your message was deleted in error, please contact a moderator.')
+                    await message.channel.send(
+                        f'{message.author.mention}, please do not upload executable files.  If your message was deleted in error, please contact a moderator.')
 
         # delete roms if server is configured to do so
         if len(message.attachments) > 0:
             for attachment in message.attachments:
-                if attachment.filename.endswith('.zip') and await message.guild.config_get('InspectZipArchives') == "true":
+                if attachment.filename.endswith('.zip') and await message.guild.config_get(
+                        'InspectZipArchives') == "true":
                     zippedfiles = await inspect_zip(attachment.url)
                     for zippedfile in zippedfiles:
-                        if zippedfile.endswith(('.sfc', '.smc')) and await message.guild.config_get('DeleteRoms') == "true":
+                        if zippedfile.endswith(('.sfc', '.smc')) and await message.guild.config_get(
+                                'DeleteRoms') == "true":
                             await message.delete()
-                            await message.channel.send(f'{message.author.mention}, a ROM was detected in the zip archive posted.  If your message was deleted in error, please contact a moderator.')
+                            await message.channel.send(
+                                f'{message.author.mention}, a ROM was detected in the zip archive posted.  If your message was deleted in error, please contact a moderator.')
 
-                elif attachment.filename.endswith(('.sfc', '.smc')) and await message.guild.config_get('DeleteRoms') == "true":
+                elif attachment.filename.endswith(('.sfc', '.smc')) and await message.guild.config_get(
+                        'DeleteRoms') == "true":
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
+                    await message.channel.send(
+                        f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
 
 
 async def inspect_zip(url):

@@ -1,29 +1,30 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-<title>Presets for {{ ns_data.name }}</title>
+    <title>Presets for {{ ns_data.name }}</title>
 {%- endblock head %}
 
 {% block content -%}
 
-<h2>{{ ns_data.name }}</h2>
-<a href="/presets/create">Create a new preset</a>
-<hr />
-<table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Randomizer</th>
-        <th>Action</th>
-    </tr>
-    {% for preset in presets %}
-    <tr>
-        <td>{{ ns_data.name }}/{{preset.preset_name}}</td>
-        <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}">{{preset.randomizer}}</a></td>
-        <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}/{{ preset.preset_name }}">{% if is_owner
+    <h2>{{ ns_data.name }}</h2>
+    <a href="/presets/create">Create a new preset</a>
+    <hr/>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Randomizer</th>
+            <th>Action</th>
+        </tr>
+        {% for preset in presets %}
+            <tr>
+                <td>{{ ns_data.name }}/{{ preset.preset_name }}</td>
+                <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}">{{ preset.randomizer }}</a>
+                </td>
+                <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}/{{ preset.preset_name }}">{% if is_owner
                 ==
                 True %}edit{% else %}view{% endif %}</a></td>
-    </tr>
-    {% endfor %}
-</table>
+            </tr>
+        {% endfor %}
+    </table>
 
 {%- endblock content %}

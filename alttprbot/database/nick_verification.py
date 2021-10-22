@@ -1,5 +1,6 @@
 from ..util import orm
 
+
 async def insert_verification(key, discord_user_id):
     await orm.execute(
         'INSERT INTO nick_verification(`key`, `discord_user_id`) VALUES (%s, %s);',

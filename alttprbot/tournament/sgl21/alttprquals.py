@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import random
 
@@ -44,14 +43,17 @@ class ALTTPRQuals(TournamentRace):
         await triforce_text.save()
 
     async def process_tournament_race(self):
-        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message(
+            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
         await self.roll()
 
         await self.rtgg_handler.send_message(self.seed.url)
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(
+            srl_id=self.rtgg_handler.data.get('name'),
+            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed.url
         await tournamentresults.save()
 
@@ -60,7 +62,8 @@ class ALTTPRQuals(TournamentRace):
         await self.rtgg_handler.edit(streaming_required=False)
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
 
-        await self.rtgg_handler.send_message("Seed has been generated!  20 MINUTE STREAM DELAY REQUIRED, please check your delay!")
+        await self.rtgg_handler.send_message(
+            "Seed has been generated!  20 MINUTE STREAM DELAY REQUIRED, please check your delay!")
         self.rtgg_handler.seed_rolled = True
 
     @property

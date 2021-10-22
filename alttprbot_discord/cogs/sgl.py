@@ -11,6 +11,7 @@ def restrict_sgl_channels():
             return True
 
         return False
+
     return commands.check(predicate)
 
 

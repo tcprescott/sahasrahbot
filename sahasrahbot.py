@@ -1,4 +1,5 @@
 from dotenv import load_dotenv  # nopep8
+
 load_dotenv()  # nopep8
 
 import asyncio
@@ -12,6 +13,7 @@ from tortoise import Tortoise
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import start_racetime
+
 # from alttprbot_twitch.bot import twitchbot
 
 DB_HOST = os.environ.get("DB_HOST", "localhost")
@@ -32,6 +34,7 @@ async def database():
         db_url=f'mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

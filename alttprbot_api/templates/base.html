@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        {% block head %}
-        {% endblock head %}
-        <style>
+<head>
+    {% block head %}
+    {% endblock head %}
+    <style>
         .header {
             position: absolute;
             right: 0px;
@@ -11,16 +11,16 @@
             border: 3px solid #73AD21;
             padding: 10px;
         }
-        </style>
-    </head>
-    <body>
-        <header>
-            {% if logged_in == True %}
-            <div class="header">Logged in as {{ user.name }}#{{ user.discriminator }}.  <a href="/logout/">Logout</a></div>
-            {% else %}
-            <div class="header"><a href="/login/">Login</a></div>
-            {% endif %}
-        </header>
-        {% block content %}{% endblock content %}
-    </body>
+    </style>
+</head>
+<body>
+<header>
+    {% if logged_in == True %}
+        <div class="header">Logged in as {{ user.name }}#{{ user.discriminator }}. <a href="/logout/">Logout</a></div>
+    {% else %}
+        <div class="header"><a href="/login/">Login</a></div>
+    {% endif %}
+</header>
+{% block content %}{% endblock content %}
+</body>
 </html>

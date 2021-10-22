@@ -41,7 +41,8 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
             self.preset_dict = await fetch_preset('sglive')
             self.preset_dict['settings']['texts'] = {}
             self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
-            self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
+            self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off',
+                                              tournament=True)
 
             if self.broadcast_channels:
                 triforce_text.broadcasted = True
@@ -49,7 +50,8 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
         except IndexError:
             logging.exception("Could not retrieve any triforce texts, generating this normally instead...")
             self.preset_dict = await fetch_preset('sglive')
-            self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
+            self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off',
+                                              tournament=True)
 
     @property
     def seed_code(self):

@@ -1,6 +1,7 @@
 import discord
-from alttprbot.alttprgen.generator import ALTTPRMystery
 from discord.ext import commands
+
+from alttprbot.alttprgen.generator import ALTTPRMystery
 from pyz3r.alttpr import ALTTPR
 
 
@@ -18,7 +19,7 @@ class Aqttp(commands.Cog):
             meta = settings
 
             embed = discord.Embed(
-                title=f"Seed #{c+1}",
+                title=f"Seed #{c + 1}",
                 color=discord.Colour.blue()
             )
 
@@ -47,9 +48,9 @@ class Aqttp(commands.Cog):
                 value="**World State:** {mode}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Hints:** {hints}".format(
                     mode=settings_map['world_state'][meta['mode']],
                     boss=settings_map['boss_shuffle'][meta['enemizer']
-                                                      ['boss_shuffle']],
+                    ['boss_shuffle']],
                     enemy=settings_map['enemy_shuffle'][meta['enemizer']
-                                                        ['enemy_shuffle']],
+                    ['enemy_shuffle']],
                     hints=meta['hints']
                 ),
                 inline=True)
@@ -59,7 +60,7 @@ class Aqttp(commands.Cog):
                     weapons=settings_map['weapons'][meta['weapons']],
                     pool=settings_map['item_pool'][meta['item']['pool']],
                     functionality=settings_map['item_functionality'][meta['item']
-                                                                     ['functionality']],
+                    ['functionality']],
                 ),
                 inline=True)
 

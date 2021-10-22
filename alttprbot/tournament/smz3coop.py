@@ -1,7 +1,8 @@
 from alttprbot.alttprgen import preset
-from alttprbot.tournament.core import TournamentConfig
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
+from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
+
 
 class SMZ3CoopTournament(ALTTPRTournamentRace):
     async def roll(self):

@@ -12,32 +12,32 @@ import shortuuid
 from github import Github, InputFileContent
 
 STANDARD_PERMALINKS = OrderedDict([
-    ("s4",        "MS45LjAAQQAFCyIAD3DAAgAAAAAAAQAA"),
-    ("beginner",  "MS45LjAAQQAFAwIADzDAAYAcQIFBATAA"),
-    ("co-op",     "MS45LjAAQQAVCyYAD3DABAAAAAAAAAAA"),
+    ("s4", "MS45LjAAQQAFCyIAD3DAAgAAAAAAAQAA"),
+    ("beginner", "MS45LjAAQQAFAwIADzDAAYAcQIFBATAA"),
+    ("co-op", "MS45LjAAQQAVCyYAD3DABAAAAAAAAAAA"),
     ("allsanity", "MS45LjAAQQD//3+CD3BABQAAAAAAAAAA"),
-    ("s3",        "MS45LjAAQQAXAwQATjDAAwgAAAAAAQAA"),
+    ("s3", "MS45LjAAQQAXAwQATjDAAwgAAAAAAQAA"),
 ])
 STANDARD_DEFAULT = ["s4"]
 
 SPOILER_LOG_PERMALINKS = OrderedDict([
-    ("preset-a",  "MS45LjAAQQA3AyYCD1DAAgAAAAAAAAAA"),
-    ("preset-b",  "MS45LjAAQQAXYyaCD1DAAgAAAAAAAAAA"),
-    ("preset-c",  "MS45LjAAQQAXAyYCD5DAAgAAAAAAAAAA"),
-    ("preset-d",  "MS45LjAAQQAXByYCD1DAAgAAAAAAAAAA"),
-    ("preset-e",  "MS45LjAAQQAXA2YCD1DAAwAAAAAAAAAA"),
-    ("preset-f",  "MS45LjAAQQAfCyYCD1DAAgAAAAAAAAAA"),
-    ("s1",        "MS45LjAAQQAXAwYCDxDAAgAAAAAAAQAA"),
+    ("preset-a", "MS45LjAAQQA3AyYCD1DAAgAAAAAAAAAA"),
+    ("preset-b", "MS45LjAAQQAXYyaCD1DAAgAAAAAAAAAA"),
+    ("preset-c", "MS45LjAAQQAXAyYCD5DAAgAAAAAAAAAA"),
+    ("preset-d", "MS45LjAAQQAXByYCD1DAAgAAAAAAAAAA"),
+    ("preset-e", "MS45LjAAQQAXA2YCD1DAAwAAAAAAAAAA"),
+    ("preset-f", "MS45LjAAQQAfCyYCD1DAAgAAAAAAAAAA"),
+    ("s1", "MS45LjAAQQAXAwYCDxDAAgAAAAAAAQAA"),
     ("allsanity", "MS45LjAAQQD//3+CD1BABQAAAAAAAAAA"),
 ])
 
 SETTINGS_DESCRIPTIONS = OrderedDict([
-    ("preset-a",  "Long Sidequests"),
-    ("preset-b",  "Triforce Charts, Big Octos and Gunboats"),
-    ("preset-c",  "Swordless"),
-    ("preset-d",  "Lookout Platforms and Rafts"),
-    ("preset-e",  "4 Dungeon Race Mode, Key-Lunacy"),
-    ("preset-f",  "Combat Secret Caves, Submarines"),
+    ("preset-a", "Long Sidequests"),
+    ("preset-b", "Triforce Charts, Big Octos and Gunboats"),
+    ("preset-c", "Swordless"),
+    ("preset-d", "Lookout Platforms and Rafts"),
+    ("preset-e", "4 Dungeon Race Mode, Key-Lunacy"),
+    ("preset-f", "Combat Secret Caves, Submarines"),
 ])
 
 SPOILER_LOG_DEFAULT = ["preset-a", "preset-b", "preset-c", "preset-d", "preset-e", "preset-f"]
