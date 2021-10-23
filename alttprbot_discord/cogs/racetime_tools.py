@@ -17,7 +17,6 @@ class RacetimeTools(commands.Cog):
 
     @commands.Cog.listener()
     async def on_racetime_invitational(self, handler, data):
-        await self.new_players(handler)
         pass
 
     @ commands.Cog.listener()
