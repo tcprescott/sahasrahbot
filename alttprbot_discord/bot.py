@@ -119,14 +119,11 @@ async def on_message(message):
 
     ctx = await discordbot.get_context(message)
 
-    # replace the bot's invoke coroutine a modified version
-    # this allows the bot to begin "typing" when processing a command
     if ctx.command is not None:
         discordbot.dispatch('command', ctx)
         try:
             if await discordbot.can_run(ctx, call_once=True):
-                async with ctx.typing():
-                    await ctx.command.invoke(ctx)
+                await ctx.command.invoke(ctx)
             else:
                 raise errors.CheckFailure(
                     'The global check once functions failed.')
