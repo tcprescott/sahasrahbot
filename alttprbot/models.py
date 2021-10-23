@@ -200,6 +200,7 @@ class RTGGWatcher(Model):
     id = fields.IntField(pk=True)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
+    notify_on_new_player = fields.BooleanField(default=False)  # NYI
     category = fields.CharField(50, null=False)
 
 
@@ -207,7 +208,20 @@ class RTGGWatcherPlayer(Model):
     id = fields.IntField(pk=True)
     rtgg_watcher = fields.ForeignKeyField('models.RTGGWatcher', related_name='watched_player')
     racetime_id = fields.CharField(50, null=False)
-    racetime_name = fields.CharField(200, null=False)
+
+
+class RTGGAnnouncers(Model):
+    id = fields.IntField(pk=True)
+    category = fields.CharField(50, null=False)
+    guild_id = fields.BigIntField(null=False)
+    channel_id = fields.BigIntField(null=False)
+
+
+class RTGGAnnouncerMessages(Model):
+    id = fields.IntField(pk=True)
+    announcer = fields.ForeignKeyField('models.RTGGAnnouncers', related_name='announcer_messages')
+    message_id = fields.BigIntField(null=False)
+    room_name = fields.CharField(50)
 
 
 class SrlRaces(Model):

@@ -50,6 +50,7 @@ discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.moderation")
 discordbot.load_extension("alttprbot_discord.cogs.nickname")
+discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
 discordbot.load_extension("alttprbot_discord.cogs.role")
 discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
 discordbot.load_extension("alttprbot_discord.cogs.supermetroid")
@@ -125,8 +126,7 @@ async def on_message(message):
             if await discordbot.can_run(ctx, call_once=True):
                 await ctx.command.invoke(ctx)
             else:
-                raise errors.CheckFailure(
-                    'The global check once functions failed.')
+                raise errors.CheckFailure('The global check once functions failed.')
         except errors.CommandError as exc:
             await ctx.command.dispatch_error(ctx, exc)
         else:
