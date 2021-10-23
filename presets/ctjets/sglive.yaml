@@ -1,0 +1,12 @@
+randomizer: ctjets
+version: 3.1.0
+description: SpeedGaming Live
+settings:
+  difficulty: normal
+  disable_glitches: "on"
+  early_pendant: "on"
+  boss_rando: "on"
+  zeal: "on"
+  duplicate_char_assignments: 7f7f7f7f7f7f7f
+  shop_prices: Normal
+  tech_rando: Fully Random
