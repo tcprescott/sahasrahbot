@@ -1,4 +1,5 @@
 import aiocache
+import aiohttp
 import discord
 from discord.ext import commands, tasks
 import logging
@@ -41,6 +42,14 @@ class Daily(commands.Cog):
         await update_daily(hash_id)
         await ctx.reply(embed=embed)
 
+    @commands.slash_command(name='dailygame', description='Returns the current daily game from alttpr.com.', guild_ids=[508335685044928540])
+    async def daily_cmd(self, ctx):
+        daily_challenge = await find_daily_hash()
+        hash_id = daily_challenge['hash']
+        seed = await get_daily_seed(hash_id)
+        embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+        await ctx.respond(embed=embed)
+
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
         daily_challenge = await find_daily_hash()
@@ -52,9 +61,9 @@ class Daily(commands.Cog):
             for result in daily_announcer_channels:
                 guild = self.bot.get_guild(result['guild_id'])
                 for channel_name in result['value'].split(","):
-                    channel = discord.utils.get(
-                        guild.text_channels, name=channel_name)
-                    await channel.send(embed=embed)
+                    channel = discord.utils.get(guild.text_channels, name=channel_name)
+                    message: discord.Message = await channel.send(embed=embed)
+                    await message.create_thread(name=seed.data['spoiler']['meta'].get('name'), auto_archive_duration=1440)
 
     @announce_daily.before_loop
     async def before_create_races(self):
@@ -81,4 +90,5 @@ async def get_daily_seed(hash_id):
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def find_daily_hash():
-    return await http.request_generic('https://alttpr.com/api/daily', returntype='json')
+    async with aiohttp.request(method='get', url='https://alttpr.com/api/daily', raise_for_status=True) as resp:
+        return await resp.json()
