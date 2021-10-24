@@ -241,7 +241,8 @@ class Audit(commands.Cog):
 #         color=discord.Colour.green(),
 #         timestamp=datetime.datetime.now()
 #     )
-#     embed.set_thumbnail(url=member.avatar_url)
+#     if member.avatar:
+#         embed.set_thumbnail(url=member.avatar.url)
 #     return embed
 
 
@@ -252,7 +253,8 @@ async def audit_embed_member_joined(member):
         color=discord.Colour.green(),
         timestamp=datetime.datetime.now()
     )
-    embed.set_thumbnail(url=member.avatar_url)
+    if member.avatar:
+        embed.set_thumbnail(url=member.avatar.url)
     return embed
 
 
@@ -263,7 +265,8 @@ async def audit_embed_member_left(member):
         color=discord.Colour.red(),
         timestamp=datetime.datetime.now()
     )
-    embed.set_thumbnail(url=member.avatar_url)
+    if member.avatar:
+        embed.set_thumbnail(url=member.avatar.url)
     return embed
 
 
@@ -274,7 +277,8 @@ async def audit_embed_member_banned(member):
         color=discord.Colour.red(),
         timestamp=datetime.datetime.now()
     )
-    embed.set_thumbnail(url=member.avatar_url)
+    if member.avatar:
+        embed.set_thumbnail(url=member.avatar.url)
     return embed
 
 

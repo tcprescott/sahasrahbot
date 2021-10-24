@@ -81,11 +81,11 @@ class Misc(commands.Cog):
             title=f"Member info for {member.name}#{member.discriminator}",
             color=member.color
         )
-        embed.add_field(name='Created at',
-                        value=member.created_at, inline=False)
-        embed.add_field(name='Joined at', value=member.joined_at, inline=False)
+        embed.add_field(name='Created at', value=discord.utils.format_dt(member.created_at, style='F'), inline=False)
+        embed.add_field(name='Joined at', value=discord.utils.format_dt(member.joined_at, style='F'), inline=False)
         embed.add_field(name="Discord ID", value=member.id, inline=False)
-        embed.set_thumbnail(url=member.avatar_url)
+        if member.avatar:
+            embed.set_thumbnail(url=member.avatar.url)
         await ctx.reply(embed=embed)
 
     @commands.command()
