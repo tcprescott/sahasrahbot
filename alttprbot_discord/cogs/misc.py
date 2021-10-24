@@ -5,6 +5,8 @@ import os
 import discord
 from discord.commands import Option, slash_command
 from discord.ext import commands
+from discord.commands import commands as appcommands
+from discord.ext.commands.core import guild_only
 
 from alttprbot.database import config
 from alttprbot.util.holyimage import HolyImage
@@ -75,7 +77,7 @@ class Misc(commands.Cog):
     async def welcome_cmd(self, ctx, language: Option(str, description="Choose a language for the welcome message.", choices=["french", "spanish", "german"])):
         await ctx.respond(WELCOME_MESSAGES[language])
 
-    @commands.slash_command(name="memberinfo")
+    @commands.slash_command(name="memberinfo", guild_only=True)
     async def memberinfo_cmd(self, ctx, member: Option(discord.Member, "Choose a member")):
         if member is None:
             member = ctx.author

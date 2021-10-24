@@ -64,6 +64,7 @@ discordbot.load_extension("alttprbot_discord.cogs.smz3")
 discordbot.load_extension("alttprbot_discord.cogs.sgl")
 discordbot.load_extension("alttprbot_discord.cogs.tournament")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")
+# discordbot.load_extension("alttprbot_discord.cogs.generator")
 
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')
@@ -136,7 +137,6 @@ async def on_command(ctx):
 async def on_command_completion(ctx):
     await ctx.message.add_reaction('✅')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
-
 
 @discordbot.event
 async def on_message(message):
