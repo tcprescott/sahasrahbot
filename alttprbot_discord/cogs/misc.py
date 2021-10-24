@@ -11,7 +11,7 @@ from alttprbot.util.holyimage import HolyImage
 
 from ..util import checks
 
-ALTTP_RANDOMIZER_SERVERS = os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(',')
+ALTTP_RANDOMIZER_SERVERS = map(int, os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(','))
 
 WELCOME_MESSAGES = {
     'french': (
