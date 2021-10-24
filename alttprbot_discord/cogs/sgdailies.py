@@ -35,27 +35,17 @@ class SgDaily(commands.Cog):
 
         for episode in sg_schedule[0:get_next]:
             when = dateutil.parser.parse(episode['when'])
-            when_central = when.astimezone(pytz.timezone(
-                'US/Eastern')).strftime('%m-%d %I:%M %p')
-            when_europe = when.astimezone(pytz.timezone(
-                'Europe/Berlin')).strftime('%m-%d %I:%M %p')
-            difference = when - datetime.datetime.now(when.tzinfo)
-
             if get_next == 1:
                 embed.add_field(
-                    name='Time', value=f"**US:** {when_central} Eastern\n**EU:** {when_europe} CET/CEST\n\n{round(difference / datetime.timedelta(hours=1), 1)} hours from now", inline=False)
-                broadcast_channels = [a['slug']
-                                      for a in episode['channels'] if not " " in a['name']]
+                    name='Time', value=f"{discord.utils.format_dt(when, 'f')} ({discord.utils.format_dt(when, 'R')})", inline=False)
+                broadcast_channels = [a['slug'] for a in episode['channels'] if not " " in a['name']]
                 if broadcast_channels:
                     embed.add_field(name="Twitch Channels", value=', '.join(
                         [f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)
             else:
                 embed.add_field(
                     name='TBD' if episode['match1']['title'] == '' else episode['match1']['title'],
-                    value=(
-                        f"**US:** {when_central} Eastern\n"
-                        f"**EU:** {when_europe} CET/CEST\n\n"
-                    ),
+                    value=discord.utils.format_dt(when, 'f'),
                     inline=False
                 )
         embed.set_footer()

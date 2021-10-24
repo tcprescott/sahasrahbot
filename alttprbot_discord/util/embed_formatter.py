@@ -54,7 +54,7 @@ def reaction_menu(ctx, group, roles):
         title=group['name'],
         description=group['description'],
         color=discord.Colour.green(),
-        timestamp=datetime.datetime.now()
+        timestamp=discord.utils.utcnow()
     )
     value = ''
     for role in roles:

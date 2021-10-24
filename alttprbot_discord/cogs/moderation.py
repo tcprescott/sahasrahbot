@@ -5,6 +5,7 @@ import datetime
 from urllib.parse import urlparse
 from urlextract import URLExtract
 
+import discord
 from discord.ext import commands
 
 from alttprbot.database import config
@@ -22,7 +23,7 @@ class Moderation(commands.Cog):
         if message.guild is None:
             return
 
-        if hasattr(message.author, 'joined_at') and message.author.joined_at > datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true":
+        if hasattr(message.author, 'joined_at') and message.author.joined_at > discord.utils.utcnow()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true":
             for url in urlextractor.gen_urls(message.content):
                 if urlparse(url).netloc in ['discord.gg']:
                     await message.delete()

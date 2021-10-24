@@ -239,7 +239,7 @@ class Audit(commands.Cog):
 #         title="Member Joined",
 #         description=f"{member.mention} {member.name}#{member.discriminator}",
 #         color=discord.Colour.green(),
-#         timestamp=datetime.datetime.now()
+#         timestamp=discord.utils.utcnow()
 #     )
 #     if member.avatar:
 #         embed.set_thumbnail(url=member.avatar.url)
@@ -251,7 +251,7 @@ async def audit_embed_member_joined(member):
         title="Member Joined",
         description=f"{member.mention} {member.name}#{member.discriminator}",
         color=discord.Colour.green(),
-        timestamp=datetime.datetime.now()
+        timestamp=discord.utils.utcnow()
     )
     if member.avatar:
         embed.set_thumbnail(url=member.avatar.url)
@@ -263,7 +263,7 @@ async def audit_embed_member_left(member):
         title="Member Left",
         description=f"{member.mention} {member.name}#{member.discriminator}",
         color=discord.Colour.red(),
-        timestamp=datetime.datetime.now()
+        timestamp=discord.utils.utcnow()
     )
     if member.avatar:
         embed.set_thumbnail(url=member.avatar.url)
@@ -275,7 +275,7 @@ async def audit_embed_member_banned(member):
         title="Member Banned",
         description=f"{member.mention} {member.name}#{member.discriminator}",
         color=discord.Colour.red(),
-        timestamp=datetime.datetime.now()
+        timestamp=discord.utils.utcnow()
     )
     if member.avatar:
         embed.set_thumbnail(url=member.avatar.url)
@@ -295,7 +295,7 @@ async def audit_embed_edit(old_message, message):
         title="Message Edited",
         description=f"**A message from {message.author.mention} was edited in {message.channel.mention}.** [Jump to Message]({message.jump_url})",
         color=discord.Colour.dark_orange(),
-        timestamp=datetime.datetime.now()
+        timestamp=discord.utils.utcnow()
     )
 
     embed.add_field(name='Old Message', value=old_content[:1000] + (
@@ -326,7 +326,7 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
         title="Bulk Message Deleted" if bulk else "Message Deleted",
         description=f"**Message sent by {'unknown' if author is None else author.mention} was deleted in {channel.mention}.**",
         color=discord.Colour.dark_red(),
-        timestamp=datetime.datetime.now()
+        timestamp=discord.utils.utcnow()
     )
 
     embed.add_field(name='Old Message', value=old_content[:1020] + (

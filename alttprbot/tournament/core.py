@@ -165,7 +165,7 @@ class TournamentRace(object):
             title=f"RT.gg Room Opened - {self.versus}",
             description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at {self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}\n\nEnjoy!",
             color=discord.Colour.blue(),
-            timestamp=datetime.datetime.now()
+            timestamp=discord.utils.utcnow()
         )
 
         for name, player in self.player_discords:
