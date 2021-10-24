@@ -3,15 +3,11 @@ import random
 import os
 
 import discord
-from discord.commands import Option, slash_command
+from discord.commands import Option
 from discord.ext import commands
-from discord.commands import commands as appcommands
-from discord.ext.commands.core import guild_only
 
-from alttprbot.database import config
 from alttprbot.util.holyimage import HolyImage
 
-from ..util import checks
 
 ALTTP_RANDOMIZER_SERVERS = list(map(int, os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(',')))
 
@@ -147,7 +143,7 @@ class Misc(commands.Cog):
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         name='holyimage'
     )
-    async def holyimage(self, ctx, slug: Option(str, description="Slug of the holy image to retrieve."), game: Option(str, description="Slug of the game to pull a holy image for.", required=False)):
+    async def holyimage_cmd(self, ctx, slug: Option(str, description="Slug of the holy image to retrieve."), game: Option(str, description="Slug of the game to pull a holy image for.", required=False)):
         if game is None:
             if ctx.guild is None:
                 game = "z3r"

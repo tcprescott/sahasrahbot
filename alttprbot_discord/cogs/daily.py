@@ -6,7 +6,6 @@ import logging
 
 from alttprbot import models
 from alttprbot.database import config
-from alttprbot.util import http
 
 from ..util.alttpr_discord import ALTTPRDiscord
 

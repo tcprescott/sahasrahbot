@@ -6,7 +6,6 @@ import discord
 import yaml
 from discord.ext import commands
 from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
-from slugify import slugify
 
 import pyz3r
 from alttprbot import models

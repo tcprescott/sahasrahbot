@@ -1,8 +1,5 @@
-import datetime
-
 import dateutil.parser
 import discord
-import pytz
 from alttprbot.util import speedgaming
 from discord.ext import commands
 
