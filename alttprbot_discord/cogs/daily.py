@@ -42,7 +42,7 @@ class Daily(commands.Cog):
         await update_daily(hash_id)
         await ctx.reply(embed=embed)
 
-    @commands.slash_command(name='dailygame', description='Returns the current daily game from alttpr.com.', guild_ids=[508335685044928540])
+    @commands.slash_command(name='dailygame', description='Returns the current daily game from alttpr.com.')
     async def daily_cmd(self, ctx):
         daily_challenge = await find_daily_hash()
         hash_id = daily_challenge['hash']

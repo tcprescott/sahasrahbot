@@ -10,6 +10,7 @@ from discord.ext.commands.core import guild_only
 from discord_sentry_reporting import use_sentry
 
 from alttprbot_discord.util import config
+from config import Config as c
 
 config.init()
 
@@ -31,8 +32,12 @@ discordbot = commands.Bot(
         users=True,
         roles=False
     ),
-    intents=intents
+    intents=intents,
+    debug_guild = 508335685044928540 if c.DEBUG else None
 )
+
+# if c.DEBUG:
+#     discordbot.debug_guild = 508335685044928540
 
 
 if os.environ.get("SENTRY_URL"):
@@ -95,6 +100,28 @@ async def on_command_error(ctx, error):
             await ctx.reply(f"```{errorstr}```")
         else:
             await ctx.reply(
+                content="An error occured, please see attachment for the full message.",
+                file=discord.File(io.StringIO(error_to_display), filename="error.txt")
+            )
+        raise error_to_display
+
+@discordbot.event
+async def on_application_command_error(ctx, error):
+    logging.info(error)
+    if isinstance(error, commands.CheckFailure):
+        await ctx.respond("You are not authorized to use this command here.", ephemeral=True)
+    elif isinstance(error, commands.errors.MissingPermissions):
+        await ctx.respond("You are not authorized to use this command here.", ephemeral=True)
+    elif isinstance(error, commands.UserInputError):
+        await ctx.respond(error)
+    else:
+        error_to_display = error.original if hasattr(error, 'original') else error
+
+        errorstr = repr(error_to_display)
+        if len(errorstr) < 1990:
+            await ctx.respond(f"```{errorstr}```")
+        else:
+            await ctx.respond(
                 content="An error occured, please see attachment for the full message.",
                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
             )
