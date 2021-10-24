@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from alttprbot.database import voicerole
+from alttprbot.database import voicerole # TODO switch to ORM
 
 
 class VoiceRole(commands.Cog):

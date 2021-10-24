@@ -5,7 +5,7 @@ from alttprbot.alttprgen import preset, spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
-from alttprbot.database import spoiler_races
+from alttprbot.database import spoiler_races # TODO switch to ORM
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):

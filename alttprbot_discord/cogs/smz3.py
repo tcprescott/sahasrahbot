@@ -3,7 +3,7 @@ import discord
 
 from alttprbot.alttprgen.preset import get_preset, fetch_preset
 from alttprbot.alttprgen.smz3multi import generate_multiworld
-from alttprbot.database import smz3_multiworld
+from alttprbot.database import smz3_multiworld # TODO switch to ORM
 from ..util import checks
 
 

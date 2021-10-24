@@ -5,7 +5,7 @@ from discord.ext import commands, tasks
 import logging
 
 from alttprbot import models
-from alttprbot.database import config
+from alttprbot.database import config # TODO switch to ORM
 
 from ..util.alttpr_discord import ALTTPRDiscord
 

@@ -11,7 +11,7 @@ from alttprbot import models
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot.tournament.core import UnableToLookupEpisodeException
 from alttprbot.alttprgen import generator
-from alttprbot.database import league_playoffs, srlnick
+from alttprbot.database import srlnick # TODO switch to ORM
 from alttprbot_discord.bot import discordbot
 
 sahasrahbotapi = Quart(__name__)
@@ -187,18 +187,6 @@ async def submit():
         user=user,
         tournament_race=tournament_race
     )
-
-
-@sahasrahbotapi.route('/api/league/playoff/<int:episode_id>', methods=['GET'])
-async def get_league_playoff(episode_id):
-    results = await league_playoffs.get_playoff_by_episodeid_submitted(episode_id)
-    return jsonify(results)
-
-
-@sahasrahbotapi.route('/api/league/playoffs', methods=['GET'])
-async def get_league_playoffs():
-    results = await league_playoffs.get_all_playoffs()
-    return jsonify(results)
 
 
 @sahasrahbotapi.route('/racetime/verification/initiate', methods=['GET'])

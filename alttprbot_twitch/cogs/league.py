@@ -1,5 +1,5 @@
 from twitchio.ext import commands
-from alttprbot.database import twitch_command_text
+from alttprbot.database import twitch_command_text # TODO switch to ORM
 
 
 @commands.core.cog()

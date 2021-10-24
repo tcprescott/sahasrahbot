@@ -3,7 +3,7 @@ import os
 import discord
 from discord.ext import commands
 
-from alttprbot.database import srlnick
+from alttprbot.database import srlnick # TODO switch to ORM
 from alttprbot import models
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')

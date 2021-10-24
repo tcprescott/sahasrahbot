@@ -8,7 +8,7 @@ from urlextract import URLExtract
 import discord
 from discord.ext import commands
 
-from alttprbot.database import config
+from alttprbot.database import config # TODO switch to ORM
 from alttprbot.util import http
 
 urlextractor = URLExtract()

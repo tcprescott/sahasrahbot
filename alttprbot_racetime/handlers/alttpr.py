@@ -4,7 +4,7 @@ import math
 # import logging
 
 from alttprbot.alttprgen import preset, spoilers, generator
-from alttprbot.database import spoiler_races, tournament_results
+from alttprbot.database import spoiler_races, tournament_results # TODO switch to ORM
 from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler

@@ -63,5 +63,5 @@ class AlttprSGDailyRace(SGDailyRaceCore):
         )
 
         async with aiohttp.ClientSession() as session:
-            webhook = discord.Webhook.from_url(SG_DISCORD_WEBHOOK, adapter=discord.AsyncWebhookAdapter(session))
+            webhook = discord.Webhook.from_url(SG_DISCORD_WEBHOOK, session=session)
             await webhook.send(f"<@&399038388964950016> {self.announce_message}", username="SahasrahBot")

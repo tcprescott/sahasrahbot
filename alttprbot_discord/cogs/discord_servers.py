@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from alttprbot.database import discord_server_lists
+from alttprbot.database import discord_server_lists # TODO switch to ORM
 
 
 class DiscordServers(commands.Cog):

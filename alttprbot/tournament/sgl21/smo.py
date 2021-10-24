@@ -59,7 +59,7 @@ class SMO(SGLCoreTournamentRace):
         await self.send_audit_message(embed=embed)
 
         async with aiohttp.ClientSession() as session:
-            webhook = discord.Webhook.from_url(BINGO_COLLAB_DISCORD_WEBHOOK, adapter=discord.AsyncWebhookAdapter(session))
+            webhook = discord.Webhook.from_url(BINGO_COLLAB_DISCORD_WEBHOOK, session=session)
             await webhook.send(embed=embed, username="SahasrahBot")
 
         await self.rtgg_handler.send_message('Successfully created BingoSync room!')
