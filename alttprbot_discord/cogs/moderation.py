@@ -16,14 +16,14 @@ urlextractor = URLExtract()
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.guild is None:
             return
 
-        if hasattr(message.author, 'joined_at') and message.author.joined_at > discord.utils.utcnow()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true":
+        if hasattr(message.author, 'joined_at') and message.author.joined_at > discord.utils.utcnow()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true" and not message.author.id == self.bot.user.id:
             for url in urlextractor.gen_urls(message.content):
                 if urlparse(url).netloc in ['discord.gg']:
                     await message.delete()

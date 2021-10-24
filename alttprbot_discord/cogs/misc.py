@@ -1,13 +1,37 @@
 import asyncio
 import random
+import os
 
 import discord
+from discord.commands import Option, slash_command
 from discord.ext import commands
 
 from alttprbot.database import config
 from alttprbot.util.holyimage import HolyImage
 
 from ..util import checks
+
+ALTTP_RANDOMIZER_SERVERS = os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(',')
+
+WELCOME_MESSAGES = {
+    'french': (
+                'Bienvenue! Ce serveur discord est principalement en anglais.\n'
+                'Vous trouverez un serveur en français en suivant https://discord.gg/9cWhQyw .\n'
+                'Les membres de ce serveur se feront un plaisir de vous aider.\n\n'
+                'Merci, et bienvenue encore une fois.'
+            ),
+    'spanish': (
+                '¡Bienvenidos! Este servidor de Discord es principalmente de habla inglesa.'
+                '¡No tengáis miedo, hay un servidor en Español que podéis encontrar en https://discord.gg/xyHxAFJ donde os pueden ayudar!\n\n'
+                'Gracias y otra vez, bienvenidos.'
+            ),
+    'german': (
+                'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben.'
+                'Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann.'
+                'Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren\n\n'
+                'Vielen Dank und nochmals herzlich willkommen.'
+            )
+}
 
 
 class Misc(commands.Cog):
@@ -37,44 +61,22 @@ class Misc(commands.Cog):
 
     @welcome.command(aliases=['fr'])
     async def french(self, ctx):
-        await ctx.send(
-            (
-                'Bienvenue! Ce serveur discord est principalement en anglais.\n'
-                'Vous trouverez un serveur en français en suivant https://discord.gg/9cWhQyw .\n'
-                'Les membres de ce serveur se feront un plaisir de vous aider.\n\n'
-                'Merci, et bienvenue encore une fois.'
-            )
-        )
+        await ctx.reply(WELCOME_MESSAGES['french'])
 
     @welcome.command(aliases=['es'])
     async def spanish(self, ctx):
-        await ctx.send(
-            (
-                '¡Bienvenidos! Este servidor de Discord es principalmente de habla inglesa.'
-                '¡No tengáis miedo, hay un servidor en Español que podéis encontrar en https://discord.gg/xyHxAFJ donde os pueden ayudar!\n\n'
-                'Gracias y otra vez, bienvenidos.'
-            )
-        )
+        await ctx.reply(WELCOME_MESSAGES['spanish'])
 
     @welcome.command(aliases=['de'])
     async def german(self, ctx):
-        await ctx.send(
-            (
-                'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben.'
-                'Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann.'
-                'Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren\n\n'
-                'Vielen Dank und nochmals herzlich willkommen.'
-            )
-        )
+        await ctx.reply(WELCOME_MESSAGES['german'])
 
-    @commands.command(aliases=['joineddate'])
-    @commands.check_any(
-        commands.has_any_role(523276397679083520, 307883683526868992),
-        commands.has_permissions(administrator=True),
-        commands.has_permissions(manage_guild=True),
-        checks.has_any_channel_id(608008164356653066)
-    )
-    async def memberinfo(self, ctx, member: discord.Member = None):
+    @commands.slash_command(name="welcome", guild_ids=ALTTP_RANDOMIZER_SERVERS)
+    async def welcome_cmd(self, ctx, language: Option(str, description="Choose a language for the welcome message.", choices=["french", "spanish", "german"])):
+        await ctx.respond(WELCOME_MESSAGES[language])
+
+    @commands.slash_command(name="memberinfo")
+    async def memberinfo_cmd(self, ctx, member: Option(discord.Member, "Choose a member")):
         if member is None:
             member = ctx.author
         embed = discord.Embed(
@@ -86,7 +88,7 @@ class Misc(commands.Cog):
         embed.add_field(name="Discord ID", value=member.id, inline=False)
         if member.avatar:
             embed.set_thumbnail(url=member.avatar.url)
-        await ctx.reply(embed=embed)
+        await ctx.respond(embed=embed, ephemeral=True)
 
     @commands.command()
     async def prng(self, ctx):
@@ -109,35 +111,18 @@ class Misc(commands.Cog):
             "See <#543572578787393556> for details."
         )
 
-    @commands.command(hidden=True)
-    async def trpegs(self, ctx):
-        await ctx.reply(discord.utils.get(ctx.bot.emojis, name='RIPLink'))
+    @commands.slash_command(
+        name="rom",
+        guild_ids=ALTTP_RANDOMIZER_SERVERS
+    )
+    async def rom_cmd(self, ctx):
+        await ctx.respond(
+            "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALTTPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
+            "It can also help get the permalink page URL which has access to the Spoiler Log depending on the settings that were chosen. Not all games that are generated have access to the Spoiler Log.\n\n"
+            "For legal reasons, we cannot provide help with finding this ROM online.  Please do not ask here for assistance with this.\n"
+            "See <#543572578787393556> for details."
+        )
 
-    @commands.command(hidden=True, aliases=['8ball'])
-    async def eightball(self, ctx):
-        msg = random.choice([
-            "It is certain.",
-            "It is decidedly so.",
-            "Without a doubt.",
-            "Yes – definitely.",
-            "You may rely on it.",
-            "As I see it, yes.",
-            "Most likely.",
-            "Outlook good.",
-            "Yes.",
-            "Signs point to yes.",
-            "Reply hazy, try again.",
-            "Ask again later.",
-            "Better not tell you now.",
-            "Cannot predict now.",
-            "Concentrate and ask again.",
-            "Don't count on it.",
-            "My reply is no.",
-            "My sources say no.",
-            "Outlook not so good.",
-            "Very doubtful.",
-        ])
-        await ctx.reply(msg)
 
     @commands.command(
         brief="Retrieves a holy image.",
@@ -155,6 +140,21 @@ class Misc(commands.Cog):
 
         await ctx.reply(embed=holyimage.embed)
 
+    @commands.slash_command(
+        brief="Retrieves a holy image.",
+        help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
+        name='holyimage'
+    )
+    async def holyimage(self, ctx, slug: Option(str, description="Slug of the holy image to retrieve."), game: Option(str, description="Slug of the game to pull a holy image for.", required=False)):
+        if game is None:
+            if ctx.guild is None:
+                game = "z3r"
+            else:
+                game = await ctx.guild.config_get("HolyImageDefaultGame", "z3r")
+
+        holyimage = await HolyImage.construct(slug=slug, game=game)
+
+        await ctx.respond(embed=holyimage.embed)
 
 def setup(bot):
     bot.add_cog(Misc(bot))

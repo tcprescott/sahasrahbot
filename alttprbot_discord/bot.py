@@ -6,6 +6,7 @@ import io
 import discord
 from discord.ext import commands
 from discord.ext.commands import errors
+from discord.ext.commands.core import guild_only
 from discord_sentry_reporting import use_sentry
 
 from alttprbot_discord.util import config
@@ -98,7 +99,6 @@ async def on_command_error(ctx, error):
                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
             )
         raise error_to_display
-
 
 @discordbot.event
 async def on_command(ctx):
