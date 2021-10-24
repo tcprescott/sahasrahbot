@@ -108,15 +108,15 @@ class ALTTPRQuals(TournamentRace):
         msg = "{event_name} - {title} at {start_time} ({start_time_remain})".format(
             event_name=self.event_name,
             title=self.friendly_name,
-            start_time=self.discord_time(self.race_start_time),
-            start_time_remain=self.discord_time(self.race_start_time, "R")
+            start_time=discord.utils.format_dt(self.race_start_time),
+            start_time_remain=discord.utils.format_dt(self.race_start_time, "R")
         )
 
         if self.broadcast_channels:
             msg += f" on {', '.join(self.broadcast_channels)}"
 
         msg += " - Entry Deadline at {seed_time} - {racetime_url}".format(
-            seed_time=self.discord_time(self.seed_time, "R"),
+            seed_time=discord.utils.format_dt(self.seed_time, "R"),
             racetime_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])
         )
         return msg

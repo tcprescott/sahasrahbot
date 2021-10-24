@@ -1,3 +1,5 @@
+import discord
+
 from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
@@ -21,8 +23,8 @@ class SMZ3DailyRace(SGDailyRaceCore):
     def announce_message(self):
         msg = "<@&449260882501959700> SMZ3 Weekly Race - {title} at {start_time} ({start_time_remain})".format(
             title=self.friendly_name,
-            start_time=self.discord_time(self.race_start_time),
-            start_time_remain=self.discord_time(self.race_start_time, "R")
+            start_time=discord.utils.format_dt(self.race_start_time),
+            start_time_remain=discord.utils.format_dt(self.race_start_time, "R")
         )
 
         if self.broadcast_channels:

@@ -357,10 +357,6 @@ class TournamentRace(object):
     def race_start_time_restream(self):
         return dateutil.parser.parse(self.episode['when'])
 
-    # https://c.r74n.com/discord/formatting#Timestamps
-    def discord_time(self, date, time_type="f"):
-        return f"<t:{round(date.timestamp())}:{time_type}>"
-
     def string_time(self, date):
         return date.astimezone(self.timezone).strftime("%-I:%M %p")
 
