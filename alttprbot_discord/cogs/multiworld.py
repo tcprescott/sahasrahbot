@@ -58,7 +58,7 @@ class MultiworldSignupView(discord.ui.View):
         multiworld = await models.Multiworld.get(message_id=interaction.message.id)
 
         if not multiworld.owner_id == interaction.user.id:
-            await interaction.response.send_message("You are not authorized to start this game.")
+            await interaction.response.send_message("You are not authorized to start this game.", ephemeral=True)
             return
 
         message = interaction.message
