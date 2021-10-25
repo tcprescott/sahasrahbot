@@ -96,7 +96,7 @@ class MultiworldSignupView(discord.ui.View):
 
         self.clear_items()
         await message.edit(embed=embed, view=self)
-        await interaction.response.send_message("Game cancelled", ephemeral=True)
+        await interaction.response.send_message("Game started!", ephemeral=True)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id="sahabot:multiworld:cancel", emoji='❌')
     async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -114,7 +114,7 @@ class MultiworldSignupView(discord.ui.View):
 
         self.clear_items()
         await interaction.message.edit(view=self)
-        await interaction.response.send_message("Game started!", ephermal=True)
+        await interaction.response.send_message("Game cancelled", ephermal=True)
 
     async def update_player_list(self, message: discord.Message):
         embed = message.embeds[0]
