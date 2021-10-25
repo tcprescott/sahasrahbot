@@ -10,7 +10,7 @@ class FactorioALTTP(SGLCoreTournamentRace):
             guild=guild,
             racetime_category='sgl',
             racetime_goal="Factorio + ALTTP Multiworld",
-            event_slug="sgl21factorio-alttpr",
+            event_slug="sgl21factorio",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=True
