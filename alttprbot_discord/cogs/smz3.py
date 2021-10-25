@@ -3,7 +3,7 @@ import discord
 
 from alttprbot.alttprgen.preset import get_preset, fetch_preset
 from alttprbot.alttprgen.smz3multi import generate_multiworld
-from alttprbot.database import smz3_multiworld # TODO switch to ORM
+from alttprbot.database import smz3_multiworld  # TODO switch to ORM
 from ..util import checks
 
 
@@ -67,6 +67,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def multi(self, ctx, preset):
         await self.init_mw(ctx, preset, randomizer='smz3')
+        await ctx.reply(f"{ctx.author.mention} this command will be removed soon.  Please use `/multiworld` instead!")
 
     @commands.group()
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
@@ -102,6 +103,7 @@ class SuperMetroidComboRandomizer(commands.Cog):
     @checks.restrict_to_channels_by_guild_config('Smz3GenRestrictChannels')
     async def sm_multi(self, ctx, preset):
         await self.init_mw(ctx, preset, randomizer='sm')
+        await ctx.reply(f"{ctx.author.mention} this command will be removed soon.  Please use `/multiworld` instead!")
 
     @commands.command(
         hidden=True,
