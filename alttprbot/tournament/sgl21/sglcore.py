@@ -88,6 +88,7 @@ class SGLCoreTournamentRace(TournamentRace):
         await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'), defaults={'episode_id': tournament_race.episodeid, 'event': tournament_race.event_slug, 'spoiler': None})
 
         await tournament_race.send_player_room_info()
+        await tournament_race.send_commentator_room_info()
         await tournament_race.send_audit_room_info()
 
         await tournament_race.send_room_welcome()
@@ -103,6 +104,27 @@ class SGLCoreTournamentRace(TournamentRace):
     @property
     def player_racetime_ids(self):
         return []
+
+    async def send_commentator_room_info(self):
+        embed = discord.Embed(
+            title=f"RT.gg Room Opened - {self.versus}",
+            description=f"Greetings!  A RaceTime.gg race room has been automatically opened for an upcoming race that you are commentating.\nYou may access it at {self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}\n\nEnjoy!",
+            color=discord.Colour.blue(),
+            timestamp=discord.utils.utcnow()
+        )
+
+        for commentator in self.episode['commentators']:
+            if not commentator.get('approved', False):
+                continue
+
+            try:
+                member = self.data.guild.get_member_named(commentator['discordTag'])
+                if member is None:
+                    continue
+                await member.send(embed=embed)
+            except discord.HTTPException:
+                logging.exception(f"Unable to send DM to {commentator['discordTag']}")
+                continue
 
     async def send_audit_room_info(self):
         await self.race_room_log_channel.send(f"Room created: {self.event_name} - {self.versus} - Episode {self.episodeid} - <{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}>")
