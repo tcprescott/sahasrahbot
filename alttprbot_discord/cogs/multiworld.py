@@ -43,7 +43,7 @@ class MultiworldSignupView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Join/Leave", style=discord.ButtonStyle.blurple, custom_id="sahabot:multiworld:create")
+    @discord.ui.button(label="Join/Leave", style=discord.ButtonStyle.blurple, custom_id="sahabot:multiworld:create", emoji='👍')
     async def join_leave(self, button: discord.ui.Button, interaction: discord.Interaction):
         entrant = await models.MultiworldEntrant.get_or_none(discord_user_id=interaction.user.id, multiworld_id=interaction.message.id)
         if entrant is None:
@@ -53,7 +53,7 @@ class MultiworldSignupView(discord.ui.View):
 
         await self.update_player_list(interaction.message)
 
-    @discord.ui.button(label="Start", style=discord.ButtonStyle.green, custom_id="sahabot:multiworld:start")
+    @discord.ui.button(label="Start", style=discord.ButtonStyle.green, custom_id="sahabot:multiworld:start", emoji='✅')
     async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
         multiworld = await models.Multiworld.get(message_id=interaction.message.id)
 
@@ -96,9 +96,9 @@ class MultiworldSignupView(discord.ui.View):
 
         self.clear_items()
         await message.edit(embed=embed, view=self)
-        await interaction.response.send_message("Game started, check your DMs!")
+        await interaction.response.send_message("Game cancelled", ephemeral=True)
 
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id="sahabot:multiworld:cancel")
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id="sahabot:multiworld:cancel", emoji='❌')
     async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
         multiworld = await models.Multiworld.get(message_id=interaction.message.id)
 
@@ -114,7 +114,7 @@ class MultiworldSignupView(discord.ui.View):
 
         self.clear_items()
         await interaction.message.edit(view=self)
-        await interaction.response.send_message("Game started, check your DMs!")
+        await interaction.response.send_message("Game started!", ephermal=True)
 
     async def update_player_list(self, message: discord.Message):
         embed = message.embeds[0]
