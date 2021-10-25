@@ -13,22 +13,22 @@ ALTTP_RANDOMIZER_SERVERS = list(map(int, os.environ.get("ALTTP_RANDOMIZER_SERVER
 
 WELCOME_MESSAGES = {
     'french': (
-                'Bienvenue! Ce serveur discord est principalement en anglais.\n'
-                'Vous trouverez un serveur en français en suivant https://discord.gg/9cWhQyw .\n'
-                'Les membres de ce serveur se feront un plaisir de vous aider.\n\n'
-                'Merci, et bienvenue encore une fois.'
-            ),
+        'Bienvenue! Ce serveur discord est principalement en anglais.\n'
+        'Vous trouverez un serveur en français en suivant https://discord.gg/9cWhQyw .\n'
+        'Les membres de ce serveur se feront un plaisir de vous aider.\n\n'
+        'Merci, et bienvenue encore une fois.'
+    ),
     'spanish': (
-                '¡Bienvenidos! Este servidor de Discord es principalmente de habla inglesa.'
-                '¡No tengáis miedo, hay un servidor en Español que podéis encontrar en https://discord.gg/xyHxAFJ donde os pueden ayudar!\n\n'
-                'Gracias y otra vez, bienvenidos.'
-            ),
+        '¡Bienvenidos! Este servidor de Discord es principalmente de habla inglesa.'
+        '¡No tengáis miedo, hay un servidor en Español que podéis encontrar en https://discord.gg/xyHxAFJ donde os pueden ayudar!\n\n'
+        'Gracias y otra vez, bienvenidos.'
+    ),
     'german': (
-                'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben.'
-                'Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann.'
-                'Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren\n\n'
-                'Vielen Dank und nochmals herzlich willkommen.'
-            )
+        'Willkommen! Auf diesem Server wird grundsätzlich in Englisch geschrieben.'
+        'Aber keine Sorge, es gibt ebenfalls einen deutschen Discord-Server, der dir gerne in deiner Sprache helfen kann.'
+        'Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren\n\n'
+        'Vielen Dank und nochmals herzlich willkommen.'
+    )
 }
 
 
@@ -121,7 +121,6 @@ class Misc(commands.Cog):
             "See <#543572578787393556> for details."
         )
 
-
     @commands.command(
         brief="Retrieves a holy image.",
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
@@ -153,6 +152,7 @@ class Misc(commands.Cog):
         holyimage = await HolyImage.construct(slug=slug, game=game)
 
         await ctx.respond(embed=holyimage.embed)
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))

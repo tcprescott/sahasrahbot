@@ -150,6 +150,20 @@ class SMZ3Multiworld(Model):
     status = fields.CharField(20, null=True)
 
 
+class Multiworld(Model):
+    message_id = fields.BigIntField(pk=True, generated=False)
+    owner_id = fields.BigIntField(null=True)
+    randomizer = fields.CharField(45, null=True)
+    preset = fields.CharField(45, null=True)
+    status = fields.CharField(20, null=True)
+
+
+class MultiworldEntrant(Model):
+    id = fields.IntField(pk=True)
+    discord_user_id = fields.BigIntField(null=True)
+    multiworld = fields.ForeignKeyField('models.Multiworld', related_name='entrant')
+
+
 class SpoilerRaces(Model):
     class Meta:
         table = 'spoiler_races'
