@@ -1,11 +1,13 @@
+# import discord
 import logging
 
 import aiohttp
+# from alttprbot import models
 from alttprbot.alttprgen import preset, spoilers
+from alttprbot.database import spoiler_races  # TODO switch to ORM
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
-from alttprbot.database import spoiler_races # TODO switch to ORM
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):
@@ -71,6 +73,87 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             team_race=self.week_data.get('coop', False),
         )
         return self.rtgg_handler
+
+    # @property
+    # def bracket_settings(self):
+    #     if self.tournament_game:
+    #         return self.tournament_game.settings
+
+    #     return None
+
+    # @property
+    # def submission_form(self):
+    #     return [
+    #         {
+    #             'key': 'game',
+    #             'label': 'Game #',
+    #             'settings': {
+    #                 '1': '1',
+    #                 '2': '2',
+    #                 '3': '3',
+    #                 '4': '4',
+    #                 '5': '5',
+    #             }
+    #         },
+    #         {
+    #             'key': 'preset',
+    #             'label': 'Preset',
+    #             'required_if': {
+    #                 'game': ['3', '4', '5']
+    #             },
+    #             'settings': {
+    #                 'default': 'Game 1 or 2',
+    #                 'invrosia': 'Invrosia',
+    #                 'champions_swordless': 'Champion\'s Swordless',
+    #                 'hard_mc': 'Open Hard MC Shuffle',
+    #                 'hard_enemizer': 'Open Hard Enemizer',
+    #             }
+    #         }
+    #     ]
+
+    # async def process_submission_form(self, payload, submitted_by):
+    #     embed = discord.Embed(
+    #         title=f"ALTTPR League - {self.versus}",
+    #         description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a tournament admin.',
+    #         color=discord.Colour.blue()
+    #     )
+
+    #     if payload['game'] == '1':
+    #         preset_name = 'casual_boots'
+    #     elif payload['game'] == '2':
+    #         preset_name = 'crosskeys'
+    #     else:
+    #         if payload['preset'] == 'default':
+    #             raise Exception('Must choose a preset for games 3, 4, or 5.')
+    #         preset_name = payload['preset']
+
+    #     preset_dict = await preset.fetch_preset(preset_name)
+
+    #     preset_dict['tournament'] = True
+    #     preset_dict['allow_quickswap'] = True
+    #     preset_dict['spoilers'] = 'off'
+
+    #     embed.add_field(name="Preset", value=payload['preset'], inline=False)
+
+    #     embed.add_field(name="Submitted by", value=submitted_by, inline=False)
+
+    #     await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': preset_dict['settings'], 'event': self.event_slug})
+
+    #     if self.audit_channel:
+    #         await self.audit_channel.send(embed=embed)
+
+    #     for name, player in self.player_discords:
+    #         if player is None:
+    #             logging.error(f"Could not send DM to {name}")
+    #             if self.audit_channel:
+    #                 await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+    #             continue
+    #         try:
+    #             await player.send(embed=embed)
+    #         except discord.HTTPException:
+    #             logging.exception(f"Could not send DM to {name}")
+    #             if self.audit_channel:
+    #                 await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
 
 
 class ALTTPROpenLeague(ALTTPRLeague):
