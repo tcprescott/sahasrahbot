@@ -1,6 +1,7 @@
 from discord.ext import commands
-from discord.commands import Option
+# from discord.commands import Option
 import discord
+import re
 
 from alttprbot import models
 from alttprbot.alttprgen.smz3multi import generate_multiworld
@@ -23,57 +24,122 @@ PRESET_OPTIONS = {
 }
 
 
-class MultiworldPresetDropdown(discord.ui.Select):
-    def __init__(self, randomizer, mwcreateview):
-        self.mwcreateview = mwcreateview
+# class MultiworldPresetDropdown(discord.ui.Select):
+#     def __init__(self, randomizer, mwcreateview):
+#         self.mwcreateview = mwcreateview
 
-        super().__init__(
-            placeholder="Choose a preset...",
-            min_values=1,
-            max_values=1,
-            options=PRESET_OPTIONS[randomizer],
-            row=1
-        )
+#         super().__init__(
+#             placeholder="Choose a preset...",
+#             min_values=1,
+#             max_values=1,
+#             options=PRESET_OPTIONS[randomizer],
+#             row=1
+#         )
 
-    async def callback(self, interaction: discord.Interaction):
-        self.mwcreateview.preset_name = self.values[0]
+#     async def callback(self, interaction: discord.Interaction):
+#         self.mwcreateview.preset_name = self.values[0]
 
 
 class MultiworldSignupView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Join/Leave", style=discord.ButtonStyle.blurple, custom_id="sahabot:multiworld:create", emoji='👍')
-    async def join_leave(self, button: discord.ui.Button, interaction: discord.Interaction):
-        entrant = await models.MultiworldEntrant.get_or_none(discord_user_id=interaction.user.id, multiworld_id=interaction.message.id)
-        if entrant is None:
-            await models.MultiworldEntrant.create(discord_user_id=interaction.user.id, multiworld_id=interaction.message.id)
-        else:
+    @discord.ui.select(
+        placeholder="Choose a randomizer",
+        min_values=1,
+        max_values=1,
+        options=[
+            discord.SelectOption(label="smz3", description="SM + ALTTP Combo Randomizer"),
+            discord.SelectOption(label="sm", description="Super Metroid Randomizer")
+        ],
+        custom_id="sahabot:multiworld:randomizer",
+        row=1
+    )
+    async def randomizer(self, select: discord.ui.Select, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        multiworld = await self.create_or_update_multiworld(interaction)
+
+        multiworld.randomizer = select.values[0]
+        multiworld.preset = None
+
+        embed = interaction.message.embeds[0]
+        embed = set_embed_field("Randomizer", multiworld.randomizer, embed)
+        embed = set_embed_field("Preset", "Not yet chosen", embed)
+        await multiworld.save()
+        preset_select: discord.ui.Select = discord.utils.get(self.children, custom_id='sahabot:multiworld:preset')
+        preset_select.disabled = False
+        preset_select.options = PRESET_OPTIONS[multiworld.randomizer]
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.select(
+        placeholder="Choose a preset",
+        min_values=1,
+        max_values=1,
+        options=[
+            discord.SelectOption(label="none", description="Choose a randomizer first!")
+        ],
+        custom_id="sahabot:multiworld:preset",
+        row=2,
+        disabled=True
+    )
+    async def preset(self, select: discord.ui.Select, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        multiworld = await self.create_or_update_multiworld(interaction)
+
+        multiworld.preset = select.values[0]
+
+        embed = interaction.message.embeds[0]
+        embed = set_embed_field("Preset", multiworld.preset, embed)
+        await multiworld.save(update_fields=['preset'])
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.button(label="Join", style=discord.ButtonStyle.blurple, custom_id="sahabot:multiworld:join", row=3)
+    async def join(self, button: discord.ui.Button, interaction: discord.Interaction):
+        multiworld = await self.create_or_update_multiworld(interaction)
+        entrant = await models.MultiworldEntrant.get_or_none(discord_user_id=interaction.user.id, multiworld=multiworld)
+        if entrant:
+            await interaction.response.pong()
+            return
+        await models.MultiworldEntrant.create(discord_user_id=interaction.user.id, multiworld=multiworld)
+
+        await self.update_player_list(interaction.message)
+
+    @discord.ui.button(label="Leave", style=discord.ButtonStyle.secondary, custom_id="sahabot:multiworld:leave", row=3)
+    async def leave(self, button: discord.ui.Button, interaction: discord.Interaction):
+        multiworld = await self.create_or_update_multiworld(interaction)
+        entrant = await models.MultiworldEntrant.get_or_none(discord_user_id=interaction.user.id, multiworld=multiworld)
+        if entrant:
             await entrant.delete()
 
         await self.update_player_list(interaction.message)
 
-    @discord.ui.button(label="Start", style=discord.ButtonStyle.green, custom_id="sahabot:multiworld:start", emoji='✅')
+    @discord.ui.button(label="Start", style=discord.ButtonStyle.green, custom_id="sahabot:multiworld:start", row=4)
     async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
-        multiworld = await models.Multiworld.get(message_id=interaction.message.id)
+        message = interaction.message
+        embed = message.embeds[0]
+        multiworld = await self.create_or_update_multiworld(interaction)
 
         if not multiworld.owner_id == interaction.user.id:
             await interaction.response.send_message("You are not authorized to start this game.", ephemeral=True)
             return
 
-        message = interaction.message
-        embed = message.embeds[0]
-        embed.set_field_at(0, name="Status", value="⌚ Game closed for entry.  Rolling...")
+        if not multiworld.randomizer or not multiworld.preset:
+            await interaction.response.send_message("Please ensure you choose both a randomizer and preset before starting.", ephemeral=True)
+            return
+
+        embed = set_embed_field("Status", "⌚ Game closed for entry.  Rolling...", embed)
         await message.edit(embed=embed)
 
         await self.update_player_list(message)
         players = await self.get_player_members(message)
 
         if len(players) < 2:
+            embed = set_embed_field("Status", "👍 Open for entry", embed)
+            await interaction.message.edit(embed=embed, view=self)
             await interaction.response.send_message("You must have at least two players to create a multiworld.", ephemeral=True)
-            embed.set_field_at(0, name="Status", value="👍 Open for entry")
-            await message.edit(embed=embed)
             return
+
+        await interaction.response.defer()
 
         seed = await generate_multiworld(multiworld.preset, [p.name for p in players], tournament=False, randomizer=multiworld.randomizer)
 
@@ -89,32 +155,33 @@ class MultiworldSignupView(discord.ui.View):
             except discord.HTTPException:
                 await message.reply(f"Unable to send DM to {player.mention}!")
 
-        embed.set_field_at(0, name="Status", value="✅ Game started!  Check your DMs.")
+            embed = set_embed_field("Status", "✅ Game started!  Check your DMs.", embed)
 
         multiworld.status = "CLOSED"
         await multiworld.save()
 
-        self.clear_items()
-        await message.edit(embed=embed, view=self)
-        await interaction.response.send_message("Game started!", ephemeral=True)
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(embed=embed, view=self)
 
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id="sahabot:multiworld:cancel", emoji='❌')
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id="sahabot:multiworld:cancel", row=4)
     async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
-        multiworld = await models.Multiworld.get(message_id=interaction.message.id)
+        message = interaction.message
+        embed = message.embeds[0]
+        multiworld = await self.create_or_update_multiworld(interaction)
 
         if not multiworld.owner_id == interaction.user.id:
-            await interaction.response.send_message("You are not authorized to cancel this game.", ephermal=True)
+            await interaction.response.send_message("You are not authorized to cancel this game.", ephemeral=True)
             return
 
         embed = interaction.message.embeds[0]
-        embed.set_field_at(0, name="Status", value="❌ Cancelled.")
-        await interaction.message.edit(embed=embed)
+        embed = set_embed_field("Status", "❌ Cancelled.", embed)
         multiworld.status = "CANCELLED"
         await multiworld.save()
 
-        self.clear_items()
-        await interaction.message.edit(view=self)
-        await interaction.response.send_message("Game cancelled", ephermal=True)
+        for item in self.children:
+            item.disabled = True
+        await interaction.response.edit_message(embed=embed, view=self)
 
     async def update_player_list(self, message: discord.Message):
         embed = message.embeds[0]
@@ -122,9 +189,9 @@ class MultiworldSignupView(discord.ui.View):
         mentions = [f"<@{p.discord_user_id}>" for p in player_list_resp]
 
         if mentions:
-            embed.set_field_at(2, name="Players", value='\n'.join(mentions))
+            embed = set_embed_field("Players", '\n'.join(mentions), embed)
         else:
-            embed.set_field_at(2, name="Players", value='No players yet.')
+            embed = set_embed_field("Players", 'No players yet.', embed)
 
         await message.edit(embed=embed)
 
@@ -136,38 +203,42 @@ class MultiworldSignupView(discord.ui.View):
         mentions = [p.mention for p in entrant_discords]
 
         if mentions:
-            embed.set_field_at(2, name="Players", value='\n'.join(mentions))
+            embed = set_embed_field("Players", '\n'.join(mentions), embed)
         else:
-            embed.set_field_at(2, name="Players", value='No players yet.')
+            embed = set_embed_field("Players", 'No players yet.', embed)
 
         return entrant_discords
 
+    async def create_or_update_multiworld(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        multiworld, _ = await models.Multiworld.update_or_create(message_id=interaction.message.id, defaults={'owner_id': get_owner(embed, interaction.guild).id, 'status': "STARTED"})
+        return multiworld
 
-class MultiworldCreateView(discord.ui.View):
-    def __init__(self, randomizer):
-        super().__init__(timeout=300)
-        self.randomizer = randomizer
-        self.preset_name = None
-        self.add_item(MultiworldPresetDropdown(self.randomizer, self))
+# class MultiworldCreateView(discord.ui.View):
+#     def __init__(self, randomizer):
+#         super().__init__(timeout=300)
+#         self.randomizer = randomizer
+#         self.preset_name = None
+#         self.add_item(MultiworldPresetDropdown(self.randomizer, self))
 
-    @discord.ui.button(label="Create", style=discord.ButtonStyle.green, row=2)
-    async def create(self, button: discord.ui.Button, interaction: discord.Interaction):
-        embed = discord.Embed(
-            title=f'{self.randomizer.upper()} Multiworld Game',
-            description=(
-                'A new multiworld game has been initiated, click "Join" to join.\n'
-                'When everyone is ready, the game creator can click "Start" to create a session.\n'
-                'The game creator can click "Cancel" to cancel this game.'
-            ),
-            color=discord.Color.dark_blue()
-        )
-        embed.add_field(name="Status", value="👍 Open for entry", inline=False)
-        embed.add_field(name="Preset", value=f"[{self.preset_name.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{self.randomizer.lower()}/{self.preset_name.lower()}.yaml)", inline=False)
-        embed.add_field(name="Players", value="No players yet.", inline=False)
+#     @discord.ui.button(label="Create", style=discord.ButtonStyle.green, row=2)
+#     async def create(self, button: discord.ui.Button, interaction: discord.Interaction):
+#         embed = discord.Embed(
+#             title=f'{self.randomizer.upper()} Multiworld Game',
+#             description=(
+#                 'A new multiworld game has been initiated, click "Join" to join.  Click "Leave" to leave.\n'
+#                 f'When everyone is ready the game creator, {interaction.user.mention}, can click "Start" to create a session.\n'
+#                 f'The game creator can click "Cancel" to cancel this game.'
+#             ),
+#             color=discord.Color.dark_blue()
+#         )
+#         embed.add_field(name="Status", value="👍 Open for entry", inline=False)
+#         embed.add_field(name="Preset", value=f"[{self.preset_name.lower()}](https://github.com/tcprescott/sahasrahbot/blob/master/presets/{self.randomizer.lower()}/{self.preset_name.lower()}.yaml)", inline=False)
+#         embed.add_field(name="Players", value="No players yet.", inline=False)
 
-        message = await interaction.channel.send(embed=embed)
-        await models.Multiworld.create(message_id=message.id, owner_id=interaction.user.id, randomizer=self.randomizer, preset=self.preset_name, status="STARTED")
-        await message.edit(view=MultiworldSignupView())
+#         message = await interaction.channel.send(embed=embed)
+#         await models.Multiworld.create(message_id=message.id, owner_id=interaction.user.id, randomizer=self.randomizer, preset=self.preset_name, status="STARTED")
+#         await message.edit(view=MultiworldSignupView())
 
 
 class Multiworld(commands.Cog):
@@ -175,19 +246,58 @@ class Multiworld(commands.Cog):
         self.bot = bot
         self.persistent_views_added = False
 
-    @commands.Cog.listener()
+    @ commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
             self.bot.add_view(MultiworldSignupView())
             self.persistent_views_added = True
 
-    @commands.slash_command(name='multiworld')
-    async def multiworld(self, ctx, randomizer: Option(str, description="Choose a randomizer", choices=['sm', 'smz3'])):
+    @ commands.slash_command(name='multiworld')
+    async def multiworld(self, ctx: discord.commands.ApplicationContext):
         """
         Creates a multiworld session
         """
-        view = MultiworldCreateView(randomizer=randomizer)
-        await ctx.respond("Choose a preset and click Create to start signups for this multiworld session.\n\nIf you did this in error, just click \"Dismiss message\".", view=view, ephemeral=True)
+        embed = discord.Embed(
+            title=f'Multiworld Game',
+            description=(
+                'A new multiworld game has been initiated, click "Join" to join.  Click "Leave" to leave.\n'
+                f'When everyone is ready the game creator, {ctx.author.mention}, can click "Start" to create a session.\n'
+                f'The game creator can click "Cancel" to cancel this game.'
+            ),
+            color=discord.Color.dark_blue()
+        )
+        embed.add_field(name="Owner", value=ctx.author.mention, inline=False)
+        embed.add_field(name="Status", value="👍 Open for entry", inline=False)
+        embed.add_field(name="Randomizer", value="Not yet chosen", inline=False)
+        embed.add_field(name="Preset", value="Not yet chosen", inline=False)
+        embed.add_field(name="Players", value="No players yet.", inline=False)
+
+        await ctx.respond(embed=embed, view=MultiworldSignupView())
+        # await models.Multiworld.create(message_id=ctx.interaction, owner_id=ctx.author.id, status="STARTED")
+
+
+def set_embed_field(name: str, value: str, embed: discord.Embed) -> discord.Embed:
+    for idx, field in enumerate(embed.fields):
+        if field.name == name:
+            embed.set_field_at(idx, name=name, value=value, inline=field.inline)
+    return embed
+
+
+def get_embed_field(name: str, embed: discord.Embed) -> str:
+    for field in embed.fields:
+        if field.name == name:
+            return field.value
+    return None
+
+
+def get_owner(embed: discord.Embed, guild: discord.Guild) -> discord.Member:
+    value = get_embed_field("Owner", embed)
+
+    if value is None:
+        return
+
+    user_id = int(re.search('<@([0-9]*)>', value).groups()[0])
+    return guild.get_member(user_id)
 
 
 def setup(bot):
