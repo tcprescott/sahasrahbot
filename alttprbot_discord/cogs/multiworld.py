@@ -6,6 +6,7 @@ import discord
 from alttprbot import models
 from alttprbot.alttprgen.smz3multi import generate_multiworld
 from discord.ext import commands
+from slugify import slugify
 
 PRESET_OPTIONS = {
     'sm': [
@@ -152,7 +153,8 @@ class MultiworldSignupView(discord.ui.View):
 
         await interaction.response.defer()
 
-        seed = await generate_multiworld(multiworld.preset, [p.name for p in players], tournament=False, randomizer=multiworld.randomizer)
+        player_names = [slugify(p.display_name, lowercase=False, max_length=19, separator=" ") for p in players]
+        seed = await generate_multiworld(multiworld.preset, player_names, tournament=False, randomizer=multiworld.randomizer)
 
         dm_embed = discord.Embed(
             title=f"{multiworld.randomizer.upper()} Multiworld Game"
