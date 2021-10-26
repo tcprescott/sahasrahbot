@@ -1,10 +1,11 @@
-from discord.ext import commands
-# from discord.commands import Option
-import discord
+import logging
 import re
 
+# from discord.commands import Option
+import discord
 from alttprbot import models
 from alttprbot.alttprgen.smz3multi import generate_multiworld
+from discord.ext import commands
 
 PRESET_OPTIONS = {
     'sm': [
@@ -162,8 +163,8 @@ class MultiworldSignupView(discord.ui.View):
         for player in players:
             try:
                 await player.send(embed=dm_embed)
-            except discord.HTTPException:
-                await message.reply(f"Unable to send DM to {player.mention}!")
+            except Exception:
+                logging.exception(f"Unable to send DM to {player.mention}!")
 
             embed = set_embed_field("Status", "✅ Game started!  Check your DMs.", embed)
 
