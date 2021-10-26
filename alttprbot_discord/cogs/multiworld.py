@@ -111,6 +111,7 @@ class MultiworldSignupView(discord.ui.View):
         await models.MultiworldEntrant.create(discord_user_id=interaction.user.id, multiworld=multiworld)
 
         await self.update_player_list(interaction.message)
+        await interaction.response.pong()
 
     @discord.ui.button(label="Leave", style=discord.ButtonStyle.secondary, custom_id="sahabot:multiworld:leave", row=3)
     async def leave(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -120,6 +121,7 @@ class MultiworldSignupView(discord.ui.View):
             await entrant.delete()
 
         await self.update_player_list(interaction.message)
+        await interaction.response.pong()
 
     @discord.ui.button(label="Start", style=discord.ButtonStyle.green, custom_id="sahabot:multiworld:start", row=4)
     async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -191,9 +193,9 @@ class MultiworldSignupView(discord.ui.View):
             item.disabled = True
         await interaction.response.edit_message(embed=embed, view=self)
 
-    async def update_player_list(self, interaction: discord.Interaction):
-        embed = interaction.message.embeds[0]
-        player_list_resp = await models.MultiworldEntrant.filter(multiworld__message_id=interaction.message.id)
+    async def update_player_list(self, message: discord.Message):
+        embed = message.embeds[0]
+        player_list_resp = await models.MultiworldEntrant.filter(multiworld__message_id=message.id)
         mentions = [f"<@{p.discord_user_id}>" for p in player_list_resp]
 
         if mentions:
@@ -201,7 +203,7 @@ class MultiworldSignupView(discord.ui.View):
         else:
             embed = set_embed_field("Players", 'No players yet.', embed)
 
-        await interaction.message.edit(embed=embed, view=self)
+        await message.edit(embed=embed, view=self)
 
         return player_list_resp
 
