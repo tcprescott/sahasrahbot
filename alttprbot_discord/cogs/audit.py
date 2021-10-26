@@ -72,7 +72,7 @@ class Audit(commands.Cog):
         channel = self.bot.get_channel(payload.channel_id)
 
         # ignore these channels for reasons
-        if channel and channel.id in [694710452478803968, 694710286455930911]:
+        if channel and channel.id in [694710452478803968, 694710286455930911, 606873327839215616]:
             return
 
         if await guild.config_get('AuditLogging') == 'true':
@@ -119,6 +119,11 @@ class Audit(commands.Cog):
         channel = self.bot.get_channel(payload.channel_id)
         if isinstance(channel, discord.DMChannel):
             return
+
+        # ignore these channels for reasons
+        if channel and channel.id in [694710452478803968, 694710286455930911, 606873327839215616]:
+            return
+
         message = await channel.fetch_message(payload.message_id)
         if message.author.id == self.bot.user.id:
             return
