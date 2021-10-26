@@ -59,6 +59,10 @@ class MultiworldSignupView(discord.ui.View):
         embed = interaction.message.embeds[0]
         multiworld = await self.create_or_update_multiworld(interaction)
 
+        if not multiworld.owner_id == interaction.user.id:
+            await interaction.response.send_message("You are not authorized to set the randomizer.", ephemeral=True)
+            return
+
         multiworld.randomizer = select.values[0]
         multiworld.preset = None
 
@@ -85,6 +89,10 @@ class MultiworldSignupView(discord.ui.View):
     async def preset(self, select: discord.ui.Select, interaction: discord.Interaction):
         embed = interaction.message.embeds[0]
         multiworld = await self.create_or_update_multiworld(interaction)
+
+        if not multiworld.owner_id == interaction.user.id:
+            await interaction.response.send_message("You are not authorized set the preset.", ephemeral=True)
+            return
 
         multiworld.preset = select.values[0]
 
@@ -183,9 +191,9 @@ class MultiworldSignupView(discord.ui.View):
             item.disabled = True
         await interaction.response.edit_message(embed=embed, view=self)
 
-    async def update_player_list(self, message: discord.Message):
-        embed = message.embeds[0]
-        player_list_resp = await models.MultiworldEntrant.filter(multiworld__message_id=message.id)
+    async def update_player_list(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        player_list_resp = await models.MultiworldEntrant.filter(multiworld__message_id=interaction.message.id)
         mentions = [f"<@{p.discord_user_id}>" for p in player_list_resp]
 
         if mentions:
@@ -193,7 +201,12 @@ class MultiworldSignupView(discord.ui.View):
         else:
             embed = set_embed_field("Players", 'No players yet.', embed)
 
-        await message.edit(embed=embed)
+        await interaction.message.edit(embed=embed, view=self)
+
+        return player_list_resp
+
+    def allow_start(self, multiworld: models.Multiworld, entrants: models.MultiworldEntrant):
+        return entrants > 2 and not multiworld.preset is None and not multiworld.randomizer is None
 
     async def get_player_members(self, message: discord.Message):
         guild = message.guild
