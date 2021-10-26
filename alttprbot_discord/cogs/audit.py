@@ -53,11 +53,13 @@ class Audit(commands.Cog):
             await ctx.reply(file=discord_file)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.id == self.bot.user.id:
             return
         if message.guild is None:
             await record_message(message)
+            return
+        if message.channel == 606873327839215616:
             return
         if await message.guild.config_get('AuditLogging') == 'true':
             await record_message(message)
