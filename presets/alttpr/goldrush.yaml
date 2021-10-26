@@ -5,19 +5,19 @@ settings:
   glitches: none
   item_placement: advanced
   dungeon_items: standard
-  accessibility: beatable
+  accessibility: none
   goal: triforce-hunt
   crystals:
-    ganon: '7'
-    tower: '7'
+    ganon: "7"
+    tower: "7"
   mode: open
-  hints: 'off'
+  hints: "off"
   weapons: randomized
   item:
     pool: normal
     functionality: normal
   tournament: true
-  spoilers: 'off'
+  spoilers: "off"
   lang: en
   enemizer:
     boss_shuffle: none
@@ -25,95 +25,95 @@ settings:
     enemy_damage: default
     enemy_health: default
   name: Gold Rush
-  notes: ''
+  notes: ""
   l: {}
   eq:
-  - PegasusBoots
-  - BossHeartContainer
-  - BossHeartContainer
-  - BossHeartContainer
+    - PegasusBoots
+    - BossHeartContainer
+    - BossHeartContainer
+    - BossHeartContainer
   drops:
-    '0':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '1':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '2':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '3':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '4':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '5':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    '6':
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
-    - auto_fill
+    "0":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "1":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "2":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "3":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "4":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "5":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+    "6":
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     pull:
-    - auto_fill
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
+      - auto_fill
     crab:
-    - auto_fill
-    - auto_fill
+      - auto_fill
+      - auto_fill
     stun:
-    - auto_fill
+      - auto_fill
     fish:
-    - auto_fill
+      - auto_fill
   custom:
-    item.Goal.Required: '49'
+    item.Goal.Required: "49"
     item.require.Lamp: false
-    item.value.BlueClock: ''
-    item.value.GreenClock: ''
-    item.value.RedClock: ''
-    item.value.Rupoor: ''
+    item.value.BlueClock: ""
+    item.value.GreenClock: ""
+    item.value.RedClock: ""
+    item.value.Rupoor: ""
     customPrizePacks: false
     prize.crossWorld: true
     prize.shuffleCrystals: true
@@ -123,12 +123,12 @@ settings:
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
-    rom.dungeonCount: 'off'
+    rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.mapOnPickup: false
-    rom.timerMode: 'off'
-    rom.timerStart: ''
+    rom.timerMode: "off"
+    rom.timerStart: ""
     rom.rupeeBow: false
     rom.genericKeys: false
     rom.logicMode: NoGlitches
