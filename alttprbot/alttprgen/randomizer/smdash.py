@@ -1,6 +1,7 @@
 import asyncio
 import os
-import random, string
+import random
+import string
 import tempfile
 import logging
 
@@ -20,7 +21,7 @@ def roll_smdash():
     return random.randrange(1000000, 9999999)
 
 
-async def create_smdash(mode="mm"):
+async def create_smdash(mode="mm", encrypt=False):
     if mode not in ['mm', 'full', 'sgl20', 'vanilla']:
         raise Exception("Specified mode is not valid.  Must be mm, full, sgl20, or vanilla")
 
@@ -48,19 +49,21 @@ async def create_smdash(mode="mm"):
         logging.info(os.getcwd())
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
-        smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
 
-        proc = await asyncio.create_subprocess_exec(
-            'dotnet',
-            '/opt/randocrypt/RandoCryptCli.dll',
-            smdashrom,
-            os.path.join(tmp, smdashromenc),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
+        if encrypt:
+            smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
 
-        _, stderr = await proc.communicate()
-        if proc.returncode > 0:
-            raise Exception(f'Exception while securing game: {stderr.decode()}')
+            proc = await asyncio.create_subprocess_exec(
+                'dotnet',
+                '/opt/randocrypt/RandoCryptCli.dll',
+                smdashrom,
+                os.path.join(tmp, smdashromenc),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+
+            _, stderr = await proc.communicate()
+            if proc.returncode > 0:
+                raise Exception(f'Exception while securing game: {stderr.decode()}')
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
         patchname = f"DASH_{mode.upper()}_{random_id}.bps"
@@ -70,7 +73,7 @@ async def create_smdash(mode="mm"):
             '--create',
             '--bps-delta',
             os.environ.get('SM_ROM'),
-            os.path.join(tmp, smdashromenc),
+            os.path.join(tmp, smdashromenc if encrypt else smdashrom),
             os.path.join('/var/www/sgldash/bps', patchname),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE)

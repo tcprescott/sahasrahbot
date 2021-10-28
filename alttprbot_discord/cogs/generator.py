@@ -16,9 +16,9 @@ class Generator(commands.Cog):
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True),
-        race: Option(str, description="Is this a race?", choices=["yes", "no"], required=False, default="no"),
-        hints: Option(str, description="Enable hints?", choices=["yes", "no"], required=False, default="no"),
-        allow_quickswap: Option(str, description="Allow quickswap?", choices=["yes", "no"], required=False, default="yes")
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
+        hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
+        allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
     ):
         """
         Generates an ALTTP Randomizer game on https://alttpr.com
@@ -58,8 +58,8 @@ class Generator(commands.Cog):
         self,
         ctx: ApplicationContext,
         weightset: Option(str, description="The weightset you want to use.", required=True),
-        race: Option(str, description="Is this a race? (choosing no never masks settings)", choices=["yes", "no"], required=False, default="yes"),
-        mask_settings: Option(str, description="Is this a race?", choices=["yes", "no"], required=False, default="yes"),
+        race: Option(str, description="Is this a race? (choosing no never masks settings) (default yes)", choices=["yes", "no"], required=False, default="yes"),
+        mask_settings: Option(str, description="Mask settings? (default yes)", choices=["yes", "no"], required=False, default="yes"),
     ):
         """
         Generates an ALTTP Randomizer Mystery game on https://alttpr.com
@@ -82,7 +82,7 @@ class Generator(commands.Cog):
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True),
-        race: Option(str, description="Is this a race?", choices=["yes", "no"], required=False, default="no"),
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
     ):
         """
         Generates an Super Metroid Randomizer game on https://sm.samus.link
@@ -97,7 +97,7 @@ class Generator(commands.Cog):
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True),
-        race: Option(str, description="Is this a race?", choices=["yes", "no"], required=False, default="no")
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
     ):
         """
         Generates an ALTTP Super Metroid Combo Randomizer game on https://samus.link
@@ -113,7 +113,7 @@ class Generator(commands.Cog):
         ctx: ApplicationContext,
         skills: Option(str, description="The skills preset you want to use.", required=True),
         settings: Option(str, description="The settings preset you want generate.", required=True),
-        race: Option(str, description="Is this a race?", choices=["yes", "no"], required=False, default="no")
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
     ):
         """
         Generates an Super Metroid Varia Randomizer game on https://varia.run
@@ -122,20 +122,22 @@ class Generator(commands.Cog):
         seed = await smvaria.generate_preset(
             settings=settings,
             skills=skills,
-            race=True
+            race=race == "yes"
         )
         await ctx.respond(embed=seed.embed())
 
     @commands.slash_command()
     async def smdash(
-            self,
-            ctx: ApplicationContext,
-            mode: Option(str, description="The mode you want to generate.", choices=['mm', 'full', 'sgl20', 'vanilla'], required=True)
+        self,
+        ctx: ApplicationContext,
+        mode: Option(str, description="The mode you want to generate.", choices=['mm', 'full', 'sgl20', 'vanilla'], required=True),
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
     ):
         """
         Generates an Super Metroid Varia Randomizer game on https://varia.run
         """
-        url = await smdash.create_smdash(mode=mode)
+        await ctx.defer()
+        url = await smdash.create_smdash(mode=mode, encrypt=race == "yes")
         await ctx.respond(url)
 
     @ commands.slash_command()
