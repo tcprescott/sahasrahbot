@@ -21,7 +21,7 @@ class SMZ3DailyRace(SGDailyRaceCore):
 
     @property
     def announce_message(self):
-        msg = "<@&449260882501959700> SMZ3 Weekly Race - {title} at {start_time} ({start_time_remain})".format(
+        msg = "<@&449260882501959700> SMZ3 Weekly Race - {title} - {start_time} ({start_time_remain})".format(
             title=self.friendly_name,
             start_time=discord.utils.format_dt(self.race_start_time),
             start_time_remain=discord.utils.format_dt(self.race_start_time, "R")

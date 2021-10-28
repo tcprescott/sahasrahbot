@@ -270,7 +270,7 @@ class Multiworld(commands.Cog):
             self.bot.add_view(MultiworldSignupView())
             self.persistent_views_added = True
 
-    @ commands.slash_command(name='multiworld')
+    @commands.slash_command(name='multiworld')
     async def multiworld(self, ctx: discord.commands.ApplicationContext):
         """
         Creates a multiworld session

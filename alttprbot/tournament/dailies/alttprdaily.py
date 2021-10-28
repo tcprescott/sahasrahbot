@@ -25,7 +25,7 @@ class AlttprSGDailyRace(SGDailyRaceCore):
 
     @property
     def announce_message(self):
-        msg = "SpeedGaming Daily Race Series - {title} at {start_time} ({start_time_remain})".format(
+        msg = "SpeedGaming Daily Race Series - {title} - {start_time} ({start_time_remain})".format(
             title=self.friendly_name,
             start_time=discord.utils.format_dt(self.race_start_time),
             start_time_remain=discord.utils.format_dt(self.race_start_time, "R")
