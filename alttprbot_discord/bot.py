@@ -66,6 +66,9 @@ discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 discordbot.load_extension("alttprbot_discord.cogs.multiworld")
 discordbot.load_extension("alttprbot_discord.cogs.generator")
 
+if c.DEBUG:
+    discordbot.load_extension("alttprbot_discord.cogs.test")
+
 
 if importlib.util.find_spec('jishaku'):
     discordbot.load_extension('jishaku')

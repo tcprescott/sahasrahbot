@@ -129,7 +129,7 @@ class SahasrahBotPresetCore():
 class ALTTPRPreset(SahasrahBotPresetCore):
     randomizer = 'alttpr'
 
-    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False):
+    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix=""):
         if self.preset_data is None:
             await self.fetch()
 
@@ -168,11 +168,9 @@ class ALTTPRPreset(SahasrahBotPresetCore):
                 settings['allow_quickswap'] = allow_quickswap
 
             if self.preset_data.get('customizer', False):
-                endpoint = "/api/customizer"
-            elif self.preset_data.get('festive', False):
-                endpoint = "/api/festive"
+                endpoint = endpoint_prefix + "/api/customizer"
             else:
-                endpoint = "/api/randomizer"
+                endpoint = endpoint_prefix + "/api/randomizer"
 
             seed = await ALTTPRDiscord.generate(
                 settings=settings,

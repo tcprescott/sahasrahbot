@@ -37,6 +37,32 @@ class Generator(commands.Cog):
         await ctx.respond(embed=embed)
 
     @commands.slash_command()
+    async def alttprfestive(
+        self,
+        ctx: ApplicationContext,
+        preset: Option(str, description="The preset you want generate.", required=True),
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
+        hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
+        allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
+    ):
+        """
+        Generates an Festive™ ALTTP Randomizer game on https://alttpr.com/festive
+        """
+        await ctx.defer()
+        seed = await generator.ALTTPRPreset(preset).generate(
+            hints=hints == "yes",
+            spoilers="off" if race == "yes" else "on",
+            tournament=race == "yes",
+            allow_quickswap=allow_quickswap == "yes",
+            endpoint_prefix="/festive"
+        )
+        if not seed:
+            raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
+        embed = await seed.embed(emojis=self.bot.emojis)
+
+        await ctx.respond(embed=embed)
+
+    @commands.slash_command()
     async def alttprspoiler(
         self,
         ctx: ApplicationContext,
@@ -145,6 +171,7 @@ class Generator(commands.Cog):
         """
         Generates a Chrono Trigger: Jets of Time randomizer game on http://ctjot.com
         """
+        await ctx.defer()
         seed_uri = await generator.CTJetsPreset(preset).generate()
         await ctx.respond(seed_uri)
 

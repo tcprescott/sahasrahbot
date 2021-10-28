@@ -4,7 +4,7 @@ import math
 # import logging
 
 from alttprbot.alttprgen import preset, spoilers, generator
-from alttprbot.database import spoiler_races, tournament_results # TODO switch to ORM
+from alttprbot.database import spoiler_races, tournament_results  # TODO switch to ORM
 from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler
@@ -44,6 +44,16 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             return
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
+
+    async def ex_festive(self, args, message):
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, endpoint_prefix="/festive")
 
     async def ex_noqsrace(self, args, message):
         try:
@@ -205,13 +215,19 @@ class GameHandler(SahasrahBotCoreHandler):
                 break
             await asyncio.sleep(.5)
 
-    async def roll_game(self, preset_name, message, allow_quickswap=True):
+    async def roll_game(self, preset_name, message, allow_quickswap=True, endpoint_prefix=""):
         if await self.is_locked(message):
             return
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
-            seed, _ = await preset.get_preset(preset_name, randomizer='alttpr', spoilers="off", allow_quickswap=allow_quickswap)
+            seed = await generator.ALTTPRPreset(preset_name).generate(
+                hints=False,
+                spoilers="off",
+                tournament=True,
+                allow_quickswap=allow_quickswap,
+                endpoint_prefix=endpoint_prefix
+            )
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))
             return
