@@ -173,7 +173,7 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
         self.rtgg_handler.seed_rolled = True
 
     async def send_room_welcome(self):
-        await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about ~5 minutes prior to the start of your race.')
+        await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!')
 
     @property
     def seed_info(self):
