@@ -1,6 +1,8 @@
 import asyncio
 import random
 import os
+from aiocache import cached, Cache
+import aiohttp
 
 import discord
 from discord.commands import Option
@@ -31,6 +33,35 @@ WELCOME_MESSAGES = {
     )
 }
 
+async def holy_slug_autocomplete(interaction: discord.Interaction, value: str):
+    data = await get_holy_images()
+
+    raw_game = [x for x in interaction.data['options'] if x['name'] == 'game']
+    if raw_game:
+        game = raw_game[0]['value']
+    else:
+        if interaction.guild:
+            game = await holy_game_default(interaction.guild)
+        else:
+            game = 'z3r'
+
+    slugs = [val['slug'] for val in data[game] if val['slug'].startswith(value)][:25]
+
+    return slugs
+
+async def holy_game_autocomplete(interaction: discord.Interaction, value: str):
+    data = await get_holy_images()
+    return [val for val in data.keys() if val.startswith(value)][:25]
+
+@cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
+async def holy_game_default(guild: discord.Guild):
+    return await guild.config_get("HolyImageDefaultGame", "z3r")
+
+@cached(ttl=300, cache=Cache.MEMORY, key="holyimages")
+async def get_holy_images() -> dict:
+    async with aiohttp.ClientSession() as session:
+        async with session.get('http://alttp.mymm1.com/holyimage/holyimages.json') as resp:
+            return await resp.json()
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -138,11 +169,17 @@ class Misc(commands.Cog):
         await ctx.reply(embed=holyimage.embed)
 
     @commands.slash_command(
-        brief="Retrieves a holy image.",
-        help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         name='holyimage'
     )
-    async def holyimage_cmd(self, ctx, slug: Option(str, description="Slug of the holy image to retrieve."), game: Option(str, description="Slug of the game to pull a holy image for.", required=False)):
+    async def holyimage_cmd(
+        self,
+        ctx,
+        slug: Option(str, description="Slug of the holy image to retrieve.", autocomplete=holy_slug_autocomplete),
+        game: Option(str, description="Slug of the game to pull a holy image for.", required=False, autocomplete=holy_game_autocomplete)
+    ):
+        """
+        Retrieves a holy image from http://alttp.mymm1.com/holyimage/
+        """
         if game is None:
             if ctx.guild is None:
                 game = "z3r"
