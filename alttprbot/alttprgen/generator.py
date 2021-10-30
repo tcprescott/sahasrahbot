@@ -49,7 +49,11 @@ class PresetData:
 
 
 class SahasrahBotPresetCore():
-    randomizer = None
+    randomizer: str = "default"
+
+    @property
+    def global_preset_path(self) -> str:
+        return os.path.join("presets", self.randomizer)
 
     def __init__(self, preset: str = None):
         self.namespace = None
@@ -79,6 +83,9 @@ class SahasrahBotPresetCore():
         preset.preset_data = preset_dict
 
         return preset
+
+    async def search(self, value):
+        return [os.path.splitext(a)[0] for a in os.listdir(self.global_preset_path) if a.endswith(".yaml") and a.startswith(value)][:25]
 
     async def fetch(self) -> PresetData:
         if self.preset is None:
@@ -111,7 +118,7 @@ class SahasrahBotPresetCore():
     async def _fetch_global(self):
         basename = os.path.basename(f'{self.preset}.yaml')
         try:
-            async with aiofiles.open(os.path.join("presets", self.randomizer, basename)) as f:
+            async with aiofiles.open(os.path.join(self.global_preset_path, basename)) as f:
                 self.preset_data = yaml.safe_load(await f.read())
         except FileNotFoundError as err:
             raise PresetNotFoundException(
@@ -193,14 +200,9 @@ class ALTTPRPreset(SahasrahBotPresetCore):
 class ALTTPRMystery(SahasrahBotPresetCore):
     randomizer = 'alttprmystery'
 
-    async def _fetch_global(self):
-        basename = os.path.basename(f'{self.preset}.yaml')
-        try:
-            async with aiofiles.open(os.path.join("weights", basename)) as f:
-                self.preset_data = yaml.safe_load(await f.read())
-        except FileNotFoundError as err:
-            raise PresetNotFoundException(
-                f'Could not find weightset {self.preset}.  See a list of available weights at https://sahasrahbot.synack.live/mystery.html') from err
+    @property
+    def global_preset_path(self) -> str:
+        return "weights"
 
     async def generate(self, spoilers="off", tournament=True, allow_quickswap=True):
         if self.preset_data is None:

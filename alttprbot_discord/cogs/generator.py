@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from discord.commands import ApplicationContext, Option
 from alttprbot.alttprgen import generator
@@ -6,6 +7,20 @@ from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.alttprgen import smvaria
 from alttprbot.alttprgen.randomizer import smdash
 
+async def autocomplete_alttpr(interaction: discord.Interaction, value=str):
+    return await generator.ALTTPRPreset().search(value)
+
+async def autocomplete_alttprmystery(interaction: discord.Interaction, value=str):
+    return await generator.ALTTPRMystery().search(value)
+
+async def autocomplete_sm(interaction: discord.Interaction, value=str):
+    return await generator.SMPreset().search(value)
+
+async def autocomplete_smz3(interaction: discord.Interaction, value=str):
+    return await generator.SMZ3Preset().search(value)
+
+async def autocomplete_ctjets(interaction: discord.Interaction, value=str):
+    return await generator.CTJetsPreset().search(value)
 
 class Generator(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -15,7 +30,7 @@ class Generator(commands.Cog):
     async def alttpr(
         self,
         ctx: ApplicationContext,
-        preset: Option(str, description="The preset you want generate.", required=True),
+        preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
         race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
         hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
         allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
@@ -40,7 +55,7 @@ class Generator(commands.Cog):
     async def alttprfestive(
         self,
         ctx: ApplicationContext,
-        preset: Option(str, description="The preset you want generate.", required=True),
+        preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
         race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
         hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
         allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
@@ -66,7 +81,7 @@ class Generator(commands.Cog):
     async def alttprspoiler(
         self,
         ctx: ApplicationContext,
-        preset: Option(str, description="The preset you want generate.", required=True),
+        preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
     ):
         """
         Generates an ALTTP Randomizer Spoiler Race on https://alttpr.com
@@ -83,7 +98,7 @@ class Generator(commands.Cog):
     async def alttprmystery(
         self,
         ctx: ApplicationContext,
-        weightset: Option(str, description="The weightset you want to use.", required=True),
+        weightset: Option(str, description="The weightset you want to use.", required=True, autocomplete=autocomplete_alttprmystery),
         race: Option(str, description="Is this a race? (choosing no never masks settings) (default yes)", choices=["yes", "no"], required=False, default="yes"),
         mask_settings: Option(str, description="Mask settings? (default yes)", choices=["yes", "no"], required=False, default="yes"),
     ):
@@ -107,7 +122,7 @@ class Generator(commands.Cog):
     async def sm(
         self,
         ctx: ApplicationContext,
-        preset: Option(str, description="The preset you want generate.", required=True),
+        preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_sm),
         race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
     ):
         """
@@ -122,7 +137,7 @@ class Generator(commands.Cog):
     async def smz3(
         self,
         ctx: ApplicationContext,
-        preset: Option(str, description="The preset you want generate.", required=True),
+        preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_smz3),
         race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
     ):
         """
@@ -167,7 +182,7 @@ class Generator(commands.Cog):
         await ctx.respond(url)
 
     @ commands.slash_command()
-    async def ctjets(self, ctx: ApplicationContext, preset: Option(str, description="The preset you want to generate.", required=True)):
+    async def ctjets(self, ctx: ApplicationContext, preset: Option(str, description="The preset you want to generate.", required=True, autocomplete=autocomplete_ctjets)):
         """
         Generates a Chrono Trigger: Jets of Time randomizer game on http://ctjot.com
         """
