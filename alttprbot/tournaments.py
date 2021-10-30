@@ -64,7 +64,7 @@ else:
         'sgl21smz3': sgl21.SMZ3,
         'sgl21specter': sgl21.ShovelKnight,
         'sgl21ssbsse': sgl21.SmashBros,
-        # 'sgl21ssr': sgl21.SSR,
+        'sgl21ssr': sgl21.SSR,
         'sgl21startropics': sgl21.StarTropics,
         'sgl21timespinner': sgl21.Timespinner,
         'sgl21twwr': sgl21.TWWR,
