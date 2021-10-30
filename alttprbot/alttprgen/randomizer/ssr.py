@@ -44,10 +44,10 @@ async def generate_seed(permalink, spoiler=False):
         if proc.returncode > 0:
             raise Exception(f'Exception while generating game: {stderr.decode()}')
 
-        try:
+        if spoiler:
             spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name} - Spoiler Log.txt")
 
-        except FileNotFoundError:
+        else:
             spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name} - Anti Spoiler Log.txt")
 
         with open(spoiler_log_file_name, "r") as spoiler_log_file:
