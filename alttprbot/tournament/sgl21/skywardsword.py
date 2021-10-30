@@ -21,7 +21,7 @@ class SSR(SGLRandomizerTournamentRace):
 
     async def roll(self):
         self.seed = await ssr.generate_seed(
-            permalink="IwUAAAAAwsXwJQAAAAAAgAAAAAA=",
+            permalink="IQ0IIDsD85rpUwAAAAAAACHIFwA=",
             spoiler=False
         )
 
