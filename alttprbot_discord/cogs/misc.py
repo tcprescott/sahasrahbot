@@ -45,13 +45,13 @@ async def holy_slug_autocomplete(interaction: discord.Interaction, value: str):
         else:
             game = 'z3r'
 
-    slugs = [val['slug'] for val in data[game] if val['slug'].startswith(value)][:25]
+    slugs = sorted([val['slug'] for val in data[game] if val['slug'].startswith(value)][:25])
 
     return slugs
 
 async def holy_game_autocomplete(interaction: discord.Interaction, value: str):
     data = await get_holy_images()
-    return [val for val in data.keys() if val.startswith(value)][:25]
+    return sorted([val for val in data.keys() if val.startswith(value)][:25])
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):

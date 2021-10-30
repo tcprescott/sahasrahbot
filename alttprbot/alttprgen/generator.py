@@ -85,7 +85,7 @@ class SahasrahBotPresetCore():
         return preset
 
     async def search(self, value):
-        return [os.path.splitext(a)[0] for a in os.listdir(self.global_preset_path) if a.endswith(".yaml") and a.startswith(value)][:25]
+        return sorted([os.path.splitext(a)[0] for a in os.listdir(self.global_preset_path) if a.endswith(".yaml") and a.startswith(value)][:25])
 
     async def fetch(self) -> PresetData:
         if self.preset is None:
