@@ -82,12 +82,13 @@ class Generator(commands.Cog):
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
+        festive: Option(str, description="Use the festive randomizer? (default no)", choices=["yes", "no"], required=False, default="no"),
     ):
         """
         Generates an ALTTP Randomizer Spoiler Race on https://alttpr.com
         """
         await ctx.defer()
-        spoiler = await generate_spoiler_game(preset)
+        spoiler = await generate_spoiler_game(preset, festive=festive == "yes")
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
