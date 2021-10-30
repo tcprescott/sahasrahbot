@@ -84,22 +84,6 @@ class Misc(commands.Cog):
                 if random.choice([True, False]):
                     await message.reply(f'@{message.author.mention}')
 
-    @commands.group()
-    async def welcome(self, ctx):
-        pass
-
-    @welcome.command(aliases=['fr'])
-    async def french(self, ctx):
-        await ctx.reply(WELCOME_MESSAGES['french'])
-
-    @welcome.command(aliases=['es'])
-    async def spanish(self, ctx):
-        await ctx.reply(WELCOME_MESSAGES['spanish'])
-
-    @welcome.command(aliases=['de'])
-    async def german(self, ctx):
-        await ctx.reply(WELCOME_MESSAGES['german'])
-
     @commands.slash_command(name="welcome", guild_ids=ALTTP_RANDOMIZER_SERVERS)
     async def welcome_cmd(self, ctx, language: Option(str, description="Choose a language for the welcome message.", choices=["french", "spanish", "german"])):
         await ctx.respond(WELCOME_MESSAGES[language])
@@ -119,27 +103,6 @@ class Misc(commands.Cog):
             embed.set_thumbnail(url=member.avatar.url)
         await ctx.respond(embed=embed, ephemeral=True)
 
-    @commands.command()
-    async def prng(self, ctx):
-        await ctx.reply("PRNG is RNG!  It is random!  Humans tend to identify patterns where they do not exist.\n\nIf you're a Linux nerd check this out: https://www.2uo.de/myths-about-urandom/")
-
-    @commands.command(hidden=True)
-    async def pedestalgoal(self, ctx):
-        await ctx.reply("> If it takes 2 hours its because GT is required, which really isn't a thing anymore in pedestal goal games\n-Synack")
-
-    @commands.command(
-        aliases=['crc32'],
-        brief="Posts instructions on how to verify your ROM is correct.",
-        help="Posts instructions on how to verify your ROM is correct, or how to get the permalink to your randomized game."
-    )
-    async def rom(self, ctx):
-        await ctx.reply(
-            "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALTTPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
-            "It can also help get the permalink page URL which has access to the Spoiler Log depending on the settings that were chosen. Not all games that are generated have access to the Spoiler Log.\n\n"
-            "For legal reasons, we cannot provide help with finding this ROM online.  Please do not ask here for assistance with this.\n"
-            "See <#543572578787393556> for details."
-        )
-
     @commands.slash_command(
         name="rom",
         guild_ids=ALTTP_RANDOMIZER_SERVERS
@@ -158,15 +121,7 @@ class Misc(commands.Cog):
         aliases=['holy']
     )
     async def holyimage(self, ctx, slug, game=None):
-        if game is None:
-            if ctx.guild is None:
-                game = "z3r"
-            else:
-                game = await ctx.guild.config_get("HolyImageDefaultGame", "z3r")
-
-        holyimage = await HolyImage.construct(slug=slug, game=game)
-
-        await ctx.reply(embed=holyimage.embed)
+        await ctx.reply("Please use the new `/holyimage` slash command.")
 
     @commands.slash_command(
         name='holyimage'
