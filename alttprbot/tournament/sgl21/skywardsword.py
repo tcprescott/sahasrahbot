@@ -15,7 +15,8 @@ class SSR(SGLRandomizerTournamentRace):
             event_slug="sgl21ssr",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
-            coop=False
+            coop=False,
+            stream_delay=15
         )
 
     async def roll(self):
