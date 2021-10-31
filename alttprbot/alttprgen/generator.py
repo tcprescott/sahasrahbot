@@ -61,7 +61,7 @@ class SahasrahBotPresetCore():
         self.preset_data: dict = None
 
         if preset:
-            parsed = preset.split('/')
+            parsed = preset.lower().split('/')
             if len(parsed) == 1:
                 # we have a global preset
                 self.namespace = None
