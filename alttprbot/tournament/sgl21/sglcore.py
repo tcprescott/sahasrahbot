@@ -157,7 +157,7 @@ class SGLRandomizerTournamentRace(SGLCoreTournamentRace):
     async def process_tournament_race(self):
         await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
-        await self.update_data()
+        # await self.update_data()
         await self.roll()
 
         await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
