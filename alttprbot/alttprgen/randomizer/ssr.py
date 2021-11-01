@@ -44,20 +44,28 @@ async def generate_seed(permalink, spoiler=False):
         if proc.returncode > 0:
             raise Exception(f'Exception while generating game: {stderr.decode()}')
 
-        if spoiler:
+        try:
             spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name} - Spoiler Log.txt")
 
-        else:
+            with open(spoiler_log_file_name, "r") as spoiler_log_file:
+                bare_log = spoiler_log_file.read()
+                log = bare_log.split('\n')
+
+                version = log[0]
+                permalink = log[1].split(' ')[1]
+                hash_re = re.compile('Hash : (.*)')
+                rando_hash = hash_re.findall(log[3])[0]
+        except FileNotFoundError:
             spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name} - Anti Spoiler Log.txt")
 
-        with open(spoiler_log_file_name, "r") as spoiler_log_file:
-            bare_log = spoiler_log_file.read()
-            log = bare_log.split('\n')
+            with open(spoiler_log_file_name, "r") as spoiler_log_file:
+                bare_log = spoiler_log_file.read()
+                log = bare_log.split('\n')
 
-            version = log[0]
-            permalink = log[1].split(' ')[1]
-            hash_re = re.compile('Hash : (.*)')
-            rando_hash = hash_re.findall(log[3])[0]
+                version = log[0]
+                permalink = log[1].split(' ')[1]
+                hash_re = re.compile('Hash : (.*)')
+                rando_hash = hash_re.findall(log[3])[0]
 
     if spoiler:
         timestamp = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
