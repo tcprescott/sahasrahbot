@@ -1,4 +1,4 @@
-from .alttpr import GameHandler as TestGameHandler
+from .sgl import GameHandler as TestGameHandler
 
 
 class GameHandler(TestGameHandler):

@@ -47,6 +47,26 @@ class Bloodstained(SGLRandomizerTournamentRace):
             hide_card='on'
         )
 
+    async def create_race_room(self):
+        self.rtgg_handler = await self.rtgg_bot.startrace(
+            goal=self.data.racetime_goal,
+            invitational=False,
+            unlisted=True,
+            info=self.race_info,
+            start_delay=30,
+            time_limit=24,
+            streaming_required=True,
+            auto_start=True,
+            allow_comments=True,
+            hide_comments=True,
+            allow_prerace_chat=True,
+            allow_midrace_chat=True,
+            allow_non_entrant_chat=False,
+            chat_message_delay=0,
+            team_race=self.data.coop,
+        )
+        return self.rtgg_handler
+
     async def on_room_creation(self):
         await self.rtgg_handler.send_message('Setting up bingo cards, please wait...')
 
@@ -83,7 +103,7 @@ class Bloodstained(SGLRandomizerTournamentRace):
 
         await self.rtgg_handler.send_message('Successfully sent BingoSync room to SpeedGaming for setup!')
 
-    async def on_race_start(self):
+    async def on_race_pending(self):
         bingoseed = random.randint(10000, 99999)
         await self.rtgg_handler.send_message(f"-----------------------")
         await self.rtgg_handler.send_message(f"The seed for this race: {bingoseed}")

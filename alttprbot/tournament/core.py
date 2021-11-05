@@ -189,6 +189,9 @@ class TournamentRace(object):
     async def on_race_start(self):
         pass
 
+    async def on_race_pending(self):
+        pass
+
     async def process_tournament_race(self):
         pass
 
