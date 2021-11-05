@@ -228,6 +228,8 @@ class Tournament(commands.Cog):
             for match in ['match1', 'match2']:
                 if episode[match]:
                     for player in episode[match]['players']:
+                        if player['publicStream'] == 'ignore':
+                            continue
                         try:
                             member = event_data.guild.get_member(int(player.get('discordId', '')))
                         except ValueError:
