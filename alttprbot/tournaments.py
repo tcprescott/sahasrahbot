@@ -20,7 +20,7 @@ RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 
 if c.DEBUG:
     TOURNAMENT_DATA = {
-        # 'test': test.TestTournament
+        'test': test.TestTournament
     }
 else:
     TOURNAMENT_DATA = {

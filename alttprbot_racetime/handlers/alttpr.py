@@ -33,6 +33,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.tournament.on_race_start()
 
     async def status_pending(self):
+        await super().status_pending()
         await self.edit(hide_comments=True)
 
     async def ex_race(self, args, message):

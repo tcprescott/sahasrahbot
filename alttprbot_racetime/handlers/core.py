@@ -114,7 +114,8 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.tournament.on_race_start()
 
     async def status_pending(self):
-        pass
+        if self.tournament:
+            await self.tournament.on_race_pending()
 
     async def status_open(self):
         pass
