@@ -10,7 +10,7 @@ class SmashBros(SGLCoreTournamentRace):
             guild=guild,
             racetime_category='sgl',
             racetime_goal="Super Smash Bros",
-            event_slug="sgl21ssbsse",
+            event_slug="sgl21ssbb",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False
