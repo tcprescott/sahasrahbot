@@ -20,7 +20,7 @@ class SMO(SGLCoreTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='sgl',
-            racetime_goal="Super Mario Galaxy Triple Bingo",
+            racetime_goal="Super Mario Odyssey Triple Bingo",
             event_slug="sgl21smo",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
