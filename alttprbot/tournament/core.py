@@ -47,6 +47,8 @@ class TournamentConfig:
 
     stream_delay: int = 0
     room_open_time: int = 35
+    auto_record: bool = False
+    gsheet_id: str = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
 
     lang: str = 'en'
     coop: bool = False

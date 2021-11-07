@@ -14,6 +14,7 @@ class TestTournament(sgl21.Bloodstained):
             event_slug="test",
             audit_channel=discordbot.get_channel(537469084527230976),
             commentary_channel=discordbot.get_channel(659307060499972096),
+            auto_record=True
         )
 
     @property

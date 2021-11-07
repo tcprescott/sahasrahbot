@@ -1,5 +1,6 @@
 import logging
 import random
+import os
 
 from alttprbot import models
 from alttprbot.alttprgen.preset import generate_preset, fetch_preset
@@ -19,7 +20,8 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False,
-            stream_delay=20
+            stream_delay=20,
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
         )
 
     async def roll(self):

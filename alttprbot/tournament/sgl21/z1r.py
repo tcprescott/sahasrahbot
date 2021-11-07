@@ -1,3 +1,5 @@
+import os
+
 from alttprbot.alttprgen.randomizer import roll_z1r
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
@@ -15,7 +17,8 @@ class Z1R(SGLRandomizerTournamentRace):
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             stream_delay=15,
-            coop=False
+            coop=False,
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
         )
 
     async def roll(self):

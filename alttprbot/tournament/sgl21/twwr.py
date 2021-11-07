@@ -1,3 +1,5 @@
+import os
+
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from .sglcore import SGLCoreTournamentRace
@@ -14,7 +16,8 @@ class TWWR(SGLCoreTournamentRace):
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False,
-            stream_delay=60
+            stream_delay=60,
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
         )
 
     async def create_race_room(self):

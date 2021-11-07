@@ -1,3 +1,5 @@
+import os
+
 from alttprbot.alttprgen.randomizer import roll_smb3r
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
@@ -14,7 +16,8 @@ class SMB3R(SGLRandomizerTournamentRace):
             event_slug="sgl21smb3r",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
-            coop=False
+            coop=False,
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
         )
 
     @property
