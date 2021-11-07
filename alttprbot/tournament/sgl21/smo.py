@@ -25,7 +25,8 @@ class SMO(SGLCoreTournamentRace):
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False,
-            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET"),
+            auto_record=True
         )
 
     async def on_room_creation(self):

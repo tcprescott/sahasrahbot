@@ -18,7 +18,8 @@ class OOTR(SGLRandomizerTournamentRace):
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False,
             stream_delay=15,
-            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET"),
+            auto_record=True
         )
 
     @property

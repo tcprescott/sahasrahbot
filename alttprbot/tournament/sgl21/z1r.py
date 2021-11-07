@@ -18,7 +18,8 @@ class Z1R(SGLRandomizerTournamentRace):
             commentary_channel=discordbot.get_channel(631564559018098698),
             stream_delay=15,
             coop=False,
-            gsheet_id=os.environ.get("SGL_RESULTS_SHEET")
+            gsheet_id=os.environ.get("SGL_RESULTS_SHEET"),
+            auto_record=True
         )
 
     async def roll(self):
