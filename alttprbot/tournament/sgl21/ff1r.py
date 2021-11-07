@@ -21,7 +21,7 @@ class FFR(SGLRandomizerTournamentRace):
         )
 
     async def roll(self):
-        _, self.seed_url = roll_ffr("https://4-2-3.finalfantasyrandomizer.com/?s=0&f=YerhiLJ4MsRAxHLfsmtgvEUakmYRfqHbd44FvmfJi8HqCr4fd7TUBGkjKSytIkmBrpcKfJBbWCXHhJOG7GWir-U2V6hGfHEAxuNEiePNZlKdoymWRgmehZgLdXjVqCEGjOS9akIwEx2bSd9tB")
+        _, self.seed_url = roll_ffr("https://4-2-3.finalfantasyrandomizer.com/?s=00000000&f=YePQ5AT8NsRAxHLfsmtgvEUakmYRfqHbd44FvmfJi8HqCr4fd7TUBGkjKSytIkmBrpcKfJBbWCXHhJOG7GWir-U2V6hGfHEAxuNEiePNZlKdoymWRgmehZgLdXjVqCEGjOS9akIwEx2bSd9tB")
 
     @property
     def seed_info(self):
