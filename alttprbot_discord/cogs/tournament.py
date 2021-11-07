@@ -234,6 +234,9 @@ class Tournament(commands.Cog):
                         if player['displayName'].startswith('Winner of '):
                             continue
 
+                        if player['displayName'].startswith('Loser of '):
+                            continue
+
                         try:
                             member = event_data.guild.get_member(int(player.get('discordId', '')))
                         except ValueError:
