@@ -230,6 +230,10 @@ class Tournament(commands.Cog):
                     for player in episode[match]['players']:
                         if player['publicStream'] == 'ignore':
                             continue
+
+                        if player['displayName'].startswith('Winner of '):
+                            continue
+
                         try:
                             member = event_data.guild.get_member(int(player.get('discordId', '')))
                         except ValueError:
