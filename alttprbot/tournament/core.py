@@ -9,6 +9,7 @@ from alttprbot.util import speedgaming
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
+from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 import dateutil.parser
 import pytz
 
@@ -222,7 +223,7 @@ class TournamentRace(object):
 
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
 
-        self.rtgg_bot: racetime.SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
+        self.rtgg_bot: SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
         self.players = []

@@ -268,6 +268,8 @@ class TournamentGames(Model):
     event = fields.CharField(45, null=True)
     game_number = fields.IntField(null=True)
     settings = fields.JSONField(null=True)
+    preset = fields.CharField(100, null=True)
+    notes = fields.TextField(null=True)
     submitted = fields.SmallIntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)

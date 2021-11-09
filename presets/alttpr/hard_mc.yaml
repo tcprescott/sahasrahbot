@@ -1,0 +1,28 @@
+---
+goal_name: hard open maps and compasses
+customizer: false
+description: "Only maps and compasses are shuffled in the world, hard item pool"
+settings:
+  goal: ganon
+  item:
+    pool: hard
+    functionality: normal
+  lang: en
+  mode: open
+  hints: "off"
+  weapons: randomized
+  crystals:
+    ganon: "7"
+    tower: "7"
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: mc
+  item_placement: advanced

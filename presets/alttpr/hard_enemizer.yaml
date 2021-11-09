@@ -1,0 +1,28 @@
+---
+goal_name: hard enemizer open
+description: "Some good ol' enemy and boss shuffle, hard item pool."
+customizer: false
+settings:
+  goal: ganon
+  item:
+    pool: hard
+    functionality: normal
+  lang: en
+  mode: open
+  hints: "off"
+  weapons: randomized
+  crystals:
+    ganon: "7"
+    tower: "7"
+  enemizer:
+    boss_shuffle: full
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: shuffled
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: items
+  dungeon_items: standard
+  item_placement: advanced
