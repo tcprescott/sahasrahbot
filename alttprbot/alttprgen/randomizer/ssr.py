@@ -46,8 +46,10 @@ async def generate_seed(permalink, spoiler=False):
 
         logging.info("\n".join(os.listdir(tmp)))
 
+        seed_name_stripped = seed_name.lstrip('0')
+
         try:
-            spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name} - Spoiler Log.txt")
+            spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name_stripped} - Spoiler Log.txt")
 
             with open(spoiler_log_file_name, "r") as spoiler_log_file:
                 bare_log = spoiler_log_file.read()
@@ -58,7 +60,7 @@ async def generate_seed(permalink, spoiler=False):
                 hash_re = re.compile('Hash : (.*)')
                 rando_hash = hash_re.findall(log[3])[0]
         except FileNotFoundError:
-            spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name} - Anti Spoiler Log.txt")
+            spoiler_log_file_name = os.path.join(tmp, f"SS Random {seed_name_stripped} - Anti Spoiler Log.txt")
 
             with open(spoiler_log_file_name, "r") as spoiler_log_file:
                 bare_log = spoiler_log_file.read()
