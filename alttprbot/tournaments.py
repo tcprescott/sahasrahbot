@@ -32,7 +32,7 @@ else:
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         # 'alttpr': alttpr.ALTTPRTournamentRace,
-        # 'smwde': smwde.SMWDETournament,
+        'smwde': smwde.SMWDETournament,
         # 'alttprfr': alttprfr.ALTTPRFRTournament,
         # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
         # 'alttpres': alttpres.ALTTPRESTournament,
