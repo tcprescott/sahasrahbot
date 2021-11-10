@@ -4,7 +4,7 @@ import logging
 # import aiohttp
 # import tortoise.exceptions
 from alttprbot import models
-from alttprbot.alttprgen import preset #, spoilers
+from alttprbot.alttprgen import preset  # , spoilers
 # from alttprbot.database import spoiler_races  # TODO switch to ORM
 from alttprbot.alttprgen import generator
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
@@ -125,34 +125,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
     @property
     def submission_form(self):
-        return [
-            {
-                'key': 'game',
-                'label': 'Game #',
-                'settings': {
-                    '1': '1',
-                    '2': '2',
-                    '3': '3',
-                    '4': '4',
-                    '5': '5',
-                }
-            },
-            {
-                'key': 'preset',
-                'label': 'Preset',
-                'required_if': {
-                    'game': ['3', '4']
-                },
-                'default': 'default',
-                'settings': {
-                    'default': 'Game 1, 2, or 5',
-                    'invrosia': 'Invrosia',
-                    'league_swordless': 'League Swordless',
-                    'hard_mc': 'Open Hard MC Shuffle',
-                    'hard_enemizer': 'Open Hard Enemizer',
-                }
-            }
-        ]
+        return "submission_league.html"
 
     async def process_submission_form(self, payload, submitted_by):
         embed = discord.Embed(

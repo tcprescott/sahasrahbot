@@ -11,7 +11,7 @@ from alttprbot import models
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot.tournament.core import UnableToLookupEpisodeException
 from alttprbot.alttprgen import generator
-from alttprbot.database import srlnick # TODO switch to ORM
+from alttprbot.database import srlnick  # TODO switch to ORM
 from alttprbot_discord.bot import discordbot
 
 sahasrahbotapi = Quart(__name__)
@@ -163,15 +163,25 @@ async def submission_form(event):
     if form_data is None:
         raise Exception("There is no form submission data for this event.")
 
-    return await render_template(
-        'submission.html',
-        logged_in=True,
-        user=user,
-        event=event,
-        endpoint=url_for("submit"),
-        settings_list=form_data,
-        episode_id=episode_id
-    )
+    if isinstance(form_data, str):
+        return await render_template(
+            form_data,
+            logged_in=True,
+            user=user,
+            event=event,
+            endpoint=url_for("submit"),
+            episode_id=episode_id
+        )
+    else:
+        return await render_template(
+            'submission.html',
+            logged_in=True,
+            user=user,
+            event=event,
+            endpoint=url_for("submit"),
+            settings_list=form_data,
+            episode_id=episode_id
+        )
 
 
 @sahasrahbotapi.route("/submit", methods=['POST'])

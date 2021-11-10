@@ -1,0 +1,65 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Match Submission</title>
+{%- endblock head %}
+
+{% block content -%}
+
+<script>
+    var disableField = function () {
+        var game = document.getElementById("game").value;
+
+        switch (game) {
+            case '1':
+                document.getElementById("preset").hidden = true;
+                document.getElementById("static_preset").hidden = false;
+                document.getElementById("static_preset").innerHTML = "casualboots";
+                break;
+            case '2':
+                document.getElementById("preset").hidden = true;
+                document.getElementById("static_preset").hidden = false;
+                document.getElementById("static_preset").innerHTML = "crosskeys";
+                break;
+            case '3':
+                document.getElementById("preset").hidden = false;
+                document.getElementById("static_preset").hidden = true;
+                break;
+            case '4':
+                document.getElementById("preset").hidden = false;
+                document.getElementById("static_preset").hidden = true;
+                break;
+            case '5':
+                document.getElementById("preset").hidden = true;
+                document.getElementById("static_preset").hidden = false;
+                document.getElementById("static_preset").innerHTML = "retrance";
+                break;
+        }
+    };
+</script>
+
+<form action="{{ endpoint }}" method="post">
+    <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid"
+        value="{{ episode_id }}" required><br><br>
+    <input type="hidden" id="event" name="event" value="{{ event }}">
+
+    <label for="game">Game #:</label>
+    <select name="game" id="game" onchange="disableField()">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select><br><br>
+
+    <label for="preset">Preset:</label>
+    <select name="preset" id="preset" hidden="true">
+        <option value="invrosia">Invrosia</option>
+        <option value="league_swordless">League Swordless</option>
+        <option value="hard_mc">Open Hard MC Shuffle</option>
+        <option value="hard_enemizer">Open Hard Enemizer</option>
+    </select>
+    <div id="static_preset">casualboots</div><br><br>
+    <input type="submit" value="Submit">
+</form>
+{%- endblock content %}
