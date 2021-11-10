@@ -31,6 +31,7 @@ title:  Presets
 | [crisscrosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crisscrosskeys.yaml) |Cross dungeon doors, crossworld entrance shuffle, plus keysanity.|   *Door Randomizer*|
 | [crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossdoors.yaml) |Cross dungeon doors|   *Door Randomizer*|
 | [crossedkeydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossedkeydrop.yaml) |Cross dungeon door shuffle plus key drops.|   *Door Randomizer*|
+| [crosskeydropsoup](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeydropsoup.yaml) |crossworld entrance shuffle, with a touch of keydrop shuffle and starting flute and boots.|   *Door Randomizer*|
 | [crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys.yaml) |Crossworld entrance with keysanity.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
 | [dungeons_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons_boots.yaml) |All Dungeons, but you get boots too!| *Customizer*  |
@@ -39,6 +40,8 @@ title:  Presets
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
 | [fadkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower.| *Customizer*  |
 | [goldrush](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/goldrush.yaml) |A 49/50 Triforce Hunt, by BigDunka| *Customizer*  |
+| [hard_enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_enemizer.yaml) |Some good ol' enemy and boss shuffle, hard item pool.|   |
+| [hard_mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_mc.yaml) |Only maps and compasses are shuffled in the world, hard item pool|   |
 | [hardicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hardicerodhunt.yaml) |You get every item absolutely **required** to beat the game, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
 | [hybridmg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hybridmg.yaml) || *Customizer*  |
 | [inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted.yaml) |Inverted.  You start in the dark world.|   |
@@ -50,6 +53,7 @@ title:  Presets
 | [keydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keydrop.yaml) |Key drop items are shuffled.|   *Door Randomizer*|
 | [keydropsanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keydropsanity.yaml) |Key drop items are shuffled.|   *Door Randomizer*|
 | [keysanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keysanity.yaml) |Open keysanity|   |
+| [league_swordless](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/league_swordless.yaml) |Swords are overrated anyway. (Standard dungeon item shuffle)| *Customizer*  |
 | [lightspeed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/lightspeed.yaml) |Complete the 3 Light World pendant dungeons to ascend Agahnim''s Tower and grab the Triforce on the Pyramid Ledge.| *Customizer*  |
 | [mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mc.yaml) |Only maps and compasses are shuffled in the world.|   |
 | [mcs](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mcs.yaml) |Maps, compasses, and small keys are shuffled in the world.|   |
@@ -111,6 +115,7 @@ title:  Presets
 | [lostworlds](https://github.com/tcprescott/sahasrahbot/blob/master/presets/ctjets/lostworlds.yaml) |Lost Worlds|   |
 | [newplayers](https://github.com/tcprescott/sahasrahbot/blob/master/presets/ctjets/newplayers.yaml) |New Players|   |
 | [race](https://github.com/tcprescott/sahasrahbot/blob/master/presets/ctjets/race.yaml) |Race|   |
+| [sglive](https://github.com/tcprescott/sahasrahbot/blob/master/presets/ctjets/sglive.yaml) |SpeedGaming Live|   |
 
 ## SM
 
