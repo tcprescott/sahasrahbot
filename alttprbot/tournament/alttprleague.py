@@ -147,7 +147,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
                 'settings': {
                     'default': 'Game 1, 2, or 5',
                     'invrosia': 'Invrosia',
-                    'champions_swordless': 'Champion\'s Swordless',
+                    'league_swordless': 'League Swordless',
                     'hard_mc': 'Open Hard MC Shuffle',
                     'hard_enemizer': 'Open Hard Enemizer',
                 }
