@@ -36,7 +36,7 @@ settings:
     shuffleganon: true
     shufflepots: false
     startinventory: "Ocarina,Pegasus Boots"
-    swords: random
+    swords: assured
     timer: none
     usestartinventory: false
     customitemarray:
