@@ -52,4 +52,4 @@ ref = "aiohttp_update"
 
 [packages.py-cord]
 git = "https://github.com/Pycord-Development/pycord.git"
-ref = "1e77d6e542ff646eb20449a6a41671a0944d739c"
+ref = "c5eef49ad5b1240a29f25a6e1856dfb9abf3491b"
