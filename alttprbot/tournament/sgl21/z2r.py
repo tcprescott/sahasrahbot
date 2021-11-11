@@ -27,4 +27,4 @@ class Z2R(SGLRandomizerTournamentRace):
 
     @property
     def seed_info(self):
-        return f"Seed: {self.seed} - Flags: jhhhD0j9$78$JpTBT!BhSA!0P@@A"
+        return f"Seed: {self.seed} - Flags: jhhhD0j9x78$JpTBT!BhSA!0P@@A"
