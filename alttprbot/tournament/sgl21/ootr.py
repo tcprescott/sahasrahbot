@@ -29,7 +29,7 @@ class OOTR(SGLRandomizerTournamentRace):
     async def roll(self):
         self.seed = await roll_ootr(
             encrypt=True,
-            version='dev_6.0.131',
+            version='6.1.0',
             settings={
                 "world_count": 1,
                 "create_spoiler": True,
