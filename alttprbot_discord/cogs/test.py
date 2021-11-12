@@ -6,7 +6,7 @@ from discord.commands import SlashCommandGroup, Option
 class Test(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        # self.bot.add_application_command(self.test_grp)
+    #     self.bot.add_application_command(self.test_grp)
 
     # test_grp = SlashCommandGroup(name="test", description="This is a test command")
 
