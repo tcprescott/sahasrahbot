@@ -36,7 +36,7 @@ class AlttprDoor():
             self.settings['count'] = 1
             self.settings['multi'] = 1
             self.settings['names'] = ""
-            self.settings['race'] = False
+            self.settings['race'] = not self.spoilers
 
             with open(settings_file_path, "w") as f:
                 json.dump(self.settings, f)
@@ -98,7 +98,6 @@ class AlttprDoor():
                     Body=patchfile,
                     ACL='public-read'
                 )
-
 
             async with aiofiles.open(spoiler_path, "rb") as f:
                 self.spoilerfile = await f.read()
