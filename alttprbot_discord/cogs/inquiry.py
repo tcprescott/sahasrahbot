@@ -82,6 +82,10 @@ class Inquiry(commands.Cog):
         """
         Adds a message that allows users to create a private thread to open an inquiry.
         """
+        if not ctx.channel.permissions_for(ctx.author).manage_threads:
+            await ctx.respond("You must have manage threads permission to use this feature.", ephemeral=True)
+            return
+
         if "PRIVATE_THREADS" not in ctx.guild.features and not c.DEBUG:
             await ctx.respond("Private threads must be available on this server.", ephemeral=True)
             return
