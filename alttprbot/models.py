@@ -72,6 +72,11 @@ class DiscordServerCategories(Model):
     category_description = fields.CharField(200, null=True)
 
 
+class InquiryMessageConfig(Model):
+    message_id = fields.BigIntField(pk=True, generated=False)
+    role_id = fields.BigIntField(null=False)
+
+
 class LeaguePlayoffs(Model):
     class Meta:
         table = 'league_playoffs'

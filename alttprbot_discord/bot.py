@@ -63,6 +63,7 @@ discordbot.load_extension("alttprbot_discord.cogs.tournament")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")
 discordbot.load_extension("alttprbot_discord.cogs.multiworld")
 discordbot.load_extension("alttprbot_discord.cogs.generator")
+discordbot.load_extension("alttprbot_discord.cogs.inquiry")
 
 if c.DEBUG:
     discordbot.load_extension("alttprbot_discord.cogs.test")
