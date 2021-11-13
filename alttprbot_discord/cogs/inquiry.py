@@ -16,7 +16,6 @@ class ConfirmInquiryThread(discord.ui.View):
 
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬", custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, button: discord.ui.Button, interaction: discord.Interaction):
-        # original_message = await interaction.original_message()
         inquiry_message_config = await models.InquiryMessageConfig.get(message_id=interaction.message.id)
         role = interaction.guild.get_role(inquiry_message_config.role_id)
         view = OpenInquiryThread(inquiry_message_config)
