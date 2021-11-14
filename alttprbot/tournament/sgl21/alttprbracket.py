@@ -28,12 +28,12 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
     async def roll(self):
         try:
             if self.broadcast_channels:
-                triforce_texts = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglbracket')
+                triforce_texts = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglfinal')
             else:
-                triforce_texts = await models.TriforceTexts.filter(pool_name='sglbracket')
+                triforce_texts = await models.TriforceTexts.filter(pool_name='sglfinal')
 
             if not triforce_texts:
-                triforce_texts = await models.TriforceTexts.filter(pool_name='sglbracket')
+                triforce_texts = await models.TriforceTexts.filter(pool_name='sglfinal')
 
             triforce_text = random.choice(triforce_texts)
 
