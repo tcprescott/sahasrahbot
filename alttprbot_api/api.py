@@ -152,6 +152,13 @@ async def mysterygenwithweights(weightset):
     )
 
 
+@sahasrahbotapi.route('/api/tournament/games', methods=['GET'])
+async def get_tournament_games():
+    terms = request.args
+    data = await models.TournamentGames.filter(**terms).values()
+    return jsonify(data)
+
+
 @sahasrahbotapi.route("/submit/<string:event>", methods=['GET'])
 @requires_authorization
 async def submission_form(event):
