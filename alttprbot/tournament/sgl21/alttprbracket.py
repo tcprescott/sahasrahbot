@@ -27,17 +27,17 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
 
     async def roll(self):
         try:
-            if self.broadcast_channels:
-                triforce_texts = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglfinal')
-            else:
-                triforce_texts = await models.TriforceTexts.filter(pool_name='sglfinal')
+            # if self.broadcast_channels:
+            #     triforce_texts = await models.TriforceTexts.filter(broadcasted=False, pool_name='sglfinal')
+            # else:
+            #     triforce_texts = await models.TriforceTexts.filter(pool_name='sglfinal')
 
-            if not triforce_texts:
-                triforce_texts = await models.TriforceTexts.filter(pool_name='sglfinal')
+            # if not triforce_texts:
+            #     triforce_texts = await models.TriforceTexts.filter(pool_name='sglfinal')
 
-            triforce_text = random.choice(triforce_texts)
+            # triforce_text = random.choice(triforce_texts)
 
-            text = triforce_text.text.encode("utf-8").decode("unicode_escape")
+            text = "BO1 Double\nElim Worked\nツ -Daaanty"
 
             logging.info(f"Using triforce text: {text}")
 
@@ -46,9 +46,9 @@ class ALTTPRBrackets(SGLRandomizerTournamentRace):
             self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
             self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
 
-            if self.broadcast_channels:
-                triforce_text.broadcasted = True
-                await triforce_text.save()
+            # if self.broadcast_channels:
+            #     triforce_text.broadcasted = True
+            #     await triforce_text.save()
         except IndexError:
             logging.exception("Could not retrieve any triforce texts, generating this normally instead...")
             self.preset_dict = await fetch_preset('sglive')
