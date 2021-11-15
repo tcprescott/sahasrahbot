@@ -48,32 +48,32 @@ else:
         'alttprleague': alttprleague.ALTTPROpenLeague,
 
         # SGL
-        'sgl21alttpr': sgl21.ALTTPRBrackets,
-        'sgl21aosr': sgl21.AOSR,
-        'sgl21bloodstained': sgl21.Bloodstained,
-        'sgl21ctjets': sgl21.CTJets,
-        'sgl21deadlytowers': sgl21.DeadlyTowers,
-        'sgl21factorio': sgl21.FactorioALTTP,
-        'sgl21ffr': sgl21.FFR,
-        'sgl21messenger': sgl21.Messenger,
-        'sgl21minecraft2v2': sgl21.Minecraft,
+        # 'sgl21alttpr': sgl21.ALTTPRBrackets,
+        # 'sgl21aosr': sgl21.AOSR,
+        # 'sgl21bloodstained': sgl21.Bloodstained,
+        # 'sgl21ctjets': sgl21.CTJets,
+        # 'sgl21deadlytowers': sgl21.DeadlyTowers,
+        # 'sgl21factorio': sgl21.FactorioALTTP,
+        # 'sgl21ffr': sgl21.FFR,
+        # 'sgl21messenger': sgl21.Messenger,
+        # 'sgl21minecraft2v2': sgl21.Minecraft,
         'sgl21mmx': sgl21.MMX,
-        'sgl21ootr': sgl21.OOTR,
-        'sgl21pkmnredrando': sgl21.PokemonRedRando,
-        'sgl21pmdsky': sgl21.PMDSkyRando,
-        'sgl21smany': sgl21.SMAny,
-        'sgl21smb3r': sgl21.SMB3R,
-        'sgl21smo': sgl21.SMO,
-        'sgl21smr': sgl21.SuperMetroidRando,
-        'sgl21smz3': sgl21.SMZ3,
-        'sgl21specter': sgl21.ShovelKnight,
-        'sgl21ssbb': sgl21.SmashBros,
-        'sgl21ssr': sgl21.SSR,
-        'sgl21startropics': sgl21.StarTropics,
-        'sgl21timespinner': sgl21.Timespinner,
-        'sgl21twwr': sgl21.TWWR,
-        'sgl21z1r': sgl21.Z1R,
-        'sgl21zelda2': sgl21.Z2R,
+        # 'sgl21ootr': sgl21.OOTR,
+        # 'sgl21pkmnredrando': sgl21.PokemonRedRando,
+        # 'sgl21pmdsky': sgl21.PMDSkyRando,
+        # 'sgl21smany': sgl21.SMAny,
+        # 'sgl21smb3r': sgl21.SMB3R,
+        # 'sgl21smo': sgl21.SMO,
+        # 'sgl21smr': sgl21.SuperMetroidRando,
+        # 'sgl21smz3': sgl21.SMZ3,
+        # 'sgl21specter': sgl21.ShovelKnight,
+        # 'sgl21ssbb': sgl21.SmashBros,
+        # 'sgl21ssr': sgl21.SSR,
+        # 'sgl21startropics': sgl21.StarTropics,
+        # 'sgl21timespinner': sgl21.Timespinner,
+        # 'sgl21twwr': sgl21.TWWR,
+        # 'sgl21z1r': sgl21.Z1R,
+        # 'sgl21zelda2': sgl21.Z2R,
     }
 
 
@@ -176,6 +176,7 @@ async def race_recording_task():
 
     logging.debug('done')
 
+
 async def racetime_auto_record(race_data):
     url = RACETIME_URL + race_data['url']
     record_url = url + "/monitor/record"
@@ -191,7 +192,7 @@ async def racetime_auto_record(race_data):
                 method='get',
                 url=url,
                 cookies={'sessionid': RACETIME_SESSION_TOKEN,
-                        'csrftoken': RACETIME_CSRF_TOKEN},
+                         'csrftoken': RACETIME_CSRF_TOKEN},
                 raise_for_status=True
             ) as resp:
                 soup = BeautifulSoup(await resp.text(), features="html5lib")
@@ -206,9 +207,9 @@ async def racetime_auto_record(race_data):
                 method='post',
                 url=record_url,
                 cookies={'sessionid': RACETIME_SESSION_TOKEN,
-                        'csrftoken': RACETIME_CSRF_TOKEN},
+                         'csrftoken': RACETIME_CSRF_TOKEN},
                 headers={'Origin': RACETIME_URL,
-                        'Referer': url},
+                         'Referer': url},
                 data=data,
                 raise_for_status=True
             ) as resp:
