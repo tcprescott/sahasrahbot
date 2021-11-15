@@ -65,12 +65,11 @@ else:
             client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMR'),
             handler_class=handlers.smr.GameHandler,
         ),
-        # 'smw-hacks': RacetimeBotConfig(
-        #     category='smw-hacks',
-        #     client_id=os.environ.get(f"RACETIME_CLIENT_ID_SMWHACKS"),
-        #     client_secret=os.environ.get(f'RACETIME_CLIENT_SECRET_SMWHACKS'),
-        #     handler_class=handlers.smwhacks.GameHandler,
-        # ),
+        'smw-hacks': RacetimeBotConfig(
+            client_id=os.environ.get("RACETIME_CLIENT_ID_SMWHACKS"),
+            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMWHACKS'),
+            handler_class=handlers.smwhacks.GameHandler,
+        ),
         'smz3': RacetimeBotConfig(
             client_id=os.environ.get("RACETIME_CLIENT_ID_SMZ3"),
             client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMZ3'),
