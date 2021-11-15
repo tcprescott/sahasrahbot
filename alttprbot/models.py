@@ -259,10 +259,8 @@ class SRLNick(Model):
         table = 'srlnick'
 
     discord_user_id = fields.BigIntField(pk=True, generated=False)
-    srl_nick = fields.CharField(200, index=True)
-    twitch_name = fields.CharField(200, index=True)
-    rtgg_id = fields.CharField(200, index=True)
-    srl_verified = fields.SmallIntField(null=True)
+    twitch_name = fields.CharField(200, index=True, null=True)
+    rtgg_id = fields.CharField(200, index=True, null=True)
 
 
 class TournamentGames(Model):

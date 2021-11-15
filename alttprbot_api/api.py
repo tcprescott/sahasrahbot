@@ -11,7 +11,6 @@ from alttprbot import models
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot.tournament.core import UnableToLookupEpisodeException
 from alttprbot.alttprgen import generator
-from alttprbot.database import srlnick  # TODO switch to ORM
 from alttprbot_discord.bot import discordbot
 
 sahasrahbotapi = Quart(__name__)
@@ -242,7 +241,7 @@ async def return_racetime_verify():
     async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
-    await srlnick.insert_rtgg_id(user.id, userinfo_data['id'])
+    await models.SRLNick.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id']})
 
     return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
 
