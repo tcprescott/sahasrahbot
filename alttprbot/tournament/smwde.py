@@ -1,6 +1,7 @@
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
+
 class SMWDETournament(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(753727862229565612)
@@ -15,5 +16,6 @@ class SMWDETournament(TournamentRace):
                 guild.get_role(754845429773893782),
                 guild.get_role(753742980820631562),
             ],
-            lang='de'
+            lang='de',
+            gsheet_id='1BrkmhNPnpjNUSUx5yGrnm09XbfAFhYDsi-7-fHp62qY',
         )
