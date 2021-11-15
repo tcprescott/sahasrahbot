@@ -388,17 +388,6 @@ class TwitchChannels(Model):
     status = fields.CharField(45, null=False)
 
 
-class TwitchCommandText(Model):
-    class Meta:
-        table = 'twitch_command_text'
-        unique_together = ('channel', 'command')
-
-    id = fields.IntField(pk=True)
-    channel = fields.CharField(200, null=True)
-    command = fields.CharField(45, null=True)
-    content = fields.CharField(4000, null=True)
-
-
 class VoiceRole(Model):
     class Meta:
         table = 'voice_role'
