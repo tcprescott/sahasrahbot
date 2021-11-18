@@ -79,10 +79,10 @@ async def bad_domain_hashes() -> List:
     async with aiohttp.ClientSession() as session:
         async with session.request(
             method='get',
-            url='https://raw.githubusercontent.com/relative/discord-bad-domains/master/hashes.json',
+            url='https://cdn.discordapp.com/bad-domains/hashes.json',
             raise_for_status=True
         ) as resp:
-            hashes: list = await resp.json(content_type="text/plain")
+            hashes: list = await resp.json()
 
     return hashes
 
