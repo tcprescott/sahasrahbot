@@ -1,14 +1,18 @@
 import io
 import zipfile
 import datetime
+from typing import List
+import hashlib
 
 from urllib.parse import urlparse
 from urlextract import URLExtract
 
+import aiocache
+import aiohttp
 import discord
 from discord.ext import commands
 
-from alttprbot.database import config # TODO switch to ORM
+from alttprbot.database import config  # TODO switch to ORM
 from alttprbot.util import http
 
 urlextractor = URLExtract()
@@ -24,10 +28,16 @@ class Moderation(commands.Cog):
             return
 
         if hasattr(message.author, 'joined_at') and message.author.joined_at > discord.utils.utcnow()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true" and not message.author.id == self.bot.user.id:
+            phishing_hashes = await bad_domain_hashes()
             for url in urlextractor.gen_urls(message.content):
-                if urlparse(url).netloc in ['discord.gg']:
+                link_domain = urlparse(url).netloc
+                link_domain_hashed = hashlib.sha256(link_domain.encode('utf-8')).hexdigest()
+                if link_domain in ['discord.gg']:
                     await message.delete()
                     await message.channel.send(f'{message.author.mention}, you must be on this server for longer than 24 hours before posting discord invite links.  Please contact a moderator if you want to post an invite link.')
+                if link_domain_hashed in phishing_hashes:
+                    await message.delete()
+                    await message.channel.send(f'{message.author.mention}, your message seemed a bit... phishy.  🐟\n\nIf you\'re not a bot, please contact a moderator for assistance.')
             for attachment in message.attachments:
                 if attachment.filename.endswith(('.bat', '.exe', '.sh', '.py')):
                     await message.delete()
@@ -62,6 +72,19 @@ async def should_delete_message(guild_id):
         return True
     else:
         return False
+
+
+@aiocache.cached(ttl=28800, cache=aiocache.SimpleMemoryCache)
+async def bad_domain_hashes() -> List:
+    async with aiohttp.ClientSession() as session:
+        async with session.request(
+            method='get',
+            url='https://raw.githubusercontent.com/relative/discord-bad-domains/master/hashes.json',
+            raise_for_status=True
+        ) as resp:
+            hashes: list = await resp.json(content_type="text/plain")
+
+    return hashes
 
 
 def setup(bot):
