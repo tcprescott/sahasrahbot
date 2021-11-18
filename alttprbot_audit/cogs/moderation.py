@@ -1,4 +1,5 @@
 import io
+import logging
 import zipfile
 import datetime
 from typing import List
@@ -28,20 +29,27 @@ class Moderation(commands.Cog):
             return
 
         if hasattr(message.author, 'joined_at') and message.author.joined_at > discord.utils.utcnow()-datetime.timedelta(days=1) and await message.guild.config_get('ModerateNewMemberContent') == "true" and not message.author.id == self.bot.user.id:
-            phishing_hashes = await bad_domain_hashes()
             for url in urlextractor.gen_urls(message.content):
                 link_domain = urlparse(url).netloc
                 link_domain_hashed = hashlib.sha256(link_domain.encode('utf-8')).hexdigest()
                 if link_domain in ['discord.gg']:
                     await message.delete()
                     await message.channel.send(f'{message.author.mention}, you must be on this server for longer than 24 hours before posting discord invite links.  Please contact a moderator if you want to post an invite link.')
-                if link_domain_hashed in phishing_hashes:
-                    await message.delete()
-                    await message.channel.send(f'{message.author.mention}, your message seemed a bit... phishy.  🐟\n\nIf you\'re not a bot, please contact a moderator for assistance.')
             for attachment in message.attachments:
                 if attachment.filename.endswith(('.bat', '.exe', '.sh', '.py')):
                     await message.delete()
                     await message.channel.send(f'{message.author.mention}, please do not upload executable files.  If your message was deleted in error, please contact a moderator.')
+
+        try:
+            phishing_hashes = await bad_domain_hashes()
+            for url in urlextractor.gen_urls(message.content):
+                link_domain = urlparse(url).netloc
+                link_domain_hashed = hashlib.sha256(link_domain.encode('utf-8')).hexdigest()
+                if link_domain_hashed in phishing_hashes:
+                    await message.delete()
+                    await message.channel.send(f'{message.author.mention}, your message seemed a bit... phishy.  🐟\n\nIf you\'re not a bot, please contact a moderator for assistance.')
+        except Exception:
+            logging.exception("Unable to scan message for phishing links.")
 
         # delete roms if server is configured to do so
         if len(message.attachments) > 0:
@@ -74,7 +82,7 @@ async def should_delete_message(guild_id):
         return False
 
 
-@aiocache.cached(ttl=28800, cache=aiocache.SimpleMemoryCache)
+@aiocache.cached(ttl=3600, cache=aiocache.SimpleMemoryCache)
 async def bad_domain_hashes() -> List:
     async with aiohttp.ClientSession() as session:
         async with session.request(
