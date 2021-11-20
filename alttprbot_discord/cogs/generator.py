@@ -8,32 +8,32 @@ from alttprbot.alttprgen import smvaria
 from alttprbot.alttprgen.randomizer import smdash
 
 
-async def autocomplete_alttpr(interaction: discord.Interaction, value=str):
-    return await generator.ALTTPRPreset().search(value)
+async def autocomplete_alttpr(ctx):
+    return await generator.ALTTPRPreset().search(ctx.value)
 
 
-async def autocomplete_alttprmystery(interaction: discord.Interaction, value=str):
-    return await generator.ALTTPRMystery().search(value)
+async def autocomplete_alttprmystery(ctx):
+    return await generator.ALTTPRMystery().search(ctx.value)
 
 
-async def autocomplete_sm(interaction: discord.Interaction, value=str):
-    return await generator.SMPreset().search(value)
+async def autocomplete_sm(ctx):
+    return await generator.SMPreset().search(ctx.value)
 
 
-async def autocomplete_smz3(interaction: discord.Interaction, value=str):
-    return await generator.SMZ3Preset().search(value)
+async def autocomplete_smz3(ctx):
+    return await generator.SMZ3Preset().search(ctx.value)
 
 
-async def autocomplete_ctjets(interaction: discord.Interaction, value=str):
-    return await generator.CTJetsPreset().search(value)
+async def autocomplete_ctjets(ctx):
+    return await generator.CTJetsPreset().search(ctx.value)
 
 
-async def autocomplete_smvaria_skills(interaction: discord.Interaction, value=str):
+async def autocomplete_smvaria_skills(ctx):
     skills = ['SMRAT2021', 'Season_Races', 'Torneio_SGPT2', 'casual', 'expert', 'master', 'newbie', 'regular', 'samus', 'solution', 'veteran']
-    return sorted([a for a in skills if a.startswith(value)][:25])
+    return sorted([a for a in skills if a.startswith(ctx.value)][:25])
 
 
-async def autocomplete_smvaria_settings(interaction: discord.Interaction, value=str):
+async def autocomplete_smvaria_settings(ctx):
     settings = [
         'Chozo_Speedrun',
         'SGLive2021',
@@ -67,7 +67,7 @@ async def autocomplete_smvaria_settings(interaction: discord.Interaction, value=
         'where_am_i',
         'where_is_morph',
     ]
-    return sorted([a for a in settings if a.startswith(value)][:25])
+    return sorted([a for a in settings if a.startswith(ctx.value)][:25])
 
 
 class Generator(commands.Cog):

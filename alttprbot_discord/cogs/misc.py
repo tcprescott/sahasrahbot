@@ -33,15 +33,17 @@ WELCOME_MESSAGES = {
     )
 }
 
-async def holy_slug_autocomplete(interaction: discord.Interaction, value: str):
-    data = await get_holy_images()
 
-    raw_game = [x for x in interaction.data['options'] if x['name'] == 'game']
+async def holy_slug_autocomplete(ctx):
+    data = await get_holy_images()
+    value: str = ctx.value
+
+    raw_game = ctx.options['game']
     if raw_game:
         game = raw_game[0]['value']
     else:
-        if interaction.guild:
-            game = await holy_game_default(interaction.guild)
+        if ctx.interaction.guild:
+            game = await holy_game_default(ctx.interaction.guild)
         else:
             game = 'z3r'
 
@@ -49,19 +51,23 @@ async def holy_slug_autocomplete(interaction: discord.Interaction, value: str):
 
     return slugs
 
-async def holy_game_autocomplete(interaction: discord.Interaction, value: str):
+
+async def holy_game_autocomplete(ctx):
     data = await get_holy_images()
-    return sorted([val for val in data.keys() if val.startswith(value)][:25])
+    return sorted([val for val in data.keys() if val.startswith(ctx.value)][:25])
+
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
     return await guild.config_get("HolyImageDefaultGame", "z3r")
+
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holyimages")
 async def get_holy_images() -> dict:
     async with aiohttp.ClientSession() as session:
         async with session.get('http://alttp.mymm1.com/holyimage/holyimages.json') as resp:
             return await resp.json()
+
 
 class Misc(commands.Cog):
     def __init__(self, bot):
