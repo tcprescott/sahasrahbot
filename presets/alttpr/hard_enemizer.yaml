@@ -15,7 +15,7 @@ settings:
     ganon: "7"
     tower: "7"
   enemizer:
-    boss_shuffle: full
+    boss_shuffle: random
     enemy_damage: default
     enemy_health: default
     enemy_shuffle: shuffled
