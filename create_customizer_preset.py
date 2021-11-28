@@ -25,5 +25,5 @@ data = dict(
     settings=settings,
 )
 
-with open(f'presets/{args.preset_name}.yaml', 'w+') as outfile:
+with open(f'presets/alttpr/{args.preset_name}.yaml', 'w+') as outfile:
     yaml.dump(data, outfile)
