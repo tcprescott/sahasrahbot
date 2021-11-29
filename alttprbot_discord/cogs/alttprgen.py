@@ -12,7 +12,7 @@ from alttprbot import models
 from pyz3r.ext.priestmode import create_priestmode
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
-from alttprbot.database import config # TODO switch to ORM
+from alttprbot.database import config  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
@@ -108,7 +108,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
     async def norace_custom(self, ctx):
-        await self.customgame(ctx, spoilers="on", tournament=True)
+        await self.customgame(ctx, spoilers="on", tournament=False)
 
     @commands.group(
         brief='Generate a spoiler game.',
