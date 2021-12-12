@@ -45,11 +45,11 @@ else:
             client_secret=os.environ.get('RACETIME_CLIENT_SECRET_FF1R'),
             handler_class=handlers.ff1r.GameHandler,
         ),
-        'sgl': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_SGL"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SGL'),
-            handler_class=handlers.sgl.GameHandler,
-        ),
+#        'sgl': RacetimeBotConfig(
+#            client_id=os.environ.get("RACETIME_CLIENT_ID_SGL"),
+#            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SGL'),
+#            handler_class=handlers.sgl.GameHandler,
+#        ),
         'sm': RacetimeBotConfig(
             client_id=os.environ.get("RACETIME_CLIENT_ID_SM"),
             client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SM'),

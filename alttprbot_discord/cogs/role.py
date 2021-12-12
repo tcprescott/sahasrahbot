@@ -63,9 +63,9 @@ class Role(commands.Cog):
             raise SahasrahBotException(
                 'No more than 20 roles can be on a group.  Please create a new group.')
 
-        if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
-            raise SahasrahBotException(
-                'Custom emoji is not available to this bot.')
+#        if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
+#            raise SahasrahBotException(
+#                'Custom emoji is not available to this bot.')
 
         await role.create_role(ctx.guild.id, group_id, role_name.id, name, emoji, description, protect_mentions)
         await refresh_bot_message(ctx, group_id)
@@ -164,13 +164,13 @@ async def refresh_bot_message(ctx, group_id):
     message = await channel.fetch_message(group['message_id'])
 
     for item in roles:
-        try:
-            await message.add_reaction(strip_custom_emoji(item['emoji']))
-        except discord.errors.HTTPException as err:
-            if err.code == 10014:
-                await ctx.reply("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
-            else:
-                raise
+#        try:
+        await message.add_reaction(strip_custom_emoji(item['emoji']))
+#        except discord.errors.HTTPException as err:
+#            if err.code == 10014:
+#                await ctx.reply("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
+#            else:
+#                raise
 
     if group['bot_managed']:
         embed = embed_formatter.reaction_menu(ctx, group, roles)
