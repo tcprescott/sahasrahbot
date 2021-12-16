@@ -74,8 +74,10 @@ class Generator(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.slash_command()
-    async def alttpr(
+    alttpr = discord.commands.SlashCommandGroup("alttpr", "Generate a game for the ALTTP Randomizer")
+
+    @alttpr.command()
+    async def preset(
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
@@ -99,34 +101,34 @@ class Generator(commands.Cog):
 
         await ctx.respond(embed=embed)
 
-    @commands.slash_command()
-    async def alttprfestive(
-        self,
-        ctx: ApplicationContext,
-        preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
-        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
-        hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
-        allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
-    ):
-        """
-        Generates an Festive™ ALTTP Randomizer game on https://alttpr.com/festive
-        """
-        await ctx.defer()
-        seed = await generator.ALTTPRPreset(preset).generate(
-            hints=hints == "yes",
-            spoilers="off" if race == "yes" else "on",
-            tournament=race == "yes",
-            allow_quickswap=allow_quickswap == "yes",
-            endpoint_prefix="/festive"
-        )
-        if not seed:
-            raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
-        embed = await seed.embed(emojis=self.bot.emojis)
+    # @alttpr.command()
+    # async def festive(
+    #     self,
+    #     ctx: ApplicationContext,
+    #     preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
+    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
+    #     hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
+    #     allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
+    # ):
+    #     """
+    #     Generates an Festive™ ALTTP Randomizer game on https://alttpr.com/festive
+    #     """
+    #     await ctx.defer()
+    #     seed = await generator.ALTTPRPreset(preset).generate(
+    #         hints=hints == "yes",
+    #         spoilers="off" if race == "yes" else "on",
+    #         tournament=race == "yes",
+    #         allow_quickswap=allow_quickswap == "yes",
+    #         endpoint_prefix="/festive"
+    #     )
+    #     if not seed:
+    #         raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
+    #     embed = await seed.embed(emojis=self.bot.emojis)
 
-        await ctx.respond(embed=embed)
+    #     await ctx.respond(embed=embed)
 
-    @commands.slash_command()
-    async def alttprspoiler(
+    @alttpr.command()
+    async def spoiler(
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
@@ -143,8 +145,8 @@ class Generator(commands.Cog):
 
         await ctx.respond(embed=embed)
 
-    @commands.slash_command()
-    async def alttprmystery(
+    @alttpr.command()
+    async def mystery(
         self,
         ctx: ApplicationContext,
         weightset: Option(str, description="The weightset you want to use.", required=True, autocomplete=autocomplete_alttprmystery),
