@@ -24,7 +24,7 @@ class Moderation(commands.Cog):
         self.bot: commands.Bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.guild is None:
             return
 
@@ -48,6 +48,7 @@ class Moderation(commands.Cog):
                 if link_domain_hashed in phishing_hashes:
                     await message.delete()
                     await message.channel.send(f'{message.author.mention}, your message seemed a bit... phishy.  🐟\n\nIf you\'re not a bot, please contact a moderator for assistance.')
+                    await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=30), reason="automated timeout for phishing")
         except Exception:
             logging.exception("Unable to scan message for phishing links.")
 
