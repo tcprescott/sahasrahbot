@@ -47,6 +47,7 @@ class AlttprGen(commands.Cog):
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.reply(embed=embed)
+        await ctx.reply("Please consider using the `/alttpr preset` slash command, as the command you invoked will be removed soon from SahasrahBot.  Thanks!")
 
     @race.command(
         name='custom',
@@ -72,6 +73,7 @@ class AlttprGen(commands.Cog):
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.reply(embed=embed)
+        await ctx.reply("Please consider using the `/alttpr preset` slash command, as the command you invoked will be removed soon from SahasrahBot.  Thanks!")
 
     @noqsrace.command(
         name='custom',
@@ -98,6 +100,7 @@ class AlttprGen(commands.Cog):
                 'Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
         await ctx.reply(embed=embed)
+        await ctx.reply("Please consider using the `/alttpr preset` slash command, as the command you invoked will be removed soon from SahasrahBot.  Thanks!")
 
     @norace.command(
         name='custom',
@@ -122,6 +125,7 @@ class AlttprGen(commands.Cog):
         embed.insert_field_at(0, name="Spoiler Log URL",
                               value=spoiler.spoiler_log_url, inline=False)
         await ctx.reply(embed=embed)
+        await ctx.reply("Please consider using the `/alttpr spoiler` slash command, as the command you invoked will be removed soon from SahasrahBot.  Thanks!")
 
     @spoiler.command(
         name='custom',
@@ -163,6 +167,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def random(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=False, spoilers="on")
+        await ctx.reply("Please consider using the `/alttpr mystery` slash command, as the command you invoked will be removed soon from SahasrahBot.  Thanks!")
 
     @random.command(
         name='custom',
@@ -188,6 +193,7 @@ class AlttprGen(commands.Cog):
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def mystery(self, ctx, weightset='weighted'):
         await randomgame(ctx=ctx, weightset=weightset, tournament=True, spoilers="mystery")
+        await ctx.reply("Please consider using the `/alttpr mystery` slash command, as the command you invoked will be removed soon from SahasrahBot.  Thanks!")
 
     @mystery.command(
         name='custom',
