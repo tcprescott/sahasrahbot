@@ -1,0 +1,113 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Match Submission</title>
+{%- endblock head %}
+
+{% block content -%}
+
+<script>
+    var disableField = function () {
+        var game = document.getElementById("game").value;
+
+        switch (game) {
+            case '1':
+                document.getElementById("game_settings").hidden = true;
+                document.getElementById("static_preset").hidden = false;
+                document.getElementById("static_preset").innerHTML = "opensgl";
+                break;
+            case '2':
+            case '3':
+                document.getElementById("game_settings").hidden = false;
+                document.getElementById("static_preset").hidden = true;
+                break;
+        }
+    };
+</script>
+
+<form action="{{ endpoint }}" method="post">
+    <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid"
+        value="{{ episode_id }}" required><br><br>
+    <input type="hidden" id="event" name="event" value="{{ event }}">
+
+    <label for="game">Game #:</label>
+    <select name="game" id="game" onchange="disableField()">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+    </select><br><br>
+
+    <div id="static_preset">opensgl</div><br><br>
+
+    <div id="game_settings">
+        <div>
+            <label for="goal">Goal</label>
+            <select name="goal" id="goal">
+                <option value="ganon">Ganon</option>
+                <option value="fast_ganon">Fast Ganon</option>
+                <option value="dungeons">Dungeons</option>
+            </select>
+        </div>
+        <div>
+            <label for="world_state">World State</label>
+            <select name="world_state" id="world_state">
+                <option value="open">Open</option>
+                <option value="standard">Standard</option>
+                <option value="inverted">Inverted</option>
+                <option value="retro">Retro</option>
+            </select>
+        </div>
+        <div>
+            <label for="swords">Swords</label>
+            <select name="swords" id="swords">
+                <option value="random">Random</option>
+                <option value="assured">Assured</option>
+                <option value="swordless">Swordless</option>
+            </select>
+        </div>
+        <div>
+            <label for="crystals">Crystals</label>
+            <select name="crystals" id="crystals">
+                <option value="7">7/7</option>
+                <option value="6">6/6</option>
+            </select>
+        </div>
+        <div>
+            <label for="enemizer">Enemizer</label>
+            <select name="enemizer" id="enemizer">
+                <option value="none">None</option>
+                <option value="bosses">Boss full</option>
+                <option value="enemies">Enemy shuffle</option>
+                <option value="enemies_bosses">Enemy & Boss</option>
+            </select>
+        </div>
+        <div>
+            <label for="keys">Keys</label>
+            <select name="keys" id="keys">
+                <option value="none">None</option>
+                <option value="mc">MC</option>
+                <option value="bigkey">Big Key</option>
+                <option value="keysanity">Keysanity</option>
+            </select>
+        </div>
+        <div>
+            <label for="items">Items</label>
+            <select name="items" id="items">
+                <option value="none">None</option>
+                <option value="boots">Boots</option>
+                <option value="flute">Flute</option>
+                <option value="boots_flute">Boots & Flute</option>
+            </select>
+        </div>
+        <div>
+            <label for="item_pool">Item Pool</label>
+            <select name="item_pool" id="item_pool">
+                <option value="normal">Normal</option>
+                <option value="sgl">SGL-style</option>
+            </select>
+        </div>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+{%- endblock content %}

@@ -12,7 +12,7 @@ import pytz
 from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
-from alttprbot.tournament import (test, alttpr, alttprcd, alttpres, alttprfr,  # pylint: disable=unused-import
+from alttprbot.tournament import (test, alttpr, alttprcd, alttprde, alttpres, alttprfr,  # pylint: disable=unused-import
                                   alttprhmg, smwde, smz3coop, smbingo, dailies, alttprleague, sgl21)  # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
@@ -31,6 +31,8 @@ else:
         # REGULAR TOURNEMNTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
+        # 'alttprde': alttprde.ALTTPRDETournamentGroups,
+        # 'alttprmini': alttprde.ALTTPRMiniTournament,
         # 'alttpr': alttpr.ALTTPRTournamentRace,
         'smwde': smwde.SMWDETournament,
         # 'alttprfr': alttprfr.ALTTPRFRTournament,
@@ -57,7 +59,7 @@ else:
         # 'sgl21ffr': sgl21.FFR,
         # 'sgl21messenger': sgl21.Messenger,
         # 'sgl21minecraft2v2': sgl21.Minecraft,
-        'sgl21mmx': sgl21.MMX,
+        # 'sgl21mmx': sgl21.MMX,
         # 'sgl21ootr': sgl21.OOTR,
         # 'sgl21pkmnredrando': sgl21.PokemonRedRando,
         # 'sgl21pmdsky': sgl21.PMDSkyRando,
@@ -139,7 +141,7 @@ async def race_recording_task():
                     race_data = json.loads(await resp.read())
 
                 if race_data['status']['value'] == 'finished':
-                    winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
+                    winner = [e for e in race_data['entrants'] if e['place'] == 1][0] # pylint: disable=used-before-assignment
                     runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
 
                     started_at = isodate.parse_datetime(race_data['started_at']).astimezone(pytz.timezone('US/Eastern'))
