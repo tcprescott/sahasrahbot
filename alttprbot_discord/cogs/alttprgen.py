@@ -9,7 +9,6 @@ from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 
 import pyz3r
 from alttprbot import models
-from pyz3r.ext.priestmode import create_priestmode
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
 from alttprbot.database import config  # TODO switch to ORM
@@ -359,30 +358,10 @@ class AlttprGen(commands.Cog):
         else:
             raise SahasrahBotException("You must supply a valid yaml file.")
 
-    @commands.command(
-        brief="Create a series of \"Kiss Priest\" games.",
-        help=(
-            'Create a series a \"Kiss Priest\" games.  This was created by hycutype.'
-        )
-    )
+    @commands.command()
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def kisspriest(self, ctx, count=10):
-        if count > 10 or count < 1:
-            raise SahasrahBotException(
-                "Number of games generated must be between 1 and 10.")
-
-        seeds = await create_priestmode(count=count, genclass=ALTTPRDiscord)
-        embed = discord.Embed(
-            title='Kiss Priest Games',
-            color=discord.Color.blurple()
-        )
-        for idx, seed in enumerate(seeds):
-            embed.add_field(
-                name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
-                value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
-                inline=False
-            )
-        await ctx.reply(embed=embed)
+        await ctx.reply("Please use the new slash command \"/alttpr kisspriest\".")
 
     @commands.command()
     async def savepreset(self, ctx, preset):

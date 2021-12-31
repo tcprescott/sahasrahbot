@@ -1,3 +1,5 @@
+from pyz3r.ext.priestmode import create_priestmode
+
 import discord
 from discord.ext import commands
 from discord.commands import ApplicationContext, Option
@@ -6,6 +8,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.alttprgen import smvaria
 from alttprbot.alttprgen.randomizer import smdash
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 
 async def autocomplete_alttpr(ctx):
@@ -167,6 +170,30 @@ class Generator(commands.Cog):
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
 
+        await ctx.respond(embed=embed)
+
+    @alttpr.command()
+    async def kisspriest(
+        self,
+        ctx: ApplicationContext,
+        count: Option(int, description="Number of seeds to generate.  Default is 10.", required=False, default=10, min_value=1, max_value=10)
+    ):
+        """
+        Create a series a \"Kiss Priest\" games.  This was created by hycutype.
+        """
+        await ctx.defer()
+
+        seeds = await create_priestmode(count=count, genclass=ALTTPRDiscord)
+        embed = discord.Embed(
+            title='Kiss Priest Games',
+            color=discord.Color.blurple()
+        )
+        for idx, seed in enumerate(seeds):
+            embed.add_field(
+                name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
+                value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
+                inline=False
+            )
         await ctx.respond(embed=embed)
 
     @commands.slash_command()
