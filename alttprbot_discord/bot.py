@@ -36,10 +36,6 @@ discordbot = commands.Bot(
     debug_guild=508335685044928540 if c.DEBUG else None
 )
 
-# if c.DEBUG:
-#     discordbot.debug_guild = 508335685044928540
-
-
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 

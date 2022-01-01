@@ -75,20 +75,11 @@ class Misc(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content.lower() == '!role furaime':
-            await message.add_reaction('👀')
-
         if self.bot.user in message.mentions:
             emoji = discord.utils.get(self.bot.emojis, name='SahasrahBot')
             if emoji:
                 await asyncio.sleep(random.random()*5)
                 await message.add_reaction(emoji)
-
-        if discord.utils.get(message.role_mentions, id=524738280630124574):
-            async with message.channel.typing():
-                await asyncio.sleep((random.random()*30)+30)
-                if random.choice([True, False]):
-                    await message.reply(f'@{message.author.mention}')
 
     @commands.slash_command(name="welcome", guild_ids=ALTTP_RANDOMIZER_SERVERS)
     async def welcome_cmd(self, ctx, language: Option(str, description="Choose a language for the welcome message.", choices=["french", "spanish", "german"])):
