@@ -7,7 +7,7 @@ from alttprbot.alttprgen import generator
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.spoilers import generate_spoiler_game
 from alttprbot.alttprgen import smvaria
-from alttprbot.alttprgen.randomizer import smdash
+from alttprbot.alttprgen.randomizer import smdash, z2r
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 
@@ -268,6 +268,26 @@ class Generator(commands.Cog):
         seed_uri = await generator.CTJetsPreset(preset).generate()
         await ctx.respond(seed_uri)
 
+    z2r_group = discord.commands.SlashCommandGroup("z2r", "Generate a seed for Zelda 2 Randomizer")
+
+    @z2r_group.command(name="preset")
+    async def z2r_preset(
+        self, ctx: ApplicationContext,
+        preset: Option(str, description="The preset you wish to generate.", required=True, choices=z2r.Z2R_PRESETS.keys()),
+    ):
+        """
+        Generate a Zelda 2 Randomizer game using the specified preset.
+        """
+        seed, flags = z2r.preset(preset)
+        await ctx.respond(f"**Seed**: {seed}\n**Flags:** {flags}")
+
+    @z2r_group.command(name="mrb")
+    async def z2r_mrb(self, ctx: ApplicationContext):
+        """
+        Generate a seed using a random flag from the 11 in MRB's pool.
+        """
+        seed, flags, description = z2r.mrb()
+        await ctx.respond(f"**Seed**: {seed}\n**Flags:** {flags}\n**Description**: {description}")
 
 def setup(bot):
     bot.add_cog(Generator(bot))
