@@ -56,6 +56,7 @@ class PresetData:
 
 class SahasrahBotPresetCore():
     randomizer: str = "default"
+    preset_data: dict = None
 
     @property
     def global_preset_path(self) -> str:
@@ -147,7 +148,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
         if self.preset_data is None:
             await self.fetch()
 
-        settings = self.preset_data['settings']
+        settings = self.preset_data['settings'] # pylint: disable=E1136
         if self.preset_data.get('doors', False):
             if hints:
                 settings['hints'] = 'on'
@@ -277,7 +278,7 @@ class SMPreset(SahasrahBotPresetCore):
         if self.preset_data is None:
             await self.fetch()
 
-        settings = self.preset_data['settings']
+        settings = self.preset_data['settings'] # pylint: disable=E1136
         settings['race'] = "true" if tournament else "false"
         seed = await SMDiscord.create(
             settings=settings,
@@ -303,7 +304,7 @@ class SMZ3Preset(SahasrahBotPresetCore):
         if self.preset_data is None:
             await self.fetch()
 
-        settings = self.preset_data['settings']
+        settings = self.preset_data['settings'] # pylint: disable=E1136
         settings['race'] = "true" if tournament else "false"
         seed = await SMZ3Discord.create(
             settings=settings,
@@ -329,7 +330,7 @@ class CTJetsPreset(SahasrahBotPresetCore):
         if self.preset_data is None:
             await self.fetch()
 
-        settings = self.preset_data['settings']
+        settings = self.preset_data['settings'] # pylint: disable=E1136
         seed_uri = await ctjets.roll_ctjets(settings, version=self.preset_data.get('version', '3.1.0'))
 
         await models.AuditGeneratedGames.create(
