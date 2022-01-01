@@ -20,6 +20,7 @@ title:  Presets
 | [beginner](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beginner.yaml) |A good start for new players.|   |
 | [black_friday_hell_seed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/black_friday_hell_seed.yaml) || *Customizer*  |
 | [blitzmode](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/blitzmode.yaml) |4/4 fast ganon. Start with Boots, Activated Flute, Pearl, Mitts, Master Sword, and Lamp| *Customizer*  |
+| [bot_testing](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/bot_testing.yaml) |SpeedGaming Live 2021 Settings, details at <https://gist.github.com/tcprescott/4fe3359cc730ff0aadf490e0105afbec>| *Customizer*  |
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casual.yaml) |Standard with a starting weapon.|   |
 | [casualboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
 | [casualboots_dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/casualboots_dungeons.yaml) |Standard with a starting weapon, but you get boots too!| *Customizer*  |
@@ -55,6 +56,7 @@ title:  Presets
 | [keysanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/keysanity.yaml) |Open keysanity|   |
 | [league_swordless](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/league_swordless.yaml) |Swords are overrated anyway. (Standard dungeon item shuffle)| *Customizer*  |
 | [lightspeed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/lightspeed.yaml) |Complete the 3 Light World pendant dungeons to ascend Agahnim''s Tower and grab the Triforce on the Pyramid Ledge.| *Customizer*  |
+| [ludicrousspeed](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ludicrousspeed.yaml) |A fast game!  This has four of each progression item. https://www.youtube.com/watch?v=ygE01sOhzz0| *Customizer*  |
 | [mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mc.yaml) |Only maps and compasses are shuffled in the world.|   |
 | [mcs](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mcs.yaml) |Maps, compasses, and small keys are shuffled in the world.|   |
 | [mg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/mg.yaml) |This requires use of major glitches.|   |
@@ -75,6 +77,7 @@ title:  Presets
 | [openboots_mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots_mc.yaml) |You get to start with Pegasus Boots! Oh, and you don't need to defeat Aghanim 2.  Maps and compasses are shuffled in the world.| *Customizer*  |
 | [openflute](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openflute.yaml) |You get to start with.. an activated flute?  Sky's the limit!| *Customizer*  |
 | [openmajoritems](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openmajoritems.yaml) |Shuffles only inventory items and heart containers. Keys, dungeon items, ammo, money, and heart pieces remain vanilla.| *Customizer*  |
+| [opensgl](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/opensgl.yaml) |Deutsches Tournament Open in den Brackets (SGL settings)| *Customizer*  |
 | [owg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg.yaml) |Overworld glitches are required.|   |
 | [owg_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_assured.yaml) |Overworld glitches are required.  Start with a sword.|   |
 | [owg_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_fast.yaml) |Overworld glitches are required, but Aghanim 2 is not!|   |
