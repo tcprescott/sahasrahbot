@@ -149,7 +149,8 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             await self.fetch()
 
         settings = self.preset_data['settings'] # pylint: disable=E1136
-        if self.preset_data.get('doors', False):
+        doors = self.preset_data.get('doors', False)
+        if doors:
             if hints:
                 settings['hints'] = 'on'
             elif nohints:
@@ -200,7 +201,8 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             settings=settings,
             gentype='preset',
             genoption=self.preset,
-            customizer=1 if self.preset_data.get('customizer', False) else 0
+            customizer=1 if self.preset_data.get('customizer', False) else 0,
+            doors=doors
         )
         return seed
 
@@ -242,7 +244,8 @@ class ALTTPRMystery(SahasrahBotPresetCore):
                             settings=mystery.settings,
                             gentype='mystery failure',
                             genoption=self.preset,
-                            customizer=1 if mystery.customizer else 0
+                            customizer=1 if mystery.customizer else 0,
+                            doors=mystery.doors
                         )
                         logging.exception("Failed to generate game, retrying...")
                         raise
@@ -256,7 +259,8 @@ class ALTTPRMystery(SahasrahBotPresetCore):
             settings=mystery.settings,
             gentype='mystery',
             genoption=self.preset,
-            customizer=1 if mystery.customizer else 0
+            customizer=1 if mystery.customizer else 0,
+            doors=mystery.doors
         )
 
         mystery.seed = seed

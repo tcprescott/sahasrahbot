@@ -15,7 +15,7 @@ class AuditGeneratedGames(Model):
     genoption = fields.CharField(45, index=True, null=True)
     timestamp = fields.DatetimeField(auto_now=True, null=True)
     customizer = fields.IntField(null=True)
-
+    doors = fields.BooleanField(default=False, null=False)
 
 class AuditMessages(Model):
     class Meta:

@@ -1,14 +1,15 @@
-from pyz3r.ext.priestmode import create_priestmode
-
 import discord
-from discord.ext import commands
-from discord.commands import ApplicationContext, Option
-from alttprbot.alttprgen import generator
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot.alttprgen.spoilers import generate_spoiler_game
-from alttprbot.alttprgen import smvaria
+from alttprbot import models
+from alttprbot.alttprgen import generator, smvaria
 from alttprbot.alttprgen.randomizer import smdash, z2r
+from alttprbot.alttprgen.spoilers import generate_spoiler_game
+from alttprbot.exceptions import SahasrahBotException
+from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
+from discord.commands import ApplicationContext, Option
+from discord.ext import commands
+from pyz3r.ext.priestmode import create_priestmode
 
 
 async def autocomplete_alttpr(ctx):
@@ -72,10 +73,52 @@ async def autocomplete_smvaria_settings(ctx):
     ]
     return sorted([a for a in settings if a.startswith(ctx.value)][:25])
 
+class ALTTPRPresetView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Generate Again", style=discord.ButtonStyle.blurple, custom_id="sahabot:generator:regen", row=1)
+    async def regenerate(self, button: discord.ui.Button, interaction: discord.Interaction):
+        respmsg = await interaction.response.send_message("Generating, please wait...")
+        permalink = get_embed_field("Permalink", interaction.message.embeds[0])
+        audit_game = await models.AuditGeneratedGames.get(permalink=permalink)
+
+        if audit_game.doors:
+            seed = await AlttprDoorDiscord.create(
+                settings=audit_game.settings,
+                spoilers=True
+            )
+        else:
+            seed = await ALTTPRDiscord.generate(
+                settings=audit_game.settings,
+                endpoint='/api/customizer' if audit_game.customizer else '/api/randomizer'
+            )
+
+        await models.AuditGeneratedGames.create(
+            randomizer='alttpr',
+            hash_id=seed.hash,
+            permalink=seed.url,
+            settings=audit_game.settings,
+            gentype='preset',
+            genoption=audit_game.genoption,
+            customizer=1 if audit_game.customizer else 0,
+            doors=audit_game.doors
+        )
+
+        embed = await seed.embed(emojis=discordbot.emojis)
+        embed.insert_field_at(0, name="Preset", value=audit_game.genoption, inline=False)
+        await respmsg.edit_original_message(content=None, embed=embed, view=ALTTPRPresetView())
 
 class Generator(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        self.persistent_views_added = False
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if not self.persistent_views_added:
+            self.bot.add_view(ALTTPRPresetView())
+            self.persistent_views_added = True
 
     alttpr = discord.commands.SlashCommandGroup("alttpr", "Generate a game for the ALTTP Randomizer")
 
@@ -103,7 +146,7 @@ class Generator(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, view=ALTTPRPresetView())
 
     # @alttpr.command()
     # async def festive(
@@ -291,6 +334,12 @@ class Generator(commands.Cog):
         """
         seed, flags, description = z2r.mrb()
         await ctx.respond(f"**Seed**: {seed}\n**Flags:** {flags}\n**Description**: {description}")
+
+def get_embed_field(name: str, embed: discord.Embed) -> str:
+    for field in embed.fields:
+        if field.name == name:
+            return field.value
+    return None
 
 def setup(bot):
     bot.add_cog(Generator(bot))
