@@ -101,6 +101,7 @@ class Generator(commands.Cog):
         if not seed:
             raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
         embed = await seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
 
         await ctx.respond(embed=embed)
 
@@ -144,6 +145,7 @@ class Generator(commands.Cog):
         spoiler = await generate_spoiler_game(preset, festive=festive == "yes")
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
 
         await ctx.respond(embed=embed)
@@ -169,6 +171,7 @@ class Generator(commands.Cog):
 
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
+        embed.insert_field_at(0, name="Weightset", value=weightset, inline=False)
 
         await ctx.respond(embed=embed)
 
