@@ -117,7 +117,7 @@ class Misc(commands.Cog):
         help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
         aliases=['holy']
     )
-    async def holyimage(self, ctx, slug, game=None):
+    async def holyimage(self, ctx):
         await ctx.reply("Please use the new `/holyimage` slash command.")
 
     @commands.slash_command(

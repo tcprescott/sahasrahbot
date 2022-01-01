@@ -7,6 +7,9 @@ from discord.ext import commands
 # from alttprbot.database import srlnick # TODO switch to ORM
 from alttprbot import models
 
+async def role_name_autocomplete(ctx):
+    return [r.name for r in ctx.interaction.guild.roles if r.name.startswith(ctx.value)][:25]
+
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 class Nickname(commands.Cog):
@@ -47,13 +50,14 @@ class Nickname(commands.Cog):
 
     @racetime_admin_group.command()
     @permissions.is_owner()
-    async def blast(self, ctx: ApplicationContext, role_name: Option(discord.Role, "Choose a role to blast")):
+    async def blast(self, ctx: ApplicationContext, role_name: Option(str, "Choose a role to blast", required=True, autocomplete=role_name_autocomplete)):
         """
         Used by Synack to blast requests to link your RaceTime.gg account to this bot.
         """
+        role: discord.Role = discord.utils.get(ctx.guild._roles.values(), name=role_name)
         await ctx.defer()
         msg = []
-        for member in role_name.members:
+        for member in role.members:
             result = await models.SRLNick.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
                 try:
@@ -72,13 +76,14 @@ class Nickname(commands.Cog):
             await ctx.respond("No messages sent.")
 
     @racetime_admin_group.command()
-    async def report(self, ctx: ApplicationContext, role_name: Option(discord.Role, "Choose a role to blast")):
+    async def report(self, ctx: ApplicationContext, role_name: Option(str, "Choose a role to report", required=True, autocomplete=role_name_autocomplete)):
         """
         Used by Synack to report users who have not linked their racetime account to SahasrahBot.
         """
         await ctx.defer()
+        role: discord.Role = discord.utils.get(ctx.guild._roles.values(), name=role_name)
         msg = []
-        for member in role_name.members:
+        for member in role.members:
             result = await models.SRLNick.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
                 msg.append(f"{member.name}#{member.discriminator}")
