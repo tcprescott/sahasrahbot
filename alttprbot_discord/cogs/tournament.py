@@ -11,7 +11,7 @@ from config import Config as c
 
 # this module was only intended for the Main Tournament 2019
 # we will probably expand this later to support other tournaments in the future
-
+# ALTTPRDEPracticeView
 
 class Tournament(commands.Cog):
     def __init__(self, bot):
@@ -21,6 +21,13 @@ class Tournament(commands.Cog):
         self.scheduling_needs.start()
         self.find_unsubmitted_races.start()
         self.find_races_with_bad_discord.start()
+        self.persistent_views_added = False
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if not self.persistent_views_added:
+            self.bot.add_view(tournaments.alttprde.ALTTPRDEPracticeView())
+            self.persistent_views_added = True
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):

@@ -1,10 +1,10 @@
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot.tournament import sgl21
+from alttprbot.tournament import alttprde
 # from alttprbot.tournament import alttprleague
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(sgl21.ALTTPRBrackets):
+class TestTournament(alttprde.ALTTPRDETournamentBrackets):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
