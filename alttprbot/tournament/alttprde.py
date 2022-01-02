@@ -16,7 +16,7 @@ class ALTTPRDEPracticeView(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(label="Generate a Practice Seed", style=discord.ButtonStyle.blurple, custom_id="sahabot:alttprde:practice", row=1)
-    async def regenerate(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def practice(self, button: discord.ui.Button, interaction: discord.Interaction):
         respmsg = await interaction.response.send_message("Generating, please wait...")
         episode_id = get_embed_field("Episode ID", interaction.message.embeds[0])
         tournament_game = await models.TournamentGames.get(episode_id=episode_id)
