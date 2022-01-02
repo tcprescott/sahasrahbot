@@ -125,7 +125,7 @@ class Audit(commands.Cog):
             return
 
         old_message = await models.AuditMessages.filter(message_id=message.id).order_by('id').values()
-        if old_message[-1]['content'] == message.content:
+        if old_message and old_message[-1]['content'] == message.content:
             return
         audit_channel_id = await message.guild.config_get('AuditLogChannel')
         if audit_channel_id:
