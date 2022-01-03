@@ -3,7 +3,7 @@ import random
 MRB_FLAG_CHOICES = {
     'Base flags': 'iyhqh$j9g7@$ZqTBT!BhOAdES$vA',
     'Nerfed Boots, no vanilla': 'iyhqh$j9g7@$ZqTBT!BhOA!0Pv@A',
-    'Restrict caves, no vanilla': 'iyhJh$j9g7@$ZqTBT!BhOAu0P@@A',
+    'Restrict caves OFF, no vanilla': 'iyhJh$j9g7@$ZqTBT!BhOAu0P@@A',
     'Hidden Palace and Kasuto ON': 'iyhqh$j9g7@$ZZSBT!BhOAdES$vA',
     'No vanilla OW': 'iyhqh$j9g7@$ZqTBT!BhOA!0P@@A',
     'No community Rooms': 'iyhqh$j9g7@$ZqTBT!BhOAdES$rA',
