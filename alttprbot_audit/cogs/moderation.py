@@ -83,7 +83,7 @@ class Moderation(commands.Cog):
         five_minutes = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         previous_messages = await models.AuditMessages.filter(guild_id=message.guild.id, user_id=message.author.id, content=message.content, message_date__gte=five_minutes)
 
-        if len(previous_messages) > 2:
+        if previous_messages:
             await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=10), reason="automated timeout for duplicate messages")
             await message.channel.send(f"{message.author.mention}, your message was deleted because it was a duplicate of a recently sent message.  You have been timed out for 10 minutes.\n\nIf this was in error, please contact a moderator for assistance.")
 
@@ -93,9 +93,15 @@ class Moderation(commands.Cog):
                     msg = await channel.fetch_message(audit_message.message_id)
                 except discord.NotFound:
                     continue
-                await msg.delete()
+                try:
+                    await msg.delete()
+                except discord.NotFound:
+                    logging.warn(f"Unable to remove message id {message.id}")
 
-            await message.delete()
+            try:
+                await message.delete()
+            except discord.NotFound:
+                logging.warn(f"Unable to remove message id {message.id}")
 
 async def inspect_zip(url):
     binary = await http.request_generic(url, returntype='binary')
