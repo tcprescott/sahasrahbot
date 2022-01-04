@@ -71,9 +71,9 @@ class Audit(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
 
-        message = await channel.fetch_message(payload.message_id)
-        if message.author.bot:
-            return
+        # message = await channel.fetch_message(payload.message_id)
+        # if message.author.bot:
+        #     return
 
         audit_channel_id = await guild.config_get('AuditLogChannel')
         if audit_channel_id:
@@ -96,9 +96,9 @@ class Audit(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
 
-        message = await channel.fetch_message(payload.message_id)
-        if message.author.bot:
-            return
+        # message = await channel.fetch_message(payload.message_id)
+        # if message.author.bot:
+        #     return
 
         audit_channel_id = await guild.config_get('AuditLogChannel')
         if not audit_channel_id:
