@@ -54,7 +54,7 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.id == self.bot.user.id:
+        if message.author.bot:
             return
         if message.guild is None:
             await record_message(message)
@@ -71,8 +71,8 @@ class Audit(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
 
-        # ignore these channels for reasons
-        if channel and channel.id in [694710452478803968, 694710286455930911, 606873327839215616]:
+        message = await channel.fetch_message(payload.message_id)
+        if message.author.bot:
             return
 
         audit_channel_id = await guild.config_get('AuditLogChannel')
@@ -95,6 +95,10 @@ class Audit(commands.Cog):
             return
         guild = self.bot.get_guild(payload.guild_id)
         channel = self.bot.get_channel(payload.channel_id)
+
+        message = await channel.fetch_message(payload.message_id)
+        if message.author.bot:
+            return
 
         audit_channel_id = await guild.config_get('AuditLogChannel')
         if not audit_channel_id:
@@ -121,7 +125,7 @@ class Audit(commands.Cog):
             return
 
         message = await channel.fetch_message(payload.message_id)
-        if message.author.id == self.bot.user.id:
+        if message.author.bot:
             return
 
         old_message = await models.AuditMessages.filter(message_id=message.id).order_by('id').values()
