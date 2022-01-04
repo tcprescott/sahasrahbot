@@ -91,9 +91,9 @@ class SahasrahBotPresetCore():
 
         return preset
 
-    async def search(self, value) -> List[str]:
+    async def search(self, value: str) -> List[str]:
         preset_files = await get_full_preset_list(self.global_preset_path)
-        return sorted([os.path.splitext(a)[0] for a in preset_files if a.startswith(value)][:25])
+        return sorted([os.path.splitext(a)[0] for a in preset_files if a.startswith(value.lower())][:25])
 
     async def fetch(self) -> PresetData:
         if self.preset is None:
