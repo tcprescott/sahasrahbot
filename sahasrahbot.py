@@ -13,6 +13,7 @@ from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord.bot import discordbot
 from alttprbot_audit.bot import discordbot as discordbot_audit
 from alttprbot_racetime.bot import start_racetime
+from alttprbot.exceptions import SahasrahBotException
 
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = int(os.environ.get("DB_PORT", "3306"))
@@ -21,9 +22,17 @@ DB_USER = os.environ.get("DB_USER", "user")
 DB_PASS = urllib.parse.quote_plus(os.environ.get("DB_PASS", "pass"))
 
 if os.environ.get("SENTRY_URL"):
+    def before_send(event, hint):
+        if 'exc_info' in hint:
+            exc_type, exc_value, tb = hint['exc_info']
+            if isinstance(exc_value, (SahasrahBotException)):
+                return None
+        return event
+
     sentry_sdk.init(
         os.environ.get("SENTRY_URL"),
-        integrations=[AioHttpIntegration()]
+        integrations=[AioHttpIntegration()],
+        before_send=before_send
     )
 
 
