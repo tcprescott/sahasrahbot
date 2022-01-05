@@ -15,7 +15,7 @@ world_state:
 
 goals:
   ganon: 30
-  fast_ganon: 35
+  fast_ganon: 30
   dungeons: 20
   pedestal: 15
   "triforce-hunt": 5
@@ -80,8 +80,8 @@ subweights:
         crossed: 20
         restricted: 10
       dungeon_items:
-        standard: 80
-        full: 20
+        standard: 20
+        full: 80
   item:
     chance: 68
     weights:
@@ -179,17 +179,17 @@ subweights:
         custom:
           customPrizePacks: False
           region.wildMaps:
-            True: 60
-            False: 40
+            True: 70
+            False: 30
           region.wildCompasses:
-            True: 60
-            False: 40
+            True: 70
+            False: 30
           region.wildKeys:
-            True: 60
-            False: 40
+            True: 70
+            False: 30
           region.wildBigKeys:
-            True: 60
-            False: 40
+            True: 70
+            False: 30
           rom.genericKeys:
             True: 20
             False: 80
