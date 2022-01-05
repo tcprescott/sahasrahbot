@@ -1,0 +1,84 @@
+description: Season 11 mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva), but only entrance
+
+allow_quickswap: true
+glitches_required: "none"
+item_functionality: "normal"
+item_placement: "advanced"
+dungeon_items: "standard"
+entrance_shuffle: "none"
+
+world_state:
+  standard: 35
+  open: 35
+  inverted: 15
+  retro: 15
+
+goals:
+  ganon: 30
+  fast_ganon: 35
+  dungeons: 20
+  pedestal: 15
+  "triforce-hunt": 5
+
+accessibility:
+  items: 90
+  none: 10
+
+tower_open:
+  0: 5
+  1: 5
+  2: 10
+  3: 10
+  4: 10
+  5: 20
+  6: 20
+  7: 20
+ganon_open:
+  3: 10
+  4: 10
+  5: 20
+  6: 20
+  7: 40
+
+boss_shuffle:
+  none: 70
+  full: 30
+enemy_shuffle:
+  none: 70
+  shuffled: 30
+
+enemy_damage:
+  default: 80
+  shuffled: 20
+
+enemy_health:
+  default: 70
+  easy: 15
+  hard: 15
+
+hints:
+  "off": 90
+  "on": 10
+
+weapons:
+  randomized: 40
+  assured: 30
+  vanilla: 20
+  swordless: 10
+
+item_pool:
+  normal: 60
+  hard: 30
+  expert: 10
+
+
+subweights:
+  entrance:
+    chance: 28
+    weights:
+      entrance_shuffle:
+        crossed: 20
+        restricted: 10
+      dungeon_items:
+        standard: 80
+        full: 20
