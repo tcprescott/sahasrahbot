@@ -11,6 +11,12 @@ from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 from pyz3r.customizer import BASE_CUSTOMIZER_PAYLOAD
 
+ALTTPRDE_TITLE_MAP = {
+    'Game 1 (Standard)': 'standard',
+    'Game 2 (Open)': 'open',
+    'Game 3 (Casual Boots)': 'casualboots',
+}
+
 class ALTTPRDEPracticeView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -39,7 +45,8 @@ class ALTTPRDEPracticeView(discord.ui.View):
 
 class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed = await ALTTPRPreset('open').generate(hints='off', spoilers="off", allow_quickswap=True)
+        preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
+        self.seed = await ALTTPRPreset(preset).generate(hints='off', spoilers="off", allow_quickswap=True)
         await self.create_embeds()
 
     async def configuration(self):

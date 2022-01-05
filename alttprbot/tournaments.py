@@ -31,7 +31,7 @@ else:
         # REGULAR TOURNEMNTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        # 'alttprde': alttprde.ALTTPRDETournamentGroups,
+        'alttprde': alttprde.ALTTPRDETournamentGroups,
         # 'alttprmini': alttprde.ALTTPRMiniTournament,
         # 'alttpr': alttpr.ALTTPRTournamentRace,
         'smwde': smwde.SMWDETournament,
