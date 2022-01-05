@@ -115,17 +115,17 @@ subweights:
         custom:
           customPrizePacks: False
           region.wildMaps:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           region.wildCompasses:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           region.wildKeys:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           region.wildBigKeys:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           rom.genericKeys:
             True: 20
             False: 80
@@ -179,17 +179,17 @@ subweights:
         custom:
           customPrizePacks: False
           region.wildMaps:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           region.wildCompasses:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           region.wildKeys:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           region.wildBigKeys:
-            True: 70
-            False: 30
+            True: 60
+            False: 40
           rom.genericKeys:
             True: 20
             False: 80
