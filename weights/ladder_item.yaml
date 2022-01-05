@@ -82,7 +82,7 @@ subweights:
           pool: 0 # this forces it to be goal + min_difference
           min_difference: 10
         eq:
-          "PegasusBoots": # (this is a 10% change from 75 in season 5)
+          "PegasusBoots":
             0: 50
             1: 50
           "Hookshot":

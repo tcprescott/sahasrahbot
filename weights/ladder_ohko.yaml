@@ -99,7 +99,7 @@ subweights:
               value: -240
               pool: 4
         eq:
-          "PegasusBoots": # (this is a 10% change from 75 in season 5)
+          "PegasusBoots":
             0: 50
             1: 50
           "Hookshot":
