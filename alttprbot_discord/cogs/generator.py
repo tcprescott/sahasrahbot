@@ -77,6 +77,9 @@ class ALTTPRPresetView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+    async def on_error(self, error: Exception, item, interaction) -> None:
+        raise error
+
     @discord.ui.button(label="Generate Again", style=discord.ButtonStyle.blurple, custom_id="sahabot:generator:regen", row=1)
     async def regenerate(self, button: discord.ui.Button, interaction: discord.Interaction):
         respmsg = await interaction.response.send_message("Generating, please wait...")

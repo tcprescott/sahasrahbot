@@ -46,6 +46,9 @@ class MultiworldSignupView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+    async def on_error(self, error: Exception, item, interaction) -> None:
+        raise error
+
     @discord.ui.select(
         placeholder="Choose a randomizer",
         min_values=1,

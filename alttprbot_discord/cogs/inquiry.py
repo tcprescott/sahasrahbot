@@ -14,6 +14,9 @@ class ConfirmInquiryThread(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+    async def on_error(self, error: Exception, item, interaction) -> None:
+        raise error
+
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬", custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, button: discord.ui.Button, interaction: discord.Interaction):
         inquiry_message_config = await models.InquiryMessageConfig.get(message_id=interaction.message.id)
@@ -33,6 +36,9 @@ class OpenInquiryThread(discord.ui.View):
     def __init__(self, inquiry_message_config):
         super().__init__(timeout=60)
         self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
+
+    async def on_error(self, error: Exception, item, interaction) -> None:
+        raise error
 
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
     async def yes(self, button: discord.ui.Button, interaction: discord.Interaction):

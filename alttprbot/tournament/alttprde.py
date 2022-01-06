@@ -21,6 +21,9 @@ class ALTTPRDEPracticeView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
+    async def on_error(self, error: Exception, item, interaction) -> None:
+        raise error
+
     @discord.ui.button(label="Generate a Practice Seed", style=discord.ButtonStyle.blurple, custom_id="sahabot:alttprde:practice", row=1)
     async def practice(self, button: discord.ui.Button, interaction: discord.Interaction):
         respmsg = await interaction.response.send_message("Generating, please wait...")
