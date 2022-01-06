@@ -181,7 +181,7 @@ class MultiworldSignupView(discord.ui.View):
     async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
         message = interaction.message
         embed = message.embeds[0]
-        multiworld = await self.create_or_update_multiworld(interaction)
+        multiworld = await models.Multiworld.get(message_id=interaction.message.id)
 
         if not multiworld.owner_id == interaction.user.id:
             await interaction.response.send_message("You are not authorized to cancel this game.", ephemeral=True)
