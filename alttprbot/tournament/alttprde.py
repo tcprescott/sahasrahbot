@@ -49,7 +49,7 @@ class ALTTPRDEPracticeView(discord.ui.View):
 class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
         preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
-        self.seed = await ALTTPRPreset(preset).generate(hints='off', spoilers="off", allow_quickswap=True)
+        self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
         await self.create_embeds()
 
     async def configuration(self):
