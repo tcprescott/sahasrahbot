@@ -67,7 +67,8 @@ class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
                 guild.get_role(623071415129866240),
             ],
             lang='de',
-            stream_delay=10
+            stream_delay=10,
+            gsheet_id='1dWzbwxoErGQyO4K1tZ-EexX1bdnTGuxQhLJDnmfcaR4',
         )
 
 class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
@@ -94,7 +95,8 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
                 guild.get_role(623071415129866240),
             ],
             lang='de',
-            stream_delay=10
+            stream_delay=10,
+            gsheet_id='1dWzbwxoErGQyO4K1tZ-EexX1bdnTGuxQhLJDnmfcaR4',
         )
 
     @property
