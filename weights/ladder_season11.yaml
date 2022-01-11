@@ -1,5 +1,8 @@
 description: Season 11 mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva)
 
+options:
+  FillItemPoolWith: TwentyRupees2
+
 allow_quickswap: true
 glitches_required: "none"
 item_functionality: "normal"
