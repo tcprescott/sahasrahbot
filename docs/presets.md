@@ -94,6 +94,7 @@ title:  Presets
 | [shopsanity_crisscrosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity_crisscrosskeys.yaml) |Criss-cross keysanity w/ shopsanity.|   *Door Randomizer*|
 | [shopsanity_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity_crosskeys.yaml) |Crosskeys shopsanity.|   *Door Randomizer*|
 | [standard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard.yaml) |Standard world state, randomized weapons.|   |
+| [standard_adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_adkeys.yaml) |Standard world state, randomized weapons, all dungeon keysanity.|   |
 | [standard_crossdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_crossdoors.yaml) |Cross dungeon doors, standard world state.|   *Door Randomizer*|
 | [standard_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_fast.yaml) |Standard world state, randomized weapons, Aghanim 2 not required.|   |
 | [standard_hard_future](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_hard_future.yaml) |A potential new version of hard difficulty| *Customizer*  |
