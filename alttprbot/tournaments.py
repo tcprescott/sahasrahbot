@@ -46,8 +46,8 @@ else:
         'smz3': dailies.SMZ3DailyRace,
 
         # ALTTPR League
-        'invleague': alttprleague.ALTTPRLeague,
-        'alttprleague': alttprleague.ALTTPROpenLeague,
+        # 'invleague': alttprleague.ALTTPRLeague,
+        # 'alttprleague': alttprleague.ALTTPROpenLeague,
 
         # SGL
         # 'sgl21alttpr': sgl21.ALTTPRBrackets,
