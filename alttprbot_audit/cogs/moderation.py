@@ -83,7 +83,7 @@ class Moderation(commands.Cog):
         five_minutes = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         previous_messages = await models.AuditMessages.filter(guild_id=message.guild.id, user_id=message.author.id, content=message.content, message_date__gte=five_minutes)
 
-        if len(previous_messages) > 1:
+        if len(previous_messages) > 1 and message.content is not None:
             await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=10), reason="automated timeout for duplicate messages")
             await message.channel.send(f"{message.author.mention}, your message was deleted because it was a duplicate of a recently sent message.  You have been timed out for 10 minutes.\n\nIf this was in error, please contact a moderator for assistance.")
 
