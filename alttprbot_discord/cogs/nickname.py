@@ -42,7 +42,7 @@ class Nickname(commands.Cog):
         "rtggadmin",
         "Miscellaneous administrative commands for RaceTime.gg",
         permissions=[
-            permissions.Permission(
+            permissions.CommandPermission(
                 "owner", 2, True
             )
         ]

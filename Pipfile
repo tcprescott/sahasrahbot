@@ -28,15 +28,11 @@ html5lib = "*"
 shortuuid = "*"
 PyGithub = "*"
 PySide2 = "==5.15.2"
-Pillow = "==8.3.2"
-nlzss11 = "==1.1"
 python-slugify = "*"
 
 [dev-packages]
 pycodestyle = "*"
 pylint = "*"
-ipython = "*"
-requests = "*"
 
 [requires]
 python_version = "3.8"
@@ -51,4 +47,4 @@ ref = "aiohttp_update"
 
 [packages.py-cord]
 git = "https://github.com/Pycord-Development/pycord.git"
-ref = "7b28e29baaa5e660f37b39ef10254ee7dd85e1fd"
+ref = "2d204e2b0e20e9420c89b037d74e3493cc1b2981"
