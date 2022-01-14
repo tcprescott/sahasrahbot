@@ -331,6 +331,10 @@ class TriforceTexts(Model):
     author_credit = fields.CharField(200, null=True)
     broadcasted = fields.BooleanField(null=False, default=False)
 
+class ScheduledEvents(Model):
+    scheduled_event_id = fields.BigIntField(pk=True, generated=False)
+    event_slug = fields.CharField(40, null=False)
+    episode_id = fields.IntField(null=False, unique=True)
 
 class SpeedGamingDailies(Model):
     class Meta:

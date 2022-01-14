@@ -4,7 +4,8 @@ import logging
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot.tournament.core import TournamentConfig
+from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
 from config import Config as c
@@ -48,7 +49,7 @@ class Tournament(commands.Cog):
     async def week_races(self):
         logging.info('scanning for unsubmitted races')
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
-            event_data: TournamentConfig = await tournament_class.get_config()
+            event_data: TournamentRace = await tournament_class.get_config()
 
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
@@ -61,8 +62,7 @@ class Tournament(commands.Cog):
                     await self.send_race_form(event_data, event_slug, episode)
 
             if event_data.data.create_scheduled_events:
-                for episode in episodes:
-                    await self.update_scheduled_event(event_data, event_slug, episode)
+                await self.update_scheduled_event(event_data, event_slug, episodes)
 
             if event_data.data.scheduling_needs_channel:
                 await self.update_scheduling_needs(event_data, episodes)
@@ -122,10 +122,66 @@ class Tournament(commands.Cog):
     async def tourneyrace(self, ctx, event_slug, episode_number: int):
         await tournaments.create_tournament_race_room(event_slug, episode_number)
 
-    async def update_scheduled_event(self, event_data, event_slug, episode):
-        pass
+    async def update_scheduled_event(self, event_data: TournamentRace, event_slug: str, episodes: dict):
 
-    async def update_scheduling_needs(self, event_data, episodes):
+        # remove dead events
+        dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes], event_slug=event_slug)
+        for dead_event in dead_events:
+            try:
+                event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(dead_event.scheduled_event_id)
+                pass
+                if event.status == discord.ScheduledEventStatus.scheduled:
+                    await event.delete()
+            except discord.NotFound:
+                continue
+            await dead_event.delete()
+
+        for episode in episodes:
+            start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
+            episode_id = int(episode['id'])
+            scheduled_event = await models.ScheduledEvents.get_or_none(episode_id=episode_id)
+
+            tournament_race = await tournaments.fetch_tournament_handler_v2(event_slug, episode)
+
+            name = f"{tournament_race.event_name} - {tournament_race.versus}"
+            end_time = start_time + datetime.timedelta(hours=1.5)
+
+            if tournament_race.broadcast_channels:
+                location=f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
+            else:
+                location=f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
+
+            if scheduled_event:
+                try:
+                    event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
+
+                    # check if existing event requires an update
+                    if not event.name == name or not event.start_time == start_time or not event.end_time == end_time or not event.location.value == location:
+                        await event.edit(
+                            name=name,
+                            start_time=start_time,
+                            end_time=end_time,
+                            location=location
+                        )
+                except discord.NotFound:
+                    event = await event_data.guild.create_scheduled_event(
+                        name=name,
+                        start_time=start_time,
+                        end_time=end_time,
+                        location=location
+                    )
+                    await models.ScheduledEvents.update_or_create(episode_id=episode_id, defaults={'scheduled_event_id': event.id, 'event_slug': event_slug})
+            else:
+                # create an event
+                event = await event_data.guild.create_scheduled_event(
+                    name=name,
+                    start_time=start_time,
+                    end_time=end_time,
+                    location=location
+                )
+                await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id, event_slug=event_slug)
+
+    async def update_scheduling_needs(self, event_data: TournamentRace, episodes):
         comms_needed = []
         trackers_needed = []
         broadcasters_needed = []

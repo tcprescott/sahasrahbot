@@ -82,6 +82,8 @@ else:
 async def fetch_tournament_handler(event, episodeid: int, rtgg_handler=None):
     return await TOURNAMENT_DATA[event].construct(episodeid, rtgg_handler)
 
+async def fetch_tournament_handler_v2(event, episode: dict, rtgg_handler=None):
+    return await TOURNAMENT_DATA[event].construct_with_episode_data(episode, rtgg_handler)
 
 async def create_tournament_race_room(event, episodeid):
     event_data = await TOURNAMENT_DATA[event].get_config()
@@ -142,7 +144,7 @@ async def race_recording_task():
 
                 if race_data['status']['value'] == 'finished':
                     winner = [e for e in race_data['entrants'] if e['place'] == 1][0] # pylint: disable=used-before-assignment
-                    runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
+                    runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0] # pylint: disable=used-before-assignment
 
                     started_at = isodate.parse_datetime(race_data['started_at']).astimezone(pytz.timezone('US/Eastern'))
                     ended_at = isodate.parse_datetime(race_data['ended_at'])

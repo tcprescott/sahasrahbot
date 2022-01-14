@@ -90,10 +90,6 @@ class TournamentPlayer(object):
         return self.data.rtgg_id
 
     @property
-    def twitch_name(self):
-        return self.data.twitch_name
-
-    @property
     def name(self):
         return self.discord_user.name
 
@@ -122,6 +118,17 @@ class TournamentRace(object):
         await discordbot.wait_until_ready()
         tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
+
+        return tournament_race
+
+    @classmethod
+    async def construct_with_episode_data(cls, episode: dict, rtgg_handler):
+        tournament_race = cls(episode['id'], rtgg_handler)
+        tournament_race.episode = episode
+
+        await discordbot.wait_until_ready()
+        tournament_race.data = await tournament_race.configuration()
+        await tournament_race.update_data(update_episode=False)
 
         return tournament_race
 
@@ -219,8 +226,9 @@ class TournamentRace(object):
         )
         return self.rtgg_handler
 
-    async def update_data(self):
-        self.episode = await speedgaming.get_episode(self.episodeid)
+    async def update_data(self, update_episode=True):
+        if update_episode:
+            self.episode = await speedgaming.get_episode(self.episodeid)
 
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
 
@@ -321,6 +329,10 @@ class TournamentRace(object):
     @property
     def player_names(self):
         return [p.name for p in self.players]
+
+    @property
+    def player_twitch_names(self):
+        return [p['streamingFrom'] for p in self.episode['match1']['players']]
 
     @property
     def broadcast_channels(self):
