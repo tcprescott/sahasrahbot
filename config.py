@@ -26,7 +26,7 @@ class Config:
     MultiworldRomBase = os.environ.get("MultiworldRomBase")
     MultiworldHostBase = os.environ.get("MultiworldHostBase")
 
-    gsheet_api_oauth = json.loads(os.environ.get("gsheet_api_oauth"))
+    gsheet_api_oauth = json.loads(os.environ.get("gsheet_api_oauth"), strict=False)
 
     SB_TWITCH_TOKEN = os.environ.get("SB_TWITCH_TOKEN")
     SB_TWITCH_CLIENT_ID = os.environ.get("SB_TWITCH_CLIENT_ID")

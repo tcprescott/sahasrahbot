@@ -38,6 +38,7 @@ class TournamentConfig:
     commentary_channel: discord.TextChannel = None
     mod_channel: discord.TextChannel = None
     scheduling_needs_channel: discord.TextChannel = None
+    create_scheduled_events: bool = False
 
     scheduling_needs_tracker: bool = False
 
