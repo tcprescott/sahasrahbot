@@ -81,27 +81,29 @@ class Moderation(commands.Cog):
                     await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
 
         five_minutes = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-        previous_messages = await models.AuditMessages.filter(guild_id=message.guild.id, user_id=message.author.id, content=message.content, message_date__gte=five_minutes)
 
-        if len(previous_messages) > 1 and message.content is not None:
-            await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=10), reason="automated timeout for duplicate messages")
-            await message.channel.send(f"{message.author.mention}, your message was deleted because it was a duplicate of a recently sent message.  You have been timed out for 10 minutes.\n\nIf this was in error, please contact a moderator for assistance.")
+        if message.content:
+            previous_messages = await models.AuditMessages.filter(guild_id=message.guild.id, user_id=message.author.id, content=message.content, message_date__gte=five_minutes)
 
-            for audit_message in previous_messages:
-                channel = self.bot.get_channel(audit_message.channel_id)
+            if len(previous_messages) > 1:
+                await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=10), reason="automated timeout for duplicate messages")
+                await message.channel.send(f"{message.author.mention}, your message was deleted because it was a duplicate of a recently sent message.  You have been timed out for 10 minutes.\n\nIf this was in error, please contact a moderator for assistance.")
+
+                for audit_message in previous_messages:
+                    channel = self.bot.get_channel(audit_message.channel_id)
+                    try:
+                        msg = await channel.fetch_message(audit_message.message_id)
+                    except discord.NotFound:
+                        continue
+                    try:
+                        await msg.delete()
+                    except discord.NotFound:
+                        logging.warn(f"Unable to remove message id {message.id}")
+
                 try:
-                    msg = await channel.fetch_message(audit_message.message_id)
-                except discord.NotFound:
-                    continue
-                try:
-                    await msg.delete()
+                    await message.delete()
                 except discord.NotFound:
                     logging.warn(f"Unable to remove message id {message.id}")
-
-            try:
-                await message.delete()
-            except discord.NotFound:
-                logging.warn(f"Unable to remove message id {message.id}")
 
 async def inspect_zip(url):
     binary = await http.request_generic(url, returntype='binary')
