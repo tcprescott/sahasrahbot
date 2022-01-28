@@ -4,6 +4,7 @@ import zipfile
 import datetime
 from typing import List
 import hashlib
+import re
 
 from urllib.parse import urlparse
 from urlextract import URLExtract
@@ -82,7 +83,7 @@ class Moderation(commands.Cog):
 
         five_minutes = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
 
-        if message.content:
+        if message.content and ck_url(message.content):
             previous_messages = await models.AuditMessages.filter(guild_id=message.guild.id, user_id=message.author.id, content=message.content, message_date__gte=five_minutes)
 
             if len(previous_messages) > 1:
@@ -124,6 +125,10 @@ async def bad_domain_hashes() -> List:
             hashes: list = await resp.json()
 
     return hashes
+
+def ck_url(string_to_check):
+    re_equ = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+    return bool(re.findall(re_equ, string_to_check))
 
 
 def setup(bot):
