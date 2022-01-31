@@ -106,6 +106,7 @@ title:  Presets
 | [tournament](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament.yaml) |Tournament weights.|   |
 | [triforce30](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce30.yaml) |A Triforce Hunt, except there are 30 pieces required, and 40 in the item pool.| *Customizer*  |
 | [triforce40](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce40.yaml) |A Triforce Hunt, except there are 40 pieces required, and 50 in the item pool.| *Customizer*  |
+| [trinity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trinity.yaml) |trnity by thkg00fy| *Customizer*  |
 | [trueicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trueicerodhunt.yaml) |You get every **every**, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
 | [vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla.yaml) |The vanilla game, but with all of the quality life additions of the randomizer.| *Customizer*  |
 | [vanilla_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla_inverted.yaml) |An inverted version of the vanilla game.   This requires major glitch knowledge to beat!| *Customizer*  |
