@@ -1,4 +1,5 @@
 import logging
+import random
 
 import discord
 from werkzeug.datastructures import MultiDict
@@ -16,6 +17,23 @@ ALTTPRDE_TITLE_MAP = {
     'Game 2 (Open)': 'open',
     'Game 3 (Casual Boots)': 'casualboots',
 }
+
+TRIFORCE_TEXTS = [
+    "Gigagramm!",
+    "Escape is our Prison and we serve for life",
+    "Ups, hier war der Jetseed auch nicht",
+    "Saber is watching you",
+    "Hurra, ich werde ein Schnitzel!",
+    "EL\nPSY\nCONGROO",
+    "Wann gibt's eine schoene Losfee?",
+    "Hier gibts eindeutig zu wenig Katzen!!",
+    "  Und jetzt   \nDoors!   ",
+    "Last Location\nProficiency\nUp!",
+    "     Hell     \nit's about  \ndamn time!",
+    "Did you miss me? Yes, you missed me",
+    "Teto hat schon wieder LSS geskippt!",
+    "  Gewonnen?\n Weisst du ja\n nicht! LUL",
+]
 
 class ALTTPRDEPracticeView(discord.ui.View):
     def __init__(self):
@@ -77,7 +95,13 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
             raise Exception('Missing bracket settings.  Please submit!')
 
         self.preset_dict = None
-        self.seed = await alttpr_discord.ALTTPRDiscord.generate(settings=self.bracket_settings, endpoint='/api/customizer')
+        settings = self.bracket_settings
+        text = random.choice(TRIFORCE_TEXTS)
+        print(text)
+        settings['texts'] = {
+            'end_triforce': "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
+        }
+        self.seed = await alttpr_discord.ALTTPRDiscord.generate(settings=settings, endpoint='/api/customizer')
         await self.create_embeds()
 
     async def configuration(self):
