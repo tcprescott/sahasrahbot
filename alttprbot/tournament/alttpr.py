@@ -101,7 +101,7 @@ class ALTTPRTournamentRace(TournamentRace):
         if self.bracket_settings is not None and not warning:
             return
 
-        if self.tournament_game and self.tournament_game.submitted:
+        if self.tournament_game and self.tournament_game.submitted and not warning:
             return
 
         if warning:
