@@ -194,10 +194,12 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
             if payload['items'] in ['boots', 'boots_flute']:
                 settings['custom']['item']['count']['PegasusBoots'] = 0
+                settings['custom']['item']['count']['TwentyRupees'] += 1
                 settings['eq'].append('PegasusBoots')
 
             if payload['items'] in ['flute', 'boots_flute']:
                 settings['custom']['item']['count']['OcarinaInactive'] = 0
+                settings['custom']['item']['count']['TwentyRupees'] += 1
                 settings['eq'].append('OcarinaInactive' if payload['world_state'] == 'standard' else 'OcarinaActive')
 
             payload_formatted = '\n'.join([f"**{key}**: {val}" for key, val in payload.items() if not key in ['episodeid', 'game']])
