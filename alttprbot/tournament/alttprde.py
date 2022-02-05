@@ -206,6 +206,10 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
         settings['name'] = f"ALTTPRDE - {self.versus} - Game {payload['game']}"
         settings['notes'] = f"Episode {self.episodeid}<br><br>{self.versus}<br>Game {payload['game']}"
 
+        settings['hints'] = 'off'
+        settings['tournament'] = True
+        settings['spoiler'] = 'off'
+
         embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
         await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': settings, 'event': self.event_slug, 'game_number': payload['game']})
