@@ -97,17 +97,23 @@ class ALTTPRTournamentRace(TournamentRace):
             self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
             self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
 
-    async def send_race_submission_form(self):
-        if self.bracket_settings is not None:
+    async def send_race_submission_form(self, warning=False):
+        if self.bracket_settings is not None and not warning:
             return
 
         if self.tournament_game and self.tournament_game.submitted:
             return
 
-        msg = (
-            f"Greetings!  Do not forget to submit settings for your upcoming race: `{self.versus}`!\n\n"
-            f"For your convenience, you visit {self.submit_link} to submit the settings.\n\n"
-        )
+        if warning:
+            msg = (
+                f"Your upcoming race room cannot be created because settings have not submitted: `{self.versus}`!\n\n"
+                f"For your convenience, please visit {self.submit_link} to submit the settings.\n\n"
+            )
+        else:
+            msg = (
+                f"Greetings!  Do not forget to submit settings for your upcoming race: `{self.versus}`!\n\n"
+                f"For your convenience, please visit {self.submit_link} to submit the settings.\n\n"
+            )
 
         for name, player in self.player_discords:
             if player is None:
