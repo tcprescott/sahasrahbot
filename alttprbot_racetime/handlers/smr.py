@@ -20,6 +20,13 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             return
 
+        try:
+            seed_number = int(args[1])
+            if seed_number < 0 or seed_number > 2147483647:
+                raise ValueError("Seed number must be between 0 and 2147483647")
+        except IndexError:
+            seed_number = random.randint(0, 2147483647)
+
         if self.data.get('team_race', False) is False:
             await self.send_message('This must be a team race.')
             return
@@ -29,8 +36,6 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-
-        seed_number = random.randint(0, 2147483647)
 
         try:
             teams = self.teams
