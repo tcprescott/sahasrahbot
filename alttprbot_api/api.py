@@ -1,17 +1,19 @@
-from io import BytesIO
 import os
 import re
+from io import BytesIO
+from urllib.parse import quote
+import datetime
 
 import aiohttp
-from quart import Quart, abort, jsonify, request, session, redirect, url_for, render_template, send_file
-from quart_discord import DiscordOAuth2Session, requires_authorization, Unauthorized, AccessDenied
-from urllib.parse import quote
-
 from alttprbot import models
-from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
-from alttprbot.tournament.core import UnableToLookupEpisodeException
 from alttprbot.alttprgen import generator
+from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot_discord.bot import discordbot
+from alttprbot_racetime.bot import racetime_bots
+from quart import (Quart, abort, jsonify, redirect, render_template, request,
+                   send_file, session, url_for)
+from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
+                           requires_authorization)
 
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(os.environ.get("APP_SECRET_KEY"), "utf-8")
@@ -58,15 +60,6 @@ async def access_denied(e):
         'error.html',
         title="Access Denied",
         message="We were unable to access your Discord account."
-    )
-
-
-@sahasrahbotapi.errorhandler(UnableToLookupEpisodeException)
-async def unable_to_lookup(e):
-    return await render_template(
-        'error.html',
-        title="SpeedGaming Episode Not Found",
-        message="The SpeedGaming Episode ID was not found.  Please double check!"
     )
 
 
@@ -157,6 +150,59 @@ async def get_tournament_games():
     data = await models.TournamentGames.filter(**terms).values()
     return jsonify(data)
 
+@sahasrahbotapi.route('/api/racetime/cmd', methods=['POST'])
+async def bot_command():
+    data = await request.get_json()
+
+    category = data['category']
+    room = data['room']
+    cmd = data['cmd']
+    auth_key = request.args['auth_key']
+
+    access = await models.AuthorizationKeyPermissions.get_or_none(auth_key__key=auth_key, type='racetimecmd', subtype=category)
+    if access is None:
+        return abort(403)
+
+    racetime_bot = racetime_bots.get(category)
+    if not racetime_bot:
+        raise Exception("Invalid game category")
+
+    racetime_handler = racetime_bot.handlers.get(f"{category}/{room}").handler
+
+    fake_data = {
+        'message': {
+            'id': 'FAKE',
+            'user': {
+                'id': 'FAKE',
+                'full_name': 'API-submitted command',
+                'name': 'API-submitted command',
+                'discriminator': None,
+                'url': None,
+                'avatar': None,
+                'flair': None,
+                'twitch_name': None,
+                'twitch_display_name': None,
+                'twitch_channel': None,
+                'can_moderate': True,
+            },
+            'bot': False,
+            'posted_at': datetime.datetime.utcnow().isoformat(),
+            'message': cmd,
+            'message_plain': cmd,
+            'highlight': False,
+            'is_bot': False,
+            'is_monitor': True,
+            'is_system': False,
+            'delay': 0
+        },
+        'type': 'message.chat',
+        'date': datetime.datetime.utcnow().isoformat(),
+    }
+
+    await racetime_handler.send_message(f"Executing command from API request: {cmd}")
+    await racetime_handler.chat_message(fake_data)
+
+    return jsonify({'success': True})
 
 @sahasrahbotapi.route("/submit/<string:event>", methods=['GET'])
 @requires_authorization

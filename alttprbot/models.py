@@ -208,6 +208,16 @@ class Presets(Model):
     modified = fields.DatetimeField(auto_now=True)
     generated_count = fields.IntField(default=0)
 
+class AuthorizationKeys(Model):
+    id = fields.IntField(pk=True)
+    key = fields.CharField(200, null=False, unique=True)
+    name =  fields.CharField(200, null=False)
+
+class AuthorizationKeyPermissions(Model):
+    id = fields.IntField(pk=True)
+    auth_key = fields.ForeignKeyField('models.AuthorizationKeys', related_name='permissions')
+    type = fields.CharField(45, null=False)
+    subtype = fields.TextField(null=True)
 
 class RTGGUnlistedRooms(Model):
     id = fields.IntField(pk=True)

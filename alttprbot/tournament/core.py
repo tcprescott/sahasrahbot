@@ -20,10 +20,6 @@ class UnableToLookupUserException(SahasrahBotException):
     pass
 
 
-class UnableToLookupEpisodeException(SahasrahBotException):
-    pass
-
-
 @dataclass
 class TournamentConfig:
     guild: discord.Guild

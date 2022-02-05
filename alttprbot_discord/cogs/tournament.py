@@ -4,7 +4,7 @@ import logging
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot.tournament import core
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
@@ -33,7 +33,7 @@ class Tournament(commands.Cog):
     async def create_races(self):
         logging.info("scanning SG schedule for tournament races to create")
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
-            event_data: TournamentConfig = await tournament_class.get_config()
+            event_data: core.TournamentConfig = await tournament_class.get_config()
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
             except Exception as e:
@@ -49,7 +49,7 @@ class Tournament(commands.Cog):
     async def week_races(self):
         logging.info('scanning for unsubmitted races')
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
-            event_data: TournamentRace = await tournament_class.get_config()
+            event_data: core.TournamentRace = await tournament_class.get_config()
 
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
@@ -72,7 +72,7 @@ class Tournament(commands.Cog):
         logging.info('scanning for races with bad discord info')
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
             messages = await self.report_bad_player_discord(event_slug=event_slug)
-            event_data: TournamentConfig = await tournament_class.get_config()
+            event_data: core.TournamentConfig = await tournament_class.get_config()
 
             if messages and event_data.audit_channel:
                 await event_data.audit_channel.send("<@185198185990324225>\n\n" + "\n".join(messages))
@@ -122,7 +122,7 @@ class Tournament(commands.Cog):
     async def tourneyrace(self, ctx, event_slug, episode_number: int):
         await tournaments.create_tournament_race_room(event_slug, episode_number)
 
-    async def update_scheduled_event(self, event_data: TournamentRace, event_slug: str, episodes: dict):
+    async def update_scheduled_event(self, event_data: core.TournamentRace, event_slug: str, episodes: dict):
 
         # remove dead events
         dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes], event_slug=event_slug)
@@ -181,7 +181,7 @@ class Tournament(commands.Cog):
                 )
                 await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id, event_slug=event_slug)
 
-    async def update_scheduling_needs(self, event_data: TournamentRace, episodes):
+    async def update_scheduling_needs(self, event_data: core.TournamentRace, episodes):
         comms_needed = []
         trackers_needed = []
         broadcasters_needed = []
@@ -276,7 +276,7 @@ class Tournament(commands.Cog):
     async def report_bad_player_discord(self, event_slug):
         tournament_class = tournaments.TOURNAMENT_DATA[event_slug]
 
-        event_data: TournamentConfig = await tournament_class.get_config()
+        event_data: core.TournamentConfig = await tournament_class.get_config()
         episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=48)
 
         messages = []

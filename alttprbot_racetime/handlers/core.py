@@ -6,7 +6,6 @@ from alttprbot_discord.bot import discordbot
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot_racetime.misc.konot import KONOT
-from alttprbot.tournament.core import UnableToLookupEpisodeException
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
 
@@ -48,7 +47,7 @@ class SahasrahBotCoreHandler(RaceHandler):
                 rtgg_handler=self
             )
             await self.tournament.on_room_resume()
-        except (UnableToLookupEpisodeException, KeyError):
+        except:
             self.logger.exception("Error while association tournament race to handler.")
 
     async def setup_konot(self):
