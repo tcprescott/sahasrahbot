@@ -1,3 +1,4 @@
+import copy
 import logging
 import random
 
@@ -171,12 +172,12 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
         if payload['game'] == '1':
             preset = await ALTTPRPreset('opensgl').fetch()
-            settings = preset.preset_data['settings'].deepcopy()
+            settings = copy.deepcopy(preset.preset_data['settings'])
             embed.add_field(name="Preset", value='opensgl')
         else:
             if payload.get('item_pool') == 'sgl':
                 preset = await ALTTPRPreset('opensgl').fetch()
-                settings = preset.preset_data['settings'].deepcopy()
+                settings = copy.deepcopy(preset.preset_data['settings'])
             else:
                 settings = BASE_CUSTOMIZER_PAYLOAD.copy()
 
@@ -194,6 +195,8 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
             settings['custom']['rom.freeItemMenu'] = payload['keys'] in ['mc', 'keysanity', 'bigkey']
             settings['custom']['rom.freeItemText'] = payload['keys'] in ['mc', 'keysanity', 'bigkey']
+
+            settings['custom']['rom.mapOnPickup'] = payload['keys'] in ['mc', 'keysanity']
 
             if payload['items'] in ['boots', 'boots_flute']:
                 settings['custom']['item']['count']['PegasusBoots'] = 0
