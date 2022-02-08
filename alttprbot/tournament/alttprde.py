@@ -179,7 +179,7 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
                 preset = await ALTTPRPreset('opensgl').fetch()
                 settings = copy.deepcopy(preset.preset_data['settings'])
             else:
-                settings = BASE_CUSTOMIZER_PAYLOAD.copy()
+                settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
 
             settings['goal'] = payload['goal']
             settings['mode'] = payload['world_state']
