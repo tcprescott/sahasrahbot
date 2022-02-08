@@ -192,9 +192,8 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
             settings['custom']['region.wildKeys'] = payload['keys'] == 'keysanity'
             settings['custom']['region.wildMaps'] = payload['keys'] in ['mc', 'keysanity']
 
-            if settings['custom'].get('region.wildKeys', False) or settings['custom'].get('region.wildBigKeys', False) or settings['custom'].get('region.wildCompasses', False) or settings['custom'].get('region.wildMaps', False):
-                settings['custom']['rom.freeItemMenu'] = True
-                settings['custom']['rom.freeItemText'] = True
+            settings['custom']['rom.freeItemMenu'] = payload['keys'] in ['mc', 'keysanity', 'bigkey']
+            settings['custom']['rom.freeItemText'] = payload['keys'] in ['mc', 'keysanity', 'bigkey']
 
             if payload['items'] in ['boots', 'boots_flute']:
                 settings['custom']['item']['count']['PegasusBoots'] = 0
