@@ -171,12 +171,12 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
         if payload['game'] == '1':
             preset = await ALTTPRPreset('opensgl').fetch()
-            settings = preset.preset_data['settings'].copy()
+            settings = preset.preset_data['settings'].deepcopy()
             embed.add_field(name="Preset", value='opensgl')
         else:
             if payload.get('item_pool') == 'sgl':
-                preset = await ALTTPRPreset('sglive').fetch()
-                settings = preset.preset_data['settings'].copy()
+                preset = await ALTTPRPreset('opensgl').fetch()
+                settings = preset.preset_data['settings'].deepcopy()
             else:
                 settings = BASE_CUSTOMIZER_PAYLOAD.copy()
 
@@ -191,6 +191,10 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
             settings['custom']['region.wildCompasses'] = payload['keys'] in ['mc', 'keysanity']
             settings['custom']['region.wildKeys'] = payload['keys'] == 'keysanity'
             settings['custom']['region.wildMaps'] = payload['keys'] in ['mc', 'keysanity']
+
+            if settings['custom'].get('region.wildKeys', False) or settings['custom'].get('region.wildBigKeys', False) or settings['custom'].get('region.wildCompasses', False) or settings['custom'].get('region.wildMaps', False):
+                settings['custom']['rom.freeItemMenu'] = True
+                settings['custom']['rom.freeItemText'] = True
 
             if payload['items'] in ['boots', 'boots_flute']:
                 settings['custom']['item']['count']['PegasusBoots'] = 0
@@ -210,7 +214,8 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
         settings['hints'] = 'off'
         settings['tournament'] = True
-        settings['spoiler'] = 'off'
+        settings['spoilers'] = 'off'
+        settings['allow_quickswap'] = True
 
         embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
