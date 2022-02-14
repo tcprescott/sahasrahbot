@@ -44,7 +44,7 @@ title:  Presets
 | [hard_enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_enemizer.yaml) |Some good ol' enemy and boss shuffle, hard item pool.|   |
 | [hard_mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_mc.yaml) |Only maps and compasses are shuffled in the world, hard item pool|   |
 | [hardicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hardicerodhunt.yaml) |You get every item absolutely **required** to beat the game, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
-| [hybridmg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hybridmg.yaml) || *Customizer*  |
+| [hmg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hmg.yaml) || *Customizer*  |
 | [inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted.yaml) |Inverted.  You start in the dark world.|   |
 | [inverted_adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_adkeys.yaml) |Inverted world state and keysanity, all dungeons.|   |
 | [inverted_crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/inverted_crosskeys.yaml) |Cross world entrance shuffle, but also using the inverted world state.|   |
