@@ -115,7 +115,7 @@ settings:
         Ether: 1
         FiftyRupees: 5
         FireRod: 1
-        FiveRupees: 0
+        FiveRupees: 2
         Flippers: 1
         GreenClock: 0
         HalfMagic: 0
@@ -168,10 +168,10 @@ settings:
         OneHundredRupees: 1
         OneRupee: 0
         PegasusBoots: 1
-        PieceOfHeart: 40
+        PieceOfHeart: 48
         Powder: 1
         PowerGlove: 0
-        ProgressiveArmor: 2
+        ProgressiveArmor: 0
         ProgressiveBow: 0
         ProgressiveGlove: 2
         ProgressiveShield: 3
