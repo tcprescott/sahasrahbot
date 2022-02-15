@@ -39,7 +39,6 @@ discordbot = commands.Bot(
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
-discordbot.load_extension("alttprbot_discord.cogs.aqttp")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
@@ -50,8 +49,6 @@ discordbot.load_extension("alttprbot_discord.cogs.nickname")
 discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
 discordbot.load_extension("alttprbot_discord.cogs.role")
 discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
-discordbot.load_extension("alttprbot_discord.cogs.supermetroid")
-discordbot.load_extension("alttprbot_discord.cogs.smz3")
 discordbot.load_extension("alttprbot_discord.cogs.sgl")
 discordbot.load_extension("alttprbot_discord.cogs.tournament")
 discordbot.load_extension("alttprbot_discord.cogs.voicerole")

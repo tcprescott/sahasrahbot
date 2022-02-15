@@ -14,6 +14,7 @@ from config import Config as c
 # we will probably expand this later to support other tournaments in the future
 # ALTTPRDEPracticeView
 
+
 class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -115,13 +116,6 @@ class Tournament(commands.Cog):
         else:
             return False
 
-    @commands.command(
-        help="Generate a tournament race."
-    )
-    @commands.is_owner()
-    async def tourneyrace(self, ctx, event_slug, episode_number: int):
-        await tournaments.create_tournament_race_room(event_slug, episode_number)
-
     async def update_scheduled_event(self, event_data: core.TournamentRace, event_slug: str, episodes: dict):
 
         # remove dead events
@@ -147,9 +141,9 @@ class Tournament(commands.Cog):
             end_time = start_time + datetime.timedelta(hours=1.5)
 
             if tournament_race.broadcast_channels:
-                location=f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
+                location = f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
             else:
-                location=f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
+                location = f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
 
             if scheduled_event:
                 try:
@@ -300,12 +294,13 @@ class Tournament(commands.Cog):
                             member = None
 
                         if member is None:
-                            member =  event_data.guild.get_member_named(player.get('discordTag', ''))
+                            member = event_data.guild.get_member_named(player.get('discordTag', ''))
 
                         if member is None:
                             messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
+
 
 def setup(bot):
     bot.add_cog(Tournament(bot))
