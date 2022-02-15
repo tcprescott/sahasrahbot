@@ -1,39 +1,41 @@
+import discord
+from discord.commands import permissions, ApplicationContext, Option
 from discord.ext import commands
-
-from alttprbot_discord.util.config import GuildConfig
 
 
 class Config(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
-        if await ctx.bot.is_owner(ctx.author):
-            return True
+    guildconfig = discord.commands.SlashCommandGroup(
+        "guildconfig",
+        "Miscellaneous guild configuration commands for the bot's owner.",
+        permissions=[
+            permissions.CommandPermission(
+                "owner", 2, True
+            )
+        ]
+    )
 
-        return False
-
-    @commands.group()
-    async def config(self, ctx):
-        pass
-
-    @config.command()
-    async def set(self, ctx, parameter, value):
+    @guildconfig.command()
+    async def set(self, ctx: ApplicationContext, parameter: Option(str), value: Option(str)):
         ctx.guild.config.set(parameter, value)
+        await ctx.respond(f"Set {parameter} to {value}", ephemeral=True)
 
-    @config.command()
-    async def get(self, ctx):
-        await ctx.reply(ctx.guild.config.dump())
+    @guildconfig.command()
+    async def get(self, ctx: ApplicationContext):
+        await ctx.respond(ctx.guild.config.dump(), ephemeral=True)
 
-    @config.command()
-    async def delete(self, ctx, parameter):
+    @guildconfig.command()
+    async def delete(self, ctx: ApplicationContext, parameter: Option(str)):
         ctx.guild.config.delete(parameter)
+        await ctx.respond(f"Deleted {parameter}", ephemeral=True)
 
-    @config.command()
-    async def reloadall(self, ctx):
-        for guild in self.bot.guilds():
-            guild.config = GuildConfig(guild.id)
-
+    # @guildconfig.command()
+    # async def reloadall(self, ctx: ApplicationContext):
+    #     for guild in self.bot.guilds():
+    #         guild.config = GuildConfig(guild.id)
+    #     await ctx.respond("Reloaded all guild configs", ephemeral=True)
 
 def setup(bot):
     bot.add_cog(Config(bot))

@@ -82,7 +82,7 @@ class Misc(commands.Cog):
                 await message.add_reaction(emoji)
 
     @commands.slash_command(name="welcome", guild_ids=ALTTP_RANDOMIZER_SERVERS)
-    async def welcome_cmd(self, ctx, language: Option(str, description="Choose a language for the welcome message.", choices=["french", "spanish", "german"])):
+    async def welcome_cmd(self, ctx: discord.ApplicationContext, language: Option(str, description="Choose a language for the welcome message.", choices=WELCOME_MESSAGES.keys())):
         await ctx.respond(WELCOME_MESSAGES[language])
 
     @commands.slash_command(name="memberinfo", guild_only=True)
@@ -112,13 +112,17 @@ class Misc(commands.Cog):
             "See <#543572578787393556> for details."
         )
 
-    @commands.command(
-        brief="Retrieves a holy image.",
-        help="Retrieves a holy image from http://alttp.mymm1.com/holyimage/",
-        aliases=['holy']
-    )
-    async def holyimage(self, ctx):
-        await ctx.reply("Please use the new `/holyimage` slash command.")
+    @commands.slash_command(guild_ids=ALTTP_RANDOMIZER_SERVERS)
+    async def festive(self, ctx: discord.ApplicationContext):
+        embed = discord.Embed(
+            title='Festive Randomizer Information',
+            description='Latest details of any upcoming festive randomizers.',
+            color=discord.Color.red()
+        )
+        embed.set_image(
+            url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
+
+        await ctx.respond(embed=embed)
 
     @commands.slash_command(
         name='holyimage'

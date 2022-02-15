@@ -1,31 +1,34 @@
+from importlib.metadata import requires
 import discord
+from discord.commands import permissions, ApplicationContext, Option
 from discord.ext import commands
 
-from alttprbot.database import discord_server_lists # TODO switch to ORM
+from alttprbot.database import discord_server_lists  # TODO switch to ORM
 
 
 class DiscordServers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['dg'])
-    @commands.is_owner()
-    async def discordservers(self, ctx):
-        pass
+    discordservers = discord.commands.SlashCommandGroup(
+        "discordservers",
+        "Commands for updating the discord server list.",
+        permissions=[
+            permissions.CommandPermission(
+                "owner", 2, True
+            )
+        ]
+    )
 
-    @discordservers.group()
-    @commands.is_owner()
-    async def category(self, ctx):
-        pass
+    category = discordservers.create_subgroup("category", "Manage catagories.")
 
     @category.command(name='add')
-    @commands.is_owner()
-    async def category_add(self, ctx, channel: commands.TextChannelConverter, category_title, category_description=None, order=0):
+    async def category_add(self, ctx: ApplicationContext, channel: Option(discord.TextChannel, required=True), category_title: Option(str), category_description: Option(str, default=None), order=Option(int, default=0)):
         await discord_server_lists.add_category(ctx.guild.id, channel.id, category_title=category_title, category_description=category_description, order=order)
+        await ctx.respond(f"Added category {category_title} to {channel.mention}", ephemeral=True)
 
     @category.command(name='list')
-    @commands.is_owner()
-    async def category_list(self, ctx):
+    async def category_list(self, ctx: ApplicationContext):
         results = await discord_server_lists.get_categories(ctx.guild.id)
         if results:
             embed = discord.Embed(
@@ -39,31 +42,27 @@ class DiscordServers(commands.Cog):
                     value=f"_*Id:*_ {result['id']}\n_*Channel:*_ {channel.mention}",
                     inline=False
                 )
-            await ctx.reply(embed=embed)
+            await ctx.respond(embed=embed)
 
     @category.command(name='remove')
-    @commands.is_owner()
-    async def category_remove(self, ctx, category_id: int):
+    async def category_remove(self, ctx: ApplicationContext, category_id: Option(int, required=True)):
         await discord_server_lists.remove_category(ctx.guild.id, category_id)
+        await ctx.respond(f"Removed category {category_id}", ephemeral=True)
 
     @category.command(name='update')
-    @commands.is_owner()
-    async def category_update(self, ctx, category_id: int, category_title, category_description=None, order=0):
+    async def category_update(self, ctx: ApplicationContext, category_id: Option(int, required=True), category_title: Option(str), category_description: Option(str, default=None), order=Option(int, default=0)):
         await discord_server_lists.update_category(category_id, ctx.guild.id, category_title, category_description, order)
+        await ctx.respond(f"Updated category {category_id}", ephemeral=True)
 
-    @discordservers.group()
-    @commands.is_owner()
-    async def server(self, ctx):
-        pass
+    server = discordservers.create_subgroup("server", "Manage servers in a category.")
 
     @server.command(name='add')
-    @commands.is_owner()
-    async def server_add(self, ctx, category_id: int, invite: commands.InviteConverter, server_description=None):
+    async def server_add(self, ctx, category_id: Option(int, required=True), invite: discord.Invite, server_description: str):
         await discord_server_lists.add_server(ctx.guild.id, invite.id, category_id, server_description=server_description)
+        await ctx.respond(f"Added server {invite.guild.name} to category {category_id}", ephemeral=True)
 
     @server.command(name='list')
-    @commands.is_owner()
-    async def server_list(self, ctx, category_id: int):
+    async def server_list(self, ctx: ApplicationContext, category_id: int):
         results = await discord_server_lists.get_servers_for_category(category_id)
 
         if results:
@@ -77,21 +76,22 @@ class DiscordServers(commands.Cog):
                     value=f"_*Id:*_ {result['id']}",
                     inline=False
                 )
-            await ctx.reply(embed=embed)
+            await ctx.respond(embed=embed)
 
     @server.command(name='remove')
-    @commands.is_owner()
     async def server_remove(self, ctx, server_id: int):
         await discord_server_lists.remove_server(ctx.guild.id, server_id)
+        await ctx.respond(f"Removed server {server_id}", ephemeral=True)
 
     @server.command(name='update')
-    @commands.is_owner()
-    async def server_update(self, ctx, server_id: int, invite: commands.InviteConverter, category_id: int, server_description=None):
+    async def server_update(self, ctx, server_id: int, invite: discord.Invite, category_id: int, server_description: str = None):
         await discord_server_lists.update_server(ctx.guild.id, server_id, invite.id, category_id, server_description)
+        await ctx.respond(f"Updated server {server_id}", ephemeral=True)
 
     @discordservers.command()
-    @commands.is_owner()
     async def refresh(self, ctx):
+        await ctx.defer()
+
         def is_me(m):
             return m.author == self.bot.user
 
@@ -117,6 +117,8 @@ class DiscordServers(commands.Cog):
                 ]
                 msgs += [f"{s['server_description']}: https://discord.gg/{s['invite_id']}" for s in servers]
                 await channel.send('\n'.join(msgs))
+
+        await ctx.respond(f"Refreshed server list for {ctx.guild.name}", ephemeral=True)
 
 
 def setup(bot):

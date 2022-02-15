@@ -39,11 +39,9 @@ discordbot = commands.Bot(
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
-discordbot.load_extension("alttprbot_discord.cogs.admin")
 discordbot.load_extension("alttprbot_discord.cogs.aqttp")
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
-discordbot.load_extension("alttprbot_discord.cogs.ctjets")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
 discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
 # discordbot.load_extension("alttprbot_discord.cogs.guildconfig")

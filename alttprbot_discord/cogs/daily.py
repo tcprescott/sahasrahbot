@@ -28,21 +28,8 @@ class Daily(commands.Cog):
         self.bot = bot
         self.announce_daily.start()
 
-    @commands.command(
-        name='daily',
-        brief='Returns the current daily seed.',
-        help='Returns the currently daily seed.')
-    @is_daily_channel()
-    async def daily(self, ctx):
-        daily_challenge = await find_daily_hash()
-        hash_id = daily_challenge['hash']
-        seed = await get_daily_seed(hash_id)
-        embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
-        await update_daily(hash_id)
-        await ctx.reply(embed=embed)
-
     @commands.slash_command(name='dailygame', description='Returns the current daily game from alttpr.com.')
-    async def daily_cmd(self, ctx):
+    async def daily_cmd(self, ctx: discord.ApplicationContext):
         daily_challenge = await find_daily_hash()
         hash_id = daily_challenge['hash']
         seed = await get_daily_seed(hash_id)
