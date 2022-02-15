@@ -12,6 +12,7 @@ MRB_FLAG_CHOICES = {
     'Disable MC Requirements': 'iyhqh$j9g7@gZqTBT!BhOAdES$vA',
     'No Hints, Disable MC Requirements': 'iyhqh$j9g7@gZqTBTyBAOAdES$vA',
     'The "Finals" Experience': 'iyAqh$j9Q7@gZZSBTyBAOAdES0vA',
+    'Vanilla Shuffle': 'iyhqh$j9g7@$ZqTBT!BhOA!AC#qA',
 }
 
 Z2R_PRESETS = {
@@ -26,10 +27,12 @@ Z2R_PRESETS = {
     'sgl': 'jhhhD0j9$78$JpTBT!BhSA!0P@@A',
 }
 
+
 def preset(preset):
     seed = random.randint(0, 1000000000)
     flags = Z2R_PRESETS[preset]
     return seed, flags
+
 
 def mrb():
     seed = random.randint(0, 1000000000)
