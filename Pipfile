@@ -29,7 +29,6 @@ shortuuid = "*"
 PyGithub = "*"
 PySide2 = "==5.15.2"
 python-slugify = "*"
-py-cord = "==2.0.0b4"
 
 [dev-packages]
 pycodestyle = "*"
@@ -38,9 +37,6 @@ pylint = "*"
 [requires]
 python_version = "3.8"
 
-[pipenv]
-allow_prereleases = true
-
 [packages.pyz3r]
 git = "https://github.com/tcprescott/pyz3r.git"
 ref = "6.0.0-dev"
@@ -48,3 +44,6 @@ ref = "6.0.0-dev"
 [packages.racetime-bot]
 git = "https://github.com/tcprescott/racetime-bot.git"
 ref = "aiohttp_update"
+
+[packages.1a972df]
+file = "https://github.com/Pycord-Development/pycord/archive/1b035413bd76b14e65d9d58676f573a51ec492b0.zip"

@@ -1,8 +1,10 @@
 import discord
+
 from alttprbot import models
 from alttprbot.alttprgen import generator, smvaria
 from alttprbot.alttprgen.randomizer import smdash, z2r
-from alttprbot.alttprgen.spoilers import generate_spoiler_game
+from alttprbot.alttprgen.spoilers import (generate_spoiler_game,
+                                          generate_spoiler_game_custom)
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
@@ -132,7 +134,7 @@ class Generator(commands.Cog):
         preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
         race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
         hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
-        allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
+        allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes"),
     ):
         """
         Generates an ALTTP Randomizer game on https://alttpr.com
@@ -151,47 +153,70 @@ class Generator(commands.Cog):
 
         await ctx.respond(embed=embed, view=ALTTPRPresetView())
 
-    # @alttpr.command()
-    # async def festive(
-    #     self,
-    #     ctx: ApplicationContext,
-    #     preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
-    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
-    #     hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
-    #     allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes")
-    # ):
-    #     """
-    #     Generates an Festive™ ALTTP Randomizer game on https://alttpr.com/festive
-    #     """
-    #     await ctx.defer()
-    #     seed = await generator.ALTTPRPreset(preset).generate(
-    #         hints=hints == "yes",
-    #         spoilers="off" if race == "yes" else "on",
-    #         tournament=race == "yes",
-    #         allow_quickswap=allow_quickswap == "yes",
-    #         endpoint_prefix="/festive"
-    #     )
-    #     if not seed:
-    #         raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
-    #     embed = await seed.embed(emojis=self.bot.emojis)
+    @alttpr.command()
+    async def custompreset(
+        self,
+        ctx: ApplicationContext,
+        yamlfile: Option(discord.Attachment, description="The preset you want generate.", required=True),
+        race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
+        hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
+        allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes"),
+    ):
+        """
+        Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user
+        """
+        await ctx.defer()
 
-    #     await ctx.respond(embed=embed)
+        namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
+
+        content = await yamlfile.read()
+        data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/latest")
+        await data.save()
+        seed = await data.generate(
+            spoilers="off" if race == "yes" else "on",
+            tournament=race == "yes",
+            allow_quickswap=allow_quickswap == "yes",
+            hints=hints == "yes"
+        )
+
+        embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
+        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`", inline=False)
+
+        await ctx.respond(embed=embed)
 
     @alttpr.command()
     async def spoiler(
         self,
         ctx: ApplicationContext,
         preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_alttpr),
-        festive: Option(str, description="Use the festive randomizer? (default no)", choices=["yes", "no"], required=False, default="no"),
     ):
         """
         Generates an ALTTP Randomizer Spoiler Race on https://alttpr.com
         """
         await ctx.defer()
-        spoiler = await generate_spoiler_game(preset, festive=festive == "yes")
+        spoiler = await generate_spoiler_game(preset)
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
+        embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
+
+        await ctx.respond(embed=embed)
+
+    @alttpr.command()
+    async def customspoiler(
+        self,
+        ctx: ApplicationContext,
+        yamlfile: Option(discord.Attachment, description="A valid preset yaml file.", required=True),
+    ):
+        """
+        Generates an ALTTP Randomizer spoiler race game using a custom yaml provided by the user
+        """
+        await ctx.defer()
+
+        content = await yamlfile.read()
+        spoiler = await generate_spoiler_game_custom(content)
+
+        embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
 
         await ctx.respond(embed=embed)
@@ -218,6 +243,35 @@ class Generator(commands.Cog):
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
         embed.insert_field_at(0, name="Weightset", value=weightset, inline=False)
+
+        await ctx.respond(embed=embed)
+
+    @alttpr.command()
+    async def custommystery(
+        self,
+        ctx: ApplicationContext,
+        yamlfile: Option(discord.Attachment, description="A valid mystery yaml file.", required=True),
+        race: Option(str, description="Is this a race? (choosing no never masks settings) (default yes)", choices=["yes", "no"], required=False, default="yes"),
+        mask_settings: Option(str, description="Mask settings? (default yes)", choices=["yes", "no"], required=False, default="yes"),
+    ):
+        """
+        Generates an ALTTP Randomizer Mystery game on https://alttpr.com using a custom yaml
+        """
+        await ctx.defer()
+
+        namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
+        content = await yamlfile.read()
+        data = await generator.ALTTPRMystery.custom(content, f"{namespace.name}/latest")
+        await data.save()
+
+        mystery = await data.generate(spoilers="mystery" if mask_settings else "off", tournament=race == "yes")
+
+        embed = await mystery.seed.embed(emojis=ctx.bot.emojis, name="Mystery Game")
+
+        if mystery.custom_instructions:
+            embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
+
+        embed.add_field(name="Saved as custom weightset!", value=f"You can generate this weightset again by using the weightset name of `{namespace.name}/latest`.", inline=False)
 
         await ctx.respond(embed=embed)
 

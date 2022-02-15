@@ -41,8 +41,7 @@ async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False):
 
 
 async def generate_spoiler_game_custom(content, spoiler_type='spoiler'):
-    preset_data = ALTTPRPreset()
-    await preset_data.custom(content)
+    preset_data = await ALTTPRPreset.custom(content)
     seed = await preset_data.generate(spoilers="generate", tournament=True, allow_quickswap=True)
 
     spoiler_log_url = await write_json_to_disk(seed, spoiler_type)
