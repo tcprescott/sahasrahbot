@@ -1,7 +1,8 @@
 import discord
+from discord.commands import permissions, Option
 from discord.ext import commands
 
-from alttprbot.database import voicerole # TODO switch to ORM
+from alttprbot.database import voicerole  # TODO switch to ORM
 
 
 class VoiceRole(commands.Cog):
@@ -29,18 +30,23 @@ class VoiceRole(commands.Cog):
                     await member.remove_roles(role, reason='Left voice channel.')
         return
 
-    @commands.group(aliases=['vr'])
-    @commands.has_permissions(manage_roles=True)
-    async def voicerole(self, ctx):
-        pass
+    voicerole = discord.commands.SlashCommandGroup(
+        "voicerole",
+        "Commands for managing voice roles.",
+        permissions=[permissions.CommandPermission(
+            "owner", 2, True
+        )
+        ])
 
-    @voicerole.command(name='create', aliases=['c'])
-    async def vr_create(self, ctx, voice_channel: discord.VoiceChannel, role: discord.Role):
+    @voicerole.command(name='create')
+    async def vr_create(self, ctx, voice_channel: Option(discord.VoiceChannel, description="Voice channel to monitor."), role: Option(discord.Role, description="Role to assign to members in the voice channel.")):
         await voicerole.create_voice_role(ctx.guild.id, voice_channel.id, role.id)
+        await ctx.respond(f"Created voice role mapping for {voice_channel.mention}", ephemeral=True)
 
-    @voicerole.command(name='delete', aliases=['d'])
+    @voicerole.command(name='delete')
     async def vr_delete(self, ctx, role_id: int):
         await voicerole.delete_voice_role(ctx.guild.id, role_id)
+        await ctx.respond(f"Deleted voice role mapping for {role_id}", ephemeral=True)
 
 
 def setup(bot):

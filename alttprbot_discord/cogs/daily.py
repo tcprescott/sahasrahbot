@@ -5,22 +5,9 @@ from discord.ext import commands, tasks
 import logging
 
 from alttprbot import models
-from alttprbot.database import config # TODO switch to ORM
+from alttprbot.database import config  # TODO switch to ORM
 
 from ..util.alttpr_discord import ALTTPRDiscord
-
-
-def is_daily_channel():
-    async def predicate(ctx):
-        if ctx.guild is None:
-            return False
-        result = await config.get_parameter(ctx.guild.id, 'DailyAnnouncerChannel')
-        if result is not None:
-            channels = result['value'].split(',')
-            if ctx.channel.name in channels:
-                return True
-        return False
-    return commands.check(predicate)
 
 
 class Daily(commands.Cog):
@@ -54,6 +41,7 @@ class Daily(commands.Cog):
     @announce_daily.before_loop
     async def before_create_races(self):
         await self.bot.wait_until_ready()
+
 
 def setup(bot):
     bot.add_cog(Daily(bot))

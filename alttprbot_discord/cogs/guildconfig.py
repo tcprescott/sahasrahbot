@@ -19,15 +19,24 @@ class Config(commands.Cog):
 
     @guildconfig.command()
     async def set(self, ctx: ApplicationContext, parameter: Option(str), value: Option(str)):
+        """
+        Set a guild configuration parameter.
+        """
         ctx.guild.config.set(parameter, value)
         await ctx.respond(f"Set {parameter} to {value}", ephemeral=True)
 
     @guildconfig.command()
     async def get(self, ctx: ApplicationContext):
+        """
+        Get a guild configuration parameter.
+        """
         await ctx.respond(ctx.guild.config.dump(), ephemeral=True)
 
     @guildconfig.command()
     async def delete(self, ctx: ApplicationContext, parameter: Option(str)):
+        """
+        Delete a guild configuration parameter.
+        """
         ctx.guild.config.delete(parameter)
         await ctx.respond(f"Deleted {parameter}", ephemeral=True)
 
@@ -36,6 +45,7 @@ class Config(commands.Cog):
     #     for guild in self.bot.guilds():
     #         guild.config = GuildConfig(guild.id)
     #     await ctx.respond("Reloaded all guild configs", ephemeral=True)
+
 
 def setup(bot):
     bot.add_cog(Config(bot))

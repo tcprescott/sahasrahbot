@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from emoji import UNICODE_EMOJI
 
-from alttprbot.database import role # TODO switch to ORM
+from alttprbot.database import role  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
 
 from ..util import embed_formatter
@@ -164,7 +164,7 @@ async def refresh_bot_message(ctx, group_id):
     message = await channel.fetch_message(group['message_id'])
 
     for item in roles:
-#        try:
+        #        try:
         await message.add_reaction(strip_custom_emoji(item['emoji']))
 #        except discord.errors.HTTPException as err:
 #            if err.code == 10014:

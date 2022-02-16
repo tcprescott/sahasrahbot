@@ -83,10 +83,16 @@ class Misc(commands.Cog):
 
     @commands.slash_command(name="welcome", guild_ids=ALTTP_RANDOMIZER_SERVERS)
     async def welcome_cmd(self, ctx: discord.ApplicationContext, language: Option(str, description="Choose a language for the welcome message.", choices=WELCOME_MESSAGES.keys())):
+        """
+        Welcome messages for various languages.
+        """
         await ctx.respond(WELCOME_MESSAGES[language])
 
     @commands.slash_command(name="memberinfo", guild_only=True)
     async def memberinfo_cmd(self, ctx, member: Option(discord.Member, "Choose a member")):
+        """
+        Get information about a member.
+        """
         if member is None:
             member = ctx.author
         embed = discord.Embed(
@@ -105,6 +111,9 @@ class Misc(commands.Cog):
         guild_ids=ALTTP_RANDOMIZER_SERVERS
     )
     async def rom_cmd(self, ctx):
+        """
+        Get info about how to verify a ROM.
+        """
         await ctx.respond(
             "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALTTPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
             "It can also help get the permalink page URL which has access to the Spoiler Log depending on the settings that were chosen. Not all games that are generated have access to the Spoiler Log.\n\n"
@@ -114,6 +123,9 @@ class Misc(commands.Cog):
 
     @commands.slash_command(guild_ids=ALTTP_RANDOMIZER_SERVERS)
     async def festive(self, ctx: discord.ApplicationContext):
+        """
+        Get info about festive randomizers.
+        """
         embed = discord.Embed(
             title='Festive Randomizer Information',
             description='Latest details of any upcoming festive randomizers.',
