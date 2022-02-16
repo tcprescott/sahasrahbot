@@ -222,121 +222,22 @@ class AlttprGen(commands.Cog):
                 url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
         await ctx.reply(embed=embed)
 
-    @commands.command()
-    async def alttprstats(self, ctx, raw: bool = False):
-        if ctx.message.attachments:
-            sram = await ctx.message.attachments[0].read()
-            parsed = parse_sram(sram)
-            if raw:
-                await ctx.reply(
-                    file=discord.File(
-                        io.StringIO(json.dumps(parsed, indent=4)),
-                        filename=f"stats_{parsed['meta'].get('filename', 'alttpr').strip()}.txt"
-                    )
-                )
-            else:
-                embed = discord.Embed(
-                    title=f"ALTTPR Stats for \"{parsed['meta'].get('filename', '').strip()}\"",
-                    description=f"Collection Rate {parsed['stats'].get('collection rate')}",
-                    color=discord.Color.blue()
-                )
-                embed.add_field(
-                    name="Time",
-                    value=(
-                        f"Total Time: {parsed['stats'].get('total time', None)}\n"
-                        f"Lag Time: {parsed['stats'].get('lag time', None)}\n"
-                        f"Menu Time: {parsed['stats'].get('menu time', None)}\n\n"
-                        f"First Sword: {parsed['stats'].get('first sword', None)}\n"
-                        f"Flute Found: {parsed['stats'].get('flute found', None)}\n"
-                        f"Mirror Found: {parsed['stats'].get('mirror found', None)}\n"
-                        f"Boots Found: {parsed['stats'].get('boots found', None)}\n"
-                    ),
-                    inline=False
-                )
-                embed.add_field(
-                    name="Important Stats",
-                    value=(
-                        f"Bonks: {parsed['stats'].get('bonks', None)}\n"
-                        f"Deaths: {parsed['stats'].get('deaths', None)}\n"
-                        f"Revivals: {parsed['stats'].get('faerie revivals', None)}\n"
-                        f"Overworld Mirrors: {parsed['stats'].get('overworld mirrors', None)}\n"
-                        f"Rupees Spent: {parsed['stats'].get('rupees spent', None)}\n"
-                        f"Save and Quits: {parsed['stats'].get('save and quits', None)}\n"
-                        f"Screen Transitions: {parsed['stats'].get('screen transitions', None)}\n"
-                        f"Times Fluted: {parsed['stats'].get('times fluted', None)}\n"
-                        f"Underworld Mirrors: {parsed['stats'].get('underworld mirrors', None)}\n"
-                    )
-                )
-                embed.add_field(
-                    name="Misc Stats",
-                    value=(
-                        f"Swordless Bosses: {parsed['stats'].get('swordless bosses', None)}\n"
-                        f"Fighter Sword Bosses: {parsed['stats'].get('fighter sword bosses', None)}\n"
-                        f"Master Sword Bosses: {parsed['stats'].get('master sword bosses', None)}\n"
-                        f"Tempered Sword Bosses: {parsed['stats'].get('tempered sword bosses', None)}\n"
-                        f"Golden Sword Bosses: {parsed['stats'].get('golden sword bosses', None)}\n\n"
-                        f"Heart Containers: {parsed['stats'].get('heart containers', None)}\n"
-                        f"Heart Containers: {parsed['stats'].get('heart pieces', None)}\n"
-                        f"Mail Upgrade: {parsed['stats'].get('mails', None)}\n"
-                        f"Bottles: {parsed['equipment'].get('bottles', None)}\n"
-                        f"Silver Arrows: {parsed['equipment'].get('silver arrows', None)}\n"
-                    )
-                )
-                if not parsed.get('hash id', 'none') == 'none':
-                    seed = await ALTTPRDiscord.retrieve(hash_id=parsed.get('hash id', 'none'))
-                    embed.add_field(name='File Select Code', value=seed.build_file_select_code(
-                        emojis=ctx.bot.emojis
-                    ), inline=False)
-                    embed.add_field(name='Permalink', value=seed.url, inline=False)
+    @commands.command(hidden=True)
+    async def alttprstats(self, ctx):
+        await ctx.reply("This command is currently disabled.  Please use the `/alttprutil stats` command instead.")
 
-                await ctx.reply(embed=embed)
-        else:
-            raise SahasrahBotException("You must attach an SRAM file.")
-
-    @commands.command(
-        brief='Make a SahasrahBot preset file from a customizer save.',
-        help=(
-            'Take a customizer settings save and create a SahasrahBot preset file from it.\n'
-            'This can then be fed into SahasrahBot using the "$preset custom" command.\n\n'
-        )
-    )
+    @commands.command(hidden=True)
     async def convertcustomizer(self, ctx):
-        if ctx.message.attachments:
-            content = await ctx.message.attachments[0].read()
-            customizer_save = json.loads(content)
-            settings = pyz3r.customizer.convert2settings(customizer_save)
-            preset_dict = {
-                'customizer': True,
-                'goal_name': "REPLACE WITH SRL GOAL STRING",
-                'randomizer': 'alttpr',
-                'settings': settings
-            }
-            await ctx.reply(
-                file=discord.File(
-                    io.StringIO(yaml.dump(preset_dict)),
-                    filename="output.yaml"
-                )
-            )
-        else:
-            raise SahasrahBotException("You must supply a valid yaml file.")
+        await ctx.reply("This command is currently disabled.  Please use the `/alttprutil convertcustomizer` command instead.")
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.cooldown(rate=15, per=900, type=commands.BucketType.user)
     async def kisspriest(self, ctx, count=10):
         await ctx.reply("Please use the new slash command \"/alttpr kisspriest\".")
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def savepreset(self, ctx, preset):
-        namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
-
-        if ctx.message.attachments:
-            content = await ctx.message.attachments[0].read()
-            data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/{preset}")
-            await data.save()
-
-            await ctx.send(f"Preset saved as {data.namespace}/{data.preset}")
-        else:
-            raise SahasrahBotException("You must supply a valid yaml file.")
+        await ctx.reply("This command is currently disabled.  Please use the `/alttprutil savepreset` command instead.")
 
     async def customgame(self, ctx, spoilers="off", tournament=True, allow_quickswap=False):
         namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
