@@ -41,9 +41,8 @@ python_version = "3.8"
 git = "https://github.com/tcprescott/pyz3r.git"
 ref = "6.0.0-dev"
 
-[packages.racetime-bot]
-git = "https://github.com/tcprescott/racetime-bot.git"
-ref = "aiohttp_update"
-
 [packages.1a972df]
 file = "https://github.com/Pycord-Development/pycord/archive/1b035413bd76b14e65d9d58676f573a51ec492b0.zip"
+
+[packages.fa33066]
+file = "https://github.com/tcprescott/racetime-bot/archive/7a0fb0bc13fd63e6dbf2417b21a09c8485a8e7b4.zip"
