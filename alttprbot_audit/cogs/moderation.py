@@ -14,7 +14,6 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from alttprbot.database import config  # TODO switch to ORM
 from alttprbot.util import http
 from alttprbot import models
 
@@ -106,6 +105,7 @@ class Moderation(commands.Cog):
                 except discord.NotFound:
                     logging.warn(f"Unable to remove message id {message.id}")
 
+
 async def inspect_zip(url):
     binary = await http.request_generic(url, returntype='binary')
     with zipfile.ZipFile(io.BytesIO(binary), "r") as thezip:
@@ -125,6 +125,7 @@ async def bad_domain_hashes() -> List:
             hashes: list = await resp.json()
 
     return hashes
+
 
 def ck_url(string_to_check):
     re_equ = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"

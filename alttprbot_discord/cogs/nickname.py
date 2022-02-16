@@ -4,13 +4,14 @@ import discord
 from discord.commands import permissions, ApplicationContext, Option
 from discord.ext import commands
 
-# from alttprbot.database import srlnick # TODO switch to ORM
 from alttprbot import models
+
 
 async def role_name_autocomplete(ctx):
     return [r.name for r in ctx.interaction.guild.roles if r.name.startswith(ctx.value)][:25]
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+
 
 class Nickname(commands.Cog):
     def __init__(self, bot):
@@ -63,8 +64,8 @@ class Nickname(commands.Cog):
                 try:
                     await member.send(
                         (f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n"
-                        f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
-                        "If you have any questions, please contact Synack.  Thank you!")
+                         f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
+                         "If you have any questions, please contact Synack.  Thank you!")
                     )
                     msg.append(f"Send DM to {member.name}#{member.discriminator}")
                 except (discord.Forbidden, discord.HTTPException) as e:
@@ -93,6 +94,7 @@ class Nickname(commands.Cog):
 
         else:
             await ctx.respond("Everyone in this role is registered with the bot.")
+
 
 def setup(bot):
     bot.add_cog(Nickname(bot))
