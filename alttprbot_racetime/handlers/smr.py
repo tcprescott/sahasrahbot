@@ -20,6 +20,9 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             return
 
+        if preset_name == "tournament":
+            preset_name = random.choice(["tournament_split", "tournament_full"])
+
         try:
             seed_number = int(args[1])
             if seed_number < 0 or seed_number > 2147483647:
