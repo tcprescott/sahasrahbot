@@ -45,4 +45,4 @@ ref = "6.0.0-dev"
 file = "https://github.com/Pycord-Development/pycord/archive/1b035413bd76b14e65d9d58676f573a51ec492b0.zip"
 
 [packages.fa33066]
-file = "https://github.com/tcprescott/racetime-bot/archive/7a0fb0bc13fd63e6dbf2417b21a09c8485a8e7b4.zip"
+file = "https://github.com/tcprescott/racetime-bot/archive/906c21c756e8ec32b421bfa47e95c1a7e2f8146a.zip"
