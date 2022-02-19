@@ -36,6 +36,7 @@ TRIFORCE_TEXTS = [
     "  Gewonnen?\n Weisst du ja\n nicht! LUL",
 ]
 
+
 class ALTTPRDEPracticeView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -65,6 +66,7 @@ class ALTTPRDEPracticeView(discord.ui.View):
         embed = await seed.embed(emojis=discordbot.emojis)
         await respmsg.edit_original_message(content=None, embed=embed)
 
+
 class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
         preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
@@ -89,6 +91,7 @@ class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
             stream_delay=10,
             gsheet_id='1dWzbwxoErGQyO4K1tZ-EexX1bdnTGuxQhLJDnmfcaR4',
         )
+
 
 class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
     async def roll(self):
@@ -198,6 +201,8 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
             settings['custom']['rom.mapOnPickup'] = payload['keys'] in ['mc', 'keysanity']
 
+            # settings['custom']['customPrizePacks'] = False
+
             if payload['items'] in ['boots', 'boots_flute']:
                 settings['custom']['item']['count']['PegasusBoots'] = 0
                 settings['custom']['item']['count']['TwentyRupees'] += 1
@@ -238,6 +243,7 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
                 logging.exception(f"Could not send DM to {name}")
                 if self.audit_channel:
                     await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+
 
 def get_embed_field(name: str, embed: discord.Embed) -> str:
     for field in embed.fields:
