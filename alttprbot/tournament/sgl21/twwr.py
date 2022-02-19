@@ -25,7 +25,7 @@ class TWWR(SGLCoreTournamentRace):
             goal=self.data.racetime_goal,
             invitational=False,
             unlisted=False,
-            info=self.race_info,
+            info_user=self.race_info,
             start_delay=15,
             time_limit=24,
             streaming_required=False,

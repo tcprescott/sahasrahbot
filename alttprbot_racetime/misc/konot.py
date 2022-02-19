@@ -1,5 +1,6 @@
 from alttprbot import models
 
+
 class KONOT(object):
     def __init__(self, rtgg_handler):
         self.rtgg_handler = rtgg_handler
@@ -54,7 +55,7 @@ class KONOT(object):
         params = {
             'invitational': True,
             'unlisted': False,
-            'info': f"KONOT Series, Segment #{next_segment_number}",
+            'info_user': f"KONOT Series, Segment #{next_segment_number}",
             'start_delay': 15,
             'time_limit': 24,
             'streaming_required': self.rtgg_handler.data['streaming_required'],

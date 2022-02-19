@@ -6,6 +6,7 @@ from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
 
+
 class ALTTPRTournamentRace(TournamentRace):
     async def roll(self):
         self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
