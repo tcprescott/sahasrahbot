@@ -137,7 +137,7 @@ class Tournament(commands.Cog):
 
             tournament_race = await tournaments.fetch_tournament_handler_v2(event_slug, episode)
 
-            name = f"{tournament_race.event_name} - {tournament_race.versus}"
+            name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
             end_time = start_time + datetime.timedelta(hours=1.5)
 
             if tournament_race.broadcast_channels:
