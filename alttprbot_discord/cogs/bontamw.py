@@ -66,7 +66,7 @@ class BontaMultiworld(commands.Cog):
         if not result.get('success', True):
             raise SahasrahBotException("That game does not exist.")
 
-        if not result['admin'] == ctx.author.id or (discord.utils.get(ctx.author.roles, id=507932829527703554) and result['meta']['guild'] == "Communauté ALttPR francophone"):
+        if not result['admin'] == ctx.author.id or not (discord.utils.get(ctx.author.roles, id=507932829527703554) and result['meta']['guild'] == "Communauté ALttPR francophone"):
             raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
         data = {
