@@ -1,8 +1,3 @@
-import io
-import lzma
-import zipfile
-import yaml
-
 import discord
 from aiohttp import ClientResponseError
 from discord.ext import commands
