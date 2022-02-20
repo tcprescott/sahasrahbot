@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import errors
 from discord.ext.commands.core import guild_only
 from discord_sentry_reporting import use_sentry
+from sentry_sdk import push_scope, capture_exception
 
 from alttprbot_discord.util import config
 from config import Config as c
@@ -98,7 +99,11 @@ async def on_command_error(ctx, error):
                 content="An error occured, please see attachment for the full message.",
                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
             )
-        raise error_to_display
+        with push_scope() as scope:
+            scope.set_tag("guild", ctx.guild.id if ctx.guild else "")
+            scope.set_tag("channel", ctx.channel.id if ctx.channel else "")
+            scope.set_tag("user", f"{ctx.author.name}#{ctx.author.discriminator}" if ctx.author else "")
+            raise error_to_display
 
 
 @discordbot.event
@@ -121,7 +126,12 @@ async def on_application_command_error(ctx, error):
                 content="An error occured, please see attachment for the full message.",
                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
             )
-        raise error_to_display
+
+        with push_scope() as scope:
+            scope.set_tag("guild", ctx.guild.id if ctx.guild else "")
+            scope.set_tag("channel", ctx.channel.id if ctx.channel else "")
+            scope.set_tag("user", f"{ctx.author.name}#{ctx.author.discriminator}" if ctx.author else "")
+            raise error_to_display
 
 
 @discordbot.event
