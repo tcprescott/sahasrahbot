@@ -119,7 +119,7 @@ class ALTTPRPresetView(discord.ui.View):
 
         embed = await seed.embed(emojis=discordbot.emojis)
         embed.insert_field_at(0, name="Preset", value=audit_game.genoption, inline=False)
-        await respmsg.edit_original_message(content=None, embed=embed, view=ALTTPRPresetView())
+        await respmsg.edit_original_message(content=None, embed=embed)
 
 
 class Generator(commands.Cog):
@@ -160,7 +160,7 @@ class Generator(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
 
-        await ctx.respond(embed=embed, view=ALTTPRPresetView())
+        await ctx.respond(embed=embed)
 
     @alttpr.command()
     async def custompreset(
