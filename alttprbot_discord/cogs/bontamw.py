@@ -14,7 +14,7 @@ from config import Config as c
 
 class BontaMultiworld(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
     @commands.command(
         help=('Host a multiworld using an attached multidata file from Bonta\'s multiworld implementation.\n'
@@ -66,7 +66,7 @@ class BontaMultiworld(commands.Cog):
         if not result.get('success', True):
             raise SahasrahBotException("That game does not exist.")
 
-        if not result['admin'] == ctx.author.id or not (discord.utils.get(ctx.author.roles, id=507932829527703554) and result['meta']['guild'] == "Communauté ALttPR francophone"):
+        if not (result['admin'] == ctx.author.id or (discord.utils.get(ctx.author.roles, id=507932829527703554) and result['meta']['guild'] == "Communauté ALttPR francophone")):
             raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
         data = {
@@ -81,7 +81,7 @@ class BontaMultiworld(commands.Cog):
         if 'resp' in response and response['resp'] is not None:
             await ctx.reply(response['resp'])
 
-    @commands.command(
+    @ commands.command(
         help=(
             'Resume an existing multiworld that was previously closed.\n'
             'Specify the existing token, and port number.\n\n'
