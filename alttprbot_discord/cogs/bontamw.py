@@ -66,9 +66,8 @@ class BontaMultiworld(commands.Cog):
         if not result.get('success', True):
             raise SahasrahBotException("That game does not exist.")
 
-        if not result['admin']:
-            raise SahasrahBotException(
-                'You must be the creator of the game to send messages to it.')
+        if not result['admin'] == ctx.author.id or (discord.utils.get(ctx.author.roles, id=507932829527703554) and result['meta']['guild'] == "Communauté ALttPR francophone"):
+            raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
         data = {
             'msg': msg
@@ -105,42 +104,6 @@ class BontaMultiworld(commands.Cog):
         multiworld = await http.request_json_post(url='http://localhost:5000/game', data=data, returntype='json')
 
         await ctx.reply(embed=make_embed(multiworld))
-
-    @commands.command(
-        help=(
-            "Attach a zip file that contains the bmbp patches you wish to update.\n"
-            "Command will return a zip file with corrected patch files.\n\n"
-            "The hoststring should be in \"hostname:port\" format."
-        ),
-        brief="Update hostname in a zip file of bmbp patches."
-    )
-    async def mwfixpatch(self, ctx, hoststring):
-        if not ctx.message.attachments:
-            raise SahasrahBotException('Must attach a zip file.')
-
-        binary = await ctx.message.attachments[0].read()
-
-        zip_buffer = io.BytesIO()
-
-        with zipfile.ZipFile(io.BytesIO(binary), "r") as oldzip:
-            with zipfile.ZipFile(zip_buffer, "w") as newzip:
-                bmbp_files = [
-                    f for f in oldzip.namelist() if f.endswith('.bmbp')]
-                for bmbp_file in bmbp_files:
-                    with oldzip.open(bmbp_file, 'r') as bmbp:
-                        content = yaml.load(lzma.decompress(
-                            bmbp.read()), Loader=yaml.SafeLoader)
-                        try:
-                            content['meta']['server'] = hoststring
-                        except KeyError:
-                            pass
-
-                    new_file = yaml.dump(content).encode(encoding="utf-8-sig")
-                    newzip.writestr(bmbp_file, lzma.compress(new_file))
-
-        zip_to_send = zip_buffer.getvalue()
-        await ctx.reply(file=discord.File(fp=io.BytesIO(zip_to_send), filename=f'Fixed_{ctx.message.attachments[0].filename}'))
-        zip_buffer.close()
 
 
 def make_embed(multiworld):
