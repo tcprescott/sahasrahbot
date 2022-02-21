@@ -21,7 +21,7 @@ class GameHandler(SahasrahBotCoreHandler):
         seed = await generator.CTJetsPreset(preset).generate()
 
         await self.send_message(seed)
-        await self.set_raceinfo(seed)
+        await self.set_bot_raceinfo(seed)
         await self.send_message("Seed rolling complete.  See race info for details.")
 
     async def ex_help(self, args, message):

@@ -162,7 +162,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def ex_cancel(self, args, message):
         self.seed_rolled = False
-        await self.set_raceinfo("New Race", overwrite=True)
+        await self.set_bot_raceinfo("New Race")
         await self.send_message("Reseting bot state.  You may now roll a new game.")
 
     async def ex_tournamentrace(self, args, message):
@@ -174,7 +174,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def ex_konot(self, args, message):
         await self.send_message("Setting up new KONOT race series!  The last player(s) to finish will be eliminated.  Once this race finishes, a new race will be created and the players advancing will be invited to the new room.")
-        await self.set_raceinfo("KONOT Series, Segment #1")
+        await self.set_bot_raceinfo("KONOT Series, Segment #1")
         self.konot = await KONOT.create_new(self.data['category']['slug'], self)
 
     @monitor_cmd

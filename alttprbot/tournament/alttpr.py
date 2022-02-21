@@ -18,7 +18,8 @@ class ALTTPRTournamentRace(TournamentRace):
         await self.update_data()
         await self.roll()
 
-        await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
+        # await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
+        await self.rtgg_handler.set_bot_raceinfo(self.seed_code)
 
         await self.send_audit_message(embed=self.embed)
         await self.send_commentary_message(self.tournament_embed)

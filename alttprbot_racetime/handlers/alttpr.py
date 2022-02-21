@@ -93,7 +93,7 @@ class GameHandler(SahasrahBotCoreHandler):
         except IndexError:
             studytime = spoiler.preset.preset_data.get('studytime', 900)
 
-        await self.set_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
+        await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
         await self.send_message(spoiler.seed.url)
         await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler.spoiler_log_url, studytime)
@@ -118,7 +118,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message(str(e))
             return
 
-        await self.set_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
+        await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
         await self.send_message(spoiler.seed.url)
         await self.send_message(f"The progression spoiler for this race will be sent after the race begins in this room.")
         await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler.spoiler_log_url, 0)
@@ -140,9 +140,9 @@ class GameHandler(SahasrahBotCoreHandler):
 
         if mystery.custom_instructions:
             await self.send_message(f"Instructions: {mystery.custom_instructions}")
-            await self.set_raceinfo(f"Instructions: {mystery.custom_instructions} - mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+            await self.set_bot_raceinfo(f"Instructions: {mystery.custom_instructions} - mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
         else:
-            await self.set_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+            await self.set_bot_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
 
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
@@ -151,7 +151,7 @@ class GameHandler(SahasrahBotCoreHandler):
     @monitor_cmd
     async def ex_cancel(self, args, message):
         self.seed_rolled = False
-        await self.set_raceinfo("New Race", overwrite=True)
+        await self.set_bot_raceinfo("New Race")
         await tournament_results.delete_active_tournament_race(self.data.get('name'))
         await spoiler_races.delete_spoiler_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
@@ -234,7 +234,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
-        await self.set_raceinfo(race_info)
+        await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True

@@ -25,7 +25,6 @@ class GameHandler(SahasrahBotCoreHandler):
         except IndexError:
             seed_number = random.randint(0, 2147483647)
 
-
         if self.data.get('team_race', False) is False:
             await self.send_message('This must be a team race.')
             return
@@ -47,7 +46,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         race_info = f"SMZ3 Multiworld - {preset_name}"
-        await self.set_raceinfo(race_info)
+        await self.set_bot_raceinfo(race_info)
         await self.send_message("Seed rolling complete.")
         self.seed_rolled = True
 
@@ -80,7 +79,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         race_info = f"{preset_name} - {seed.url} - ({seed.code})"
-        await self.set_raceinfo(race_info)
+        await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True

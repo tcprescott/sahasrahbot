@@ -68,7 +68,7 @@ class SMO(SGLCoreTournamentRace):
         await self.rtgg_handler.send_message(f'BingoSync Room: {self.bingo.url}')
         await self.rtgg_handler.send_message(f'BingoSync Password: {self.bingo.password}')
 
-        await self.rtgg_handler.set_raceinfo(f"{self.bingo.url} - Password: {self.bingo.password}")
+        await self.rtgg_handler.set_bot_raceinfo(f"{self.bingo.url} - Password: {self.bingo.password}")
 
     async def on_race_start(self):
         await self.bingo.new_card(

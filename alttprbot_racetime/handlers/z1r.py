@@ -19,7 +19,7 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_z1rtournament(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
         await self.send_message(f"Z1R 2022 Tournament - Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}")
-        await self.set_raceinfo(f"Z1R 2022 Tournament - Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}", overwrite=True)
+        await self.set_bot_raceinfo(f"Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}")
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!race <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#the-legend-of-zelda-randomizer-z1r for more info.")
@@ -30,7 +30,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         seed, flags = roll_z1r(flags)
 
-        await self.set_raceinfo(f"Seed: {seed} - Flags: {flags}")
+        await self.set_bot_raceinfo(f"Seed: {seed} - Flags: {flags}")
         await self.send_message(f"Seed: {seed} - Flags: {flags}")
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True

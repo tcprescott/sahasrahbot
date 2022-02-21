@@ -58,7 +58,8 @@ class ALTTPRQuals(TournamentRace):
         await self.rtgg_handler.set_invitational()
 
         await self.rtgg_handler.edit(streaming_required=False)
-        await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
+        # await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
+        await self.rtgg_handler.set_bot_raceinfo(self.seed_code)
 
         await self.rtgg_handler.send_message("Seed has been generated!  20 MINUTE STREAM DELAY REQUIRED, please check your delay!")
         self.rtgg_handler.seed_rolled = True

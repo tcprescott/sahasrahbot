@@ -2,6 +2,7 @@ import random
 from .core import SahasrahBotCoreHandler
 from alttprbot.alttprgen.randomizer import z2r
 
+
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_flags(self, args, message):
         try:
@@ -16,7 +17,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         seed = random.randint(0, 1000000000)
-        await self.set_raceinfo(f"Seed: {seed} - Flags: {flags}")
+        await self.set_bot_raceinfo(f"Seed: {seed} - Flags: {flags}")
         await self.send_message(f"Seed: {seed} - Flags: {flags}")
 
         await self.send_message("Seed rolling complete.  See race info for details.")
@@ -28,7 +29,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         seed, flags, description = z2r.mrb()
 
-        await self.set_raceinfo(f"Seed: {seed} - Flags: {flags} - {description}")
+        await self.set_bot_raceinfo(f"Seed: {seed} - Flags: {flags} - {description}")
         await self.send_message(f"Seed: {seed} - Flags: {flags} - {description}")
 
         await self.send_message("Seed rolling complete.  See race info for details.")
@@ -70,7 +71,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         seed, flags = z2r.preset(preset)
 
-        await self.set_raceinfo(f"Seed: {seed} - Flags: {flags}")
+        await self.set_bot_raceinfo(f"Seed: {seed} - Flags: {flags}")
         await self.send_message(f"Seed: {seed} - Flags: {flags}")
 
         await self.send_message("Seed rolling complete.  See race info for details.")

@@ -24,7 +24,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         _, seed_url = roll_ffr(flags)
 
-        await self.set_raceinfo(seed_url)
+        await self.set_bot_raceinfo(seed_url)
         await self.send_message(seed_url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True

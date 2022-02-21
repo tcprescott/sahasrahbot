@@ -51,7 +51,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         race_info = f"SM Multiworld - {preset_name}"
-        await self.set_raceinfo(race_info)
+        await self.set_bot_raceinfo(race_info)
         await self.send_message("Seed rolling complete.")
         self.seed_rolled = True
 
@@ -76,7 +76,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         race_info = f"Super Metroid League Playoffs - {preset_name} - {seed.url} - {', '.join(args)}"
-        await self.set_raceinfo(race_info)
+        await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
@@ -104,7 +104,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         race_info = f"SM Total Randomizer - {preset_name} - {seed.url} - ({seed.code})"
-        await self.set_raceinfo(race_info)
+        await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
@@ -139,7 +139,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message(str(e))
             return
 
-        await self.set_raceinfo(f"SM VARIA Randomizer - {settings} / {skills} - {seed.url}")
+        await self.set_bot_raceinfo(f"{settings} / {skills} - {seed.url}")
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
@@ -161,7 +161,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message(str(e))
             return
 
-        await self.set_raceinfo(f"SM Dash Randomizer - {url}")
+        await self.set_bot_raceinfo(f"SM Dash Randomizer - {url}")
         await self.send_message(f"{url}")
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
