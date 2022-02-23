@@ -202,7 +202,7 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
             settings['custom']['rom.mapOnPickup'] = payload['keys'] in ['mc', 'keysanity']
 
-            # settings['custom']['customPrizePacks'] = False
+            settings['custom']['customPrizePacks'] = False
 
             if payload['items'] in ['boots', 'boots_flute']:
                 settings['custom']['item']['count']['PegasusBoots'] = 0
