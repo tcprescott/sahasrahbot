@@ -1,7 +1,6 @@
 ---
-goal_name: tournament
 customizer: false
-description: "Tournament weights."
+description: "Standard + Hard Item Pool"
 settings:
   allow_quickswap: true
   goal: ganon

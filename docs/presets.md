@@ -37,6 +37,7 @@ title:  Presets
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
 | [dungeons_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons_boots.yaml) |All Dungeons, but you get boots too!| *Customizer*  |
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
+| [enemizer_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_assured.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
 | [fadkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower.| *Customizer*  |
@@ -77,6 +78,7 @@ title:  Presets
 | [openboots_mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openboots_mc.yaml) |You get to start with Pegasus Boots! Oh, and you don't need to defeat Aghanim 2.  Maps and compasses are shuffled in the world.| *Customizer*  |
 | [openflute](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openflute.yaml) |You get to start with.. an activated flute?  Sky's the limit!| *Customizer*  |
 | [openmajoritems](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openmajoritems.yaml) |Shuffles only inventory items and heart containers. Keys, dungeon items, ammo, money, and heart pieces remain vanilla.| *Customizer*  |
+| [openplus](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/openplus.yaml) |Ladder S12 - Open w/ Pseudoboots| *Customizer*  |
 | [opensgl](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/opensgl.yaml) |Deutsches Tournament Open in den Brackets (SGL settings)| *Customizer*  |
 | [owg](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg.yaml) |Overworld glitches are required.|   |
 | [owg_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/owg_assured.yaml) |Overworld glitches are required.  Start with a sword.|   |
@@ -101,12 +103,16 @@ title:  Presets
 | [standard_vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standard_vanilla.yaml) |Standard world state, vanilla weapons.|   |
 | [standardboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standardboots.yaml) |Standard world state, randomized weapons, and you get boots!| *Customizer*  |
 | [standardmajoritems](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standardmajoritems.yaml) |Standard world state.  Shuffles only inventory items and heart containers. Keys, dungeon items, ammo, money, and heart pieces remain vanilla.| *Customizer*  |
+| [standhard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/standhard.yaml) |Standard + Hard Item Pool|   |
 | [superquick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/superquick.yaml) |Find your equipment and defeat Ganon as quick as you can!|   |
 | [swordless](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/swordless.yaml) |Swords are overrated anyway.|   |
-| [tournament](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament.yaml) |Tournament weights.|   |
+| [tournament_hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_hard.yaml) |Tournament Hard Item Pool| *Customizer*  |
+| [tournament_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_inverted.yaml) || *Customizer*  |
+| [tournament_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_keys.yaml) |Tournament keysanity.  GTBK is always in GT, and | *Customizer*  |
+| [tournament_mcboss](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_mcboss.yaml) |Tournament MC Bossmizer| *Customizer*  |
 | [triforce30](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce30.yaml) |A Triforce Hunt, except there are 30 pieces required, and 40 in the item pool.| *Customizer*  |
 | [triforce40](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce40.yaml) |A Triforce Hunt, except there are 40 pieces required, and 50 in the item pool.| *Customizer*  |
-| [trinity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trinity.yaml) |trnity by thkg00fy| *Customizer*  |
+| [trinity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trinity.yaml) || *Customizer*  |
 | [trueicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/trueicerodhunt.yaml) |You get every **every**, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
 | [vanilla](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla.yaml) |The vanilla game, but with all of the quality life additions of the randomizer.| *Customizer*  |
 | [vanilla_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/vanilla_inverted.yaml) |An inverted version of the vanilla game.   This requires major glitch knowledge to beat!| *Customizer*  |

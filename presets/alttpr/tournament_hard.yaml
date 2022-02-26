@@ -1,5 +1,5 @@
 customizer: true
-description: "Test Hard Item Pool"
+description: "Tournament Hard Item Pool"
 settings:
   accessibility: items
   allow_quickswap: true
@@ -299,6 +299,7 @@ settings:
     enemy_damage: default
     enemy_health: default
     enemy_shuffle: none
+    pot_shuffle: "off"
   eq:
     - BossHeartContainer
     - BossHeartContainer
@@ -313,8 +314,8 @@ settings:
   l: {}
   lang: en
   mode: open
-  name: Hard Test
-  notes: A draft of some hard mode settings
+  name: Tournament Hard
+  notes: "48 pieces of heart, 4 heart containers, and 1 sanctuary heart container (max 20 hearts).  Four bottles are placed, 1 is available and will be empty.  No half magic.  No armor.  Three shields placed, capped at Fighter Shield.  Four swords placed, capped at Tempered Sword.  Bows are non-progressive.   Green and blue rupees removed from the pool to account for the extra heart pieces.  Only the sword overflows to a Green 20."
   spoilers: "off"
   tournament: true
   weapons: randomized
