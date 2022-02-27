@@ -213,7 +213,7 @@ settings:
     prize.shuffleCrystals: true
     prize.shufflePendants: true
     region.bossNormalLocation: false
-    region.wildBigKeys: true
+    region.wildBigKeys: false
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
@@ -301,7 +301,7 @@ settings:
       - auto_fill
     stun:
       - auto_fill
-  dungeon_items: standard
+  dungeon_items: full
   enemizer:
     boss_shuffle: none
     enemy_damage: default
