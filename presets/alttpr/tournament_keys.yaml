@@ -212,7 +212,7 @@ settings:
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
-    region.bossNormalLocation: false
+    region.bossNormalLocation: true
     region.wildBigKeys: false
     region.wildCompasses: false
     region.wildKeys: false
