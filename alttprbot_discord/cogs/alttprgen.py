@@ -111,7 +111,7 @@ class AlttprGen(commands.Cog):
     @commands.group(
         brief='Generate a game with randomized settings.',
         help='Generate a game with randomized settings.  Find a list of weights at https://sahasrahbot.synack.live/mystery.html',
-        invoke_without_command=True, ,
+        invoke_without_command=True,
         hidden=True
     )
     @checks.restrict_to_channels_by_guild_config('AlttprGenRestrictChannels')
