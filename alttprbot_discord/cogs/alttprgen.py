@@ -1,19 +1,4 @@
-import io
-import json
-
-import aiohttp
-import discord
-import yaml
 from discord.ext import commands
-from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
-
-import pyz3r
-from alttprbot import models
-from alttprbot.alttprgen import generator
-from alttprbot.alttprgen.spoilers import generate_spoiler_game, generate_spoiler_game_custom
-from alttprbot.database import config  # TODO switch to ORM
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 from ..util import checks
 
