@@ -328,5 +328,5 @@ settings:
     Tournament keysanity
   spoilers: "off"
   tournament: true
-  weapons: assured
+  weapons: randomized
   hints: "off"

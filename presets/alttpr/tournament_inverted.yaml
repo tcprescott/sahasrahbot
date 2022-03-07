@@ -290,7 +290,7 @@ settings:
     - BossHeartContainer
   glitches: none
   goal: ganon
-  hints: "on"
+  hints: "off"
   item:
     functionality: normal
     pool: normal
