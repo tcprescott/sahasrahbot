@@ -91,7 +91,7 @@ settings:
       - auto_fill
     stun:
       - auto_fill
-  notes: Open w/ Boots Start
+  notes: Standard w/ Boots Start
   custom:
     customPrizePacks: false
     drop:
