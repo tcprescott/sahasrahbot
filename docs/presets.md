@@ -42,6 +42,7 @@ title:  Presets
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
 | [fadkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower.| *Customizer*  |
 | [goldrush](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/goldrush.yaml) |A 49/50 Triforce Hunt, by BigDunka| *Customizer*  |
+| [goldrush_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/goldrush_keys.yaml) |A 49/50 Triforce Hunt Keysanity, by BigDunka| *Customizer*  |
 | [hard_enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_enemizer.yaml) |Some good ol' enemy and boss shuffle, hard item pool.|   |
 | [hard_mc](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_mc.yaml) |Only maps and compasses are shuffled in the world, hard item pool|   |
 | [hardicerodhunt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hardicerodhunt.yaml) |You get every item absolutely **required** to beat the game, except Ice Rod.  All chests are otherwise empty except for that Ice Rod.  GLHF :)| *Customizer*  |
