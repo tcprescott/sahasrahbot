@@ -109,13 +109,11 @@ class ALTTPR2022Race(ALTTPRTournamentRace):
         self.seed, self.preset, self.deck = await roll_seed([p[1] for p in self.player_discords], episode_id=self.episodeid)
         await self.rtgg_handler.send_message("-----------------")
         await self.rtgg_handler.send_message(f"Your preset is: {self.preset}")
-        await self.rtgg_handler.send_message("-----------------")
         if self.deck:
+            await self.rtgg_handler.send_message("-----------------")
             await self.rtgg_handler.send_message("Deck used to generate this game.")
             for preset, cards in self.deck.items():
                 await self.rtgg_handler.send_message(f"{preset}: {cards}")
-        else:
-            await self.rtgg_handler.send_message("No deck used to generate this game.")
         await self.rtgg_handler.send_message("-----------------")
 
     @property
