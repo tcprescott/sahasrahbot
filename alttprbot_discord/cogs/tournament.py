@@ -2,9 +2,10 @@ import datetime
 import logging
 
 import discord
+from discord.commands import permissions, ApplicationContext, Option
 from discord.ext import commands, tasks
 
-from alttprbot.tournament import core
+from alttprbot.tournament import core, alttpr
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
@@ -300,6 +301,28 @@ class Tournament(commands.Cog):
                             messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
+
+    @commands.slash_command(
+        name='alttpr2022',
+        permissions=[
+            permissions.CommandPermission(
+                "owner", 2, True
+            )
+        ]
+    )
+    async def alttpr2022(self, ctx, player1: discord.Member, player2: discord.Member):
+        """
+        Generate a randomizer seed for the ALTTPR Main Tournament 2022.
+        """
+        await ctx.defer()
+        seed, preset, deck = await alttpr.roll_seed([player1, player2])
+
+        embed = await seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
+        if deck:
+            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+
+        await ctx.respond(embed=embed)
 
 
 def setup(bot):

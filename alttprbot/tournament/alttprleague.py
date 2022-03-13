@@ -39,7 +39,6 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             raise Exception('Missing preset.  Please submit!')
 
         self.seed = await generator.ALTTPRPreset(self.tournament_game.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
-        await self.create_embeds()
 
     async def update_data(self):
         await super().update_data()

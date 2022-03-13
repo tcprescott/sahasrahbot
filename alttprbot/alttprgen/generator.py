@@ -144,7 +144,7 @@ class SahasrahBotPresetCore():
 class ALTTPRPreset(SahasrahBotPresetCore):
     randomizer = 'alttpr'
 
-    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix=""):
+    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix="") -> ALTTPRDiscord:
         if self.preset_data is None:
             await self.fetch()
 

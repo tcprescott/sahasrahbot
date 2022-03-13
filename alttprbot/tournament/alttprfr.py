@@ -8,6 +8,7 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 
+
 class ALTTPRFRTournament(ALTTPRTournamentRace):
     async def roll(self):
         if self.bracket_settings is None:
@@ -15,7 +16,6 @@ class ALTTPRFRTournament(ALTTPRTournamentRace):
 
         self.preset_dict = None
         self.seed = await alttpr_discord.ALTTPRDiscord.generate(settings=self.bracket_settings)
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(470200169841950741)

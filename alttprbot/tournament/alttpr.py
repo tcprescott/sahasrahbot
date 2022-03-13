@@ -1,6 +1,9 @@
 import logging
+import random
+from typing import List
+import discord
 
-from alttprbot.alttprgen import preset
+from alttprbot.alttprgen import generator
 from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot.exceptions import SahasrahBotException
@@ -8,17 +11,20 @@ from alttprbot_discord.bot import discordbot
 
 
 class ALTTPRTournamentRace(TournamentRace):
+    """
+    ALTTPTournamentRace represets a generic ALTTP tournament
+    """
     async def roll(self):
-        self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
-        await self.create_embeds()
+        # self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
+        pass
 
     async def process_tournament_race(self):
         await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
         await self.roll()
+        await self.create_embeds()
 
-        # await self.rtgg_handler.set_raceinfo(self.race_info_rolled, overwrite=True)
         await self.rtgg_handler.set_bot_raceinfo(self.seed_code)
 
         await self.send_audit_message(embed=self.embed)
@@ -34,43 +40,12 @@ class ALTTPRTournamentRace(TournamentRace):
         await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         self.rtgg_handler.seed_rolled = True
 
-    async def configuration(self):
-        guild = discordbot.get_guild(334795604918272012)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game',
-            event_slug="alttpr",
-            audit_channel=discordbot.get_channel(647966639266201620),
-            commentary_channel=discordbot.get_channel(408347983709470741),
-            scheduling_needs_channel=discordbot.get_channel(434560353461075969),
-            scheduling_needs_tracker=True,
-            helper_roles=[
-                guild.get_role(334797023054397450),
-                guild.get_role(435200206552694794),
-                guild.get_role(482353483853332481),
-                guild.get_role(426487540829388805),
-                guild.get_role(613394561594687499),
-                guild.get_role(334796844750209024)
-            ]
-        )
-
     async def send_room_welcome(self):
         await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.  You do NOT need to wait for your setup helper to do this or start your race, they will appear later to setup the stream.')
 
     @property
     def seed_code(self):
         return f"({'/'.join(self.seed.code)})"
-
-    @property
-    def race_info_rolled(self):
-        info = f"{self.event_name} - {self.versus} - {self.friendly_name} - {self.seed_code}"
-        if self.game_number:
-            info += f" - Game #{self.game_number}"
-        if self.broadcast_channels:
-            info += f" - Restream(s) at {', '.join(self.broadcast_channels)}"
-        info += f" - {self.episodeid}"
-        return info
 
     @property
     def bracket_settings(self):
@@ -120,7 +95,98 @@ class ALTTPRTournamentRace(TournamentRace):
         for name, player in self.player_discords:
             if player is None:
                 continue
-            logging.info(f"Sending tournament submit reminder to {name}.")
+            logging.info("Sending tournament submit reminder to %s.", name)
             await player.send(msg)
 
         await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
+
+
+class ALTTPR2022Race(ALTTPRTournamentRace):
+    """
+    ALTTPR2022Race is a class that represents the ALTTPR Main Tournament for the 2022 season.
+    """
+    async def roll(self):
+        self.seed, self.preset, self.deck = await roll_seed([p[1] for p in self.player_discords], episode_id=self.episodeid)
+        await self.rtgg_handler.send_message("-----------------")
+        await self.rtgg_handler.send_message(f"Your preset is: {self.preset}")
+        await self.rtgg_handler.send_message("-----------------")
+        if self.deck:
+            await self.rtgg_handler.send_message("Deck used to generate this game.")
+            for preset, cards in self.deck.items():
+                await self.rtgg_handler.send_message(f"{preset}: {cards}")
+        else:
+            await self.rtgg_handler.send_message("No deck used to generate this game.")
+        await self.rtgg_handler.send_message("-----------------")
+
+    @property
+    def seed_code(self):
+        return f"{self.preset} - ({'/'.join(self.seed.code)})"
+
+    async def create_embeds(self):
+        await super().create_embeds()
+        self.embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
+        if self.deck:
+            self.embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]), inline=False)
+
+    async def configuration(self):
+        guild = discordbot.get_guild(334795604918272012)
+        return TournamentConfig(
+            guild=guild,
+            racetime_category='alttpr',
+            racetime_goal='Beat the game',
+            event_slug="alttpr",
+            audit_channel=discordbot.get_channel(647966639266201620),
+            commentary_channel=discordbot.get_channel(408347983709470741),
+            scheduling_needs_channel=discordbot.get_channel(434560353461075969),
+            scheduling_needs_tracker=True,
+            create_scheduled_events=True,
+            helper_roles=[
+                guild.get_role(334797023054397450),
+                guild.get_role(435200206552694794),
+                guild.get_role(482353483853332481),
+                guild.get_role(426487540829388805),
+                guild.get_role(613394561594687499),
+                guild.get_role(334796844750209024)
+            ]
+        )
+
+
+async def roll_seed(players: List[discord.Member], episode_id: int = None):
+    """
+    Roll a seed for the given players.
+    """
+    if not episode_id is None:
+        existing_preset_for_episode = await models.TournamentPresetHistory.filter(episode_id=episode_id, event_slug="alttpr2022").first()
+        if existing_preset_for_episode:
+            seed = await generator.ALTTPRPreset(existing_preset_for_episode.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+            return seed, existing_preset_for_episode.preset, None
+
+    deck = {
+        'tournament_hard': 2 * len(players),
+        'tournament_inverted': 2 * len(players),
+        'ambrosia': 2 * len(players),
+        'tournament_keys': 2 * len(players),
+        'tournament_mcboss': 2 * len(players),
+    }
+    for player in players:
+        history = await models.TournamentPresetHistory.filter(discord_user_id=player.id, event_slug="alttpr2022").order_by('-timestamp').limit(5)
+        for h in history:
+            deck[h.preset] -= 1 if deck[h.preset] > 0 else 0
+
+    preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
+
+    for player in players:
+        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug="alttpr2022")
+
+    data = generator.ALTTPRPreset(preset)
+    await data.fetch()
+
+    triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022')
+    if triforce_texts:
+        triforce_text = random.choice(triforce_texts)
+        logging.info("Using triforce text: %s", triforce_text.text)
+        data.preset_data['settings']['texts'] = {}
+        data.preset_data['settings']['texts']['end_triforce'] = triforce_text.text
+
+    seed = await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+    return seed, preset, deck

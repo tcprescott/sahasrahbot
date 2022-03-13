@@ -9,6 +9,7 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
 
+
 class ALTTPRESTournament(ALTTPRTournamentRace):
     async def roll(self):
         if self.bracket_settings is None:
@@ -19,7 +20,6 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
             settings=self.bracket_settings,
             endpoint='/api/customizer' if 'eq' in self.bracket_settings else '/api/randomizer',
         )
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(477850508368019486)

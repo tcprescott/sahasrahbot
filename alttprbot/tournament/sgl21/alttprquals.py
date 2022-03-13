@@ -38,8 +38,6 @@ class ALTTPRQuals(TournamentRace):
         self.preset_dict['settings']['texts']['end_triforce'] = "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
         self.seed = await generate_preset(self.preset_dict, hints=False, nohints=True, spoilers='off', tournament=True)
 
-        await self.create_embeds()
-
         triforce_text.broadcasted = True
         await triforce_text.save()
 

@@ -20,7 +20,6 @@ class ALTTPRMiniTournament(ALTTPRTournamentRace):
     async def roll(self):
         preset = TITLE_MAP[self.episode['match1']['title']]
         self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)

@@ -71,7 +71,6 @@ class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
         preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
         self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)
@@ -106,7 +105,6 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
             'end_triforce': "{NOBORDER}\n{SPEED6}\n" + text + "\n{PAUSE9}"
         }
         self.seed = await alttpr_discord.ALTTPRDiscord.generate(settings=settings, endpoint='/api/customizer')
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)

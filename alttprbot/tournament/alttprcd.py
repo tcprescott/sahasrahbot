@@ -3,10 +3,10 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot.alttprgen import preset
 from alttprbot_discord.bot import discordbot
 
+
 class ALTTPRCDTournament(ALTTPRTournamentRace):
     async def roll(self):
         self.seed, self.preset_dict = await preset.get_preset('crossedkeydrop')
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)

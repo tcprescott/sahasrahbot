@@ -17,6 +17,7 @@ class AuditGeneratedGames(Model):
     customizer = fields.IntField(null=True)
     doors = fields.BooleanField(default=False, null=False)
 
+
 class AuditMessages(Model):
     class Meta:
         table = "audit_messages"
@@ -208,16 +209,19 @@ class Presets(Model):
     modified = fields.DatetimeField(auto_now=True)
     generated_count = fields.IntField(default=0)
 
+
 class AuthorizationKeys(Model):
     id = fields.IntField(pk=True)
     key = fields.CharField(200, null=False, unique=True)
-    name =  fields.CharField(200, null=False)
+    name = fields.CharField(200, null=False)
+
 
 class AuthorizationKeyPermissions(Model):
     id = fields.IntField(pk=True)
     auth_key = fields.ForeignKeyField('models.AuthorizationKeys', related_name='permissions')
     type = fields.CharField(45, null=False)
     subtype = fields.TextField(null=True)
+
 
 class RTGGUnlistedRooms(Model):
     id = fields.IntField(pk=True)
@@ -288,6 +292,15 @@ class TournamentGames(Model):
     updated = fields.DatetimeField(auto_now=True)
 
 
+class TournamentPresetHistory(Model):
+    id = fields.IntField(pk=True)
+    preset = fields.CharField(max_length=255)
+    discord_user_id = fields.BigIntField()
+    episode_id = fields.IntField(null=True)
+    event_slug = fields.CharField(max_length=255)
+    timestamp = fields.DatetimeField(auto_now_add=True)
+
+
 class TournamentResults(Model):
     class Meta:
         table = 'tournament_results'
@@ -337,14 +350,18 @@ class TriforceTexts(Model):
     id = fields.IntField(pk=True)
     pool_name = fields.CharField(45, null=False)
     text = fields.CharField(200, null=False)
+    discord_user_id = fields.BigIntField(null=True)
     author = fields.CharField(200, null=True)
-    author_credit = fields.CharField(200, null=True)
+    approved = fields.BooleanField(default=False)
     broadcasted = fields.BooleanField(null=False, default=False)
+    timestamp = fields.DatetimeField(auto_now=True)
+
 
 class ScheduledEvents(Model):
     scheduled_event_id = fields.BigIntField(pk=True, generated=False)
     event_slug = fields.CharField(40, null=False)
     episode_id = fields.IntField(null=False, unique=True)
+
 
 class SpeedGamingDailies(Model):
     class Meta:

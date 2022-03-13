@@ -3,10 +3,10 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot_discord.bot import discordbot
 
+
 class SMZ3CoopTournament(ALTTPRTournamentRace):
     async def roll(self):
         self.seed, self.preset_dict = await preset.get_preset('hard', tournament=True, randomizer='smz3')
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(460905692857892865)

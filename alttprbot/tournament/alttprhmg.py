@@ -3,10 +3,10 @@ from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot_discord.bot import discordbot
 from alttprbot.alttprgen import preset
 
+
 class ALTTPRHMGTournament(ALTTPRTournamentRace):
     async def roll(self):
         self.seed, self.preset_dict = await preset.get_preset('hybridmg')
-        await self.create_embeds()
 
     async def configuration(self):
         guild = discordbot.get_guild(535946014037901333)
