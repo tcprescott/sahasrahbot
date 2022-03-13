@@ -7,7 +7,14 @@
 {% block content -%}
 <div>
     <h1>Triforce Text Submission</h1>
-    <p>This is a form for submitting text to the Triforce. All submissions are subject to review and approval by the tournament staff.</p>
+    <p>This is a form for submitting text to the Triforce. All submissions are subject to review and approval by the tournament staff.  Submissions that may be rejected include, but are not limited to:</p>
+    <ol>
+        <li>Real-life religion or politics</li>
+        <li>Advertising (unless approved)</li>
+        <li>References to other community members (will be verified with that person first).</li>
+        <li>Harassment</li>
+        <li>Text inappropriate for streaming on SpeedGaming or ALTTPRandomizer.</li>
+    </ol>
     <p>Each submission must be no more than three lines, with 14 characters per line.</p>
     <p>Valid characters include:</p>
     <ul style="font-family: 'Courier New', Courier, monospace;">
@@ -19,11 +26,8 @@
     </ul>
 </div>
 <form action="{{ endpoint }}" method="post">
-    <label for="first_line">First Line:</label>
     <input type="text" id="first_line" name="first_line" maxlength="14" title="Line one" pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
-    <label for="second_line">Second Line:</label>
     <input type="text" id="second_line" name="second_line" maxlength="14" title="Line two" pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
-    <label for="second_line">Third Line:</label>
     <input type="text" id="third_line" name="third_line" maxlength="14" title="Line three" pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
     <input type="submit" value="Submit">
 </form>
