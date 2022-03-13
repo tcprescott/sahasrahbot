@@ -1,0 +1,30 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Triforce Text Submission</title>
+{%- endblock head %}
+
+{% block content -%}
+<div>
+    <h1>Triforce Text Submission</h1>
+    <p>This is a form for submitting text to the Triforce. All submissions are subject to review and approval by the tournament staff.</p>
+    <p>Each submission must be no more than three lines, with 14 characters per line.</p>
+    <p>Valid characters include:</p>
+    <ul style="font-family: 'Courier New', Courier, monospace;">
+        <li>A-Z</li>
+        <li>0-9</li>
+        <li>spaces</li>
+        <li>? ! , \ - … . ~ ～ ' ' ↑ ↓ → ←</li>
+        <li>あ い う え お や ゆ よ か き く け こ わ を ん さ し す せ そ が ぎ ぐ た ち つ て と げ ご ざ な に ぬ ね の じ ず ぜ は ひ ふ へ ほ ぞ だ ぢ ま み む め も づ で ど ら り る れ ろ ば び ぶ べ ぼ ぱ ぴ ぷ ぺ ぽ ゃ ゅ ょ っ ぁ ぃ ぅ ぇ ぉ ア イ ウ エ オ ヤ ユ ヨ カ キ ク ケ コ ワ ヲ ン サ シ ス セ ソ ガ ギ グ タ チ ツ テ ト ゲ ゴ ザ ナ ニ ヌ ネ ノ ジ ズ ゼ ハ ヒ フ ヘ ホ ゾ ダ マ ミ ム メ モ ヅ デ ド ラ リ ル レ ロ バ ビ ブ ベ ボ パ ピ プ ペ ポ ャ ュ ョ ッ ァ ィ ゥ ェ ォ </li>
+    </ul>
+</div>
+<form action="{{ endpoint }}" method="post">
+    <label for="first_line">First Line:</label>
+    <input type="text" id="first_line" name="first_line" maxlength="14" title="Line one" pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
+    <label for="second_line">Second Line:</label>
+    <input type="text" id="second_line" name="second_line" maxlength="14" title="Line two" pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
+    <label for="second_line">Third Line:</label>
+    <input type="text" id="third_line" name="third_line" maxlength="14" title="Line three" pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
+    <input type="submit" value="Submit">
+</form>
+{%- endblock content %}
