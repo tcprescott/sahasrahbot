@@ -179,8 +179,10 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None):
     data = generator.ALTTPRPreset(preset)
     await data.fetch()
 
-    triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022')
-    if triforce_texts:
+    discord_user_ids = await models.TriforceTexts.filter(pool_name="alttpr2022", approved=True).distinct().values_list("discord_user_id", flat=True)
+    if discord_user_ids:
+        discord_user_id = random.choice(discord_user_ids)
+        triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022', discord_user_id=discord_user_id)
         triforce_text = random.choice(triforce_texts)
         logging.info("Using triforce text: %s", triforce_text.text)
         data.preset_data['settings']['texts'] = {}
