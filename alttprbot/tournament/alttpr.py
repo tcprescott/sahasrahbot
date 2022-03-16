@@ -161,13 +161,16 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None):
 
     deck = {
         'tournament_hard': 2 * len(players),
-        'tournament_inverted': 2 * len(players),
+        'tournament_invkeys': 2 * len(players),
         'ambrosia': 2 * len(players),
         'tournament_keys': 2 * len(players),
         'tournament_mcboss': 2 * len(players),
     }
     for player in players:
         history = await models.TournamentPresetHistory.filter(discord_user_id=player.id, event_slug="alttpr2022").order_by('-timestamp').limit(5)
+        if history:
+            deck[history[0].preset] -= 1 if deck[history[0].preset] > 0 else 0
+
         for h in history:
             deck[h.preset] -= 1 if deck[h.preset] > 0 else 0
 
