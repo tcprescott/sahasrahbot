@@ -2,7 +2,7 @@ customizer: true
 description: Tournament MC Bossmizer
 settings:
   accessibility: items
-  allow_quickswap: false
+  allow_quickswap: true
   crystals:
     ganon: "7"
     tower: "7"
