@@ -172,13 +172,14 @@ class Misc(commands.Cog):
         hour: Option(int, description="Hour to get the date for. (24 hour)", required=False, min_value=0, max_value=23) = 0,
         minute: Option(int, description="Minute to get the date for.", required=False, min_value=0, max_value=59) = 0,
         second: Option(int, description="Second to get the date for.", required=False, min_value=0, max_value=59) = 0,
-        timezone: Option(str, description="Timezone to get the date for.", required=False, autocomplete=datetime_autocomplete_tz) = "UTC",
+        timezone: Option(str, description="Timezone to get the date for. Defaults to US/Eastern", required=False, autocomplete=datetime_autocomplete_tz) = "US/Eastern",
     ):
         """
         Get discord markdown for the date specified.
         """
         try:
-            time = datetime.datetime(year, month, day, hour, minute, second, tzinfo=pytz.timezone(timezone))
+            tz = pytz.timezone(timezone)
+            time = tz.localize(datetime.datetime(year, month, day, hour, minute, second))
         except UnknownTimeZoneError:
             await ctx.respond(f"Unknown timezone: {timezone}", ephemeral=True)
             return
@@ -198,7 +199,6 @@ class Misc(commands.Cog):
             color=discord.Color.blue()
         )
         await ctx.respond(embed=embed, ephemeral=True)
-
 
 def setup(bot):
     bot.add_cog(Misc(bot))
