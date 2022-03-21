@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import random
 import os
 from aiocache import cached, Cache
@@ -7,6 +8,8 @@ import aiohttp
 import discord
 from discord.commands import Option
 from discord.ext import commands
+import pytz
+from pytz import UnknownTimeZoneError
 
 from alttprbot.util.holyimage import HolyImage
 
@@ -56,6 +59,8 @@ async def holy_game_autocomplete(ctx):
     data = await get_holy_images()
     return sorted([val for val in data.keys() if val.startswith(ctx.value)][:25])
 
+async def datetime_autocomplete_tz(ctx):
+    return sorted([val for val in pytz.all_timezones if val.startswith(ctx.value)][:25])
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
@@ -67,7 +72,6 @@ async def get_holy_images() -> dict:
     async with aiohttp.ClientSession() as session:
         async with session.get('http://alttp.mymm1.com/holyimage/holyimages.json') as resp:
             return await resp.json()
-
 
 class Misc(commands.Cog):
     def __init__(self, bot):
@@ -157,6 +161,40 @@ class Misc(commands.Cog):
         holyimage = await HolyImage.construct(slug=slug, game=game)
 
         await ctx.respond(embed=holyimage.embed)
+
+    @commands.slash_command(name="datetime")
+    async def datetime_cmd(
+        self,
+        ctx: discord.ApplicationContext,
+        year: Option(int, description="Year to get the date for.  Defaults to the current year.", required=False, min_value=1970, max_value=9999) = datetime.datetime.utcnow().year,
+        month: Option(int, description="Month to get the date for.  Defaults to the current month.", required=False, min_value=1, max_value=12) = datetime.datetime.utcnow().month,
+        day: Option(int, description="Day to get the date for.   Defaults to the current day.", required=False, min_value=1, max_value=31) = datetime.datetime.utcnow().day,
+        hour: Option(int, description="Hour to get the date for. (24 hour)", required=False, min_value=0, max_value=23) = 0,
+        minute: Option(int, description="Minute to get the date for.", required=False, min_value=0, max_value=59) = 0,
+        second: Option(int, description="Second to get the date for.", required=False, min_value=0, max_value=59) = 0,
+        timezone: Option(str, description="Timezone to get the date for.", required=False, autocomplete=datetime_autocomplete_tz) = "UTC",
+    ):
+        """
+        Get discord markdown for the date specified.
+        """
+        try:
+            time = datetime.datetime(year, month, day, hour, minute, second, tzinfo=pytz.timezone(timezone))
+        except UnknownTimeZoneError:
+            await ctx.respond(f"Unknown timezone: {timezone}", ephemeral=True)
+            return
+
+        markdown = "Discord formatted datetime\n\n"
+
+        for fmt in ["t", "T", "d", "D", "f", "F", "R"]:
+            formatted_time = discord.utils.format_dt(time, fmt)
+            markdown += f"{formatted_time} - `{formatted_time}`\n"
+
+        embed = discord.Embed(
+            title=f"Date markdown for {time.strftime('%Y-%m-%d %H:%M:%S')} {timezone}",
+            description=markdown,
+            color=discord.Color.blue()
+        )
+        await ctx.respond(embed=embed, ephemeral=True)
 
 
 def setup(bot):
