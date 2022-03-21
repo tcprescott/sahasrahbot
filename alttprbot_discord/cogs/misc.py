@@ -182,6 +182,9 @@ class Misc(commands.Cog):
         except UnknownTimeZoneError:
             await ctx.respond(f"Unknown timezone: {timezone}", ephemeral=True)
             return
+        except ValueError:
+            await ctx.respond(f"Invalid date: {year}-{month}-{day} {hour}:{minute}:{second} {timezone}", ephemeral=True)
+            return
 
         markdown = "Discord formatted datetime\n\n"
 
