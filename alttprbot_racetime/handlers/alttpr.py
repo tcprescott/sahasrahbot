@@ -1,8 +1,10 @@
 import asyncio
 from datetime import datetime
 import math
-# import logging
+import logging
+import random
 
+from alttprbot import models
 from alttprbot.alttprgen import preset, spoilers, generator
 from alttprbot.database import spoiler_races, tournament_results  # TODO switch to ORM
 from racetime_bot import monitor_cmd
@@ -66,9 +68,6 @@ class GameHandler(SahasrahBotCoreHandler):
             return
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
 
-    async def ex_quickswaprace(self, args, message):
-        await self.send_message("Please use !race instead of this command.")
-
     async def ex_spoiler(self, args, message):
         if await self.is_locked(message):
             return
@@ -120,7 +119,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
         await self.send_message(spoiler.seed.url)
-        await self.send_message(f"The progression spoiler for this race will be sent after the race begins in this room.")
+        await self.send_message("The progression spoiler for this race will be sent after the race begins in this room.")
         await spoiler_races.insert_spoiler_race(self.data.get('name'), spoiler.spoiler_log_url, 0)
         self.seed_rolled = True
 
@@ -144,6 +143,35 @@ class GameHandler(SahasrahBotCoreHandler):
         else:
             await self.set_bot_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
 
+        await self.send_message(seed.url)
+        await self.send_message("Seed rolling complete.  See race info for details.")
+        self.seed_rolled = True
+
+    async def ex_tourneyqual(self, args, message):
+        if await self.is_locked(message):
+            return
+
+        preset_name="tournament_hard"
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        data = generator.ALTTPRPreset(preset_name)
+        await data.fetch()
+
+        discord_user_ids = await models.TriforceTexts.filter(pool_name="alttpr2022", approved=True).distinct().values_list("discord_user_id", flat=True)
+        if discord_user_ids:
+            discord_user_id = random.choice(discord_user_ids)
+            triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022', discord_user_id=discord_user_id)
+            triforce_text = random.choice(triforce_texts)
+            logging.info("Using triforce text: %s", triforce_text.text)
+            data.preset_data['settings']['texts'] = {}
+            data.preset_data['settings']['texts']['end_triforce'] = triforce_text.text
+
+        seed = await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+
+        race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
+        await self.edit(streaming_required=False, start_delay=30)
+        await self.set_invitational()
+        await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
