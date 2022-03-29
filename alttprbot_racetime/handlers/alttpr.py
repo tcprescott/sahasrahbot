@@ -169,7 +169,7 @@ class GameHandler(SahasrahBotCoreHandler):
         seed = await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
 
         race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
-        await self.edit(streaming_required=False, start_delay=30)
+        await self.edit(streaming_required=False, start_delay=30, auto_start=False, allow_midrace_chat=False, allow_non_entrant_chat=False)
         await self.set_invitational()
         await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
