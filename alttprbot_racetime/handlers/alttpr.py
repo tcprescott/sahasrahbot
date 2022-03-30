@@ -162,9 +162,10 @@ class GameHandler(SahasrahBotCoreHandler):
             discord_user_id = random.choice(discord_user_ids)
             triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022', discord_user_id=discord_user_id)
             triforce_text = random.choice(triforce_texts)
-            logging.info("Using triforce text: %s", triforce_text.text)
+            text = triforce_text.text.encode("utf-8").decode("unicode_escape")
+            logging.info("Using triforce text: %s", text)
             data.preset_data['settings']['texts'] = {}
-            data.preset_data['settings']['texts']['end_triforce'] = triforce_text.text
+            data.preset_data['settings']['texts']['end_triforce'] = "{NOBORDER}\n" + text
 
         seed = await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
 
