@@ -166,9 +166,9 @@ class Misc(commands.Cog):
     async def datetime_cmd(
         self,
         ctx: discord.ApplicationContext,
-        year: Option(int, description="Year to get the date for.  Defaults to the current year.", required=False, min_value=1970, max_value=9999) = datetime.datetime.utcnow().year,
-        month: Option(int, description="Month to get the date for.  Defaults to the current month.", required=False, min_value=1, max_value=12) = datetime.datetime.utcnow().month,
-        day: Option(int, description="Day to get the date for.   Defaults to the current day.", required=False, min_value=1, max_value=31) = datetime.datetime.utcnow().day,
+        year: Option(int, description="Year to get the date for.  Defaults to the current year.", required=False, min_value=1970, max_value=9999) = None,
+        month: Option(int, description="Month to get the date for.  Defaults to the current month.", required=False, min_value=1, max_value=12) = None,
+        day: Option(int, description="Day to get the date for.   Defaults to the current day.", required=False, min_value=1, max_value=31) = None,
         hour: Option(int, description="Hour to get the date for. (24 hour)", required=False, min_value=0, max_value=23) = 0,
         minute: Option(int, description="Minute to get the date for.", required=False, min_value=0, max_value=59) = 0,
         second: Option(int, description="Second to get the date for.", required=False, min_value=0, max_value=59) = 0,
@@ -177,6 +177,12 @@ class Misc(commands.Cog):
         """
         Get discord markdown for the date specified.
         """
+        if year is None:
+            year = datetime.datetime.now().year
+        if month is None:
+            month = datetime.datetime.now().month
+        if day is None:
+            day = datetime.datetime.now().day
         try:
             tz = pytz.timezone(timezone)
             time = tz.localize(datetime.datetime(year, month, day, hour, minute, second))
