@@ -108,7 +108,7 @@ title:  Presets
 | [superquick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/superquick.yaml) |Find your equipment and defeat Ganon as quick as you can!|   |
 | [swordless](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/swordless.yaml) |Swords are overrated anyway.|   |
 | [tournament_hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_hard.yaml) |Tournament Hard Item Pool| *Customizer*  |
-| [tournament_inverted](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_inverted.yaml) || *Customizer*  |
+| [tournament_invkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_invkeys.yaml) || *Customizer*  |
 | [tournament_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_keys.yaml) |Tournament keysanity.  GTBK is always in GT, and | *Customizer*  |
 | [tournament_mcboss](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/tournament_mcboss.yaml) |Tournament MC Bossmizer| *Customizer*  |
 | [triforce30](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/triforce30.yaml) |A Triforce Hunt, except there are 30 pieces required, and 40 in the item pool.| *Customizer*  |
