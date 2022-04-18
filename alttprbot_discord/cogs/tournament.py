@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 
 import discord
 from discord.commands import permissions, ApplicationContext, Option
@@ -15,6 +16,9 @@ from config import Config as c
 # we will probably expand this later to support other tournaments in the future
 # ALTTPRDEPracticeView
 
+MAIN_TOURNAMENT_SERVERS = list(map(int, os.environ.get("MAIN_TOURNAMENT_SERVERS", "").split(',')))
+CC_TOURNAMENT_SERVERS = list(map(int, os.environ.get("CC_TOURNAMENT_SERVERS", "").split(',')))
+CC_TOURNAMENT_AUDIT_CHANNELS = list(map(int, os.environ.get("CC_TOURNAMENT_AUDIT_CHANNELS", "").split(',')))
 
 class Tournament(commands.Cog):
     def __init__(self, bot):
@@ -308,7 +312,8 @@ class Tournament(commands.Cog):
             permissions.CommandPermission(
                 "owner", 2, True
             )
-        ]
+        ],
+        guild_ids=MAIN_TOURNAMENT_SERVERS,
     )
     async def alttpr2022(self, ctx, player1: discord.Member, player2: discord.Member):
         """
@@ -324,6 +329,35 @@ class Tournament(commands.Cog):
 
         await ctx.respond(embed=embed)
 
+    @commands.slash_command(
+        name='cc2022',
+        guild_ids=CC_TOURNAMENT_SERVERS,
+    )
+    async def challenge_cup(self, ctx, opponent: discord.Member, you: discord.Member = None):
+        """
+        Generate a randomizer seed for the 2022 challenge cup.
+        """
+        if you is None:
+            you = ctx.author
+
+        await ctx.defer()
+        seed, preset, deck = await alttpr.roll_seed([opponent, you], event_slug="cc2022")
+
+        embed = await seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
+        if deck:
+            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+
+        embed.title = f"{you.display_name} vs {opponent.display_name}"
+        embed.description = f"{you.mention} vs {opponent.mention}"
+
+        for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
+            channel = self.bot.get_channel(channel_id)
+            await channel.send(embed=embed)
+        await you.send(embed=embed)
+        await opponent.send(embed=embed)
+
+        await ctx.respond("Seed successfully sent to DM.")
 
 def setup(bot):
     bot.add_cog(Tournament(bot))

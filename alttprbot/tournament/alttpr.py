@@ -149,12 +149,12 @@ class ALTTPR2022Race(ALTTPRTournamentRace):
         )
 
 
-async def roll_seed(players: List[discord.Member], episode_id: int = None):
+async def roll_seed(players: List[discord.Member], episode_id: int = None, event_slug="alttpr2022"):
     """
     Roll a seed for the given players.
     """
     if not episode_id is None:
-        existing_preset_for_episode = await models.TournamentPresetHistory.filter(episode_id=episode_id, event_slug="alttpr2022").first()
+        existing_preset_for_episode = await models.TournamentPresetHistory.filter(episode_id=episode_id, event_slug=event_slug).first()
         if existing_preset_for_episode:
             seed = await generator.ALTTPRPreset(existing_preset_for_episode.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
             return seed, existing_preset_for_episode.preset, None
@@ -167,7 +167,7 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None):
         'tournament_mcboss': 2 * len(players),
     }
     for player in players:
-        history = await models.TournamentPresetHistory.filter(discord_user_id=player.id, event_slug="alttpr2022").order_by('-timestamp').limit(5)
+        history = await models.TournamentPresetHistory.filter(discord_user_id=player.id, event_slug=event_slug).order_by('-timestamp').limit(5)
         if history:
             deck[history[0].preset] -= 1 if deck[history[0].preset] > 0 else 0
 
@@ -177,7 +177,7 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None):
     preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
 
     for player in players:
-        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug="alttpr2022")
+        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug=event_slug)
 
     data = generator.ALTTPRPreset(preset)
     await data.fetch()
