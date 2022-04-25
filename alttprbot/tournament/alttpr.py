@@ -139,6 +139,7 @@ class ALTTPR2022Race(ALTTPRTournamentRace):
             scheduling_needs_tracker=True,
             create_scheduled_events=True,
             stream_delay=10,
+            gsheet_id='1epZRDXfe-O4BBerzOEZbFMOVCFrVXU6TCDNjp66P7ZI',
             helper_roles=[
                 guild.get_role(334797023054397450),
                 guild.get_role(435200206552694794),
