@@ -332,7 +332,7 @@ class TournamentRace(object):
 
     @property
     def broadcast_channels(self):
-        return [a['slug'] for a in self.episode['channels'] if not " " in a['name']]
+        return [a['name'] for a in self.episode['channels'] if not " " in a['name']]
 
     @property
     def broadcast_channel_links(self):
