@@ -143,7 +143,11 @@ class Tournament(commands.Cog):
             episode_id = int(episode['id'])
             scheduled_event = await models.ScheduledEvents.get_or_none(episode_id=episode_id)
 
-            tournament_race = await tournaments.fetch_tournament_handler_v2(event_slug, episode)
+            try:
+                tournament_race = await tournaments.fetch_tournament_handler_v2(event_slug, episode)
+            except Exception:
+                logging.exception("Error while creating tournament race handler.")
+                continue
 
             name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
             end_time = start_time + datetime.timedelta(hours=1.5)
