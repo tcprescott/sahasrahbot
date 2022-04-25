@@ -53,25 +53,28 @@ class Tournament(commands.Cog):
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
     async def week_races(self):
-        logging.info('scanning for unsubmitted races')
-        for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
-            event_data: core.TournamentRace = await tournament_class.get_config()
+        try:
+            logging.info('scanning for unsubmitted races')
+            for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
+                event_data: core.TournamentRace = await tournament_class.get_config()
 
-            try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
-            except Exception:
-                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
-                continue
+                try:
+                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
+                except Exception:
+                    logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
+                    continue
 
-            if event_data.submission_form:
-                for episode in episodes:
-                    await self.send_race_form(event_data, event_slug, episode)
+                if event_data.submission_form:
+                    for episode in episodes:
+                        await self.send_race_form(event_data, event_slug, episode)
 
-            if event_data.data.create_scheduled_events:
-                await self.update_scheduled_event(event_data, event_slug, episodes)
+                if event_data.data.create_scheduled_events:
+                    await self.update_scheduled_event(event_data, event_slug, episodes)
 
-            if event_data.data.scheduling_needs_channel:
-                await self.update_scheduling_needs(event_data, episodes)
+                if event_data.data.scheduling_needs_channel:
+                    await self.update_scheduling_needs(event_data, episodes)
+        except Exception:
+            logging.exception("Encountered a problem when attempting to run week_races.")
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
     async def find_races_with_bad_discord(self):
