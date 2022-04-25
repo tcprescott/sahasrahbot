@@ -134,10 +134,11 @@ class ALTTPR2022Race(ALTTPRTournamentRace):
             racetime_goal='Beat the game',
             event_slug="alttpr",
             audit_channel=discordbot.get_channel(647966639266201620),
-            commentary_channel=discordbot.get_channel(408347983709470741),
+            commentary_channel=discordbot.get_channel(947095820673638400),
             scheduling_needs_channel=discordbot.get_channel(434560353461075969),
             scheduling_needs_tracker=True,
             create_scheduled_events=True,
+            stream_delay=10,
             helper_roles=[
                 guild.get_role(334797023054397450),
                 guild.get_role(435200206552694794),
