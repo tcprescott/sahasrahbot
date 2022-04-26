@@ -202,8 +202,8 @@ async def racetime_auto_record(race_data):
                 raise_for_status=True
             ) as resp:
                 soup = BeautifulSoup(await resp.text(), features="html5lib")
-        except:
-            raise Exception("Unable to acquire CSRF token.  Please contact Synack for help.")
+        except Exception as e:
+            raise Exception("Unable to acquire CSRF token.  Please contact Synack for help.") from e
 
         csrftoken = soup.find('input', {'name': 'csrfmiddlewaretoken'})['value']
         data = {'csrfmiddlewaretoken': csrftoken}
@@ -220,5 +220,5 @@ async def racetime_auto_record(race_data):
                 raise_for_status=True
             ) as resp:
                 pass
-        except:
+        except Exception:
             logging.exception("Unable to automatically record race. Skipping...")
