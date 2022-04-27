@@ -361,7 +361,7 @@ class Tournament(commands.Cog):
             return
 
         await ctx.defer()
-        seed, preset, deck = await alttpr.roll_seed([opponent, you], event_slug="cc2022")
+        seed, preset, deck = await alttpr.roll_seed([opponent, on_behalf_of], event_slug="cc2022")
 
         embed = await seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
