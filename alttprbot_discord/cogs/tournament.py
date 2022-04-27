@@ -368,13 +368,13 @@ class Tournament(commands.Cog):
         if deck:
             embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
 
-        embed.title = f"{you.display_name} vs {opponent.display_name}"
-        embed.description = f"{you.mention} vs {opponent.mention}"
+        embed.title = f"{on_behalf_of.display_name} vs {opponent.display_name}"
+        embed.description = f"{on_behalf_of.mention} vs {opponent.mention}"
 
         for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
             channel = self.bot.get_channel(channel_id)
             await channel.send(embed=embed)
-        await you.send(embed=embed)
+        await on_behalf_of.send(embed=embed)
         await opponent.send(embed=embed)
 
         await ctx.respond("Seed successfully sent to DM.")
