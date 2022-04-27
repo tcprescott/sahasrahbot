@@ -340,25 +340,25 @@ class Tournament(commands.Cog):
         name='cc2022',
         guild_ids=CC_TOURNAMENT_SERVERS,
     )
-    async def challenge_cup(self, ctx: discord.ApplicationContext, opponent: discord.Member, you: discord.Member = None):
+    async def challenge_cup(self, ctx: discord.ApplicationContext, opponent: discord.Member, on_behalf_of: discord.Member = None):
         """
         Generate a randomizer seed for the 2022 challenge cup.
         """
 
-        if you and ctx.guild.get_role(503724516854202370) not in you.roles:
-            await ctx.respond("You must be a admin of the Challenge Cup to specify `you`.")
+        if on_behalf_of and ctx.guild.get_role(503724516854202370) not in on_behalf_of.roles:
+            await ctx.respond("You must be a member of the Challenge Cup admin team to roll a seed on someone else's behalf..")
             return
 
         if ctx.author == opponent:
             await ctx.respond("You can't race yourself.")
             return
 
-        if opponent.bot:
+        if opponent.bot or on_behalf_of.bot:
             await ctx.respond("You can't race a bot.")
             return
 
-        if you is None:
-            you = ctx.author
+        if on_behalf_of is None:
+            on_behalf_of = ctx.author
 
         await ctx.defer()
         seed, preset, deck = await alttpr.roll_seed([opponent, you], event_slug="cc2022")
