@@ -353,12 +353,12 @@ class Tournament(commands.Cog):
             await ctx.respond("You can't race yourself.")
             return
 
+        if on_behalf_of is None:
+            on_behalf_of = ctx.author
+
         if opponent.bot or on_behalf_of.bot:
             await ctx.respond("You can't race a bot.")
             return
-
-        if on_behalf_of is None:
-            on_behalf_of = ctx.author
 
         await ctx.defer()
         seed, preset, deck = await alttpr.roll_seed([opponent, you], event_slug="cc2022")
