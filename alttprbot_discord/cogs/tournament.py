@@ -150,7 +150,7 @@ class Tournament(commands.Cog):
                 continue
 
             name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
-            end_time = start_time + datetime.timedelta(hours=1.5)
+            end_time = start_time + datetime.timedelta(hours=2)
 
             if tournament_race.broadcast_channels:
                 location = f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
