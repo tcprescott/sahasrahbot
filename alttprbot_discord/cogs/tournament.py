@@ -315,11 +315,6 @@ class Tournament(commands.Cog):
 
     @commands.slash_command(
         name='alttpr2022',
-        permissions=[
-            permissions.CommandPermission(
-                "owner", 2, True
-            )
-        ],
         guild_ids=MAIN_TOURNAMENT_SERVERS,
     )
     async def alttpr2022(self, ctx, player1: discord.Member, player2: discord.Member):

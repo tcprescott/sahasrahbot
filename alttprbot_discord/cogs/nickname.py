@@ -15,7 +15,7 @@ APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 class Nickname(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
     # @commands.command(
     #     help="Register your Twitch name with SahasrahBot."
@@ -42,11 +42,6 @@ class Nickname(commands.Cog):
     racetime_admin_group = discord.commands.SlashCommandGroup(
         "rtggadmin",
         "Miscellaneous administrative commands for RaceTime.gg",
-        permissions=[
-            permissions.CommandPermission(
-                "owner", 2, True
-            )
-        ]
     )
 
     @racetime_admin_group.command()
@@ -55,6 +50,10 @@ class Nickname(commands.Cog):
         """
         Used by Synack to blast requests to link your RaceTime.gg account to this bot.
         """
+        if not await self.bot.is_owner(ctx.author):
+            await ctx.reply("Only the bot owner can use this command.")
+            return
+
         role: discord.Role = discord.utils.get(ctx.guild._roles.values(), name=role_name)
         await ctx.defer()
         msg = []
@@ -81,6 +80,10 @@ class Nickname(commands.Cog):
         """
         Used by Synack to report users who have not linked their racetime account to SahasrahBot.
         """
+        if not await self.bot.is_owner(ctx.author):
+            await ctx.reply("Only the bot owner can use this command.")
+            return
+
         await ctx.defer()
         role: discord.Role = discord.utils.get(ctx.guild._roles.values(), name=role_name)
         msg = []
