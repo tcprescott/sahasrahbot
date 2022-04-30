@@ -144,8 +144,14 @@ title:  Presets
 |---|---|---|
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casual.yaml) |Normal logic, but Sword and Morph are early.|   |
 | [casualkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casualkeys.yaml) |Keysanity.  Normal logic, but Sword and Morph are early.|   |
+| [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/dungeons.yaml) |Normal logic, all dungeons + SM bosses.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) |Hard logic, sword and morph are fully randomized.|   |
+| [harddungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/harddungeons.yaml) |Hard logic, all dungeons + SM bosses.|   |
 | [hardkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardkeys.yaml) |Keysanity.  Hard logic, sword and morph are fully randomized.|   |
+| [hardquick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardquick.yaml) |Hard logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.|   |
+| [hardrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardrandom.yaml) |Hard logic, randomized GT, Ganon, and Tourian requirements.|   |
 | [normal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normal.yaml) |Normal logic, sword and morph are fully randomized.|   |
 | [normalkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normalkeys.yaml) |Keysanity.  Normal logic, sword and morph are fully randomized.|   |
+| [quick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/quick.yaml) |Normal logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.|   |
+| [random](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/random.yaml) |Normal logic, randomized GT, Ganon, and Tourian requirements.|   |
 
