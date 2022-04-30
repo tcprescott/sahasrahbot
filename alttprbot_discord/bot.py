@@ -16,18 +16,18 @@ from config import Config as c
 config.init()
 
 
-async def determine_prefix(bot, message):
-    if message.guild is None:
-        return "$"
+# async def determine_prefix(bot, message):
+#     if message.guild is None:
+#         return "$"
 
-    prefix = await message.guild.config_get("CommandPrefix", "$")
-    return prefix
+#     prefix = await message.guild.config_get("CommandPrefix", "$")
+#     return prefix
 
 intents = discord.Intents.default()
 intents.members = True  # pylint: disable=assigning-non-slot
 
 discordbot = commands.Bot(
-    command_prefix=determine_prefix,
+    command_prefix=commands.when_mentioned_or("$"),
     allowed_mentions=discord.AllowedMentions(
         everyone=False,
         users=True,
