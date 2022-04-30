@@ -18,10 +18,16 @@ PRESET_OPTIONS = {
     'smz3': [
         discord.SelectOption(label="casual"),
         discord.SelectOption(label="casualkeys"),
+        discord.SelectOption(label="dungeons"),
         discord.SelectOption(label="hard"),
+        discord.SelectOption(label="harddungeons"),
         discord.SelectOption(label="hardkeys"),
+        discord.SelectOption(label="hardquick"),
+        discord.SelectOption(label="hardrandom"),
         discord.SelectOption(label="normal"),
         discord.SelectOption(label="normalkeys"),
+        discord.SelectOption(label="quick"),
+        discord.SelectOption(label="random"),
     ]
 }
 

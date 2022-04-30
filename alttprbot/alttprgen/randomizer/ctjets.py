@@ -8,7 +8,7 @@ async def roll_ctjets(settings: dict, version: str = '3_1_0'):
     version = version.replace('.', '_')
 
     async with aiohttp.ClientSession(cookie_jar=jar) as session:
-        async with session.get(url=f'http://www.ctjot.com/{version}/options/') as resp:
+        async with session.get(url=f'https://ctjot.com/{version}/options/') as resp:
             soup = BeautifulSoup(await resp.text(), features="html5lib")
 
         csrfmiddlewaretoken = soup.find('input', {'name': 'csrfmiddlewaretoken'})['value']
@@ -24,7 +24,11 @@ async def roll_ctjets(settings: dict, version: str = '3_1_0'):
         with open('/opt/data/chronotrigger.sfc', 'rb') as rom:
             formdata.add_field('rom_file', rom.read(), filename=None)
 
-        async with session.post(url=f'http://www.ctjot.com/{version}/generate-rom/', data=formdata) as resp:
+        headers = {
+            'Referer': f'https://ctjot.com/{version}/options/',
+        }
+
+        async with session.post(url=f'https://ctjot.com/{version}/generate-rom/', data=formdata, headers=headers) as resp:
             soup = BeautifulSoup(await resp.text(), features="html5lib")
 
         relative_uri = soup.find('a', text='Seed share link')['href']

@@ -4,6 +4,9 @@ description: "Normal logic, but Sword and Morph are early."
 settings:
     smlogic: normal
     goal: defeatboth
+    ganonvulnerable: sevencrystals
+    opentower: sevencrystals
+    opentourian: fourbosses
     swordlocation: early
     morphlocation: early
     seed: ""

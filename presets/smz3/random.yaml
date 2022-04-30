@@ -1,0 +1,15 @@
+randomizer: "smz3"
+goal_name: beat the games
+description: "Normal logic, randomized GT, Ganon, and Tourian requirements."
+settings:
+    smlogic: normal
+    goal: defeatboth
+    ganonvulnerable: random
+    opentower: random
+    opentourian: random
+    swordlocation: random
+    morphlocation: random
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"

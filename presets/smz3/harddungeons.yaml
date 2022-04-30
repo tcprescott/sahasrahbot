@@ -1,9 +1,9 @@
 randomizer: "smz3"
 goal_name: beat the games
-description: "Hard logic, sword and morph are fully randomized."
+description: "Hard logic, all dungeons + SM bosses."
 settings:
     smlogic: hard
-    goal: defeatboth
+    goal: alldungeonsdefeatmotherbrain
     ganonvulnerable: sevencrystals
     opentower: sevencrystals
     opentourian: fourbosses

@@ -1,0 +1,15 @@
+randomizer: "smz3"
+goal_name: beat the games
+description: "Normal logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla."
+settings:
+    smlogic: normal
+    goal: fastganondefeatmotherbrain
+    ganonvulnerable: nocrystals
+    opentower: nocrystals
+    opentourian: nobosses
+    swordlocation: uncle
+    morphlocation: original
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"

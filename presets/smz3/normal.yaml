@@ -4,6 +4,9 @@ description: "Normal logic, sword and morph are fully randomized."
 settings:
     smlogic: normal
     goal: defeatboth
+    ganonvulnerable: sevencrystals
+    opentower: sevencrystals
+    opentourian: fourbosses
     swordlocation: randomized
     morphlocation: randomized
     seed: ""
