@@ -26,6 +26,8 @@ config.init()
 intents = discord.Intents.default()
 intents.members = True  # pylint: disable=assigning-non-slot
 
+discord.http.API_VERSION = 9
+
 discordbot = commands.Bot(
     command_prefix=commands.when_mentioned_or("$"),
     allowed_mentions=discord.AllowedMentions(
@@ -135,6 +137,8 @@ async def on_application_command_error(ctx, error):
 
 @discordbot.event
 async def on_command(ctx):
+    if ctx.prefix == "$":
+        await ctx.reply(f"The use of the `$` prefix is deprecated. Please mention {discordbot.user.mention} instead.  For example: \"{discordbot.user.mention} {ctx.invoked_with} ...\"\nThis will stop working soon.")
     await ctx.message.add_reaction('⌚')
 
 
