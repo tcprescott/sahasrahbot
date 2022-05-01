@@ -9,6 +9,7 @@ settings:
     opentourian: nobosses
     swordlocation: uncle
     morphlocation: original
+    keyshuffle: none
     seed: ""
     race: "true"
     gamemode: normal

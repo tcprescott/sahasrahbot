@@ -9,6 +9,7 @@ settings:
     opentourian: random
     swordlocation: random
     morphlocation: random
+    keyshuffle: none
     seed: ""
     race: "true"
     gamemode: normal

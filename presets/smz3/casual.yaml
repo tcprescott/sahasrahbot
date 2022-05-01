@@ -9,6 +9,7 @@ settings:
     opentourian: fourbosses
     swordlocation: early
     morphlocation: early
+    keyshuffle: none
     seed: ""
     race: "true"
     gamemode: normal

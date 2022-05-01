@@ -9,6 +9,7 @@ settings:
     opentourian: fourbosses
     swordlocation: randomized
     morphlocation: randomized
+    keyshuffle: none
     seed: ""
     race: "true"
     gamemode: normal
