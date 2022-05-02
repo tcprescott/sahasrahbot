@@ -10,7 +10,6 @@ settings:
     swordlocation: randomized
     morphlocation: randomized
     keyshuffle: keysanity
-    keyshuffle: none
     seed: ""
     race: "true"
     gamemode: normal
