@@ -1,0 +1,224 @@
+description: Season 13 mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva)
+
+options:
+  FillItemPoolWith: TwentyRupees2
+
+allow_quickswap: true
+glitches_required: "none"
+item_functionality: "normal"
+item_placement: "advanced"
+dungeon_items: "standard"
+entrance_shuffle: "none"
+
+world_state:
+  standard: 30
+  open: 30
+  inverted: 20
+  retro: 20
+
+goals:
+  ganon: 25
+  fast_ganon: 25
+  dungeons: 25
+  pedestal: 15
+  "triforce-hunt": 10
+
+accessibility:
+  items: 75
+  none: 25
+
+tower_open:
+  0: 5
+  1: 10
+  2: 10
+  3: 15
+  4: 15
+  5: 15
+  6: 15
+  7: 15
+ganon_open:
+  3: 10
+  4: 15
+  5: 20
+  6: 25
+  7: 30
+
+boss_shuffle:
+  none: 70
+  full: 30
+enemy_shuffle:
+  none: 70
+  shuffled: 30
+
+enemy_damage: default
+enemy_health: default
+
+hints:
+  "off": 75
+  "on": 25
+
+weapons:
+  randomized: 40
+  assured: 30
+  vanilla: 20
+  swordless: 10
+
+item_pool:
+  normal: 60
+  hard: 30
+  expert: 10
+
+rules:
+  - conditions:
+      - Key: tower_open
+        Value: 4
+    actions:
+      ganon_open:
+        4: 15
+        5: 20
+        6: 25
+        7: 30
+  - conditions:
+      - Key: tower_open
+        Value: 5
+    actions:
+      ganon_open:
+        5: 20
+        6: 25
+        7: 30
+  - conditions:
+      - Key: tower_open
+        Value: 6
+    actions:
+      ganon_open:
+        6: 25
+        7: 30
+  - conditions:
+      - Key: tower_open
+        Value: 7
+    actions:
+      ganon_open:
+        7: 30
+
+
+subweights:
+  entrance:
+    chance: 29
+    weights:
+      entrance_shuffle:
+        crossed: 75
+        restricted: 25
+      dungeon_items:
+        standard: 20
+        full: 80
+  normal:
+    chance: 69
+    weights:
+      customizer:
+        triforce-hunt:
+          goal: [20, 40]
+          pool: 0 # this forces it to be goal + min_difference
+          min_difference: 10
+        eq:
+          "PegasusBoots":
+            0: 50
+            1: 50
+          "Hookshot":
+            0: 80
+            1: 20
+          "FireRod":
+            0: 80
+            1: 20
+          "IceRod":
+            0: 80
+            1: 20
+          "Flippers":
+            0: 80
+            1: 20
+          "MagicMirror":
+            0: 80
+            1: 20
+          "OcarinaActive":
+            0: 80
+            1: 20
+        custom:
+          customPrizePacks: False
+          region.wildMaps:
+            True: 60
+            False: 40
+          region.wildCompasses:
+            True: 60
+            False: 40
+          region.wildKeys:
+            True: 60
+            False: 40
+          region.wildBigKeys:
+            True: 60
+            False: 40
+  ohko:
+    chance: 2
+    weights:
+      enemy_damage: "default"
+      enemy_health: "default"
+      boss_shuffle: "none"
+      enemy_shuffle: "none"
+
+      customizer:
+        triforce-hunt:
+          goal: [20, 40]
+          pool: 0 # this forces it to be goal + min_difference
+          min_difference: 10
+        timed-ohko:
+          timerStart: 600
+          clock:
+            GreenClock:
+              value: 180
+              pool: 12
+            BlueClock:
+              value: 360
+              pool: 4
+            RedClock:
+              value: -240
+              pool: 4
+        eq:
+          "PegasusBoots": # (this is a 10% change from 75 in season 5)
+            0: 50
+            1: 50
+          "Hookshot":
+            0: 80
+            1: 20
+          "FireRod":
+            0: 80
+            1: 20
+          "IceRod":
+            0: 80
+            1: 20
+          "Flippers":
+            0: 80
+            1: 20
+          "MagicMirror":
+            0: 80
+            1: 20
+          "OcarinaActive":
+            0: 80
+            1: 20
+        custom:
+          customPrizePacks: False
+          region.wildMaps:
+            True: 70
+            False: 30
+          region.wildCompasses:
+            True: 70
+            False: 30
+          region.wildKeys:
+            True: 70
+            False: 30
+          region.wildBigKeys:
+            True: 70
+            False: 30
+          rom.genericKeys:
+            True: 20
+            False: 80
+          rom.timerMode: "countdown-ohko"
+        pool:
+          "PieceOfHeart": 4
