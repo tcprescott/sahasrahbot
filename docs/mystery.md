@@ -26,6 +26,7 @@ title:  Mystery Weights
 | [ladder_ohko](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_ohko.yaml) | Season 11 mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva), but only ohko subweight | *Subweights* |
 | [ladder_season1](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season1.yaml) | Pre-season mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |  |
 | [ladder_season11](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season11.yaml) | Season 11 mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
+| [ladder_season13](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season13.yaml) | Season 13 mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
 | [ladder_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season2.yaml) | Season two mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) |  |
 | [ladder_season3](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season3.yaml) | Season three mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Customizer* |
 | [ladder_season4](https://github.com/tcprescott/sahasrahbot/blob/master/weights/ladder_season4.yaml) | Season four mystery weights for [ALTTPR Ladder](https://discord.gg/Jy7Srva) | *Subweights* |
