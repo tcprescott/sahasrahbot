@@ -74,7 +74,7 @@ rules:
         Value: 4
     actions:
       ganon_open:
-        4: 15
+        4: 25
         5: 20
         6: 25
         7: 30
@@ -83,7 +83,7 @@ rules:
         Value: 5
     actions:
       ganon_open:
-        5: 20
+        5: 45
         6: 25
         7: 30
   - conditions:
@@ -91,14 +91,13 @@ rules:
         Value: 6
     actions:
       ganon_open:
-        6: 25
+        6: 70
         7: 30
   - conditions:
       - Key: tower_open
         Value: 7
     actions:
-      ganon_open:
-        7: 30
+      ganon_open: 7
 
 
 subweights:
