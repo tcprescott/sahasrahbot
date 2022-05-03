@@ -149,7 +149,11 @@ class Tournament(commands.Cog):
                 logging.exception("Error while creating tournament race handler.")
                 continue
 
-            name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
+            if tournament_race.friendly_name:
+                name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
+            else:
+                name = f"{tournament_race.event_slug.upper()} - {tournament_race.versus}"
+            description = f"Start Time: {discord.utils.format_dt(start_time, 'f')}"
             end_time = start_time + datetime.timedelta(hours=2)
 
             if tournament_race.broadcast_channels:
@@ -162,9 +166,10 @@ class Tournament(commands.Cog):
                     event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
 
                     # check if existing event requires an update
-                    if not event.name == name or not event.start_time == start_time or not event.end_time == end_time or not event.location.value == location:
+                    if not event.name == name or not event.description == description or not event.start_time == start_time or not event.end_time == end_time or not event.location.value == location:
                         await event.edit(
                             name=name,
+                            description=description,
                             start_time=start_time,
                             end_time=end_time,
                             location=location
@@ -172,6 +177,7 @@ class Tournament(commands.Cog):
                 except discord.NotFound:
                     event = await event_data.guild.create_scheduled_event(
                         name=name,
+                        description=description,
                         start_time=start_time,
                         end_time=end_time,
                         location=location
@@ -181,6 +187,7 @@ class Tournament(commands.Cog):
                 # create an event
                 event = await event_data.guild.create_scheduled_event(
                     name=name,
+                    description=description,
                     start_time=start_time,
                     end_time=end_time,
                     location=location
