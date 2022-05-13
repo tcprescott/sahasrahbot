@@ -409,11 +409,10 @@ class Tournament(commands.Cog):
         await ctx.defer()
         embed = await self.generate_deck_seed(players, "alttpr2022")
 
-        await ctx.channel.send(embed=embed)
         for player in players:
             await player.send(embed=embed)
 
-        await ctx.respond("Seed successfully sent to DM.")
+        await ctx.respond(embed=embed)
 
     async def generate_deck_seed(self, players, event_slug):
         seed, preset, deck = await alttpr.roll_seed(players, event_slug=event_slug)
