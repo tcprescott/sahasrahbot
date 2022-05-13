@@ -20,6 +20,9 @@ MAIN_TOURNAMENT_SERVERS = list(map(int, os.environ.get("MAIN_TOURNAMENT_SERVERS"
 CC_TOURNAMENT_SERVERS = list(map(int, os.environ.get("CC_TOURNAMENT_SERVERS", "").split(',')))
 CC_TOURNAMENT_AUDIT_CHANNELS = list(map(int, os.environ.get("CC_TOURNAMENT_AUDIT_CHANNELS", "").split(',')))
 
+MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 334796844750209024
+CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
+
 class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -342,13 +345,17 @@ class Tournament(commands.Cog):
         name='cc2022',
         guild_ids=CC_TOURNAMENT_SERVERS,
     )
-    async def challenge_cup(self, ctx: discord.ApplicationContext, opponent: discord.Member, on_behalf_of: discord.Member = None):
+    async def challenge_cup(self, ctx: discord.ApplicationContext, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
         """
         Generate a randomizer seed for the 2022 challenge cup.
         """
 
-        if on_behalf_of and ctx.guild.get_role(503724516854202370) not in on_behalf_of.roles:
+        if on_behalf_of and ctx.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in ctx.author.roles:
             await ctx.respond("You must be a member of the Challenge Cup admin team to roll a seed on someone else's behalf..")
+            return
+
+        if (player3 or player4) and ctx.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in ctx.author.roles:
+            await ctx.respond("You must be a member of the Challenge Cup admin team to roll a seed with more than 2 players.")
             return
 
         if ctx.author == opponent:
@@ -362,24 +369,64 @@ class Tournament(commands.Cog):
             await ctx.respond("You can't race a bot.")
             return
 
+        players = [opponent, on_behalf_of]
+        if player3:
+            players.append(player3)
+        if player4:
+            players.append(player4)
+
         await ctx.defer()
-        seed, preset, deck = await alttpr.roll_seed([opponent, on_behalf_of], event_slug="cc2022")
+        embed = await self.generate_deck_seed(players, "cc2022")
+
+        for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
+            channel = self.bot.get_channel(channel_id)
+            await channel.send(embed=embed)
+
+        for player in players:
+            await player.send(embed=embed)
+
+        await ctx.respond("Seed successfully sent to DM.")
+
+    @commands.slash_command(
+        name='alttpr2022multi',
+        guild_ids=MAIN_TOURNAMENT_SERVERS,
+    )
+    async def alttpr2022multi(self, ctx: discord.ApplicationContext, player1: discord.Member, player2: discord.Member, player3: discord.Member = None, player4: discord.Member = None):
+        """
+        Generate a randomizer seed for the 2022 challenge cup.
+        """
+
+        if ctx.guild.get_role(MAIN_TOURNAMENT_ADMIN_ROLE_ID) not in ctx.author.roles:
+            await ctx.respond("You must be an admin to use this command.")
+            return
+
+        players = [player1, player2]
+        if player3:
+            players.append(player3)
+        if player4:
+            players.append(player4)
+
+        await ctx.defer()
+        embed = await self.generate_deck_seed(players, "alttpr2022")
+
+        await ctx.channel.send(embed=embed)
+        for player in players:
+            await player.send(embed=embed)
+
+        await ctx.respond("Seed successfully sent to DM.")
+
+    async def generate_deck_seed(self, players, event_slug):
+        seed, preset, deck = await alttpr.roll_seed(players, event_slug=event_slug)
 
         embed = await seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         if deck:
             embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
 
-        embed.title = f"{on_behalf_of.display_name} vs {opponent.display_name}"
-        embed.description = f"{on_behalf_of.mention} vs {opponent.mention}"
+        embed.title = " vs. ".join([p.display_name for p in players])
+        embed.description = " vs. ".join([p.mention for p in players])
 
-        for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
-            channel = self.bot.get_channel(channel_id)
-            await channel.send(embed=embed)
-        await on_behalf_of.send(embed=embed)
-        await opponent.send(embed=embed)
-
-        await ctx.respond("Seed successfully sent to DM.")
+        return embed
 
 def setup(bot):
     bot.add_cog(Tournament(bot))
