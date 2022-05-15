@@ -7,7 +7,7 @@ description: "The vanilla game, but with all of the quality life additions of th
 settings:
   accessibility: none
   crystals:
-    ganon: "7"
+    ganon: "0"
     tower: "7"
   custom:
     customPrizePacks: true
@@ -540,6 +540,6 @@ settings:
 
     This can also be used as a learning guide for ALttP in terms of understanding
     where items are normally and how the puzzles work and how the prize packs work."
-  spoilers: "off"
+  spoilers: "on"
   tournament: false
   weapons: randomized
