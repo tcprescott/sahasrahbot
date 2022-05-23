@@ -29,6 +29,7 @@ shortuuid = "*"
 PyGithub = "*"
 PySide2 = "==5.15.2"
 python-slugify = "*"
+pyz3r = "*"
 
 [dev-packages]
 pycodestyle = "*"
@@ -36,10 +37,6 @@ pylint = "*"
 
 [requires]
 python_version = "3.8"
-
-[packages.pyz3r]
-git = "https://github.com/tcprescott/pyz3r.git"
-ref = "6.0.0-dev"
 
 [packages.1e6d33a]
 file = "https://github.com/tcprescott/racetime-bot/archive/6c9b41087196541a9794f3cf6f6afe4648bb5644.zip"
