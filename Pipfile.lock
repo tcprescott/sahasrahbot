@@ -925,11 +925,11 @@
         },
         "pyz3r": {
             "hashes": [
-                "sha256:6b52eef3b9054fc1dab26853161251eae4f24d01c3fdf0e8ea3b9edafde7a54a",
-                "sha256:97cad30df41abac652c98772b300bafe2e8328d277e9933e27dd9045a3225d86"
+                "sha256:5cc65e989bb40cc78d203eb9691eec16a5114114752a1542fc40ab513b009bcc",
+                "sha256:a9f4e17dcc4cf8141a5768bf5c0830a0a7430decec7f1064bcdc000e13dc0fbf"
             ],
             "index": "pypi",
-            "version": "==6.0.0"
+            "version": "==6.0.1"
         },
         "quart": {
             "hashes": [
