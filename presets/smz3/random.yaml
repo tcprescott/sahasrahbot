@@ -7,8 +7,8 @@ settings:
     ganonvulnerable: random
     opentower: random
     opentourian: random
-    swordlocation: random
-    morphlocation: random
+    swordlocation: randomized
+    morphlocation: randomized
     keyshuffle: none
     seed: ""
     race: "true"
