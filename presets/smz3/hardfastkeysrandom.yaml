@@ -1,15 +1,15 @@
 randomizer: "smz3"
 goal_name: beat the games
-description: "Hard logic, randomized GT, Ganon, and Tourian requirements."
+description: "Hard logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements."
 settings:
     smlogic: hard
-    goal: defeatboth
+    goal: fastganondefeatmotherbrain
     ganonvulnerable: random
     opentower: random
     opentourian: random
     swordlocation: randomized
     morphlocation: randomized
-    keyshuffle: none
+    keyshuffle: keysanity
     seed: ""
     race: "true"
     gamemode: normal

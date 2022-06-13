@@ -1,12 +1,12 @@
 randomizer: "smz3"
 goal_name: beat the games
-description: "Normal logic, randomized GT, Ganon, and Tourian requirements."
+description: "Normal logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized."
 settings:
     smlogic: normal
     goal: defeatboth
-    ganonvulnerable: random
-    opentower: random
-    opentourian: random
+    ganonvulnerable: fivecrystals
+    opentower: fivecrystals
+    opentourian: threebosses
     swordlocation: randomized
     morphlocation: randomized
     keyshuffle: none
