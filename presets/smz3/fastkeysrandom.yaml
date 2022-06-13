@@ -1,0 +1,16 @@
+randomizer: "smz3"
+goal_name: beat the games
+description: "Normal logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements."
+settings:
+    smlogic: normal
+    goal: fastganondefeatmotherbrain
+    ganonvulnerable: random
+    opentower: random
+    opentourian: random
+    swordlocation: randomized
+    morphlocation: randomized
+    keyshuffle: keysanity
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"
