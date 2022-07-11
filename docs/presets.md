@@ -147,12 +147,18 @@ title:  Presets
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casual.yaml) |Normal logic, but Sword and Morph are early.|   |
 | [casualkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casualkeys.yaml) |Keysanity.  Normal logic, but Sword and Morph are early.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/dungeons.yaml) |Normal logic, all dungeons + SM bosses.|   |
+| [fastkeysrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeysrandom.yaml) |Normal logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
+| [fastrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastrandom.yaml) |Normal logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) |Hard logic, sword and morph are fully randomized.|   |
+| [hard553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard553.yaml) |Hard logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized.|   |
 | [harddungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/harddungeons.yaml) |Hard logic, all dungeons + SM bosses.|   |
+| [hardfastkeysrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfastkeysrandom.yaml) |Hard logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
+| [hardfastrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfastrandom.yaml) |Hard logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [hardkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardkeys.yaml) |Keysanity.  Hard logic, sword and morph are fully randomized.|   |
 | [hardquick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardquick.yaml) |Hard logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.|   |
 | [hardrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardrandom.yaml) |Hard logic, randomized GT, Ganon, and Tourian requirements.|   |
 | [normal](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normal.yaml) |Normal logic, sword and morph are fully randomized.|   |
+| [normal553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normal553.yaml) |Normal logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized.|   |
 | [normalkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/normalkeys.yaml) |Keysanity.  Normal logic, sword and morph are fully randomized.|   |
 | [quick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/quick.yaml) |Normal logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.|   |
 | [random](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/random.yaml) |Normal logic, randomized GT, Ganon, and Tourian requirements.|   |
