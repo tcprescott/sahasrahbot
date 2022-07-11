@@ -29,6 +29,7 @@ PyGithub = "*"
 PySide2 = "==5.15.2"
 python-slugify = "*"
 pyz3r = "*"
+py-cord = "*"
 
 [dev-packages]
 pycodestyle = "*"
@@ -39,7 +40,3 @@ python_version = "3.8"
 
 [packages.1e6d33a]
 file = "https://github.com/tcprescott/racetime-bot/archive/6c9b41087196541a9794f3cf6f6afe4648bb5644.zip"
-
-[packages.py-cord]
-git = "https://github.com/Pycord-Development/pycord"
-ref = "fe5803f2d109e104a663a92d281468ce8333e1b6"

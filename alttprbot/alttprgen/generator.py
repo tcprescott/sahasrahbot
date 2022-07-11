@@ -3,6 +3,7 @@ import os
 import random
 from dataclasses import dataclass
 from typing import List
+import base64
 
 import aiocache
 import aiofiles
@@ -144,6 +145,8 @@ class SahasrahBotPresetCore():
 class ALTTPRPreset(SahasrahBotPresetCore):
     randomizer = 'alttpr'
 
+    # TODO: Make this so it isn't an absolute dumpster fire
+    # this code really sucks
     async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix="") -> ALTTPRDiscord:
         if self.preset_data is None:
             await self.fetch()
@@ -169,8 +172,21 @@ class ALTTPRPreset(SahasrahBotPresetCore):
                 if 'l' not in settings:
                     settings['l'] = {}
                 for i in self.preset_data.get('forced_locations', {}):
-                    location = random.choice([l for l in i['locations'] if l not in settings['l']])
-                    settings['l'][location] = i['item']
+                    quantity = i.get('quantity', 1)
+                    if quantity > len(i['locations']):
+                        quantity = len(i['locations'])
+                    for q in range(i.get('quantity', 1)):
+                        logging.info("Placing item %s (#%s)", i['item'], q)
+                        if random.randint(1, 100) <= i.get('chance', 100):
+                            location = random.choice([l for l in i['locations'] if l not in settings['l']])
+                            if not settings['l'].get(location, None) and i.get('override', True):
+                                settings['l'][location] = i['item']
+                                try:
+                                    i['locations'].remove(location)
+                                except ValueError:
+                                    continue
+                            else:
+                                logging.info("Skipping \"%s\" because it is already populated with \"%s\" and override is true.", base64.b64decode(location).decode("utf8"), settings['l'][location])
 
             if hints:
                 settings['hints'] = 'on'

@@ -143,7 +143,6 @@ async def mysterygenwithweights(weightset):
         endpoint=endpoint
     )
 
-
 @sahasrahbotapi.route('/api/tournament/games', methods=['GET'])
 async def get_tournament_games():
     terms = request.args

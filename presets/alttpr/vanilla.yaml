@@ -300,236 +300,236 @@ settings:
     pool: normal
   item_placement: advanced
   l:
-    Q2F0ZmlzaDox: Quake:1
-    Q2F2ZSA0NTox: PieceOfHeart:1
-    Q2FzdGxlIFRvd2VyIC0gRGFyayBNYXplOjE=: KeyA1:1
-    Q2FzdGxlIFRvd2VyIC0gUm9vbSAwMzox: KeyA1:1
-    Q2hlY2tlcmJvYXJkIENhdmU6MQ==: PieceOfHeart:1
-    Q2hlc3QgR2FtZTox: PieceOfHeart:1
-    Q2hpY2tlbiBIb3VzZTox: Boomerang:1
-    QWdpbmFoJ3MgQ2F2ZTox: PieceOfHeart:1
-    Qm90dGxlIE1lcmNoYW50OjE=: Bottle:1
-    Qm9tYm9zIFRhYmxldDox: Bombos:1
-    QmxhY2tzbWl0aDox: L3Sword:1
-    QmxpbmQncyBIaWRlb3V0IC0gRmFyIExlZnQ6MQ==: TwentyRupees:1
-    QmxpbmQncyBIaWRlb3V0IC0gRmFyIFJpZ2h0OjE=: TwentyRupees:1
-    QmxpbmQncyBIaWRlb3V0IC0gTGVmdDox: TwentyRupees:1
-    QmxpbmQncyBIaWRlb3V0IC0gUmlnaHQ6MQ==: TwentyRupees:1
-    QmxpbmQncyBIaWRlb3V0IC0gVG9wOjE=: PieceOfHeart:1
-    QnJld2VyeTox: ThreeHundredRupees:1
-    QnVtcGVyIENhdmU6MQ==: PieceOfHeart:1
-    Qy1TaGFwZWQgSG91c2U6MQ==: ThreeHundredRupees:1
-    R2Fub24ncyBUb3dlciAtIE1hcCBDaGVzdDox: MapA2:1
-    R2Fub24ncyBUb3dlciAtIE1pbmkgSGVsbWFzYXVyIFJvb20gLSBMZWZ0OjE=: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIE1pbmkgSGVsbWFzYXVyIFJvb20gLSBSaWdodDox: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==: TwentyRupees:1
-    R2Fub24ncyBUb3dlciAtIEJpZyBDaGVzdDox: RedMail:1
-    R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyA2:1
-    R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgUm9vbSAtIExlZnQ6MQ==: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgUm9vbSAtIFJpZ2h0OjE=: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIEJvYidzIENoZXN0OjE=: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIEJvYidzIFRvcmNoOjE=: KeyA2:1
-    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIEJvdHRvbSBMZWZ0OjE=: TwentyRupees:1
-    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIEJvdHRvbSBSaWdodDox: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIFRvcCBMZWZ0OjE=: CompassA2:1
-    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIFRvcCBSaWdodDox: OneRupee:1
-    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gQm90dG9tIExlZnQ6MQ==: TwentyRupees:1
-    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gQm90dG9tIFJpZ2h0OjE=: TwentyRupees:1
-    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gVG9wIExlZnQ6MQ==: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gVG9wIFJpZ2h0OjE=: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIEZpcmVzbmFrZSBSb29tOjE=: KeyA2:1
-    R2Fub24ncyBUb3dlciAtIEhvcGUgUm9vbSAtIExlZnQ6MQ==: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIEhvcGUgUm9vbSAtIFJpZ2h0OjE=: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIFByZS1Nb2xkb3JtIENoZXN0OjE=: KeyA2:1
-    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIEJvdHRvbSBMZWZ0OjE=: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIEJvdHRvbSBSaWdodDox: ThreeBombs:1
-    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIFRvcCBMZWZ0OjE=: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIFRvcCBSaWdodDox: TenArrows:1
-    R2Fub24ncyBUb3dlciAtIFRpbGUgUm9vbTox: KeyA2:1
-    R3JhdmV5YXJkIExlZGdlOjE=: PieceOfHeart:1
-    RGVzZXJ0IExlZGdlOjE=: PieceOfHeart:1
-    RGVzZXJ0IFBhbGFjZSAtIE1hcCBDaGVzdDox: MapP2:1
-    RGVzZXJ0IFBhbGFjZSAtIEJpZyBDaGVzdDox: PowerGlove:1
-    RGVzZXJ0IFBhbGFjZSAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyP2:1
-    RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==: BossHeartContainer:1
-    RGVzZXJ0IFBhbGFjZSAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassP2:1
-    RGVzZXJ0IFBhbGFjZSAtIFByaXplOjE=: PendantOfWisdom:1
-    RGVzZXJ0IFBhbGFjZSAtIFRvcmNoOjE=: KeyP2:1
-    RGlnZ2luZyBHYW1lOjE=: PieceOfHeart:1
-    RWFzdGVybiBQYWxhY2UgLSBCaWcgQ2hlc3Q6MQ==: Bow:1
-    RWFzdGVybiBQYWxhY2UgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyP1:1
-    RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=: BossHeartContainer:1
-    RWFzdGVybiBQYWxhY2UgLSBDYW5ub25iYWxsIENoZXN0OjE=: OneHundredRupees:1
-    RWFzdGVybiBQYWxhY2UgLSBDb21wYXNzIENoZXN0OjE=: CompassP1:1
-    RWFzdGVybiBQYWxhY2UgLSBNYXAgQ2hlc3Q6MQ==: MapP1:1
-    RWFzdGVybiBQYWxhY2UgLSBQcml6ZTox: PendantOfCourage:1
-    RXRoZXIgVGFibGV0OjE=: Ether:1
-    Rmx1dGUgU3BvdDox: OcarinaInactive:1
-    RmxvYXRpbmcgSXNsYW5kOjE=: PieceOfHeart:1
-    Rmxvb2RnYXRlIENoZXN0OjE=: ThreeBombs:1
-    S2FrYXJpa28gV2VsbCAtIE1pZGRsZTox: TwentyRupees:1
-    S2FrYXJpa28gV2VsbCAtIEJvdHRvbTox: ThreeBombs:1
-    S2FrYXJpa28gV2VsbCAtIExlZnQ6MQ==: TwentyRupees:1
-    S2FrYXJpa28gV2VsbCAtIFJpZ2h0OjE=: TwentyRupees:1
-    S2FrYXJpa28gV2VsbCAtIFRvcDox: PieceOfHeart:1
-    S2FrYXJpa28gVGF2ZXJuOjE=: Bottle:1
-    S2luZyBab3JhOjE=: Flippers:1
-    S2luZydzIFRvbWI6MQ==: Cape:1
-    SG9ibzox: Bottle:1
-    SG9va3Nob3QgQ2F2ZSAtIEJvdHRvbSBMZWZ0OjE=: FiftyRupees:1
-    SG9va3Nob3QgQ2F2ZSAtIEJvdHRvbSBSaWdodDox: FiftyRupees:1
-    SG9va3Nob3QgQ2F2ZSAtIFRvcCBMZWZ0OjE=: FiftyRupees:1
-    SG9va3Nob3QgQ2F2ZSAtIFRvcCBSaWdodDox: FiftyRupees:1
-    SGFtbWVyIFBlZ3M6MQ==: PieceOfHeart:1
-    SHlwZSBDYXZlIC0gQm90dG9tOjE=: TwentyRupees:1
-    SHlwZSBDYXZlIC0gTWlkZGxlIExlZnQ6MQ==: TwentyRupees:1
-    SHlwZSBDYXZlIC0gTWlkZGxlIFJpZ2h0OjE=: TwentyRupees:1
-    SHlwZSBDYXZlIC0gTlBDOjE=: ThreeHundredRupees:1
-    SHlwZSBDYXZlIC0gVG9wOjE=: TwentyRupees:1
-    SHlydWxlIENhc3RsZSAtIE1hcCBDaGVzdDox: MapH2:1
-    SHlydWxlIENhc3RsZSAtIEJvb21lcmFuZyBDaGVzdDox: Boomerang:1
-    SHlydWxlIENhc3RsZSAtIFplbGRhJ3MgQ2VsbDox: Lamp:1
-    SWNlIFBhbGFjZSAtIE1hcCBDaGVzdDox: MapD5:1
-    SWNlIFBhbGFjZSAtIEJpZyBDaGVzdDox: BlueMail:1
-    SWNlIFBhbGFjZSAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyD5:1
-    SWNlIFBhbGFjZSAtIEJvc3M6MQ==: BossHeartContainer:1
-    SWNlIFBhbGFjZSAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassD5:1
-    SWNlIFBhbGFjZSAtIEZyZWV6b3IgQ2hlc3Q6MQ==: ThreeBombs:1
-    SWNlIFBhbGFjZSAtIEljZWQgVCBSb29tOjE=: KeyD5:1
-    SWNlIFBhbGFjZSAtIFByaXplOjE=: Crystal5:1
-    SWNlIFBhbGFjZSAtIFNwaWtlIFJvb206MQ==: KeyD5:1
-    SWNlIFJvZCBDYXZlOjE=: IceRod:1
-    T2xkIE1hbjox: MagicMirror:1
-    TG9zdCBXb29kcyBIaWRlb3V0OjE=: PieceOfHeart:1
-    TGFrZSBIeWxpYSBJc2xhbmQ6MQ==: PieceOfHeart:1
-    TGlicmFyeTox: BookOfMudora:1
-    TGluaydzIEhvdXNlOjE=: Lamp:1
-    TGluaydzIFVuY2xlOjE=: L1SwordAndShield:1
-    THVtYmVyamFjayBUcmVlOjE=: PieceOfHeart:1
-    TWF6ZSBSYWNlOjE=: PieceOfHeart:1
-    TWFnaWMgQmF0OjE=: HalfMagic:1
-    TWFzdGVyIFN3b3JkIFBlZGVzdGFsOjE=: MasterSword:1
-    TWltaWMgQ2F2ZTox: PieceOfHeart:1
-    TWluaSBNb2xkb3JtIENhdmUgLSBGYXIgTGVmdDox: ThreeBombs:1
-    TWluaSBNb2xkb3JtIENhdmUgLSBGYXIgUmlnaHQ6MQ==: TenArrows:1
-    TWluaSBNb2xkb3JtIENhdmUgLSBMZWZ0OjE=: TwentyRupees:1
-    TWluaSBNb2xkb3JtIENhdmUgLSBOUEM6MQ==: ThreeHundredRupees:1
-    TWluaSBNb2xkb3JtIENhdmUgLSBSaWdodDox: TwentyRupees:1
-    TWlyZSBTaGVkIC0gTGVmdDox: PieceOfHeart:1
-    TWlyZSBTaGVkIC0gUmlnaHQ6MQ==: TwentyRupees:1
-    TWlzZXJ5IE1pcmUgLSBCaWcgQ2hlc3Q6MQ==: CaneOfSomaria:1
-    TWlzZXJ5IE1pcmUgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyD6:1
-    TWlzZXJ5IE1pcmUgLSBCb3NzOjE=: BossHeartContainer:1
-    TWlzZXJ5IE1pcmUgLSBCcmlkZ2UgQ2hlc3Q6MQ==: KeyD6:1
-    TWlzZXJ5IE1pcmUgLSBDb21wYXNzIENoZXN0OjE=: CompassD6:1
-    TWlzZXJ5IE1pcmUgLSBNYWluIExvYmJ5OjE=: KeyD6:1
-    TWlzZXJ5IE1pcmUgLSBNYXAgQ2hlc3Q6MQ==: MapD6:1
-    TWlzZXJ5IE1pcmUgLSBQcml6ZTox: Crystal6:1
-    TWlzZXJ5IE1pcmUgLSBTcGlrZSBDaGVzdDox: KeyD6:1
-    TWlzZXJ5IE1pcmUgTWVkYWxsaW9uOjE=: Ether:1
-    TXVzaHJvb206MQ==: Mushroom:1
-    U2FoYXNyYWhsYSdzIEh1dCAtIE1pZGRsZTox: ThreeBombs:1
-    U2FoYXNyYWhsYSdzIEh1dCAtIExlZnQ6MQ==: FiftyRupees:1
-    U2FoYXNyYWhsYSdzIEh1dCAtIFJpZ2h0OjE=: FiftyRupees:1
-    U2FoYXNyYWhsYTox: PegasusBoots:1
-    U2FuY3R1YXJ5OjE=: HeartContainer:1
-    U2V3ZXJzIC0gRGFyayBDcm9zczox: KeyH2:1
-    U2V3ZXJzIC0gU2VjcmV0IFJvb20gLSBMZWZ0OjE=: ThreeBombs:1
-    U2V3ZXJzIC0gU2VjcmV0IFJvb20gLSBNaWRkbGU6MQ==: ThreeHundredRupees:1
-    U2V3ZXJzIC0gU2VjcmV0IFJvb20gLSBSaWdodDox: TenArrows:1
-    U2VjcmV0IFBhc3NhZ2U6MQ==: Lamp:1
-    U2ljayBLaWQ6MQ==: BugCatchingNet:1
-    U2t1bGwgV29vZHMgLSBCaWcgQ2hlc3Q6MQ==: FireRod:1
-    U2t1bGwgV29vZHMgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyD3:1
-    U2t1bGwgV29vZHMgLSBCb3NzOjE=: BossHeartContainer:1
-    U2t1bGwgV29vZHMgLSBCcmlkZ2UgUm9vbTox: KeyD3:1
-    U2t1bGwgV29vZHMgLSBDb21wYXNzIENoZXN0OjE=: CompassD3:1
-    U2t1bGwgV29vZHMgLSBNYXAgQ2hlc3Q6MQ==: MapD3:1
-    U2t1bGwgV29vZHMgLSBQaW5iYWxsIFJvb206MQ==: KeyD3:1
-    U2t1bGwgV29vZHMgLSBQb3QgUHJpc29uOjE=: KeyD3:1
-    U2t1bGwgV29vZHMgLSBQcml6ZTox: Crystal3:1
-    U3BlY3RhY2xlIFJvY2s6MQ==: PieceOfHeart:1
-    U3BlY3RhY2xlIFJvY2sgQ2F2ZTox: PieceOfHeart:1
-    U3Bpa2UgQ2F2ZTox: CaneOfByrna:1
-    U3BpcmFsIENhdmU6MQ==: FiftyRupees:1
-    U3R1bXB5OjE=: Shovel:1
-    U3Vua2VuIFRyZWFzdXJlOjE=: PieceOfHeart:1
-    U3VwZXJidW5ueSBDYXZlIC0gQm90dG9tOjE=: TwentyRupees:1
-    U3VwZXJidW5ueSBDYXZlIC0gVG9wOjE=: ThreeBombs:1
-    U3dhbXAgUGFsYWNlIC0gQ29tcGFzcyBDaGVzdDox: CompassD2:1
-    U3dhbXAgUGFsYWNlIC0gQm9zczox: BossHeartContainer:1
-    U3dhbXAgUGFsYWNlIC0gQmlnIENoZXN0OjE=: Hookshot:1
-    U3dhbXAgUGFsYWNlIC0gQmlnIEtleSBDaGVzdDox: BigKeyD2:1
-    U3dhbXAgUGFsYWNlIC0gRW50cmFuY2U6MQ==: KeyD2:1
-    U3dhbXAgUGFsYWNlIC0gRmxvb2RlZCBSb29tIC0gTGVmdDox: TwentyRupees:1
-    U3dhbXAgUGFsYWNlIC0gRmxvb2RlZCBSb29tIC0gUmlnaHQ6MQ==: TwentyRupees:1
-    U3dhbXAgUGFsYWNlIC0gTWFwIENoZXN0OjE=: MapD2:1
-    U3dhbXAgUGFsYWNlIC0gUHJpemU6MQ==: Crystal2:1
-    U3dhbXAgUGFsYWNlIC0gV2F0ZXJmYWxsIFJvb206MQ==: TwentyRupees:1
-    U3dhbXAgUGFsYWNlIC0gV2VzdCBDaGVzdDox: TwentyRupees:1
-    UG90aW9uIFNob3A6MQ==: Powder:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gQ29tcGFzcyBDaGVzdDox: CompassD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox: BossHeartContainer:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gQmlnIENoZXN0OjE=: Hammer:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gQmlnIEtleSBDaGVzdDox: BigKeyD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBCYXNlbWVudCAtIExlZnQ6MQ==: Arrow:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBCYXNlbWVudCAtIFJpZ2h0OjE=: KeyD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBNYXplIC0gQm90dG9tOjE=: KeyD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBNYXplIC0gVG9wOjE=: ThreeBombs:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gSGFybWxlc3MgSGVsbHdheTox: FiveRupees:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gTWFwIENoZXN0OjE=: MapD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gU2hvb3RlciBSb29tOjE=: KeyD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gU3RhbGZvcyBCYXNlbWVudDox: KeyD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gUHJpemU6MQ==: Crystal1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gVGhlIEFyZW5hIC0gQnJpZGdlOjE=: KeyD1:1
-    UGFsYWNlIG9mIERhcmtuZXNzIC0gVGhlIEFyZW5hIC0gTGVkZ2U6MQ==: KeyD1:1
-    UGFyYWRveCBDYXZlIExvd2VyIC0gRmFyIExlZnQ6MQ==: TwentyRupees:1
-    UGFyYWRveCBDYXZlIExvd2VyIC0gRmFyIFJpZ2h0OjE=: TwentyRupees:1
-    UGFyYWRveCBDYXZlIExvd2VyIC0gTGVmdDox: TwentyRupees:1
-    UGFyYWRveCBDYXZlIExvd2VyIC0gTWlkZGxlOjE=: TwentyRupees:1
-    UGFyYWRveCBDYXZlIExvd2VyIC0gUmlnaHQ6MQ==: TwentyRupees:1
-    UGFyYWRveCBDYXZlIFVwcGVyIC0gTGVmdDox: ThreeBombs:1
-    UGFyYWRveCBDYXZlIFVwcGVyIC0gUmlnaHQ6MQ==: TenArrows:1
-    UGVnYXN1cyBSb2Nrczox: PieceOfHeart:1
-    UHVycGxlIENoZXN0OjE=: Bottle:1
-    UHlyYW1pZCBCb3R0bGU6MQ==: BottleWithGreenPotion:1
-    UHlyYW1pZCBGYWlyeSAtIExlZnQ6MQ==: SilverArrowUpgrade:1
-    UHlyYW1pZCBGYWlyeSAtIFJpZ2h0OjE=: L4Sword:1
-    UHlyYW1pZDox: PieceOfHeart:1
-    V2F0ZXJmYWxsIEJvdHRsZTox: BottleWithGreenPotion:1
-    V2F0ZXJmYWxsIEZhaXJ5IC0gTGVmdDox: RedBoomerang:1
-    V2F0ZXJmYWxsIEZhaXJ5IC0gUmlnaHQ6MQ==: RedShield:1
-    VG93ZXIgb2YgSGVyYSAtIE1hcCBDaGVzdDox: MapP3:1
-    VG93ZXIgb2YgSGVyYSAtIEJhc2VtZW50IENhZ2U6MQ==: KeyP3:1
-    VG93ZXIgb2YgSGVyYSAtIEJpZyBDaGVzdDox: MoonPearl:1
-    VG93ZXIgb2YgSGVyYSAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyP3:1
-    VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==: BossHeartContainer:1
-    VG93ZXIgb2YgSGVyYSAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassP3:1
-    VG93ZXIgb2YgSGVyYSAtIFByaXplOjE=: PendantOfPower:1
-    VGhpZXZlcycgVG93biAtIE1hcCBDaGVzdDox: MapD4:1
-    VGhpZXZlcycgVG93biAtIEF0dGljOjE=: ThreeBombs:1
-    VGhpZXZlcycgVG93biAtIEFtYnVzaCBDaGVzdDox: TwentyRupees:1
-    VGhpZXZlcycgVG93biAtIEJpZyBDaGVzdDox: TitansMitt:1
-    VGhpZXZlcycgVG93biAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyD4:1
-    VGhpZXZlcycgVG93biAtIEJsaW5kJ3MgQ2VsbDox: KeyD4:1
-    VGhpZXZlcycgVG93biAtIEJvc3M6MQ==: BossHeartContainer:1
-    VGhpZXZlcycgVG93biAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassD4:1
-    VGhpZXZlcycgVG93biAtIFByaXplOjE=: Crystal4:1
-    VHVydGxlIFJvY2sgLSBCaWcgQ2hlc3Q6MQ==: MirrorShield:1
-    VHVydGxlIFJvY2sgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyD7:1
-    VHVydGxlIFJvY2sgLSBCb3NzOjE=: BossHeartContainer:1
-    VHVydGxlIFJvY2sgLSBDaGFpbiBDaG9tcHM6MQ==: KeyD7:1
-    VHVydGxlIFJvY2sgLSBDb21wYXNzIENoZXN0OjE=: CompassD7:1
-    VHVydGxlIFJvY2sgLSBDcnlzdGFyb2xsZXIgUm9vbTox: KeyD7:1
-    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gQm90dG9tIExlZnQ6MQ==: KeyD7:1
-    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gQm90dG9tIFJpZ2h0OjE=: TwentyRupees:1
-    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gVG9wIExlZnQ6MQ==: FiveRupees:1
-    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gVG9wIFJpZ2h0OjE=: OneRupee:1
-    VHVydGxlIFJvY2sgLSBQcml6ZTox: Crystal7:1
-    VHVydGxlIFJvY2sgLSBSb2xsZXIgUm9vbSAtIExlZnQ6MQ==: MapD7:1
-    VHVydGxlIFJvY2sgLSBSb2xsZXIgUm9vbSAtIFJpZ2h0OjE=: KeyD7:1
-    VHVydGxlIFJvY2sgTWVkYWxsaW9uOjE=: Quake:1
-    Wm9yYSdzIExlZGdlOjE=: PieceOfHeart:1
+    Q2F0ZmlzaDox: Quake:1 # Catfish:1
+    Q2F2ZSA0NTox: PieceOfHeart:1 # Cave 45:1
+    Q2FzdGxlIFRvd2VyIC0gRGFyayBNYXplOjE=: KeyA1:1 # Castle Tower - Dark Maze:1
+    Q2FzdGxlIFRvd2VyIC0gUm9vbSAwMzox: KeyA1:1 # Castle Tower - Room 03:1
+    Q2hlY2tlcmJvYXJkIENhdmU6MQ==: PieceOfHeart:1 # Checkerboard Cave:1
+    Q2hlc3QgR2FtZTox: PieceOfHeart:1 # Chest Game:1
+    Q2hpY2tlbiBIb3VzZTox: Boomerang:1 # Chicken House:1
+    QWdpbmFoJ3MgQ2F2ZTox: PieceOfHeart:1 # Aginah's Cave:1
+    Qm90dGxlIE1lcmNoYW50OjE=: Bottle:1 # Bottle Merchant:1
+    Qm9tYm9zIFRhYmxldDox: Bombos:1 # Bombos Tablet:1
+    QmxhY2tzbWl0aDox: L3Sword:1 # Blacksmith:1
+    QmxpbmQncyBIaWRlb3V0IC0gRmFyIExlZnQ6MQ==: TwentyRupees:1 # Blind's Hideout - Far Left:1
+    QmxpbmQncyBIaWRlb3V0IC0gRmFyIFJpZ2h0OjE=: TwentyRupees:1 # Blind's Hideout - Far Right:1
+    QmxpbmQncyBIaWRlb3V0IC0gTGVmdDox: TwentyRupees:1 # Blind's Hideout - Left:1
+    QmxpbmQncyBIaWRlb3V0IC0gUmlnaHQ6MQ==: TwentyRupees:1 # Blind's Hideout - Right:1
+    QmxpbmQncyBIaWRlb3V0IC0gVG9wOjE=: PieceOfHeart:1 # Blind's Hideout - Top:1
+    QnJld2VyeTox: ThreeHundredRupees:1 # Brewery:1
+    QnVtcGVyIENhdmU6MQ==: PieceOfHeart:1 # Bumper Cave:1
+    Qy1TaGFwZWQgSG91c2U6MQ==: ThreeHundredRupees:1 # C-Shaped House:1
+    R2Fub24ncyBUb3dlciAtIE1hcCBDaGVzdDox: MapA2:1 # Ganon's Tower - Map Chest:1
+    R2Fub24ncyBUb3dlciAtIE1pbmkgSGVsbWFzYXVyIFJvb20gLSBMZWZ0OjE=: ThreeBombs:1 # Ganon's Tower - Mini Helmasaur Room - Left:1
+    R2Fub24ncyBUb3dlciAtIE1pbmkgSGVsbWFzYXVyIFJvb20gLSBSaWdodDox: ThreeBombs:1 # Ganon's Tower - Mini Helmasaur Room - Right:1
+    R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ==: TwentyRupees:1 # Ganon's Tower - Moldorm Chest:1
+    R2Fub24ncyBUb3dlciAtIEJpZyBDaGVzdDox: RedMail:1 # Ganon's Tower - Big Chest:1
+    R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyA2:1 # Ganon's Tower - Big Key Chest:1
+    R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgUm9vbSAtIExlZnQ6MQ==: TenArrows:1 # Ganon's Tower - Big Key Room - Left:1
+    R2Fub24ncyBUb3dlciAtIEJpZyBLZXkgUm9vbSAtIFJpZ2h0OjE=: ThreeBombs:1 # Ganon's Tower - Big Key Room - Right:1
+    R2Fub24ncyBUb3dlciAtIEJvYidzIENoZXN0OjE=: TenArrows:1 # Ganon's Tower - Bob's Chest:1
+    R2Fub24ncyBUb3dlciAtIEJvYidzIFRvcmNoOjE=: KeyA2:1 # Ganon's Tower - Bob's Torch:1
+    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIEJvdHRvbSBMZWZ0OjE=: TwentyRupees:1 # Ganon's Tower - Compass Room - Bottom Left:1
+    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIEJvdHRvbSBSaWdodDox: TenArrows:1 # Ganon's Tower - Compass Room - Bottom Right:1
+    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIFRvcCBMZWZ0OjE=: CompassA2:1 # Ganon's Tower - Compass Room - Top Left:1
+    R2Fub24ncyBUb3dlciAtIENvbXBhc3MgUm9vbSAtIFRvcCBSaWdodDox: OneRupee:1 # Ganon's Tower - Compass Room - Top Right:1
+    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gQm90dG9tIExlZnQ6MQ==: TwentyRupees:1 # Ganon's Tower - DMs Room - Bottom Left:1
+    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gQm90dG9tIFJpZ2h0OjE=: TwentyRupees:1 # Ganon's Tower - DMs Room - Bottom Right:1
+    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gVG9wIExlZnQ6MQ==: ThreeBombs:1 # Ganon's Tower - DMs Room - Top Left:1
+    R2Fub24ncyBUb3dlciAtIERNcyBSb29tIC0gVG9wIFJpZ2h0OjE=: TenArrows:1 # Ganon's Tower - DMs Room - Top Right:1
+    R2Fub24ncyBUb3dlciAtIEZpcmVzbmFrZSBSb29tOjE=: KeyA2:1 # Ganon's Tower - Firesnake Room:1
+    R2Fub24ncyBUb3dlciAtIEhvcGUgUm9vbSAtIExlZnQ6MQ==: TenArrows:1 # Ganon's Tower - Hope Room - Left:1
+    R2Fub24ncyBUb3dlciAtIEhvcGUgUm9vbSAtIFJpZ2h0OjE=: ThreeBombs:1 # Ganon's Tower - Hope Room - Right:1
+    R2Fub24ncyBUb3dlciAtIFByZS1Nb2xkb3JtIENoZXN0OjE=: KeyA2:1 # Ganon's Tower - Pre-Moldorm Chest:1
+    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIEJvdHRvbSBMZWZ0OjE=: ThreeBombs:1 # Ganon's Tower - Randomizer Room - Bottom Left:1
+    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIEJvdHRvbSBSaWdodDox: ThreeBombs:1 # Ganon's Tower - Randomizer Room - Bottom Right:1
+    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIFRvcCBMZWZ0OjE=: TenArrows:1 # Ganon's Tower - Randomizer Room - Top Left:1
+    R2Fub24ncyBUb3dlciAtIFJhbmRvbWl6ZXIgUm9vbSAtIFRvcCBSaWdodDox: TenArrows:1 # Ganon's Tower - Randomizer Room - Top Right:1
+    R2Fub24ncyBUb3dlciAtIFRpbGUgUm9vbTox: KeyA2:1 # Ganon's Tower - Tile Room:1
+    R3JhdmV5YXJkIExlZGdlOjE=: PieceOfHeart:1 # Graveyard Ledge:1
+    RGVzZXJ0IExlZGdlOjE=: PieceOfHeart:1 # Desert Ledge:1
+    RGVzZXJ0IFBhbGFjZSAtIE1hcCBDaGVzdDox: MapP2:1 # Desert Palace - Map Chest:1
+    RGVzZXJ0IFBhbGFjZSAtIEJpZyBDaGVzdDox: PowerGlove:1 # Desert Palace - Big Chest:1
+    RGVzZXJ0IFBhbGFjZSAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyP2:1 # Desert Palace - Big Key Chest:1
+    RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==: BossHeartContainer:1 # Desert Palace - Boss:1
+    RGVzZXJ0IFBhbGFjZSAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassP2:1 # Desert Palace - Compass Chest:1
+    RGVzZXJ0IFBhbGFjZSAtIFByaXplOjE=: PendantOfWisdom:1 # Desert Palace - Prize:1
+    RGVzZXJ0IFBhbGFjZSAtIFRvcmNoOjE=: KeyP2:1 # Desert Palace - Torch:1
+    RGlnZ2luZyBHYW1lOjE=: PieceOfHeart:1 # Digging Game:1
+    RWFzdGVybiBQYWxhY2UgLSBCaWcgQ2hlc3Q6MQ==: Bow:1 # Eastern Palace - Big Chest:1
+    RWFzdGVybiBQYWxhY2UgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyP1:1 # Eastern Palace - Big Key Chest:1
+    RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=: BossHeartContainer:1 # Eastern Palace - Boss:1
+    RWFzdGVybiBQYWxhY2UgLSBDYW5ub25iYWxsIENoZXN0OjE=: OneHundredRupees:1 # Eastern Palace - Cannonball Chest:1
+    RWFzdGVybiBQYWxhY2UgLSBDb21wYXNzIENoZXN0OjE=: CompassP1:1 # Eastern Palace - Compass Chest:1
+    RWFzdGVybiBQYWxhY2UgLSBNYXAgQ2hlc3Q6MQ==: MapP1:1 # Eastern Palace - Map Chest:1
+    RWFzdGVybiBQYWxhY2UgLSBQcml6ZTox: PendantOfCourage:1 # Eastern Palace - Prize:1
+    RXRoZXIgVGFibGV0OjE=: Ether:1 # Ether Tablet:1
+    Rmx1dGUgU3BvdDox: OcarinaInactive:1 # Flute Spot:1
+    RmxvYXRpbmcgSXNsYW5kOjE=: PieceOfHeart:1 # Floating Island:1
+    Rmxvb2RnYXRlIENoZXN0OjE=: ThreeBombs:1 # Floodgate Chest:1
+    S2FrYXJpa28gV2VsbCAtIE1pZGRsZTox: TwentyRupees:1 # Kakariko Well - Middle:1
+    S2FrYXJpa28gV2VsbCAtIEJvdHRvbTox: ThreeBombs:1 # Kakariko Well - Bottom:1
+    S2FrYXJpa28gV2VsbCAtIExlZnQ6MQ==: TwentyRupees:1 # Kakariko Well - Left:1
+    S2FrYXJpa28gV2VsbCAtIFJpZ2h0OjE=: TwentyRupees:1 # Kakariko Well - Right:1
+    S2FrYXJpa28gV2VsbCAtIFRvcDox: PieceOfHeart:1 # Kakariko Well - Top:1
+    S2FrYXJpa28gVGF2ZXJuOjE=: Bottle:1 # Kakariko Tavern:1
+    S2luZyBab3JhOjE=: Flippers:1 # King Zora:1
+    S2luZydzIFRvbWI6MQ==: Cape:1 # King's Tomb:1
+    SG9ibzox: Bottle:1 # Hobo:1
+    SG9va3Nob3QgQ2F2ZSAtIEJvdHRvbSBMZWZ0OjE=: FiftyRupees:1 # Hookshot Cave - Bottom Left:1
+    SG9va3Nob3QgQ2F2ZSAtIEJvdHRvbSBSaWdodDox: FiftyRupees:1 # Hookshot Cave - Bottom Right:1
+    SG9va3Nob3QgQ2F2ZSAtIFRvcCBMZWZ0OjE=: FiftyRupees:1 # Hookshot Cave - Top Left:1
+    SG9va3Nob3QgQ2F2ZSAtIFRvcCBSaWdodDox: FiftyRupees:1 # Hookshot Cave - Top Right:1
+    SGFtbWVyIFBlZ3M6MQ==: PieceOfHeart:1 # Hammer Pegs:1
+    SHlwZSBDYXZlIC0gQm90dG9tOjE=: TwentyRupees:1 # Hype Cave - Bottom:1
+    SHlwZSBDYXZlIC0gTWlkZGxlIExlZnQ6MQ==: TwentyRupees:1 # Hype Cave - Middle Left:1
+    SHlwZSBDYXZlIC0gTWlkZGxlIFJpZ2h0OjE=: TwentyRupees:1 # Hype Cave - Middle Right:1
+    SHlwZSBDYXZlIC0gTlBDOjE=: ThreeHundredRupees:1 # Hype Cave - NPC:1
+    SHlwZSBDYXZlIC0gVG9wOjE=: TwentyRupees:1 # Hype Cave - Top:1
+    SHlydWxlIENhc3RsZSAtIE1hcCBDaGVzdDox: MapH2:1 # Hyrule Castle - Map Chest:1
+    SHlydWxlIENhc3RsZSAtIEJvb21lcmFuZyBDaGVzdDox: Boomerang:1 # Hyrule Castle - Boomerang Chest:1
+    SHlydWxlIENhc3RsZSAtIFplbGRhJ3MgQ2VsbDox: Lamp:1 # Hyrule Castle - Zelda's Cell:1
+    SWNlIFBhbGFjZSAtIE1hcCBDaGVzdDox: MapD5:1 # Ice Palace - Map Chest:1
+    SWNlIFBhbGFjZSAtIEJpZyBDaGVzdDox: BlueMail:1 # Ice Palace - Big Chest:1
+    SWNlIFBhbGFjZSAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyD5:1 # Ice Palace - Big Key Chest:1
+    SWNlIFBhbGFjZSAtIEJvc3M6MQ==: BossHeartContainer:1 # Ice Palace - Boss:1
+    SWNlIFBhbGFjZSAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassD5:1 # Ice Palace - Compass Chest:1
+    SWNlIFBhbGFjZSAtIEZyZWV6b3IgQ2hlc3Q6MQ==: ThreeBombs:1 # Ice Palace - Freezor Chest:1
+    SWNlIFBhbGFjZSAtIEljZWQgVCBSb29tOjE=: KeyD5:1 # Ice Palace - Iced T Room:1
+    SWNlIFBhbGFjZSAtIFByaXplOjE=: Crystal5:1 # Ice Palace - Prize:1
+    SWNlIFBhbGFjZSAtIFNwaWtlIFJvb206MQ==: KeyD5:1 # Ice Palace - Spike Room:1
+    SWNlIFJvZCBDYXZlOjE=: IceRod:1 # Ice Rod Cave:1
+    T2xkIE1hbjox: MagicMirror:1 # Old Man:1
+    TG9zdCBXb29kcyBIaWRlb3V0OjE=: PieceOfHeart:1 # Lost Woods Hideout:1
+    TGFrZSBIeWxpYSBJc2xhbmQ6MQ==: PieceOfHeart:1 # Lake Hylia Island:1
+    TGlicmFyeTox: BookOfMudora:1 # Library:1
+    TGluaydzIEhvdXNlOjE=: Lamp:1 # Link's House:1
+    TGluaydzIFVuY2xlOjE=: L1SwordAndShield:1 # Link's Uncle:1
+    THVtYmVyamFjayBUcmVlOjE=: PieceOfHeart:1 # Lumberjack Tree:1
+    TWF6ZSBSYWNlOjE=: PieceOfHeart:1 # Maze Race:1
+    TWFnaWMgQmF0OjE=: HalfMagic:1 # Magic Bat:1
+    TWFzdGVyIFN3b3JkIFBlZGVzdGFsOjE=: MasterSword:1 # Master Sword Pedestal:1
+    TWltaWMgQ2F2ZTox: PieceOfHeart:1 # Mimic Cave:1
+    TWluaSBNb2xkb3JtIENhdmUgLSBGYXIgTGVmdDox: ThreeBombs:1 # Mini Moldorm Cave - Far Left:1
+    TWluaSBNb2xkb3JtIENhdmUgLSBGYXIgUmlnaHQ6MQ==: TenArrows:1 # Mini Moldorm Cave - Far Right:1
+    TWluaSBNb2xkb3JtIENhdmUgLSBMZWZ0OjE=: TwentyRupees:1 # Mini Moldorm Cave - Left:1
+    TWluaSBNb2xkb3JtIENhdmUgLSBOUEM6MQ==: ThreeHundredRupees:1 # Mini Moldorm Cave - NPC:1
+    TWluaSBNb2xkb3JtIENhdmUgLSBSaWdodDox: TwentyRupees:1 # Mini Moldorm Cave - Right:1
+    TWlyZSBTaGVkIC0gTGVmdDox: PieceOfHeart:1 # Mire Shed - Left:1
+    TWlyZSBTaGVkIC0gUmlnaHQ6MQ==: TwentyRupees:1 # Mire Shed - Right:1
+    TWlzZXJ5IE1pcmUgLSBCaWcgQ2hlc3Q6MQ==: CaneOfSomaria:1 # Misery Mire - Big Chest:1
+    TWlzZXJ5IE1pcmUgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyD6:1 # Misery Mire - Big Key Chest:1
+    TWlzZXJ5IE1pcmUgLSBCb3NzOjE=: BossHeartContainer:1 # Misery Mire - Boss:1
+    TWlzZXJ5IE1pcmUgLSBCcmlkZ2UgQ2hlc3Q6MQ==: KeyD6:1 # Misery Mire - Bridge Chest:1
+    TWlzZXJ5IE1pcmUgLSBDb21wYXNzIENoZXN0OjE=: CompassD6:1 # Misery Mire - Compass Chest:1
+    TWlzZXJ5IE1pcmUgLSBNYWluIExvYmJ5OjE=: KeyD6:1 # Misery Mire - Main Lobby:1
+    TWlzZXJ5IE1pcmUgLSBNYXAgQ2hlc3Q6MQ==: MapD6:1 # Misery Mire - Map Chest:1
+    TWlzZXJ5IE1pcmUgLSBQcml6ZTox: Crystal6:1 # Misery Mire - Prize:1
+    TWlzZXJ5IE1pcmUgLSBTcGlrZSBDaGVzdDox: KeyD6:1 # Misery Mire - Spike Chest:1
+    TWlzZXJ5IE1pcmUgTWVkYWxsaW9uOjE=: Ether:1 # Misery Mire Medallion:1
+    TXVzaHJvb206MQ==: Mushroom:1 # Mushroom:1
+    U2FoYXNyYWhsYSdzIEh1dCAtIE1pZGRsZTox: ThreeBombs:1 # Sahasrahla's Hut - Middle:1
+    U2FoYXNyYWhsYSdzIEh1dCAtIExlZnQ6MQ==: FiftyRupees:1 # Sahasrahla's Hut - Left:1
+    U2FoYXNyYWhsYSdzIEh1dCAtIFJpZ2h0OjE=: FiftyRupees:1 # Sahasrahla's Hut - Right:1
+    U2FoYXNyYWhsYTox: PegasusBoots:1 # Sahasrahla:1
+    U2FuY3R1YXJ5OjE=: HeartContainer:1 # Sanctuary:1
+    U2V3ZXJzIC0gRGFyayBDcm9zczox: KeyH2:1 # Sewers - Dark Cross:1
+    U2V3ZXJzIC0gU2VjcmV0IFJvb20gLSBMZWZ0OjE=: ThreeBombs:1 # Sewers - Secret Room - Left:1
+    U2V3ZXJzIC0gU2VjcmV0IFJvb20gLSBNaWRkbGU6MQ==: ThreeHundredRupees:1 # Sewers - Secret Room - Middle:1
+    U2V3ZXJzIC0gU2VjcmV0IFJvb20gLSBSaWdodDox: TenArrows:1 # Sewers - Secret Room - Right:1
+    U2VjcmV0IFBhc3NhZ2U6MQ==: Lamp:1 # Secret Passage:1
+    U2ljayBLaWQ6MQ==: BugCatchingNet:1 # Sick Kid:1
+    U2t1bGwgV29vZHMgLSBCaWcgQ2hlc3Q6MQ==: FireRod:1 # Skull Woods - Big Chest:1
+    U2t1bGwgV29vZHMgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyD3:1 # Skull Woods - Big Key Chest:1
+    U2t1bGwgV29vZHMgLSBCb3NzOjE=: BossHeartContainer:1 # Skull Woods - Boss:1
+    U2t1bGwgV29vZHMgLSBCcmlkZ2UgUm9vbTox: KeyD3:1 # Skull Woods - Bridge Room:1
+    U2t1bGwgV29vZHMgLSBDb21wYXNzIENoZXN0OjE=: CompassD3:1 # Skull Woods - Compass Chest:1
+    U2t1bGwgV29vZHMgLSBNYXAgQ2hlc3Q6MQ==: MapD3:1 # Skull Woods - Map Chest:1
+    U2t1bGwgV29vZHMgLSBQaW5iYWxsIFJvb206MQ==: KeyD3:1 # Skull Woods - Pinball Room:1
+    U2t1bGwgV29vZHMgLSBQb3QgUHJpc29uOjE=: KeyD3:1 # Skull Woods - Pot Prison:1
+    U2t1bGwgV29vZHMgLSBQcml6ZTox: Crystal3:1 # Skull Woods - Prize:1
+    U3BlY3RhY2xlIFJvY2s6MQ==: PieceOfHeart:1 # Spectacle Rock:1
+    U3BlY3RhY2xlIFJvY2sgQ2F2ZTox: PieceOfHeart:1 # Spectacle Rock Cave:1
+    U3Bpa2UgQ2F2ZTox: CaneOfByrna:1 # Spike Cave:1
+    U3BpcmFsIENhdmU6MQ==: FiftyRupees:1 # Spiral Cave:1
+    U3R1bXB5OjE=: Shovel:1 # Stumpy:1
+    U3Vua2VuIFRyZWFzdXJlOjE=: PieceOfHeart:1 # Sunken Treasure:1
+    U3VwZXJidW5ueSBDYXZlIC0gQm90dG9tOjE=: TwentyRupees:1 # Superbunny Cave - Bottom:1
+    U3VwZXJidW5ueSBDYXZlIC0gVG9wOjE=: ThreeBombs:1 # Superbunny Cave - Top:1
+    U3dhbXAgUGFsYWNlIC0gQ29tcGFzcyBDaGVzdDox: CompassD2:1 # Swamp Palace - Compass Chest:1
+    U3dhbXAgUGFsYWNlIC0gQm9zczox: BossHeartContainer:1 # Swamp Palace - Boss:1
+    U3dhbXAgUGFsYWNlIC0gQmlnIENoZXN0OjE=: Hookshot:1 # Swamp Palace - Big Chest:1
+    U3dhbXAgUGFsYWNlIC0gQmlnIEtleSBDaGVzdDox: BigKeyD2:1 # Swamp Palace - Big Key Chest:1
+    U3dhbXAgUGFsYWNlIC0gRW50cmFuY2U6MQ==: KeyD2:1 # Swamp Palace - Entrance:1
+    U3dhbXAgUGFsYWNlIC0gRmxvb2RlZCBSb29tIC0gTGVmdDox: TwentyRupees:1 # Swamp Palace - Flooded Room - Left:1
+    U3dhbXAgUGFsYWNlIC0gRmxvb2RlZCBSb29tIC0gUmlnaHQ6MQ==: TwentyRupees:1 # Swamp Palace - Flooded Room - Right:1
+    U3dhbXAgUGFsYWNlIC0gTWFwIENoZXN0OjE=: MapD2:1 # Swamp Palace - Map Chest:1
+    U3dhbXAgUGFsYWNlIC0gUHJpemU6MQ==: Crystal2:1 # Swamp Palace - Prize:1
+    U3dhbXAgUGFsYWNlIC0gV2F0ZXJmYWxsIFJvb206MQ==: TwentyRupees:1 # Swamp Palace - Waterfall Room:1
+    U3dhbXAgUGFsYWNlIC0gV2VzdCBDaGVzdDox: TwentyRupees:1 # Swamp Palace - West Chest:1
+    UG90aW9uIFNob3A6MQ==: Powder:1 # Potion Shop:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gQ29tcGFzcyBDaGVzdDox: CompassD1:1 # Palace of Darkness - Compass Chest:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox: BossHeartContainer:1 # Palace of Darkness - Boss:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gQmlnIENoZXN0OjE=: Hammer:1 # Palace of Darkness - Big Chest:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gQmlnIEtleSBDaGVzdDox: BigKeyD1:1 # Palace of Darkness - Big Key Chest:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBCYXNlbWVudCAtIExlZnQ6MQ==: Arrow:1 # Palace of Darkness - Dark Basement - Left:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBCYXNlbWVudCAtIFJpZ2h0OjE=: KeyD1:1 # Palace of Darkness - Dark Basement - Right:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBNYXplIC0gQm90dG9tOjE=: KeyD1:1 # Palace of Darkness - Dark Maze - Bottom:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gRGFyayBNYXplIC0gVG9wOjE=: ThreeBombs:1 # Palace of Darkness - Dark Maze - Top:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gSGFybWxlc3MgSGVsbHdheTox: FiveRupees:1 # Palace of Darkness - Harmless Hellway:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gTWFwIENoZXN0OjE=: MapD1:1 # Palace of Darkness - Map Chest:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gU2hvb3RlciBSb29tOjE=: KeyD1:1 # Palace of Darkness - Shooter Room:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gU3RhbGZvcyBCYXNlbWVudDox: KeyD1:1 # Palace of Darkness - Stalfos Basement:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gUHJpemU6MQ==: Crystal1:1 # Palace of Darkness - Prize:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gVGhlIEFyZW5hIC0gQnJpZGdlOjE=: KeyD1:1 # Palace of Darkness - The Arena - Bridge:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gVGhlIEFyZW5hIC0gTGVkZ2U6MQ==: KeyD1:1 # Palace of Darkness - The Arena - Ledge:1
+    UGFyYWRveCBDYXZlIExvd2VyIC0gRmFyIExlZnQ6MQ==: TwentyRupees:1 # Paradox Cave Lower - Far Left:1
+    UGFyYWRveCBDYXZlIExvd2VyIC0gRmFyIFJpZ2h0OjE=: TwentyRupees:1 # Paradox Cave Lower - Far Right:1
+    UGFyYWRveCBDYXZlIExvd2VyIC0gTGVmdDox: TwentyRupees:1 # Paradox Cave Lower - Left:1
+    UGFyYWRveCBDYXZlIExvd2VyIC0gTWlkZGxlOjE=: TwentyRupees:1 # Paradox Cave Lower - Middle:1
+    UGFyYWRveCBDYXZlIExvd2VyIC0gUmlnaHQ6MQ==: TwentyRupees:1 # Paradox Cave Lower - Right:1
+    UGFyYWRveCBDYXZlIFVwcGVyIC0gTGVmdDox: ThreeBombs:1 # Paradox Cave Upper - Left:1
+    UGFyYWRveCBDYXZlIFVwcGVyIC0gUmlnaHQ6MQ==: TenArrows:1 # Paradox Cave Upper - Right:1
+    UGVnYXN1cyBSb2Nrczox: PieceOfHeart:1 # Pegasus Rocks:1
+    UHVycGxlIENoZXN0OjE=: Bottle:1 # Purple Chest:1
+    UHlyYW1pZCBCb3R0bGU6MQ==: BottleWithGreenPotion:1 # Pyramid Bottle:1
+    UHlyYW1pZCBGYWlyeSAtIExlZnQ6MQ==: SilverArrowUpgrade:1 # Pyramid Fairy - Left:1
+    UHlyYW1pZCBGYWlyeSAtIFJpZ2h0OjE=: L4Sword:1 # Pyramid Fairy - Right:1
+    UHlyYW1pZDox: PieceOfHeart:1 # Pyramid:1
+    V2F0ZXJmYWxsIEJvdHRsZTox: BottleWithGreenPotion:1 # Waterfall Bottle:1
+    V2F0ZXJmYWxsIEZhaXJ5IC0gTGVmdDox: RedBoomerang:1 # Waterfall Fairy - Left:1
+    V2F0ZXJmYWxsIEZhaXJ5IC0gUmlnaHQ6MQ==: RedShield:1 # Waterfall Fairy - Right:1
+    VG93ZXIgb2YgSGVyYSAtIE1hcCBDaGVzdDox: MapP3:1 # Tower of Hera - Map Chest:1
+    VG93ZXIgb2YgSGVyYSAtIEJhc2VtZW50IENhZ2U6MQ==: KeyP3:1 # Tower of Hera - Basement Cage:1
+    VG93ZXIgb2YgSGVyYSAtIEJpZyBDaGVzdDox: MoonPearl:1 # Tower of Hera - Big Chest:1
+    VG93ZXIgb2YgSGVyYSAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyP3:1 # Tower of Hera - Big Key Chest:1
+    VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==: BossHeartContainer:1 # Tower of Hera - Boss:1
+    VG93ZXIgb2YgSGVyYSAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassP3:1 # Tower of Hera - Compass Chest:1
+    VG93ZXIgb2YgSGVyYSAtIFByaXplOjE=: PendantOfPower:1 # Tower of Hera - Prize:1
+    VGhpZXZlcycgVG93biAtIE1hcCBDaGVzdDox: MapD4:1 # Thieves' Town - Map Chest:1
+    VGhpZXZlcycgVG93biAtIEF0dGljOjE=: ThreeBombs:1 # Thieves' Town - Attic:1
+    VGhpZXZlcycgVG93biAtIEFtYnVzaCBDaGVzdDox: TwentyRupees:1 # Thieves' Town - Ambush Chest:1
+    VGhpZXZlcycgVG93biAtIEJpZyBDaGVzdDox: TitansMitt:1 # Thieves' Town - Big Chest:1
+    VGhpZXZlcycgVG93biAtIEJpZyBLZXkgQ2hlc3Q6MQ==: BigKeyD4:1 # Thieves' Town - Big Key Chest:1
+    VGhpZXZlcycgVG93biAtIEJsaW5kJ3MgQ2VsbDox: KeyD4:1 # Thieves' Town - Blind's Cell:1
+    VGhpZXZlcycgVG93biAtIEJvc3M6MQ==: BossHeartContainer:1 # Thieves' Town - Boss:1
+    VGhpZXZlcycgVG93biAtIENvbXBhc3MgQ2hlc3Q6MQ==: CompassD4:1 # Thieves' Town - Compass Chest:1
+    VGhpZXZlcycgVG93biAtIFByaXplOjE=: Crystal4:1 # Thieves' Town - Prize:1
+    VHVydGxlIFJvY2sgLSBCaWcgQ2hlc3Q6MQ==: MirrorShield:1 # Turtle Rock - Big Chest:1
+    VHVydGxlIFJvY2sgLSBCaWcgS2V5IENoZXN0OjE=: BigKeyD7:1 # Turtle Rock - Big Key Chest:1
+    VHVydGxlIFJvY2sgLSBCb3NzOjE=: BossHeartContainer:1 # Turtle Rock - Boss:1
+    VHVydGxlIFJvY2sgLSBDaGFpbiBDaG9tcHM6MQ==: KeyD7:1 # Turtle Rock - Chain Chomps:1
+    VHVydGxlIFJvY2sgLSBDb21wYXNzIENoZXN0OjE=: CompassD7:1 # Turtle Rock - Compass Chest:1
+    VHVydGxlIFJvY2sgLSBDcnlzdGFyb2xsZXIgUm9vbTox: KeyD7:1 # Turtle Rock - Crystaroller Room:1
+    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gQm90dG9tIExlZnQ6MQ==: KeyD7:1 # Turtle Rock - Eye Bridge - Bottom Left:1
+    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gQm90dG9tIFJpZ2h0OjE=: TwentyRupees:1 # Turtle Rock - Eye Bridge - Bottom Right:1
+    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gVG9wIExlZnQ6MQ==: FiveRupees:1 # Turtle Rock - Eye Bridge - Top Left:1
+    VHVydGxlIFJvY2sgLSBFeWUgQnJpZGdlIC0gVG9wIFJpZ2h0OjE=: OneRupee:1 # Turtle Rock - Eye Bridge - Top Right:1
+    VHVydGxlIFJvY2sgLSBQcml6ZTox: Crystal7:1 # Turtle Rock - Prize:1
+    VHVydGxlIFJvY2sgLSBSb2xsZXIgUm9vbSAtIExlZnQ6MQ==: MapD7:1 # Turtle Rock - Roller Room - Left:1
+    VHVydGxlIFJvY2sgLSBSb2xsZXIgUm9vbSAtIFJpZ2h0OjE=: KeyD7:1 # Turtle Rock - Roller Room - Right:1
+    VHVydGxlIFJvY2sgTWVkYWxsaW9uOjE=: Quake:1 # Turtle Rock Medallion:1
+    Wm9yYSdzIExlZGdlOjE=: PieceOfHeart:1 # Zora's Ledge:1
   lang: en
   mode: standard
   name: Vanilla Settings v31

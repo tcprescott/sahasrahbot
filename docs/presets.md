@@ -15,6 +15,7 @@ title:  Presets
 | [adkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys.yaml) |All dungeon items are shuffled and all dungeons, including Castle Tower, are required.|   |
 | [adkeys_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/adkeys_boots.yaml) |All Dungeons Keysanity, but you get boots too!| *Customizer*  |
 | [ambrosia](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambrosia.yaml) |Standard with a pre-equipped sword.  Dungeon bosses have a guaranteed non-dungeon item.  Uncle spoilers your boots location.| *Customizer*  |
+| [ambroz1a](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/ambroz1a.yaml) |Get 8 triforce pieces and talk to Murahdahla!| *Customizer*  |
 | [basicdoors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/basicdoors.yaml) |Basic door shuffle, open world state.|   *Door Randomizer*|
 | [beatable](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beatable.yaml) |Open, except the randomizer only ensures it can be beaten.|   |
 | [beginner](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/beginner.yaml) |A good start for new players.|   |
@@ -65,6 +66,7 @@ title:  Presets
 | [msutest](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/msutest.yaml) |This generates a game ideal for MSU-1 pack testing.| *Customizer*  |
 | [nologic](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic.yaml) |No Logic.  Anything can be anywhere and nothing really matters.|   |
 | [nologic_keylock](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic_keylock.yaml) |No Logic Keysanity, but Big Keys are stuck on bosses and in the Moldorm 2 chest.| *Customizer*  |
+| [nologic_rods](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/nologic_rods.yaml) |No Logic with Double Rods| *Customizer*  |
 | [open](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open.yaml) |Open mode, thats pretty much it.|   |
 | [open_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_assured.yaml) |Open mode with assured sword.|   |
 | [open_fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/open_fast.yaml) |Open mode, thats pretty much it.|   |
