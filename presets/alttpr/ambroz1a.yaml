@@ -80,7 +80,7 @@ settings:
         Bombos: 1
         BookOfMudora: 1
         Boomerang: 1
-        BossHeartContainer: 12
+        BossHeartContainer: 13
         Bottle: 0
         BottleWithBee: 0
         BottleWithBluePotion: 0
@@ -89,7 +89,7 @@ settings:
         BottleWithGreenPotion: 0
         BottleWithRandom: 4
         BottleWithRedPotion: 0
-        Bow: 0
+        Bow: 1
         BowAndArrows: 0
         BowAndSilverArrows: 0
         BugCatchingNet: 1
@@ -119,7 +119,7 @@ settings:
         HalfMagic: 1
         Hammer: 1
         Heart: 0
-        HeartContainer: 1
+        HeartContainer: 0
         Hookshot: 1
         IceRod: 1
         KeyA1: 2
@@ -170,10 +170,10 @@ settings:
         Powder: 1
         PowerGlove: 0
         ProgressiveArmor: 2
-        ProgressiveBow: 2
+        ProgressiveBow: 0
         ProgressiveGlove: 2
         ProgressiveShield: 3
-        ProgressiveSword: 4
+        ProgressiveSword: 3
         Quake: 1
         QuarterMagic: 0
         RedBoomerang: 1
@@ -182,7 +182,7 @@ settings:
         RedShield: 0
         Rupoor: 0
         Shovel: 1
-        SilverArrowUpgrade: 0
+        SilverArrowUpgrade: 1
         SmallMagic: 0
         TenArrows: 12
         TenBombs: 1
@@ -204,7 +204,7 @@ settings:
     region.bossNormalLocation: false
     region.wildBigKeys: false
     region.wildCompasses: false
-    region.wildKeys: false
+    region.wildKeys: true
     region.wildMaps: false
     rom.dungeonCount: "off"
     rom.freeItemMenu: false
@@ -316,8 +316,8 @@ settings:
   lang: en
   mode: open
   name: AmbroZ1A
-  notes: ""
+  notes: "Open 8/10 Triforce Hunt. One Piece placed on each dungeon boss. Boots guaranteed on Green Pendant turn-in. Small keys are universal and shuffled in the wild. Flute is Active on pickup. 3 Swords. Rupee Bow is non-progressive. 13 Heart Containers."
   spoilers: "off"
   tournament: true
-  weapons: assured
+  weapons: randomized
   hints: "off"
