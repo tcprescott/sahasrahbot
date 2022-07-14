@@ -1,20 +1,20 @@
 customizer: true
 description: "Get 8 triforce pieces and talk to Murahdahla!"
-forced_locations:
-  - item: "TriforcePiece:1"
-    quantity: 8
-    override: True
-    locations:
-      - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ== # Desert Palace - Boss:1
-      - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE= # Eastern Palace - Boss:1
-      - SWNlIFBhbGFjZSAtIEJvc3M6MQ== # Ice Palace - Boss:1
-      - TWlzZXJ5IE1pcmUgLSBCb3NzOjE= # Misery Mire - Boss:1
-      - U2t1bGwgV29vZHMgLSBCb3NzOjE= # Skull Woods - Boss:1
-      - U3dhbXAgUGFsYWNlIC0gQm9zczox # Swamp Palace - Boss:1
-      - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox # Palace of Darkness - Boss:1
-      - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ== # Tower of Hera - Boss:1
-      - VGhpZXZlcycgVG93biAtIEJvc3M6MQ== # Thieves' Town - Boss:1
-      - VHVydGxlIFJvY2sgLSBCb3NzOjE= # Turtle Rock - Boss:1
+# forced_locations:
+#   - item: "TriforcePiece:1"
+#     quantity: 8
+#     override: True
+#     locations:
+#       - RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ== # Desert Palace - Boss:1
+#       - RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE= # Eastern Palace - Boss:1
+#       - SWNlIFBhbGFjZSAtIEJvc3M6MQ== # Ice Palace - Boss:1
+#       - TWlzZXJ5IE1pcmUgLSBCb3NzOjE= # Misery Mire - Boss:1
+#       - U2t1bGwgV29vZHMgLSBCb3NzOjE= # Skull Woods - Boss:1
+#       - U3dhbXAgUGFsYWNlIC0gQm9zczox # Swamp Palace - Boss:1
+#       - UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox # Palace of Darkness - Boss:1
+#       - VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ== # Tower of Hera - Boss:1
+#       - VGhpZXZlcycgVG93biAtIEJvc3M6MQ== # Thieves' Town - Boss:1
+#       - VHVydGxlIFJvY2sgLSBCb3NzOjE= # Turtle Rock - Boss:1
 settings:
   accessibility: items
   crystals:
@@ -80,7 +80,7 @@ settings:
         Bombos: 1
         BookOfMudora: 1
         Boomerang: 1
-        BossHeartContainer: 10
+        BossHeartContainer: 12
         Bottle: 0
         BottleWithBee: 0
         BottleWithBluePotion: 0
@@ -161,12 +161,12 @@ settings:
         MoonPearl: 1
         Mushroom: 1
         Nothing: 0
-        OcarinaActive: 0
-        OcarinaInactive: 1
+        OcarinaActive: 1
+        OcarinaInactive: 0
         OneHundredRupees: 1
         OneRupee: 2
-        PegasusBoots: 1
-        PieceOfHeart: 24
+        PegasusBoots: 0
+        PieceOfHeart: 0
         Powder: 1
         PowerGlove: 0
         ProgressiveArmor: 2
@@ -191,7 +191,7 @@ settings:
         TitansMitt: 0
         Triforce: 0
         TriforcePiece: 0
-        TwentyRupees: 28
+        TwentyRupees: 48
     item.Goal.Required: "8"
     item.require.Lamp: false
     item.value.BlueClock: ""
@@ -209,9 +209,9 @@ settings:
     rom.dungeonCount: "off"
     rom.freeItemMenu: false
     rom.freeItemText: false
-    rom.genericKeys: false
+    rom.genericKeys: true
     rom.mapOnPickup: false
-    rom.rupeeBow: false
+    rom.rupeeBow: true
     rom.timerMode: "off"
     rom.timerStart: ""
     spoil.BootsLocation: true
@@ -301,9 +301,20 @@ settings:
     functionality: normal
     pool: normal
   item_placement: advanced
-  l: {}
+  l:
+    U2FoYXNyYWhsYTox: PegasusBoots:1 # Sahasrahla:1
+    RGVzZXJ0IFBhbGFjZSAtIEJvc3M6MQ==: "TriforcePiece:1" # Desert Palace - Boss:1
+    RWFzdGVybiBQYWxhY2UgLSBCb3NzOjE=: "TriforcePiece:1" # Eastern Palace - Boss:1
+    SWNlIFBhbGFjZSAtIEJvc3M6MQ==: "TriforcePiece:1" # Ice Palace - Boss:1
+    TWlzZXJ5IE1pcmUgLSBCb3NzOjE=: "TriforcePiece:1" # Misery Mire - Boss:1
+    U2t1bGwgV29vZHMgLSBCb3NzOjE=: "TriforcePiece:1" # Skull Woods - Boss:1
+    U3dhbXAgUGFsYWNlIC0gQm9zczox: "TriforcePiece:1" # Swamp Palace - Boss:1
+    UGFsYWNlIG9mIERhcmtuZXNzIC0gQm9zczox: "TriforcePiece:1" # Palace of Darkness - Boss:1
+    VG93ZXIgb2YgSGVyYSAtIEJvc3M6MQ==: "TriforcePiece:1" # Tower of Hera - Boss:1
+    VGhpZXZlcycgVG93biAtIEJvc3M6MQ==: "TriforcePiece:1" # Thieves' Town - Boss:1
+    VHVydGxlIFJvY2sgLSBCb3NzOjE=: "TriforcePiece:1" # Turtle Rock - Boss:1
   lang: en
-  mode: retro
+  mode: open
   name: AmbroZ1A
   notes: ""
   spoilers: "off"
