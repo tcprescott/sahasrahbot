@@ -13,7 +13,7 @@ from alttprbot_racetime.bot import racetime_bots
 
 from alttprbot import models
 from alttprbot.tournament import (test, alttpr, alttprcd, alttprde, alttpres, alttprfr, alttprmini,  # pylint: disable=unused-import
-                                  alttprhmg, smwde, smz3coop, smbingo, dailies, alttprleague, sgl21)  # pylint: disable=unused-import
+                                  alttprhmg, smwde, smz3coop, smbingo, dailies, alttprleague, sgl21, boots, nologic)  # pylint: disable=unused-import
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -34,6 +34,8 @@ else:
         # 'alttprde': alttprde.ALTTPRDETournamentBrackets,
         # 'alttprmini': alttprmini.ALTTPRMiniTournament,
         'alttpr': alttpr.ALTTPR2022Race,
+        'boots': boots.ALTTPRCASBootsTournamentRace,
+        'nologic': nologic.ALTTPRNoLogicRace,
         # 'smwde': smwde.SMWDETournament,
         # 'alttprfr': alttprfr.ALTTPRFRTournament,
         # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,

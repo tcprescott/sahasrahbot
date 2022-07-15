@@ -1,8 +1,9 @@
 import os
 
 import discord
-from discord.commands import permissions, ApplicationContext, Option
+from discord.commands import permissions, ApplicationContext, Option, SlashCommandGroup
 from discord.ext import commands
+from racetime_bot import Bot
 
 from alttprbot import models
 
@@ -39,13 +40,12 @@ class Nickname(commands.Cog):
     #     else:
     #         await ctx.reply("You currently do not have any nicknames registered with this bot.  Use the command `$twitch yournick` to do that!")
 
-    racetime_admin_group = discord.commands.SlashCommandGroup(
-        "rtggadmin",
+    rtggadmin = SlashCommandGroup(
+        "rtgg",
         "Miscellaneous administrative commands for RaceTime.gg",
     )
 
-    @racetime_admin_group.command()
-    @permissions.is_owner()
+    @rtggadmin.command()
     async def blast(self, ctx: ApplicationContext, role_name: Option(str, "Choose a role to blast", required=True, autocomplete=role_name_autocomplete)):
         """
         Used by Synack to blast requests to link your RaceTime.gg account to this bot.
@@ -75,7 +75,7 @@ class Nickname(commands.Cog):
         else:
             await ctx.respond("No messages sent.")
 
-    @racetime_admin_group.command()
+    @rtggadmin.command()
     async def report(self, ctx: ApplicationContext, role_name: Option(str, "Choose a role to report", required=True, autocomplete=role_name_autocomplete)):
         """
         Used by Synack to report users who have not linked their racetime account to SahasrahBot.

@@ -15,18 +15,10 @@ from config import Config as c
 
 config.init()
 
-
-# async def determine_prefix(bot, message):
-#     if message.guild is None:
-#         return "$"
-
-#     prefix = await message.guild.config_get("CommandPrefix", "$")
-#     return prefix
-
 intents = discord.Intents.default()
 intents.members = True  # pylint: disable=assigning-non-slot
 
-discord.http.API_VERSION = 9
+# discord.http.API_VERSION = 9
 
 discordbot = commands.Bot(
     command_prefix=commands.when_mentioned_or("$"),
@@ -45,7 +37,7 @@ if os.environ.get("SENTRY_URL"):
 discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
 discordbot.load_extension("alttprbot_discord.cogs.bontamw")
 discordbot.load_extension("alttprbot_discord.cogs.daily")
-# discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
+discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
 discordbot.load_extension("alttprbot_discord.cogs.misc")
 discordbot.load_extension("alttprbot_discord.cogs.nickname")
 discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
