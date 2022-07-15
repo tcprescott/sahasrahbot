@@ -3,6 +3,11 @@ import random
 
 from .core import SahasrahBotCoreHandler
 
+PRESETS = {
+    'abns_swiss': 'J780EYa2ywOnCpVR1VGodM1jVyu!o5F',
+    'abns_bracket': 'PPcIk!s3aupL7C41f6AhZ3mi8IwACwv',
+    'abns_elite8': 'PPcIk!s3aupL9yxEvapydBFdC9X8E2A'
+}
 
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_flags(self, args, message):
@@ -20,6 +25,20 @@ class GameHandler(SahasrahBotCoreHandler):
         seed_number = random.randint(0, 9999999999999999)
         await self.send_message(f"Z1R 2022 Tournament - Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}")
         await self.set_bot_raceinfo(f"Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}")
+
+    async def ex_race(self, args, message):
+        seed_number = random.randint(0, 9999999999999999)
+        try:
+            preset = args[0]
+            flags = PRESETS[preset]
+        except KeyError:
+            await self.send_message("Invalid preset specified.")
+            return
+        except IndexError:
+            await self.send_message("No preset specified.")
+
+        await self.send_message(f"{preset} - Flags: {flags} Seed: {seed_number}")
+        await self.set_bot_raceinfo(f"Flags: {flags} Seed: {seed_number}")
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!race <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#the-legend-of-zelda-randomizer-z1r for more info.")
