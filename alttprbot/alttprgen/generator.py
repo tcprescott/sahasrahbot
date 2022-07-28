@@ -255,14 +255,14 @@ class ALTTPRMystery(SahasrahBotPresetCore):
                             mystery.settings['allow_quickswap'] = allow_quickswap
                             seed = await ALTTPRDiscord.generate(settings=mystery.settings, endpoint=endpoint)
                     except:
-                        await models.AuditGeneratedGames.create(
-                            randomizer='alttpr',
-                            settings=mystery.settings,
-                            gentype='mystery failure',
-                            genoption=self.preset,
-                            customizer=1 if mystery.customizer else 0,
-                            doors=mystery.doors
-                        )
+                        # await models.AuditGeneratedGames.create(
+                        #     randomizer='alttpr',
+                        #     settings=mystery.settings,
+                        #     gentype='mystery failure',
+                        #     genoption=self.preset,
+                        #     customizer=1 if mystery.customizer else 0,
+                        #     doors=mystery.doors
+                        # )
                         logging.exception("Failed to generate game, retrying...")
                         raise
         except RetryError as e:
