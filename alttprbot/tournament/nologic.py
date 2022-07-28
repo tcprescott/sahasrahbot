@@ -6,7 +6,7 @@ from alttprbot_discord.bot import discordbot
 
 class ALTTPRNoLogicRace(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed, self.preset_dict = await preset.get_preset('nologic_rods')
+        self.seed, self.preset_dict = await preset.get_preset('nologic_rods', allow_quickswap=True)
 
     async def configuration(self):
         guild = discordbot.get_guild(535946014037901333)

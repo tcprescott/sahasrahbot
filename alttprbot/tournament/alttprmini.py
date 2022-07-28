@@ -1,25 +1,13 @@
 from alttprbot.alttprgen.generator import ALTTPRPreset
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
+from alttprbot.alttprgen import preset
 from alttprbot_discord.bot import discordbot
-
-TITLE_MAP = {
-    'Open': 'open',
-    'Open Boots': 'openboots',
-    'Open 6/6 Fast Ganon': 'open_fast_66',
-    'Open All Dungeons': 'dungeons',
-    'Standard': 'standard',
-    'Casual Boots': 'casualboots',
-    'Ambrosia': 'ambrosia',
-    'Enemizer Assured Sword': 'enemizer_assured',
-    'Keysanity': 'keysanity',
-}
 
 
 class ALTTPRMiniTournament(ALTTPRTournamentRace):
     async def roll(self):
-        preset = TITLE_MAP[self.episode['match1']['title']]
-        self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
+        self.seed, self.preset_dict = await preset.get_preset('teto/swordless', allow_quickswap=True)
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)

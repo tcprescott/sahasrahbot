@@ -6,7 +6,7 @@ from alttprbot_discord.bot import discordbot
 
 class ALTTPRCASBootsTournamentRace(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed, self.preset_dict = await preset.get_preset('casualboots')
+        self.seed, self.preset_dict = await preset.get_preset('casualboots', allow_quickswap=True)
 
     async def configuration(self):
         guild = discordbot.get_guild(973765801528139837)

@@ -32,8 +32,8 @@ else:
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         # 'alttprde': alttprde.ALTTPRDETournamentBrackets,
-        # 'alttprmini': alttprmini.ALTTPRMiniTournament,
-        'alttpr': alttpr.ALTTPR2022Race,
+        'alttprmini': alttprmini.ALTTPRMiniTournament,
+        # 'alttpr': alttpr.ALTTPR2022Race,
         'boots': boots.ALTTPRCASBootsTournamentRace,
         'nologic': nologic.ALTTPRNoLogicRace,
         # 'smwde': smwde.SMWDETournament,
