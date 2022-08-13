@@ -147,11 +147,17 @@ title:  Presets
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casual.yaml) |Normal logic, but Sword and Morph are early.|   |
 | [casualkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casualkeys.yaml) |Keysanity.  Normal logic, but Sword and Morph are early.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/dungeons.yaml) |Normal logic, all dungeons + SM bosses.|   |
+| [fast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fast.yaml) |Normal logic, 7/7/4 crystal/boss requirements, pyramid hole open.|   |
+| [fast553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fast553.yaml) |Normal logic, 5/5/3 crystal/boss requirements, pyramid hole open.|   |
+| [fastkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeys.yaml) |Normal logic keysanity, 7/7/4 crystal/boss requirements, pyramid hole open.|   |
 | [fastkeysrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeysrandom.yaml) |Normal logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [fastrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastrandom.yaml) |Normal logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) |Hard logic, sword and morph are fully randomized.|   |
 | [hard553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard553.yaml) |Hard logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized.|   |
 | [harddungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/harddungeons.yaml) |Hard logic, all dungeons + SM bosses.|   |
+| [hardfast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfast.yaml) |Hard logic, 7/7/4 crystal/boss requirements, pyramid hole open. SGL 2022 tournament settings.|   |
+| [hardfast553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfast553.yaml) |Hard logic, 5/5/3 crystal/boss requirements, pyramid hole open.|   |
+| [hardfastkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfastkeys.yaml) |Hard logic keysanity, 7/7/4 crystal/boss requirements, pyramid hole open.|   |
 | [hardfastkeysrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfastkeysrandom.yaml) |Hard logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [hardfastrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfastrandom.yaml) |Hard logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [hardkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardkeys.yaml) |Keysanity.  Hard logic, sword and morph are fully randomized.|   |
