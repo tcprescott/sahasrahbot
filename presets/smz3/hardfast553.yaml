@@ -1,0 +1,16 @@
+randomizer: "smz3"
+goal_name: beat the games
+description: "Hard logic, 5/5/3 crystal/boss requirements, pyramid hole open."
+settings:
+    smlogic: hard
+    goal: fastganondefeatmotherbrain
+    ganonvulnerable: fivecrystals
+    opentower: fivecrystals
+    opentourian: threebosses
+    swordlocation: randomized
+    morphlocation: randomized
+    keyshuffle: none
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"

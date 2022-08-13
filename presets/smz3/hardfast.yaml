@@ -1,0 +1,16 @@
+randomizer: "smz3"
+goal_name: beat the games
+description: "Hard logic, 7/7/4 crystal/boss requirements, pyramid hole open. SGL 2022 tournament settings."
+settings:
+    smlogic: hard
+    goal: fastganondefeatmotherbrain
+    ganonvulnerable: sevencrystals
+    opentower: sevencrystals
+    opentourian: fourbosses
+    swordlocation: randomized
+    morphlocation: randomized
+    keyshuffle: none
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"
