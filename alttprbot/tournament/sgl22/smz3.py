@@ -18,7 +18,8 @@ class SMZ3(SGLRandomizerTournamentRace):
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False,
             gsheet_id=os.environ.get("SGL_RESULTS_SHEET"),
-            auto_record=True
+            auto_record=True,
+            stream_delay=10,
         )
 
     async def roll(self):
