@@ -67,7 +67,7 @@ else:
         # 'sgl21pmdsky': sgl21.PMDSkyRando,
         'sgl22smany': sgl22.SMAny,
         # 'sgl21smb3r': sgl21.SMB3R,
-        # 'sgl21smo': sgl21.SMO,
+        'sgl22smo': sgl22.SMO,
         # 'sgl21smr': sgl21.SuperMetroidRando,
         'sgl22smz3': sgl22.SMZ3,
         # 'sgl21specter': sgl21.ShovelKnight,
