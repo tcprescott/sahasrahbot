@@ -12,7 +12,7 @@ class MMX(SGLCoreTournamentRace):
             guild=guild,
             racetime_category='sgl',
             racetime_goal="Mega Man X",
-            event_slug="sgl21mmx",
+            event_slug="sgl22mmx",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
             coop=False,
