@@ -74,7 +74,7 @@ else:
         # 'sgl21ssbb': sgl21.SmashBros,
         # 'sgl21ssr': sgl21.SSR,
         # 'sgl21startropics': sgl21.StarTropics,
-        'sgl22stimespinner': sgl22.Timespinner,
+        'sgl22timespinner': sgl22.Timespinner,
         # 'sgl21twwr': sgl21.TWWR,
         # 'sgl21z1r': sgl21.Z1R,
         # 'sgl21zelda2': sgl21.Z2R,
