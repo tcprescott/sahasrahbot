@@ -4,3 +4,4 @@ from .smany import SMAny
 from .smo import SMO
 from .mmx import MMX
 from .timespinner import Timespinner
+from .z1r import Z1R
