@@ -53,7 +53,7 @@ else:
 
         # SGL
         # 'sgl21alttpr': sgl21.ALTTPRBrackets,
-        # 'sgl21aosr': sgl21.AOSR,
+        'sgl22aosr': sgl22.AOSR,
         # 'sgl21bloodstained': sgl21.Bloodstained,
         # 'sgl21ctjets': sgl21.CTJets,
         # 'sgl21deadlytowers': sgl21.DeadlyTowers,

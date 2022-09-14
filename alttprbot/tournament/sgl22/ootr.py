@@ -3,10 +3,11 @@ import os
 # from alttprbot.alttprgen.randomizer import roll_ootr
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
-from .sglcore import SGLRandomizerTournamentRace
+# from .sglcore import SGLRandomizerTournamentRace
+from .sglcore import SGLCoreTournamentRace
 
 
-class OOTR(SGLRandomizerTournamentRace):
+class OOTR(SGLCoreTournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(590331405624410116)
         return TournamentConfig(
