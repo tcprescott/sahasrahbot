@@ -10,3 +10,4 @@ from .cv2r import CV2R
 from .kdl import KDL
 from .ootr import OOTR
 from .aosr import AOSR
+from .sotn import SOTNR
