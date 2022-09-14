@@ -78,6 +78,9 @@ else:
         # 'sgl21twwr': sgl21.TWWR,
         'sgl22z1r': sgl22.Z1R,
         # 'sgl21zelda2': sgl21.Z2R,
+        'sgl22cv1': sgl22.CV1,
+        'sgl22cv2r': sgl22.CV2R,
+        'sgl22kdl': sgl22.KDL
     }
 
 
