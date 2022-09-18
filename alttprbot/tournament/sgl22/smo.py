@@ -73,8 +73,9 @@ class SMO(SGLCoreTournamentRace):
     async def on_race_start(self):
         await self.bingo.new_card(
             game_type=45,
-            variant_type=45,
+            variant_type=87,
             hide_card='off',
+            lockout_mode=2
         )
 
     async def on_room_resume(self):
