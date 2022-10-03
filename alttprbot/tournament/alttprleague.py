@@ -71,7 +71,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
 
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal=self.data.racetime_goal,
+            # goal=self.data.racetime_goal,
+            goal="Beat the game (assisted)",
             invitational=True,
             unlisted=False,
             info_user=self.race_info,
@@ -195,5 +196,5 @@ class ALTTPROpenLeague(ALTTPRLeague):
                 guild.get_role(553295025190993930),
                 guild.get_role(674109759179194398),
             ],
-            stream_delay=10
+            stream_delay=10,
         )
