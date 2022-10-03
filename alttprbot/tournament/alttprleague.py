@@ -71,8 +71,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
 
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            # goal=self.data.racetime_goal,
-            goal="Beat the game (assisted)",
+            goal="Beat the game (assisted)" if self.league_data['coop']  else "Beat the game",
             invitational=True,
             unlisted=False,
             info_user=self.race_info,
@@ -86,8 +85,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             allow_midrace_chat=True,
             allow_non_entrant_chat=False,
             chat_message_delay=0,
-            # team_race=self.tournament_game.game_number == 5,
-            team_race=True,
+            team_race=self.league_data['coop'],
         )
         return self.rtgg_handler
 
