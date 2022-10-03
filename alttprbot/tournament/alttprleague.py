@@ -85,7 +85,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             allow_midrace_chat=True,
             allow_non_entrant_chat=False,
             chat_message_delay=0,
-            team_race=self.tournament_game.game_number == 5,
+            # team_race=self.tournament_game.game_number == 5,
+            team_race=True,
         )
         return self.rtgg_handler
 
