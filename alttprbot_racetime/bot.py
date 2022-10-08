@@ -20,6 +20,10 @@ def start_racetime(loop):
 
 racetime_bots = {}
 for slug, category in RACETIME_CATEGORIES.items():
+    if not category.client_id:
+        raise ValueError("Racetime category %s has no client id" % slug)
+    if not category.client_secret:
+        raise ValueError("Racetime category %s has no client secret" % slug)
     racetime_bots[slug] = category.bot_class(
         category_slug=slug,
         client_id=category.client_id,
