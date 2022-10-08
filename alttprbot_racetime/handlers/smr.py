@@ -8,6 +8,26 @@ from .core import SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
+    async def ex_choozorace(self, args, message):
+        if await self.is_locked(message):
+            return
+
+        if len(args) != 7:
+            await self.send_message("%s %s provided, 7 required (item split, area, boss, difficulty, escape, morph, start)" % (len(args), "argument" if 1 == len(args) else "arguments"))
+            return
+
+        try:
+            seed = await smvaria.generate_choozo(self, True, args[0], args[1], args[2], args[3], args[4], args[5], args[6])
+        except Exception as e:
+            await self.send_message(str(e))
+            return
+
+        race_info = f"Super Metroid Choozo Randomizer - {seed.url} - {' '.join(args)}"
+        await self.set_bot_raceinfo(race_info)
+        await self.send_message(seed.url)
+        await self.send_message("Seed rolling complete.  See race info for details.")
+        self.seed_rolled = True
+
     async def ex_multiworld(self, args, message):
         if await self.is_locked(message):
             return
