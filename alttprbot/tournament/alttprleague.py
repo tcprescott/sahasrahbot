@@ -53,8 +53,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             event_slug="invleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(611601587139510322),
-            scheduling_needs_channel=discordbot.get_channel(878075812996337744),
-            scheduling_needs_tracker=True,
+            # scheduling_needs_channel=discordbot.get_channel(878075812996337744),
+            # scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(543596853871116288),
                 guild.get_role(543597099649073162),
@@ -185,8 +185,8 @@ class ALTTPROpenLeague(ALTTPRLeague):
             event_slug="alttprleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(611601587139510322),
-            scheduling_needs_channel=discordbot.get_channel(878076083193389096),
-            scheduling_needs_tracker=True,
+            # scheduling_needs_channel=discordbot.get_channel(878076083193389096),
+            # scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(543596853871116288),
                 guild.get_role(543597099649073162),
