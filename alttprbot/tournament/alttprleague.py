@@ -40,8 +40,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
     #     self.seed = await generator.ALTTPRPreset(self.tournament_game.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
 
-    async def update_data(self):
-        await super().update_data()
+    async def update_data(self, update_episode=True):
+        await super().update_data(update_episode=update_episode)
         await self.get_league_data()
 
     async def configuration(self):
