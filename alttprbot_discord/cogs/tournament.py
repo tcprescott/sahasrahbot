@@ -164,38 +164,41 @@ class Tournament(commands.Cog):
             else:
                 location = f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
 
-            if scheduled_event:
-                try:
-                    event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
+            try:
+                if scheduled_event:
+                    try:
+                        event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
 
-                    # check if existing event requires an update
-                    if not event.name == name or not event.description == description or not event.start_time == start_time or not event.end_time == end_time or not event.location.value == location:
-                        await event.edit(
+                        # check if existing event requires an update
+                        if not event.name == name or not event.description == description or not event.start_time == start_time or not event.end_time == end_time or not event.location.value == location:
+                            await event.edit(
+                                name=name,
+                                description=description,
+                                start_time=start_time,
+                                end_time=end_time,
+                                location=location
+                            )
+                    except discord.NotFound:
+                        event = await event_data.guild.create_scheduled_event(
                             name=name,
                             description=description,
                             start_time=start_time,
                             end_time=end_time,
                             location=location
                         )
-                except discord.NotFound:
+                        await models.ScheduledEvents.update_or_create(episode_id=episode_id, defaults={'scheduled_event_id': event.id, 'event_slug': event_slug})
+                else:
+                    # create an event
                     event = await event_data.guild.create_scheduled_event(
-                        name=name,
+                        name=name[:100],
                         description=description,
                         start_time=start_time,
                         end_time=end_time,
                         location=location
                     )
-                    await models.ScheduledEvents.update_or_create(episode_id=episode_id, defaults={'scheduled_event_id': event.id, 'event_slug': event_slug})
-            else:
-                # create an event
-                event = await event_data.guild.create_scheduled_event(
-                    name=name,
-                    description=description,
-                    start_time=start_time,
-                    end_time=end_time,
-                    location=location
-                )
-                await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id, event_slug=event_slug)
+                    await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id, event_slug=event_slug)
+            except Exception:
+                logging.exception("Unable to create guild event.")
 
     async def update_scheduling_needs(self, event_data: core.TournamentRace, episodes):
         comms_needed = []
