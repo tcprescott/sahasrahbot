@@ -62,7 +62,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
                 guild.get_role(553295025190993930),
                 guild.get_role(674109759179194398),
             ],
-            stream_delay=10
+            stream_delay=10,
+            create_scheduled_events = True,
         )
 
     async def create_race_room(self):
@@ -195,4 +196,5 @@ class ALTTPROpenLeague(ALTTPRLeague):
                 guild.get_role(674109759179194398),
             ],
             stream_delay=10,
+            create_scheduled_events = True,
         )
