@@ -7,7 +7,7 @@ import logging
 
 import aiohttp
 from alttprbot import models
-from alttprbot.alttprgen import generator
+from alttprbot.alttprgen import generator, smvaria
 from alttprbot.alttprgen.randomizer.ootr import roll_ootr
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot_discord.bot import discordbot
@@ -706,6 +706,18 @@ async def sgl22_generate_ootr():
     seed = await roll_ootr(settings=settings, version='devSGLive22_6.2.197', encrypt=True)
     logging.info("SGL22 - Generated OOTR seed %s", seed['id'])
     return redirect(f"https://ootrandomizer.com/seed/get?id={seed['id']}")
+
+@sahasrahbotapi.route("/sgl22/generate/smr/<string:game_num>")
+async def sgl22_generate_smr(game_num):
+    if game_num not in ["1", "2", "3"]:
+        return "bad input"
+
+    seed = await smvaria.generate_preset(
+        settings=f"SGLive2022_Game_{game_num}",
+        skills="Season_Races",
+        race=True
+    )
+    return redirect(seed.url)
 
 # @sahasrahbotapi.route('/presets/<str:namespace>', methods=['POST'])
 # @requires_authorization
