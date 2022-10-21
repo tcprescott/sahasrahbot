@@ -8,7 +8,7 @@ import logging
 import aiohttp
 from alttprbot import models
 from alttprbot.alttprgen import generator, smvaria
-from alttprbot.alttprgen.randomizer.ootr import roll_ootr
+from alttprbot.alttprgen.randomizer import roll_ffr, roll_ootr
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.bot import racetime_bots
@@ -717,6 +717,16 @@ async def sgl22_generate_smr(game_num):
         skills="Season_Races",
         race=True
     )
+    return redirect(seed.url)
+
+@sahasrahbotapi.route("/sgl22/generate/ffr")
+async def sgl22_generate_ffr():
+    _, seed_url = roll_ffr("https://4-6-2.finalfantasyrandomizer.com/?s=00000000&f=ePMaDqw0oGJc7M6XlzT4jyfeIq4bh2fqDnPVafb.RXEaa.l2e55h.Ffv07WTbtutjWOIrV3MTKoR.ISYQQTjPtSB42oxxHtWscLxyc0l7Ea7ptfKITpWDViEPsYTX12UsLdnxl0JI5IAKJFK6Xxr2bnOMv9-wLYskNjvq")
+    return redirect(seed_url)
+
+@sahasrahbotapi.route("/sgl22/generate/smz3")
+async def sgl22_generate_smz3():
+    seed = await generator.SMZ3Preset("normal").generate(tournament=True)
     return redirect(seed.url)
 
 # @sahasrahbotapi.route('/presets/<str:namespace>', methods=['POST'])
