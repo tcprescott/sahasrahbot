@@ -3,6 +3,7 @@ import re
 from io import BytesIO
 from urllib.parse import quote
 import datetime
+import logging
 
 import aiohttp
 from alttprbot import models
@@ -526,6 +527,7 @@ async def sgl22_dashboard():
 async def sgl22_generate_alttpr():
     preset = "sgl2022"
     seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+    logging.info("SGL22 - Generated ALTTPR seed %s", seed.url)
     return redirect(seed.url)
 
 @sahasrahbotapi.route('/sgl22/generate/ootr')
@@ -702,6 +704,7 @@ async def sgl22_generate_ootr():
         "cosmetic_file": ""
     }
     seed = await roll_ootr(settings=settings, version='devSGLive22_6.2.197', encrypt=True)
+    logging.info("SGL22 - Generated OOTR seed %s", seed['id'])
     return redirect(f"https://ootrandomizer.com/seed/get?id={seed['id']}")
 
 # @sahasrahbotapi.route('/presets/<str:namespace>', methods=['POST'])
