@@ -509,6 +509,26 @@ async def update_preset(namespace, randomizer, preset):
 
     return redirect(f"/presets/manage/{namespace}/{randomizer}/{preset}")
 
+
+@sahasrahbotapi.route('/sgl22', methods=["GET"])
+async def sgl22_dashboard():
+    try:
+        user = await discord.fetch_user()
+        logged_in = True
+    except Unauthorized:
+        user = None
+        logged_in = False
+
+    return await render_template("sgl22_dashboard.html", logged_in=logged_in, user=user)
+
+@sahasrahbotapi.route('/sgl22/generate/alttpr', methods=["GET"])
+async def sgl22_generate_alttpr():
+    preset = "sgl2022"
+    seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+    return redirect(seed.url)
+
+# @sahasrahbotapi.route('/sgl22')
+
 # @sahasrahbotapi.route('/presets/<str:namespace>', methods=['POST'])
 # @requires_authorization
 # async def update_namespace():
