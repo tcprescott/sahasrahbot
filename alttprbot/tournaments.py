@@ -53,7 +53,7 @@ else:
 
         # SGL
         # 'sgl21alttpr': sgl21.ALTTPRBrackets,
-        'sgl22aosr': sgl22.AOSR,
+        # 'sgl22aosr': sgl22.AOSR,
         # 'sgl21bloodstained': sgl21.Bloodstained,
         # 'sgl21ctjets': sgl21.CTJets,
         # 'sgl21deadlytowers': sgl21.DeadlyTowers,
@@ -61,27 +61,27 @@ else:
         # 'sgl21ffr': sgl21.FFR,
         # 'sgl21messenger': sgl21.Messenger,
         # 'sgl21minecraft2v2': sgl21.Minecraft,
-        'sgl22mmx': sgl22.MMX,
-        'sgl22ootr': sgl22.OOTR,
+        # 'sgl22mmx': sgl22.MMX,
+        # 'sgl22ootr': sgl22.OOTR,
         # 'sgl21pkmnredrando': sgl21.PokemonRedRando,
         # 'sgl21pmdsky': sgl21.PMDSkyRando,
-        'sgl22smany': sgl22.SMAny,
+        # 'sgl22smany': sgl22.SMAny,
         # 'sgl21smb3r': sgl21.SMB3R,
-        'sgl22smo': sgl22.SMO,
+        # 'sgl22smo': sgl22.SMO,
         # 'sgl21smr': sgl21.SuperMetroidRando,
-        'sgl22smz3': sgl22.SMZ3,
+        # 'sgl22smz3': sgl22.SMZ3,
         # 'sgl21specter': sgl21.ShovelKnight,
         # 'sgl21ssbb': sgl21.SmashBros,
         # 'sgl21ssr': sgl21.SSR,
         # 'sgl21startropics': sgl21.StarTropics,
-        'sgl22timespinner': sgl22.Timespinner,
+        # 'sgl22timespinner': sgl22.Timespinner,
         # 'sgl21twwr': sgl21.TWWR,
-        'sgl22z1r': sgl22.Z1R,
+        # 'sgl22z1r': sgl22.Z1R,
         # 'sgl21zelda2': sgl21.Z2R,
-        'sgl22cv1': sgl22.CV1,
-        'sgl22cv2r': sgl22.CV2R,
-        'sgl22kdl': sgl22.KDL,
-        'sgl22sotnr': sgl22.SOTNR
+        # 'sgl22cv1': sgl22.CV1,
+        # 'sgl22cv2r': sgl22.CV2R,
+        # 'sgl22kdl': sgl22.KDL,
+        # 'sgl22sotnr': sgl22.SOTNR
     }
 
 
