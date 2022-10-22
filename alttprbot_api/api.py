@@ -726,7 +726,7 @@ async def sgl22_generate_ffr():
 
 @sahasrahbotapi.route("/sgl22/generate/smz3")
 async def sgl22_generate_smz3():
-    seed = await generator.SMZ3Preset("normal").generate(tournament=True)
+    seed = await generator.SMZ3Preset("fast").generate(tournament=True)
     return redirect(seed.url)
 
 # @sahasrahbotapi.route('/presets/<str:namespace>', methods=['POST'])
