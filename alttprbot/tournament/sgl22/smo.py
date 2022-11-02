@@ -20,7 +20,7 @@ class SMO(SGLCoreTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='sgl',
-            racetime_goal="Super Mario Odyssey Triple Bingo",
+            racetime_goal="Super Mario Odyssey Bingo",
             event_slug="sgl22smo",
             audit_channel=discordbot.get_channel(772351829022474260),
             commentary_channel=discordbot.get_channel(631564559018098698),
@@ -36,8 +36,9 @@ class SMO(SGLCoreTournamentRace):
             room_name=f"{self.versus} - {self.friendly_name}"[:30],
             passphrase=''.join(random.choice(string.ascii_lowercase) for i in range(8)),
             game_type=45,
-            variant_type=45,
-            hide_card='on'
+            variant_type=87,
+            hide_card='off',
+            lockout_mode=2
         )
 
         tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug})
