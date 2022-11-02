@@ -26,6 +26,8 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
+        if args[4] == "RandomEscape":
+            await self.send_message("Don't forget to disable screen shake during escape.")
         self.seed_rolled = True
 
     async def ex_multiworld(self, args, message):
