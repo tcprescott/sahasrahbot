@@ -13,11 +13,11 @@ class DiscordServers(commands.Cog):
     discordservers = discord.commands.SlashCommandGroup(
         "discordservers",
         "Commands for updating the discord server list.",
-        permissions=[
-            permissions.CommandPermission(
-                "owner", 2, True
-            )
-        ]
+        # permissions=[
+        #     permissions.CommandPermission(
+        #         "owner", 2, True
+        #     )
+        # ]
     )
 
     category = discordservers.create_subgroup("category", "Manage catagories.")

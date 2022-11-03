@@ -10,11 +10,11 @@ class Config(commands.Cog):
     guildconfig = discord.commands.SlashCommandGroup(
         "guildconfig",
         "Miscellaneous guild configuration commands for the bot's owner.",
-        permissions=[
-            permissions.CommandPermission(
-                "owner", 2, True
-            )
-        ]
+        # permissions=[
+        #     permissions.CommandPermission(
+        #         "owner", 2, True
+        #     )
+        # ]
     )
 
     @guildconfig.command()
