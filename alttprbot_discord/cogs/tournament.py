@@ -156,6 +156,8 @@ class Tournament(commands.Cog):
                 name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
             else:
                 name = f"{tournament_race.event_slug.upper()} - {tournament_race.versus}"
+            name = name[:100]
+
             description = f"Start Time: {discord.utils.format_dt(start_time, 'f')}"
             end_time = start_time + datetime.timedelta(hours=2)
 
@@ -190,7 +192,7 @@ class Tournament(commands.Cog):
                 else:
                     # create an event
                     event = await event_data.guild.create_scheduled_event(
-                        name=name[:100],
+                        name=name,
                         description=description,
                         start_time=start_time,
                         end_time=end_time,
