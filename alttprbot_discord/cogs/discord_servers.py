@@ -1,10 +1,11 @@
 from importlib.metadata import requires
 import discord
-from discord.commands import permissions, ApplicationContext, Option
+from discord import app_commands
 from discord.ext import commands
 
 from alttprbot.database import discord_server_lists  # TODO switch to ORM
 
+# TODO: make work with discord.py 2.0
 
 class DiscordServers(commands.Cog):
     def __init__(self, bot):
