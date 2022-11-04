@@ -24,59 +24,6 @@ YES_NO_CHOICE = [
     app_commands.Choice(name="No", value="no"),
 ]
 
-async def autocomplete_sm(ctx):
-    return await generator.SMPreset().search(ctx.value)
-
-
-async def autocomplete_smz3(ctx):
-    return await generator.SMZ3Preset().search(ctx.value)
-
-
-async def autocomplete_ctjets(ctx):
-    return await generator.CTJetsPreset().search(ctx.value)
-
-
-async def autocomplete_smvaria_skills(ctx):
-    skills = ['SMRAT2021', 'Season_Races', 'Torneio_SGPT2', 'casual', 'expert', 'master', 'newbie', 'regular', 'samus', 'solution', 'veteran']
-    return sorted([a for a in skills if a.startswith(ctx.value)][:25])
-
-
-async def autocomplete_smvaria_settings(ctx):
-    settings = [
-        'Chozo_Speedrun',
-        'SGLive2021',
-        'SMRAT2021',
-        'Season_Races',
-        'Torneio_SGPT2',
-        'VARIA_Weekly',
-        'all_random',
-        'default',
-        'doors_long',
-        'doors_short',
-        'free',
-        'hardway2hell',
-        'haste',
-        'highway2hell',
-        'hud',
-        'hud_hard',
-        'hud_start',
-        'minimizer',
-        'minimizer_hardcore',
-        'minimizer_maximizer',
-        'quite_random',
-        'scavenger_hard',
-        'scavenger_random',
-        'scavenger_speedrun',
-        'scavenger_vanilla_but_not',
-        'stupid_hard',
-        'surprise',
-        'vanilla',
-        'way_of_chozo',
-        'where_am_i',
-        'where_is_morph',
-    ]
-    return sorted([a for a in settings if a.startswith(ctx.value)][:25])
-
 class AlttprGenerator(commands.GroupCog, name="alttpr"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -266,258 +213,373 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         weightsets = await generator.ALTTPRMystery().search(current)
         return [app_commands.Choice(name=weightset, value=weightset) for weightset in weightsets]
 
-class AlttprUtilsGenerator(commands.GroupCog, name="alttprutils", description="Utilities for the ALTTP Randomizer"):
+
+    @app_commands.command(description="Create a series a \"Kiss Priest\" games.  This was created by hycutype.")
+    @app_commands.describe(
+        count="The number of games you want to generate.  Default is 10.",
+    )
+    async def kisspriest(
+        self,
+        interaction: discord.Interaction,
+        count: app_commands.Range[int, 1, 10] = 10,
+    ):
+        await interaction.response.defer()
+
+        seeds = await create_priestmode(count=count, genclass=ALTTPRDiscord)
+        embed = discord.Embed(
+            title='Kiss Priest Games',
+            color=discord.Color.blurple()
+        )
+        for idx, seed in enumerate(seeds):
+            embed.add_field(
+                name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
+                value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
+                inline=False
+            )
+        await interaction.response.send_message(embed=embed)
+
+class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities for the ALTTP Randomizer"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    # @alttprutils.command()
-    # async def stats(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     sram: Option(discord.Attachment, description="A valid ALTTPR sram file.", required=True),
-    #     raw: Option(bool, description="Output raw stats?", required=False, default=False),
-    # ):
-    #     """
-    #     Outputs stats about an ALTTP Randomizer sram file
-    #     """
-    #     parsed = parse_sram(await sram.read())
-    #     if raw:
-    #         await ctx.respond(
-    #             file=discord.File(
-    #                 io.StringIO(json.dumps(parsed, indent=4)),
-    #                 filename=f"stats_{parsed['meta'].get('filename', 'alttpr').strip()}.txt"
-    #             )
-    #         )
-    #     else:
-    #         embed = discord.Embed(
-    #             title=f"ALTTPR Stats for \"{parsed['meta'].get('filename', '').strip()}\"",
-    #             description=f"Collection Rate {parsed['stats'].get('collection rate')}",
-    #             color=discord.Color.blue()
-    #         )
-    #         embed.add_field(
-    #             name="Time",
-    #             value=(
-    #                 f"Total Time: {parsed['stats'].get('total time', None)}\n"
-    #                 f"Lag Time: {parsed['stats'].get('lag time', None)}\n"
-    #                 f"Menu Time: {parsed['stats'].get('menu time', None)}\n\n"
-    #                 f"First Sword: {parsed['stats'].get('first sword', None)}\n"
-    #                 f"Flute Found: {parsed['stats'].get('flute found', None)}\n"
-    #                 f"Mirror Found: {parsed['stats'].get('mirror found', None)}\n"
-    #                 f"Boots Found: {parsed['stats'].get('boots found', None)}\n"
-    #             ),
-    #             inline=False
-    #         )
-    #         embed.add_field(
-    #             name="Important Stats",
-    #             value=(
-    #                 f"Bonks: {parsed['stats'].get('bonks', None)}\n"
-    #                 f"Deaths: {parsed['stats'].get('deaths', None)}\n"
-    #                 f"Revivals: {parsed['stats'].get('faerie revivals', None)}\n"
-    #                 f"Overworld Mirrors: {parsed['stats'].get('overworld mirrors', None)}\n"
-    #                 f"Rupees Spent: {parsed['stats'].get('rupees spent', None)}\n"
-    #                 f"Save and Quits: {parsed['stats'].get('save and quits', None)}\n"
-    #                 f"Screen Transitions: {parsed['stats'].get('screen transitions', None)}\n"
-    #                 f"Times Fluted: {parsed['stats'].get('times fluted', None)}\n"
-    #                 f"Underworld Mirrors: {parsed['stats'].get('underworld mirrors', None)}\n"
-    #             )
-    #         )
-    #         embed.add_field(
-    #             name="Misc Stats",
-    #             value=(
-    #                 f"Swordless Bosses: {parsed['stats'].get('swordless bosses', None)}\n"
-    #                 f"Fighter Sword Bosses: {parsed['stats'].get('fighter sword bosses', None)}\n"
-    #                 f"Master Sword Bosses: {parsed['stats'].get('master sword bosses', None)}\n"
-    #                 f"Tempered Sword Bosses: {parsed['stats'].get('tempered sword bosses', None)}\n"
-    #                 f"Golden Sword Bosses: {parsed['stats'].get('golden sword bosses', None)}\n\n"
-    #                 f"Heart Containers: {parsed['stats'].get('heart containers', None)}\n"
-    #                 f"Heart Containers: {parsed['stats'].get('heart pieces', None)}\n"
-    #                 f"Mail Upgrade: {parsed['stats'].get('mails', None)}\n"
-    #                 f"Bottles: {parsed['equipment'].get('bottles', None)}\n"
-    #                 f"Silver Arrows: {parsed['equipment'].get('silver arrows', None)}\n"
-    #             )
-    #         )
-    #         if not parsed.get('hash id', 'none') == 'none':
-    #             seed = await ALTTPRDiscord.retrieve(hash_id=parsed.get('hash id', 'none'))
-    #             embed.add_field(name='File Select Code', value=seed.build_file_select_code(
-    #                 emojis=ctx.bot.emojis
-    #             ), inline=False)
-    #             embed.add_field(name='Permalink', value=seed.url, inline=False)
+    @app_commands.command(description="Outputs stats about an ALTTP Randomizer sram file.")
+    @app_commands.describe(sram="A valid ALTTPR SRAM file.", raw="Output raw json instead of a pretty embed.")
+    async def stats(
+        self,
+        interaction: discord.Interaction,
+        sram: discord.Attachment,
+        raw: bool=False,
+    ):
+        """
+        Outputs stats about an ALTTP Randomizer sram file
+        """
+        parsed = parse_sram(await sram.read())
+        if raw:
+            await interaction.response.send_message(
+                file=discord.File(
+                    io.StringIO(json.dumps(parsed, indent=4)),
+                    filename=f"stats_{parsed['meta'].get('filename', 'alttpr').strip()}.txt"
+                )
+            )
+        else:
+            embed = discord.Embed(
+                title=f"ALTTPR Stats for \"{parsed['meta'].get('filename', '').strip()}\"",
+                description=f"Collection Rate {parsed['stats'].get('collection rate')}",
+                color=discord.Color.blue()
+            )
+            embed.add_field(
+                name="Time",
+                value=(
+                    f"Total Time: {parsed['stats'].get('total time', None)}\n"
+                    f"Lag Time: {parsed['stats'].get('lag time', None)}\n"
+                    f"Menu Time: {parsed['stats'].get('menu time', None)}\n\n"
+                    f"First Sword: {parsed['stats'].get('first sword', None)}\n"
+                    f"Flute Found: {parsed['stats'].get('flute found', None)}\n"
+                    f"Mirror Found: {parsed['stats'].get('mirror found', None)}\n"
+                    f"Boots Found: {parsed['stats'].get('boots found', None)}\n"
+                ),
+                inline=False
+            )
+            embed.add_field(
+                name="Important Stats",
+                value=(
+                    f"Bonks: {parsed['stats'].get('bonks', None)}\n"
+                    f"Deaths: {parsed['stats'].get('deaths', None)}\n"
+                    f"Revivals: {parsed['stats'].get('faerie revivals', None)}\n"
+                    f"Overworld Mirrors: {parsed['stats'].get('overworld mirrors', None)}\n"
+                    f"Rupees Spent: {parsed['stats'].get('rupees spent', None)}\n"
+                    f"Save and Quits: {parsed['stats'].get('save and quits', None)}\n"
+                    f"Screen Transitions: {parsed['stats'].get('screen transitions', None)}\n"
+                    f"Times Fluted: {parsed['stats'].get('times fluted', None)}\n"
+                    f"Underworld Mirrors: {parsed['stats'].get('underworld mirrors', None)}\n"
+                )
+            )
+            embed.add_field(
+                name="Misc Stats",
+                value=(
+                    f"Swordless Bosses: {parsed['stats'].get('swordless bosses', None)}\n"
+                    f"Fighter Sword Bosses: {parsed['stats'].get('fighter sword bosses', None)}\n"
+                    f"Master Sword Bosses: {parsed['stats'].get('master sword bosses', None)}\n"
+                    f"Tempered Sword Bosses: {parsed['stats'].get('tempered sword bosses', None)}\n"
+                    f"Golden Sword Bosses: {parsed['stats'].get('golden sword bosses', None)}\n\n"
+                    f"Heart Containers: {parsed['stats'].get('heart containers', None)}\n"
+                    f"Heart Containers: {parsed['stats'].get('heart pieces', None)}\n"
+                    f"Mail Upgrade: {parsed['stats'].get('mails', None)}\n"
+                    f"Bottles: {parsed['equipment'].get('bottles', None)}\n"
+                    f"Silver Arrows: {parsed['equipment'].get('silver arrows', None)}\n"
+                )
+            )
+            if not parsed.get('hash id', 'none') == 'none':
+                seed = await ALTTPRDiscord.retrieve(hash_id=parsed.get('hash id', 'none'))
+                embed.add_field(name='File Select Code', value=seed.build_file_select_code(
+                    emojis=self.bot.emojis
+                ), inline=False)
+                embed.add_field(name='Permalink', value=seed.url, inline=False)
 
-    #         await ctx.respond(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    # @alttprutils.command()
-    # async def convertcustomizer(self, interaction: discord.Interaction,, customizer_json: Option(discord.Attachment, description="A valid customizer save file.", required=True)):
-    #     """
-    #     Convert a customizer save file to a SahasrahBot preset file.
-    #     """
-    #     content = await customizer_json.read()
-    #     customizer_save = json.loads(content)
-    #     settings = pyz3r.customizer.convert2settings(customizer_save)
-    #     preset_dict = {
-    #         'customizer': True,
-    #         'randomizer': 'alttpr',
-    #         'settings': settings
-    #     }
-    #     await ctx.respond(
-    #         file=discord.File(
-    #             io.StringIO(yaml.dump(preset_dict)),
-    #             filename="output.yaml"
-    #         ),
-    #         ephemeral=True
-    #     )
+    @app_commands.command(description="Convert a customizer save file to a SahasrahBot preset file.")
+    @app_commands.describe(customizer_json="A valid ALTTPR Customizer save file.")
+    async def convertcustomizer(self, interaction: discord.Interaction, customizer_json: discord.Attachment):
+        """
+        Convert a customizer save file to a SahasrahBot preset file.
+        """
+        content = await customizer_json.read()
+        customizer_save = json.loads(content)
+        settings = pyz3r.customizer.convert2settings(customizer_save)
+        preset_dict = {
+            'customizer': True,
+            'randomizer': 'alttpr',
+            'settings': settings
+        }
+        await interaction.response.send_message(
+            file=discord.File(
+                io.StringIO(yaml.dump(preset_dict)),
+                filename="output.yaml"
+            ),
+            ephemeral=True
+        )
 
-    # @alttprutils.command()
-    # async def savepreset(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     preset_name: Option(str, description="The name of the preset.", required=True),
-    #     preset_file: Option(discord.Attachment, description="A valid preset file.", required=True)
-    # ):
-    #     """
-    #     Save a preset to your namespace.
-    #     """
-    #     namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
+    @app_commands.command(description="Save a preset to your namespace.")
+    @app_commands.describe(
+        preset_name="The name of the preset to save.",
+        preset_file="A valid SahasrahBot preset file."
+    )
+    async def savepreset(
+        self,
+        interaction: discord.Interaction,
+        preset_name: str,
+        preset_file: discord.Attachment
+    ):
+        """
+        Save a preset to your namespace.
+        """
+        namespace = await generator.create_or_retrieve_namespace(interaction.user.id, interaction.user.name)
 
-    #     content = await preset_file.read()
-    #     data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/{preset_name}")
-    #     await data.save()
+        content = await preset_file.read()
+        data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/{preset_name}")
+        await data.save()
 
-    #     await ctx.respond(f"Preset saved as {data.namespace}/{data.preset}", ephemeral=True)
+        await interaction.response.send_message(f"Preset saved as {data.namespace}/{data.preset}", ephemeral=True)
 
-    # @alttprutils.command()
-    # async def verifygame(self, interaction: discord.Interaction, hash_id: Option(str, description="The hash id of the game you want to verify.", required=True)):
-    #     """
-    #     Verify a game was generated by SahasrahBot.
-    #     """
-    #     result = await models.AuditGeneratedGames.get_or_none(hash_id=hash_id)
-    #     if not result:
-    #         await ctx.reply("That game was not generated by SahasrahBot.")
-    #         return
+    @app_commands.command(description="Verify a game was generated by SahasrahBot.")
+    @app_commands.describe(
+        hash_id="The hash ID of the game to verify."
+    )
+    async def verifygame(
+        self, interaction: discord.Interaction,
+        hash_id: str
+    ):
+        """
+        Verify a game was generated by SahasrahBot.
+        """
+        result = await models.AuditGeneratedGames.get_or_none(hash_id=hash_id)
+        if not result:
+            await interaction.response.send_message("That game was not generated by SahasrahBot.")
+            return
 
-    #     await ctx.respond((
-    #         f"{hash_id} was generated by SahasrahBot.\n\n"
-    #         f"**Randomizer:** {result.randomizer}\n"
-    #         f"**Game Type:** {result.gentype}\n"
-    #         f"**Game Option:** {result.genoption}\n\n"
-    #         f"**Permalink:** <{result.permalink}>"
-    #     ), ephemeral=True)
+        await interaction.response.send_message((
+            f"{hash_id} was generated by SahasrahBot.\n\n"
+            f"**Randomizer:** {result.randomizer}\n"
+            f"**Game Type:** {result.gentype}\n"
+            f"**Game Option:** {result.genoption}\n\n"
+            f"**Permalink:** <{result.permalink}>"
+        ), ephemeral=True)
 
-    # @alttpr.command()
-    # async def kisspriest(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     count: Option(int, description="Number of seeds to generate.  Default is 10.", required=False, default=10, min_value=1, max_value=10)
-    # ):
-    #     """
-    #     Create a series a \"Kiss Priest\" games.  This was created by hycutype.
-    #     """
-    #     await interaction.response.defer()
+class Generator(commands.Cog):
+    def __init__(self, bot: commands.Bot) -> None:
+        self.bot = bot
 
-    #     seeds = await create_priestmode(count=count, genclass=ALTTPRDiscord)
-    #     embed = discord.Embed(
-    #         title='Kiss Priest Games',
-    #         color=discord.Color.blurple()
-    #     )
-    #     for idx, seed in enumerate(seeds):
-    #         embed.add_field(
-    #             name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
-    #             value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
-    #             inline=False
-    #         )
-    #     await ctx.respond(embed=embed)
+    @app_commands.command(description="Generates an Super Metroid Randomizer game on https://sm.samus.link")
+    @app_commands.describe(
+        preset="The preset you want generate.",
+        race="Is this a race? (default no)"
+    )
+    @app_commands.choices(race=YES_NO_CHOICE)
+    async def sm(
+        self,
+        interaction: discord.Interaction,
+        preset: str,
+        race: str = "no",
+    ):
+        """
+        Generates an Super Metroid Randomizer game on https://sm.samus.link
+        """
+        await interaction.response.defer()
+        seed = await generator.SMPreset(preset).generate(tournament=race == "yes")
+        embed = await seed.embed()
+        await interaction.followup.send(embed=embed)
 
-    # @commands.slash_command()
-    # async def sm(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_sm),
-    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
-    # ):
-    #     """
-    #     Generates an Super Metroid Randomizer game on https://sm.samus.link
-    #     """
-    #     await interaction.response.defer()
-    #     seed = await generator.SMPreset(preset).generate(tournament=race == "yes")
-    #     embed = await seed.embed()
-    #     await ctx.respond(embed=embed)
+    @sm.autocomplete("preset")
+    async def sm_autocomplete(self, interaction: discord.Interaction, current: str):
+        presets = await generator.SMPreset().search(current)
+        return [app_commands.Choice(name=preset, value=preset) for preset in presets]
 
-    # @commands.slash_command()
-    # async def smz3(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     preset: Option(str, description="The preset you want generate.", required=True, autocomplete=autocomplete_smz3),
-    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
-    # ):
-    #     """
-    #     Generates an ALTTP Super Metroid Combo Randomizer game on https://samus.link
-    #     """
-    #     await interaction.response.defer()
-    #     seed = await generator.SMZ3Preset(preset).generate(tournament=race == "yes")
-    #     embed = await seed.embed()
-    #     await ctx.respond(embed=embed)
+    @app_commands.command()
+    @app_commands.describe(
+        preset="The preset you want generate.",
+        race="Is this a race? (default no)"
+    )
+    @app_commands.choices(race=YES_NO_CHOICE)
+    async def smz3(
+        self,
+        interaction: discord.Interaction,
+        preset: str,
+        race: str = "no",
+    ):
+        """
+        Generates an ALTTP Super Metroid Combo Randomizer game on https://samus.link
+        """
+        await interaction.response.defer()
+        seed = await generator.SMZ3Preset(preset).generate(tournament=race == "yes")
+        embed = await seed.embed()
+        await interaction.followup.send(embed=embed)
 
-    # @commands.slash_command()
-    # async def smvaria(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     settings: Option(str, description="The settings preset you want generate.", required=True, autocomplete=autocomplete_smvaria_settings),
-    #     skills: Option(str, description="The skills preset you want to use.", required=True, autocomplete=autocomplete_smvaria_skills),
-    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
-    # ):
-    #     """
-    #     Generates an Super Metroid Varia Randomizer game on https://varia.run
-    #     """
-    #     await interaction.response.defer()
-    #     seed = await smvaria.generate_preset(
-    #         settings=settings,
-    #         skills=skills,
-    #         race=race == "yes"
-    #     )
-    #     await ctx.respond(embed=seed.embed())
+    @smz3.autocomplete("preset")
+    async def smz3_autocomplete(self, interaction: discord.Interaction, current: str):
+        presets = await generator.SMZ3Preset().search(current)
+        return [app_commands.Choice(name=preset, value=preset) for preset in presets]
 
-    # @commands.slash_command()
-    # async def smdash(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     mode: Option(str, description="The mode you want to generate.", choices=['mm', 'full', 'sgl20', 'vanilla'], required=True),
-    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no")
-    # ):
-    #     """
-    #     Generates an Super Metroid Varia Randomizer game on https://varia.run
-    #     """
-    #     await interaction.response.defer()
-    #     url = await smdash.create_smdash(mode=mode, encrypt=race == "yes")
-    #     await ctx.respond(url)
+    @app_commands.command()
+    @app_commands.describe(
+        settings="The settings preset you want generate.",
+        skills="The skills you want to use.",
+        race="Is this a race? (default no)"
+    )
+    @app_commands.choices(race=YES_NO_CHOICE)
+    async def smvaria(
+        self,
+        interaction: discord.Interaction,
+        settings: str,
+        skills: str,
+        race: str = "no",
+    ):
+        """
+        Generates an Super Metroid Varia Randomizer game on https://varia.run
+        """
+        await interaction.response.defer()
+        seed = await smvaria.generate_preset(
+            settings=settings,
+            skills=skills,
+            race=race == "yes"
+        )
+        await interaction.followup.send(embed=seed.embed())
 
-    # @ commands.slash_command()
-    # async def ctjets(self, interaction: discord.Interaction, preset: Option(str, description="The preset you want to generate.", required=True, autocomplete=autocomplete_ctjets)):
-    #     """
-    #     Generates a Chrono Trigger: Jets of Time randomizer game on http://ctjot.com
-    #     """
-    #     await interaction.response.defer()
-    #     seed_uri = await generator.CTJetsPreset(preset).generate()
-    #     await ctx.respond(seed_uri)
+    @smvaria.autocomplete("skills")
+    async def autocomplete_smvaria_skills(self, interaction: discord.Interaction, current: str):
+        skills = ['SMRAT2021', 'Season_Races', 'Torneio_SGPT2', 'casual', 'expert', 'master', 'newbie', 'regular', 'samus', 'solution', 'veteran']
+        return sorted([a for a in skills if a.startswith(current)][:25])
 
-    # z2r_group = discord.commands.SlashCommandGroup("z2r", "Generate a seed for Zelda 2 Randomizer")
+    @smvaria.autocomplete("settings")
+    async def autocomplete_smvaria_settings(self, interaction: discord.Interaction, current: str):
+        settings = [
+            'Chozo_Speedrun',
+            'SGLive2021',
+            'SMRAT2021',
+            'Season_Races',
+            'Torneio_SGPT2',
+            'VARIA_Weekly',
+            'all_random',
+            'default',
+            'doors_long',
+            'doors_short',
+            'free',
+            'hardway2hell',
+            'haste',
+            'highway2hell',
+            'hud',
+            'hud_hard',
+            'hud_start',
+            'minimizer',
+            'minimizer_hardcore',
+            'minimizer_maximizer',
+            'quite_random',
+            'scavenger_hard',
+            'scavenger_random',
+            'scavenger_speedrun',
+            'scavenger_vanilla_but_not',
+            'stupid_hard',
+            'surprise',
+            'vanilla',
+            'way_of_chozo',
+            'where_am_i',
+            'where_is_morph',
+        ]
+        return sorted([a for a in settings if a.startswith(current)][:25])
 
-    # @z2r_group.command(name="preset")
-    # async def z2r_preset(
-    #     self, interaction: discord.Interaction,
-    #     preset: Option(str, description="The preset you wish to generate.", required=True, choices=z2r.Z2R_PRESETS.keys()),
-    # ):
-    #     """
-    #     Generate a Zelda 2 Randomizer game using the specified preset.
-    #     """
-    #     seed, flags = z2r.preset(preset)
-    #     await ctx.respond(f"**Seed**: {seed}\n**Flags:** {flags}")
+    @app_commands.command()
+    @app_commands.describe(
+        mode="The mode you want to generate.",
+        race="Is this a race? (default no)"
+    )
+    @app_commands.choices(race=YES_NO_CHOICE, mode=[
+        app_commands.Choice(name="Major/Minor Split", value="mm"),
+        app_commands.Choice(name="Full", value="full"),
+        app_commands.Choice(name="SpeedGaming Live 2020", value="sgl20"),
+        app_commands.Choice(name="Vanilla", value="vanilla"),
+    ])
+    async def smdash(
+        self,
+        interaction: discord.Interaction,
+        mode: str,
+        race: str = "no",
+    ):
+        """
+        Generates an Super Metroid Varia Randomizer game on https://varia.run
+        """
+        await interaction.response.defer()
+        url = await smdash.create_smdash(mode=mode, encrypt=race == "yes")
+        await interaction.followup.send(url)
 
-    # @z2r_group.command(name="mrb")
-    # async def z2r_mrb(self, interaction: discord.Interaction):
-    #     """
-    #     Generate a seed using a random flag from the 11 in MRB's pool.
-    #     """
-    #     seed, flags, description = z2r.mrb()
-    #     await ctx.respond(f"**Seed**: {seed}\n**Flags:** {flags}\n**Description**: {description}")
+    @app_commands.command()
+    @app_commands.describe(
+        preset="The preset you want to generate."
+    )
+    async def ctjets(
+        self,
+        interaction: discord.Interaction,
+        preset: str
+    ):
+        """
+        Generates a Chrono Trigger: Jets of Time randomizer game on http://ctjot.com
+        """
+        await interaction.response.defer()
+        seed_uri = await generator.CTJetsPreset(preset).generate()
+        await interaction.followup.send(seed_uri)
+
+
+    @smz3.autocomplete("preset")
+    async def ctjets_autocomplete(self, interaction: discord.Interaction, current: str):
+        presets = await generator.CTJetsPreset().search(current)
+        return [app_commands.Choice(name=preset, value=preset) for preset in presets]
+
+class Z2RGenerator(commands.GroupCog, name="z2r", description="Generate a seed for Zelda 2 Randomizer"):
+    def __init__(self, bot: commands.Bot) -> None:
+        self.bot = bot
+
+    @app_commands.command()
+    @app_commands.describe(
+        preset="The preset you want to generate."
+    )
+    @app_commands.choices(preset=[app_commands.Choice(name=preset, value=preset) for preset in z2r.Z2R_PRESETS.keys()])
+    async def preset(
+        self,
+        interaction: discord.Interaction,
+        preset: str,
+    ):
+        """
+        Generate a Zelda 2 Randomizer game using the specified preset.
+        """
+        seed, flags = z2r.preset(preset)
+        await interaction.response.send_message(f"**Seed**: {seed}\n**Flags:** {flags}")
+
+    @app_commands.command()
+    async def mrb(self, interaction: discord.Interaction):
+        """
+        Generate a seed using a random flag from the 11 in MRB's pool.
+        """
+        seed, flags, description = z2r.mrb()
+        await interaction.response.send_message(f"**Seed**: {seed}\n**Flags:** {flags}\n**Description**: {description}")
 
 
 def get_embed_field(name: str, embed: discord.Embed) -> str:
@@ -529,3 +591,6 @@ def get_embed_field(name: str, embed: discord.Embed) -> str:
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(AlttprGenerator(bot))
+    await bot.add_cog(AlttprUtils(bot))
+    await bot.add_cog(Generator(bot))
+    await bot.add_cog(Z2RGenerator(bot))
