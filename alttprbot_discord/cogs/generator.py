@@ -119,10 +119,10 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
     ):
         await interaction.response.defer()
         seed = await generator.ALTTPRPreset(preset).generate(
-            hints=hints == "yes",
-            spoilers="off" if race == "yes" else "on",
-            tournament=race == "yes",
-            allow_quickswap=allow_quickswap == "yes"
+            hints=hints.value == "yes",
+            spoilers="off" if race.value == "yes" else "on",
+            tournament=race.value == "yes",
+            allow_quickswap=allow_quickswap.value == "yes"
         )
         if not seed:
             raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
