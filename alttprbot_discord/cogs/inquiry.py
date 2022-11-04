@@ -81,7 +81,7 @@ class Inquiry(commands.Cog):
     @commands.slash_command()
     async def inquiry(
         self,
-        ctx: ApplicationContext,
+        interaction: discord.Interaction,
         role: Option(discord.Role, "Role that has the members that should join the thread", required=True)
     ):
         """

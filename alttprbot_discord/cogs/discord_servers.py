@@ -23,7 +23,7 @@ class DiscordServers(commands.Cog):
     category = discordservers.create_subgroup("category", "Manage catagories.")
 
     @category.command(name='add')
-    async def category_add(self, ctx: ApplicationContext, channel: Option(discord.TextChannel, required=True), category_title: Option(str), category_description: Option(str, default=None), order=Option(int, default=0)):
+    async def category_add(self, interaction: discord.Interaction, channel: Option(discord.TextChannel, required=True), category_title: Option(str), category_description: Option(str, default=None), order=Option(int, default=0)):
         """
         Add a category to the discord server list.
         """
@@ -31,7 +31,7 @@ class DiscordServers(commands.Cog):
         await ctx.respond(f"Added category {category_title} to {channel.mention}", ephemeral=True)
 
     @category.command(name='list')
-    async def category_list(self, ctx: ApplicationContext):
+    async def category_list(self, interaction: discord.Interaction):
         """
         List all categories in the server.
         """
@@ -51,12 +51,12 @@ class DiscordServers(commands.Cog):
             await ctx.respond(embed=embed)
 
     @category.command(name='remove')
-    async def category_remove(self, ctx: ApplicationContext, category_id: Option(int, required=True)):
+    async def category_remove(self, interaction: discord.Interaction, category_id: Option(int, required=True)):
         await discord_server_lists.remove_category(ctx.guild.id, category_id)
         await ctx.respond(f"Removed category {category_id}", ephemeral=True)
 
     @category.command(name='update')
-    async def category_update(self, ctx: ApplicationContext, category_id: Option(int, required=True), category_title: Option(str), category_description: Option(str, default=None), order=Option(int, default=0)):
+    async def category_update(self, interaction: discord.Interaction, category_id: Option(int, required=True), category_title: Option(str), category_description: Option(str, default=None), order=Option(int, default=0)):
         """
         Update a category.
         """
@@ -74,7 +74,7 @@ class DiscordServers(commands.Cog):
         await ctx.respond(f"Added server {invite.guild.name} to category {category_id}", ephemeral=True)
 
     @server.command(name='list')
-    async def server_list(self, ctx: ApplicationContext, category_id: int):
+    async def server_list(self, interaction: discord.Interaction, category_id: int):
         """
         List all servers in a category.
         """
@@ -114,7 +114,7 @@ class DiscordServers(commands.Cog):
         """
         Refresh the discord server list.
         """
-        await ctx.defer()
+        await interaction.response.defer()
 
         def is_me(m):
             return m.author == self.bot.user

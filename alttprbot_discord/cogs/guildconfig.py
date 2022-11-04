@@ -18,7 +18,7 @@ class Config(commands.Cog):
     )
 
     @guildconfig.command()
-    async def set(self, ctx: ApplicationContext, parameter: Option(str), value: Option(str)):
+    async def set(self, interaction: discord.Interaction, parameter: Option(str), value: Option(str)):
         """
         Set a guild configuration parameter.
         """
@@ -26,14 +26,14 @@ class Config(commands.Cog):
         await ctx.respond(f"Set {parameter} to {value}", ephemeral=True)
 
     @guildconfig.command()
-    async def get(self, ctx: ApplicationContext):
+    async def get(self, interaction: discord.Interaction):
         """
         Get a guild configuration parameter.
         """
         await ctx.respond(ctx.guild.config.dump(), ephemeral=True)
 
     @guildconfig.command()
-    async def delete(self, ctx: ApplicationContext, parameter: Option(str)):
+    async def delete(self, interaction: discord.Interaction, parameter: Option(str)):
         """
         Delete a guild configuration parameter.
         """
@@ -41,7 +41,7 @@ class Config(commands.Cog):
         await ctx.respond(f"Deleted {parameter}", ephemeral=True)
 
     # @guildconfig.command()
-    # async def reloadall(self, ctx: ApplicationContext):
+    # async def reloadall(self, interaction: discord.Interaction):
     #     for guild in self.bot.guilds():
     #         guild.config = GuildConfig(guild.id)
     #     await ctx.respond("Reloaded all guild configs", ephemeral=True)

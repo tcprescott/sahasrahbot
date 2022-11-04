@@ -332,11 +332,11 @@ class Tournament(commands.Cog):
         name='alttpr2022',
         guild_ids=MAIN_TOURNAMENT_SERVERS,
     )
-    async def alttpr2022(self, ctx, player1: discord.Member, player2: discord.Member):
+    async def alttpr2022(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member):
         """
         Generate a randomizer seed for the ALTTPR Main Tournament 2022.
         """
-        await ctx.defer()
+        await interaction.response.defer()
         seed, preset, deck = await alttpr.roll_seed([player1, player2])
 
         embed = await seed.embed(emojis=self.bot.emojis)
@@ -350,7 +350,7 @@ class Tournament(commands.Cog):
         name='cc2022',
         guild_ids=CC_TOURNAMENT_SERVERS,
     )
-    async def challenge_cup(self, ctx: discord.ApplicationContext, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
+    async def challenge_cup(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
         """
         Generate a randomizer seed for the 2022 challenge cup.
         """
@@ -380,7 +380,7 @@ class Tournament(commands.Cog):
         if player4:
             players.append(player4)
 
-        await ctx.defer()
+        await interaction.response.defer()
         embed = await self.generate_deck_seed(players, "cc2022")
 
         for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
@@ -396,7 +396,7 @@ class Tournament(commands.Cog):
         name='alttpr2022multi',
         guild_ids=MAIN_TOURNAMENT_SERVERS,
     )
-    async def alttpr2022multi(self, ctx: discord.ApplicationContext, player1: discord.Member, player2: discord.Member, player3: discord.Member = None, player4: discord.Member = None):
+    async def alttpr2022multi(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member, player3: discord.Member = None, player4: discord.Member = None):
         """
         Generate a randomizer seed for the 2022 challenge cup.
         """
@@ -411,7 +411,7 @@ class Tournament(commands.Cog):
         if player4:
             players.append(player4)
 
-        await ctx.defer()
+        await interaction.response.defer()
         embed = await self.generate_deck_seed(players, "alttpr2022")
 
         for player in players:
