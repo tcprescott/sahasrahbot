@@ -49,5 +49,5 @@ class VoiceRole(commands.Cog):
     #     await ctx.respond(f"Deleted voice role mapping for {role_id}", ephemeral=True)
 
 
-def setup(bot):
-    bot.add_cog(VoiceRole(bot))
+async def setup(bot):
+    await bot.add_cog(VoiceRole(bot))

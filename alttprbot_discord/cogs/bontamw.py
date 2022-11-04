@@ -119,5 +119,5 @@ def make_embed(multiworld):
     return embed
 
 
-def setup(bot):
-    bot.add_cog(BontaMultiworld(bot))
+async def setup(bot):
+    await bot.add_cog(BontaMultiworld(bot))

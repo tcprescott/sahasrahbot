@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 import os
 import logging
@@ -34,32 +35,35 @@ discordbot = commands.Bot(
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
-discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
-discordbot.load_extension("alttprbot_discord.cogs.bontamw")
-discordbot.load_extension("alttprbot_discord.cogs.daily")
-# discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
-discordbot.load_extension("alttprbot_discord.cogs.misc")
-discordbot.load_extension("alttprbot_discord.cogs.nickname")
-discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
-discordbot.load_extension("alttprbot_discord.cogs.role")
-discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
-discordbot.load_extension("alttprbot_discord.cogs.sgl")
-discordbot.load_extension("alttprbot_discord.cogs.tournament")
-discordbot.load_extension("alttprbot_discord.cogs.voicerole")
-discordbot.load_extension("alttprbot_discord.cogs.multiworld")
-discordbot.load_extension("alttprbot_discord.cogs.generator")
-discordbot.load_extension("alttprbot_discord.cogs.inquiry")
+async def load_extensions():
+    await discordbot.load_extension("alttprbot_discord.cogs.alttprgen")
+    await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
+    await discordbot.load_extension("alttprbot_discord.cogs.daily")
+    # await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
+    await discordbot.load_extension("alttprbot_discord.cogs.misc")
+    await discordbot.load_extension("alttprbot_discord.cogs.nickname")
+    await discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
+    await discordbot.load_extension("alttprbot_discord.cogs.role")
+    await discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
+    await discordbot.load_extension("alttprbot_discord.cogs.sgl")
+    await discordbot.load_extension("alttprbot_discord.cogs.tournament")
+    await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
+    await discordbot.load_extension("alttprbot_discord.cogs.multiworld")
+    await discordbot.load_extension("alttprbot_discord.cogs.generator")
+    await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
 
-if c.DEBUG:
-    discordbot.load_extension("alttprbot_discord.cogs.test")
+    if c.DEBUG:
+        await discordbot.load_extension("alttprbot_discord.cogs.test")
 
 
-if importlib.util.find_spec('jishaku'):
-    discordbot.load_extension('jishaku')
+    if importlib.util.find_spec('jishaku'):
+        await discordbot.load_extension('jishaku')
 
-if importlib.util.find_spec('sahasrahbot_private'):
-    discordbot.load_extension('sahasrahbot_private.stupid_memes')
+    if importlib.util.find_spec('sahasrahbot_private'):
+        await discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
+loop = asyncio.get_event_loop()
+loop.run_until_complete(load_extensions())
 
 @discordbot.event
 async def on_command_error(ctx, error):

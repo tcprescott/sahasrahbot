@@ -303,5 +303,5 @@ def get_owner(embed: discord.Embed, guild: discord.Guild) -> discord.Member:
     return guild.get_member(user_id)
 
 
-def setup(bot):
-    bot.add_cog(Multiworld(bot))
+async def setup(bot):
+    await bot.add_cog(Multiworld(bot))

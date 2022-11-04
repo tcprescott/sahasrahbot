@@ -206,5 +206,5 @@ class Misc(commands.Cog):
         )
         await ctx.respond(embed=embed, ephemeral=True)
 
-def setup(bot):
-    bot.add_cog(Misc(bot))
+async def setup(bot):
+    await bot.add_cog(Misc(bot))

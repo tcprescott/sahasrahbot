@@ -136,5 +136,5 @@ class SpeedGamingLive(commands.Cog):
     #     await ctx.reply(f"https://ootrandomizer.com/seed/get?id={seed['id']}")
 
 
-def setup(bot):
-    bot.add_cog(SpeedGamingLive(bot))
+async def setup(bot):
+    await bot.add_cog(SpeedGamingLive(bot))

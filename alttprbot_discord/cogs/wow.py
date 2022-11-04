@@ -56,5 +56,5 @@ class WorldOfWarcraft(commands.Cog):
         msg = await ctx.send(embed=embed)
         await msg.create_thread(name=f"Gambling session by {ctx.author.name}")
 
-def setup(bot):
-    bot.add_cog(WorldOfWarcraft(bot))
+async def setup(bot):
+    await bot.add_cog(WorldOfWarcraft(bot))

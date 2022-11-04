@@ -132,5 +132,5 @@ def ck_url(string_to_check):
     return bool(re.findall(re_equ, string_to_check))
 
 
-def setup(bot):
-    bot.add_cog(Moderation(bot))
+async def setup(bot):
+    await bot.add_cog(Moderation(bot))

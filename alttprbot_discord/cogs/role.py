@@ -182,5 +182,5 @@ def strip_custom_emoji(emoji):
     emoji = re.sub('>$', '', emoji)
     return emoji
 
-def setup(bot):
-    bot.add_cog(Role(bot))
+async def setup(bot):
+    await bot.add_cog(Role(bot))

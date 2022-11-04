@@ -145,5 +145,5 @@ class DiscordServers(commands.Cog):
         await ctx.respond(f"Refreshed server list for {ctx.guild.name}", ephemeral=True)
 
 
-def setup(bot):
-    bot.add_cog(DiscordServers(bot))
+async def setup(bot):
+    await bot.add_cog(DiscordServers(bot))

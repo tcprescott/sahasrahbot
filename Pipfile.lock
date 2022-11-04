@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "69cab27bfdebaaaf7ea62d67442a8b9bddc2814663e8252d828702ea9a0de4e6"
+            "sha256": "01ce130521ac4de4038e2c45944f9f25655fb2eee4b7c5ea1b6a09d1d6801e2c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -361,6 +361,7 @@
                 "sha256:309146476e986cb8faf038cd5d604d4b3834ef15c2d34df697ce5064bf5cd779",
                 "sha256:aeb186348bf011708b085b2715cf92bbb72c692eb4f59c4c0b488130cc4c4b7e"
             ],
+            "index": "pypi",
             "version": "==2.0.1"
         },
         "emoji": {
@@ -792,14 +793,6 @@
             ],
             "version": "==4.21.9"
         },
-        "py-cord": {
-            "hashes": [
-                "sha256:6e8dbdd78c26040081240c6f342687289c7b5287652c452a41f17ca5beaa3d06",
-                "sha256:88a1db521994bad838c1ca52f46671d4344a0745977c4dfe81beba31f637b3f6"
-            ],
-            "index": "pypi",
-            "version": "==2.2.2"
-        },
         "pyasn1": {
             "hashes": [
                 "sha256:014c0e9976956a08139dc0712ae195324a75e142284d5f87f1a87ee1b068a359",
@@ -926,7 +919,6 @@
                 "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb",
                 "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"
             ],
-            "markers": "python_version > '3.0'",
             "version": "==3.0.9"
         },
         "pypika-tortoise": {
@@ -1072,7 +1064,6 @@
                 "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7",
                 "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"
             ],
-            "markers": "python_version >= '3.6'",
             "version": "==4.9"
         },
         "s3transfer": {

@@ -541,5 +541,5 @@ def get_embed_field(name: str, embed: discord.Embed) -> str:
     return None
 
 
-def setup(bot):
-    bot.add_cog(Generator(bot))
+async def setup(bot):
+    await bot.add_cog(Generator(bot))

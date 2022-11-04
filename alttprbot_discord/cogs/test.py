@@ -15,5 +15,5 @@ class Test(commands.Cog):
     #     await ctx.respond(testarg)
 
 
-def setup(bot):
-    bot.add_cog(Test(bot))
+async def setup(bot):
+    await bot.add_cog(Test(bot))

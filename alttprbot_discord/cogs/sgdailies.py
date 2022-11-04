@@ -63,5 +63,5 @@ class SgDaily(commands.Cog):
         await ctx.respond(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(SgDaily(bot))
+async def setup(bot):
+    await bot.add_cog(SgDaily(bot))

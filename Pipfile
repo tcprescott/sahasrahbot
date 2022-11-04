@@ -29,8 +29,8 @@ PyGithub = "*"
 PySide2 = "==5.15.2"
 python-slugify = "*"
 pyz3r = "*"
-py-cord = "*"
 isodate = "*"
+"discord.py" = "*"
 
 [dev-packages]
 pycodestyle = "*"

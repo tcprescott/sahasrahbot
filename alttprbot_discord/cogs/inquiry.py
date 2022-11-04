@@ -131,5 +131,5 @@ def check_private_threads(interaction):
     return True
 
 
-def setup(bot):
-    bot.add_cog(Inquiry(bot))
+async def setup(bot):
+    await bot.add_cog(Inquiry(bot))

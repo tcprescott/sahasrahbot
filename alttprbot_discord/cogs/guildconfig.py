@@ -47,5 +47,5 @@ class Config(commands.Cog):
     #     await ctx.respond("Reloaded all guild configs", ephemeral=True)
 
 
-def setup(bot):
-    bot.add_cog(Config(bot))
+async def setup(bot):
+    await bot.add_cog(Config(bot))

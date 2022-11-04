@@ -155,5 +155,5 @@ class AlttprGen(commands.Cog):
         await ctx.reply("This command is currently disabled.  Please use the `/alttprutil savepreset` command instead.")
 
 
-def setup(bot):
-    bot.add_cog(AlttprGen(bot))
+async def setup(bot):
+    await bot.add_cog(AlttprGen(bot))
