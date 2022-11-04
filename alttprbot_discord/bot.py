@@ -138,29 +138,3 @@ async def on_command(ctx):
 async def on_command_completion(ctx):
     await ctx.message.add_reaction('✅')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
-
-
-@discordbot.event
-async def on_message(message):
-    # override discord.py's process_commands coroutine in the commands.Bot class
-    # this allows SpeedGamingBot to issue commands to SahasrahBot
-    if message.author.bot and not message.author.id == 344251539931660288:
-        return
-
-    ctx = await discordbot.get_context(message)
-
-    if ctx.command is not None:
-        discordbot.dispatch('command', ctx)
-        try:
-            if await discordbot.can_run(ctx, call_once=True):
-                await ctx.command.invoke(ctx)
-            else:
-                raise errors.CheckFailure('The global check once functions failed.')
-        except errors.CommandError as exc:
-            await ctx.command.dispatch_error(ctx, exc)
-        else:
-            discordbot.dispatch('command_completion', ctx)
-    # elif ctx.invoked_with:
-    #     exc = errors.CommandNotFound(
-    #         'Command "{}" is not found'.format(ctx.invoked_with))
-    #     discordbot.dispatch('command_error', ctx, exc)
