@@ -19,6 +19,10 @@ from discord import app_commands
 from pyz3r.ext.priestmode import create_priestmode
 from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 
+YES_NO_CHOICE = [
+    app_commands.Choice(name="Yes", value="yes"),
+    app_commands.Choice(name="No", value="no"),
+]
 
 async def autocomplete_alttpr(ctx):
     return await generator.ALTTPRPreset().search(ctx.value)
@@ -96,33 +100,24 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         allow_quickswap="Allow quickswap? (default yes)",
     )
     @app_commands.choices(
-        race=[
-            app_commands.Choice(name="Yes", value="yes"),
-            app_commands.Choice(name="No", value="no"),
-        ],
-        hints=[
-            app_commands.Choice(name="Yes", value="yes"),
-            app_commands.Choice(name="No", value="no"),
-        ],
-        allow_quickswap=[
-            app_commands.Choice(name="Yes", value="yes"),
-            app_commands.Choice(name="No", value="no"),
-        ],
+        race=YES_NO_CHOICE,
+        hints=YES_NO_CHOICE,
+        allow_quickswap=YES_NO_CHOICE,
     )
     async def preset(
         self,
         interaction: discord.Interaction,
         preset: str,
-        race: app_commands.Choice[str] = "no",
-        hints: app_commands.Choice[str] = "no",
-        allow_quickswap: app_commands.Choice[str] = "yes",
+        race: str = "no",
+        hints: str = "no",
+        allow_quickswap: str = "yes",
     ):
         await interaction.response.defer()
         seed = await generator.ALTTPRPreset(preset).generate(
-            hints=hints.value == "yes",
-            spoilers="off" if race.value == "yes" else "on",
-            tournament=race.value == "yes",
-            allow_quickswap=allow_quickswap.value == "yes"
+            hints=hints == "yes",
+            spoilers="off" if race == "yes" else "on",
+            tournament=race == "yes",
+            allow_quickswap=allow_quickswap == "yes"
         )
         if not seed:
             raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
@@ -136,37 +131,47 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         presets = await generator.ALTTPRPreset().search(current)
         return [app_commands.Choice(name=preset, value=preset) for preset in presets]
 
+    @app_commands.command(description="Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user")
+    @app_commands.describe(
+        yamlfile="The yaml you want to use to generate the game.",
+        race="Is this a race? (default no)",
+        hints="Do you want hints? (default no)",
+        allow_quickswap="Allow quickswap? (default yes)"
+    )
+    @app_commands.choices(
+        race=YES_NO_CHOICE,
+        hints=YES_NO_CHOICE,
+        allow_quickswap=YES_NO_CHOICE,
+    )
+    async def custompreset(
+        self,
+        interaction: discord.Interaction,
+        yamlfile: discord.Attachment,
+        race: str = "no",
+        hints: str = "no",
+        allow_quickswap: str = "yes",
+    ):
+        """
+        Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user
+        """
+        await interaction.response.defer()
 
-    # @alttpr.command()
-    # async def custompreset(
-    #     self,
-    #     ctx: ApplicationContext,
-    #     yamlfile: Option(discord.Attachment, description="The preset you want generate.", required=True),
-    #     race: Option(str, description="Is this a race? (default no)", choices=["yes", "no"], required=False, default="no"),
-    #     hints: Option(str, description="Enable hints? (default no)", choices=["yes", "no"], required=False, default="no"),
-    #     allow_quickswap: Option(str, description="Allow quickswap? (default yes)", choices=["yes", "no"], required=False, default="yes"),
-    # ):
-    #     """
-    #     Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user
-    #     """
-    #     await ctx.defer()
+        namespace = await generator.create_or_retrieve_namespace(interaction.user.id, interaction.user.name)
 
-    #     namespace = await generator.create_or_retrieve_namespace(ctx.author.id, ctx.author.name)
+        content = await yamlfile.read()
+        data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/latest")
+        await data.save()
+        seed = await data.generate(
+            spoilers="off" if race == "yes" else "on",
+            tournament=race == "yes",
+            allow_quickswap=allow_quickswap == "yes",
+            hints=hints == "yes"
+        )
 
-    #     content = await yamlfile.read()
-    #     data = await generator.ALTTPRPreset.custom(content, f"{namespace.name}/latest")
-    #     await data.save()
-    #     seed = await data.generate(
-    #         spoilers="off" if race == "yes" else "on",
-    #         tournament=race == "yes",
-    #         allow_quickswap=allow_quickswap == "yes",
-    #         hints=hints == "yes"
-    #     )
+        embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
+        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`", inline=False)
 
-    #     embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
-    #     embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`", inline=False)
-
-    #     await ctx.respond(embed=embed)
+        await interaction.followup.send(embed=embed)
 
     # @alttpr.command()
     # async def spoiler(
