@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.commands import SlashCommandGroup, Option
+from discord import app_commands
 
 
 class Test(commands.Cog):

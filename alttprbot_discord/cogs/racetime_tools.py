@@ -3,8 +3,11 @@ import json
 import aiohttp
 import discord
 from discord.ext import commands
+from discord import app_commands
 
 from alttprbot import models
+
+# TODO: make work with discord.py 2.0
 
 
 class RacetimeTools(commands.Cog):

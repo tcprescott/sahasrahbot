@@ -1,5 +1,4 @@
 import discord
-from discord.commands import permissions, Option
 from discord.ext import commands
 
 from alttprbot.database import voicerole  # TODO switch to ORM

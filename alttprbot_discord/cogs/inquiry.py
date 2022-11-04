@@ -3,11 +3,13 @@ import random
 import os
 
 import discord
-from discord.commands import Option, ApplicationContext
+from discord import app_commands
 from discord.ext import commands
 
 from alttprbot import models
 from config import Config as c
+
+# TODO: make work with discord.py 2.0
 
 
 class ConfirmInquiryThread(discord.ui.View):

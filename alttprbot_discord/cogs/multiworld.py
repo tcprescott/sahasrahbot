@@ -6,7 +6,11 @@ import discord
 from alttprbot import models
 from alttprbot.alttprgen.smz3multi import generate_multiworld
 from discord.ext import commands
+from discord import app_commands
 from slugify import slugify
+
+# TODO: make work with discord.py 2.0
+
 
 PRESET_OPTIONS = {
     'sm': [
@@ -254,7 +258,7 @@ class Multiworld(commands.Cog):
             self.persistent_views_added = True
 
     @commands.slash_command(name='multiworld')
-    async def multiworld(self, ctx: discord.commands.ApplicationContext):
+    async def multiworld(self, interaction: discord.Interaction):
         """
         Creates a multiworld session
         """

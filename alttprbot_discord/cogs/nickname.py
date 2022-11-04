@@ -1,11 +1,13 @@
 import os
 
 import discord
-from discord.commands import permissions, ApplicationContext, Option, SlashCommandGroup
+from discord import app_commands
 from discord.ext import commands
 from racetime_bot import Bot
 
 from alttprbot import models
+
+# TODO: make work with discord.py 2.0
 
 
 async def role_name_autocomplete(ctx):

@@ -4,6 +4,10 @@ import json
 import discord
 import pyz3r
 import yaml
+from discord import app_commands
+from discord.ext import commands
+from pyz3r.ext.priestmode import create_priestmode
+from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 
 from alttprbot import models
 from alttprbot.alttprgen import generator, smvaria
@@ -11,13 +15,7 @@ from alttprbot.alttprgen.randomizer import smdash, z2r
 from alttprbot.alttprgen.spoilers import (generate_spoiler_game,
                                           generate_spoiler_game_custom)
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
-from discord.ext import commands
-from discord import app_commands
-from pyz3r.ext.priestmode import create_priestmode
-from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 
 YES_NO_CHOICE = [
     app_commands.Choice(name="Yes", value="yes"),

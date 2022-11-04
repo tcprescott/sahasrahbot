@@ -3,7 +3,7 @@ import logging
 import os
 
 import discord
-from discord.commands import permissions, ApplicationContext, Option
+from discord import app_commands
 from discord.ext import commands, tasks
 
 from alttprbot.tournament import core, alttpr
@@ -12,9 +12,8 @@ from alttprbot import tournaments
 from alttprbot.util import speedgaming
 from config import Config as c
 
-# this module was only intended for the Main Tournament 2019
-# we will probably expand this later to support other tournaments in the future
-# ALTTPRDEPracticeView
+# TODO: make work with discord.py 2.0
+
 
 MAIN_TOURNAMENT_SERVERS = list(map(int, os.environ.get("MAIN_TOURNAMENT_SERVERS", "").split(',')))
 CC_TOURNAMENT_SERVERS = list(map(int, os.environ.get("CC_TOURNAMENT_SERVERS", "").split(',')))

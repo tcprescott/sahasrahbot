@@ -1,9 +1,14 @@
+import os
+
 import dateutil.parser
 import discord
-from discord.commands import Option
+from discord import app_commands
 from discord.ext import commands
+
 from alttprbot.util import speedgaming
-import os
+
+# TODO: make work with discord.py 2.0
+
 
 ALTTP_RANDOMIZER_SERVERS = list(map(int, os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(',')))
 
