@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b7f9a9a39c3f411baf331e790d1a5c3ce3fbe03d5f7775a8451573d1a17debd9"
+            "sha256": "69cab27bfdebaaaf7ea62d67442a8b9bddc2814663e8252d828702ea9a0de4e6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -578,6 +578,14 @@
             ],
             "version": "==1.1.0"
         },
+        "isodate": {
+            "hashes": [
+                "sha256:0751eece944162659049d35f4f549ed815792b38793f07cf73381c1c87cbed96",
+                "sha256:48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"
+            ],
+            "index": "pypi",
+            "version": "==0.6.1"
+        },
         "itsdangerous": {
             "hashes": [
                 "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44",
@@ -918,6 +926,7 @@
                 "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb",
                 "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"
             ],
+            "markers": "python_version > '3.0'",
             "version": "==3.0.9"
         },
         "pypika-tortoise": {
@@ -1063,6 +1072,7 @@
                 "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7",
                 "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"
             ],
+            "markers": "python_version >= '3.6'",
             "version": "==4.9"
         },
         "s3transfer": {

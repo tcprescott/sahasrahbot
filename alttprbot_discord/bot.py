@@ -129,8 +129,6 @@ async def on_application_command_error(ctx, error):
 
 @discordbot.event
 async def on_command(ctx):
-    if ctx.prefix == "$":
-        await ctx.reply(f"The use of the `$` prefix is deprecated. Please mention {discordbot.user.mention} instead.  For example: \"{discordbot.user.mention} {ctx.invoked_with} ...\"\nThis will stop working soon.")
     await ctx.message.add_reaction('⌚')
 
 
