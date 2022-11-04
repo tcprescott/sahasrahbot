@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5d6079cab718c563484ffd2a337e83eb3f83b089c85b248ff35cdd4634cb4b7a"
+            "sha256": "b7f9a9a39c3f411baf331e790d1a5c3ce3fbe03d5f7775a8451573d1a17debd9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -472,10 +472,10 @@
         },
         "google-auth-oauthlib": {
             "hashes": [
-                "sha256:53019edbde83e08ff0740eefc5bded7e26a289941d12e7ae1f0f5bacf2faa031",
-                "sha256:db11bce4b3effc99b518ec22a2903470e0853c0c92be57694e3684e738d22513"
+                "sha256:860e54c4b58b2664116c9cb44325bc0ec92bcd93e8211698ceea911b1b873b86",
+                "sha256:9940f543f77d1447432a93781d7c931fb53e418023351ad4bf9e92837a1154ec"
             ],
-            "version": "==0.7.0"
+            "version": "==0.7.1"
         },
         "googleapis-common-protos": {
             "hashes": [
@@ -1063,6 +1063,7 @@
                 "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7",
                 "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"
             ],
+            "markers": "python_version >= '3.6'",
             "version": "==4.9"
         },
         "s3transfer": {

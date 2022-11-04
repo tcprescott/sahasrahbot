@@ -5,7 +5,7 @@ import io
 
 import discord
 from discord.ext import commands
-# from emoji import UNICODE_EMOJI
+from emoji import is_emoji
 
 from alttprbot.database import role  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
@@ -181,12 +181,6 @@ def strip_custom_emoji(emoji):
     emoji = re.sub('^<', '', emoji)
     emoji = re.sub('>$', '', emoji)
     return emoji
-
-
-def is_emoji(s):
-    # return True if s in UNICODE_EMOJI else False
-    return False
-
 
 def setup(bot):
     bot.add_cog(Role(bot))
