@@ -69,7 +69,8 @@ class Errors(commands.Cog, name="errors"):
             await edit(content=f"{riplink} {d_error}")
         # CommandNotFound
         except commands.CommandNotFound as d_error:
-            await edit(content=f"{riplink} Command `{str(d_error).split(' ')[1]}` not found !")
+            # await edit(content=f"{riplink} Command `{str(d_error).split(' ')[1]}` not found !")
+            pass # Ignore this error
         # CheckFailure
         except commands.PrivateMessageOnly:
             await edit(content=f"{riplink} This command canno't be used in a guild, try in direct message.")
