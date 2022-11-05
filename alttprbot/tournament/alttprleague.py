@@ -87,6 +87,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             allow_non_entrant_chat=False,
             chat_message_delay=0,
             team_race=self.league_data['coop'],
+            require_even_teams=True,
         )
         return self.rtgg_handler
 
