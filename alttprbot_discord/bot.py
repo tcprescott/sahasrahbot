@@ -26,13 +26,16 @@ discordbot = commands.Bot(
     intents=intents
 )
 
+discordbot.logger = logging.getLogger('discord')
+
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
 async def load_extensions():
+    await discordbot.load_extension("alttprbot_discord.cogs.errors")
     await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
     await discordbot.load_extension("alttprbot_discord.cogs.daily")
-    # await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
+    await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
     await discordbot.load_extension("alttprbot_discord.cogs.nickname")
     await discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
@@ -44,9 +47,8 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
     await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
 
-    # if c.DEBUG:
-    #     await discordbot.load_extension("alttprbot_discord.cogs.test")
-
+    if c.DEBUG:
+        await discordbot.load_extension("alttprbot_discord.cogs.test")
 
     if importlib.util.find_spec('jishaku'):
         await discordbot.load_extension('jishaku')
@@ -90,34 +92,6 @@ async def on_command_error(ctx, error):
             scope.set_tag("channel", ctx.channel.id if ctx.channel else "")
             scope.set_tag("user", f"{ctx.author.name}#{ctx.author.discriminator}" if ctx.author else "")
             raise error_to_display
-
-
-# @discordbot.event
-# async def on_application_command_error(ctx, error):
-#     logging.info(error)
-#     if isinstance(error, commands.CheckFailure):
-#         await ctx.respond("You are not authorized to use this command here.", ephemeral=True)
-#     elif isinstance(error, commands.errors.MissingPermissions):
-#         await ctx.respond("You are not authorized to use this command here.", ephemeral=True)
-#     elif isinstance(error, commands.UserInputError):
-#         await ctx.respond(error)
-#     else:
-#         error_to_display = error.original if hasattr(error, 'original') else error
-
-#         errorstr = repr(error_to_display)
-#         if len(errorstr) < 1990:
-#             await ctx.respond(f"```{errorstr}```")
-#         else:
-#             await ctx.respond(
-#                 content="An error occured, please see attachment for the full message.",
-#                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
-#             )
-
-#         with push_scope() as scope:
-#             scope.set_tag("guild", ctx.guild.id if ctx.guild else "")
-#             scope.set_tag("channel", ctx.channel.id if ctx.channel else "")
-#             scope.set_tag("user", f"{ctx.author.name}#{ctx.author.discriminator}" if ctx.author else "")
-#             raise error_to_display
 
 
 @discordbot.event
