@@ -69,7 +69,7 @@ class Misc(commands.Cog):
         ]
     )
     @app_commands.guilds(*ALTTP_RANDOMIZER_SERVERS)
-    async def welcome_cmd(self, interaction: discord.Interaction, language: str):
+    async def welcome(self, interaction: discord.Interaction, language: str):
         await interaction.response.send_message(WELCOME_MESSAGES[language])
 
     @app_commands.command(description="Get info about how to verify a ROM.")
