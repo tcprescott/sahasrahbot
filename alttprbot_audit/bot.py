@@ -78,4 +78,4 @@ async def start_bot():
     await load_extensions()
     if c.DEBUG:
         discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540)) # hard code the discord server id for now
-    await discordbot.start(os.environ.get("DISCORD_TOKEN"))
+    await discordbot.start(os.environ.get("AUDIT_DISCORD_TOKEN"))

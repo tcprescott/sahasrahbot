@@ -24,7 +24,7 @@ CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202
 
 class Tournament(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
         self.create_races.start()
         self.record_races.start()
         self.week_races.start()
@@ -170,7 +170,7 @@ class Tournament(commands.Cog):
                         event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
 
                         # check if existing event requires an update
-                        if not event.name == name or not event.description == description or not event.start_time == start_time or not event.end_time == end_time or not event.location.value == location:
+                        if not event.name == name or not event.description == description or not event.start_time == start_time or not event.end_time == end_time or not event.location == location:
                             await event.edit(
                                 name=name,
                                 description=description,

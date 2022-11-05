@@ -49,7 +49,7 @@ if __name__ == '__main__':
     loop.run_until_complete(dbtask)
 
     loop.create_task(start_discord_bot())
-    # loop.create_task(discordbot_audit.start(os.environ.get("AUDIT_DISCORD_TOKEN")))
+    loop.create_task(start_audit_bot())
     start_racetime(loop)
     loop.create_task(sahasrahbotapi.run(host='127.0.0.1', port=5001, use_reloader=False, loop=loop))
     loop.run_forever()

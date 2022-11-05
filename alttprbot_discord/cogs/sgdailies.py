@@ -17,8 +17,8 @@ class SgDaily(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # TODO: must be specific to ALTTP_RANDOMIZER_SERVERS
     @app_commands.command(name="sgdaily", description="Retrieves the next SG daily race.")
+    @app_commands.guilds(*ALTTP_RANDOMIZER_SERVERS)
     async def sgdaily_cmd(
         self,
         interaction: discord.Interaction,

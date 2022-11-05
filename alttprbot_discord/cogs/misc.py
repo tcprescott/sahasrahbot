@@ -61,7 +61,6 @@ class Misc(commands.Cog):
                 await asyncio.sleep(random.random()*5)
                 await message.add_reaction(emoji)
 
-    # TODO: make this app command guild-specific for ALTTP Randomizer
     @app_commands.command(description="Welcome messages for various languages.")
     @app_commands.describe(language="Choose a language for the welcome message.")
     @app_commands.choices(
@@ -69,11 +68,12 @@ class Misc(commands.Cog):
             app_commands.Choice(name=lang, value=lang) for lang in WELCOME_MESSAGES.keys()
         ]
     )
+    @app_commands.guilds(*ALTTP_RANDOMIZER_SERVERS)
     async def welcome_cmd(self, interaction: discord.Interaction, language: str):
         await interaction.response.send_message(WELCOME_MESSAGES[language])
 
-    # TODO: make this app command guild-specific for ALTTP Randomizer
     @app_commands.command(description="Get info about how to verify a ROM.")
+    @app_commands.guilds(*ALTTP_RANDOMIZER_SERVERS)
     async def rom(self, interaction: discord.Interaction):
         await interaction.response.send_message(
             "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALTTPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
@@ -177,5 +177,5 @@ class Misc(commands.Cog):
         timezones = sorted([val for val in pytz.all_timezones if val.startswith(current)][:25])
         return [app_commands.Choice(name=timezone, value=timezone) for timezone in timezones]
 
-async def setup(bot: commands.Command):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Misc(bot))
