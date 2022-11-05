@@ -132,8 +132,8 @@ class Tournament(commands.Cog):
         for dead_event in dead_events:
             try:
                 event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(dead_event.scheduled_event_id)
-                pass
-                if event.status == discord.ScheduledEventStatus.scheduled:
+
+                if event.status == discord.EventStatus.scheduled:
                     await event.delete()
             except discord.NotFound:
                 continue
