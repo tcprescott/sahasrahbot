@@ -120,7 +120,7 @@ class Inquiry(commands.Cog):
             view=ConfirmInquiryThread(),
             allowed_mentions=discord.AllowedMentions(roles=False)
         )
-        original_message = await interaction_response.original_message()
+        original_message = await interaction_response.original_response()
         await models.InquiryMessageConfig.create(message_id=original_message.id, role_id=role.id)
 
 

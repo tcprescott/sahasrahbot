@@ -273,10 +273,10 @@ class Multiworld(commands.Cog):
         embed.add_field(name="Preset", value="Not yet chosen", inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
-        interaction_response: discord.Interaction = await ctx.interaction.response.send_message(embed=embed)
-        original_message = await interaction_response.original_message()
+        interaction_response: discord.Interaction = await ctx.interaction.response.send_message(embed=embed, view=MultiworldSignupView())
+        original_message = await interaction_response.original_response()
         await models.Multiworld.create(message_id=original_message.id, owner_id=ctx.author.id, status="STARTED")
-        await interaction_response.edit_original_message(embed=embed, view=MultiworldSignupView())
+        # await ctx.interaction.edit_original_message(embed=embed, view=MultiworldSignupView())
 
 
 def set_embed_field(name: str, value: str, embed: discord.Embed) -> discord.Embed:
