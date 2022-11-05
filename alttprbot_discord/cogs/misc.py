@@ -38,32 +38,6 @@ WELCOME_MESSAGES = {
     )
 }
 
-
-async def holy_slug_autocomplete(ctx):
-    data = await get_holy_images()
-    value: str = ctx.value
-
-    raw_game = ctx.options['game']
-    if raw_game:
-        game = raw_game[0]['value']
-    else:
-        if ctx.interaction.guild:
-            game = await holy_game_default(ctx.interaction.guild)
-        else:
-            game = 'z3r'
-
-    slugs = sorted([val['slug'] for val in data[game] if val['slug'].startswith(value)][:25])
-
-    return slugs
-
-
-async def holy_game_autocomplete(ctx):
-    data = await get_holy_images()
-    return sorted([val for val in data.keys() if val.startswith(ctx.value)][:25])
-
-async def datetime_autocomplete_tz(ctx):
-    return sorted([val for val in pytz.all_timezones if val.startswith(ctx.value)][:25])
-
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
     return await guild.config_get("HolyImageDefaultGame", "z3r")
@@ -87,98 +61,88 @@ class Misc(commands.Cog):
                 await asyncio.sleep(random.random()*5)
                 await message.add_reaction(emoji)
 
-    @commands.slash_command(name="welcome", guild_ids=ALTTP_RANDOMIZER_SERVERS)
-    async def welcome_cmd(self, ctx: discord.ApplicationContext, language: Option(str, description="Choose a language for the welcome message.", choices=WELCOME_MESSAGES.keys())):
-        """
-        Welcome messages for various languages.
-        """
-        await ctx.respond(WELCOME_MESSAGES[language])
-
-    @commands.slash_command(name="memberinfo", guild_only=True)
-    async def memberinfo_cmd(self, ctx, member: Option(discord.Member, "Choose a member")):
-        """
-        Get information about a member.
-        """
-        if member is None:
-            member = ctx.author
-        embed = discord.Embed(
-            title=f"Member info for {member.name}#{member.discriminator}",
-            color=member.color
-        )
-        embed.add_field(name='Created at', value=discord.utils.format_dt(member.created_at, style='F'), inline=False)
-        embed.add_field(name='Joined at', value=discord.utils.format_dt(member.joined_at, style='F'), inline=False)
-        embed.add_field(name="Discord ID", value=member.id, inline=False)
-        if member.avatar:
-            embed.set_thumbnail(url=member.avatar.url)
-        await ctx.respond(embed=embed, ephemeral=True)
-
-    @commands.slash_command(
-        name="rom",
-        guild_ids=ALTTP_RANDOMIZER_SERVERS
+    # TODO: make this app command guild-specific for ALTTP Randomizer
+    @app_commands.command(description="Welcome messages for various languages.")
+    @app_commands.describe(language="Choose a language for the welcome message.")
+    @app_commands.choices(
+        language=[
+            app_commands.Choice(name=lang, value=lang) for lang in WELCOME_MESSAGES.keys()
+        ]
     )
-    async def rom_cmd(self, ctx):
-        """
-        Get info about how to verify a ROM.
-        """
-        await ctx.respond(
+    async def welcome_cmd(self, interaction: discord.Interaction, language: str):
+        await interaction.response.send_message(WELCOME_MESSAGES[language])
+
+    # TODO: make this app command guild-specific for ALTTP Randomizer
+    @app_commands.command(description="Get info about how to verify a ROM.")
+    async def rom(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
             "If you need help verifying your legally-dumped Japanese version 1.0 A Link to the Past Game file needed to run ALTTPR, use this tool: <http://alttp.mymm1.com/game/checkcrc/>\n"
             "It can also help get the permalink page URL which has access to the Spoiler Log depending on the settings that were chosen. Not all games that are generated have access to the Spoiler Log.\n\n"
             "For legal reasons, we cannot provide help with finding this ROM online.  Please do not ask here for assistance with this.\n"
             "See <#543572578787393556> for details."
         )
 
-    @commands.slash_command(guild_ids=ALTTP_RANDOMIZER_SERVERS)
-    async def festive(self, ctx: discord.ApplicationContext):
-        """
-        Get info about festive randomizers.
-        """
-        embed = discord.Embed(
-            title='Festive Randomizer Information',
-            description='Latest details of any upcoming festive randomizers.',
-            color=discord.Color.red()
-        )
-        embed.set_image(
-            url='https://cdn.discordapp.com/attachments/307860211333595146/654123045375442954/unknown.png')
-
-        await ctx.respond(embed=embed)
-
-    @commands.slash_command(
-        name='holyimage'
-    )
-    async def holyimage_cmd(
+    @app_commands.command(description="Retrieves a holy image from http://alttp.mymm1.com/holyimage/")
+    @app_commands.describe(slug="The slug of the holy image to get.", game="The game to get the holy image from.")
+    async def holyimage(
         self,
-        ctx,
-        slug: Option(str, description="Slug of the holy image to retrieve.", autocomplete=holy_slug_autocomplete),
-        game: Option(str, description="Slug of the game to pull a holy image for.", required=False, autocomplete=holy_game_autocomplete)
+        interaction: discord.Interaction,
+        slug: str,
+        game: str = None
     ):
-        """
-        Retrieves a holy image from http://alttp.mymm1.com/holyimage/
-        """
         if game is None:
-            if ctx.guild is None:
+            if interaction.guild is None:
                 game = "z3r"
             else:
-                game = await ctx.guild.config_get("HolyImageDefaultGame", "z3r")
+                game = await interaction.guild.config_get("HolyImageDefaultGame", "z3r")
 
         holyimage = await HolyImage.construct(slug=slug, game=game)
 
-        await ctx.respond(embed=holyimage.embed)
+        await interaction.response.send_message(embed=holyimage.embed)
 
-    @commands.slash_command(name="datetime")
+    @holyimage.autocomplete("game")
+    async def holy_game_autocomplete(self, interaction: discord.Interaction, current: str):
+        data = await get_holy_images()
+        keys = sorted([val for val in data.keys() if val.startswith(current)][:25])
+        return [app_commands.Choice(name=key, value=key) for key in keys]
+
+    @holyimage.autocomplete("slug")
+    async def holy_slug_autocomplete(self, interaction: discord.Interaction, current: str):
+        data = await get_holy_images()
+        value: str = current
+
+        game = interaction.namespace.game
+        if not game:
+            if interaction.guild:
+                game = await holy_game_default(interaction.guild)
+            else:
+                game = 'z3r'
+
+        slugs = sorted([val['slug'] for val in data[game] if val['slug'].startswith(value)][:25])
+
+        return [app_commands.Choice(name=slug, value=slug) for slug in slugs]
+
+    @app_commands.command(name="datetime", description="Get discord markdown for the date specified.")
+    @app_commands.describe(
+        year="The year to use. Defaults to the current year.",
+        month="The month to use. Defaults to the current month.",
+        day="The day to use. Defaults to the current day.",
+        hour="The hour to use. Defaults to 0.",
+        minute="The minute to use. Defaults to 0.",
+        second="The second to use. Defaults to 0.",
+        timezone="Timezone to get the date for. Defaults to US/Eastern"
+    )
     async def datetime_cmd(
         self,
-        ctx: discord.ApplicationContext,
-        year: Option(int, description="Year to get the date for.  Defaults to the current year.", required=False, min_value=1970, max_value=9999) = None,
-        month: Option(int, description="Month to get the date for.  Defaults to the current month.", required=False, min_value=1, max_value=12) = None,
-        day: Option(int, description="Day to get the date for.   Defaults to the current day.", required=False, min_value=1, max_value=31) = None,
-        hour: Option(int, description="Hour to get the date for. (24 hour)", required=False, min_value=0, max_value=23) = 0,
-        minute: Option(int, description="Minute to get the date for.", required=False, min_value=0, max_value=59) = 0,
-        second: Option(int, description="Second to get the date for.", required=False, min_value=0, max_value=59) = 0,
-        timezone: Option(str, description="Timezone to get the date for. Defaults to US/Eastern", required=False, autocomplete=datetime_autocomplete_tz) = "US/Eastern",
+        interaction: discord.Interaction,
+        year: app_commands.Range[int, 1970, 9999] = None,
+        month: app_commands.Range[int, 1, 12] = None,
+        day: app_commands.Range[int, 1, 31] = None,
+        hour: app_commands.Range[int, 0, 23] = 0,
+        minute: app_commands.Range[int, 0, 59] = 0,
+        second: app_commands.Range[int, 0, 59] = 0,
+        timezone: str  = "US/Eastern"
     ):
-        """
-        Get discord markdown for the date specified.
-        """
         if year is None:
             year = datetime.datetime.now().year
         if month is None:
@@ -189,10 +153,10 @@ class Misc(commands.Cog):
             tz = pytz.timezone(timezone)
             time = tz.localize(datetime.datetime(year, month, day, hour, minute, second))
         except UnknownTimeZoneError:
-            await ctx.respond(f"Unknown timezone: {timezone}", ephemeral=True)
+            await interaction.response.send_message(f"Unknown timezone: {timezone}", ephemeral=True)
             return
         except ValueError:
-            await ctx.respond(f"Invalid date: {year}-{month}-{day} {hour}:{minute}:{second} {timezone}", ephemeral=True)
+            await interaction.response.send_message(f"Invalid date: {year}-{month}-{day} {hour}:{minute}:{second} {timezone}", ephemeral=True)
             return
 
         markdown = "Discord formatted datetime\n\n"
@@ -206,7 +170,12 @@ class Misc(commands.Cog):
             description=markdown,
             color=discord.Color.blue()
         )
-        await ctx.respond(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
-async def setup(bot):
+    @datetime_cmd.autocomplete("timezone")
+    async def datetime_autocomplete_tz(self, interaction: discord.Interaction, current: str):
+        timezones = sorted([val for val in pytz.all_timezones if val.startswith(current)][:25])
+        return [app_commands.Choice(name=timezone, value=timezone) for timezone in timezones]
+
+async def setup(bot: commands.Command):
     await bot.add_cog(Misc(bot))

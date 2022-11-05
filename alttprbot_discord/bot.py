@@ -33,9 +33,9 @@ if os.environ.get("SENTRY_URL"):
 
 async def load_extensions():
     # await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
-    # await discordbot.load_extension("alttprbot_discord.cogs.daily")
+    await discordbot.load_extension("alttprbot_discord.cogs.daily")
     # # await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
-    # await discordbot.load_extension("alttprbot_discord.cogs.misc")
+    await discordbot.load_extension("alttprbot_discord.cogs.misc")
     # await discordbot.load_extension("alttprbot_discord.cogs.nickname")
     # await discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
     # await discordbot.load_extension("alttprbot_discord.cogs.role")
@@ -43,9 +43,9 @@ async def load_extensions():
     # await discordbot.load_extension("alttprbot_discord.cogs.sgl")
     # await discordbot.load_extension("alttprbot_discord.cogs.tournament")
     # await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
-    # await discordbot.load_extension("alttprbot_discord.cogs.multiworld")
+    await discordbot.load_extension("alttprbot_discord.cogs.multiworld")
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
-    # await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
+    await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
 
     # if c.DEBUG:
     #     await discordbot.load_extension("alttprbot_discord.cogs.test")

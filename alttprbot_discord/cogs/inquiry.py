@@ -16,11 +16,11 @@ class ConfirmInquiryThread(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    async def on_error(self, error: Exception, item, interaction) -> None:
-        raise error
+    # async def on_error(self, error: Exception, item, interaction) -> None:
+    #     raise error
 
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬", custom_id="sahasrahbot:open_inquiry")
-    async def openthread(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):
         inquiry_message_config = await models.InquiryMessageConfig.get(message_id=interaction.message.id)
         role = interaction.guild.get_role(inquiry_message_config.role_id)
         view = OpenInquiryThread(inquiry_message_config)
@@ -39,11 +39,8 @@ class OpenInquiryThread(discord.ui.View):
         super().__init__(timeout=60)
         self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
 
-    async def on_error(self, error: Exception, item, interaction) -> None:
-        raise error
-
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
-    async def yes(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         if "PRIVATE_THREADS" not in interaction.channel.guild.features and not c.DEBUG:
             await interaction.response.send_message("Private threads must be available on this server.  Please let the server admin know so this may be fixed.", ephemeral=True)
             return
@@ -80,40 +77,41 @@ class Inquiry(commands.Cog):
             self.bot.add_view(ConfirmInquiryThread())
             self.persistent_views_added = True
 
-    @commands.slash_command()
+    @app_commands.command(description="Adds a message that allows users to create a private thread to open an inquiry.")
+    @app_commands.describe(role="Role that has the members that should join the thread")
     async def inquiry(
         self,
         interaction: discord.Interaction,
-        role: Option(discord.Role, "Role that has the members that should join the thread", required=True)
+        role: discord.Role
     ):
         """
         Adds a message that allows users to create a private thread to open an inquiry.
         """
-        if not ctx.channel.permissions_for(ctx.author).manage_threads:
-            await ctx.respond("You must have manage threads permission to use this feature.", ephemeral=True)
+        if not interaction.channel.permissions_for(interaction.user).manage_threads:
+            await interaction.response.send_message("You must have manage threads permission to use this feature.", ephemeral=True)
             return
 
-        if "PRIVATE_THREADS" not in ctx.guild.features and not c.DEBUG:
-            await ctx.respond("Private threads must be available on this server.", ephemeral=True)
+        if "PRIVATE_THREADS" not in interaction.guild.features and not c.DEBUG:
+            await interaction.response.send_message("Private threads must be available on this server.", ephemeral=True)
             return
 
-        if not ctx.channel.permissions_for(ctx.guild.me).create_private_threads:
-            await ctx.respond("This bot needs permission to create private threads in this channel.", ephemeral=True)
+        if not interaction.channel.permissions_for(interaction.guild.me).create_private_threads:
+            await interaction.response.send_message("This bot needs permission to create private threads in this channel.", ephemeral=True)
             return
 
-        if ctx.channel.permissions_for(ctx.guild.default_role).send_messages:
-            await ctx.respond("`@everyone` should not be allowed to send messages in this channel.", ephemeral=True)
+        if interaction.channel.permissions_for(interaction.guild.default_role).send_messages:
+            await interaction.response.send_message("`@everyone` should not be allowed to send messages in this channel.", ephemeral=True)
             return
 
-        if not ctx.channel.permissions_for(ctx.guild.default_role).send_messages_in_threads:
-            await ctx.respond("`@everyone` needs to be able to send messages in threads.", ephemeral=True)
+        if not interaction.channel.permissions_for(interaction.guild.default_role).send_messages_in_threads:
+            await interaction.response.send_message("`@everyone` needs to be able to send messages in threads.", ephemeral=True)
             return
 
-        if not ctx.channel.permissions_for(role).read_messages:
-            await ctx.respond(f"{role.mention} is not allowed to see this channel.", ephemeral=True, allowed_mentions=discord.AllowedMentions(roles=False))
+        if not interaction.channel.permissions_for(role).read_messages:
+            await interaction.response.send_message(f"{role.mention} is not allowed to see this channel.", ephemeral=True, allowed_mentions=discord.AllowedMentions(roles=False))
             return
 
-        interaction_response = await ctx.respond(
+        await interaction.response.send_message(
             content=(
                 "To **submit an inquiry**, click the 📬 button below, then click \"Yes!\" button in the next message to confirm.\n\n"
                 f"This will open an inquiry visible to members of {role.mention}\n\n"
@@ -122,16 +120,16 @@ class Inquiry(commands.Cog):
             view=ConfirmInquiryThread(),
             allowed_mentions=discord.AllowedMentions(roles=False)
         )
-        original_message = await interaction_response.original_message()
+        original_message = await interaction.original_response()
         await models.InquiryMessageConfig.create(message_id=original_message.id, role_id=role.id)
 
 
-def check_private_threads(interaction):
+def check_private_threads(interaction: discord.Interaction):
     if "PRIVATE_THREADS" not in interaction.channel.guild.features:
         return False
 
     return True
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Inquiry(bot))

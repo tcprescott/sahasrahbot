@@ -16,13 +16,13 @@ class Daily(commands.Cog):
         self.bot = bot
         self.announce_daily.start()
 
-    @commands.slash_command(name='dailygame', description='Returns the current daily game from alttpr.com.')
-    async def daily_cmd(self, ctx: discord.ApplicationContext):
+    @app_commands.command(description='Returns the current daily game from alttpr.com.')
+    async def dailygame(self, interaction: discord.Interaction):
         daily_challenge = await find_daily_hash()
         hash_id = daily_challenge['hash']
         seed = await get_daily_seed(hash_id)
         embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
-        await ctx.respond(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @tasks.loop(minutes=5, reconnect=True)
     async def announce_daily(self):
