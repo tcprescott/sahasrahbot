@@ -27,6 +27,7 @@ discordbot = commands.Bot(
 )
 
 discordbot.logger = logging.getLogger('discord')
+discordbot.logger.setLevel(logging.INFO)
 
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
@@ -56,42 +57,42 @@ async def load_extensions():
     # if importlib.util.find_spec('sahasrahbot_private'):
     #     await discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
-@discordbot.event
-async def on_command_error(ctx, error):
-    riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
-    await ctx.message.remove_reaction('⌚', ctx.bot.user)
-    logging.info(error)
-    if isinstance(error, commands.CheckFailure):
-        pass
-    elif isinstance(error, commands.errors.MissingPermissions):
-        await ctx.message.add_reaction('🚫')
-    elif isinstance(error, commands.CommandNotFound):
-        pass
-    elif isinstance(error, commands.UserInputError):
-        if riplink is None:
-            riplink = '👎'
-        await ctx.reply(error)
-    else:
-        if riplink is None:
-            riplink = '👎'
-        error_to_display = error.original if hasattr(
-            error, 'original') else error
+# @discordbot.event
+# async def on_command_error(ctx, error):
+#     riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
+#     await ctx.message.remove_reaction('⌚', ctx.bot.user)
+#     logging.info(error)
+#     if isinstance(error, commands.CheckFailure):
+#         pass
+#     elif isinstance(error, commands.errors.MissingPermissions):
+#         await ctx.message.add_reaction('🚫')
+#     elif isinstance(error, commands.CommandNotFound):
+#         pass
+#     elif isinstance(error, commands.UserInputError):
+#         if riplink is None:
+#             riplink = '👎'
+#         await ctx.reply(error)
+#     else:
+#         if riplink is None:
+#             riplink = '👎'
+#         error_to_display = error.original if hasattr(
+#             error, 'original') else error
 
-        await ctx.message.add_reaction(riplink)
+#         await ctx.message.add_reaction(riplink)
 
-        errorstr = repr(error_to_display)
-        if len(errorstr) < 1990:
-            await ctx.reply(f"```{errorstr}```")
-        else:
-            await ctx.reply(
-                content="An error occured, please see attachment for the full message.",
-                file=discord.File(io.StringIO(error_to_display), filename="error.txt")
-            )
-        with push_scope() as scope:
-            scope.set_tag("guild", ctx.guild.id if ctx.guild else "")
-            scope.set_tag("channel", ctx.channel.id if ctx.channel else "")
-            scope.set_tag("user", f"{ctx.author.name}#{ctx.author.discriminator}" if ctx.author else "")
-            raise error_to_display
+#         errorstr = repr(error_to_display)
+#         if len(errorstr) < 1990:
+#             await ctx.reply(f"```{errorstr}```")
+#         else:
+#             await ctx.reply(
+#                 content="An error occured, please see attachment for the full message.",
+#                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
+#             )
+#         with push_scope() as scope:
+#             scope.set_tag("guild", ctx.guild.id if ctx.guild else "")
+#             scope.set_tag("channel", ctx.channel.id if ctx.channel else "")
+#             scope.set_tag("user", f"{ctx.author.name}#{ctx.author.discriminator}" if ctx.author else "")
+#             raise error_to_display
 
 
 @discordbot.event

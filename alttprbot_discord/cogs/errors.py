@@ -124,13 +124,15 @@ class Errors(commands.Cog, name="errors"):
                 await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original.text}")
             else:
                 await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
+            # raise d_error.original
         except app_commands.CheckFailure as d_error:
             if isinstance(d_error, app_commands.errors.CommandOnCooldown):
                 await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
             else:
                 await edit(content=f"{riplink} `{type(d_error).__name__}` : {d_error}")
-        except app_commands.CommandNotFound:
-            await edit(content=f"{riplink} Command was not found.. Seems to be a discord bug, probably due to desynchronization.\nMaybe there is multiple commands with the same name, you should try the other one.")
+        except app_commands.CommandNotFound as d_error:
+            await edit(content=f"{riplink} Command was not found.. Seems to be a discord bug, probably due to desynchronization.\nTry again in a little bit, and if this still happens after an hour contact Synack for help.")
+            raise d_error
         except Exception as e:
             """
             Caught here:
