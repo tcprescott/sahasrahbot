@@ -1,63 +1,28 @@
 import os
+import logging
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from racetime_bot import Bot
 
 from alttprbot import models
 
-# TODO: make work with discord.py 2.0
-
-
-async def role_name_autocomplete(ctx):
-    return [r.name for r in ctx.interaction.guild.roles if r.name.startswith(ctx.value)][:25]
-
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
-
-class Nickname(commands.Cog):
+class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands for rt.gg integration"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    # @commands.command(
-    #     help="Register your Twitch name with SahasrahBot."
-    # )
-    # async def twitch(self, ctx, twitch):
-    #     await srlnick.insert_twitch_name(ctx.author.id, twitch)
-
-    # @commands.command(
-    #     help="Register your RaceTime.gg nick with SahasrahBot."
-    # )
-    # async def rtgg(self, ctx):
-    #     await ctx.reply(f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!")
-
-    # @commands.command(
-    #     help="List the nicknames registered with SahasrahBot."
-    # )
-    # async def getnick(self, ctx):
-    #     nick = await srlnick.get_nickname(ctx.author.id)
-    #     if nick:
-    #         await ctx.reply(f"Your currently registered nickname for Twitch is `{nick[0]['twitch_name']}`")
-    #     else:
-    #         await ctx.reply("You currently do not have any nicknames registered with this bot.  Use the command `$twitch yournick` to do that!")
-
-    rtggadmin = SlashCommandGroup(
-        "rtgg",
-        "Miscellaneous administrative commands for RaceTime.gg",
+    @app_commands.command(description="Used by Synack to blast requests to link your RaceTime.gg account to this bot.")
+    @app_commands.describe(
+        role="Choose a role to blast",
     )
-
-    @rtggadmin.command()
-    async def blast(self, interaction: discord.Interaction, role_name: Option(str, "Choose a role to blast", required=True, autocomplete=role_name_autocomplete)):
-        """
-        Used by Synack to blast requests to link your RaceTime.gg account to this bot.
-        """
-        if not await self.bot.is_owner(ctx.author):
-            await ctx.reply("Only the bot owner can use this command.")
+    async def blast(self, interaction: discord.Interaction, role: discord.Role):
+        if not await self.bot.is_owner(interaction.user):
+            await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
             return
 
-        role: discord.Role = discord.utils.get(ctx.guild._roles.values(), name=role_name)
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         msg = []
         for member in role.members:
             result = await models.SRLNick.get_or_none(discord_user_id=member.id)
@@ -71,23 +36,23 @@ class Nickname(commands.Cog):
                     msg.append(f"Send DM to {member.name}#{member.discriminator}")
                 except (discord.Forbidden, discord.HTTPException) as e:
                     msg.append(f"Failed to send DM to {member.name}#{member.discriminator}.\n\n{str(e)}")
+                    logging.exception(f"Failed to send DM to {member.name}#{member.discriminator}.")
 
         if msg:
-            await ctx.respond("\n".join(msg))
+            await interaction.followup.send("\n".join(msg), ephemeral=True)
         else:
-            await ctx.respond("No messages sent.")
+            await interaction.followup.send("No messages sent.", ephemeral=True)
 
-    @rtggadmin.command()
-    async def report(self, interaction: discord.Interaction, role_name: Option(str, "Choose a role to report", required=True, autocomplete=role_name_autocomplete)):
-        """
-        Used by Synack to report users who have not linked their racetime account to SahasrahBot.
-        """
-        if not await self.bot.is_owner(ctx.author):
-            await ctx.reply("Only the bot owner can use this command.")
+    @app_commands.command(description="Used by Synack to report users who have not linked their racetime account to SahasrahBot.")
+    @app_commands.describe(
+        role="Choose a role to blast",
+    )
+    async def report(self, interaction: discord.Interaction, role: discord.Role):
+        if not await self.bot.is_owner(interaction.user):
+            await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
             return
 
-        await interaction.response.defer()
-        role: discord.Role = discord.utils.get(ctx.guild._roles.values(), name=role_name)
+        await interaction.response.defer(ephemeral=True)
         msg = []
         for member in role.members:
             result = await models.SRLNick.get_or_none(discord_user_id=member.id)
@@ -95,11 +60,11 @@ class Nickname(commands.Cog):
                 msg.append(f"{member.name}#{member.discriminator}")
 
         if msg:
-            await ctx.respond("\n".join(msg))
+            await interaction.followup.send("\n".join(msg), ephemeral=True)
 
         else:
-            await ctx.respond("Everyone in this role is registered with the bot.")
+            await interaction.followup.send("Everyone in this role is registered with the bot.", ephemeral=True)
 
 
 async def setup(bot):
-    await bot.add_cog(Nickname(bot))
+    await bot.add_cog(RtggAdmin(bot))

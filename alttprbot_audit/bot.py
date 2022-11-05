@@ -33,9 +33,9 @@ discordbot = commands.Bot(
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
-discordbot.load_extension("alttprbot_audit.cogs.audit")
-discordbot.load_extension("alttprbot_audit.cogs.moderation")
-
+async def load_extensions():
+    await discordbot.load_extension("alttprbot_audit.cogs.audit")
+    await discordbot.load_extension("alttprbot_audit.cogs.moderation")
 
 @discordbot.event
 async def on_command_error(ctx, error):
@@ -69,3 +69,13 @@ async def on_command_error(ctx, error):
                 file=discord.File(io.StringIO(error_to_display), filename="error.txt")
             )
         raise error_to_display
+
+@discordbot.event
+async def on_ready():
+    await discordbot.tree.sync()
+
+async def start_bot():
+    await load_extensions()
+    if c.DEBUG:
+        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540)) # hard code the discord server id for now
+    await discordbot.start(os.environ.get("DISCORD_TOKEN"))

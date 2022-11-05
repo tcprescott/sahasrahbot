@@ -45,8 +45,7 @@ class Tournament(commands.Cog):
             try:
                 episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
             except Exception as e:
-                logging.exception(
-                    "Encountered a problem when attempting to retrieve SG schedule.")
+                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                 continue
             for episode in episodes:
                 logging.info(episode['id'])
@@ -326,110 +325,6 @@ class Tournament(commands.Cog):
                             messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
-
-    @commands.slash_command(
-        name='alttpr2022',
-        guild_ids=MAIN_TOURNAMENT_SERVERS,
-    )
-    async def alttpr2022(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member):
-        """
-        Generate a randomizer seed for the ALTTPR Main Tournament 2022.
-        """
-        await interaction.response.defer()
-        seed, preset, deck = await alttpr.roll_seed([player1, player2])
-
-        embed = await seed.embed(emojis=self.bot.emojis)
-        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
-        if deck:
-            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
-
-        await ctx.respond(embed=embed)
-
-    @commands.slash_command(
-        name='cc2022',
-        guild_ids=CC_TOURNAMENT_SERVERS,
-    )
-    async def challenge_cup(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
-        """
-        Generate a randomizer seed for the 2022 challenge cup.
-        """
-
-        if on_behalf_of and ctx.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in ctx.author.roles:
-            await ctx.respond("You must be a member of the Challenge Cup admin team to roll a seed on someone else's behalf..")
-            return
-
-        if (player3 or player4) and ctx.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in ctx.author.roles:
-            await ctx.respond("You must be a member of the Challenge Cup admin team to roll a seed with more than 2 players.")
-            return
-
-        if ctx.author == opponent:
-            await ctx.respond("You can't race yourself.")
-            return
-
-        if on_behalf_of is None:
-            on_behalf_of = ctx.author
-
-        if opponent.bot or on_behalf_of.bot:
-            await ctx.respond("You can't race a bot.")
-            return
-
-        players = [opponent, on_behalf_of]
-        if player3:
-            players.append(player3)
-        if player4:
-            players.append(player4)
-
-        await interaction.response.defer()
-        embed = await self.generate_deck_seed(players, "cc2022")
-
-        for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
-            channel = self.bot.get_channel(channel_id)
-            await channel.send(embed=embed)
-
-        for player in players:
-            await player.send(embed=embed)
-
-        await ctx.respond("Seed successfully sent to DM.")
-
-    @commands.slash_command(
-        name='alttpr2022multi',
-        guild_ids=MAIN_TOURNAMENT_SERVERS,
-    )
-    async def alttpr2022multi(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member, player3: discord.Member = None, player4: discord.Member = None):
-        """
-        Generate a randomizer seed for the 2022 challenge cup.
-        """
-
-        if ctx.guild.get_role(MAIN_TOURNAMENT_ADMIN_ROLE_ID) not in ctx.author.roles:
-            await ctx.respond("You must be an admin to use this command.")
-            return
-
-        players = [player1, player2]
-        if player3:
-            players.append(player3)
-        if player4:
-            players.append(player4)
-
-        await interaction.response.defer()
-        embed = await self.generate_deck_seed(players, "alttpr2022")
-
-        for player in players:
-            await player.send(embed=embed)
-
-        await ctx.respond(embed=embed)
-
-    async def generate_deck_seed(self, players, event_slug):
-        seed, preset, deck = await alttpr.roll_seed(players, event_slug=event_slug)
-
-        embed = await seed.embed(emojis=self.bot.emojis)
-        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
-        if deck:
-            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
-
-        embed.title = " vs. ".join([p.display_name for p in players])
-        embed.description = " vs. ".join([p.mention for p in players])
-
-        return embed
 
 async def setup(bot):
     await bot.add_cog(Tournament(bot))

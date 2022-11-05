@@ -17,22 +17,19 @@ class SgDaily(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="sgdaily")
-    async def sgdaily_oldcmd(self, ctx: commands.Context):
-        await ctx.reply("Please use the /sgdaily command instead.")
-
-    @commands.slash_command(name="sgdaily", guild_ids=ALTTP_RANDOMIZER_SERVERS)
+    # TODO: must be specific to ALTTP_RANDOMIZER_SERVERS
+    @app_commands.command(name="sgdaily", description="Retrieves the next SG daily race.")
     async def sgdaily_cmd(
         self,
-        ctx: discord.ApplicationContext,
-        number_of_days: Option(int, description="Number of days to lookup.", default=1)
+        interaction: discord.Interaction,
+        number_of_days: app_commands.Range[int, 1, 8] = 1,
     ):
         """
         Retrieves the next SG daily race.
         """
         sg_schedule = await speedgaming.get_upcoming_episodes_by_event("alttprdaily", hours_past=0, hours_future=192)
         if len(sg_schedule) == 0:
-            await ctx.respond("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
+            await interaction.response.send_message("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
             return
 
         if number_of_days == 1:
@@ -65,8 +62,8 @@ class SgDaily(commands.Cog):
 
         embed.set_thumbnail(
             url='https://pbs.twimg.com/profile_images/1185422684190105600/3jiXIf5Y_400x400.jpg')
-        await ctx.respond(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(SgDaily(bot))

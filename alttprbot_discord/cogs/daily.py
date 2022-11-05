@@ -13,7 +13,7 @@ from ..util.alttpr_discord import ALTTPRDiscord
 
 class Daily(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
         self.announce_daily.start()
 
     @app_commands.command(description='Returns the current daily game from alttpr.com.')
@@ -44,7 +44,7 @@ class Daily(commands.Cog):
         await self.bot.wait_until_ready()
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Daily(bot))
 
 
