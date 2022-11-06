@@ -9,7 +9,7 @@ import gspread_asyncio
 import gspread.exceptions
 import isodate
 import pytz
-from alttprbot_racetime.bot import racetime_bots
+from alttprbot_racetime import bot as racetimebot
 
 from alttprbot import models
 from alttprbot.tournament import (test, alttpr, alttprcd, alttprde, alttpres, alttprfr, alttprmini,  # pylint: disable=unused-import
@@ -95,7 +95,7 @@ async def fetch_tournament_handler_v2(event, episode: dict, rtgg_handler=None):
 
 async def create_tournament_race_room(event, episodeid):
     event_data = await TOURNAMENT_DATA[event].get_config()
-    rtgg_bot = racetime_bots[event_data.data.racetime_category]
+    rtgg_bot = racetimebot.racetime_bots[event_data.data.racetime_category]
     race = await models.TournamentResults.get_or_none(episode_id=episodeid)
     if race:
         async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"), raise_for_status=True) as resp:
