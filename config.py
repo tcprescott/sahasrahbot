@@ -31,14 +31,6 @@ class Config:
     # if gsheet_api_oauth is not None:
     #     gsheet_api_oauth = json.loads(gsheet_api_oauth, strict=False)
 
-    SB_TWITCH_TOKEN = os.environ.get("SB_TWITCH_TOKEN")
-    SB_TWITCH_CLIENT_ID = os.environ.get("SB_TWITCH_CLIENT_ID")
-    SB_TWITCH_NICK = os.environ.get("SB_TWITCH_NICK")
-    SB_TWITCH_PREFIX = os.environ.get("SB_TWITCH_PREFIX")
-    SB_TWITCH_CHANNELS = os.environ.get("SB_TWITCH_CHANNELS")
-    if SB_TWITCH_CHANNELS is not None:
-        SB_TWITCH_CHANNELS = SB_TWITCH_CHANNELS.split(',')
-
     RACETIME_CLIENT_ID = os.environ.get("RACETIME_CLIENT_ID")
     RACETIME_CLIENT_SECRET = os.environ.get("RACETIME_CLIENT_SECRET")
     RACETIME_COMMAND_PREFIX = os.environ.get("RACETIME_COMMAND_PREFIX")

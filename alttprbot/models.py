@@ -78,21 +78,6 @@ class InquiryMessageConfig(Model):
     role_id = fields.BigIntField(null=False)
 
 
-class LeaguePlayoffs(Model):
-    class Meta:
-        table = 'league_playoffs'
-
-    episode_id = fields.IntField(pk=True, generated=False)
-    playoff_round = fields.CharField(45, null=True)
-    game_number = fields.IntField(null=True)
-    type = fields.CharField(45, null=True)
-    preset = fields.CharField(45, null=True)
-    settings = fields.JSONField(null=True)
-    submitted = fields.SmallIntField(null=True)
-    created = fields.DatetimeField(auto_now_add=True)
-    modified = fields.DatetimeField(auto_now=True)
-
-
 class PatchDistribution(Model):
     class Meta:
         table = 'patch_distribution'
@@ -371,7 +356,7 @@ class SpeedGamingDailies(Model):
     slug = fields.CharField(45, null=True)
     guild_id = fields.BigIntField(null=False)
     announce_channel = fields.BigIntField(null=False)
-    announce_message = fields.BigIntField(null=False)
+    announce_message = fields.CharField(2000, null=False)
     racetime_category = fields.CharField(45, null=True)
     racetime_goal = fields.CharField(45, null=True)
     race_info = fields.CharField(2000, null=False)
@@ -411,14 +396,6 @@ class SGL2020TournamentBO3(Model):
     updated = fields.DatetimeField(auto_now=True)
 
 
-class TwitchChannels(Model):
-    class Meta:
-        table = 'twitch_channels'
-
-    channel = fields.CharField(200, pk=True)
-    status = fields.CharField(45, null=False)
-
-
 class VoiceRole(Model):
     class Meta:
         table = 'voice_role'
@@ -428,49 +405,48 @@ class VoiceRole(Model):
     voice_channel_id = fields.BigIntField(null=False)
     role_id = fields.BigIntField(null=False)
 
-# class RankedChoice(Model):
-#     class Meta:
-#         table = 'ranked_choice'
+class RankedChoiceElection(Model):
+    class Meta:
+        table = 'ranked_choice_election'
 
-#     id = fields.IntField(pk=True)
-#     guild_id = fields.BigIntField(null=False)
-#     channel_id = fields.BigIntField(null=False)
-#     message_id = fields.BigIntField(null=False)
-#     owner_id = fields.BigIntField(null=False)
-#     title = fields.CharField(200, null=False)
-#     description = fields.CharField(2000, null=False)
-#     show_vote_count = fields.BooleanField(null=False, default=True)
-#     show_realtime_results = fields.BooleanField(null=False, default=True)
-#     active = fields.BooleanField(null=False, default=True)
-#     created = fields.DatetimeField(auto_now_add=True)
-#     updated = fields.DatetimeField(auto_now=True)
+    id = fields.IntField(pk=True)
+    guild_id = fields.BigIntField(null=False)
+    channel_id = fields.BigIntField(null=False)
+    message_id = fields.BigIntField(null=False)
+    owner_id = fields.BigIntField(null=False)
+    title = fields.CharField(200, null=False)
+    description = fields.CharField(2000, null=False)
+    show_vote_count = fields.BooleanField(null=False, default=True)
+    active = fields.BooleanField(null=False, default=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
 
-# class RankedChoiceAuthorizedVoters(Model):
-#     class Meta:
-#         table = 'ranked_choice_authorized_voters'
+class RankedChoiceAuthorizedVoters(Model):
+    class Meta:
+        table = 'ranked_choice_authorized_voters'
 
-#     id = fields.IntField(pk=True)
-#     ranked_choice = fields.ForeignKeyField('models.RankedChoice', related_name='id')
-#     user_id = fields.BigIntField(null=False)
+    id = fields.IntField(pk=True)
+    election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='authorized_voters')
+    user_id = fields.BigIntField(null=False)
 
-# class RankedChoiceOption(Model):
-#     class Meta:
-#         table = 'ranked_choice_option'
+class RankedChoiceCandidate(Model):
+    class Meta:
+        table = 'ranked_choice_candidate'
 
-#     id = fields.IntField(pk=True)
-#     ranked_choice = fields.ForeignKeyField('models.RankedChoice', related_name='id')
-#     option = fields.CharField(200, null=False)
-#     created = fields.DatetimeField(auto_now_add=True)
-#     updated = fields.DatetimeField(auto_now=True)
+    id = fields.IntField(pk=True)
+    election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='candidates')
+    candidate_name = fields.CharField(200, null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
 
-# class RankedChoiceVotes(Model):
-#     class Meta:
-#         table = 'ranked_choice_votes'
+class RankedChoiceVotes(Model):
+    class Meta:
+        table = 'ranked_choice_votes'
 
-#     id = fields.IntField(pk=True)
-#     ranked_choice = fields.ForeignKeyField('models.RankedChoice', related_name='id')
-#     user_id = fields.BigIntField(null=False)
-#     option = fields.ForeignKeyField('models.RankedChoiceOption', related_name='id')
-#     rank = fields.IntField()
-#     created = fields.DatetimeField(auto_now_add=True)
-#     updated = fields.DatetimeField(auto_now=True)
+    id = fields.IntField(pk=True)
+    election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='votes')
+    user_id = fields.BigIntField(null=False)
+    candidate = fields.ForeignKeyField('models.RankedChoiceCandidate', related_name='votes')
+    rank = fields.IntField(null=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
