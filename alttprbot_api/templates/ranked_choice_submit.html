@@ -1,0 +1,25 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>{{ election.title }}</title>
+{%- endblock head %}
+
+{% block content -%}
+<h1>{{ election.title }}</h1>
+<p>Below is your votes.  If this is not correct, please contact Synack ASAP to have your ballot cleared so you may vote again.</p>
+<p>Your vote is confidential.</p>
+<table border="1">
+    <tr>
+        <th>Candidate</th>
+        <th>Rank</th>
+    </tr>
+    <div class="option">
+        {% for vote in votes %}
+        <tr>
+            <td>{{ vote.candidate.candidate_name }}</td>
+            <td>{{ vote.rank }}</td>
+        </tr>
+        {% endfor %}
+    </div>
+</table>
+{%- endblock content %}

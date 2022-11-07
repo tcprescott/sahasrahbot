@@ -1,38 +1,28 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-<title>Ranked Choice Voting</title>
+<title>{{ election.title }}</title>
 {%- endblock head %}
 
 {% block content -%}
-<h1>Ballot for X</h1>
+<h1>{{ election.title }}</h1>
 <p>Rank each candidate using 1 for the most favorable, up to 999 for the least favorable.  You can leave a field blank to not vote at all for a candidate.</p>
 <p>Your vote is confidential.  You'll be asked to confirm the ranking of the candidates after submitting this form.  Your vote is not final until confirmed on the next page.</p>
-<form action="/ranked_choice/submit" method="post">
-    <table>
+<form action="/ranked_choice/{{ election.id }}" method="post">
+    <table border="1">
         <tr>
             <th>Candidate</th>
             <th>Rank</th>
         </tr>
         <div class="option">
-        <tr>
-            <td><label for="candidate-name">Synack</label></td>
-            <td><input type="number" class="candidate-rank" id="rank1"  min="1" max="999"/></td>
-        </tr>
-        <tr>
-            <td><label for="candidate-name">SynAlt</label></td>
-            <td><input type="number" class="candidate-rank" id="rank2"  min="1" max="999"/></td>
-        </tr>
-        <tr>
-            <td><label for="candidate-name">SomeoneElse</label></td>
-            <td><input type="number" class="candidate-rank" id="rank3"  min="1" max="999"/></td>
-        </tr>
-        <tr>
-            <td><label for="candidate-name">AnotherPerson</label></td>
-            <td><input type="number" class="candidate-rank" id="rank4"  min="1" max="999"/></td>
-        </tr>
+            {% for candidate in election.candidates %}
+            <tr>
+                <td><label for="candidate-name">{{ candidate.candidate_name }}</label></td>
+                <td><input type="number" class="candidate-rank" name="candidate_{{ candidate.id }}" id="{{ candidate.id }}"  min="1" max="999"/></td>
+            </tr>
+            {% endfor %}
         </div>
     </table>
     <input type="submit" value="Submit"/>
 </form>
-{%- endblock content %}
+{%- endblock content %}  
