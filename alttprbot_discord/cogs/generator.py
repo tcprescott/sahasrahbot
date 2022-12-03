@@ -234,7 +234,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
                 value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
                 inline=False
             )
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities for the ALTTP Randomizer"):
     def __init__(self, bot: commands.Bot) -> None:
