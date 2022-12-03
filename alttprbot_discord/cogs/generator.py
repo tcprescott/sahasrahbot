@@ -546,7 +546,7 @@ class Generator(commands.Cog):
         await interaction.followup.send(seed_uri)
 
 
-    @smz3.autocomplete("preset")
+    @ctjets.autocomplete("preset")
     async def ctjets_autocomplete(self, interaction: discord.Interaction, current: str):
         presets = await generator.CTJetsPreset().search(current)
         return [app_commands.Choice(name=preset, value=preset) for preset in presets]
