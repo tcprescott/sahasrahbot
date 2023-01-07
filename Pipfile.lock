@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "776d7d2f3bc113f01b499916fa564538fc0b87049c52ed7f33d484dd4d5877e4"
+            "sha256": "75adea9baab2d36699163ed81767ccc6270e8db21da42d6039ca77aa4fcaa94b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -17,7 +17,7 @@
     },
     "default": {
         "1e6d33a": {
-            "file": "https://github.com/tcprescott/racetime-bot/archive/efe872d3c2a0157baa052cd77bcbbc5b9a7caa26.zip"
+            "file": "https://github.com/tcprescott/racetime-bot/archive/1e74910b1520c4be31a84253dabeda264fe54841.zip"
         },
         "aerich": {
             "hashes": [
@@ -1307,6 +1307,7 @@
                 "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
                 "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8"
             ],
+            "markers": "python_version >= '3.6'",
             "version": "==1.26.13"
         },
         "webencodings": {
