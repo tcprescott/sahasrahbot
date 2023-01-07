@@ -31,11 +31,11 @@ else:
         # REGULAR TOURNEMNTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        # 'alttprde': alttprde.ALTTPRDETournamentBrackets,
-        'alttprmini': alttprmini.ALTTPRMiniTournament,
+        'alttprde': alttprde.ALTTPRDETournamentGroups,
+        # 'alttprmini': alttprmini.ALTTPRMiniTournament,
         # 'alttpr': alttpr.ALTTPR2022Race,
-        'boots': boots.ALTTPRCASBootsTournamentRace,
-        'nologic': nologic.ALTTPRNoLogicRace,
+        # 'boots': boots.ALTTPRCASBootsTournamentRace,
+        # 'nologic': nologic.ALTTPRNoLogicRace,
         # 'smwde': smwde.SMWDETournament,
         # 'alttprfr': alttprfr.ALTTPRFRTournament,
         # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,

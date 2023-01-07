@@ -14,9 +14,9 @@ from alttprbot_discord.util import alttpr_discord
 from pyz3r.customizer import BASE_CUSTOMIZER_PAYLOAD
 
 ALTTPRDE_TITLE_MAP = {
-    'Game 1 (Standard)': 'standard',
-    'Game 2 (Open)': 'open',
-    'Game 3 (Casual Boots)': 'casualboots',
+    'Standard': 'standard',
+    'Open': 'open',
+    'Casual Boots': 'casualboots',
 }
 
 TRIFORCE_TEXTS = [
@@ -37,39 +37,43 @@ TRIFORCE_TEXTS = [
 ]
 
 
-class ALTTPRDEPracticeView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
+# class ALTTPRDEPracticeView(discord.ui.View):
+#     def __init__(self):
+#         super().__init__(timeout=None)
 
-    async def on_error(self, error: Exception, item, interaction) -> None:
-        raise error
+#     async def on_error(self, error: Exception, item, interaction) -> None:
+#         raise error
 
-    @discord.ui.button(label="Generate a Practice Seed", style=discord.ButtonStyle.blurple, custom_id="sahabot:alttprde:practice", row=1)
-    async def practice(self, interaction: discord.Interaction, button: discord.ui.Button):
-        respmsg = await interaction.response.send_message("Generating, please wait...")
-        episode_id = get_embed_field("Episode ID", interaction.message.embeds[0])
-        tournament_game = await models.TournamentGames.get(episode_id=episode_id)
+#     @discord.ui.button(label="Generate a Practice Seed", style=discord.ButtonStyle.blurple, custom_id="sahabot:alttprde:practice", row=1)
+#     async def practice(self, interaction: discord.Interaction, button: discord.ui.Button):
+#         respmsg = await interaction.response.send_message("Generating, please wait...")
+#         episode_id = get_embed_field("Episode ID", interaction.message.embeds[0])
+#         tournament_game = await models.TournamentGames.get(episode_id=episode_id)
 
-        seed = await alttpr_discord.ALTTPRDiscord.generate(settings=tournament_game.settings, endpoint='/api/customizer')
+#         seed = await alttpr_discord.ALTTPRDiscord.generate(settings=tournament_game.settings, endpoint='/api/customizer')
 
-        await models.AuditGeneratedGames.create(
-            randomizer='alttpr',
-            hash_id=seed.hash,
-            permalink=seed.url,
-            settings=tournament_game.settings,
-            gentype='preset',
-            genoption=f'episode {episode_id}',
-            customizer=1,
-            doors=0
-        )
+#         await models.AuditGeneratedGames.create(
+#             randomizer='alttpr',
+#             hash_id=seed.hash,
+#             permalink=seed.url,
+#             settings=tournament_game.settings,
+#             gentype='preset',
+#             genoption=f'episode {episode_id}',
+#             customizer=1,
+#             doors=0
+#         )
 
-        embed = await seed.embed(emojis=discordbot.emojis)
-        await respmsg.edit_original_message(content=None, embed=embed)
+#         embed = await seed.embed(emojis=discordbot.emojis)
+#         await respmsg.edit_original_message(content=None, embed=embed)
 
 
 class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
-        preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
+        try:
+            preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
+        except KeyError:
+            await self.rtgg_handler.send_message("Invalid mode chosen, please contact a tournament admin for assistance.")
+            raise
         self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
 
     async def configuration(self):
@@ -228,7 +232,7 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
         await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': settings, 'event': self.event_slug, 'game_number': payload['game']})
 
         if self.audit_channel:
-            await self.audit_channel.send(embed=embed, view=ALTTPRDEPracticeView())
+            await self.audit_channel.send(embed=embed)
 
         for name, player in self.player_discords:
             if player is None:
@@ -237,7 +241,7 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
                     await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
                 continue
             try:
-                await player.send(embed=embed, view=ALTTPRDEPracticeView())
+                await player.send(embed=embed)
             except discord.HTTPException:
                 logging.exception(f"Could not send DM to {name}")
                 if self.audit_channel:
