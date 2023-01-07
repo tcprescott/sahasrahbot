@@ -4,7 +4,7 @@ from alttprbot_racetime.config import RACETIME_CATEGORIES
 
 logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 logger_handler.setFormatter(logging.Formatter(
