@@ -1,5 +1,5 @@
 customizer: true
-goal_name: Trinity by thkg00fy - version 0.8
+goal_name: Trinity by thkg00fy - version 1.0 final
 randomizer: alttpr
 settings:
   accessibility: items
@@ -53,6 +53,7 @@ settings:
         BigKeyD5: 1
         BigKeyD6: 1
         BigKeyD7: 1
+        BigKeyH1: 0
         BigKeyH2: 0
         BigKeyP1: 1
         BigKeyP2: 1
@@ -91,6 +92,7 @@ settings:
         CompassD5: 1
         CompassD6: 1
         CompassD7: 1
+        CompassH1: 0
         CompassH2: 0
         CompassP1: 1
         CompassP2: 1
@@ -116,6 +118,7 @@ settings:
         KeyD5: 2
         KeyD6: 3
         KeyD7: 4
+        KeyH1: 0
         KeyH2: 1
         KeyP1: 0
         KeyP2: 1
@@ -135,6 +138,7 @@ settings:
         MapD5: 1
         MapD6: 1
         MapD7: 1
+        MapH1: 0
         MapH2: 1
         MapP1: 1
         MapP2: 1
@@ -175,119 +179,119 @@ settings:
         Triforce: 0
         TriforcePiece: 10
         TwentyRupees: 28
-    item.Goal.Required: "8"
+    item.Goal.Required: '8'
     item.require.Lamp: false
-    item.value.BlueClock: ""
-    item.value.GreenClock: ""
-    item.value.RedClock: ""
-    item.value.Rupoor: ""
+    item.value.BlueClock: ''
+    item.value.GreenClock: ''
+    item.value.RedClock: ''
+    item.value.Rupoor: ''
     prize.crossWorld: true
     prize.shuffleCrystals: true
     prize.shufflePendants: true
-    region.bossNormalLocation: false
+    region.bossNormalLocation: true
     region.wildBigKeys: false
     region.wildCompasses: false
     region.wildKeys: false
     region.wildMaps: false
-    rom.dungeonCount: "off"
+    rom.dungeonCount: 'off'
     rom.freeItemMenu: false
     rom.freeItemText: false
     rom.genericKeys: false
     rom.logicMode: NoGlitches
     rom.mapOnPickup: true
     rom.rupeeBow: false
-    rom.timerMode: "off"
-    rom.timerStart: ""
+    rom.timerMode: 'off'
+    rom.timerStart: ''
     spoil.BootsLocation: false
   drops:
-    "0":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-    "1":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-    "2":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-    "3":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-    "4":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-    "5":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-    "6":
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    '0':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    '1':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    '2':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    '3':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    '4':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    '5':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    '6':
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     crab:
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
     fish:
-      - auto_fill
+    - auto_fill
     pull:
-      - auto_fill
-      - auto_fill
-      - auto_fill
+    - auto_fill
+    - auto_fill
+    - auto_fill
     stun:
-      - auto_fill
+    - auto_fill
   dungeon_items: standard
   enemizer:
     boss_shuffle: none
     enemy_damage: default
     enemy_health: default
     enemy_shuffle: none
-    pot_shuffle: "off"
+    pot_shuffle: 'off'
   eq:
-    - BossHeartContainer
-    - BossHeartContainer
-    - BossHeartContainer
+  - BossHeartContainer
+  - BossHeartContainer
+  - BossHeartContainer
   glitches: none
-  goal: ganon
-  hints: "off"
+  goal: fast_ganon
+  hints: 'off'
   item:
     functionality: normal
     pool: normal
@@ -297,9 +301,9 @@ settings:
   lang: en
   mode: open
   name: Trinity
-  notes:
-    "Three ways to finish this Seed: Pedestal, Triforce Pieces or Ganon Fight.
-    Choose your own way based on the items you find."
-  spoilers: "off"
+  notes: 'Three ways to finish this Seed: Pedestal, Triforce Pieces or Ganon Fight.
+    Choose your own way based on the items you find.'
+  spoilers: 'off'
   tournament: true
   weapons: randomized
+  version: "v1.0 final"
