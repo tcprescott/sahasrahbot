@@ -156,7 +156,7 @@ class AlttprDoor():
 
     @property
     def version(self):
-        return re.search("ALttP Entrance Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
+        return re.search("ALttP Door Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
 
     @property
     def doors(self):
