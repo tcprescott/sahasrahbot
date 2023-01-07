@@ -1,5 +1,16 @@
+import asyncio
 from .alttpr import GameHandler as TestGameHandler
 
 
 class GameHandler(TestGameHandler):
-    pass
+    async def ex_test(self, args, message):
+        try:
+            seconds = int(args[0])
+        except IndexError:
+            seconds = 30
+        except ValueError:
+            await self.send_message("Invalid number of seconds")
+            return
+        await self.send_message(f"initated test command, waiting {seconds} seconds")
+        await asyncio.sleep(seconds)
+        await self.send_message("test command complete")

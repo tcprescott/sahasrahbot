@@ -41,4 +41,4 @@ pylint = "*"
 python_version = "3.8"
 
 [packages.1e6d33a]
-file = "https://github.com/tcprescott/racetime-bot/archive/6c9b41087196541a9794f3cf6f6afe4648bb5644.zip"
+file = "https://github.com/tcprescott/racetime-bot/archive/efe872d3c2a0157baa052cd77bcbbc5b9a7caa26.zip"
