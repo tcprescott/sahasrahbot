@@ -1,4 +1,4 @@
-from .z1r import GameHandler as TestGameHandler
+from .alttpr import GameHandler as TestGameHandler
 
 
 class GameHandler(TestGameHandler):

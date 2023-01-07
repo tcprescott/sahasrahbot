@@ -121,11 +121,13 @@ class Errors(commands.Cog, name="errors"):
         except app_commands.CommandInvokeError as d_error:
             if isinstance(d_error.original, discord.errors.InteractionResponded):
                 await edit(content=f"{riplink} {d_error.original}")
+                raise d_error.original
             elif isinstance(d_error.original, discord.errors.Forbidden):
                 await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original.text}")
+                raise d_error.original
             else:
                 await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
-            # raise d_error.original
+                raise d_error.original
         except app_commands.CheckFailure as d_error:
             if isinstance(d_error, app_commands.errors.CommandOnCooldown):
                 await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
