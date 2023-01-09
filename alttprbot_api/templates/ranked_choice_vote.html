@@ -7,7 +7,7 @@
 {% block content -%}
 <h1>{{ election.title }}</h1>
 <p>Rank each candidate using 1 for the most favorable, up to 999 for the least favorable.  You can leave a field blank to not vote at all for a candidate.</p>
-<p>Your vote is confidential.  You'll be asked to confirm the ranking of the candidates after submitting this form.  Your vote is not final until confirmed on the next page.</p>
+<p>Your vote is confidential.  Your vote is not final until you click Submit.</p>
 <form action="/ranked_choice/{{ election.id }}" method="post">
     <table border="1">
         <tr>
