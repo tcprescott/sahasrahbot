@@ -3,6 +3,10 @@ from discord.ext import commands
 from alttprbot import models
 from typing import List
 import pyrankvote
+import os
+import io
+
+APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 
 async def calculate_results(election: models.RankedChoiceElection):
@@ -25,11 +29,12 @@ async def calculate_results(election: models.RankedChoiceElection):
         winner_candidate = next((c for c in election.candidates if c.name == winner.name), None)
         if winner_candidate:
             winner_candidate.winner = True
+            await winner_candidate.save()
 
     election.results = str(election_result)
     await election.save()
 
-    return election_result, [winner.name for winner in winners]
+    return
 
 def create_embed(election: models.RankedChoiceElection):
     embed = discord.Embed(title=election.title, description=election.description)
@@ -47,7 +52,7 @@ def create_embed(election: models.RankedChoiceElection):
 
             voter_list.append(f"<@{voter.user_id}>{suffix}")
         embed.add_field(name="Authorized Voters", value="\n".join(voter_list), inline=False)
-    embed.add_field(name="Vote URL", value=f"https://sahasrahbotapi.synack.live/rankedchoice/{election.id}", inline=False)
+    embed.add_field(name="Vote URL", value=f"{APP_URL}/ranked_choice/{election.id}", inline=False)
     embed.add_field(name="Owner", value=f"<@{election.owner_id}>", inline=False)
     embed.add_field(name="Status", value="Open" if election.active else "Closed", inline=False)
     embed.set_footer(text=f"ID: {election.id}")
@@ -60,4 +65,8 @@ async def refresh_election_post(election: models.RankedChoiceElection, bot: comm
 
     channel = bot.get_channel(election.channel_id)
     message = await channel.fetch_message(election.message_id)
-    await message.edit(embed=create_embed(election))
+    if election.results:
+        file = [discord.File(io.StringIO(election.results), filename="results.txt")]
+    else:
+        file = None
+    await message.edit(embed=create_embed(election), attachments=file)

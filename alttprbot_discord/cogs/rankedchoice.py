@@ -4,7 +4,9 @@ from discord import app_commands
 import discord
 from alttprbot import models
 from alttprbot.util import rankedchoice
-import io
+import os
+
+APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 class RankedChoiceMessageView(discord.ui.View):
     def __init__(self, bot: commands.Bot):
@@ -16,7 +18,7 @@ class RankedChoiceMessageView(discord.ui.View):
     #     await interaction.response.send_message(f"Vote at https://sahasrahbotapi.synack.live/ranked_choice/{self.election.id}", ephemeral=True)
 
     @discord.ui.button(label="End Election", custom_id="sahasrahbot:rankedchoice:end_election", style=discord.ButtonStyle.danger)
-    async def end_election(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def end_election(self, interaction: discord.Interaction, button: discord.ui.Button):
         # await interaction.response.send_message("Ending the election is not yet implemented.", ephemeral=True)
         await interaction.response.defer()
         election = await models.RankedChoiceElection.get(message_id=interaction.message.id)
