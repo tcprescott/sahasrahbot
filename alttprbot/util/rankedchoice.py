@@ -64,10 +64,10 @@ async def refresh_election_post(election: models.RankedChoiceElection, bot: comm
     await election.fetch_related('authorized_voters')
     await election.fetch_related('votes')
 
-    channel = bot.get_channel(election.channel_id)
-    message = await channel.fetch_message(election.message_id)
+    guild = bot.get_guild(election.guild_id)
+    message = await guild.fetch_message(election.message_id)
     if election.results:
         file = [discord.File(io.StringIO(election.results), filename="results.txt")]
+        await message.edit(embed=create_embed(election), attachments=file)
     else:
-        file = None
-    await message.edit(embed=create_embed(election), attachments=file)
+        await message.edit(embed=create_embed(election))
