@@ -410,16 +410,19 @@ class RankedChoiceElection(Model):
         table = 'ranked_choice_election'
 
     id = fields.IntField(pk=True)
-    guild_id = fields.BigIntField(null=False)
-    channel_id = fields.BigIntField(null=False)
-    message_id = fields.BigIntField(null=False)
+    guild_id = fields.BigIntField(null=True)
+    channel_id = fields.BigIntField(null=True)
+    message_id = fields.BigIntField(null=True)
     owner_id = fields.BigIntField(null=False)
     title = fields.CharField(200, null=False)
-    description = fields.CharField(2000, null=False)
+    description = fields.CharField(2000, null=True)
     show_vote_count = fields.BooleanField(null=False, default=True)
     active = fields.BooleanField(null=False, default=True)
+    private = fields.BooleanField(null=False, default=False)
+    seats = fields.SmallIntField(null=False, default=1)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+    results = fields.TextField(null=True)
 
 class RankedChoiceAuthorizedVoters(Model):
     class Meta:
@@ -435,9 +438,10 @@ class RankedChoiceCandidate(Model):
 
     id = fields.IntField(pk=True)
     election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='candidates')
-    candidate_name = fields.CharField(200, null=False)
+    name = fields.CharField(200, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+    winner = fields.BooleanField(null=True)
 
 class RankedChoiceVotes(Model):
     class Meta:

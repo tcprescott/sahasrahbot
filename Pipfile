@@ -32,6 +32,7 @@ pyz3r = "*"
 isodate = "*"
 "discord.py" = "*"
 jishaku = "*"
+pyrankvote = "*"
 
 [dev-packages]
 pycodestyle = "*"

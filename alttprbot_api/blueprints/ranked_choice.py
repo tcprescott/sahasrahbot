@@ -3,13 +3,15 @@ from quart_discord import requires_authorization
 import tortoise.exceptions
 
 from alttprbot import models
+from alttprbot.util import rankedchoice
+from alttprbot_discord.bot import discordbot
 
 from ..api import discord
 
 # TODO: add a way to resubmit votes (low priority)
-# TODO: add verification that the user is authorized to vote
 # TODO: client-side verification that ranked choices are unique
 # TODO: the entire Discord-side of this need to be written
+# TODO: deduplicate code between presentation and submission
 
 ranked_choice_blueprint = Blueprint('ranked_choice', __name__)
 
@@ -26,6 +28,11 @@ async def get_ballot(election_id: int):
 
     if not election.active:
         return abort(404, "Election is inactive.")
+
+    if election.private:
+        await election.fetch_related('authorized_voters')
+        if user.id not in [voter.user_id for voter in election.authorized_voters]:
+            return abort(403, "You are not authorized to vote in this election.")
 
     await election.fetch_related('candidates')
 
@@ -49,6 +56,11 @@ async def submit_ballot(election_id: int):
     if not election.active:
         return abort(404, "Election is inactive.")
 
+    if election.private:
+        authorized_voters = await election.authorized_voters.all()
+        if user.id not in [voter.user_id for voter in authorized_voters]:
+            return abort(403, "You are not authorized to vote in this election.")
+
     await election.fetch_related('candidates')
 
     existing_votes = await election.votes.filter(user_id=user.id)
@@ -57,10 +69,10 @@ async def submit_ballot(election_id: int):
 
     payload = await request.form
 
-    if dupcheck(payload.values()):
+    if dupcheck([v for v in payload.values() if not v == '']):
         return await abort(400, "Each candidate must have a unique rank.")
 
-    if dupcheck(payload.keys()):
+    if dupcheck(list(payload.keys())):
         return await abort(400, "You can only vote for each candidate once.  This should not have happened.  Please contact Synack.")
 
     votes = []
@@ -91,6 +103,8 @@ async def submit_ballot(election_id: int):
 
     votes.sort(key=sort_rank)
     await models.RankedChoiceVotes.bulk_create(votes)
+
+    await rankedchoice.refresh_election_post(election, discordbot)
 
     return await render_template('ranked_choice_submit.html', election=election, votes=votes, logged_in=logged_in, user=user)
 
