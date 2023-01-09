@@ -90,43 +90,43 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         election.message_id = message.id
         await election.save()
 
-    @app_commands.command(description="Refresh the .")
-    @app_commands.describe(election_id="The ID of the election.")
-    async def status(self, interaction: discord.Interaction, election_id: int):
-        election = await models.RankedChoiceElection.get(id=election_id)
-        await election.fetch_related('candidates')
-        await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
+    # @app_commands.command(description="Refresh the .")
+    # @app_commands.describe(election_id="The ID of the election.")
+    # async def status(self, interaction: discord.Interaction, election_id: int):
+    #     election = await models.RankedChoiceElection.get(id=election_id)
+    #     await election.fetch_related('candidates')
+    #     await election.fetch_related('authorized_voters')
+    #     await election.fetch_related('votes')
 
-        await interaction.response.send_message(embed=rankedchoice.create_embed(election))
+    #     await interaction.response.send_message(embed=rankedchoice.create_embed(election))
 
-    @app_commands.command(description="Forcibly refresh the election post.")
-    @app_commands.describe(election_id="The ID of the election.")
-    async def refresh(self, interaction: discord.Interaction, election_id: int):
-        election = await models.RankedChoiceElection.get(id=election_id)
-        await election.fetch_related('candidates')
-        await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
+    # @app_commands.command(description="Forcibly refresh the election post.")
+    # @app_commands.describe(election_id="The ID of the election.")
+    # async def refresh(self, interaction: discord.Interaction, election_id: int):
+    #     election = await models.RankedChoiceElection.get(id=election_id)
+    #     await election.fetch_related('candidates')
+    #     await election.fetch_related('authorized_voters')
+    #     await election.fetch_related('votes')
 
-        await rankedchoice.refresh_election_post(election, self.bot)
-        await interaction.response.send_message(f"Refreshed election post.", ephemeral=True)
+    #     await rankedchoice.refresh_election_post(election, self.bot)
+    #     await interaction.response.send_message(f"Refreshed election post.", ephemeral=True)
 
-    @app_commands.command(description="Temp command")
-    @app_commands.describe(election_id="The ID of the election.")
-    async def temp(self, interaction: discord.Interaction, election_id: int):
-        await interaction.response.defer()
-        election = await models.RankedChoiceElection.get(id=election_id)
-        await election.fetch_related('candidates')
-        await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
+    # @app_commands.command(description="Temp command")
+    # @app_commands.describe(election_id="The ID of the election.")
+    # async def temp(self, interaction: discord.Interaction, election_id: int):
+    #     await interaction.response.defer()
+    #     election = await models.RankedChoiceElection.get(id=election_id)
+    #     await election.fetch_related('candidates')
+    #     await election.fetch_related('authorized_voters')
+    #     await election.fetch_related('votes')
 
-        await rankedchoice.calculate_results(election)
+    #     await rankedchoice.calculate_results(election)
 
-        election.active = False
-        await election.save()
+    #     election.active = False
+    #     await election.save()
 
-        await rankedchoice.refresh_election_post(election, self.bot)
-        await interaction.followup.send("Successfully ended the election.", ephemeral=True)
+    #     await rankedchoice.refresh_election_post(election, self.bot)
+    #     await interaction.followup.send("Successfully ended the election.", ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RankedChoice(bot))
