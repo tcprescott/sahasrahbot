@@ -38,6 +38,7 @@ async def calculate_results(election: models.RankedChoiceElection):
 
 def create_embed(election: models.RankedChoiceElection):
     embed = discord.Embed(title=election.title, description=election.description)
+    embed.add_field(name="Seats up for election", value=election.seats, inline=False)
     embed.add_field(name="Candidates", value="\n".join([f"{i+1}. {candidate.name} {'✅' if candidate.winner else ''}" for i, candidate in enumerate(election.candidates)]), inline=False)
     if election.private:
         voter_list = []
