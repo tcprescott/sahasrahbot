@@ -93,6 +93,7 @@ title:  Presets
 | [retro](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/retro.yaml) |A throwback to Zelda 1.|   |
 | [sakuleague](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleague.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).|   |
 | [sakuleagueboots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sakuleagueboots.yaml) |An easy preset.  Intended for the Friday Night [Saku Racing League](https://twitch.tv/sakuratsubasa).  With 100% more starting boots!| *Customizer*  |
+| [sgl2022](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sgl2022.yaml) |SpeedGaming Live 2022 Settings| *Customizer*  |
 | [sglive](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/sglive.yaml) |SpeedGaming Live 2021 Settings, details at <https://gist.github.com/tcprescott/4fe3359cc730ff0aadf490e0105afbec>| *Customizer*  |
 | [shopsanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity.yaml) |Regular shopsanity.|   *Door Randomizer*|
 | [shopsanity_crisscrosskeydropsanity](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/shopsanity_crisscrosskeydropsanity.yaml) |Shopsanity, crossed doors, crossed entrance, keydrop and keysanity|   *Door Randomizer*|

@@ -38,7 +38,7 @@ title:  Mystery Weights
 | [microfr2020](https://github.com/tcprescott/sahasrahbot/blob/master/weights/microfr2020.yaml) | Weights for second French micro-tournament | *Subweights* |
 | [nologic](https://github.com/tcprescott/sahasrahbot/blob/master/weights/nologic.yaml) | Anything can be anywhere and nothing maters anymore. |  |
 | [owg](https://github.com/tcprescott/sahasrahbot/blob/master/weights/owg.yaml) | This'll always be OWG.  Always. |  |
-| [pogchampion](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion.yaml) | A pseudoblast from PogChampionship past |  |
+| [pogchampion](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion.yaml) | pogchampion_season9 | *Subweights* |
 | [pogchampion_season2](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season2.yaml) | This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season One winner Kyong. |  |
 | [pogchampion_season3](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season3.yaml) | This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Two winner Bonta. | *Customizer* |
 | [pogchampion_season4](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season4.yaml) | This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Three winner Furaime. | *Customizer* |
@@ -46,6 +46,7 @@ title:  Mystery Weights
 | [pogchampion_season6](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season6.yaml) | This is for the poggiest of PogChampions.  Settings chosen by Mystery PogChampionship Season Five winner WallKicks.  | *Subweights* |
 | [pogchampion_season7](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season7.yaml) | Pog7 | *Subweights* |
 | [pogchampion_season8](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season8.yaml) | A pseudoblast from PogChampionship past |  |
+| [pogchampion_season9](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season9.yaml) | pogchampion_season9 | *Subweights* |
 | [timed_ohko](https://github.com/tcprescott/sahasrahbot/blob/master/weights/timed_ohko.yaml) | a test weightset for timed ohko | *Customizer* |
 | [tournament_de](https://github.com/tcprescott/sahasrahbot/blob/master/weights/tournament_de.yaml) | Weights for the first Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS) | *Customizer* |
 | [unweighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/unweighted.yaml) | Every option is equally possible.  GLHF. |  |
