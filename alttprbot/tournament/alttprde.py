@@ -227,6 +227,18 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
 
 def apply_pool(settings, pool1, pool2, pool3):
+    if pool1 == 'dungeons' and pool2 == 'fast_ganon':
+        raise Exception("You cannot have all dungeons and fast ganon at the same time.")
+    if pool1 == 'inverted' and pool2 == 'standard':
+        raise Exception("You cannot have inverted and standard at the same time.")
+    if pool1 == 'keysanity' and pool2 == 'mcs':
+        raise Exception("You cannot have keysanity and MC Shuffle at the same time.")
+    if pool1 == 'keysanity' and pool2 == 'bks':
+        raise Exception("You cannot have keysanity and BK Shuffle at the same time.")
+
+    if pool1 == 'enemy_shuffle' and pool2 == 'standard' and not pool3 == 'start_sword':
+        raise Exception("You cannot have enemy shuffle and standard without starting with a sword.")
+
     settings['custom']['customPrizePacks'] = False
 
     # pool 1
@@ -241,7 +253,6 @@ def apply_pool(settings, pool1, pool2, pool3):
 
         settings['custom']['rom.mapOnPickup'] = True
     elif pool1 == 'enemy_shuffle':
-        settings['enemizer']['boss_shuffle'] = 'full'
         settings['enemizer']['enemy_shuffle'] = 'shuffled'
     elif pool1 == 'inverted':
         settings['mode'] = 'inverted'
@@ -257,7 +268,6 @@ def apply_pool(settings, pool1, pool2, pool3):
     # pool 2
     if pool2 == 'mcs':
         settings['custom']['region.wildCompasses'] = True
-        settings['custom']['region.wildKeys'] = True
         settings['custom']['region.wildMaps'] = True
 
         settings['custom']['rom.freeItemMenu'] = True
@@ -272,6 +282,7 @@ def apply_pool(settings, pool1, pool2, pool3):
         settings['mode'] = 'standard'
     elif pool2 == 'universal_keys':
         settings['custom']['rom.genericKeys'] = True
+        settings['custom']['region.wildKeys'] = True
     elif pool2 == 'boss_shuffle':
         settings['enemizer']['boss_shuffle'] = 'full'
     elif pool2 == 'fast_ganon':
