@@ -4,7 +4,7 @@ from alttprbot.tournament import alttprde
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(alttprde.ALTTPRDETournamentGroups):
+class TestTournament(alttprde.ALTTPRDETournamentBrackets):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
@@ -15,7 +15,7 @@ class TestTournament(alttprde.ALTTPRDETournamentGroups):
             audit_channel=discordbot.get_channel(537469084527230976),
             commentary_channel=discordbot.get_channel(659307060499972096),
             scheduling_needs_channel=discordbot.get_channel(835699086261747742),
-            create_scheduled_events=True
+            # create_scheduled_events=True
         )
 
     @property

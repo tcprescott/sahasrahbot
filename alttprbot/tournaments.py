@@ -31,7 +31,7 @@ else:
         # REGULAR TOURNEMNTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        'alttprde': alttprde.ALTTPRDETournamentGroups,
+        'alttprde': alttprde.ALTTPRDETournamentBrackets,
         # 'alttprmini': alttprmini.ALTTPRMiniTournament,
         # 'alttpr': alttpr.ALTTPR2022Race,
         # 'boots': boots.ALTTPRCASBootsTournamentRace,

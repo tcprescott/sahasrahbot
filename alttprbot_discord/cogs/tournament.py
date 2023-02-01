@@ -22,6 +22,7 @@ CC_TOURNAMENT_AUDIT_CHANNELS = list(map(int, os.environ.get("CC_TOURNAMENT_AUDIT
 MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 334796844750209024
 CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
 
+
 class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -34,7 +35,7 @@ class Tournament(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
-            self.bot.add_view(tournaments.alttprde.ALTTPRDEPracticeView())
+            # self.bot.add_view(tournaments.alttprde.ALTTPRDEPracticeView())
             self.persistent_views_added = True
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
@@ -325,6 +326,7 @@ class Tournament(commands.Cog):
                             messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
+
 
 async def setup(bot):
     await bot.add_cog(Tournament(bot))

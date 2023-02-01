@@ -176,48 +176,26 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
         embed.add_field(name="Event", value=self.event_slug, inline=False)
         embed.add_field(name="Game #", value=payload['game'], inline=False)
 
-        if payload['game'] == '1':
-            preset = await ALTTPRPreset('opensgl').fetch()
-            settings = copy.deepcopy(preset.preset_data['settings'])
-            embed.add_field(name="Preset", value='opensgl')
-        else:
-            if payload.get('item_pool') == 'sgl':
-                preset = await ALTTPRPreset('opensgl').fetch()
+        try:
+            game_number = int(payload['game'])
+        except ValueError:
+            raise Exception("Invalid game number.")
+
+        if game_number in [1, 2]:
+            if payload['pool_2'] == 'german_hard':
+                preset = await ALTTPRPreset('derduden2/german_hard').fetch()
                 settings = copy.deepcopy(preset.preset_data['settings'])
             else:
                 settings = copy.deepcopy(BASE_CUSTOMIZER_PAYLOAD)
+            settings = apply_pool(settings, payload['pool_1'], payload['pool_2'], payload['pool_3'])
+        elif game_number == 3:
+            preset = await ALTTPRPreset('derduden2/german_hard').fetch()
+            settings = copy.deepcopy(preset.preset_data['settings'])
+        else:
+            raise Exception("Invalid game number.")
 
-            settings['goal'] = payload['goal']
-            settings['mode'] = payload['world_state']
-            settings['weapons'] = payload['swords']
-            settings['crystals']['tower'] = payload['crystals']
-            settings['crystals']['ganon'] = payload['crystals']
-            settings['enemizer']['boss_shuffle'] = 'full' if payload['enemizer'] in ['bosses', 'enemies_bosses'] else 'none'
-            settings['enemizer']['enemy_shuffle'] = 'shuffled' if payload['enemizer'] in ['enemies', 'enemies_bosses'] else 'none'
-            settings['custom']['region.wildBigKeys'] = payload['keys'] in ['bigkey', 'keysanity']
-            settings['custom']['region.wildCompasses'] = payload['keys'] in ['mc', 'keysanity']
-            settings['custom']['region.wildKeys'] = payload['keys'] == 'keysanity'
-            settings['custom']['region.wildMaps'] = payload['keys'] in ['mc', 'keysanity']
-
-            settings['custom']['rom.freeItemMenu'] = payload['keys'] in ['mc', 'keysanity', 'bigkey']
-            settings['custom']['rom.freeItemText'] = payload['keys'] in ['mc', 'keysanity', 'bigkey']
-
-            settings['custom']['rom.mapOnPickup'] = payload['keys'] in ['mc', 'keysanity']
-
-            settings['custom']['customPrizePacks'] = False
-
-            if payload['items'] in ['boots', 'boots_flute']:
-                settings['custom']['item']['count']['PegasusBoots'] = 0
-                settings['custom']['item']['count']['TwentyRupees'] += 1
-                settings['eq'].append('PegasusBoots')
-
-            if payload['items'] in ['flute', 'boots_flute']:
-                settings['custom']['item']['count']['OcarinaInactive'] = 0
-                settings['custom']['item']['count']['TwentyRupees'] += 1
-                settings['eq'].append('OcarinaInactive' if payload['world_state'] == 'standard' else 'OcarinaActive')
-
-            payload_formatted = '\n'.join([f"**{key}**: {val}" for key, val in payload.items() if not key in ['episodeid', 'game']])
-            embed.add_field(name="Settings", value=payload_formatted, inline=False)
+        payload_formatted = '\n'.join([f"**{key}**: {val}" for key, val in payload.items() if not key in ['episodeid', 'game']])
+        embed.add_field(name="Settings", value=payload_formatted, inline=False)
 
         settings['name'] = f"ALTTPRDE - {self.versus} - Game {payload['game']}"
         settings['notes'] = f"Episode {self.episodeid}<br><br>{self.versus}<br>Game {payload['game']}"
@@ -246,6 +224,80 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
                 logging.exception(f"Could not send DM to {name}")
                 if self.audit_channel:
                     await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+
+
+def apply_pool(settings, pool1, pool2, pool3):
+    settings['custom']['customPrizePacks'] = False
+
+    # pool 1
+    if pool1 == 'keysanity':
+        settings['custom']['region.wildBigKeys'] = True
+        settings['custom']['region.wildCompasses'] = True
+        settings['custom']['region.wildKeys'] = True
+        settings['custom']['region.wildMaps'] = True
+
+        settings['custom']['rom.freeItemMenu'] = True
+        settings['custom']['rom.freeItemText'] = True
+
+        settings['custom']['rom.mapOnPickup'] = True
+    elif pool1 == 'enemy_shuffle':
+        settings['enemizer']['boss_shuffle'] = 'full'
+        settings['enemizer']['enemy_shuffle'] = 'shuffled'
+    elif pool1 == 'inverted':
+        settings['mode'] = 'inverted'
+    elif pool1 == '66crystals':
+        settings['crystals']['tower'] = 6
+        settings['crystals']['ganon'] = 6
+    elif pool1 == 'dungeons':
+        settings['mode'] = 'dungeons'
+    elif pool1 == 'miniswordless':
+        settings['weapons'] = 'swordless'
+        settings['l']['R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ=='] = 'SilverArrowUpgrade:1'
+
+    # pool 2
+    if pool2 == 'mcs':
+        settings['custom']['region.wildCompasses'] = True
+        settings['custom']['region.wildKeys'] = True
+        settings['custom']['region.wildMaps'] = True
+
+        settings['custom']['rom.freeItemMenu'] = True
+        settings['custom']['rom.freeItemText'] = True
+
+        settings['custom']['rom.mapOnPickup'] = True
+    elif pool2 == 'bks':
+        settings['custom']['region.wildBigKeys'] = True
+        settings['custom']['rom.freeItemMenu'] = True
+        settings['custom']['rom.freeItemText'] = True
+    elif pool2 == 'standard':
+        settings['mode'] = 'standard'
+    elif pool2 == 'universal_keys':
+        settings['custom']['rom.genericKeys'] = True
+    elif pool2 == 'boss_shuffle':
+        settings['enemizer']['boss_shuffle'] = 'full'
+    elif pool2 == 'fast_ganon':
+        settings['mode'] = 'fast_ganon'
+
+    # pool 3
+    if pool3 == 'start_sword':
+        if settings['weapons'] == 'swordless':
+            raise Exception("Cannot have swordless and start with sword.")
+        settings['eq'].append('ProgressiveSword')
+        settings['custom']['item']['count']['ProgressiveSword'] = max(settings['custom']['item']['count']['ProgressiveSword']-1, 0)
+        settings['custom']['item']['count']['TwentyRupees'] += 1
+    elif pool3 == 'start_boots':
+        settings['eq'].append('PegasusBoots')
+        settings['custom']['item']['count']['PegasusBoots'] = max(settings['custom']['item']['count']['PegasusBoots']-1, 0)
+        settings['custom']['item']['count']['TwentyRupees'] += 1
+    elif pool3 == 'start_flute':
+        settings['eq'].append('OcarinaInactive' if settings['mode'] == 'standard' else 'OcarinaActive')
+        settings['custom']['item']['count']['OcarinaInactive'] = max(settings['custom']['item']['count']['OcarinaInactive']-1, 0)
+        settings['custom']['item']['count']['TwentyRupees'] += 1
+    elif pool3 == 'start_bombs':
+        settings['eq'].append('TenBombs')
+    elif pool3 == 'start_rupees':
+        settings['eq'].append('ThreeHundredRupees')
+
+    return settings
 
 
 def get_embed_field(name: str, embed: discord.Embed) -> str:

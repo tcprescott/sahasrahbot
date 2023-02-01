@@ -12,14 +12,11 @@
 
         switch (game) {
             case '1':
-                document.getElementById("game_settings").hidden = true;
-                document.getElementById("static_preset").hidden = false;
-                document.getElementById("static_preset").innerHTML = "opensgl";
-                break;
             case '2':
+                document.getElementById("pools").hidden = false;
+                break;
             case '3':
-                document.getElementById("game_settings").hidden = false;
-                document.getElementById("static_preset").hidden = true;
+                document.getElementById("pools").hidden = true;
                 break;
         }
     };
@@ -37,73 +34,41 @@
         <option value="3">3</option>
     </select><br><br>
 
-    <div id="static_preset">opensgl</div><br><br>
-
-    <div id="game_settings" hidden>
+    <div id="pools">
         <div>
-            <label for="goal">Goal</label>
-            <select name="goal" id="goal">
-                <option value="ganon">Ganon</option>
-                <option value="fast_ganon">Fast Ganon</option>
-                <option value="dungeons">Dungeons</option>
-            </select>
-        </div>
-        <div>
-            <label for="world_state">World State</label>
-            <select name="world_state" id="world_state">
-                <option value="open">Open</option>
-                <option value="standard">Standard</option>
-                <option value="inverted">Inverted</option>
-                <option value="retro">Retro</option>
-            </select>
-        </div>
-        <div>
-            <label for="swords">Swords</label>
-            <select name="swords" id="swords">
-                <option value="randomized">Random</option>
-                <option value="assured">Assured</option>
-                <option value="swordless">Swordless</option>
-            </select>
-        </div>
-        <div>
-            <label for="crystals">Crystals</label>
-            <select name="crystals" id="crystals">
-                <option value="7">7/7</option>
-                <option value="6">6/6</option>
-            </select>
-        </div>
-        <div>
-            <label for="enemizer">Enemizer</label>
-            <select name="enemizer" id="enemizer">
-                <option value="none">None</option>
-                <option value="bosses">Boss full</option>
-                <option value="enemies">Enemy shuffle</option>
-                <option value="enemies_bosses">Enemy & Boss</option>
-            </select>
-        </div>
-        <div>
-            <label for="keys">Keys</label>
-            <select name="keys" id="keys">
-                <option value="none">None</option>
-                <option value="mc">MC</option>
-                <option value="bigkey">Big Key</option>
+            <label for="pool_1">Pool 1</label>
+            <select name="pool_1" id="pool_1">
+                <option value="none">Keine Änderung</option>
                 <option value="keysanity">Keysanity</option>
+                <option value="enemy_shuffle">Enemy Shuffle</option>
+                <option value="inverted">Inverted</option>
+                <option value="66crystals">6/6 Crystals</option>
+                <option value="dungeons">All Dungeons</option>
+                <option value="miniswordless">Swordless Mini-Style</option>
             </select>
         </div>
         <div>
-            <label for="items">Items</label>
-            <select name="items" id="items">
-                <option value="none">None</option>
-                <option value="boots">Boots</option>
-                <option value="flute">Flute</option>
-                <option value="boots_flute">Boots & Flute</option>
+            <label for="pool_2">Pool 2</label>
+            <select name="pool_2" id="pool_2">
+                <option value="none">Keine Änderung</option>
+                <option value="mcs">Map/Compass-Shuffle</option>
+                <option value="bks">Big Key-Shuffle</option>
+                <option value="german_hard">Deutscher Hard Item Pool</option>
+                <option value="standard">Standard</option>
+                <option value="universal_keys">Universal Keys</option>
+                <option value="boss_shuffle">Boss Shuffle (Full)</option>
+                <option value="fast_ganon">Fast Ganon</option>
             </select>
         </div>
         <div>
-            <label for="item_pool">Item Pool</label>
-            <select name="item_pool" id="item_pool">
-                <option value="normal">Normal</option>
-                <option value="sgl">SGL-style</option>
+            <label for="pool_3">Pool 3</label>
+            <select name="pool_3" id="pool_3">
+                <option value="none">Keine Änderung</option>
+                <option value="start_sword">Start-Schwert</option>
+                <option value="start_boots">Start-Boots</option>
+                <option value="start_flute">Start-Flöte (aktiv, außer Standard)</option>
+                <option value="start_bombs">Start-Bomben (10 Stück)</option>
+                <option value="start_rupees">Start-Geld (300 Rubine)</option>
             </select>
         </div>
     </div>

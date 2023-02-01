@@ -8,11 +8,13 @@ from ..api import discord
 
 tournament_blueprint = Blueprint('tournament', __name__)
 
+
 @tournament_blueprint.route('/api/tournament/games', methods=['GET'])
 async def get_tournament_games():
     terms = request.args
     data = await models.TournamentGames.filter(**terms).values()
     return jsonify(data)
+
 
 @tournament_blueprint.route("/submit/<string:event>", methods=['GET'])
 @requires_authorization
@@ -31,7 +33,7 @@ async def submission_form(event):
             logged_in=True,
             user=user,
             event=event,
-            endpoint=url_for("submit"),
+            endpoint=url_for("tournament.submit"),
             episode_id=episode_id
         )
     else:
@@ -40,7 +42,7 @@ async def submission_form(event):
             logged_in=True,
             user=user,
             event=event,
-            endpoint=url_for("submit"),
+            endpoint=url_for("tournament.submit"),
             settings_list=form_data,
             episode_id=episode_id
         )
