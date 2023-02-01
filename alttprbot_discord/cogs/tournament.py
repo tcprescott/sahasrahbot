@@ -61,7 +61,7 @@ class Tournament(commands.Cog):
                 event_data: core.TournamentRace = await tournament_class.get_config()
 
                 try:
-                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=72)
+                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
                 except Exception:
                     logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                     continue
