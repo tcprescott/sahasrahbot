@@ -1,4 +1,4 @@
-from quart import Blueprint, jsonify, render_template, request, url_for
+from quart import Blueprint, jsonify, render_template, request, url_for, abort
 from quart_discord import requires_authorization
 
 from alttprbot import models
@@ -53,11 +53,14 @@ async def submission_form(event):
 async def submit():
     user = await discord.fetch_user()
     payload = await request.form
-    tournament_race = await fetch_tournament_handler(payload['event'], int(payload['episodeid']))
-    await tournament_race.process_submission_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
-    return await render_template(
-        "submission_done.html",
-        logged_in=True,
-        user=user,
-        tournament_race=tournament_race
-    )
+    try:
+        tournament_race = await fetch_tournament_handler(payload['event'], int(payload['episodeid']))
+        await tournament_race.process_submission_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
+        return await render_template(
+            "submission_done.html",
+            logged_in=True,
+            user=user,
+            tournament_race=tournament_race
+        )
+    except Exception as e:
+        abort(400, description=f"Error processing submission: {e}")
