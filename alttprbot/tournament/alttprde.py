@@ -260,7 +260,7 @@ def apply_pool(settings, pool1, pool2, pool3):
         settings['crystals']['tower'] = 6
         settings['crystals']['ganon'] = 6
     elif pool1 == 'dungeons':
-        settings['mode'] = 'dungeons'
+        settings['goal'] = 'dungeons'
     elif pool1 == 'miniswordless':
         settings['weapons'] = 'swordless'
         settings['l']['R2Fub24ncyBUb3dlciAtIE1vbGRvcm0gQ2hlc3Q6MQ=='] = 'SilverArrowUpgrade:1'
@@ -286,7 +286,7 @@ def apply_pool(settings, pool1, pool2, pool3):
     elif pool2 == 'boss_shuffle':
         settings['enemizer']['boss_shuffle'] = 'full'
     elif pool2 == 'fast_ganon':
-        settings['mode'] = 'fast_ganon'
+        settings['goal'] = 'fast_ganon'
 
     # pool 3
     if pool3 == 'start_sword':
