@@ -7,6 +7,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from alttprbot.tournament import core, alttpr
+from alttprbot_discord.util import alttpr_discord
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
@@ -23,7 +24,7 @@ MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 3347968447502
 CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
 
 
-class Tournament(commands.Cog):
+class Tournament(commands.GroupCog, name="tournament"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.create_races.start()
@@ -326,6 +327,21 @@ class Tournament(commands.Cog):
                             messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
+
+    @app_commands.command(description="Generate an ALTTPR practice seed from an SG Episode that's already been submitted.")
+    async def practice(self, interaction: discord.Interaction, episode_id: int):
+        await interaction.response.defer()
+        tournament_game = await models.TournamentGames.get_or_none(episode_id=episode_id)
+        if tournament_game is None:
+            await interaction.response.send_message("That episode has not been submitted yet.", ephemeral=True)
+            return
+
+        settings = tournament_game.settings
+
+        seed = await alttpr_discord.ALTTPRDiscord.generate(settings=settings, endpoint='/api/customizer')  # TODO: don't hardcode endpoint
+        embed = await seed.embed(emojis=self.bot.emojis)
+
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot):
