@@ -6,15 +6,14 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from alttprbot.tournament import core, alttpr
+from alttprbot.tournament import core
 from alttprbot_discord.util import alttpr_discord
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
 from config import Config as c
 
-# TODO: make work with discord.py 2.0
-
+# TODO: use asyncio.semaphore() to limit the number of concurrent tasks
 
 MAIN_TOURNAMENT_SERVERS = list(map(int, os.environ.get("MAIN_TOURNAMENT_SERVERS", "").split(',')))
 CC_TOURNAMENT_SERVERS = list(map(int, os.environ.get("CC_TOURNAMENT_SERVERS", "").split(',')))
