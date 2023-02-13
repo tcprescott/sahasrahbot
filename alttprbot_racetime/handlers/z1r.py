@@ -23,8 +23,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
     async def ex_z1rtournament(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
-        await self.send_message(f"Z1R 2022 Tournament - Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}")
-        await self.set_bot_raceinfo(f"Flags: gk3dX65LVKcrmrgMOKusB166JX1cQF Seed: {seed_number}")
+        await self.send_message(f"Z1R 2023 Tournament - Flags: KUeUOiDAFHkdMHEQpQYmfZSa5931R5R Seed: {seed_number}")
+        await self.set_bot_raceinfo(f"Flags: KUeUOiDAFHkdMHEQpQYmfZSa5931R5R Seed: {seed_number}")
 
     async def ex_race(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
