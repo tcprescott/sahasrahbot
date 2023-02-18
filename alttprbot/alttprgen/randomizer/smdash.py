@@ -8,12 +8,12 @@ import logging
 ###
 # 1) Make a new temp directory
 # 2) Set working dir to that temp dir
-# 3) Run the command: mono /opt/dash-rando-app/dash-rando-app-v10/DASH_Randomizer.exe -q -v -m "full" -p /home/tprescott/super_metroid.sfc
+# 3) Run the command: node /opt/dash-rando-app/dash.cli.js -r /home/tprescott/super_metroid.sfc -p "full"
 # 4) Find the first file with a .sfc extension in the directory
 # 5) Create a .bps file
 # 6) Copy the bps file to /var/www/sgldash/bps/
 # 7) Delete the temporary directory created in step 1
-# 8) Return with the url for the patch (https://patch.synack.live/?patch=DASH_v10_SF_57677.bps)
+# 8) Return with the url for the patch (https://patch.synack.live/?patch=DASH_v11_SF_057677.bps)
 ###
 
 
@@ -22,20 +22,18 @@ def roll_smdash():
 
 
 async def create_smdash(mode="mm", encrypt=False):
-    if mode not in ['mm', 'full', 'sgl20', 'vanilla']:
-        raise Exception("Specified mode is not valid.  Must be mm, full, sgl20, or vanilla")
+    if mode not in ['mm', 'full']:
+        raise Exception("Specified mode is not valid.  Must be mm or full")
 
     with tempfile.TemporaryDirectory() as tmp:
         wd = os.getcwd()
         os.chdir(tmp)
         try:
             proc = await asyncio.create_subprocess_exec(
-                'mono',
-                '/opt/dash-rando-app/dash-rando-app-v10/DASH_Randomizer.exe',
-                '-q',
-                '-v',
-                '-m', mode,
-                '-p', os.environ.get('SM_ROM'),
+                'node',
+                '/opt/dash-rando-app/dash.cli.js',
+                '-r', os.environ.get('SM_ROM'),
+                '-p', mode,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE)
 
