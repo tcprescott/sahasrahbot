@@ -1,0 +1,37 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Triforce Text Moderation</title>
+{%- endblock head %}
+
+{% block content -%}
+{%- if not texts %}
+<div class="alert alert-info">
+    <strong>There are no texts to moderate!</strong>
+</div>
+{%- else %}
+<table border="1">
+    <tr>
+        <th>Text</th>
+        <th>Submitted by</th>
+        <th>Actions</th>
+    </tr>
+    {% for text in texts %}
+    <tr>
+        <td>
+            <pre>{{ text.text }}</pre>
+        </td>
+        <td>
+            <p>{{ text.author }}</p>
+        </td>
+        <td>
+            <a href="{{ url_for('triforcetexts.moderation_approve', event=event, text_id=text.id) }}"
+                class="btn btn-success">Approve</a>
+            <br /><a href="{{ url_for('triforcetexts.moderation_reject', event=event, text_id=text.id) }}"
+                class="btn btn-danger">Reject</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{%- endif %}
+{%- endblock content %}

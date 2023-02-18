@@ -342,6 +342,13 @@ class TriforceTexts(Model):
     timestamp = fields.DatetimeField(auto_now=True)
 
 
+class TriforceTextsConfig(Model):
+    id = fields.IntField(pk=True)
+    pool_name = fields.CharField(45, null=False)
+    key_name = fields.CharField(2000, null=False)
+    value = fields.CharField(2000, null=False)
+
+
 class ScheduledEvents(Model):
     scheduled_event_id = fields.BigIntField(pk=True, generated=False)
     event_slug = fields.CharField(40, null=False)

@@ -18,18 +18,16 @@ sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = os.environ.get("DISCORD_TOKEN")
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
 
-from .blueprints import (presets_blueprint, racetime_blueprint,
-                         ranked_choice_blueprint, settingsgen_blueprint,
-                         sgl22_blueprint, tournament_blueprint,
-                         triforcetexts_blueprint)
+import alttprbot_api.blueprints as blueprints  # nopep8
 
-sahasrahbotapi.register_blueprint(presets_blueprint)
-sahasrahbotapi.register_blueprint(racetime_blueprint)
-sahasrahbotapi.register_blueprint(ranked_choice_blueprint)
-sahasrahbotapi.register_blueprint(settingsgen_blueprint)
-sahasrahbotapi.register_blueprint(sgl22_blueprint)
-sahasrahbotapi.register_blueprint(tournament_blueprint)
-sahasrahbotapi.register_blueprint(triforcetexts_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.sgl22_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
+
 
 @sahasrahbotapi.route("/login/")
 async def login():
@@ -75,6 +73,7 @@ async def logout():
     discord.revoke()
     return await render_template('logout.html', logged_in=False)
 
+
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
     if discordbot.is_closed():
@@ -86,6 +85,7 @@ async def healthcheck():
     return jsonify(
         success=True
     )
+
 
 @sahasrahbotapi.route('/purgeme', methods=['GET'])
 async def purge_me():
@@ -108,9 +108,6 @@ async def purge_me_action():
         return redirect("/logout/")
 
     return redirect("/me/")
-
-
-
 
 
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
