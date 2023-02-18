@@ -38,7 +38,7 @@ settings:
     startinventory: "Ocarina,Pegasus Boots"
     swords: assured
     timer: none
-    usestartinventory: false
+    usestartinventory: true
     customitemarray:
         bow: 0
         progressivebow: 2
