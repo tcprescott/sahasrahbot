@@ -10,18 +10,18 @@ from ..api import discord
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
 
 
-@triforcetexts_blueprint.route('/triforcetexts/<string:event>', methods=['GET'])
+@triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>', methods=['GET'])
 @requires_authorization
-async def triforcetexts(event):
+async def triforcetexts(pool_name):
     user = await discord.fetch_user()
     logged_in = True
 
-    return await render_template('triforce_text.html', logged_in=logged_in, user=user, endpoint=url_for('triforcetexts.submit', event=event))
+    return await render_template('triforce_text.html', logged_in=logged_in, user=user, pool_name=pool_name)
 
 
-@triforcetexts_blueprint.route('/triforcetexts/<string:event>/submit', methods=['POST'])
+@triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>/submit', methods=['POST'])
 @requires_authorization
-async def submit(event):
+async def submit(pool_name):
     user = await discord.fetch_user()
     logged_in = True
 
@@ -39,58 +39,36 @@ async def submit(event):
 
     text = f"{payload['first_line']}\n{payload['second_line']}\n{payload['third_line']}"
 
-    await models.TriforceTexts.create(pool_name=event, text=text, discord_user_id=user.id, author=f"{user.name}#{user.discriminator}")
+    await models.TriforceTexts.create(pool_name=pool_name, text=text, discord_user_id=user.id, author=f"{user.name}#{user.discriminator}")
 
     return await render_template('triforce_text_submit.html', logged_in=logged_in, user=user)
 
 
-@triforcetexts_blueprint.route('/triforcetexts/<string:event>/moderation', methods=['GET'])
+@triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>/moderation', methods=['GET'])
 @requires_authorization
-async def moderation(event):
+async def moderation(pool_name):
     user = await discord.fetch_user()
     logged_in = True
 
-    triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=event, key_name='moderator')
+    triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=pool_name, key_name='moderator')
 
     moderators = [int(x.value) for x in triforce_texts_config]
 
     if user.id not in moderators:
         return await render_template('error.html', logged_in=logged_in, user=user, title="Access Denied", message="You do not have permission to access this page.")
 
-    texts = await models.TriforceTexts.filter(pool_name=event, approved=False)
+    texts = await models.TriforceTexts.filter(pool_name=pool_name, approved=False)
 
-    return await render_template('triforce_text_moderation.html', logged_in=logged_in, user=user, event=event, texts=texts)
+    return await render_template('triforce_text_moderation.html', logged_in=logged_in, user=user, pool_name=pool_name, texts=texts)
 
 
-@triforcetexts_blueprint.route('/triforcetexts/<string:event>/moderation/<int:text_id>/approve', methods=['GET'])
+@triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>/moderation/<int:text_id>/<string:action>', methods=['GET'])
 @requires_authorization
-async def moderation_approve(event, text_id):
+async def moderation_action(pool_name, text_id, action):
     user = await discord.fetch_user()
     logged_in = True
 
-    triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=event, key_name='moderator')
-
-    moderators = [int(x.value) for x in triforce_texts_config]
-
-    if user.id not in moderators:
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Access Denied", message="You do not have permission to access this page.")
-
-    text = await models.TriforceTexts.get(id=text_id)
-
-    text.approved = True
-
-    await text.save()
-
-    return redirect(url_for('triforcetexts.moderation', event=event))
-
-
-@triforcetexts_blueprint.route('/triforcetexts/<string:event>/moderation/<int:text_id>/reject', methods=['GET'])
-@requires_authorization
-async def moderation_reject(event, text_id):
-    user = await discord.fetch_user()
-    logged_in = True
-
-    triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=event, key_name='moderator')
+    triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=pool_name, key_name='moderator')
 
     moderators = [int(x.value) for x in triforce_texts_config]
 
@@ -99,6 +77,11 @@ async def moderation_reject(event, text_id):
 
     text = await models.TriforceTexts.get(id=text_id)
 
-    await text.delete()
+    if action == 'reject':
+        await text.delete()
 
-    return redirect(url_for('triforcetexts.moderation', event=event))
+    if action == 'approve':
+        text.approved = True
+        await text.save()
+
+    return redirect(url_for('triforcetexts.moderation', pool_name=pool_name))
