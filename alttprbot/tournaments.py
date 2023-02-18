@@ -12,8 +12,7 @@ import pytz
 from alttprbot_racetime import bot as racetimebot
 
 from alttprbot import models
-from alttprbot.tournament import (test, alttpr, alttprcd, alttprde, alttpres, alttprfr, alttprmini,  # pylint: disable=unused-import
-                                  alttprhmg, smwde, smz3coop, smbingo, dailies, alttprleague, sgl22, boots, nologic)  # pylint: disable=unused-import
+from alttprbot.tournament import test, alttprde, alttprmini, dailies, alttprleague
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -112,8 +111,8 @@ async def race_recording_task():
     agcm = gspread_asyncio.AsyncioGspreadClientManager(gsheet.get_creds)
     agc = await agcm.authorize()
 
-    for event in TOURNAMENT_DATA.keys():
-        event_data = await TOURNAMENT_DATA[event].get_config()
+    for event, event_obj in TOURNAMENT_DATA.items():
+        event_data = await event_obj.get_config()
         if event_data.data.gsheet_id is None:
             continue
 

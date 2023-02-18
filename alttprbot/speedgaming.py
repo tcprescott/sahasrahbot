@@ -31,6 +31,7 @@ class SpeedGamingPlayer:
     discord_id: str
     discord_tag: str
 
+
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class SpeedGamingCrew:
@@ -44,6 +45,7 @@ class SpeedGamingCrew:
     public_stream: str
     approved: bool
 
+
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class SpeedGamingMatch:
@@ -51,6 +53,7 @@ class SpeedGamingMatch:
     note: str
     players: List[SpeedGamingPlayer]
     title: str
+
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
@@ -65,6 +68,7 @@ class SpeedGamingEvent:
     srl: str
     slug: str
 
+
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class SpeedGamingChannel:
@@ -73,6 +77,7 @@ class SpeedGamingChannel:
     initials: str
     name: str
     slug: str
+
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
@@ -106,6 +111,7 @@ class SpeedGamingEpisode:
             mm_field=fields.DateTime(format='iso')
         )
     )
+
 
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     if c.DEBUG and event == 'test':

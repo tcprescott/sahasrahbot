@@ -405,6 +405,7 @@ class VoiceRole(Model):
     voice_channel_id = fields.BigIntField(null=False)
     role_id = fields.BigIntField(null=False)
 
+
 class RankedChoiceElection(Model):
     class Meta:
         table = 'ranked_choice_election'
@@ -424,6 +425,7 @@ class RankedChoiceElection(Model):
     updated = fields.DatetimeField(auto_now=True)
     results = fields.TextField(null=True)
 
+
 class RankedChoiceAuthorizedVoters(Model):
     class Meta:
         table = 'ranked_choice_authorized_voters'
@@ -431,6 +433,7 @@ class RankedChoiceAuthorizedVoters(Model):
     id = fields.IntField(pk=True)
     election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='authorized_voters')
     user_id = fields.BigIntField(null=False)
+
 
 class RankedChoiceCandidate(Model):
     class Meta:
@@ -442,6 +445,7 @@ class RankedChoiceCandidate(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     winner = fields.BooleanField(null=True)
+
 
 class RankedChoiceVotes(Model):
     class Meta:

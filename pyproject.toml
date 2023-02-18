@@ -44,6 +44,8 @@ racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/1e7491
 [tool.poetry.group.dev.dependencies]
 pycodestyle = "*"
 pylint = "*"
+autopep8 = "^2.0.1"
+ipython = "^8.10.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

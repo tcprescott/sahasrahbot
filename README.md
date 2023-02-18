@@ -15,6 +15,9 @@ Thomas Prescott, aka Synack
 ## Installing dependencies
 
 1. pip install --user virtualenv
+
 2. pip install poetry
+
 3. virtualenv .venv
+
 4. poetry install
