@@ -513,8 +513,6 @@ class Generator(commands.Cog):
     @app_commands.choices(race=YES_NO_CHOICE, mode=[
         app_commands.Choice(name="Major/Minor Split", value="mm"),
         app_commands.Choice(name="Full", value="full"),
-        app_commands.Choice(name="SpeedGaming Live 2020", value="sgl20"),
-        app_commands.Choice(name="Vanilla", value="vanilla"),
     ])
     async def smdash(
         self,

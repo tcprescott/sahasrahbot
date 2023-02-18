@@ -30,7 +30,7 @@ async def create_smdash(mode="mm", encrypt=False):
         os.chdir(tmp)
         try:
             proc = await asyncio.create_subprocess_exec(
-                'node',
+                '/usr/bin/node',
                 '/opt/dash-rando-app/dash.cli.js',
                 '-r', os.environ.get('SM_ROM'),
                 '-p', mode,
