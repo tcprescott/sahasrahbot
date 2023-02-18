@@ -11,3 +11,10 @@ If there's any feature within this bot that you'd like to use for your own proje
 Thanks,
 
 Thomas Prescott, aka Synack
+
+## Installing dependencies
+
+1. pip install --user virtualenv
+2. pip install poetry
+3. virtualenv .venv
+4. poetry install
