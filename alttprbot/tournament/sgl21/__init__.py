@@ -13,7 +13,6 @@
 # from .pkmnred import PokemonRedRando
 # from .pmdsky import PMDSkyRando
 # from .shovelknight import ShovelKnight
-# from .skywardsword import SSR
 # from .smany import SMAny
 # from .smashbros import SmashBros
 # from .smb3r import SMB3R
