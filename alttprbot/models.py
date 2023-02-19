@@ -465,3 +465,45 @@ class RankedChoiceVotes(Model):
     rank = fields.IntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+
+
+class AsyncTournament(Model):
+    id = fields.IntField(pk=True)
+    name = fields.CharField(45, null=False)
+    guild_id = fields.BigIntField(null=False)
+    channel_id = fields.BigIntField(null=False, unique=True)
+    report_channel_id = fields.BigIntField(null=True)
+    owner_id = fields.BigIntField(null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+    active = fields.BooleanField(null=False, default=True)
+
+
+class AsyncTournamentPermalink(Model):
+    id = fields.IntField(pk=True)
+    pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='permalinks')
+    permalink = fields.CharField(200, null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
+class AsyncTournamentPermalinkPool(Model):
+    id = fields.IntField(pk=True)
+    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permalink_pools')
+    name = fields.CharField(45, null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
+class AsyncTournamentRace(Model):
+    id = fields.IntField(pk=True)
+    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
+    permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
+    discord_user_id = fields.BigIntField(null=False)
+    thread_id = fields.BigIntField(null=False)
+    thread_open_time = fields.DatetimeField(null=True)
+    start_time = fields.DatetimeField(null=True)
+    end_time = fields.DatetimeField(null=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit

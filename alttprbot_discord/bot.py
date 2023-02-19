@@ -50,6 +50,10 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
 
     if c.DEBUG:
+        # not ready for prime time yet
+        await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
+
+    if c.DEBUG:
         await discordbot.load_extension("alttprbot_discord.cogs.test")
 
     if importlib.util.find_spec('jishaku'):

@@ -51,37 +51,6 @@ TRIFORCE_TEXTS = [
     'Stiefel\nSein\nMann',
 ]
 
-
-# class ALTTPRDEPracticeView(discord.ui.View):
-#     def __init__(self):
-#         super().__init__(timeout=None)
-
-#     async def on_error(self, error: Exception, item, interaction) -> None:
-#         raise error
-
-#     @discord.ui.button(label="Generate a Practice Seed", style=discord.ButtonStyle.blurple, custom_id="sahabot:alttprde:practice", row=1)
-#     async def practice(self, interaction: discord.Interaction, button: discord.ui.Button):
-#         respmsg = await interaction.response.send_message("Generating, please wait...")
-#         episode_id = get_embed_field("Episode ID", interaction.message.embeds[0])
-#         tournament_game = await models.TournamentGames.get(episode_id=episode_id)
-
-#         seed = await alttpr_discord.ALTTPRDiscord.generate(settings=tournament_game.settings, endpoint='/api/customizer')
-
-#         await models.AuditGeneratedGames.create(
-#             randomizer='alttpr',
-#             hash_id=seed.hash,
-#             permalink=seed.url,
-#             settings=tournament_game.settings,
-#             gentype='preset',
-#             genoption=f'episode {episode_id}',
-#             customizer=1,
-#             doors=0
-#         )
-
-#         embed = await seed.embed(emojis=discordbot.emojis)
-#         await respmsg.edit_original_message(content=None, embed=embed)
-
-
 class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
         try:
