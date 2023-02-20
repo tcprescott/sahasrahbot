@@ -169,6 +169,13 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         await thread.send(embed=embed, view=AsyncTournamentRaceViewReady())
         await interaction.response.send_message(f"Successfully created {thread.mention}.  Please join that thread for more details.", ephemeral=True)
 
+        await interaction.delete_original_response()
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
+    async def async_cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("Successfully cancelled your request.  This run has not been recorded on your record.", ephemeral=True)
+        await interaction.delete_original_response()
+
 
 class AsyncTournamentRaceViewReady(discord.ui.View):
     def __init__(self):
