@@ -167,14 +167,11 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         embed.add_field(name="Permalink", value=permalink.permalink)
         embed.set_footer(text=f"Race ID: {async_tournament_race.id}")
         await thread.send(embed=embed, view=AsyncTournamentRaceViewReady())
-        await interaction.response.send_message(f"Successfully created {thread.mention}.  Please join that thread for more details.", ephemeral=True)
-
-        await interaction.delete_original_response()
+        await interaction.response.edit_message(content=f"Successfully created {thread.mention}.  Please join that thread for more details.", view=None, embed=None)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
     async def async_cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("Successfully cancelled your request.  This run has not been recorded on your record.", ephemeral=True)
-        await interaction.delete_original_response()
+        await interaction.response.edit_message(content="Successfully cancelled this request.  It will not be placed on your record and may be attempted at a later time.", view=None, embed=None)
 
 
 class AsyncTournamentRaceViewReady(discord.ui.View):
