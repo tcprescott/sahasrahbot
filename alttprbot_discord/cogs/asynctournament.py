@@ -311,7 +311,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
     @app_commands.command(name="create", description="Create an async tournament")
     async def create(self, interaction: discord.Interaction, name: str, permalinks: discord.Attachment, report_channel: discord.TextChannel = None):
-        if interaction.user is not self.bot.owner:
+        if not await self.bot.is_owner(interaction.user):
             await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
             return
 
@@ -357,7 +357,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
     @app_commands.command(name="repost", description="Repost the tournament embed")
     async def repost(self, interaction: discord.Interaction):
-        if interaction.user is not self.bot.owner:
+        if not await self.bot.is_owner(interaction.user):
             await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
             return
 
@@ -373,10 +373,6 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
 def create_tournament_embed(async_tournament: models.AsyncTournament):
     embed = discord.Embed(title=async_tournament.name)
-    instructions = """
-    Put useful instructions here
-    """
-    embed.add_field(name="Instructions", value=instructions, inline=False)
     embed.add_field(name="Owner", value=f"<@{async_tournament.owner_id}>", inline=False)
     embed.set_footer(text=f"ID: {async_tournament.id}")
     return embed
