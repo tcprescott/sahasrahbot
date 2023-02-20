@@ -217,7 +217,7 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
             await interaction.response.send_message("The race must be pending or in progress to forfeit it.", ephemeral=True)
             return
 
-        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.", view=AsyncTournamentRaceViewForfeit(), ephemeral=True)
+        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
 
 
 class AsyncTournamentRaceViewInProgress(discord.ui.View):
@@ -247,6 +247,10 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
         await interaction.response.send_message(f"Your finish time of **{elapsed}** as been recorded.  Please post the VoD of your run in this channel.")
 
+        for child_item in self.children:
+            child_item.disabled = True
+        await interaction.followup.edit_message(message_id=interaction.message.id, view=self)
+
     @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️", custom_id="sahasrahbot:async_forfeit2")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
@@ -258,11 +262,13 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
             await interaction.response.send_message("The race must be pending or in progress to forfeit it.", ephemeral=True)
             return
 
-        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.", view=AsyncTournamentRaceViewForfeit(), ephemeral=True)
+        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
 
     @discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️", custom_id="sahasrahbot:async_get_timer")
     async def async_get_timer(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        if async_tournament_race.status in ["forfeit", "finished"]:
+            await interaction.response.send_message("Race is already finished.", ephemeral=True)
         start_time = async_tournament_race.start_time
         now = discord.utils.utcnow()
         elapsed = now - start_time
@@ -272,10 +278,12 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
 
 class AsyncTournamentRaceViewForfeit(discord.ui.View):
-    def __init__(self):
+    def __init__(self, view, interaction):
         super().__init__(timeout=60)
+        self.original_view = view
+        self.original_interaction = interaction
 
-    @discord.ui.button(label="Confirm Forfeit", style=discord.ButtonStyle.red, emoji="🏳️")
+    @ discord.ui.button(label="Confirm Forfeit", style=discord.ButtonStyle.red, emoji="🏳️")
     async def async_confirm_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Write forfeit to database
         # Disable buttons on this view
@@ -295,13 +303,17 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
             child_item.disabled = True
         await interaction.followup.edit_message(message_id=interaction.message.id, view=self)
 
+        for child_item in self.original_view.children:
+            child_item.disabled = True
+        await self.original_interaction.followup.edit_message(message_id=self.original_interaction.message.id, view=self.original_view)
+
 
 class AsyncTournament(commands.GroupCog, name="asynctournament"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.persistent_views_added = False
 
-    @commands.Cog.listener()
+    @ commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
             self.bot.add_view(AsyncTournamentView())
@@ -309,7 +321,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
             self.bot.add_view(AsyncTournamentRaceViewInProgress())
             self.persistent_views_added = True
 
-    @app_commands.command(name="create", description="Create an async tournament")
+    @ app_commands.command(name="create", description="Create an async tournament")
     async def create(self, interaction: discord.Interaction, name: str, permalinks: discord.Attachment, report_channel: discord.TextChannel = None):
         if not await self.bot.is_owner(interaction.user):
             await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
