@@ -311,6 +311,10 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
     @app_commands.command(name="create", description="Create an async tournament")
     async def create(self, interaction: discord.Interaction, name: str, permalinks: discord.Attachment, report_channel: discord.TextChannel = None):
+        if interaction.user is not self.bot.owner:
+            await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
+            return
+
         await interaction.response.defer()
         embed = discord.Embed(title=name)
         try:
@@ -353,6 +357,10 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
     @app_commands.command(name="repost", description="Repost the tournament embed")
     async def repost(self, interaction: discord.Interaction):
+        if interaction.user is not self.bot.owner:
+            await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
+            return
+
         await interaction.response.defer()
         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
         if async_tournament is None:

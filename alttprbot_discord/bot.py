@@ -32,6 +32,7 @@ discordbot.logger.setLevel(logging.INFO)
 if os.environ.get("SENTRY_URL"):
     use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
 
+
 async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.errors")
     await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
@@ -48,10 +49,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
     await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
-
-    if c.DEBUG:
-        # not ready for prime time yet
-        await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
+    await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
 
     if c.DEBUG:
         await discordbot.load_extension("alttprbot_discord.cogs.test")
@@ -110,12 +108,14 @@ async def on_command_completion(ctx):
     await ctx.message.add_reaction('✅')
     await ctx.message.remove_reaction('⌚', ctx.bot.user)
 
+
 @discordbot.event
 async def on_ready():
     await discordbot.tree.sync()
 
+
 async def start_bot():
     await load_extensions()
     if c.DEBUG:
-        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540)) # hard code the discord server id for now
+        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
     await discordbot.start(os.environ.get("DISCORD_TOKEN"))
