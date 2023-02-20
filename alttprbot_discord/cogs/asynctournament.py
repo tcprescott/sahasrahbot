@@ -221,7 +221,7 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
             await interaction.response.send_message("The race must be pending or in progress to forfeit it.", ephemeral=True)
             return
 
-        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
+        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.  This race will be scored as a **zero** on your record and you may not re-play the run.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
 
 
 class AsyncTournamentRaceViewInProgress(discord.ui.View):
@@ -266,7 +266,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
             await interaction.response.send_message("The race must be pending or in progress to forfeit it.", ephemeral=True)
             return
 
-        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
+        await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.  This race will be scored as a **zero** on your record and you may not re-play the run.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
 
     @discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️", custom_id="sahasrahbot:async_get_timer")
     async def async_get_timer(self, interaction: discord.Interaction, button: discord.ui.Button):
