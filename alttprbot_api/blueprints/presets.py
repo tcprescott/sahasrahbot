@@ -52,13 +52,20 @@ async def new_preset_submit():
     request_files = await request.files
     ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
 
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
+    is_owner = generator.is_namespace_owner(user, ns_data)
+
+    if not is_owner:
+        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="You are not the owner of this preset.")
+
     if not re.match("^[a-zA-Z0-9_]*$", payload['preset_name']):
         return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="Invalid preset name provided.")
 
     preset_data, _ = await models.Presets.update_or_create(
         preset_name=payload['preset_name'],
         randomizer=payload['randomizer'],
-        namespace=ns_current_user,
+        namespace=ns_data,
         defaults={
             'content': request_files['presetfile'].read().decode()
         }
