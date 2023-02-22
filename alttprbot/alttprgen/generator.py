@@ -401,7 +401,22 @@ async def create_or_retrieve_namespace(discord_user_id, discord_user_name):
         tempnamespaceslug = tempnamespaceslug + str(random.randint(0, 99))
         namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
 
+    await namespace.fetch_related('collaborators')
     return namespace
+
+
+def is_namespace_owner(user, namespace: models.PresetNamespaces):
+    if namespace.discord_user_id == user.id:
+        return True
+
+    # collaborators needs to be fetched by the caller first
+    if user.id in [x.discord_user_id for x in namespace.collaborators]:
+        return True
+
+    if user.id == 185198185990324225:
+        return True
+
+    return False
 
 
 PRESET_CLASS_MAPPING = {

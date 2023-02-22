@@ -11,6 +11,7 @@ from ..api import discord
 
 presets_blueprint = Blueprint('presets', __name__)
 
+
 @presets_blueprint.route('/presets', methods=['GET'])
 async def all_presets():
     try:
@@ -23,6 +24,7 @@ async def all_presets():
     namespaces = await models.PresetNamespaces.all()
 
     return await render_template('preset_namespaces_all.html', logged_in=logged_in, user=user, namespaces=namespaces)
+
 
 @presets_blueprint.route('/presets/me', methods=['GET'])
 @requires_authorization
@@ -68,18 +70,20 @@ async def new_preset_submit():
 @presets_blueprint.route('/presets/manage/<string:namespace>', methods=['GET'])
 # @requires_authorization
 async def presets_for_namespace(namespace):
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
+
     try:
         user = await discord.fetch_user()
         logged_in = True
         ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
-        is_owner = ns_current_user.name == namespace
+        is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
         logged_in = False
         ns_current_user = None
         is_owner = False
 
-    ns_data = await models.PresetNamespaces.get(name=namespace)
     presets = await models.Presets.filter(namespace__name=namespace)
 
     return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, presets=presets)
@@ -88,18 +92,20 @@ async def presets_for_namespace(namespace):
 @presets_blueprint.route('/presets/manage/<string:namespace>/<string:randomizer>', methods=['GET'])
 # @requires_authorization
 async def presets_for_namespace_randomizer(namespace, randomizer):
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
+
     try:
         user = await discord.fetch_user()
         logged_in = True
         ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
-        is_owner = ns_current_user.name == namespace
+        is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
         logged_in = False
         ns_current_user = None
         is_owner = False
 
-    ns_data = await models.PresetNamespaces.get(name=namespace)
     presets = await models.Presets.filter(randomizer=randomizer, namespace__name=namespace).only('id', 'preset_name', 'randomizer')
 
     return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, presets=presets)
@@ -107,18 +113,20 @@ async def presets_for_namespace_randomizer(namespace, randomizer):
 
 @presets_blueprint.route('/presets/manage/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
 async def get_preset(namespace, randomizer, preset):
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
+
     try:
         user = await discord.fetch_user()
         logged_in = True
         ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
-        is_owner = ns_current_user.name == namespace
+        is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
         logged_in = False
         ns_current_user = None
         is_owner = False
 
-    ns_data = await models.PresetNamespaces.get(name=namespace)
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
 
     return await render_template('preset_view.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data, preset_data=preset_data)
@@ -142,8 +150,10 @@ async def update_preset(namespace, randomizer, preset):
     user = await discord.fetch_user()
     payload = await request.form
     request_files = await request.files
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
     ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
-    is_owner = ns_current_user.name == namespace
+    is_owner = generator.is_namespace_owner(user, ns_data)
 
     if not is_owner:
         return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="You are not the owner of this preset.")

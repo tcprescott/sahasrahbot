@@ -182,6 +182,14 @@ class PresetNamespaces(Model):
     discord_user_id = fields.BigIntField(null=False, unique=True)
 
 
+class PresetNamespaceCollaborators(Model):
+    class Meta:
+        unique_together = ('namespace', 'discord_user_id')
+    id = fields.IntField(pk=True)
+    namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='collaborators')
+    discord_user_id = fields.BigIntField(null=False)
+
+
 class Presets(Model):
     class Meta:
         unique_together = ('randomizer', 'preset_name', 'namespace')
