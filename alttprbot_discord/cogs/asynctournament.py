@@ -342,7 +342,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
     @ tasks.loop(seconds=60, reconnect=True)
     async def timeout_warning_task(self):
         try:
-            pending_races = await models.AsyncTournamentRace.filter(status="pending")
+            pending_races = await models.AsyncTournamentRace.filter(status="pending", thread_id__isnull=False)
             for pending_race in pending_races:
                 # make these configurable
                 if pending_race.thread_timeout_time is None:
