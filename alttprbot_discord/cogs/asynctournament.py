@@ -2,6 +2,7 @@ import asyncio
 import csv
 import random
 import os
+import datetime
 
 import discord
 import tortoise.exceptions
@@ -30,6 +31,14 @@ class AsyncTournamentView(discord.ui.View):
         if async_tournament.active is False:
             await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
             return
+
+        # check discord account age, this should also be configurable in the future
+        # the age of the account must be at least 7 days older than the tournament start date
+        if interaction.user.created_at > (async_tournament.created - datetime.timedelta(days=7)):
+            await async_tournament.fetch_related('whitelist')
+            if interaction.user.id not in [w.discord_user_id for w in async_tournament.whitelist]:
+                await interaction.response.send_message("Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for assistance.", ephemeral=True)
+                return
 
         # this should be configurable in the future
         srlnick = await models.SRLNick.get_or_none(discord_user_id=interaction.user.id)

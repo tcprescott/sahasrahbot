@@ -487,6 +487,14 @@ class AsyncTournament(Model):
     active = fields.BooleanField(null=False, default=True)
 
 
+class AsyncTournamentWhitelist(Model):
+    id = fields.IntField(pk=True)
+    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='whitelist')
+    discord_user_id = fields.BigIntField(null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
 class AsyncTournamentPermalink(Model):
     id = fields.IntField(pk=True)
     pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='permalinks')
