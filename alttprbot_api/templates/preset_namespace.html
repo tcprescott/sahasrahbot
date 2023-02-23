@@ -7,7 +7,7 @@
 {% block content -%}
 
 <h2>{{ ns_data.name }}</h2>
-<a href="/presets/create">Create a new preset</a>
+<a href="{{ url_for('presets.new_preset_submit', namespace=ns_data.name)}}">Create a new preset</a>
 <hr />
 <table border="1">
     <tr>
@@ -18,8 +18,12 @@
     {% for preset in presets %}
     <tr>
         <td>{{ ns_data.name }}/{{preset.preset_name}}</td>
-        <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}">{{preset.randomizer}}</a></td>
-        <td><a href="/presets/manage/{{ ns_data.name }}/{{ preset.randomizer }}/{{ preset.preset_name }}">{% if is_owner
+        <td><a
+                href="{{ url_for('presets.presets_for_namespace_randomizer', namespace=ns_data.name, randomizer=preset.randomizer)}}">{{preset.randomizer}}</a>
+        </td>
+        <td><a
+                href="{{ url_for('presets.get_preset', namespace=ns_data.name, randomizer=preset.randomizer, preset=preset.preset_name)}}">{%
+                if is_owner
                 ==
                 True %}edit{% else %}view{% endif %}</a></td>
     </tr>

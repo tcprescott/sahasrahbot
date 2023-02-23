@@ -6,11 +6,12 @@
 
 {% block content -%}
 <h2>Preset &quot;{{ ns_data.name }}/{{ preset_data.preset_name }}&quot; for {{ preset_data.randomizer}}</h2>
-<p><a href="/presets/manage/{{ ns_data.name }}">View presets from {{ ns_data.name }}</a></p>
+<p><a href="{{ url_for('presets.presets_for_namespace', namespace=ns_data.name) }}">View presets from {{ ns_data.name
+        }}</a></p>
 <hr />
 {% if is_owner == True %}
 <form enctype=multipart/form-data
-    action="/presets/manage/{{ ns_data.name }}/{{ preset_data.randomizer }}/{{ preset_data.preset_name }}"
+    action="{{ url_for('presets.get_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}"
     method="post">
     <p>Upload a new YAML file to replace this preset</p>
     <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
@@ -21,7 +22,7 @@
 <hr />
 {% endif %}
 <p><a
-        href="/presets/download/{{ ns_data.name }}/{{ preset_data.randomizer }}/{{ preset_data.preset_name }}">download</a>
+        href="{{ url_for('presets.download_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}">download</a>
 </p>
 <pre>{{ preset_data.content|e }}</pre>
 {%- endblock content %}

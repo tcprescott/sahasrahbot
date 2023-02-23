@@ -1,7 +1,7 @@
 import re
 from io import BytesIO
 
-from quart import Blueprint, redirect, render_template, request, send_file
+from quart import Blueprint, redirect, render_template, request, send_file, url_for
 from quart_discord import Unauthorized, requires_authorization
 
 from alttprbot import models
@@ -32,25 +32,34 @@ async def my_presets():
     user = await discord.fetch_user()
     ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
 
-    return redirect(f"/presets/manage/{ns_current_user.name}")
+    return redirect(url_for('presets.presets_for_namespace', namespace=ns_current_user.name))
 
 
-@presets_blueprint.route('/presets/create', methods=['GET'])
+@presets_blueprint.route('/presets/<string:namespace>/create', methods=['GET'])
 @requires_authorization
-async def new_preset():
+async def new_preset(namespace):
     user = await discord.fetch_user()
     ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
 
-    return await render_template('preset_new.html', logged_in=True, user=user, ns_current_user=ns_current_user, randomizers=generator.PRESET_CLASS_MAPPING.keys())
+    if not generator.is_namespace_owner(user, ns_data):
+        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="You are not authorized to create presets in this namespace.")
+
+    return await render_template('preset_new.html', logged_in=True, user=user, ns_data=ns_data, ns_current_user=ns_current_user, randomizers=generator.PRESET_CLASS_MAPPING.keys())
 
 
-@presets_blueprint.route('/presets/create', methods=['POST'])
+@presets_blueprint.route('/presets/<string:namespace>/create', methods=['POST'])
 @requires_authorization
-async def new_preset_submit():
+async def new_preset_submit(namespace):
     user = await discord.fetch_user()
     payload = await request.form
     request_files = await request.files
-    ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
+    ns_data = await models.PresetNamespaces.get(name=namespace)
+    await ns_data.fetch_related('collaborators')
+
+    if not generator.is_namespace_owner(user, ns_data):
+        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="You are not authorized to create presets in this namespace.")
 
     if not re.match("^[a-zA-Z0-9_]*$", payload['preset_name']):
         return await render_template('error.html', logged_in=True, user=user, title="Unauthorized", message="Invalid preset name provided.")
@@ -58,13 +67,13 @@ async def new_preset_submit():
     preset_data, _ = await models.Presets.update_or_create(
         preset_name=payload['preset_name'],
         randomizer=payload['randomizer'],
-        namespace=ns_current_user,
+        namespace=ns_data,
         defaults={
             'content': request_files['presetfile'].read().decode()
         }
     )
 
-    return redirect(f"/presets/manage/{ns_current_user.name}/{preset_data.randomizer}/{preset_data.preset_name}")
+    return redirect(url_for('presets.presets_for_namespace_randomizer', namespace=ns_data.name, preset=preset_data.preset_name, randomizer=preset_data.randomizer))
 
 
 @presets_blueprint.route('/presets/manage/<string:namespace>', methods=['GET'])
@@ -76,12 +85,10 @@ async def presets_for_namespace(namespace):
     try:
         user = await discord.fetch_user()
         logged_in = True
-        ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
         is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
         logged_in = False
-        ns_current_user = None
         is_owner = False
 
     presets = await models.Presets.filter(namespace__name=namespace)
@@ -98,12 +105,10 @@ async def presets_for_namespace_randomizer(namespace, randomizer):
     try:
         user = await discord.fetch_user()
         logged_in = True
-        ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
         is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
         logged_in = False
-        ns_current_user = None
         is_owner = False
 
     presets = await models.Presets.filter(randomizer=randomizer, namespace__name=namespace).only('id', 'preset_name', 'randomizer')
@@ -119,12 +124,10 @@ async def get_preset(namespace, randomizer, preset):
     try:
         user = await discord.fetch_user()
         logged_in = True
-        ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
         is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
         logged_in = False
-        ns_current_user = None
         is_owner = False
 
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
@@ -152,7 +155,7 @@ async def update_preset(namespace, randomizer, preset):
     request_files = await request.files
     ns_data = await models.PresetNamespaces.get(name=namespace)
     await ns_data.fetch_related('collaborators')
-    ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
+
     is_owner = generator.is_namespace_owner(user, ns_data)
 
     if not is_owner:
@@ -162,13 +165,13 @@ async def update_preset(namespace, randomizer, preset):
 
     if 'delete' in payload:
         await preset_data.delete()
-        return redirect(f"/presets/manage/{namespace}")
+        return redirect(url_for('presets.presets_for_namespace', namespace=namespace))
 
     preset_data.content = request_files['presetfile'].read().decode()
 
     await preset_data.save()
 
-    return redirect(f"/presets/manage/{namespace}/{randomizer}/{preset}")
+    return redirect(url_for('presets.get_preset', namespace=namespace, randomizer=randomizer, preset=preset))
 
 # @presets_blueprint.route('/presets/<str:namespace>', methods=['POST'])
 # @requires_authorization

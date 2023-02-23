@@ -6,12 +6,12 @@
 
 {% block content -%}
 
-<a href="/presets/me">Access your namespace or create a new namespace (requires login).</a>
+<a href="{{ url_for('presets.my_presets') }}">Access your namespace or create a new namespace (requires login).</a>
 
 <p>All namespaces</p>
 <ul>
     {% for namespace in namespaces %}
-    <li><a href="/presets/manage/{{namespace.name}}">{{ namespace.name }}</a></li>
+    <li><a href="{{ url_for('presets.presets_for_namespace', namespace=namespace.name) }}">{{ namespace.name }}</a></li>
     {% endfor %}
 </ul>
 

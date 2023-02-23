@@ -8,13 +8,14 @@
 <h2>New Preset</h2>
 <hr />
 
-<form enctype=multipart/form-data action="/presets/create" method="post">
+<form enctype=multipart/form-data action="{{ url_for('presets.new_preset_submit', namespace=ns_data.name)}}"
+    method="post">
     <p>Randomizer: <select name="randomizer" id="randomizer">
             {% for randomizer in randomizers %}
             <option value="{{ randomizer }}">{{ randomizer }}</option>
             {% endfor %}
         </select></p>
-    <p>{{ ns_current_user.name }}/<input type="text" id="preset_name" name="preset_name" minlength="1" maxlength="20"
+    <p>{{ ns_data.name }}/<input type="text" id="preset_name" name="preset_name" minlength="1" maxlength="20"
             pattern="^[a-zA-Z0-9_]*$" placeholder="your_preset_name" /></p>
     <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
     <p><input type="submit" value="Save" /></p>
