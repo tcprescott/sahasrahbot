@@ -37,7 +37,7 @@ class AsyncTournamentView(discord.ui.View):
         if interaction.user.created_at > (async_tournament.created - datetime.timedelta(days=7)):
             await async_tournament.fetch_related('whitelist')
             if interaction.user.id not in [w.discord_user_id for w in async_tournament.whitelist]:
-                await interaction.response.send_message("Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for assistance.", ephemeral=True)
+                await interaction.response.send_message("Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for manual verification and whitelisting.", ephemeral=True)
                 return
 
         # this should be configurable in the future
