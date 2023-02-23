@@ -501,6 +501,8 @@ class AsyncTournamentPermalink(Model):
     permalink = fields.CharField(200, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+    live_race = fields.BooleanField(null=False, default=False)
+    racetime_slug = fields.CharField(200, null=True)
 
 
 class AsyncTournamentPermalinkPool(Model):
@@ -516,10 +518,12 @@ class AsyncTournamentRace(Model):
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
     discord_user_id = fields.BigIntField(null=False)
-    thread_id = fields.BigIntField(null=False)
-    thread_open_time = fields.DatetimeField(null=True)
+    thread_id = fields.BigIntField(null=True)  # only set if run async in discord
+    thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
+    thread_timeout_time = fields.DatetimeField(null=True)
     start_time = fields.DatetimeField(null=True)
     end_time = fields.DatetimeField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit
+    racetime_slug = fields.CharField(200, null=True)  # only set if race was performed on racetime.gg

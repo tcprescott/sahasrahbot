@@ -1,8 +1,9 @@
 import asyncio
 import csv
-import random
-import os
 import datetime
+import logging
+import os
+import random
 
 import discord
 import tortoise.exceptions
@@ -166,7 +167,8 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         await pool.fetch_related("permalinks")
 
         # TODO: This needs to be smart by balancing the number of runs per permalink
-        permalink = random.choice(pool.permalinks)
+        # Ensure we don't pick a permalink that was used in a live group race
+        permalink = random.choice([p for p in pool.permalinks if not p.live_race])
 
         # Write the race to the database
         async_tournament_race = await models.AsyncTournamentRace.create(
@@ -188,7 +190,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         await thread.send(embed=embed, view=AsyncTournamentRaceViewReady())
         await interaction.response.edit_message(content=f"Successfully created {thread.mention}.  Please join that thread for more details.", view=None, embed=None)
 
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
+    @ discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
     async def async_cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.edit_message(content="Successfully cancelled this request.  It will not be placed on your record and may be attempted at a later time.", view=None, embed=None)
 
@@ -197,7 +199,7 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Ready (start countdown)", style=discord.ButtonStyle.green, emoji="✅", custom_id="sahasrahbot:async_ready")
+    @ discord.ui.button(label="Ready (start countdown)", style=discord.ButtonStyle.green, emoji="✅", custom_id="sahasrahbot:async_ready")
     async def async_ready(self, interaction: discord.Interaction, button: discord.ui.Button):
         tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
         if tournament_race is None:
@@ -229,7 +231,7 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
         tournament_race.start_time = start_time
         await tournament_race.save()
 
-    @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️", custom_id="sahasrahbot:async_forfeit")
+    @ discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️", custom_id="sahasrahbot:async_forfeit")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
         if async_tournament_race.discord_user_id != interaction.user.id:
@@ -247,7 +249,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Finish", style=discord.ButtonStyle.green, emoji="✅", custom_id="sahasrahbot:async_finish")
+    @ discord.ui.button(label="Finish", style=discord.ButtonStyle.green, emoji="✅", custom_id="sahasrahbot:async_finish")
     async def async_finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Verify user clicking the button is the intended runner
         # Send a message to the thread with AsyncTournamentRaceViewFinished
@@ -274,7 +276,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
             child_item.disabled = True
         await interaction.followup.edit_message(message_id=interaction.message.id, view=self)
 
-    @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️", custom_id="sahasrahbot:async_forfeit2")
+    @ discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️", custom_id="sahasrahbot:async_forfeit2")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
         if async_tournament_race.discord_user_id != interaction.user.id:
@@ -287,7 +289,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
         await interaction.response.send_message("Are you sure you wish to forfeit?  Think carefully, as this action **cannot be undone**.  This race will be scored as a **zero** on your record and you may not re-play the run.", view=AsyncTournamentRaceViewForfeit(view=self, interaction=interaction), ephemeral=True)
 
-    @discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️", custom_id="sahasrahbot:async_get_timer")
+    @ discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️", custom_id="sahasrahbot:async_get_timer")
     async def async_get_timer(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
         if async_tournament_race.status in ["forfeit", "finished"]:
@@ -334,7 +336,40 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
 class AsyncTournament(commands.GroupCog, name="asynctournament"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.timeout_warning_task.start()
         self.persistent_views_added = False
+
+    @ tasks.loop(seconds=60, reconnect=True)
+    async def timeout_warning_task(self):
+        try:
+            pending_races = await models.AsyncTournamentRace.filter(status="pending")
+            for pending_race in pending_races:
+                # make these configurable
+                if pending_race.thread_timeout_time is None:
+                    pending_race.thread_timeout_time = pending_race.thread_open_time + datetime.timedelta(minutes=20)
+                    await pending_race.save()
+
+                warning_time = pending_race.thread_timeout_time - datetime.timedelta(minutes=10)
+                forfeit_time = pending_race.thread_timeout_time
+
+                thread = self.bot.get_channel(pending_race.thread_id)
+                if thread is None:
+                    logging.warning("Cannot access thread for pending race %s.  This should not have happened.", pending_race.id)
+                    continue
+
+                if warning_time < discord.utils.utcnow() < forfeit_time:
+                    await thread.send(f"<@{pending_race.discord_user_id}>, your race will be permanently forfeit at {discord.utils.format_dt(forfeit_time, 'f')} ({discord.utils.format_dt(forfeit_time, 'R')}) if you do not start it by then.  Please start your run as soon as possible.  Please ping the @Admins if you require more time.")
+
+                if forfeit_time < discord.utils.utcnow():
+                    await thread.send(f"<@{pending_race.discord_user_id}>, the grace period for the start of this run has elapsed.  This run has been forfeit.  Please contact the @Admins if you believe this was in error.")
+                    pending_race.status = "forfeit"
+                    await pending_race.save()
+        except Exception:
+            logging.exception("Exception in timeout_warning_task")
+
+    @ timeout_warning_task.before_loop
+    async def before_timeout_warning_task(self):
+        await self.bot.wait_until_ready()
 
     @ commands.Cog.listener()
     async def on_ready(self):
@@ -390,7 +425,33 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
         embed = create_tournament_embed(async_tournament)
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
 
-    @app_commands.command(name="repost", description="Repost the tournament embed")
+    @ app_commands.command(name="extendtimeout", description="Extend the timeout of this tournament run")
+    async def extend_timeout(self, interaction: discord.Interaction, minutes: int):
+        # TODO: replace this with a lookup on the config table for authorized users
+        if not await self.bot.is_owner(interaction.user):
+            await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
+            return
+
+        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        if not async_tournament_race:
+            await interaction.response.send_message("This channel is not an async tournament thread.", ephemeral=True)
+            return
+
+        if async_tournament_race.status != "pending":
+            await interaction.response.send_message("This race is not pending.  It cannot be extended.", ephemeral=True)
+            return
+
+        if async_tournament_race.thread_timeout_time is None:
+            thread_timeout_time = async_tournament_race.thread_open_time + datetime.timedelta(minutes=20) + datetime.timedelta(minutes=minutes)
+        else:
+            thread_timeout_time = async_tournament_race.thread_timeout_time + datetime.timedelta(minutes=minutes)
+
+        async_tournament_race.thread_timeout_time = thread_timeout_time
+        await async_tournament_race.save()
+
+        await interaction.response.send_message(f"Timeout extended to {discord.utils.format_dt(thread_timeout_time, 'f')} ({discord.utils.format_dt(thread_timeout_time, 'R')}).")
+
+    @ app_commands.command(name="repost", description="Repost the tournament embed")
     async def repost(self, interaction: discord.Interaction):
         if not await self.bot.is_owner(interaction.user):
             await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
