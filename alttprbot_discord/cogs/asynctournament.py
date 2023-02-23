@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import random
+import os
 
 import discord
 import tortoise.exceptions
@@ -9,6 +10,8 @@ from discord.ext import commands, tasks
 from slugify import slugify
 
 from alttprbot import models
+
+APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 
 class AsyncTournamentView(discord.ui.View):
@@ -19,12 +22,19 @@ class AsyncTournamentView(discord.ui.View):
     async def new_async_race(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
         await async_tournament.fetch_related('permalink_pools')
+
         if async_tournament is None:
             await interaction.response.send_message("This channel is not configured for async tournaments.", ephemeral=True)
             return
 
         if async_tournament.active is False:
             await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
+            return
+
+        # this should be configurable in the future
+        srlnick = await models.SRLNick.get_or_none(discord_user_id=interaction.user.id)
+        if srlnick is None or srlnick.rtgg_id is None:
+            await interaction.response.send_message(f"You must link your RaceTime.gg account to SahasrahBot before you can participate in an async tournament.\n\nPlease visit <{APP_URL}/racetime/verification/initiate> to link your RaceTime account.", ephemeral=True)
             return
 
         async_history = await models.AsyncTournamentRace.filter(discord_user_id=interaction.user.id, tournament=async_tournament).prefetch_related('permalink__pool')
