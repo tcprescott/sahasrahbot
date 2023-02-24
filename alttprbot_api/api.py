@@ -27,6 +27,7 @@ sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.sgl22_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
 
 
 @sahasrahbotapi.route("/login/")

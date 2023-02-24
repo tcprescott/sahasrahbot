@@ -5,3 +5,4 @@ from .settingsgen import settingsgen_blueprint
 from .sgl22 import sgl22_blueprint
 from .tournament import tournament_blueprint
 from .triforcetexts import triforcetexts_blueprint
+from .asynctournament import asynctournament_blueprint
