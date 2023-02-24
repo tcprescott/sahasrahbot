@@ -358,10 +358,10 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
                     continue
 
                 if warning_time < discord.utils.utcnow() < forfeit_time:
-                    await thread.send(f"<@{pending_race.discord_user_id}>, your race will be permanently forfeit at {discord.utils.format_dt(forfeit_time, 'f')} ({discord.utils.format_dt(forfeit_time, 'R')}) if you do not start it by then.  Please start your run as soon as possible.  Please ping the @Admins if you require more time.")
+                    await thread.send(f"<@{pending_race.discord_user_id}>, your race will be permanently forfeit on {discord.utils.format_dt(forfeit_time, 'f')} ({discord.utils.format_dt(forfeit_time, 'R')}) if you do not start it by then.  Please start your run as soon as possible.  Please ping the @Admins if you require more time.", allowed_mentions=discord.AllowedMentions(users=True))
 
                 if forfeit_time < discord.utils.utcnow():
-                    await thread.send(f"<@{pending_race.discord_user_id}>, the grace period for the start of this run has elapsed.  This run has been forfeit.  Please contact the @Admins if you believe this was in error.")
+                    await thread.send(f"<@{pending_race.discord_user_id}>, the grace period for the start of this run has elapsed.  This run has been forfeit.  Please contact the @Admins if you believe this was in error.", allowed_mentions=discord.AllowedMentions(users=True))
                     pending_race.status = "forfeit"
                     await pending_race.save()
         except Exception:
