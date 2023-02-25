@@ -46,7 +46,7 @@ async def async_tournament_races(tournament_id):
     if request.args.get('status'):
         filter_args['status'] = request.args.get('status')
 
-    result = await models.AsyncTournamentRace.filter(tournament_id=tournament_id, **filter_args).prefetch_related('tournament', 'permalink').values()
+    result = await models.AsyncTournamentRace.filter(tournament_id=tournament_id, **filter_args).prefetch_related('tournament', 'permalink').values('id', 'tournament_id', 'permalink_id', 'permalink__pool_id', 'permalink__pool__name', 'permalink__permalink', 'discord_user_id', 'status', 'thread_id', 'thread_open_time', 'start_time', 'end_time', 'created', 'updated')
     if result is None:
         return jsonify({'error': 'Tournament not found.'})
 

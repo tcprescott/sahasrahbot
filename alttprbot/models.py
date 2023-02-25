@@ -486,6 +486,19 @@ class AsyncTournament(Model):
     updated = fields.DatetimeField(auto_now=True)
     active = fields.BooleanField(null=False, default=True)
 
+    # def as_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'name': self.name,
+    #         'guild_id': self.guild_id,
+    #         'channel_id': self.channel_id,
+    #         'report_channel_id': self.report_channel_id,
+    #         'owner_id': self.owner_id,
+    #         'created': self.created,
+    #         'updated': self.updated,
+    #         'active': self.active
+    #     }
+
 
 class AsyncTournamentWhitelist(Model):
     id = fields.IntField(pk=True)
@@ -493,6 +506,15 @@ class AsyncTournamentWhitelist(Model):
     discord_user_id = fields.BigIntField(null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+
+    # def as_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'tournament': self.tournament.as_dict(),
+    #         'discord_user_id': self.discord_user_id,
+    #         'created': self.created,
+    #         'updated': self.updated
+    #     }
 
 
 class AsyncTournamentPermalink(Model):
@@ -504,6 +526,15 @@ class AsyncTournamentPermalink(Model):
     live_race = fields.BooleanField(null=False, default=False)
     racetime_slug = fields.CharField(200, null=True)
 
+    # def as_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'pool': self.pool.as_dict(),
+    #         'permalink': self.permalink,
+    #         'created': self.created,
+    #         'updated': self.updated,
+    #     }
+
 
 class AsyncTournamentPermalinkPool(Model):
     id = fields.IntField(pk=True)
@@ -511,6 +542,15 @@ class AsyncTournamentPermalinkPool(Model):
     name = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+
+    # def as_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'tournament': self.tournament.as_dict(),
+    #         'name': self.name,
+    #         'created': self.created,
+    #         'updated': self.updated,
+    #     }
 
 
 class AsyncTournamentRace(Model):
@@ -527,3 +567,20 @@ class AsyncTournamentRace(Model):
     updated = fields.DatetimeField(auto_now=True)
     status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit
     racetime_slug = fields.CharField(200, null=True)  # only set if race was performed on racetime.gg
+
+    # def as_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'tournament': self.tournament.as_dict(),
+    #         'permalink': self.permalink.as_dict(),
+    #         'discord_user_id': self.discord_user_id,
+    #         'thread_id': self.thread_id,
+    #         'thread_open_time': self.thread_open_time,
+    #         'thread_timeout_time': self.thread_timeout_time,
+    #         'start_time': self.start_time,
+    #         'end_time': self.end_time,
+    #         'created': self.created,
+    #         'updated': self.updated,
+    #         'status': self.status,
+    #         'racetime_slug': self.racetime_slug,
+    #     }
