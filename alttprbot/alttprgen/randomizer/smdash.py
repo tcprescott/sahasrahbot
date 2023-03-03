@@ -16,6 +16,10 @@ import logging
 # 8) Return with the url for the patch (https://patch.synack.live/?patch=DASH_v11_SF_057677.bps)
 ###
 
+###
+# https://dashrando.github.io/app/dash.cli.js
+###
+
 
 def roll_smdash():
     return random.randrange(1000000, 9999999)
