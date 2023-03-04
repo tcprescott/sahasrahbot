@@ -1,3 +1,5 @@
+from enum import Enum
+
 from tortoise.models import Model
 from tortoise import fields
 
@@ -268,6 +270,7 @@ class SRLNick(Model):
     discord_user_id = fields.BigIntField(pk=True, generated=False)
     twitch_name = fields.CharField(200, index=True, null=True)
     rtgg_id = fields.CharField(200, index=True, null=True)
+    display_name = fields.CharField(200, index=True, null=True)
 
 
 class TournamentGames(Model):
@@ -584,3 +587,111 @@ class AsyncTournamentRace(Model):
     #         'status': self.status,
     #         'racetime_slug': self.racetime_slug,
     #     }
+
+# class TournamentSchedulePermissionRole(str, Enum):
+#     ADMIN = 'admin'
+#     MODERATOR = 'moderator'
+#     PLAYER = 'player'
+#     COMMENTATOR = 'commentator'
+#     BROADCASTER = 'broadcaster'
+#     TRACKER = 'tracker'
+
+# class TournamentSchedule(Model):
+#     id = fields.IntField(pk=True)
+#     slug = fields.CharField(45, null=False)
+#     name = fields.CharField(200, null=False)
+#     game = fields.CharField(200, null=False)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+#     stream_delay_minutes = fields.IntField(null=False, default=0)
+#     speedgaming_slug = fields.CharField(200, null=True)
+
+# class TournamentSchedulePermissions(Model):
+#     id = fields.IntField(pk=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='permissions')
+#     discord_user_id = fields.BigIntField(null=False)
+#     role = fields.CharEnumField(TournamentSchedulePermissionRole, null=False)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleChannels(Model):
+#     id = fields.IntField(pk=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='channels')
+#     slug = fields.CharField(200, null=False)
+#     url = fields.CharField(200, null=False)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentSchedulePlayer(Model):
+#     id = fields.IntField(pk=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='players')
+#     name = fields.CharField(200, null=False)
+#     srlnick = fields.OneToOneField('models.SRLNick', related_name='schedule_player', null=True)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleBroadcaster(Model):
+#     id = fields.IntField(pk=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='broadcasters')
+#     name = fields.CharField(200, null=False)
+#     srlnick = fields.OneToOneField('models.SRLNick', related_name='schedule_broadcaster', null=True)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleCommentator(Model):
+#     id = fields.IntField(pk=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='commentators')
+#     name = fields.CharField(200, null=False)
+#     srlnick = fields.OneToOneField('models.SRLNick', related_name='schedule_commentator', null=True)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleTracker(Model):
+#     id = fields.IntField(pk=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='trackers')
+#     name = fields.CharField(200, null=False)
+#     srlnick = fields.OneToOneField('models.SRLNick', related_name='schedule_tracker', null=True)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+
+# class TournamentScheduleMatch(Model):
+#     id = fields.IntField(pk=True)
+#     name = fields.CharField(200, null=True)
+#     submission_notes = fields.CharField(2000, null=True)
+#     schedule = fields.ForeignKeyField('models.TournamentSchedule', related_name='matches')
+#     channel = fields.ForeignKeyField('models.TournamentScheduleChannels', related_name='matches')
+#     start_time = fields.DatetimeField(null=True)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleMatchPlayer(Model):
+#     id = fields.IntField(pk=True)
+#     match = fields.ForeignKeyField('models.TournamentScheduleMatch', related_name='players')
+#     player = fields.ForeignKeyField('models.TournamentSchedulePlayer', related_name='matches')
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleMatchBroadcaster(Model):
+#     id = fields.IntField(pk=True)
+#     match = fields.ForeignKeyField('models.TournamentScheduleMatch', related_name='broadcasters')
+#     broadcaster = fields.ForeignKeyField('models.TournamentScheduleBroadcaster', related_name='matches')
+#     approved = fields.BooleanField(default=False)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleMatchCommentator(Model):
+#     id = fields.IntField(pk=True)
+#     match = fields.ForeignKeyField('models.TournamentScheduleMatch', related_name='commentators')
+#     commentator = fields.ForeignKeyField('models.TournamentScheduleCommentator', related_name='matches')
+#     approved = fields.BooleanField(default=False)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
+
+# class TournamentScheduleMatchTracker(Model):
+#     id = fields.IntField(pk=True)
+#     match = fields.ForeignKeyField('models.TournamentScheduleMatch', related_name='trackers')
+#     tracker = fields.ForeignKeyField('models.TournamentScheduleTracker', related_name='matches')
+#     approved = fields.BooleanField(default=False)
+#     created = fields.DatetimeField(auto_now_add=True)
+#     updated = fields.DatetimeField(auto_now=True)
