@@ -16,8 +16,9 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
         data = {
             'multidata_url': multidata.url,
             'admin': interaction.user.id,
+            'racemode': race,
             'meta': {
-                'channel': None if isinstance(interaction.channel, discord.DMChannel) else interaction.channel.name,
+                'channel': interaction.channel.name if interaction.channel.guild else None,
                 'guild': interaction.guild.name if interaction.guild else None,
                 'multidata_url': multidata.url,
                 'name': f'{interaction.user.name}#{interaction.user.discriminator}'
@@ -45,7 +46,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
             'port': port,
             'admin': interaction.user.id,
             'meta': {
-                'channel': None if isinstance(interaction.channel, discord.DMChannel) else interaction.channel.name,
+                'channel': interaction.channel.name if interaction.channel.guild else None,
                 'guild': interaction.guild.name if interaction.guild else None,
                 'name': f'{interaction.user.name}#{interaction.user.discriminator}'
             }
