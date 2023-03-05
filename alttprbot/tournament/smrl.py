@@ -113,8 +113,8 @@ class SMRandoLeague(TournamentRace):
         seed_number = random.randint(0, 2147483647)
         player_names = self.player_names
         teams = [
-            [player_names[0], player_names[1]],
-            [player_names[2], player_names[3]]
+            [player_names[0], player_names[2]],
+            [player_names[1], player_names[4]]
         ]
         seeds = []
         for team in teams:
