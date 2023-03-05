@@ -605,6 +605,7 @@ class AsyncTournamentRace(Model):
 #     updated = fields.DatetimeField(auto_now=True)
 #     stream_delay_minutes = fields.IntField(null=False, default=0)
 #     speedgaming_slug = fields.CharField(200, null=True)
+#     discord_guild_id = fields.BigIntField(null=True)
 
 # class TournamentSchedulePermissions(Model):
 #     id = fields.IntField(pk=True)
