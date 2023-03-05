@@ -60,7 +60,7 @@ class DiscordServerLists(Model):
     id = fields.IntField(pk=True)
     server_description = fields.CharField(200, null=False)
     invite_id = fields.CharField(45, null=False)
-    category = fields.ForeignKeyField('models.DiscordServerCategories', related_name='discord_server_lists')
+    category = fields.ForeignKeyField('models.DiscordServerCategories', related_name='server_list')
 
 
 class DiscordServerCategories(Model):
