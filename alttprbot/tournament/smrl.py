@@ -114,7 +114,7 @@ class SMRandoLeague(TournamentRace):
         player_names = self.player_names
         teams = [
             [player_names[0], player_names[2]],
-            [player_names[1], player_names[4]]
+            [player_names[1], player_names[3]]
         ]
         seeds = []
         for team in teams:
