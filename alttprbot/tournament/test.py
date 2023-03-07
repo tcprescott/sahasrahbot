@@ -12,7 +12,7 @@ class TestTournament(smrl.SMRandoLeague):
             racetime_category='test',
             racetime_goal='Beat the game',
             event_slug="test",
-            # audit_channel=discordbot.get_channel(537469084527230976),
+            audit_channel=discordbot.get_channel(537469084527230976),
             # commentary_channel=discordbot.get_channel(659307060499972096),
             # scheduling_needs_channel=discordbot.get_channel(835699086261747742),
             # create_scheduled_events=True

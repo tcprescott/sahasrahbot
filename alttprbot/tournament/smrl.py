@@ -151,7 +151,6 @@ class SMRandoLeague(TournamentRace):
                 guild.get_role(501810831504179250),
                 guild.get_role(504725352745140224)
             ],
-            coop=True,
         )
 
     async def create_race_room(self):
