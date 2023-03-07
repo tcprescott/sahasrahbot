@@ -111,7 +111,9 @@ class TournamentRace(object):
     async def construct(cls, episodeid, rtgg_handler):
         tournament_race = cls(episodeid, rtgg_handler)
 
+        logging.info(f"TournamentRace: Waiting for discordbot to be ready to construct {episodeid}")
         await discordbot.wait_until_ready()
+        logging.info(f"TournamentRace: Finished constructing {episodeid}")
         tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
 
