@@ -12,6 +12,7 @@ from discord.ext import commands, tasks
 from slugify import slugify
 
 from alttprbot import models
+from tortoise.functions import Count
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
@@ -201,13 +202,34 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
 
         # TODO: This needs to be smart by balancing the number of runs per permalink
         # Ensure we don't pick a permalink that was used in a live group race
-        permalink = random.choice([p for p in pool.permalinks if not p.live_race])
 
+        permalink_counts = await models.AsyncTournamentRace.filter(tournament=async_tournament, permalink__pool=pool).annotate(count=Count('permalink_id')).group_by("permalink_id").values("permalink_id", "count")
+        permalink_count_dict = {item['permalink_id']: item['count'] for item in permalink_counts}
+        permalink_count_dict = {p.id: permalink_count_dict.get(p.id, 0) for p in pool.permalinks if p.live_race is False}
+
+        player_async_history = await models.AsyncTournamentRace.filter(discord_user_id=interaction.user.id, tournament=async_tournament, permalink__pool=pool).prefetch_related('permalink')
+        available_permalinks = await pool.permalinks.filter(live_race=False)
+        played_permalinks = [p.permalink for p in player_async_history]
+        eligible_permalinks = list(set(available_permalinks) - set(played_permalinks))
+
+        if max(permalink_count_dict.values()) - min(permalink_count_dict.values()) > 10:
+            # pool is unbalanced, so we need to pick a permalink that has been played the least
+            permalink_id = min(permalink_count_dict, key=permalink_count_dict.get)
+            # ensure it's eligible to be played
+            if permalink_id in [e.id for e in eligible_permalinks]:
+                permalink = await models.AsyncTournamentPermalink.get(id=permalink_id)
+            else:
+                # pick a random eligible permalink instead of the one we need to force, because the one we're forcing is not eligible
+                permalink: models.AsyncTournamentPermalink = random.choice(eligible_permalinks)
+        else:
+            permalink: models.AsyncTournamentPermalink = random.choice(eligible_permalinks)
+
+        # Log the action
         await models.AsyncTournamentAuditLog.create(
             tournament=async_tournament,
             discord_user_id=interaction.user.id,
             action="create_thread",
-            details=f"Created thread {thread.id} for permalink {permalink.permalink}"
+            details=f"Created thread {thread.id} for pool {pool.name}, permalink {permalink.permalink}"
         )
 
         # Write the race to the database
