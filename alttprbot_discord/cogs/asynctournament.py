@@ -409,7 +409,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
         elapsed = async_tournament_race.end_time - async_tournament_race.start_time
 
-        await interaction.response.send_message(f"Your finish time of **{elapsed}** as been recorded.  Please post the VoD of your run in this channel.")
+        await interaction.response.send_message(f"Your finish time of **{elapsed}** as been recorded.  Thank you for playing!", view=AsyncTournamentPostRaceView())
 
         for child_item in self.children:
             child_item.disabled = True
@@ -450,6 +450,10 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
         # Write forfeit to database
         # Disable buttons on this view
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        if async_tournament_race is None:
+            await interaction.response.send_message("This race does not exist.  Please contact a moderator.", ephemeral=True)
+            return
+
         if async_tournament_race.discord_user_id != interaction.user.id:
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
@@ -475,6 +479,41 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
         for child_item in self.original_view.children:
             child_item.disabled = True
         await self.original_interaction.followup.edit_message(message_id=self.original_interaction.message.id, view=self.original_view)
+
+
+# button to open a modal to submit vod link and runner notes
+class AsyncTournamentPostRaceView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Submit VOD and Notes", style=discord.ButtonStyle.green, emoji="📹", custom_id="sahasrahbot:async_submit_vod")
+    async def async_submit_vod(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(SubmitVODModal())
+
+
+class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
+    runner_vod_url = discord.ui.TextInput(label="VOD Link", placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ", row=0)
+    runner_notes = discord.ui.TextInput(
+        label="Runner Notes",
+        placeholder="Any notes you want to leave for tournament admins regarding this run.",
+        style=discord.TextStyle.long,
+        required=False,
+        row=1
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        # write vod link and runner notes to database
+        # close modal
+        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        if async_tournament_race is None:
+            await interaction.response.send_message("This race does not exist.  This should not have happened.  Please contact a moderator.")
+            return
+
+        async_tournament_race.runner_vod_url = self.runner_vod_url.value
+        async_tournament_race.runner_notes = self.runner_notes.value
+        await async_tournament_race.save()
+
+        await interaction.response.send_message(f"VOD link and runner notes saved.\n\n**URL:**\n{self.runner_vod_url.value}\n\n**Notes:**\n{self.runner_notes.value}")
 
 
 class AsyncTournament(commands.GroupCog, name="asynctournament"):
@@ -526,6 +565,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
             self.bot.add_view(AsyncTournamentView())
             self.bot.add_view(AsyncTournamentRaceViewReady())
             self.bot.add_view(AsyncTournamentRaceViewInProgress())
+            self.bot.add_view(AsyncTournamentPostRaceView())
             self.persistent_views_added = True
 
     @app_commands.command(name="create", description="Create an async tournament")
