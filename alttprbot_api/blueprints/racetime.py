@@ -110,6 +110,6 @@ async def return_racetime_verify():
     async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
-    await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id']})
+    await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token})
 
     return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
