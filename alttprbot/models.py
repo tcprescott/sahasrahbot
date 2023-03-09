@@ -1,8 +1,6 @@
 from tortoise.models import Model
 from tortoise import fields
 
-from alttprbot import enums
-
 
 class AuditGeneratedGames(Model):
     class Meta:
@@ -547,8 +545,8 @@ class AsyncTournamentRace(Model):
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)
     runner_vod_url = fields.CharField(400, null=True)
-    review_status = fields.CharEnumField(enums.AsyncReviewStatus, null=False, default="pending")  # pending, approved, rejected
-    reviewed_by = fields.BigIntField(null=True)
+    review_status = fields.CharField(20, null=False, default="pending")  # pending, approved, rejected
+    reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
 

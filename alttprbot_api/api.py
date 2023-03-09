@@ -103,9 +103,9 @@ async def purge_me_action():
     if payload.get('confirmpurge', 'no') == 'yes':
         await models.PresetNamespaces.filter(discord_user_id=user.id).delete()
         await models.NickVerification.filter(discord_user_id=user.id).delete()
-        return redirect("/logout/")
+        return redirect(url_for('logout'))
 
-    return redirect("/me/")
+    return redirect(url_for('me'))
 
 
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
