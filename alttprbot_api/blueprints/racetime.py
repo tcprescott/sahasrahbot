@@ -18,6 +18,7 @@ RACETIME_CLIENT_SECRET_OAUTH = os.environ.get('RACETIME_CLIENT_SECRET_OAUTH')
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
+
 @racetime_blueprint.route('/api/racetime/cmd', methods=['POST'])
 async def bot_command():
     data = await request.get_json()
@@ -72,6 +73,7 @@ async def bot_command():
 
     return jsonify({'success': True})
 
+
 @racetime_blueprint.route('/racetime/verification/initiate', methods=['GET'])
 @requires_authorization
 async def racetime_init_verification():
@@ -108,6 +110,6 @@ async def return_racetime_verify():
     async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
-    await models.SRLNick.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id']})
+    await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id']})
 
     return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])

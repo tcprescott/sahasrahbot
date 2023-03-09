@@ -9,6 +9,7 @@ from alttprbot import models
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
+
 class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands for rt.gg integration"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -25,7 +26,7 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
         await interaction.response.defer(ephemeral=True)
         msg = []
         for member in role.members:
-            result = await models.SRLNick.get_or_none(discord_user_id=member.id)
+            result = await models.Users.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
                 try:
                     await member.send(
@@ -55,7 +56,7 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
         await interaction.response.defer(ephemeral=True)
         msg = []
         for member in role.members:
-            result = await models.SRLNick.get_or_none(discord_user_id=member.id)
+            result = await models.Users.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
                 msg.append(f"{member.name}#{member.discriminator}")
 

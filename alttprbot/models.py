@@ -273,6 +273,16 @@ class SRLNick(Model):
     display_name = fields.CharField(200, index=True, null=True)
 
 
+class Users(Model):
+    id = fields.IntField(pk=True)
+    discord_user_id = fields.BigIntField(null=True, unique=True)
+    twitch_name = fields.CharField(200, null=True)
+    rtgg_id = fields.CharField(200, null=True, unique=True)
+    display_name = fields.CharField(200, index=True, null=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
 class TournamentGames(Model):
     class Meta:
         table = 'tournament_games'
@@ -494,6 +504,7 @@ class AsyncTournament(Model):
 class AsyncTournamentWhitelist(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='whitelist')
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_whitelist')
     discord_user_id = fields.BigIntField(null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
@@ -522,6 +533,7 @@ class AsyncTournamentRace(Model):
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
     discord_user_id = fields.BigIntField(null=False)
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=True)
     thread_id = fields.BigIntField(null=True)  # only set if run async in discord
     thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
     thread_timeout_time = fields.DatetimeField(null=True)
@@ -535,6 +547,8 @@ class AsyncTournamentRace(Model):
     runner_notes = fields.TextField(null=True)
     runner_vod_url = fields.CharField(400, null=True)
     review_status = fields.CharEnumField(enums.AsyncReviewStatus, null=False, default="pending")  # pending, approved, rejected
+    reviewed_by = fields.BigIntField(null=True)
+    reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
 
 
@@ -542,6 +556,7 @@ class AsyncTournamentAuditLog(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='audit_log')
     discord_user_id = fields.BigIntField(null=True)
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True)
     action = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)

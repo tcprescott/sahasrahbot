@@ -103,7 +103,7 @@ async def purge_me_action():
     if payload.get('confirmpurge', 'no') == 'yes':
         await models.PresetNamespaces.filter(discord_user_id=user.id).delete()
         await models.NickVerification.filter(discord_user_id=user.id).delete()
-        await models.SRLNick.filter(discord_user_id=user.id).delete()
+        await models.Users.filter(discord_user_id=user.id).delete()
         await models.AuditMessages.filter(user_id=user.id).delete()
 
         return redirect("/logout/")

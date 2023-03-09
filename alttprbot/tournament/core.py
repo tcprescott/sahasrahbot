@@ -54,14 +54,14 @@ class TournamentConfig:
 
 class TournamentPlayer(object):
     def __init__(self):
-        self.data: models.SRLNick = None
+        self.data: models.Users = None
         self.discord_user: discord.Member = None
 
     @classmethod
     async def construct(cls, discord_id: int, guild: discord.Guild):
         playerobj = cls()
 
-        playerobj.data = await models.SRLNick.get_or_none(discord_user_id=discord_id)
+        playerobj.data = await models.Users.get_or_none(discord_user_id=discord_id)
         if playerobj.data is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_id}")
         playerobj.discord_user = guild.get_member(int(discord_id))
@@ -75,7 +75,7 @@ class TournamentPlayer(object):
         playerobj.discord_user = guild.get_member_named(discord_name)
         if playerobj.discord_user is None:
             raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
-        playerobj.data = await models.SRLNick.get_or_none(discord_user_id=playerobj.discord_user.id)
+        playerobj.data = await models.Users.get_or_none(discord_user_id=playerobj.discord_user.id)
         if playerobj.data is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_name}")
 
@@ -263,7 +263,7 @@ class TournamentRace(object):
         if rtgg_id in team_member_ids:
             return True
 
-        nickname = await models.SRLNick.get_or_none(rtgg_id=rtgg_id)
+        nickname = await models.Users.get_or_none(rtgg_id=rtgg_id)
 
         if not nickname:
             return False
