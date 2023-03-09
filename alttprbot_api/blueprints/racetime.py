@@ -110,6 +110,13 @@ async def return_racetime_verify():
     async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
-    await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token, 'display_name': user.name})
+    rtgg_id = userinfo_data['id']
+
+    # we need to test if the user has a rtgg_id but no discord_user_id and handle that case
+    rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
+    if rtgg_user is not None:
+        rtgg_user.discord_user_id = user.id
+    else:
+        await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token, 'display_name': user.name})
 
     return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
