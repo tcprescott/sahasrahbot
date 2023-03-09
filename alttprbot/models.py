@@ -505,7 +505,7 @@ class AsyncTournamentWhitelist(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='whitelist')
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_whitelist')
-    discord_user_id = fields.BigIntField(null=False)
+    discord_user_id = fields.BigIntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
@@ -532,7 +532,7 @@ class AsyncTournamentRace(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
-    discord_user_id = fields.BigIntField(null=False)
+    discord_user_id = fields.BigIntField(null=True)
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=True)
     thread_id = fields.BigIntField(null=True)  # only set if run async in discord
     thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
