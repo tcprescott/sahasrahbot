@@ -1,9 +1,10 @@
-from quart import Blueprint, jsonify, redirect, render_template, request, send_file, url_for, Response
+import html
+from quart import Blueprint, jsonify, redirect, render_template, request, send_file, url_for, Response, abort
+from quart_discord import Unauthorized, requires_authorization
 import tortoise.exceptions
 
 from alttprbot import models
 from alttprbot_api import auth
-
 from ..api import discord
 
 asynctournament_blueprint = Blueprint('async', __name__)
@@ -111,6 +112,32 @@ async def async_tournament_whitelist(tournament_id):
         return jsonify({'error': 'Tournament not found.'})
 
     return jsonify([asynctournamentwhitelist_to_dict(r) for r in result])
+
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>', methods=['GET'])
+@requires_authorization
+async def async_tournament_queue(tournament_id: int):
+    user = await discord.fetch_user()
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user__discord_user_id=user.id, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    await tournament.fetch_related('races', 'races__permalink', 'races__permalink__pool', 'races__user')
+    return await render_template('asynctournament_race_list.html', tournament=tournament)
+
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/review/<int:race_id>', methods=['GET'])
+@requires_authorization
+async def async_tournament_review(tournament_id: int, race_id: int):
+    return "NYI"
+
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/review/<int:race_id>', methods=['POST'])
+@requires_authorization
+async def async_tournament_review_submit(tournament_id: int, race_id: int):
+    return "NYI"
 
 
 def asynctournament_to_dict(asynctournament: models.AsyncTournament):

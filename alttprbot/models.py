@@ -509,6 +509,15 @@ class AsyncTournamentWhitelist(Model):
     updated = fields.DatetimeField(auto_now=True)
 
 
+class AsyncTournamentPermissions(Model):
+    id = fields.IntField(pk=True)
+    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permissions')
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions')
+    role = fields.CharField(45, null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
 class AsyncTournamentPermalink(Model):
     id = fields.IntField(pk=True)
     pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='permalinks')

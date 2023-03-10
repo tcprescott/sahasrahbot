@@ -1,0 +1,38 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Moderation Queue for Tournament ID {{ tournament.id }}</title>
+{%- endblock head %}
+
+{% block content -%}
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Player Name</th>
+        <th>Pool</th>
+        <th>Permalink</th>
+        <th>VoD</th>
+        <th>Thread Link</th>
+        <th>Finish Time</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for race in tournament.races %}
+    <tr>
+        <td>{{ race.id }}</td>
+        <td>{{ race.user.display_name }}</td>
+        <td>{{ race.permalink.permalink }}</td>
+        <td>{{ race.permalink.pool.name }}</td>
+        <td>{{ race.runner_vod_url }}</td>
+        <td><a href="https://discord.com/channels/{{ race.tournament.guild_id }}/{{ race.thread_id }}">thread</a></td>
+        <td>{{ race.end_time - race.start_time if race.end_time else "" }}</td>
+        <td>{{ race.status }}</td>
+        <td>
+            <p><a
+                    href="{{ url_for('async.async_tournament_review', tournament_id=race.tournament.id, race_id=race.id) }}">review</a>
+            </p>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{%- endblock content %}
