@@ -116,6 +116,7 @@ async def return_racetime_verify():
     rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
     if rtgg_user is not None:
         rtgg_user.discord_user_id = user.id
+        await rtgg_user.save()
     else:
         await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token, 'display_name': user.name})
 
