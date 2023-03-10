@@ -23,7 +23,8 @@ discordbot = commands.Bot(
         users=True,
         roles=False
     ),
-    intents=intents
+    intents=intents,
+    chunk_guilds_at_startup=False,
 )
 
 discordbot.logger = logging.getLogger('discord')

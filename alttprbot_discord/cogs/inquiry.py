@@ -59,6 +59,9 @@ class OpenInquiryThread(discord.ui.View):
         await thread.add_user(interaction.user)
         await interaction.response.send_message(f"A new thread called {thread.mention} has been opened for this inquiry.", ephemeral=True)
 
+        if interaction.guild.chunked is False:
+            await interaction.guild.chunk(cache=True)
+
         for member in role_ping.members:
             logging.info(f"Adding {member.name}#{member.discriminator} to thread {thread.name}")
             await thread.add_user(member)

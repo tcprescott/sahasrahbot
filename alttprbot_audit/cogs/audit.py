@@ -314,7 +314,7 @@ async def audit_embed_edit(old_message, message):
     return embed
 
 
-async def audit_embed_delete(guild, channel, message_id, bulk=False):
+async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=False):
     old_message = await models.AuditMessages.filter(message_id=message_id).order_by('id').values()
     if old_message is None:
         author = None
@@ -322,6 +322,8 @@ async def audit_embed_delete(guild, channel, message_id, bulk=False):
         old_attachment_url = None
         original_timestamp = '*unknown*'
     else:
+        if guild.chunked is False:
+            await guild.chunk(cache=True)
         author = guild.get_member(int(old_message[-1]['user_id']))
         old_content = old_message[-1]['content']
         old_attachment_url = old_message[-1]['attachment']

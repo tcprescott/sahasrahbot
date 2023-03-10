@@ -243,6 +243,7 @@ class MultiworldSignupView(discord.ui.View):
 
         return entrant_discords
 
+
 class Multiworld(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -291,14 +292,14 @@ def get_embed_field(name: str, embed: discord.Embed) -> str:
     return None
 
 
-def get_owner(embed: discord.Embed, guild: discord.Guild) -> discord.Member:
-    value = get_embed_field("Owner", embed)
+# def get_owner(embed: discord.Embed, guild: discord.Guild) -> discord.Member:
+#     value = get_embed_field("Owner", embed)
 
-    if value is None:
-        return
+#     if value is None:
+#         return
 
-    user_id = int(re.search('<@([0-9]*)>', value).groups()[0])
-    return guild.get_member(user_id)
+#     user_id = int(re.search('<@([0-9]*)>', value).groups()[0])
+#     return guild.get_member(user_id)
 
 
 async def setup(bot):

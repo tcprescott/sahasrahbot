@@ -61,6 +61,9 @@ class TournamentPlayer(object):
     async def construct(cls, discord_id: int, guild: discord.Guild):
         playerobj = cls()
 
+        if guild.chunked is False:
+            await guild.chunk(cache=True)
+
         playerobj.data = await models.Users.get_or_none(discord_user_id=discord_id)
         if playerobj.data is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_id}")
@@ -71,6 +74,9 @@ class TournamentPlayer(object):
     @classmethod
     async def construct_discord_name(cls, discord_name: str, guild: discord.Guild):
         playerobj = cls()
+
+        if guild.chunked is False:
+            await guild.chunk(cache=True)
 
         playerobj.discord_user = guild.get_member_named(discord_name)
         if playerobj.discord_user is None:
@@ -267,6 +273,9 @@ class TournamentRace(object):
 
         if not nickname:
             return False
+
+        if self.guild.chunked is False:
+            await self.guild.chunk(cache=True)
 
         discord_user = self.guild.get_member(nickname.discord_user_id)
 

@@ -25,6 +25,9 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
 
         await interaction.response.defer(ephemeral=True)
         msg = []
+        if interaction.guild.chunked is False:
+            await interaction.guild.chunk(cache=True)
+
         for member in role.members:
             result = await models.Users.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
@@ -55,6 +58,9 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
 
         await interaction.response.defer(ephemeral=True)
         msg = []
+        if interaction.guild.chunked is False:
+            await interaction.guild.chunk(cache=True)
+
         for member in role.members:
             result = await models.Users.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:

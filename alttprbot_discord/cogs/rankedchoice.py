@@ -8,6 +8,7 @@ import os
 
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
+
 class RankedChoiceMessageView(discord.ui.View):
     def __init__(self, bot: commands.Bot):
         super().__init__(timeout=None)
@@ -71,11 +72,14 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
             active=True,
             guild_id=interaction.guild.id,
             channel_id=interaction.channel.id,
-            message_id=None, # set this later
+            message_id=None,  # set this later
             owner_id=interaction.user.id,
             show_vote_count=show_vote_count,
             seats=seats,
         )
+
+        if interaction.guild.chunked is False:
+            await interaction.guild.chunk(cache=True)
 
         await models.RankedChoiceCandidate.bulk_create([models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in candidates.split(',')])
         if authorized_voters_role:
@@ -127,6 +131,7 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
 
     #     await rankedchoice.refresh_election_post(election, self.bot)
     #     await interaction.followup.send("Successfully ended the election.", ephemeral=True)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RankedChoice(bot))

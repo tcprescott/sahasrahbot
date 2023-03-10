@@ -14,6 +14,9 @@ class SGLTournamentPlayer(object):
     async def construct(cls, discord_id: int, guild: discord.Guild):
         playerobj = cls()
 
+        if guild.chunked is False:
+            await guild.chunk(cache=True)
+
         playerobj.discord_user = guild.get_member(int(discord_id))
 
         return playerobj
@@ -21,6 +24,9 @@ class SGLTournamentPlayer(object):
     @classmethod
     async def construct_discord_name(cls, discord_name: str, guild: discord.Guild):
         playerobj = cls()
+
+        if guild.chunked is False:
+            await guild.chunk(cache=True)
 
         playerobj.discord_user = guild.get_member_named(discord_name)
         if playerobj.discord_user is None:
@@ -116,6 +122,9 @@ class SGLCoreTournamentRace(TournamentRace):
         for commentator in self.episode['commentators']:
             if not commentator.get('approved', False):
                 continue
+
+            if self.data.guild.chunked is False:
+                await self.data.guild.chunk(cache=True)
 
             try:
                 member = self.data.guild.get_member_named(commentator['discordTag'])

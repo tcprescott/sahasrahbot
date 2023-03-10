@@ -301,6 +301,9 @@ class Tournament(commands.GroupCog, name="tournament"):
 
         messages = []
 
+        if event_data.guild.chunked is False:
+            await event_data.guild.chunk(cache=True)
+
         for episode in episodes:
             for match in ['match1', 'match2']:
                 if episode[match]:
