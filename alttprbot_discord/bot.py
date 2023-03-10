@@ -52,6 +52,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
     await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
     await discordbot.load_extension("alttprbot_discord.cogs.doorsmw")
+    await discordbot.load_extension("alttprbot_discord.cogs.admin")
 
     if c.DEBUG:
         await discordbot.load_extension("alttprbot_discord.cogs.test")

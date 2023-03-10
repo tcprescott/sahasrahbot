@@ -532,6 +532,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.timeout_warning_task.start()
+        self.timeout_in_progress_races_task.start()
         self.persistent_views_added = False
 
     @tasks.loop(seconds=60, reconnect=True)
@@ -567,8 +568,37 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
         except Exception:
             logging.exception("Exception in timeout_warning_task")
 
+    @tasks.loop(seconds=60, reconnect=True)
+    async def timeout_in_progress_races_task(self):
+        try:
+            races = await models.AsyncTournamentRace.filter(status="in_progress", thread_id__isnull=False).prefetch_related('user')
+            for race in races:
+                if race.start_time + datetime.timedelta(hours=12) > discord.utils.utcnow():
+                    # this race is still in progress and has not timed out
+                    continue
+
+                thread = self.bot.get_channel(race.thread_id)
+                if thread is None:
+                    logging.warning("Cannot access thread for pending race %s.  This should not have happened.", race.id)
+                    continue
+
+                await thread.send(f"<@{race.user.discord_user_id}>, this race has exceeded 12 hours.  This run has been forfeit.  Please contact the @Admins if you believe this was in error.", allowed_mentions=discord.AllowedMentions(users=True))
+                race.status = "forfeit"
+                await race.save()
+                await models.AsyncTournamentAuditLog.create(
+                    tournament_id=race.tournament_id,
+                    action="timeout_forfeit",
+                    details=f"in progress race \"{race.id}\" was automatically forfeited by System due to timeout",
+                )
+        except Exception:
+            logging.exception("Exception in timeout_in_progress_races_task")
+
     @timeout_warning_task.before_loop
     async def before_timeout_warning_task(self):
+        await self.bot.wait_until_ready()
+
+    @timeout_in_progress_races_task.before_loop
+    async def before_timeout_in_progress_races_task(self):
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener()

@@ -503,7 +503,7 @@ class AsyncTournament(Model):
 class AsyncTournamentWhitelist(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='whitelist')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_whitelist')
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_whitelist', on_delete="RESTRICT")
     discord_user_id = fields.BigIntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
@@ -512,7 +512,7 @@ class AsyncTournamentWhitelist(Model):
 class AsyncTournamentPermissions(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permissions')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions')
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT")
     role = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
@@ -541,7 +541,7 @@ class AsyncTournamentRace(Model):
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
     discord_user_id = fields.BigIntField(null=True)
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=True)
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=True, on_delete="RESTRICT")
     thread_id = fields.BigIntField(null=True)  # only set if run async in discord
     thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
     thread_timeout_time = fields.DatetimeField(null=True)
@@ -564,7 +564,7 @@ class AsyncTournamentAuditLog(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='audit_log')
     discord_user_id = fields.BigIntField(null=True)
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True)
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True, on_delete="RESTRICT")
     action = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
