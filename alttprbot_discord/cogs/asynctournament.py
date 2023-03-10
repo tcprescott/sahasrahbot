@@ -419,7 +419,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
         elapsed = async_tournament_race.end_time - async_tournament_race.start_time
 
-        await interaction.response.send_message(f"Your finish time of **{elapsed}** as been recorded.  Thank you for playing!", view=AsyncTournamentPostRaceView())
+        await interaction.response.send_message(f"Your finish time of **{elapsed}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
 
         for child_item in self.children:
             child_item.disabled = True
