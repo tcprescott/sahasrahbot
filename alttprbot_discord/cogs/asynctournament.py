@@ -678,9 +678,9 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
     @app_commands.command(name="extendtimeout", description="Extend the timeout of this tournament run")
     async def extend_timeout(self, interaction: discord.Interaction, minutes: int):
         # TODO: replace this with a lookup on the config table for authorized users
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
-            return
+        # if not await self.bot.is_owner(interaction.user):
+        #     await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
+        #     return
 
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
         if not async_tournament_race:
@@ -689,6 +689,13 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
         if async_tournament_race.status != "pending":
             await interaction.response.send_message("This race is not pending.  It cannot be extended.", ephemeral=True)
+            return
+
+        await async_tournament_race.fetch_related("tournament")
+
+        authorized = await async_tournament_race.tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin', 'mod'])
+        if not authorized:
+            await interaction.response.send_message("You are not authorized to extend the timeout for this tournament race.", ephemeral=True)
             return
 
         if async_tournament_race.thread_timeout_time is None:
@@ -724,6 +731,62 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
 
         embed = create_tournament_embed(async_tournament)
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
+
+    @app_commands.command(name="permissions", description="Configure permissions for this tournament")
+    async def permissions(self, interaction: discord.Interaction, permission: str, role: discord.Role = None, user: discord.User = None):
+        if not await self.bot.is_owner(interaction.user):
+            await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
+            return
+
+        await interaction.response.defer()
+        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
+        if async_tournament is None:
+            await interaction.followup.send("This channel is not configured for async tournaments.  Please create a new tournament.", ephemeral=True)
+            return
+
+        if permission not in ["admin", "mod"]:
+            await interaction.followup.send("Invalid permission.  Valid permissions are: admin, mod", ephemeral=True)
+            return
+
+        if role is None and user is None:
+            await interaction.followup.send("Please specify a role or user.", ephemeral=True)
+            return
+
+        if role is not None and user is not None:
+            await interaction.followup.send("Please specify a role OR a user, not both.", ephemeral=True)
+            return
+
+        if role is not None:
+            for member in role.members:
+                dbuser, _ = await models.Users.get_or_create(discord_user_id=member.id, defaults={"display_name": member.name})
+                async_tournament_permission = await models.AsyncTournamentPermissions.get_or_none(
+                    tournament=async_tournament,
+                    user=dbuser,
+                    role=permission
+                )
+                if async_tournament_permission is None:
+                    await models.AsyncTournamentPermissions.create(
+                        tournament=async_tournament,
+                        user=dbuser,
+                        role=permission
+                    )
+            await interaction.followup.send(f"Users in role {role.name} ({role.id}) has been granted {permission} permissions.", ephemeral=True)
+
+        elif user is not None:
+            dbuser, _ = await models.Users.get_or_create(discord_user_id=user.id, defaults={"display_name": user.name})
+            async_tournament_permission = await models.AsyncTournamentPermissions.get_or_none(
+                tournament=async_tournament,
+                user=dbuser,
+                role=permission
+            )
+            if async_tournament_permission is None:
+                await models.AsyncTournamentPermissions.create(
+                    tournament=async_tournament,
+                    user=dbuser,
+                    role=permission
+                )
+
+            await interaction.followup.send(f"{user.name} ({user.id}) has been granted {permission} permissions.", ephemeral=True)
 
 
 def create_tournament_embed(async_tournament: models.AsyncTournament):
