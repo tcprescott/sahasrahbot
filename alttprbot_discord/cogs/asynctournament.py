@@ -738,7 +738,7 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
             await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
             return
 
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
         if async_tournament is None:
             await interaction.followup.send("This channel is not configured for async tournaments.  Please create a new tournament.", ephemeral=True)
@@ -757,6 +757,9 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
             return
 
         if role is not None:
+            if interaction.guild.chunked is False:
+                await interaction.guild.chunk()
+
             for member in role.members:
                 dbuser, _ = await models.Users.get_or_create(discord_user_id=member.id, defaults={"display_name": member.name})
                 async_tournament_permission = await models.AsyncTournamentPermissions.get_or_none(
