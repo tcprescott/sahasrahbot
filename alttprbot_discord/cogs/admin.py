@@ -4,6 +4,7 @@ from discord import app_commands
 
 from alttprbot import models
 
+
 class Admin(commands.GroupCog, name="admin"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -20,13 +21,17 @@ class Admin(commands.GroupCog, name="admin"):
         updated = 0
 
         for user in users:
-            member = await self.bot.fetch_user(user.discord_user_id)
-            if member is not None:
-                user.name = member.display_name
-                await user.save()
-                updated += 1
+            try:
+                member = await self.bot.fetch_user(user.discord_user_id)
+            except discord.NotFound:
+                continue
+
+            user.display_name = member.display_name
+            await user.save()
+            updated += 1
 
         await interaction.followup.send(f"Done. Performed {updated} changes.", ephemeral=True)
 
+
 async def setup(bot: commands.Bot):
-    bot.add_cog(Admin(bot))
+    await bot.add_cog(Admin(bot))

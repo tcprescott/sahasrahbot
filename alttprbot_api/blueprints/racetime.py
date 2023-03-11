@@ -113,11 +113,35 @@ async def return_racetime_verify():
     rtgg_id = userinfo_data['id']
 
     # we need to test if the user has a rtgg_id but no discord_user_id and handle that case
+    # this is really ugly and needs to be refactored
     rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
-    if rtgg_user is not None:
-        rtgg_user.discord_user_id = user.id
-        await rtgg_user.save()
-    else:
+    discord_user = await models.Users.get_or_none(discord_user_id=user.id)
+    if not rtgg_user == discord_user and rtgg_user is not None and discord_user is not None:
+        kept_user = await merge_users(rtgg_user, discord_user)
+        kept_user.display_name = user.name
+        await kept_user.save()
+    elif rtgg_user is None:
         await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token, 'display_name': user.name})
+    else:
+        await models.Users.update_or_create(rtgg_id=rtgg_id, defaults={'discord_user_id': user.id, 'rtgg_access_token': token, 'display_name': user.name})
 
     return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
+
+
+async def merge_users(user_to_keep: models.Users, victim: models.Users):
+    if victim.discord_user_id:
+        user_to_keep.discord_user_id = victim.discord_user_id
+    if victim.rtgg_id:
+        user_to_keep.rtgg_id = victim.rtgg_id
+
+    # update everything to the new user
+    # we should be figuring this out dynamically by looking at the models
+    await models.AsyncTournamentAuditLog.filter(user=victim).update(user=user_to_keep)
+    await models.AsyncTournamentPermissions.filter(user=victim).update(user=user_to_keep)
+    await models.AsyncTournamentRace.filter(user=victim).update(user=user_to_keep)
+    await models.AsyncTournamentRace.filter(reviewed_by=victim).update(reviewed_by=user_to_keep)
+
+    await victim.delete()
+    await user_to_keep.save()
+
+    return user_to_keep

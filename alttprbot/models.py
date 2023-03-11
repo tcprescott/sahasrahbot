@@ -521,7 +521,8 @@ class AsyncTournamentPermissions(Model):
 class AsyncTournamentPermalink(Model):
     id = fields.IntField(pk=True)
     pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='permalinks')
-    permalink = fields.CharField(200, null=False)
+    url = fields.CharField(200, null=False)
+    notes = fields.CharField(200, null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     live_race = fields.BooleanField(null=False, default=False)

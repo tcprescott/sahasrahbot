@@ -233,7 +233,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
             tournament=async_tournament,
             user=user,
             action="create_thread",
-            details=f"Created thread {thread.id} for pool {pool.name}, permalink {permalink.permalink}"
+            details=f"Created thread {thread.id} for pool {pool.name}, permalink {permalink.url}"
         )
 
         # Write the race to the database
@@ -250,8 +250,10 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
 
         # Create a post in that thread using AsyncTournamentRaceView
         embed = discord.Embed(title="Tournament Async Run")
-        embed.add_field(name="Pool", value=self.pool)
-        embed.add_field(name="Permalink", value=permalink.permalink)
+        embed.add_field(name="Pool", value=self.pool, inline=False)
+        embed.add_field(name="Permalink", value=permalink.url, inline=False)
+        if permalink.notes:
+            embed.add_field(name="Notes", value=permalink.notes, inline=False)
         embed.set_footer(text=f"Race ID: {async_tournament_race.id}")
         await thread.send(embed=embed, view=AsyncTournamentRaceViewReady())
         await interaction.response.edit_message(content=f"Successfully created {thread.mention}.  Please join that thread for more details.", view=None, embed=None)

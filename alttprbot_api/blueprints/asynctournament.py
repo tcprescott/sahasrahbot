@@ -176,7 +176,7 @@ def asynctournamentpermalink_to_dict(asynctournamentpermalink: models.AsyncTourn
     try:
         return {
             'id': asynctournamentpermalink.id,
-            'permalink': asynctournamentpermalink.permalink,
+            'permalink': asynctournamentpermalink.url,
             'pool': asynctournamentpermalinkpool_to_dict(asynctournamentpermalink.pool),
             'live_race': asynctournamentpermalink.live_race
         }
