@@ -2227,14 +2227,14 @@ files = [
 
 [[package]]
 name = "pyz3r"
-version = "6.0.5"
+version = "6.0.7"
 description = "A python module for interacting with the web API of various randomizers, such as https://alttpr.com or https://samus.link."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyz3r-6.0.5-py3-none-any.whl", hash = "sha256:ca33bd3615677f311ce05d9a83efbb867246b456ac13f43a4f82ae7dc20670d2"},
-    {file = "pyz3r-6.0.5.tar.gz", hash = "sha256:9e6b60ad2c88344d7f6473869f153ec3f4347045f85d3e9b2d05c7d196fc4f08"},
+    {file = "pyz3r-6.0.7-py3-none-any.whl", hash = "sha256:c59958be9205d623f2753acf5cdaaa9d190ba4fce82b8cced8ba309059bb09be"},
+    {file = "pyz3r-6.0.7.tar.gz", hash = "sha256:7e12690e2630da8e772e35894a689851bf3dac1ee36980239df4aeed843d9ca7"},
 ]
 
 [package.dependencies]
@@ -2952,4 +2952,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "4396cfdbafd709b3c89433af3a08900333bf7debd34af78b9495b5355b958015"
+content-hash = "6701a0aedfa758f4d8aeffe81a97f2ba935a951ea0a59474e0ac5f1f16b7dd0d"
