@@ -1,0 +1,66 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>{{ race.user.display_name }} - {{ race.permalink.pool.name }}</title>
+{%- endblock head %}
+
+{% block content -%}
+<h1>{{ race.user.display_name }} - {{ race.permalink.pool.name }}</h1>
+{% if already_claimed %}
+<p>
+    <b>This race has already been claimed for review! Please reach out to the reviewer listed if you have any
+        questions.</b>
+</p>
+{% endif %}
+<table>
+    <tr>
+        <th>Runner</th>
+        <td>{{ race.user.display_name }}</td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>{{ race.status }}</td>
+    </tr>
+    <tr>
+        <th>Reviewer</th>
+        <td>{{ race.reviewed_by.display_name }}</td>
+    </tr>
+    <tr>
+        <th>Finish Time</th>
+        <td>{{ race.end_time - race.start_time if race.end_time else "no finish time" }}</td>
+    </tr>
+    <tr>
+        <th>Pool</th>
+        <td>{{ race.permalink.pool.name }}</td>
+    </tr>
+    <tr>
+        <th>Permalink</th>
+        <td><a href="{{ race.permalink.url }}" target="_blank">{{ race.permalink.url }}</a></td>
+    </tr>
+    <tr>
+        <th>VoD</th>
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% else
+            %}NO VOD SUBMITTED{% endif %}</td>
+    </tr>
+</table>
+<h2>Runner Notes</h2>
+<p>{{race.runner_notes|e }}</p>
+<h2>Review</h2>
+<form action="{{ url_for('async.async_tournament_review_submit', tournament_id=tournament.id, race_id=race.id )}}"
+    method="post">
+    <p>
+        <label for="review_status">Review Status</label>
+        <select name="review_status" id="review_status" required>
+            <option value="pending" {% if race.review_status=="pending" %} selected{% endif %}>Pending</option>
+            <option value="accepted" {% if race.review_status=="accepted" %} selected{% endif %}>Accepted</option>
+            <option value="rejected" {% if race.review_status=="rejected" %} selected{% endif %}>Rejected</option>
+        </select>
+    </p>
+    <p><label for="reviewer_notes">Reviewer Notes</label>
+    </p>
+    <p><textarea name="reviewer_notes" id="reviewer_notes" cols="30" rows="10"
+            required>{% if race.reviewer_notes %}{{ race.reviewer_notes|e }}{% endif %}</textarea>
+    </p>
+    <p><input type="submit" value="Save" /></p>
+</form>
+{%- endblock content %}

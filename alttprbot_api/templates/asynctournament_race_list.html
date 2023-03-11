@@ -5,31 +5,55 @@
 {%- endblock head %}
 
 {% block content -%}
+<h1>Moderation Queue for Tournament ID {{ tournament.id }}</h1>
+<p><a
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all') }}">
+        View all in progress</a></p>
+<p><a
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='false', reviewer='all', status='finished', review_status='pending') }}">
+        View runs awaiting verification</a></p>
+<p><a
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='all') }}">
+        View all runs</a></p>
+<p><a
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='rejected') }}">
+        View all rejected runs</a></p>
 <table border="1">
     <tr>
         <th>ID</th>
         <th>Player Name</th>
         <th>Pool</th>
-        <th>Permalink</th>
         <th>VoD</th>
-        <th>Thread Link</th>
+        <th>Thread</th>
         <th>Finish Time</th>
-        <th>Status</th>
+        <th>Run Status</th>
+        <th>Reviewed By</th>
+        <th>Reviewed At</th>
+        <th>Review Status</th>
         <th>Actions</th>
     </tr>
-    {% for race in tournament.races %}
+    {% for race in races %}
     <tr>
         <td>{{ race.id }}</td>
         <td>{{ race.user.display_name }}</td>
-        <td>{{ race.permalink.url }}</td>
         <td>{{ race.permalink.pool.name }}</td>
-        <td>{{ race.runner_vod_url }}</td>
-        <td><a href="https://discord.com/channels/{{ race.tournament.guild_id }}/{{ race.thread_id }}">thread</a></td>
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url }}">{{ race.runner_vod_url }}</a>{% endif %}
+        </td>
+        <td>{% if race.thread_id %}
+            <a href="https://discord.com/channels/{{ race.tournament.guild_id }}/{{ race.thread_id }}"
+                target="_blank">thread</a>
+            {% else %}
+            <a href="https://racetime.gg/{{ race.racetime_slug }}" target="_blank">racetime</a>
+            {% endif %}
+        </td>
         <td>{{ race.end_time - race.start_time if race.end_time else "" }}</td>
         <td>{{ race.status }}</td>
+        <td>{{ race.reviewed_by.display_name }}</td>
+        <td>{{ race.reviewed_at if race.reviewed_at else "" }}</td>
+        <td>{{ race.review_status }}</td>
         <td>
             <p><a
-                    href="{{ url_for('async.async_tournament_review', tournament_id=race.tournament.id, race_id=race.id) }}">review</a>
+                    href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}">review</a>
             </p>
         </td>
     </tr>

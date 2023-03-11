@@ -1,10 +1,13 @@
-import html
-from quart import Blueprint, jsonify, redirect, render_template, request, send_file, url_for, Response, abort
-from quart_discord import Unauthorized, requires_authorization
+import datetime
+
 import tortoise.exceptions
+from quart import (Blueprint, abort, jsonify, redirect,
+                   render_template, request, url_for)
+from quart_discord import requires_authorization
 
 from alttprbot import models
 from alttprbot_api import auth
+
 from ..api import discord
 
 asynctournament_blueprint = Blueprint('async', __name__)
@@ -117,27 +120,111 @@ async def async_tournament_whitelist(tournament_id):
 @asynctournament_blueprint.route('/races/<int:tournament_id>', methods=['GET'])
 @requires_authorization
 async def async_tournament_queue(tournament_id: int):
-    user = await discord.fetch_user()
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    request_filter = {}
+
+    if not (status := request.args.get('status', 'finished')) == 'all':
+        request_filter['status'] = status
+
+    if not (reviewer := request.args.get('reviewed', 'all')) == 'all':
+        if reviewer == 'unreviewed':
+            request_filter['reviewed_by'] = None
+        elif reviewer == 'me':
+            request_filter['reviewed_by'] = user
+        else:
+            try:
+                request_filter['reviewed_by_id'] = int(reviewer)
+            except ValueError:
+                pass
+
+    if not (review_status := request.args.get('review_status', 'pending')) == 'all':
+        request_filter['review_status'] = review_status
+
+    if not (live := request.args.get('live', 'false')) == 'all':
+        request_filter['thread_id__isnull'] = live == 'true'
+
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user__discord_user_id=user.id, role__in=['admin', 'mod'])
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
-    await tournament.fetch_related('races', 'races__permalink', 'races__permalink__pool', 'races__user')
-    return await render_template('asynctournament_race_list.html', tournament=tournament)
+    races = await tournament.races.filter(reattempted=False, **request_filter).prefetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
+
+    return await render_template('asynctournament_race_list.html', logged_in=True, user=discord_user, tournament=tournament, races=races)
 
 
 @asynctournament_blueprint.route('/races/<int:tournament_id>/review/<int:race_id>', methods=['GET'])
 @requires_authorization
 async def async_tournament_review(tournament_id: int, race_id: int):
-    return "NYI"
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
+    if race is None:
+        abort(404, "Race not found.")
+
+    if race.status != 'finished':
+        abort(403, "This race cannot be reviewed yet.")
+
+    if race.reattempted:
+        abort(403, "This race was marked as reattempted and cannot be reviewed.")
+
+    await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
+
+    if race.user == user:
+        abort(403, "You are not authorized to review your own tournament run.")
+
+    if race.reviewed_by is None:
+        race.reviewed_by = user
+        await race.save()
+
+    return await render_template('asynctournament_race_view.html', logged_in=True, user=discord_user, tournament=tournament, race=race, already_claimed=race.reviewed_by != user)
 
 
 @asynctournament_blueprint.route('/races/<int:tournament_id>/review/<int:race_id>', methods=['POST'])
 @requires_authorization
 async def async_tournament_review_submit(tournament_id: int, race_id: int):
-    return "NYI"
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
+    if race is None:
+        abort(404, "Race not found.")
+
+    if race.status != 'finished':
+        abort(403, "This race cannot be reviewed yet.")
+
+    if race.reattempted:
+        abort(403, "This race was marked as reattempted and cannot be reviewed.")
+
+    if race.user == user:
+        abort(403, "You are not authorized to review your own tournament run.")
+
+    payload = await request.form
+
+    race.review_status = payload.get('review_status', 'pending')
+    race.reviewer_notes = payload.get('reviewer_notes', None)
+    race.reviewed_at = datetime.datetime.now()
+    race.reviewed_by = user
+
+    await race.save()
+
+    return redirect(url_for("async.async_tournament_queue", tournament_id=tournament_id))
 
 
 def asynctournament_to_dict(asynctournament: models.AsyncTournament):
