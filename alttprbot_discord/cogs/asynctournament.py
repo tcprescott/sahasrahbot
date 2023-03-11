@@ -393,35 +393,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
     @discord.ui.button(label="Finish", style=discord.ButtonStyle.green, emoji="✅", custom_id="sahasrahbot:async_finish")
     async def async_finish(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # Verify user clicking the button is the intended runner
-        # Send a message to the thread with AsyncTournamentRaceViewFinished
-        # Write the end time to database
-        # Disable buttons on this view
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related('user')
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
-            await interaction.response.send_message("Only the player of this race may finish it.", ephemeral=True)
-            return
-
-        if async_tournament_race.status != "in_progress":
-            await interaction.response.send_message("You may only finish a race that's in progress.", ephemeral=True)
-            return
-
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
-
-        await models.AsyncTournamentAuditLog.create(
-            tournament_id=async_tournament_race.tournament_id,
-            user=user,
-            action="race_finish",
-            details=f"{async_tournament_race.id} has finished"
-        )
-
-        async_tournament_race.end_time = discord.utils.utcnow()
-        async_tournament_race.status = "finished"
-        await async_tournament_race.save()
-
-        elapsed = async_tournament_race.end_time - async_tournament_race.start_time
-
-        await interaction.response.send_message(f"Your finish time of **{elapsed}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
+        await finish_race(interaction)
 
         for child_item in self.children:
             child_item.disabled = True
@@ -538,7 +510,7 @@ class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
         await interaction.response.send_message(f"VOD link and runner notes saved.\n\n**URL:**\n{self.runner_vod_url.value}\n\n**Notes:**\n{self.runner_notes.value}")
 
 
-class AsyncTournament(commands.GroupCog, name="asynctournament"):
+class AsyncTournament(commands.GroupCog, name="async"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.timeout_warning_task.start()
@@ -732,6 +704,10 @@ class AsyncTournament(commands.GroupCog, name="asynctournament"):
         embed = create_tournament_embed(async_tournament)
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
 
+    @app_commands.command(name="done", description="Finish the current race.")
+    async def done(self, interaction: discord.Interaction):
+        await finish_race(interaction)
+
     @app_commands.command(name="permissions", description="Configure permissions for this tournament")
     async def permissions(self, interaction: discord.Interaction, permission: str, role: discord.Role = None, user: discord.User = None):
         if not await self.bot.is_owner(interaction.user):
@@ -797,6 +773,37 @@ def create_tournament_embed(async_tournament: models.AsyncTournament):
     embed.add_field(name="Owner", value=f"<@{async_tournament.owner_id}>", inline=False)
     embed.set_footer(text=f"ID: {async_tournament.id}")
     return embed
+
+async def finish_race(interaction: discord.Interaction):
+    race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related('user')
+    if race is None:
+        await interaction.response.send_message("This channel/thread is not an async race room.", ephemeral=True)
+        return
+
+    if race.user.discord_user_id != interaction.user.id:
+        await interaction.response.send_message("Only the player of this race may finish it.", ephemeral=True)
+        return
+
+    if race.status != "in_progress":
+        await interaction.response.send_message("You may only finish a race that's in progress.", ephemeral=True)
+        return
+
+    user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+
+    await models.AsyncTournamentAuditLog.create(
+        tournament_id=race.tournament_id,
+        user=user,
+        action="race_finish",
+        details=f"{race.id} has finished"
+    )
+
+    race.end_time = discord.utils.utcnow()
+    race.status = "finished"
+    await race.save()
+
+    elapsed = race.end_time - race.start_time
+
+    await interaction.response.send_message(f"Your finish time of **{elapsed}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
 
 
 async def setup(bot: commands.Bot):
