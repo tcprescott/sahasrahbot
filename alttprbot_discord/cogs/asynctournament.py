@@ -510,7 +510,7 @@ class AsyncTournamentPostRaceView(discord.ui.View):
         if race.user.discord_user_id != interaction.user.id:
             await interaction.response.send_message("Only the player may submit a VoD.", ephemeral=True)
 
-        await interaction.response.send_modal(SubmitVODModal(race))
+        await interaction.response.send_modal(SubmitVODModal())
 
 
 class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
