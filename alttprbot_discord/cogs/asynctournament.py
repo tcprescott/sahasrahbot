@@ -502,7 +502,15 @@ class AsyncTournamentPostRaceView(discord.ui.View):
 
     @discord.ui.button(label="Submit VOD and Notes", style=discord.ButtonStyle.green, emoji="📹", custom_id="sahasrahbot:async_submit_vod")
     async def async_submit_vod(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(SubmitVODModal())
+        race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related('user')
+        if race is None:
+            await interaction.response.send_message("This is not a race thread.  This should not have happened.  Please contact a moderator.")
+            return
+
+        if race.user.discord_user_id != interaction.user.id:
+            await interaction.response.send_message("Only the player may submit a VoD.", ephemeral=True)
+
+        await interaction.response.send_modal(SubmitVODModal(race))
 
 
 class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
