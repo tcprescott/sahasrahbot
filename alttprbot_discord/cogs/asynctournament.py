@@ -421,7 +421,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
         start_time = async_tournament_race.start_time
         now = discord.utils.utcnow()
         elapsed = now - start_time
-        await interaction.response.send_message(f"Timer: {elapsed}", ephemeral=True)
+        await interaction.response.send_message(f"Timer: {elapsed_time_hhmmss(elapsed)}", ephemeral=True)
 
 
 class AsyncTournamentRaceViewForfeit(discord.ui.View):
@@ -804,8 +804,13 @@ async def finish_race(interaction: discord.Interaction):
 
     elapsed = race.end_time - race.start_time
 
-    await interaction.response.send_message(f"Your finish time of **{elapsed}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
+    await interaction.response.send_message(f"Your finish time of **{elapsed_time_hhmmss(elapsed)}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
 
+
+def elapsed_time_hhmmss(elapsed: datetime.timedelta):
+    hours, remainder = divmod(elapsed.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(AsyncTournament(bot))
