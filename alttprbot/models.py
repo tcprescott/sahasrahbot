@@ -526,13 +526,29 @@ class AsyncTournamentPermalink(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     live_race = fields.BooleanField(null=False, default=False)
-    racetime_slug = fields.CharField(200, null=True)
 
 
 class AsyncTournamentPermalinkPool(Model):
+    class Meta:
+        unique_together = ('tournament', 'name')
+
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permalink_pools')
     name = fields.CharField(45, null=False)
+    preset = fields.CharField(45, null=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+
+
+class AsyncTournamentLiveRace(Model):
+    id = fields.IntField(pk=True)
+    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='live_races')
+    pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='live_races')
+    permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='live_races', null=True)
+    racetime_slug = fields.CharField(200, null=True, unique=True)
+    episode_id = fields.IntField(null=True, unique=True)
+    match_title = fields.CharField(200, null=True)
+    status = fields.CharField(45, null=False, default='scheduled')  # scheduled, pending, in_progress, finished
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
@@ -541,7 +557,6 @@ class AsyncTournamentRace(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
-    discord_user_id = fields.BigIntField(null=True)
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=True, on_delete="RESTRICT")
     thread_id = fields.BigIntField(null=True)  # only set if run async in discord
     thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
@@ -550,8 +565,8 @@ class AsyncTournamentRace(Model):
     end_time = fields.DatetimeField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
-    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit
-    racetime_slug = fields.CharField(200, null=True)  # only set if race was performed on racetime.gg
+    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit - "scheduled" is only for live races
+    live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True) # only set if run was raced live
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)
     runner_vod_url = fields.CharField(400, null=True)
@@ -564,7 +579,6 @@ class AsyncTournamentRace(Model):
 class AsyncTournamentAuditLog(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='audit_log')
-    discord_user_id = fields.BigIntField(null=True)
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True, on_delete="RESTRICT")
     action = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)

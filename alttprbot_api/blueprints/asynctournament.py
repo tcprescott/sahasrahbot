@@ -301,7 +301,7 @@ def asynctournamentrace_to_dict(asynctournamentrace: models.AsyncTournamentRace)
             'created': asynctournamentrace.created,
             'updated': asynctournamentrace.updated,
             'status': asynctournamentrace.status,
-            'racetime_slug': asynctournamentrace.racetime_slug,
+            'live_race': asynctournamentrace.live_race, # TODO: translate to dictionary
             'reattempted': asynctournamentrace.reattempted,
             'runner_notes': asynctournamentrace.runner_notes,
             'runner_vod_url': asynctournamentrace.runner_vod_url,
