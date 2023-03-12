@@ -417,6 +417,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
         async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
         if async_tournament_race.status in ["forfeit", "finished"]:
             await interaction.response.send_message("Race is already finished.", ephemeral=True)
+            return
         start_time = async_tournament_race.start_time
         now = discord.utils.utcnow()
         elapsed = now - start_time
