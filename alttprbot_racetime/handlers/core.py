@@ -170,7 +170,9 @@ class SahasrahBotCoreHandler(RaceHandler):
             return
 
         if self.tournament:
-            await self.tournament.process_tournament_race()
+            await self.tournament.process_tournament_race(args, message)
+        else:
+            await self.send_message("This room is not associated with a tournament.")
 
     async def ex_konot(self, args, message):
         await self.send_message("Setting up new KONOT race series!  The last player(s) to finish will be eliminated.  Once this race finishes, a new race will be created and the players advancing will be invited to the new room.")

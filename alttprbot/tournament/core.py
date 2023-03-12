@@ -207,7 +207,7 @@ class TournamentRace(object):
     async def on_race_pending(self):
         pass
 
-    async def process_tournament_race(self):
+    async def process_tournament_race(self, args, message):
         pass
 
     async def create_race_room(self):
