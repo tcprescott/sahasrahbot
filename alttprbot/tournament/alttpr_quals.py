@@ -66,9 +66,16 @@ class ALTTPRQualifierRace(TournamentRace):
             await self.rtgg_handler.send_message("No pool has been set for this live race.  Please contact Synack for further help.")
             return
 
-        # TODO: verify the caller is an async tournament moderator, we may need to extend process_tournament_race args to include the caller
-        # await async_tournament_live_race.fetch_related('tournament')
-        # await async_tournament_live_race.tournament.permissions.filter(user__rtgg_id=caller)
+        await async_tournament_live_race.fetch_related('tournament')
+
+        authorized = await models.AsyncTournamentPermissions.filter(
+            tournament = async_tournament_live_race.tournament,
+            user__rtgg_id=message['user']['id'],
+            role__in=['mod', 'admin']
+        )
+        if not authorized:
+            await self.rtgg_handler.send_message("Only a mod or admin of this tournament may invoke !tournamentrace.  Please contact Synack for further help.")
+            return
 
         # lock the room
         await self.rtgg_handler.set_invitational()
