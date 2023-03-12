@@ -151,7 +151,7 @@ class ALTTPR2022Race(ALTTPRTournamentRace):
         )
 
 
-async def roll_seed(players: List[discord.Member], episode_id: int = None, event_slug="alttpr2022"):
+async def roll_seed(players: List[discord.Member], episode_id: int = None, event_slug="alttpr2023"):
     """
     Roll a seed for the given players.
     """
@@ -163,9 +163,9 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
 
     deck = {
         'tournament_hard': 2 * len(players),
-        'tournament_invkeys': 2 * len(players),
-        'ambrosia': 2 * len(players),
-        'tournament_keys': 2 * len(players),
+        'standardboots': 2 * len(players),
+        'invrosia': 2 * len(players),
+        'fadkeysgt': 2 * len(players),
         'tournament_mcboss': 2 * len(players),
     }
     for player in players:
@@ -184,10 +184,10 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
     data = generator.ALTTPRPreset(preset)
     await data.fetch()
 
-    discord_user_ids = await models.TriforceTexts.filter(pool_name="alttpr2022", approved=True).distinct().values_list("discord_user_id", flat=True)
+    discord_user_ids = await models.TriforceTexts.filter(pool_name="alttpr2023", approved=True).distinct().values_list("discord_user_id", flat=True)
     if discord_user_ids:
         discord_user_id = random.choice(discord_user_ids)
-        triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022', discord_user_id=discord_user_id)
+        triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2023', discord_user_id=discord_user_id)
         triforce_text = random.choice(triforce_texts)
         text = triforce_text.text.encode("utf-8").decode("unicode_escape")
         logging.info("Using triforce text: %s", text)

@@ -13,14 +13,16 @@
         <li>Real-life religion or politics</li>
         <li>Hate speech</li>
         <li>Advertising (unless previously approved)</li>
-        <li>References to other community members without consent (will be verified with that person first)</li>
+        <li>References to other community members without their prior consent (will be verified with that person)</li>
         <li>Harassing or other overtly negative content</li>
         <li>Text inappropriate for streaming on SpeedGaming, ALTTPRandomizer, or other Twitch channels.</li>
     </ol>
-    <p>Each submission must be no more than three lines, with 14 characters per line.</p>
+    <p>In short, keep it fun and positive!</p>
+    <p>Each submission must be no more than three lines, with a maximum of 19 characters per line.</p>
     <p>Valid characters include:</p>
     <ul style="font-family: 'Courier New', Courier, monospace;">
         <li>A-Z</li>
+        <li>a-z</li>
         <li>0-9</li>
         <li>spaces</li>
         <li>? ! , \ - … . ~ ～ ' ' ↑ ↓ → ←</li>
@@ -30,11 +32,11 @@
     </ul>
 </div>
 <form action="{{ url_for('triforcetexts.submit', pool_name=pool_name) }}" method="post">
-    <input type="text" id="first_line" name="first_line" maxlength="14" title="Line one"
+    <input type="text" id="first_line" name="first_line" maxlength="19" title="Line one"
         pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
-    <input type="text" id="second_line" name="second_line" maxlength="14" title="Line two"
+    <input type="text" id="second_line" name="second_line" maxlength="19" title="Line two"
         pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
-    <input type="text" id="third_line" name="third_line" maxlength="14" title="Line three"
+    <input type="text" id="third_line" name="third_line" maxlength="19" title="Line three"
         pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,14}"><br><br>
     <input type="submit" value="Submit">
 </form>
