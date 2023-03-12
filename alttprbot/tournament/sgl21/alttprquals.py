@@ -41,7 +41,7 @@ class ALTTPRQuals(TournamentRace):
         triforce_text.broadcasted = True
         await triforce_text.save()
 
-    async def process_tournament_race(self):
+    async def process_tournament_race(self, args, message):
         await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()

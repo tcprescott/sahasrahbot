@@ -18,7 +18,7 @@ class ALTTPRTournamentRace(TournamentRace):
         # self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
         pass
 
-    async def process_tournament_race(self):
+    async def process_tournament_race(self, args, message):
         await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()

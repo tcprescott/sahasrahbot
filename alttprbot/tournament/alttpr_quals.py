@@ -45,7 +45,7 @@ class ALTTPRQualifierRace(TournamentRace):
     # 5. Write to models.AsyncTournamentRace records for each runner who's run will count.
     #   a. Write this list to the audit channel.
     #   b. Create Users if they don't exist.
-    async def process_tournament_race(self):
+    async def process_tournament_race(self, args, message):
         await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         await self.update_data()
 
@@ -106,6 +106,7 @@ class ALTTPRQualifierRace(TournamentRace):
             race_room_data=self.rtgg_handler.data
         )
 
+        # TODO: RT.gg max message length is 1000 characters, we need to split this up if we have more than 1000 characters
         await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         await self.rtgg_handler.send_message(f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
         await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
