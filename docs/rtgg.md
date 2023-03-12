@@ -116,7 +116,7 @@ Example `!variarace default regular`
 ### !dash
 Generate a seed using the Super Metroid DASH Randomizer, found at https://dashrando.github.io/
 
-Valid modes are: mm, full
+Specify 'mm' or 'full' to run the latest DASH release or use one of the following modes directly: recall_mm, recall_full, std_mm, std_full
 
 Example `!dashrace <mode>`
 

@@ -521,7 +521,7 @@ class Generator(commands.Cog):
         race: str = "no",
     ):
         """
-        Generates an Super Metroid Varia Randomizer game on https://varia.run
+        Generates a Super Metroid Dash Randomizer game on https://dashrando.github.io
         """
         await interaction.response.defer()
         url = await smdash.create_smdash(mode=mode, encrypt=race == "yes")

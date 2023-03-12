@@ -26,8 +26,8 @@ def roll_smdash():
 
 
 async def create_smdash(mode="mm", encrypt=False):
-    if mode not in ['mm', 'full']:
-        raise Exception("Specified mode is not valid.  Must be mm or full")
+    if mode not in ['mm', 'full', 'recall_mm', 'recall_full', 'std_mm', 'std_full']:
+        raise Exception("Specified mode is not valid.  Modes: mm, full, recall_mm, recall_full, std_mm, std_full")
 
     with tempfile.TemporaryDirectory() as tmp:
         wd = os.getcwd()
