@@ -511,8 +511,12 @@ class Generator(commands.Cog):
         race="Is this a race? (default no)"
     )
     @app_commands.choices(race=YES_NO_CHOICE, mode=[
-        app_commands.Choice(name="Major/Minor Split", value="mm"),
-        app_commands.Choice(name="Full", value="full"),
+        app_commands.Choice(name="mm", value="mm"),
+        app_commands.Choice(name="full", value="full"),
+        app_commands.Choice(name="recall_mm", value="recall_mm"),
+        app_commands.Choice(name="recall_full", value="recall_full"),
+        app_commands.Choice(name="std_mm", value="std_mm"),
+        app_commands.Choice(name="std_full", value="std_full"),
     ])
     async def smdash(
         self,

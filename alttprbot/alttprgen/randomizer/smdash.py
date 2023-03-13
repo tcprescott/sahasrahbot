@@ -1,9 +1,9 @@
 import asyncio
 import os
 import random
-import string
 import tempfile
 import logging
+import shortuuid
 
 ###
 # 1) Make a new temp directory
@@ -30,12 +30,12 @@ async def create_smdash(mode="mm", encrypt=False):
         raise Exception("Specified mode is not valid.  Modes: mm, full, recall_mm, recall_full, std_mm, std_full")
 
     with tempfile.TemporaryDirectory() as tmp:
-        wd = os.getcwd()
+        current_working_directory = os.getcwd()
         os.chdir(tmp)
         try:
             proc = await asyncio.create_subprocess_exec(
                 '/usr/bin/node',
-                '/opt/dash-rando-app/dash.cli.js',
+                os.path.join(current_working_directory, 'utils', 'dash.cli.js'),
                 '-r', os.environ.get('SM_ROM'),
                 '-p', mode,
                 stdout=asyncio.subprocess.PIPE,
@@ -45,13 +45,14 @@ async def create_smdash(mode="mm", encrypt=False):
             if proc.returncode > 0:
                 raise Exception(f'Exception while generating game: {stderr.decode()}')
         finally:
-            os.chdir(wd)
+            os.chdir(current_working_directory)
 
-        os.chdir(wd)
+        os.chdir(current_working_directory)
         logging.info(os.getcwd())
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
 
+        ## note to those who are reading this: this encryption process is not publically available.
         if encrypt:
             smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
 
@@ -67,11 +68,11 @@ async def create_smdash(mode="mm", encrypt=False):
             if proc.returncode > 0:
                 raise Exception(f'Exception while securing game: {stderr.decode()}')
 
-        random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        random_id = shortuuid.ShortUUID().random(length=12)
         patchname = f"DASH_{mode.upper()}_{random_id}.bps"
 
         proc = await asyncio.create_subprocess_exec(
-            os.path.join(wd, 'utils', 'flips'),
+            os.path.join(current_working_directory, 'utils', 'flips'),
             '--create',
             '--bps-delta',
             os.environ.get('SM_ROM'),
