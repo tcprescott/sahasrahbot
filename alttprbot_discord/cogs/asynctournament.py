@@ -4,6 +4,8 @@ import datetime
 import logging
 import os
 import random
+import aiohttp
+import pytz
 
 import discord
 import tortoise.exceptions
@@ -14,6 +16,7 @@ from slugify import slugify
 from alttprbot import models
 from tortoise.functions import Count
 
+RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
 
@@ -768,6 +771,78 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
             await interaction.followup.send(f"{user.name} ({user.id}) has been granted {permission} permissions.", ephemeral=True)
 
+    # TODO: write autocomplete racetime_slug
+    @app_commands.command(name="live_race_record", description="Used record the results of a live qualifier race.")
+    async def live_race_record(self, interaction: discord.Interaction, racetime_slug: str):
+        async_live_race = await models.AsyncTournamentLiveRace.get_or_none(racetime_slug=racetime_slug)
+        if async_live_race is None:
+            await interaction.response.send_message("That episode ID is not a async tournament live race.", ephemeral=True)
+            return
+
+        if not async_live_race.status == "in_progress":
+            await interaction.response.send_message("This race is not currently in progress.", ephemeral=True)
+            return
+
+        await async_live_race.fetch_related("tournament")
+
+        authorized = await async_live_race.tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin'])
+        if not authorized:
+            await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{RACETIME_URL}/{async_live_race.racetime_slug}") as resp:
+                if resp.status != 200:
+                    await interaction.followup.send(f"Error fetching {async_live_race.racetime_slug}. Please try again.", ephemeral=True)
+                    return
+
+                data = await resp.json()
+
+        if not data["status"]["value"] == "finished":
+            await interaction.followup.send(f"{RACETIME_URL}/{async_live_race.racetime_slug} is not finished.", ephemeral=True)
+            return
+
+        warnings = []
+        for entrant in data["entrants"]:
+            entrant_id = entrant["user"]["id"]
+
+            race = await models.AsyncTournamentRace.get(
+                live_race=async_live_race,
+                user__rtgg_id=entrant_id,
+                status="in_progress"
+            )
+
+            if entrant['status'] == 'finished':
+                race.end_time = datetime.datetime.fromisoformat(entrant["finished_at"]).astimezone(pytz.utc)
+                race.status="finished"
+            elif entrant['status'] == 'forfeit':
+                race.status="forfeit"
+            else:
+                warnings.append(f"{entrant['user']['name']} is not finished or forfeited.  This should not have happened.")
+
+            await race.save()
+
+        races_still_in_progress = await models.AsyncTournamentRace.filter(
+            live_race=async_live_race,
+            status="in_progress"
+        ).count()
+
+        if races_still_in_progress:
+            warnings.append(f"**There are still {races_still_in_progress} still in progress for this live race**, even after recording.  This should not have happened.")
+
+        async_live_race.status = "finished"
+        await async_live_race.save()
+
+        if warnings:
+            await interaction.followup.send("There were some warnings when recording this race.  Please report this to Synack so he can investigate further:\n" + "\n".join(warnings), ephemeral=True)
+        else:
+            await interaction.followup.send("The recording of this race finished without any warnings!", ephemeral=True)
+
+    async def autocomplete_racetime_slug(self, interaction: discord.Interaction, current: str):
+        result = await models.AsyncTournamentLiveRace.filter(racetime_slug__icontains=current, status="in_progress").values("racetime_slug")
+        return [discord.SelectOption(label=r["racetime_slug"], value=r["racetime_slug"]) for r in result]
 
 def create_tournament_embed(async_tournament: models.AsyncTournament):
     embed = discord.Embed(title=async_tournament.name)

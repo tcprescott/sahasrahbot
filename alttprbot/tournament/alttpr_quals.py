@@ -77,15 +77,18 @@ class ALTTPRQualifierRace(TournamentRace):
             await self.rtgg_handler.send_message("Only a mod or admin of this tournament may invoke !tournamentrace.  Please contact Synack for further help.")
             return
 
-        # lock the room
-        await self.rtgg_handler.set_invitational()
-        await self.rtgg_handler.edit(streaming_required=False)
-
         await async_tournament_live_race.fetch_related('pool')
 
         if async_tournament_live_race.pool.preset is None:
             await self.rtgg_handler.send_message("No preset has been set for this pool.  Please contact Synack for further help.")
             return
+
+
+        # lock the room
+        await self.rtgg_handler.set_invitational()
+        await self.rtgg_handler.edit(streaming_required=False)
+        await self.rtgg_handler.send_message("This room is now locked.  Please contact a Tournament Moderator if you need to be added to the room.")
+
 
         preset = async_tournament_live_race.pool.preset
 
@@ -125,10 +128,14 @@ class ALTTPRQualifierRace(TournamentRace):
             episode_id=self.episodeid,
         )
         # entrants = self.rtgg_handler.data.get('entrants', [])
-        await process_async_tournament_start(
+        in_progress_entrants = await process_async_tournament_start(
             async_tournament_live_race=async_tournament_live_race,
             race_room_data=self.rtgg_handler.data
         )
+
+        await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - Entrants: {', '.join(in_progress_entrants)}")
+        await self.rtgg_handler.send_message(f"Final eligible entrants for this pool: {', '.join(in_progress_entrants)}")
+        await self.rtgg_handler.send_message("Good luck, have fun!  Mid-race chat is disabled.  If you need assistance, please ping @Admins in Discord.")
 
     @property
     def announce_channel(self):
@@ -259,6 +266,10 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
 
     return eligible_entrants_for_pool
 
+# We need to update the entrants to in_progress and delete any pending entrants that didn't actually join
+# TODO: We need to handle people who are accepted after the race room is locked.  We may need to refactor this to
+# iterate through entrants a second time, and do a update_or_create, updating the status to in_progress if they
+# already exist, and creating them if they don't.
 async def process_async_tournament_start(async_tournament_live_race: models.AsyncTournamentLiveRace, race_room_data: dict):
     start_time = isodate.parse_datetime(race_room_data.get['started_at']).astimezone(pytz.utc)
     entrants = race_room_data.get('entrants', [])
@@ -281,3 +292,10 @@ async def process_async_tournament_start(async_tournament_live_race: models.Asyn
 
     async_tournament_live_race.status = 'in_progress'
     await async_tournament_live_race.save()
+
+    in_progress_entrants = await models.AsyncTournamentRace.filter(
+        live_race = async_tournament_live_race,
+        status = 'in_progress'
+    ).prefetch_related('user')
+
+    return [entrant.user.display_name for entrant in in_progress_entrants]

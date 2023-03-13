@@ -565,7 +565,7 @@ class AsyncTournamentRace(Model):
     end_time = fields.DatetimeField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
-    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit - "scheduled" is only for live races
+    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit
     live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True) # only set if run was raced live
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)
