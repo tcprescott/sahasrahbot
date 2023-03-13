@@ -421,7 +421,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
         start_time = async_tournament_race.start_time
         now = discord.utils.utcnow()
         elapsed = now - start_time
-        await interaction.response.send_message(f"Timer: {elapsed_time_hhmmss(elapsed)}", ephemeral=True)
+        await interaction.response.send_message(f"Timer: **{elapsed_time_hhmmss(elapsed)}**", ephemeral=True)
 
 
 class AsyncTournamentRaceViewForfeit(discord.ui.View):
