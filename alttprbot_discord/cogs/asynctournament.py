@@ -95,6 +95,59 @@ class AsyncTournamentView(discord.ui.View):
 
         await interaction.response.send_message(f"Please choose a pool to reattempt.  You have **{available_reattempts}** re-attempts remaining.", view=AsyncTournamentRaceViewConfirmReattempt(played_pools=played_pools), ephemeral=True)
 
+    @discord.ui.button(label="View your history", style=discord.ButtonStyle.grey, emoji="📜", custom_id="sahasrahbot:async_history")
+    async def async_history(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+
+        if async_tournament is None:
+            await interaction.followup.send("This channel is not configured for async tournaments.", ephemeral=True)
+            return
+
+        pools = await models.AsyncTournamentPermalinkPool.filter(
+            tournament=async_tournament
+        )
+        embed = discord.Embed(title="Async Tournament History", color=discord.Color.blurple())
+
+        for pool in pools:
+            race = await models.AsyncTournamentRace.get_or_none(
+                user__discord_user_id=interaction.user.id,
+                tournament=async_tournament,
+                permalink__pool=pool,
+                reattempted=False
+            )
+            if race is None:
+                status = "Not yet played"
+                finish_time = "N/A"
+            elif race.status == "finished":
+                status = "Finished"
+                finish_time = elapsed_time_hhmmss(race.end_time - race.start_time)
+            elif race.status == "forfeit":
+                status = "Forfeit"
+                finish_time = "N/A"
+            else:
+                status = "In Progress"
+                finish_time = "N/A"
+
+            embed.add_field(
+                name=f"Pool {pool.name}",
+                value=f"**Status:** {status}\n**Finish Time:** {finish_time}",
+                inline=False
+            )
+
+        reattempts = await models.AsyncTournamentRace.filter(
+            user__discord_user_id=interaction.user.id,
+            tournament=async_tournament,
+            reattempted=True
+        ).prefetch_related('permalink__pool')
+        if reattempts:
+            embed.add_field(
+                name="Re-attempted Pools",
+                value="\n".join([f"{r.permalink.pool.name}" for r in reattempts])
+            )
+
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
     @discord.ui.button(label="Close Async Tournament", style=discord.ButtonStyle.red, emoji="🔒", custom_id="sahasrahbot:close_async_tournament")
     async def close_async_tournament(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
