@@ -253,6 +253,16 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
         if race_history:
             continue
 
+        # check if they have an active race already
+        active_races = await models.AsyncTournamentRace.filter(
+            tournament = async_tournament_live_race.tournament,
+            user = user,
+            status__in = ['pending', 'in_progress'],
+        )
+
+        if active_races:
+            continue
+
         await models.AsyncTournamentRace.create(
             tournament = async_tournament_live_race.tournament,
             permalink = async_tournament_permalink,
