@@ -148,23 +148,6 @@ class AsyncTournamentView(discord.ui.View):
 
         await interaction.followup.send(embed=embed, ephemeral=True)
 
-    @discord.ui.button(label="Close Async Tournament", style=discord.ButtonStyle.red, emoji="🔒", custom_id="sahasrahbot:close_async_tournament")
-    async def close_async_tournament(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
-        if async_tournament is None:
-            await interaction.response.send_message("This channel is not configured for async tournaments.", ephemeral=True)
-            return
-
-        if async_tournament.active is False:
-            await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
-            return
-
-        if interaction.user.id != async_tournament.owner_id:
-            await interaction.response.send_message("You are not the owner of this tournament.", ephemeral=True)
-            return
-
-        await interaction.response.send_message("Are you sure you want to close this tournament?\n\nThis action cannot be undone.", view=AsyncTournamentViewConfirmCloseTournament(view=self, interaction=interaction), ephemeral=True)
-
 
 class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
     def __init__(self, view, interaction):
@@ -896,6 +879,23 @@ class AsyncTournament(commands.GroupCog, name="async"):
     async def autocomplete_racetime_slug(self, interaction: discord.Interaction, current: str):
         result = await models.AsyncTournamentLiveRace.filter(racetime_slug__icontains=current, status="in_progress").values("racetime_slug")
         return [discord.SelectOption(label=r["racetime_slug"], value=r["racetime_slug"]) for r in result]
+
+    @app_commands.command(name="close", description="Close a async tournament.")
+    async def close(self, interaction: discord.Interaction):
+        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        if async_tournament is None:
+            await interaction.response.send_message("This channel is not configured for async tournaments.", ephemeral=True)
+            return
+
+        if async_tournament.active is False:
+            await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
+            return
+
+        if interaction.user.id != async_tournament.owner_id:
+            await interaction.response.send_message("You are not the owner of this tournament.", ephemeral=True)
+            return
+
+        await interaction.response.send_message("Are you sure you want to close this tournament?\n\nThis action cannot be undone.", view=AsyncTournamentViewConfirmCloseTournament(view=self, interaction=interaction), ephemeral=True)
 
 def create_tournament_embed(async_tournament: models.AsyncTournament):
     embed = discord.Embed(title=async_tournament.name)
