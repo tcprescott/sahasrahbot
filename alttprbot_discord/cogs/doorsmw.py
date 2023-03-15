@@ -37,7 +37,6 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
                 f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
 
         await interaction.response.send_message(embed=make_embed(multiworld))
-        await interaction.response.send_message("New multiworld", ephemeral=True)
 
     @app_commands.command(description="Resume a multiworld that was previously closed.")
     async def resume(self, interaction: discord.Interaction, token: str):
@@ -143,6 +142,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
         else:
             await interaction.response.send_message("Message sent to multiworld server.  No response received (this may be normal).")
 
+
 async def send_command(token, interaction: discord.Interaction, cmd, data=None):
     async with aiohttp.ClientSession() as session:
         async with session.get(f'http://localhost:5002/game/{token}') as multiworld_resp:
@@ -165,6 +165,7 @@ async def send_command(token, interaction: discord.Interaction, cmd, data=None):
         return response.get('error', f'Unknown error occured while processing {cmd}.')
 
     return response.get('resp', 'Command sent to multiworld server.  No response received (this may be normal).')
+
 
 def make_embed(multiworld):
     embed = discord.Embed(
