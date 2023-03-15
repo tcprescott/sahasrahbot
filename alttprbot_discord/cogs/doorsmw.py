@@ -50,34 +50,34 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
 
     @app_commands.command(description="Kick a player from a multiworld game.")
     async def kick(self, interaction: discord.Interaction, token: str, player: str):
-        resp = await send_command(token, interaction, 'kick', {'player': player})
+        resp = await send_command(token, interaction, command='kick', name=player)
 
         await interaction.response.send_message(resp, ephemeral=True)
 
     @app_commands.command(description="Close a multiworld game.")
     async def close(self, interaction: discord.Interaction, token: str):
-        resp = await send_command(token, interaction, 'close')
+        resp = await send_command(token, interaction, command='close')
 
         await interaction.response.send_message(resp, ephemeral=True)
 
     @app_commands.command(description="Forfeit a player in a multiworld game.")
     async def forfeit(self, interaction: discord.Interaction, token: str, player: str):
-        resp = await send_command(token, interaction, 'forfeit', {'player': player})
+        resp = await send_command(token, interaction, command='forfeit', name=player)
 
         await interaction.response.send_message(resp, ephemeral=True)
 
-    @app_commands.command(description="Send an item to a player.")
+    @ app_commands.command(description="Send an item to a player.")
     async def send(self, interaction: discord.Interaction, token: str, player: str, item: str):
-        resp = await send_command(token, interaction, 'send', {'player': player, 'item': item})
+        resp = await send_command(token, interaction, command='senditem', player=player, item=item)
         await interaction.response.send_message(resp, ephemeral=True)
 
-    @app_commands.command(description="Set password for a multiworld game.")
+    @ app_commands.command(description="Set password for a multiworld game.")
     async def password(self, interaction: discord.Interaction, token: str, password: str):
-        resp = await send_command(token, interaction, 'password', {'password': password})
+        resp = await send_command(token, interaction, command='password', password=password)
         await interaction.response.send_message(resp, ephemeral=True)
 
-    @forfeit.autocomplete("player")
-    @send.autocomplete("player")
+    @ forfeit.autocomplete("player")
+    @ send.autocomplete("player")
     async def autocomplete_player(self, interaction: discord.Interaction, current: str):
         token = interaction.namespace.token
         params = {
@@ -90,7 +90,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
 
         return [app_commands.Choice(name=player, value=player) for player in result]
 
-    @send.autocomplete("item")
+    @ send.autocomplete("item")
     async def autocomplete_item(self, interaction: discord.Interaction, current: str):
         params = {
             'item': current
@@ -101,7 +101,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
 
         return [app_commands.Choice(name=item, value=item) for item in result]
 
-    @kick.autocomplete("player")
+    @ kick.autocomplete("player")
     async def autocomplete_kick(self, interaction: discord.Interaction, current: str):
         token = interaction.namespace.token
         params = {
@@ -114,7 +114,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
 
         return [app_commands.Choice(name=client, value=client) for client in result]
 
-    @app_commands.command(description="Send a message to the multiworld server.")
+    @ app_commands.command(description="Send a message to the multiworld server.")
     async def msg(self, interaction: discord.Interaction, token: str, msg: str):
         async with aiohttp.ClientSession() as session:
             async with session.get(f'http://localhost:5002/game/{token}') as multiworld_resp:
@@ -143,7 +143,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
             await interaction.response.send_message("Message sent to multiworld server.  No response received (this may be normal).")
 
 
-async def send_command(token, interaction: discord.Interaction, cmd, data=None):
+async def send_command(token, interaction: discord.Interaction, **data):
     async with aiohttp.ClientSession() as session:
         async with session.get(f'http://localhost:5002/game/{token}') as multiworld_resp:
             multiworld = await multiworld_resp.json()
@@ -154,15 +154,12 @@ async def send_command(token, interaction: discord.Interaction, cmd, data=None):
     if not (multiworld['admin'] == interaction.user.id):
         raise SahasrahBotException('You must be the creator of the game to send items to players.')
 
-    if data is None:
-        data = {}
-
     async with aiohttp.ClientSession() as session:
         async with session.put(f'http://localhost:5002/game/{token}/cmd', json=data) as send_response:
             response = await send_response.json()
 
     if response.get('success', True) is False:
-        return response.get('error', f'Unknown error occured while processing {cmd}.')
+        return response.get('error', response.get('description', 'Unknown error occured while processing command.'))
 
     return response.get('resp', 'Command sent to multiworld server.  No response received (this may be normal).')
 
