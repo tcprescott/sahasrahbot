@@ -42,6 +42,7 @@ title:  Presets
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
 | [fadkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower.| *Customizer*  |
+| [fadkeys_gt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys_gt.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower and GT Big Key is in GT.| *Customizer*  |
 | [goldrush](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/goldrush.yaml) |A 49/50 Triforce Hunt, by BigDunka| *Customizer*  |
 | [goldrush_keys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/goldrush_keys.yaml) |A 49/50 Triforce Hunt Keysanity, by BigDunka| *Customizer*  |
 | [hard_enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/hard_enemizer.yaml) |Some good ol' enemy and boss shuffle, hard item pool.|   |
