@@ -595,6 +595,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
         try:
             races = await models.AsyncTournamentRace.filter(status="in_progress", thread_id__isnull=False).prefetch_related('user')
             for race in races:
+                if race.start_time is None:
+                    continue
+
                 if race.start_time + datetime.timedelta(hours=12) > discord.utils.utcnow():
                     # this race is still in progress and has not timed out
                     continue
@@ -852,9 +855,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
             if entrant['status'] == 'finished':
                 race.end_time = datetime.datetime.fromisoformat(entrant["finished_at"]).astimezone(pytz.utc)
-                race.status="finished"
+                race.status = "finished"
             elif entrant['status'] == 'forfeit':
-                race.status="forfeit"
+                race.status = "forfeit"
             else:
                 warnings.append(f"{entrant['user']['name']} is not finished or forfeited.  This should not have happened.")
 
@@ -897,11 +900,13 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await interaction.response.send_message("Are you sure you want to close this tournament?\n\nThis action cannot be undone.", view=AsyncTournamentViewConfirmCloseTournament(view=self, interaction=interaction), ephemeral=True)
 
+
 def create_tournament_embed(async_tournament: models.AsyncTournament):
     embed = discord.Embed(title=async_tournament.name)
     embed.add_field(name="Owner", value=f"<@{async_tournament.owner_id}>", inline=False)
     embed.set_footer(text=f"ID: {async_tournament.id}")
     return embed
+
 
 async def finish_race(interaction: discord.Interaction):
     race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related('user')
@@ -939,6 +944,7 @@ def elapsed_time_hhmmss(elapsed: datetime.timedelta):
     hours, remainder = divmod(elapsed.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02}:{minutes:02}:{seconds:02}"
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(AsyncTournament(bot))
