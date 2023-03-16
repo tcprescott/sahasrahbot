@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+
 class Errors(commands.Cog, name="errors"):
     """Errors handler."""
 
@@ -70,7 +71,7 @@ class Errors(commands.Cog, name="errors"):
         # CommandNotFound
         except commands.CommandNotFound as d_error:
             # await edit(content=f"{riplink} Command `{str(d_error).split(' ')[1]}` not found !")
-            pass # Ignore this error
+            pass  # Ignore this error
         # CheckFailure
         except commands.PrivateMessageOnly:
             await edit(content=f"{riplink} This command canno't be used in a guild, try in direct message.")
@@ -121,13 +122,13 @@ class Errors(commands.Cog, name="errors"):
         except app_commands.CommandInvokeError as d_error:
             if isinstance(d_error.original, discord.errors.InteractionResponded):
                 await edit(content=f"{riplink} {d_error.original}")
-                self.bot.logging.exception("Error during interaction")
+                self.bot.logger.exception("Error during interaction")
             elif isinstance(d_error.original, discord.errors.Forbidden):
                 await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original.text}")
-                self.bot.logging.exception("Error during interaction")
+                self.bot.logger.exception("Error during interaction")
             else:
                 await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
-                self.bot.logging.exception("Error during interaction")
+                self.bot.logger.exception("Error during interaction")
         except app_commands.CheckFailure as d_error:
             if isinstance(d_error, app_commands.errors.CommandOnCooldown):
                 await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
