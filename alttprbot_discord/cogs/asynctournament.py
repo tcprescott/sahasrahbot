@@ -15,6 +15,7 @@ from discord.ext import commands, tasks
 from slugify import slugify
 
 from alttprbot import models
+from alttprbot.util import triforce_text
 from tortoise.functions import Count
 
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
@@ -671,21 +672,37 @@ class AsyncTournament(commands.GroupCog, name="async"):
         content = permalink_attachment.decode('utf-8-sig').splitlines()
         csv_reader = csv.reader(content)
         for row in csv_reader:
-            key = row[0]
-            value = row[1]
-            if key not in pools:
-                pools[key] = []
-            pools[key].append(value)
+            preset = row[0]
+            pool_name = row[1]
+            num_to_generate = int(row[2])
+            try:
+                oss = int(row[3])
+            except (IndexError, ValueError):
+                oss = None
 
-        for pool_name, permalinks in pools.items():
             pool = await models.AsyncTournamentPermalinkPool.create(
                 tournament=async_tournament,
                 name=pool_name,
+                preset=preset,
             )
-            for permalink in permalinks:
+
+            for i in range(num_to_generate):
+                if oss:
+                    settings = {
+                        "override_start_screen": [oss, oss, oss, oss, oss]
+                    }
+                else:
+                    settings = None
+                seed = await triforce_text.generate_with_triforce_text(
+                    pool_name="alttpr2023",
+                    preset=preset,
+                    settings=settings,
+                )
                 await models.AsyncTournamentPermalink.create(
                     pool=pool,
-                    permalink=permalink,
+                    url=seed.url,
+                    notes='/'.join(seed.code),
+                    live_race=False,
                 )
 
         embed = create_tournament_embed(async_tournament)

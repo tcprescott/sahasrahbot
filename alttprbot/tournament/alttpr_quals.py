@@ -3,12 +3,10 @@ import datetime
 import pytz
 import isodate
 
-from alttprbot.alttprgen import generator
 from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
-from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.bot import discordbot
-from alttprbot.util import speedgaming
+from alttprbot.util import speedgaming, triforce_text
 from alttprbot_racetime import bot as racetime
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 
@@ -91,7 +89,8 @@ class ALTTPRQualifierRace(TournamentRace):
 
         preset = async_tournament_live_race.pool.preset
 
-        self.seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+        self.seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
+
         await self.rtgg_handler.set_bot_raceinfo(f"{self.seed.url} - {self.seed_code}")
         await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - {self.seed.url} - {self.seed_code}")
 
@@ -102,7 +101,7 @@ class ALTTPRQualifierRace(TournamentRace):
         async_tournament_permalink = await models.AsyncTournamentPermalink.create(
             url=self.seed.url,
             pool=async_tournament_live_race.pool,
-            notes="Generated for a live race.  YOU SHOULD NOT SEE THIS.",
+            notes=f"Generated for a live race.  {self.seed_code}",
             live_race=True
         )
 
@@ -117,7 +116,6 @@ class ALTTPRQualifierRace(TournamentRace):
         )
 
         # TODO: RT.gg max message length is 1000 characters, we need to split this up if we have more than 1000 characters
-        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         await self.rtgg_handler.send_message(f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
         await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
         self.rtgg_handler.seed_rolled = True
@@ -135,6 +133,10 @@ class ALTTPRQualifierRace(TournamentRace):
         await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - Entrants: {', '.join(in_progress_entrants)}")
         await self.rtgg_handler.send_message(f"Final eligible entrants for this pool: {', '.join(in_progress_entrants)}")
         await self.rtgg_handler.send_message("Good luck, have fun!  Mid-race chat is disabled.  If you need assistance, please ping @Admins in Discord.")
+
+    @property
+    def seed_code(self):
+        return f"({'/'.join(self.seed.code)})"
 
     @property
     def announce_channel(self):
