@@ -6,6 +6,7 @@ import os
 import random
 import aiohttp
 import pytz
+import isodate
 
 import discord
 import tortoise.exceptions
@@ -832,7 +833,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         await interaction.response.defer(ephemeral=True)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{RACETIME_URL}/{async_live_race.racetime_slug}") as resp:
+            async with session.get(f"{RACETIME_URL}/{async_live_race.racetime_slug}/data") as resp:
                 if resp.status != 200:
                     await interaction.followup.send(f"Error fetching {async_live_race.racetime_slug}. Please try again.", ephemeral=True)
                     return
@@ -853,10 +854,10 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 status="in_progress"
             )
 
-            if entrant['status'] == 'finished':
-                race.end_time = datetime.datetime.fromisoformat(entrant["finished_at"]).astimezone(pytz.utc)
+            if entrant['status']['value'] == 'done':
+                race.end_time = isodate.parse_datetime(entrant["finished_at"]).astimezone(pytz.utc)
                 race.status = "finished"
-            elif entrant['status'] == 'forfeit':
+            elif entrant['status']['value'] == 'dnf':
                 race.status = "forfeit"
             else:
                 warnings.append(f"{entrant['user']['name']} is not finished or forfeited.  This should not have happened.")
@@ -879,9 +880,10 @@ class AsyncTournament(commands.GroupCog, name="async"):
         else:
             await interaction.followup.send("The recording of this race finished without any warnings!", ephemeral=True)
 
+    @live_race_record.autocomplete("racetime_slug")
     async def autocomplete_racetime_slug(self, interaction: discord.Interaction, current: str):
         result = await models.AsyncTournamentLiveRace.filter(racetime_slug__icontains=current, status="in_progress").values("racetime_slug")
-        return [discord.SelectOption(label=r["racetime_slug"], value=r["racetime_slug"]) for r in result]
+        return [app_commands.Choice(name=r["racetime_slug"], value=r["racetime_slug"]) for r in result]
 
     @app_commands.command(name="close", description="Close a async tournament.")
     async def close(self, interaction: discord.Interaction):

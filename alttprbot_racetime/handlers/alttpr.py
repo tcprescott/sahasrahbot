@@ -151,7 +151,7 @@ class GameHandler(SahasrahBotCoreHandler):
         if await self.is_locked(message):
             return
 
-        preset_name="tournament_hard"
+        preset_name = "tournament_hard"
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         data = generator.ALTTPRPreset(preset_name)
@@ -177,11 +177,12 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
+    # TODO: refactor this pile of shit
     @monitor_cmd
     async def ex_cancel(self, args, message):
         self.seed_rolled = False
         await self.set_bot_raceinfo("New Race")
-        await tournament_results.delete_active_tournament_race(self.data.get('name'))
+        # await tournament_results.delete_active_tournament_race(self.data.get('name'))
         await spoiler_races.delete_spoiler_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
 

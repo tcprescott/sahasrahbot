@@ -1,10 +1,10 @@
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot.tournament import smrl
+from alttprbot.tournament import alttpr_quals
 # from alttprbot.tournament import alttprleague
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(smrl.SMRandoLeague):
+class TestTournament(alttpr_quals.ALTTPRQualifierRace):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
@@ -19,8 +19,12 @@ class TestTournament(smrl.SMRandoLeague):
         )
 
     @property
+    def announce_channel(self):
+        return discordbot.get_channel(508335685044928548)
+
+    @property
     def race_room_log_channel(self):
-        return discordbot.get_channel(678695059016646697)
+        return discordbot.get_channel(537469084527230976)
 
     # @property
     # def announce_channel(self):

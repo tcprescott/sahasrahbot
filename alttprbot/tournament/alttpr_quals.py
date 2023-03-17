@@ -12,6 +12,7 @@ from alttprbot.util import speedgaming
 from alttprbot_racetime import bot as racetime
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 
+
 class ALTTPRQualifierRace(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(334795604918272012)
@@ -51,7 +52,7 @@ class ALTTPRQualifierRace(TournamentRace):
 
         async_tournament_live_race = await models.AsyncTournamentLiveRace.get_or_none(
             episode_id=self.episodeid,
-        )
+        ).prefetch_related('pool', 'permalink')
 
         # a whole bunch of guard conditions we need to satisfy before we can roll a seed
         if async_tournament_live_race is None:
@@ -69,7 +70,7 @@ class ALTTPRQualifierRace(TournamentRace):
         await async_tournament_live_race.fetch_related('tournament')
 
         authorized = await models.AsyncTournamentPermissions.filter(
-            tournament = async_tournament_live_race.tournament,
+            tournament=async_tournament_live_race.tournament,
             user__rtgg_id=message['user']['id'],
             role__in=['mod', 'admin']
         )
@@ -83,12 +84,10 @@ class ALTTPRQualifierRace(TournamentRace):
             await self.rtgg_handler.send_message("No preset has been set for this pool.  Please contact Synack for further help.")
             return
 
-
         # lock the room
         await self.rtgg_handler.set_invitational()
         await self.rtgg_handler.edit(streaming_required=False)
         await self.rtgg_handler.send_message("This room is now locked.  Please contact a Tournament Moderator if you need to be added to the room.")
-
 
         preset = async_tournament_live_race.pool.preset
 
@@ -101,18 +100,19 @@ class ALTTPRQualifierRace(TournamentRace):
         await tournamentresults.save()
 
         async_tournament_permalink = await models.AsyncTournamentPermalink.create(
-            url = self.seed.url,
-            pool = async_tournament_live_race.pool,
-            notes = None,
-            live_race = True
+            url=self.seed.url,
+            pool=async_tournament_live_race.pool,
+            notes="Generated for a live race.  YOU SHOULD NOT SEE THIS.",
+            live_race=True
         )
 
         async_tournament_live_race.permalink = async_tournament_permalink
+        async_tournament_live_race.racetime_slug = self.rtgg_handler.data.get('name')
         await async_tournament_live_race.save()
 
         eligible_entrants_for_pool = await write_eligible_async_entrants(
             async_tournament_live_race=async_tournament_live_race,
-            seed=self.seed,
+            permalink=async_tournament_permalink,
             race_room_data=self.rtgg_handler.data
         )
 
@@ -121,7 +121,6 @@ class ALTTPRQualifierRace(TournamentRace):
         await self.rtgg_handler.send_message(f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
         await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
         self.rtgg_handler.seed_rolled = True
-
 
     async def on_race_start(self):
         async_tournament_live_race = await models.AsyncTournamentLiveRace.get_or_none(
@@ -160,7 +159,7 @@ class ALTTPRQualifierRace(TournamentRace):
 
     @property
     def race_info(self):
-        msg = "SpeedGaming Daily Race Series - {title} at {start_time} Eastern".format(
+        msg = "ALTTPR Main Tournament Live Qualifier - {title} at {start_time} Eastern".format(
             title=self.friendly_name,
             start_time=self.string_time(self.race_start_time)
         )
@@ -218,17 +217,7 @@ class ALTTPRQualifierRace(TournamentRace):
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
 
-async def write_eligible_async_entrants(async_tournament_live_race: models.AsyncTournamentLiveRace, seed, race_room_data: dict):
-    async_tournament_permalink = await models.AsyncTournamentPermalink.create(
-        url = seed.url,
-        pool = async_tournament_live_race.pool,
-        notes = None,
-        live_race = True
-    )
-
-    async_tournament_live_race.permalink = async_tournament_permalink
-    await async_tournament_live_race.save()
-
+async def write_eligible_async_entrants(async_tournament_live_race: models.AsyncTournamentLiveRace, permalink: models.AsyncTournamentPermalink, race_room_data: dict):
     entrants = race_room_data.get('entrants', [])
 
     eligible_entrants_for_pool = []
@@ -243,10 +232,10 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
             }
         )
         race_history = await models.AsyncTournamentRace.filter(
-            tournament = async_tournament_live_race.tournament,
-            user = user,
-            permalink__pool = async_tournament_live_race.pool,
-            reattempted = False
+            tournament=async_tournament_live_race.tournament,
+            user=user,
+            permalink__pool=async_tournament_live_race.pool,
+            reattempted=False
         )
 
         # skip if they've already raced in this pool
@@ -255,21 +244,21 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
 
         # check if they have an active race already
         active_races = await models.AsyncTournamentRace.filter(
-            tournament = async_tournament_live_race.tournament,
-            user = user,
-            status__in = ['pending', 'in_progress'],
+            tournament=async_tournament_live_race.tournament,
+            user=user,
+            status__in=['pending', 'in_progress'],
         )
 
         if active_races:
             continue
 
         await models.AsyncTournamentRace.create(
-            tournament = async_tournament_live_race.tournament,
-            permalink = async_tournament_permalink,
-            user = user,
-            thread_id = None,
-            status = 'pending',
-            live_race = async_tournament_live_race,
+            tournament=async_tournament_live_race.tournament,
+            permalink=permalink,
+            user=user,
+            thread_id=None,
+            status='pending',
+            live_race=async_tournament_live_race,
         )
 
         eligible_entrants_for_pool.append(user.display_name)
@@ -280,14 +269,16 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
 # TODO: We need to handle people who are accepted after the race room is locked.  We may need to refactor this to
 # iterate through entrants a second time, and do a update_or_create, updating the status to in_progress if they
 # already exist, and creating them if they don't.
+
+
 async def process_async_tournament_start(async_tournament_live_race: models.AsyncTournamentLiveRace, race_room_data: dict):
-    start_time = isodate.parse_datetime(race_room_data.get['started_at']).astimezone(pytz.utc)
+    start_time = isodate.parse_datetime(race_room_data['started_at']).astimezone(pytz.utc)
     entrants = race_room_data.get('entrants', [])
 
     # update actual entrants to in_progress
     await models.AsyncTournamentRace.filter(
-        live_race = async_tournament_live_race,
-        status = 'pending',
+        live_race=async_tournament_live_race,
+        status='pending',
         user__rtgg_id__in=[entrant['user']['id'] for entrant in entrants]
     ).update(
         status='in_progress',
@@ -296,16 +287,16 @@ async def process_async_tournament_start(async_tournament_live_race: models.Asyn
 
     # delete any pending entrants that didn't actually join
     await models.AsyncTournamentRace.filter(
-        live_race = async_tournament_live_race,
-        status = 'pending'
+        live_race=async_tournament_live_race,
+        status='pending'
     ).delete()
 
     async_tournament_live_race.status = 'in_progress'
     await async_tournament_live_race.save()
 
     in_progress_entrants = await models.AsyncTournamentRace.filter(
-        live_race = async_tournament_live_race,
-        status = 'in_progress'
+        live_race=async_tournament_live_race,
+        status='in_progress'
     ).prefetch_related('user')
 
     return [entrant.user.display_name for entrant in in_progress_entrants]
