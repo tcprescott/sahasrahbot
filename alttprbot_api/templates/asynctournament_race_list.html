@@ -1,11 +1,11 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-<title>Moderation Queue for Tournament ID {{ tournament.id }}</title>
+<title>Moderation Queue - {{ tournament.name }} ({{ tournament.id }})</title>
 {%- endblock head %}
 
 {% block content -%}
-<h1>Moderation Queue for Tournament ID {{ tournament.id }}</h1>
+<h1>Moderation Queue - {{ tournament.name }} ({{ tournament.id }})</h1>
 <p><a
         href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all', page=page) }}">
         View all in progress</a></p>

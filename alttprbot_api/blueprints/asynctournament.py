@@ -6,6 +6,7 @@ from quart import (Blueprint, abort, jsonify, redirect,
 from quart_discord import requires_authorization
 
 from alttprbot import models
+from alttprbot.util import asynctournament
 from alttprbot_api import auth
 
 from ..api import discord
@@ -239,6 +240,23 @@ async def async_tournament_review_submit(tournament_id: int, race_id: int):
     await race.save()
 
     return redirect(url_for("async.async_tournament_queue", tournament_id=tournament_id))
+
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/leaderboard', methods=['GET'])
+@requires_authorization
+async def async_tournament_leaderboard(tournament_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    leaderboard = await asynctournament.get_leaderboard(tournament)
+
+    return await render_template('asynctournament_leaderboard.html', logged_in=True, user=discord_user, tournament=tournament, leaderboard=leaderboard)
 
 
 def asynctournament_to_dict(asynctournament: models.AsyncTournament):

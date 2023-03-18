@@ -1,0 +1,31 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Tournament Leaderboard - {{ tournament.name }} ({{ tournament.id }})</title>
+{%- endblock head %}
+
+{% block content -%}
+<h1>Tournament Leaderboard - {{ tournament.name }} ({{ tournament.id }})</h1>
+
+<table border="1">
+    <tr>
+        <th>Rank</th>
+        <th>Player Name</th>
+        <th>Score</th>
+        {% for pool in tournament.permalink_pools %}
+        <th>{{ pool.name }}</th>
+        {% endfor %}
+    </tr>
+    {% for entry in leaderboard %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ entry.player.display_name }}</td>
+        <td>{{ entry.score_formatted }}</td>
+        {% for race in entry.races %}
+        <td>{{ race.score_formatted }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{%- endblock content %}

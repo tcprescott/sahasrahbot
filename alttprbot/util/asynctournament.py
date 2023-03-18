@@ -3,9 +3,9 @@ from dataclasses import dataclass
 import logging
 import random
 from datetime import timedelta
-from typing import List, Tuple
+from typing import List
 import aiocache
-
+from functools import cached_property
 import discord
 from tortoise.functions import Count
 
@@ -20,7 +20,6 @@ MAX_POOL_IMBALANCE = 5
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
 score_calculation_lock = asyncio.Lock()
-
 
 
 async def calculate_async_tournament(tournament: models.AsyncTournament, only_approved: bool = False):
@@ -181,7 +180,7 @@ class LeaderboardEntry:
     player: models.Users
     races: List[models.AsyncTournamentRace]
 
-    @property
+    @cached_property
     def score(self) -> float:
         """
         Average score of all races.
@@ -192,26 +191,26 @@ class LeaderboardEntry:
         ]
         return sum(scores) / len(scores)
 
-    @property
+    @cached_property
     def score_formatted(self) -> str:
         """
         Formatted score suitable for web display.
         """
         return f"{self.score:.3f}"
 
-    @property
+    @cached_property
     def unattempted_race_count(self) -> int:
         """
         Count of unattempted races.
         """
         return len([r for r in self.races if r is None])
 
-    @property
+    @cached_property
     def forfeited_race_count(self) -> int:
         """
         Count of attempted, but forfeited, races.
         """
-        return len([r for r in self.races if r is not None and r.status == "forfet"])
+        return len([r for r in self.races if r is not None and r.status == "forfeit"])
 
 
 # TODO: this needs to be cached as this will be slow AF
@@ -224,20 +223,20 @@ async def get_leaderboard(tournament: models.AsyncTournament):
     """
     key = f'async_leaderboard_{tournament.id}'
     if await CACHE.exists(key):
-        leaderboard, pools = await CACHE.get(key)
-        return leaderboard, pools
+        leaderboard = await CACHE.get(key)
+        return leaderboard
 
     # get a list of all user IDs who have participated in the tournament
-    user_ids = await tournament.races.all().values("user_id").distinct()
+    user_ids = await tournament.races.all().distinct().values("user_id")
     user_id_list = [p['user_id'] for p in user_ids]
 
     # get a list of all permalink pools for the tournament
-    pools: List[models.AsyncTournamentPermalinkPool] = await tournament.permalink_pools.all()
+    await tournament.fetch_related("permalink_pools")
 
     leaderboard: List[LeaderboardEntry] = []
     for user_id in user_id_list:
         races = []
-        for pool in pools:
+        for pool in tournament.permalink_pools:
             race = await models.AsyncTournamentRace.get_or_none(
                 user_id=user_id,
                 tournament=tournament,
@@ -255,5 +254,5 @@ async def get_leaderboard(tournament: models.AsyncTournament):
 
     leaderboard.sort(key=lambda e: e.score, reverse=True)
 
-    await CACHE.set(key, (leaderboard, pools))
-    return leaderboard, pools
+    await CACHE.set(key, leaderboard)
+    return leaderboard
