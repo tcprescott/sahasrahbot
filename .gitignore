@@ -10,3 +10,4 @@ test_input/
 weights/bot_testing.yaml
 .venv/
 settings.py
+.vscode/
