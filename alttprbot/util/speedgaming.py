@@ -5,6 +5,7 @@ import aiofiles
 import aiohttp
 import pytz
 import logging
+from typing import List
 
 from alttprbot.exceptions import SahasrahBotException
 from config import Config as c
@@ -39,9 +40,9 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         url=f'{c.SgApiEndpoint}/schedule',
         params=params,
     ) as resp:
-        schedule = await resp.json(content_type='text/html')
+        schedule: List[dict] = await resp.json(content_type='text/html')
         episode_ids = [episode['id'] for episode in schedule]
-        logging.info(f'Retrieved schedule for {event} ({resp.status} {resp.reason}).  Received {len(schedule)} matches.  From: {sched_from} To: {sched_to}.  Match IDs: {", ".join(episode_ids)}')
+        logging.info(f'Retrieved schedule for {event} ({resp.status} {resp.reason}).  Received {len(schedule)} matches.  From: {sched_from} To: {sched_to}.  Match IDs: {", ".join(map(str, episode_ids))}')
 
     if 'error' in schedule:
         raise SGEventNotFoundException(f"Unable to retrieve schedule for {event}. {schedule.get('error')}")
