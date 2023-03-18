@@ -39,8 +39,8 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         url=f'{c.SgApiEndpoint}/schedule',
         params=params,
     ) as resp:
-        logging.info(resp.url)
         schedule = await resp.json(content_type='text/html')
+        logging.info(f'Retrieved schedule for {event} ({resp.status} {resp.reason}).  Received {len(schedule)} matches.  From: {sched_from} To: {sched_to}.  Match IDs: {", ".join(episode_ids)}')
 
     if 'error' in schedule:
         raise SGEventNotFoundException(f"Unable to retrieve schedule for {event}. {schedule.get('error')}")
