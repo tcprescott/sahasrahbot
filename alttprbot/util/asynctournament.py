@@ -213,7 +213,6 @@ class LeaderboardEntry:
         return len([r for r in self.races if r is not None and r.status == "forfeit"])
 
 
-# TODO: this needs to be cached as this will be slow AF
 async def get_leaderboard(tournament: models.AsyncTournament):
     """
     Returns a leaderboard for the specified tournament.

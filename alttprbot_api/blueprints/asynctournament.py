@@ -16,7 +16,7 @@ asynctournament_blueprint = Blueprint('async', __name__)
 
 @asynctournament_blueprint.route('/api/tournaments', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournaments():
+async def tournaments_api():
     filter_args = {}
     if request.args.get('active'):
         filter_args['active'] = request.args.get('active') == 'true'
@@ -27,7 +27,7 @@ async def async_tournaments():
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_by_id(tournament_id):
+async def tournament_api(tournament_id):
     result = await models.AsyncTournament.get_or_none(id=tournament_id)
     if result is None:
         return jsonify({'error': 'Tournament not found.'})
@@ -37,7 +37,7 @@ async def async_tournament_by_id(tournament_id):
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/races', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_races(tournament_id):
+async def races_api(tournament_id):
     filter_args = {}
     if request.args.get('id'):
         filter_args['id'] = request.args.get('id')
@@ -62,7 +62,7 @@ async def async_tournament_races(tournament_id):
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_pools(tournament_id):
+async def pools_api(tournament_id):
     result = await models.AsyncTournamentPermalinkPool.filter(tournament_id=tournament_id).prefetch_related('tournament')
     if result is None:
         return jsonify({'error': 'No pools found.'})
@@ -72,7 +72,7 @@ async def async_tournament_pools(tournament_id):
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools/<int:pool_id>', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_pool(tournament_id, pool_id):
+async def pool_api(tournament_id, pool_id):
     result = await models.AsyncTournamentPermalinkPool.get_or_none(tournament_id=tournament_id, id=pool_id)
     if result is None:
         return jsonify({'error': 'Pool not found.'})
@@ -82,7 +82,7 @@ async def async_tournament_pool(tournament_id, pool_id):
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/permalinks', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_permalinks(tournament_id):
+async def permalinks_api(tournament_id):
     filter_args = {}
     if request.args.get('id'):
         filter_args['id'] = request.args.get('id')
@@ -100,7 +100,7 @@ async def async_tournament_permalinks(tournament_id):
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/permalinks/<int:permalink_id>', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_permalink(tournament_id, permalink_id):
+async def permalink_api(tournament_id, permalink_id):
     result = await models.AsyncTournamentPermalink.get_or_none(pool__tournament_id=tournament_id, id=permalink_id)
     if result is None:
         return jsonify({'error': 'Permalink not found.'})
@@ -110,12 +110,32 @@ async def async_tournament_permalink(tournament_id, permalink_id):
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/whitelist', methods=['GET'])
 @auth.authorized_key('asynctournament')
-async def async_tournament_whitelist(tournament_id):
+async def whitelist_api(tournament_id):
     result = await models.AsyncTournamentWhitelist.filter(tournament_id=tournament_id).prefetch_related('tournament')
     if result is None:
         return jsonify({'error': 'Tournament not found.'})
 
     return jsonify([asynctournamentwhitelist_to_dict(r) for r in result])
+
+
+@asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/leaderboard', methods=['GET'])
+@auth.authorized_key('asynctournament')
+async def leaderboard_api(tournament_id):
+    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    if tournament is None:
+        return jsonify({'error': 'Tournament not found.'})
+
+    leaderboard = await asynctournament.get_leaderboard(tournament)
+
+    return jsonify([
+        {
+            'player': users_to_dict(e.player),
+            'score': e.score,
+            'rank': idx + 1,
+            'races': [asynctournamentrace_to_dict(race) for race in e.races]
+        }
+        for idx, e in enumerate(leaderboard)
+    ])
 
 
 @asynctournament_blueprint.route('/races/<int:tournament_id>', methods=['GET'])
@@ -330,8 +350,7 @@ def asynctournamentrace_to_dict(asynctournamentrace: models.AsyncTournamentRace)
             'thread_timeout_time': asynctournamentrace.thread_timeout_time,
             'start_time': asynctournamentrace.start_time,
             'end_time': asynctournamentrace.end_time,
-            'created': asynctournamentrace.created,
-            'updated': asynctournamentrace.updated,
+            'elapsed_time': asynctournamentrace.elapsed_time,  # calculated
             'status': asynctournamentrace.status,
             'live_race': asynctournamentrace.live_race,  # TODO: translate to dictionary
             'reattempted': asynctournamentrace.reattempted,
@@ -341,6 +360,7 @@ def asynctournamentrace_to_dict(asynctournamentrace: models.AsyncTournamentRace)
             'reviewed_by': users_to_dict(asynctournamentrace.reviewed_by),
             'reviewed_at': asynctournamentrace.reviewed_at,
             'reviewer_notes': asynctournamentrace.reviewer_notes,
+            'score': asynctournamentrace.score,
         }
     except AttributeError:
         return None

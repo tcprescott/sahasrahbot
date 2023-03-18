@@ -576,7 +576,7 @@ class AsyncTournamentRace(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=True, on_delete="RESTRICT")
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=False)
     thread_id = fields.BigIntField(null=True)  # only set if run async in discord
     thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
     thread_timeout_time = fields.DatetimeField(null=True)
