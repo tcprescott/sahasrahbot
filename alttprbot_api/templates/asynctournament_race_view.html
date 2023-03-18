@@ -27,7 +27,11 @@
     </tr>
     <tr>
         <th>Finish Time</th>
-        <td>{{ race.end_time - race.start_time if race.end_time else "no finish time" }}</td>
+        <td>{{ race.elapsed_time_formatted }}</td>
+    </tr>
+    <tr>
+        <th>Score</th>
+        <td>{{ race.score_formatted }}</td>
     </tr>
     <tr>
         <th>Pool</th>

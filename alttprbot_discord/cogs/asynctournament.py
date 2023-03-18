@@ -3,20 +3,19 @@ import csv
 import datetime
 import logging
 import os
-import random
-import aiohttp
-import pytz
-import isodate
 
+import aiohttp
 import discord
+import isodate
+import pytz
 import tortoise.exceptions
 from discord import app_commands
 from discord.ext import commands, tasks
 from slugify import slugify
 
 from alttprbot import models
-from alttprbot.util import triforce_text
-from tortoise.functions import Count
+from alttprbot.util import asynctournament, triforce_text
+from config import Config as c
 
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
@@ -123,7 +122,7 @@ class AsyncTournamentView(discord.ui.View):
                 finish_time = "N/A"
             elif race.status == "finished":
                 status = "Finished"
-                finish_time = elapsed_time_hhmmss(race.end_time - race.start_time)
+                finish_time = race.elapsed_time_formatted
             elif race.status == "forfeit":
                 status = "Forfeit"
                 finish_time = "N/A"
@@ -243,31 +242,8 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
 
         await pool.fetch_related("permalinks")
 
-        # TODO: This needs to be smart by balancing the number of runs per permalink
-        # Ensure we don't pick a permalink that was used in a live group race
-
-        permalink_counts = await models.AsyncTournamentRace.filter(tournament=async_tournament, permalink__pool=pool).annotate(count=Count('permalink_id')).group_by("permalink_id").values("permalink_id", "count")
-        permalink_count_dict = {item['permalink_id']: item['count'] for item in permalink_counts}
-        permalink_count_dict = {p.id: permalink_count_dict.get(p.id, 0) for p in pool.permalinks if p.live_race is False}
-
-        player_async_history = await models.AsyncTournamentRace.filter(user__discord_user_id=interaction.user.id, tournament=async_tournament, permalink__pool=pool).prefetch_related('permalink')
-        available_permalinks = await pool.permalinks.filter(live_race=False)
-        played_permalinks = [p.permalink for p in player_async_history]
-        eligible_permalinks = list(set(available_permalinks) - set(played_permalinks))
-
-        if max(permalink_count_dict.values()) - min(permalink_count_dict.values()) > 10:
-            # pool is unbalanced, so we need to pick a permalink that has been played the least
-            permalink_id = min(permalink_count_dict, key=permalink_count_dict.get)
-            # ensure it's eligible to be played
-            if permalink_id in [e.id for e in eligible_permalinks]:
-                permalink = await models.AsyncTournamentPermalink.get(id=permalink_id)
-            else:
-                # pick a random eligible permalink instead of the one we need to force, because the one we're forcing is not eligible
-                permalink: models.AsyncTournamentPermalink = random.choice(eligible_permalinks)
-        else:
-            permalink: models.AsyncTournamentPermalink = random.choice(eligible_permalinks)
-
         user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        permalink = await asynctournament.get_eligible_permalink_from_pool(pool, user)
 
         # Log the action
         await models.AsyncTournamentAuditLog.create(
@@ -455,14 +431,12 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
 
     @discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️", custom_id="sahasrahbot:async_get_timer")
     async def async_get_timer(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
-        if async_tournament_race.status in ["forfeit", "finished"]:
+        race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        if race.status in ["forfeit", "finished"]:
             await interaction.response.send_message("Race is already finished.", ephemeral=True)
             return
-        start_time = async_tournament_race.start_time
-        now = discord.utils.utcnow()
-        elapsed = now - start_time
-        await interaction.response.send_message(f"Timer: **{elapsed_time_hhmmss(elapsed)}**", ephemeral=True)
+
+        await interaction.response.send_message(f"Timer: **{race.elapsed_time_formatted}**", ephemeral=True)
 
 
 class AsyncTournamentRaceViewForfeit(discord.ui.View):
@@ -557,6 +531,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         self.bot: commands.Bot = bot
         self.timeout_warning_task.start()
         self.timeout_in_progress_races_task.start()
+        self.score_calculation_task.start()
         self.persistent_views_added = False
 
     @tasks.loop(seconds=60, reconnect=True)
@@ -620,12 +595,30 @@ class AsyncTournament(commands.GroupCog, name="async"):
         except Exception:
             logging.exception("Exception in timeout_in_progress_races_task")
 
+    @tasks.loop(hours=1, reconnect=True)
+    async def score_calculation_task(self):
+        try:
+            tournaments = await models.AsyncTournament.filter(active=True)
+            for tournament in tournaments:
+                logging.info("Calculating scores for tournament %s", tournament.id)
+                try:
+                    await asynctournament.calculate_async_tournament(tournament)
+                except Exception:
+                    logging.exception("Exception in score_calculation_task for tournament %s", tournament.id)
+                logging.info("Finished calculating scores for tournament %s", tournament.id)
+        except Exception:
+            logging.exception("Exception in score_calculation_task")
+
     @timeout_warning_task.before_loop
     async def before_timeout_warning_task(self):
         await self.bot.wait_until_ready()
 
     @timeout_in_progress_races_task.before_loop
     async def before_timeout_in_progress_races_task(self):
+        await self.bot.wait_until_ready()
+
+    @score_calculation_task.before_loop
+    async def before_score_calculation_task(self):
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
@@ -667,7 +660,6 @@ class AsyncTournament(commands.GroupCog, name="async"):
             details=f"{name} ({async_tournament.id}) created"
         )
 
-        pools = {}
         permalink_attachment = await permalinks.read()
         content = permalink_attachment.decode('utf-8-sig').splitlines()
         csv_reader = csv.reader(content)
@@ -897,6 +889,46 @@ class AsyncTournament(commands.GroupCog, name="async"):
         else:
             await interaction.followup.send("The recording of this race finished without any warnings!", ephemeral=True)
 
+    if c.DEBUG:
+        @app_commands.command(name="test", description="Populate tournament with dummy data.")
+        async def test(self, interaction: discord.Interaction, participant_count: int = 1):
+            if not await self.bot.is_owner(interaction.user):
+                await interaction.response.send_message("Only Synack may perform this action.", ephemeral=True)
+                return
+
+            tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+            if tournament is None:
+                await interaction.response.send_message("This channel is not configured for async tournaments.", ephemeral=True)
+                return
+
+            await interaction.response.defer(ephemeral=True)
+
+            await asynctournament.populate_test_data(tournament=tournament, participant_count=participant_count)
+
+            await interaction.followup.send("Done!", ephemeral=True)
+
+    @app_commands.command(name="calculate_scores", description="Calculate the scores for a async tournament.")
+    async def calculate_scores(self, interaction: discord.Interaction, only_approved: bool = False):
+        tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        if tournament is None:
+            await interaction.response.send_message("This channel is not configured for async tournaments.", ephemeral=True)
+            return
+
+        if tournament.active is False:
+            await interaction.response.send_message("This tournament is not active.", ephemeral=True)
+            return
+
+        authorized = await tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin'])
+        if not authorized:
+            await interaction.response.send_message("You are not authorized to perform a score recalculation.", ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        await asynctournament.calculate_async_tournament(tournament, only_approved=only_approved)
+
+        await interaction.followup.send("Done!", ephemeral=True)
+
     @live_race_record.autocomplete("racetime_slug")
     async def autocomplete_racetime_slug(self, interaction: discord.Interaction, current: str):
         result = await models.AsyncTournamentLiveRace.filter(racetime_slug__icontains=current, status="in_progress").values("racetime_slug")
@@ -954,9 +986,7 @@ async def finish_race(interaction: discord.Interaction):
     race.status = "finished"
     await race.save()
 
-    elapsed = race.end_time - race.start_time
-
-    await interaction.response.send_message(f"Your finish time of **{elapsed_time_hhmmss(elapsed)}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
+    await interaction.response.send_message(f"Your finish time of **{race.elapsed_time_formatted}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
 
 
 def elapsed_time_hhmmss(elapsed: datetime.timedelta):

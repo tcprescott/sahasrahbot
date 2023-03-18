@@ -1,5 +1,9 @@
-from tortoise.models import Model
+from datetime import datetime, timedelta
+from typing import Optional
+
+import discord.utils
 from tortoise import fields
+from tortoise.models import Model
 
 
 class AuditGeneratedGames(Model):
@@ -280,6 +284,7 @@ class Users(Model):
     display_name = fields.CharField(200, index=True, null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+    test_user = fields.BooleanField(default=False)
 
 
 class TournamentGames(Model):
@@ -526,6 +531,20 @@ class AsyncTournamentPermalink(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     live_race = fields.BooleanField(null=False, default=False)
+    par_time = fields.FloatField(null=True)
+    par_updated_at = fields.DatetimeField(null=True)
+
+    @property
+    def par_time_timedelta(self):
+        if self.par_time is None:
+            return None
+        return timedelta(seconds=self.par_time)
+
+    @property
+    def par_time_formatted(self):
+        hours, remainder = divmod(self.par_time_timedelta.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
 
 
 class AsyncTournamentPermalinkPool(Model):
@@ -566,7 +585,7 @@ class AsyncTournamentRace(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit
-    live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True) # only set if run was raced live
+    live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True)  # only set if run was raced live
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)
     runner_vod_url = fields.CharField(400, null=True)
@@ -574,6 +593,36 @@ class AsyncTournamentRace(Model):
     reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
+    score = fields.FloatField(null=True)  # this is computed by the tournament system
+    score_updated_at = fields.DatetimeField(null=True)
+
+    @property
+    def elapsed_time(self) -> Optional[timedelta]:
+        if self.status == 'finished':
+            return self.end_time - self.start_time
+        elif self.status == 'in_progress':
+            return discord.utils.utcnow() - self.start_time
+
+        return None
+
+    @property
+    def elapsed_time_formatted(self) -> Optional[str]:
+        if self.elapsed_time is None:
+            return None
+
+        hours, remainder = divmod(self.elapsed_time.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    @property
+    def score_formatted(self) -> Optional[str]:
+        if self.score is None:
+            if self.status in ['pending', 'in_progress']:
+                return "N/A"
+
+            return "not calculated"
+
+        return f"{self.score:.3f}"
 
 
 class AsyncTournamentAuditLog(Model):

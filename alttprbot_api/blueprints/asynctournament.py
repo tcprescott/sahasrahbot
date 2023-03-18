@@ -123,6 +123,9 @@ async def async_tournament_queue(tournament_id: int):
     discord_user = await discord.fetch_user()
     user = await models.Users.get_or_none(discord_user_id=discord_user.id)
 
+    page = int(request.args.get('page', 1))
+    page_size = 20
+
     request_filter = {}
 
     if not (status := request.args.get('status', 'finished')) == 'all':
@@ -151,9 +154,20 @@ async def async_tournament_queue(tournament_id: int):
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
-    races = await tournament.races.filter(reattempted=False, **request_filter).prefetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
+    races = await tournament.races.filter(reattempted=False, **request_filter).offset((page-1)*page_size).limit(page_size).prefetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
 
-    return await render_template('asynctournament_race_list.html', logged_in=True, user=discord_user, tournament=tournament, races=races)
+    return await render_template(
+        'asynctournament_race_list.html',
+        logged_in=True,
+        user=discord_user,
+        tournament=tournament,
+        races=races,
+        status=status,
+        reviewer=reviewer,
+        review_status=review_status,
+        live=live,
+        page=page
+    )
 
 
 @asynctournament_blueprint.route('/races/<int:tournament_id>/review/<int:race_id>', methods=['GET'])
@@ -301,7 +315,7 @@ def asynctournamentrace_to_dict(asynctournamentrace: models.AsyncTournamentRace)
             'created': asynctournamentrace.created,
             'updated': asynctournamentrace.updated,
             'status': asynctournamentrace.status,
-            'live_race': asynctournamentrace.live_race, # TODO: translate to dictionary
+            'live_race': asynctournamentrace.live_race,  # TODO: translate to dictionary
             'reattempted': asynctournamentrace.reattempted,
             'runner_notes': asynctournamentrace.runner_notes,
             'runner_vod_url': asynctournamentrace.runner_vod_url,

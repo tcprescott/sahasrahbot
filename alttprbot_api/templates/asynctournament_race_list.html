@@ -7,17 +7,26 @@
 {% block content -%}
 <h1>Moderation Queue for Tournament ID {{ tournament.id }}</h1>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all') }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all', page=page) }}">
         View all in progress</a></p>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='false', reviewer='all', status='finished', review_status='pending') }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='false', reviewer='all', status='finished', review_status='pending', page=page) }}">
         View runs awaiting verification</a></p>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='all') }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='all', page=page) }}">
         View all runs</a></p>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='rejected') }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='rejected', page=page) }}">
         View all rejected runs</a></p>
+<p>Page {{ page }}</p>
+<p>
+    {% if page>1 %}<a
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live=live, reviewer=reviewer, status=status, review_status=review_status, page=page-1) }}">
+        Previous page</a>{% endif %}
+    <a
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live=live, reviewer=reviewer, status=status, review_status=review_status, page=page+1) }}">
+        Next page</a>
+</p>
 <table border="1">
     <tr>
         <th>ID</th>
@@ -26,6 +35,7 @@
         <th>VoD</th>
         <th>Thread</th>
         <th>Finish Time</th>
+        <th>Score</th>
         <th>Run Status</th>
         <th>Reviewed By</th>
         <th>Reviewed At</th>
@@ -46,7 +56,8 @@
                 target="_blank">thread</a>
             {% endif %}
         </td>
-        <td>{{ race.end_time - race.start_time if race.end_time else "" }}</td>
+        <td>{{ race.elapsed_time_formatted }}</td>
+        <td>{{ race.score_formatted }}</td>
         <td>{{ race.status }}</td>
         <td>{{ race.reviewed_by.display_name }}</td>
         <td>{{ race.reviewed_at if race.reviewed_at else "" }}</td>
