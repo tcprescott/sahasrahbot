@@ -1,8 +1,10 @@
 import asyncio
+from dataclasses import dataclass
 import logging
 import random
 from datetime import timedelta
 from typing import List
+import aiocache
 
 import discord
 from tortoise.functions import Count
@@ -15,7 +17,10 @@ QUALIFIER_MAX_SCORE = 105
 QUALIFIER_MIN_SCORE = 0
 MAX_POOL_IMBALANCE = 5
 
+CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
+
 score_calculation_lock = asyncio.Lock()
+
 
 
 async def calculate_async_tournament(tournament: models.AsyncTournament, only_approved: bool = False):
@@ -32,6 +37,7 @@ async def calculate_async_tournament(tournament: models.AsyncTournament, only_ap
         for pool in tournament.permalink_pools:
             for permalink in pool.permalinks:
                 await calculate_permalink_par(permalink, only_approved=only_approved)
+        await CACHE.delete(f'async_leaderboard_{tournament.id}')
 
 
 async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, only_approved: bool = False):
@@ -165,3 +171,82 @@ async def populate_test_data(tournament: models.AsyncTournament, participant_cou
                 start_time=discord.utils.utcnow(),
                 end_time=discord.utils.utcnow() + timedelta(seconds=random.randint(3600000, 7200000)/1000),
             )
+
+
+@dataclass
+class LeaderboardEntry:
+    """
+    Represents a leaderboard entry for a user.
+    """
+    player: models.Users
+    races: List[models.AsyncTournamentRace]
+
+    @property
+    def score(self) -> float:
+        """
+        Average score of all races.
+        """
+        scores = [
+            r.score if r is not None else 0
+            for r in self.races
+        ]
+        return sum(scores) / len(scores)
+
+    @property
+    def score_formatted(self) -> str:
+        """
+        Formatted score suitable for web display.
+        """
+        return f"{self.score:.3f}"
+
+    @property
+    def unattempted_race_count(self) -> int:
+        """
+        Count of unattempted races.
+        """
+        return len([r for r in self.races if r is None])
+
+    @property
+    def forfeited_race_count(self) -> int:
+        """
+        Count of attempted, but forfeited, races.
+        """
+        return len([r for r in self.races if r is not None and r.status == "forfet"])
+
+
+# TODO: this needs to be cached as this will be slow AF
+async def calculate_leaderboard(tournament: models.AsyncTournament) -> List[LeaderboardEntry]:
+    key = f'async_leaderboard_{tournament.id}'
+    if await CACHE.exists(key):
+        return await CACHE.get(key)
+
+    # get a list of all user IDs who have participated in the tournament
+    user_ids = await tournament.races.all().values("user_id").distinct()
+    user_id_list = [p['user_id'] for p in user_ids]
+
+    # get a list of all permalink pools for the tournament
+    pools: List[models.AsyncTournamentPermalinkPool] = await tournament.permalink_pools.all()
+
+    leaderboard: List[LeaderboardEntry] = []
+    for user_id in user_id_list:
+        races = []
+        for pool in pools:
+            race = await models.AsyncTournamentRace.get_or_none(
+                user_id=user_id,
+                tournament=tournament,
+                permalink__pool=pool,
+                status__in=["finished", "forfet"],
+                reattempted=False
+            )
+            races.append(race)
+
+        entry = LeaderboardEntry(
+            player=await models.Users.get(id=user_id),
+            races=races
+        )
+        leaderboard.append(entry)
+
+    leaderboard.sort(key=lambda e: e.score, reverse=True)
+
+    await CACHE.set(key, leaderboard)
+    return leaderboard
