@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import logging
 import random
 from datetime import timedelta
-from typing import List
+from typing import List, Tuple
 import aiocache
 
 import discord
@@ -215,10 +215,17 @@ class LeaderboardEntry:
 
 
 # TODO: this needs to be cached as this will be slow AF
-async def calculate_leaderboard(tournament: models.AsyncTournament) -> List[LeaderboardEntry]:
+async def get_leaderboard(tournament: models.AsyncTournament):
+    """
+    Returns a leaderboard for the specified tournament.
+    The leaderboard is a list of LeaderboardEntry objects, sorted by score.
+    The pools are a list of the permalink pools for the tournament.
+    This coroutine is cached until scores are calculated.
+    """
     key = f'async_leaderboard_{tournament.id}'
     if await CACHE.exists(key):
-        return await CACHE.get(key)
+        leaderboard, pools = await CACHE.get(key)
+        return leaderboard, pools
 
     # get a list of all user IDs who have participated in the tournament
     user_ids = await tournament.races.all().values("user_id").distinct()
@@ -248,5 +255,5 @@ async def calculate_leaderboard(tournament: models.AsyncTournament) -> List[Lead
 
     leaderboard.sort(key=lambda e: e.score, reverse=True)
 
-    await CACHE.set(key, leaderboard)
-    return leaderboard
+    await CACHE.set(key, (leaderboard, pools))
+    return leaderboard, pools
