@@ -40,6 +40,7 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         params=params,
     ) as resp:
         schedule = await resp.json(content_type='text/html')
+        episode_ids = [episode['id'] for episode in schedule]
         logging.info(f'Retrieved schedule for {event} ({resp.status} {resp.reason}).  Received {len(schedule)} matches.  From: {sched_from} To: {sched_to}.  Match IDs: {", ".join(episode_ids)}')
 
     if 'error' in schedule:
