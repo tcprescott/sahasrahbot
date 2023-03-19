@@ -218,7 +218,7 @@ async def get_leaderboard(tournament: models.AsyncTournament):
     Returns a leaderboard for the specified tournament.
     The leaderboard is a list of LeaderboardEntry objects, sorted by score.
     The pools are a list of the permalink pools for the tournament.
-    This coroutine is cached until scores are calculated.
+    This return of this coroutine is cached until scores are calculated.
     """
     key = f'async_leaderboard_{tournament.id}'
     if await CACHE.exists(key):

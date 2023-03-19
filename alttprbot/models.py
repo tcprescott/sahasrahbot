@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -5,6 +7,7 @@ import discord.utils
 from tortoise import fields
 from tortoise.models import Model
 
+RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 
 class AuditGeneratedGames(Model):
     class Meta:
@@ -286,6 +289,11 @@ class Users(Model):
     updated = fields.DatetimeField(auto_now=True)
     test_user = fields.BooleanField(default=False)
 
+    @property
+    def racetime_profile(self):
+        if self.rtgg_id is None:
+            return None
+        return f'{RACETIME_URL}/user/{self.rtgg_id}/'
 
 class TournamentGames(Model):
     class Meta:
@@ -570,6 +578,12 @@ class AsyncTournamentLiveRace(Model):
     status = fields.CharField(45, null=False, default='scheduled')  # scheduled, pending, in_progress, finished
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+
+    @property
+    def racetime_url(self):
+        if self.racetime_slug is None:
+            return None
+        return f"{RACETIME_URL}/{self.racetime_slug}"
 
 
 class AsyncTournamentRace(Model):
