@@ -59,16 +59,16 @@ async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, on
     # sort by elapsed_time attribute
     finished_races.sort(key=lambda race: race.elapsed_time)
 
+    if not finished_races:
+        # no runs have been submitted, so we can't calculate a par time
+        # skip this permalink until we have more data
+        return
+
     # calculate the average of the 5 fastest times
     if len(races) < 5:
         top_finishes = finished_races
     else:
         top_finishes = finished_races[:5]
-
-    if len(top_finishes) == 0:
-        # no runs have been submitted, so we can't calculate a par time
-        # skip this permalink until we have more data
-        return
 
     par_time = average_timedelta([race.elapsed_time for race in top_finishes])
 
