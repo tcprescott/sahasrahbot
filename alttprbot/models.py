@@ -624,7 +624,7 @@ class AsyncTournamentRace(Model):
     @property
     def elapsed_time_formatted(self) -> Optional[str]:
         if self.elapsed_time is None:
-            return None
+            return "N/A"
 
         hours, remainder = divmod(self.elapsed_time.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -639,6 +639,24 @@ class AsyncTournamentRace(Model):
             return "not calculated"
 
         return f"{self.score:.3f}"
+
+    @property
+    def status_formatted(self) -> str:
+        if self.status == 'pending':
+            return "Pending"
+        elif self.status == 'in_progress':
+            return "In Progress"
+        elif self.status == 'finished':
+            return "Finished"
+        elif self.status == 'forfeit':
+            return "Forfeit"
+        elif self.status == 'disqualified':
+            return "Disqualified"
+
+        return "Unknown"
+
+    def is_closed(self):
+        return self.status in ['finished', 'forfeit', 'disqualified']
 
 
 class AsyncTournamentAuditLog(Model):

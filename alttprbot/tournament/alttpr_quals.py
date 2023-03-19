@@ -226,13 +226,16 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
 
     # iterate through entrants and create a AsyncTournamentRace record for each one
     for entrant in entrants:
-        user, _ = await models.Users.get_or_create(
+        user, new = await models.Users.get_or_create(
             rtgg_id=entrant['user']['id'],
             defaults={
                 'display_name': entrant['user']['name'],
                 'twitch_name': entrant['user'].get('twitch_name', None),
             }
         )
+        if not new:
+            user.twitch_name = entrant['user'].get('twitch_name', None)
+            await user.save()
         race_history = await models.AsyncTournamentRace.filter(
             tournament=async_tournament_live_race.tournament,
             user=user,

@@ -119,23 +119,12 @@ class AsyncTournamentView(discord.ui.View):
             )
             if race is None:
                 status = "Not yet played"
-                finish_time = "N/A"
-            elif race.status == "finished":
-                status = "Finished"
-                finish_time = race.elapsed_time_formatted
-            elif race.status == "forfeit":
-                status = "Forfeit"
-                finish_time = "N/A"
-            elif race.status == "disqualified":
-                status = "Disqualified"
-                finish_time = "N/A"
             else:
-                status = "In Progress"
-                finish_time = "N/A"
+                status = race.status_formatted
 
             embed.add_field(
                 name=f"Pool {pool.name}",
-                value=f"**Status:** {status}\n**Finish Time:** {finish_time}",
+                value=f"**Status:** {status}\n**Finish Time:** {race.elapsed_time_formatted}",
                 inline=False
             )
 
