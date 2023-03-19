@@ -9,6 +9,7 @@ from tortoise.models import Model
 
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 
+
 class AuditGeneratedGames(Model):
     class Meta:
         table = "audit_generated_games"
@@ -294,6 +295,7 @@ class Users(Model):
         if self.rtgg_id is None:
             return None
         return f'{RACETIME_URL}/user/{self.rtgg_id}/'
+
 
 class TournamentGames(Model):
     class Meta:
@@ -598,7 +600,7 @@ class AsyncTournamentRace(Model):
     end_time = fields.DatetimeField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
-    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit
+    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit, disqualified
     live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True)  # only set if run was raced live
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)

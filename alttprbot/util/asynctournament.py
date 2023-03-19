@@ -46,7 +46,7 @@ async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, on
     """
 
     # don't bother scoring reattempts, we also don't want them included in the average
-    query_filter = {"permalink": permalink, "status__in": ["finished", "forfeit"], "reattempted": False}
+    query_filter = {"permalink": permalink, "status__in": ["finished", "forfeit", "disqualified"], "reattempted": False}
 
     # only score approved runs, if requested, off by default
     if only_approved:
@@ -211,6 +211,13 @@ class LeaderboardEntry:
         Count of attempted, but forfeited, races.
         """
         return len([r for r in self.races if r is not None and r.status == "forfeit"])
+
+    @cached_property
+    def disqualified_race_count(self) -> int:
+        """
+        Count of disqualified races.
+        """
+        return len([r for r in self.races if r is not None and r.status == "disqualified"])
 
 
 async def get_leaderboard(tournament: models.AsyncTournament):

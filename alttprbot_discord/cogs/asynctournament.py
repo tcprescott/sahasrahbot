@@ -126,6 +126,9 @@ class AsyncTournamentView(discord.ui.View):
             elif race.status == "forfeit":
                 status = "Forfeit"
                 finish_time = "N/A"
+            elif race.status == "disqualified":
+                status = "Disqualified"
+                finish_time = "N/A"
             else:
                 status = "In Progress"
                 finish_time = "N/A"
@@ -432,7 +435,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
     @discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️", custom_id="sahasrahbot:async_get_timer")
     async def async_get_timer(self, interaction: discord.Interaction, button: discord.ui.Button):
         race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
-        if race.status in ["forfeit", "finished"]:
+        if race.status in ["forfeit", "finished", "disqualified"]:
             await interaction.response.send_message("Race is already finished.", ephemeral=True)
             return
 
@@ -868,8 +871,10 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 race.status = "finished"
             elif entrant['status']['value'] == 'dnf':
                 race.status = "forfeit"
+            elif entrant['status']['value'] == 'dq':
+                race.status = "disqualified"
             else:
-                warnings.append(f"{entrant['user']['name']} is not finished or forfeited.  This should not have happened.")
+                warnings.append(f"{entrant['user']['name']} is not finished, forfeited, or disqualified.  This should not have happened.")
 
             await race.save()
 
