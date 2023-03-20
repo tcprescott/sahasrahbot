@@ -50,10 +50,9 @@
         <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url }}">{{ race.runner_vod_url }}</a>{% endif %}
         </td>
         <td>{% if race.live_race %}
-            <a href="https://racetime.gg/{{ race.live_race.racetime_slug }}" target="_blank">racetime</a>
+            <a href="{{ race.live_race.racetime_url }}" target="_blank">racetime</a>
             {% else %}
-            <a href="https://discord.com/channels/{{ race.tournament.guild_id }}/{{ race.thread_id }}"
-                target="_blank">thread</a>
+            <a href="{{ race.thread_url }}" target="_blank">thread</a>
             {% endif %}
         </td>
         <td>{{ race.elapsed_time_formatted }}</td>

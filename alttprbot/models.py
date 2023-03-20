@@ -1,7 +1,8 @@
 import os
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Optional
+from functools import cached_property
 
 import discord.utils
 from tortoise import fields
@@ -609,8 +610,6 @@ class AsyncTournamentRace(Model):
     reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
-    score = fields.FloatField(null=True)  # this is computed by the tournament system
-    score_updated_at = fields.DatetimeField(null=True)
 
     @property
     def elapsed_time(self) -> Optional[timedelta]:
@@ -640,6 +639,15 @@ class AsyncTournamentRace(Model):
 
         return f"{self.score:.3f}"
 
+    @cached_property
+    def score(self) -> Optional[float]:
+        if self.status in ['pending', 'in_progress']:
+            return None
+        if self.status in ['forfeit', 'disqualified']:
+            return 0
+
+        return max(0, min(105, (2 - (self.elapsed_time.total_seconds() / self.permalink.par_time))*100))
+
     @property
     def status_formatted(self) -> str:
         if self.status == 'pending':
@@ -654,6 +662,24 @@ class AsyncTournamentRace(Model):
             return "Disqualified"
 
         return "Unknown"
+
+    @property
+    def review_status_formatted(self) -> str:
+        if self.review_status == 'pending':
+            return "Pending"
+        elif self.review_status == 'approved':
+            return "Approved"
+        elif self.review_status == 'rejected':
+            return "Rejected"
+
+        return "Unknown"
+
+    @property
+    def thread_url(self) -> Optional[str]:
+        if self.thread_id is None:
+            return None
+
+        return f"https://discord.com/channels/{self.tournament.guild_id}/{self.thread_id}"
 
     def is_closed(self):
         return self.status in ['finished', 'forfeit', 'disqualified']

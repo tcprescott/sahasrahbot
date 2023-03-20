@@ -175,7 +175,7 @@ async def async_tournament_queue(tournament_id: int):
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
-    races = await tournament.races.filter(reattempted=False, **request_filter).offset((page-1)*page_size).limit(page_size).prefetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
+    races = await tournament.races.filter(reattempted=False, **request_filter).offset((page-1)*page_size).limit(page_size).prefetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool', 'tournament')
 
     return await render_template(
         'asynctournament_race_list.html',

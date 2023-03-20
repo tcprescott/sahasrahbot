@@ -31,11 +31,18 @@ async def calculate_async_tournament(tournament: models.AsyncTournament, only_ap
 
     This function is thread-safe.
     """
+
+    clear_cache = False
+
     async with score_calculation_lock:
         await tournament.fetch_related("permalink_pools", "permalink_pools__permalinks")
         for pool in tournament.permalink_pools:
             for permalink in pool.permalinks:
-                await calculate_permalink_par(permalink, only_approved=only_approved)
+                updated = await calculate_permalink_par(permalink, only_approved=only_approved)
+                if updated:
+                    clear_cache = True
+
+    if clear_cache:
         await CACHE.delete(f'async_leaderboard_{tournament.id}')
 
 
@@ -72,14 +79,15 @@ async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, on
 
     par_time = average_timedelta([race.elapsed_time for race in top_finishes])
 
+    if float(par_time.total_seconds()) == permalink.par_time:
+        # par time hasn't changed, so we don't need to update anything
+        return False
+
     permalink.par_time = float(par_time.total_seconds())
     permalink.par_updated_at = discord.utils.utcnow()
     await permalink.save()
 
-    for race in races:
-        race.score = calculate_qualifier_score(par_time=par_time, elapsed_time=race.elapsed_time) if race.status == "finished" else 0
-        race.score_updated_at = discord.utils.utcnow()
-        await race.save()
+    return True
 
 
 async def get_eligible_permalink_from_pool(pool: models.AsyncTournamentPermalinkPool, user: models.Users):
@@ -249,7 +257,7 @@ async def get_leaderboard(tournament: models.AsyncTournament):
                 permalink__pool=pool,
                 status__in=["finished", "forfet"],
                 reattempted=False
-            )
+            ).prefetch_related("permalink")
             races.append(race)
 
         entry = LeaderboardEntry(
