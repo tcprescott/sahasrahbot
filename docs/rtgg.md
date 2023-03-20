@@ -114,11 +114,13 @@ Example `!variarace default regular`
 **This is currently broken and will not function.**  There's no ETA on a fix.
 
 ### !dash
-Generate a seed using the Super Metroid DASH Randomizer, found at https://dashrando.github.io/
+Generate a seed using the Super Metroid DASH Randomizer, found at https://dashrando.net
 
-Specify 'mm' or 'full' to run the latest DASH release or use one of the following modes directly: recall_mm, recall_full, std_mm, std_full
+DASH has two distinct modes, *Standard* & *Recall*, with each mode supporting either Major/Minor or Full item randomziation.
 
-Example `!dashrace <mode>`
+Available presets: `recall_mm`, `standard_mm`, `recall_full`, `standard_full`
+
+Example `!dashrace recall_mm`
 
 ### !multiworld
 Use this command in the RaceTime.gg race room.

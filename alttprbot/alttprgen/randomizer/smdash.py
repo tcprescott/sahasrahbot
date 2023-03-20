@@ -8,7 +8,7 @@ import shortuuid
 ###
 # 1) Make a new temp directory
 # 2) Set working dir to that temp dir
-# 3) Run the command: node /opt/dash-rando-app/dash.cli.js -r /home/tprescott/super_metroid.sfc -p "full"
+# 3) Run the command: node utils/dash.cli.js -r /home/tprescott/super_metroid.sfc -p "full"
 # 4) Find the first file with a .sfc extension in the directory
 # 5) Create a .bps file
 # 6) Copy the bps file to /var/www/sgldash/bps/
@@ -17,7 +17,7 @@ import shortuuid
 ###
 
 ###
-# https://dashrando.github.io/app/dash.cli.js
+# https://dashrando.net/app/dash.cli.js
 ###
 
 
@@ -26,8 +26,8 @@ def roll_smdash():
 
 
 async def create_smdash(mode="mm", encrypt=False):
-    if mode not in ['mm', 'full', 'recall_mm', 'recall_full', 'std_mm', 'std_full']:
-        raise Exception("Specified mode is not valid.  Modes: mm, full, recall_mm, recall_full, std_mm, std_full")
+    if mode not in ['recall_mm', 'recall_full', 'standard_mm', 'standard_full', 'mm', 'full']:
+        raise Exception("Specified preset is not valid.  Presets: recall_mm, recall_full, standard_mm, standard_full")
 
     with tempfile.TemporaryDirectory() as tmp:
         current_working_directory = os.getcwd()

@@ -15,7 +15,7 @@ from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 # 3. Major/Minor, Full Area, Boss Shuffle
 # 4. Coop: Full Item Shuffle, Vanilla Area, Boss Shuffle
 # 5. Chozo, Vanilla Area, Boss Shuffle
-# 6. DASH recall https: // dashrando.github.io/
+# 6. DASH recall https: // dashrando.net/
 # 7. Coop: Full Item Shuffle, Full Area Shuffle, Boss Shuffle
 
 WEEK = 2
