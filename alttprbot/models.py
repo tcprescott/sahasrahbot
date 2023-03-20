@@ -610,6 +610,8 @@ class AsyncTournamentRace(Model):
     reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
+    score = fields.FloatField(null=True)
+    score_updated_at = fields.DatetimeField(null=True)
 
     @property
     def elapsed_time(self) -> Optional[timedelta]:
@@ -638,15 +640,6 @@ class AsyncTournamentRace(Model):
             return "not calculated"
 
         return f"{self.score:.3f}"
-
-    @cached_property
-    def score(self) -> Optional[float]:
-        if self.status in ['pending', 'in_progress']:
-            return None
-        if self.status in ['forfeit', 'disqualified']:
-            return 0
-
-        return max(0, min(105, (2 - (self.elapsed_time.total_seconds() / self.permalink.par_time))*100))
 
     @property
     def status_formatted(self) -> str:

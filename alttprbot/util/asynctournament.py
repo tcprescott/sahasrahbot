@@ -22,7 +22,7 @@ CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 score_calculation_lock = asyncio.Lock()
 
 
-async def calculate_async_tournament(tournament: models.AsyncTournament, only_approved: bool = False):
+async def calculate_async_tournament(tournament: models.AsyncTournament, only_approved: bool = False, cache=True):
     """
     Iterates through each permalink for a tournament and calculates the par time for each one.
     This is intended to be run as a background task.
@@ -32,24 +32,22 @@ async def calculate_async_tournament(tournament: models.AsyncTournament, only_ap
     This function is thread-safe.
     """
 
-    clear_cache = False
-
     async with score_calculation_lock:
         await tournament.fetch_related("permalink_pools", "permalink_pools__permalinks")
         for pool in tournament.permalink_pools:
             for permalink in pool.permalinks:
-                updated = await calculate_permalink_par(permalink, only_approved=only_approved)
-                if updated:
-                    clear_cache = True
+                await calculate_permalink_par(permalink, only_approved=only_approved)
 
-    if clear_cache:
+    if cache:
         await CACHE.delete(f'async_leaderboard_{tournament.id}')
 
 
-async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, only_approved: bool = False):
+async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, only_approved: bool = False) -> bool:
     """
     Calculates the "par" time for a permalink by averaging the 5 fastest times.
     Write the par time to the Permalink record in the database, then write invidual scores
+
+    Returns if the par time has changed.
     """
 
     # don't bother scoring reattempts, we also don't want them included in the average
@@ -79,13 +77,14 @@ async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, on
 
     par_time = average_timedelta([race.elapsed_time for race in top_finishes])
 
-    if float(par_time.total_seconds()) == permalink.par_time:
-        # par time hasn't changed, so we don't need to update anything
-        return False
-
     permalink.par_time = float(par_time.total_seconds())
     permalink.par_updated_at = discord.utils.utcnow()
     await permalink.save()
+
+    for race in races:
+        race.score = calculate_qualifier_score(par_time=par_time, elapsed_time=race.elapsed_time) if race.status == "finished" else 0
+        race.score_updated_at = discord.utils.utcnow()
+        await race.save()
 
     return True
 
@@ -228,7 +227,7 @@ class LeaderboardEntry:
         return len([r for r in self.races if r is not None and r.status == "disqualified"])
 
 
-async def get_leaderboard(tournament: models.AsyncTournament):
+async def get_leaderboard(tournament: models.AsyncTournament, cache: bool = True):
     """
     Returns a leaderboard for the specified tournament.
     The leaderboard is a list of LeaderboardEntry objects, sorted by score.
@@ -236,37 +235,40 @@ async def get_leaderboard(tournament: models.AsyncTournament):
     This return of this coroutine is cached until scores are calculated.
     """
     key = f'async_leaderboard_{tournament.id}'
-    if await CACHE.exists(key):
+    if await CACHE.exists(key) and cache:
         leaderboard = await CACHE.get(key)
         return leaderboard
 
-    # get a list of all user IDs who have participated in the tournament
-    user_ids = await tournament.races.all().distinct().values("user_id")
-    user_id_list = [p['user_id'] for p in user_ids]
+    async with score_calculation_lock:
+        # get a list of all user IDs who have participated in the tournament
+        logging.info("Building leaderboard for tournament %s", tournament.id)
+        user_ids = await tournament.races.all().distinct().values("user_id")
+        user_id_list = [p['user_id'] for p in user_ids]
 
-    # get a list of all permalink pools for the tournament
-    await tournament.fetch_related("permalink_pools")
+        # get a list of all permalink pools for the tournament
+        await tournament.fetch_related("permalink_pools")
 
-    leaderboard: List[LeaderboardEntry] = []
-    for user_id in user_id_list:
-        races = []
-        for pool in tournament.permalink_pools:
-            race = await models.AsyncTournamentRace.get_or_none(
-                user_id=user_id,
-                tournament=tournament,
-                permalink__pool=pool,
-                status__in=["finished", "forfet"],
-                reattempted=False
-            ).prefetch_related("permalink")
-            races.append(race)
+        leaderboard: List[LeaderboardEntry] = []
+        for user_id in user_id_list:
+            races = []
+            for pool in tournament.permalink_pools:
+                race = await models.AsyncTournamentRace.get_or_none(
+                    user_id=user_id,
+                    tournament=tournament,
+                    permalink__pool=pool,
+                    status__in=["finished", "forfet"],
+                    reattempted=False
+                )
+                races.append(race)
 
-        entry = LeaderboardEntry(
-            player=await models.Users.get(id=user_id),
-            races=races
-        )
-        leaderboard.append(entry)
+            entry = LeaderboardEntry(
+                player=await models.Users.get(id=user_id),
+                races=races
+            )
+            leaderboard.append(entry)
 
-    leaderboard.sort(key=lambda e: e.score, reverse=True)
+        leaderboard.sort(key=lambda e: e.score, reverse=True)
 
+    logging.info("Leaderboard built for tournament %s", tournament.id)
     await CACHE.set(key, leaderboard)
     return leaderboard
