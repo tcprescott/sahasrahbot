@@ -511,12 +511,10 @@ class Generator(commands.Cog):
         race="Is this a race? (default no)"
     )
     @app_commands.choices(race=YES_NO_CHOICE, mode=[
-        app_commands.Choice(name="mm", value="mm"),
-        app_commands.Choice(name="full", value="full"),
         app_commands.Choice(name="recall_mm", value="recall_mm"),
         app_commands.Choice(name="recall_full", value="recall_full"),
-        app_commands.Choice(name="std_mm", value="std_mm"),
-        app_commands.Choice(name="std_full", value="std_full"),
+        app_commands.Choice(name="standard_mm", value="standard_mm"),
+        app_commands.Choice(name="standard_full", value="standard_full"),
     ])
     async def smdash(
         self,
@@ -525,7 +523,7 @@ class Generator(commands.Cog):
         race: str = "no",
     ):
         """
-        Generates a Super Metroid Dash Randomizer game on https://dashrando.github.io
+        Generates a Super Metroid Dash Randomizer game on https://dashrando.net
         """
         await interaction.response.defer()
         url = await smdash.create_smdash(mode=mode, encrypt=race == "yes")

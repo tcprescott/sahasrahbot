@@ -49,13 +49,13 @@ if (!fs.existsSync(vanillaPath)) {
 // Read the vanilla ROM and establish the base URL.
 //-----------------------------------------------------------------
 
-const baseUrl = "https://dashrando.github.io/";
+const baseUrl = "https://dashrando.net/";
 let userRom = fs.readFileSync(vanillaPath);
 let vanillaRom = null;
 const vanillaHash =
    "12b77c4bc9c1832cee8881244659065ee1d84c70c3d29e6eaf92e6798cc2ca72";
 const headeredHash =
-   "9a4441809ac9331cdbc6a50fba1a8fbfd08bc490bc8644587ee84a4d6f924fea"
+   "9a4441809ac9331cdbc6a50fba1a8fbfd08bc490bc8644587ee84a4d6f924fea";
 
 //-----------------------------------------------------------------
 // Verify the vanilla ROM checksum.
@@ -65,14 +65,16 @@ const verifyAndSetRom = (rom) => {
    hash.update(rom);
    const signature = hash.digest("hex");
    if (signature === vanillaHash) {
-      return rom
+      return rom;
    } else if (signature === headeredHash) {
-      console.warn('You have entered a headered ROM. The header will now be removed.')
-      const unheaderedContent = rom.slice(512)
-      return verifyAndSetRom(unheaderedContent)
+      console.warn(
+         "You have entered a headered ROM. The header will now be removed."
+      );
+      const unheaderedContent = rom.slice(512);
+      return verifyAndSetRom(unheaderedContent);
    }
-   throw Error('Invalid vanilla ROM')
-}
+   throw Error("Invalid vanilla ROM");
+};
 
 try {
    vanillaRom = verifyAndSetRom(userRom);

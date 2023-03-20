@@ -179,6 +179,11 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
             url = await smdash.create_smdash(mode=args[0])
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
         except Exception as e:
             await self.send_message(str(e))
             return
@@ -189,4 +194,4 @@ class GameHandler(SahasrahBotCoreHandler):
         self.seed_rolled = True
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <mode>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <preset>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
