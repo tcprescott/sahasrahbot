@@ -40,17 +40,20 @@ class Tournament(commands.GroupCog, name="tournament"):
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
     async def create_races(self):
-        logging.info("scanning SG schedule for tournament races to create")
-        for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
-            event_data: core.TournamentConfig = await tournament_class.get_config()
-            try:
-                episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
-            except Exception as e:
-                logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
-                continue
-            for episode in episodes:
-                logging.info(episode['id'])
-                await self.create_race_room(event_data, event_slug, episode)
+        try:
+            logging.info("scanning SG schedule for tournament races to create")
+            for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
+                event_data: core.TournamentConfig = await tournament_class.get_config()
+                try:
+                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
+                except Exception as e:
+                    logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
+                    continue
+                for episode in episodes:
+                    logging.info(episode['id'])
+                    await self.create_race_room(event_data, event_slug, episode)
+        except Exception:
+            logging.exception("An error occured while processing create_races.")
         logging.info('done')
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
