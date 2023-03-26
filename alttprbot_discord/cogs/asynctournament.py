@@ -20,6 +20,11 @@ from config import Config as c
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
 
+YES_NO_CHOICE = [
+    app_commands.Choice(name="Yes", value=True),
+    app_commands.Choice(name="No", value=False),
+]
+
 
 class AsyncTournamentView(discord.ui.View):
     def __init__(self):
@@ -814,13 +819,13 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
     # TODO: write autocomplete racetime_slug
     @app_commands.command(name="live_race_record", description="Used record the results of a live qualifier race.")
-    async def live_race_record(self, interaction: discord.Interaction, racetime_slug: str):
+    async def live_race_record(self, interaction: discord.Interaction, racetime_slug: str, force: bool = False):
         async_live_race = await models.AsyncTournamentLiveRace.get_or_none(racetime_slug=racetime_slug)
         if async_live_race is None:
             await interaction.response.send_message("That episode ID is not a async tournament live race.", ephemeral=True)
             return
 
-        if not async_live_race.status == "in_progress":
+        if not async_live_race.status == "in_progress" and not force:
             await interaction.response.send_message("This race is not currently in progress.", ephemeral=True)
             return
 
@@ -852,7 +857,6 @@ class AsyncTournament(commands.GroupCog, name="async"):
             race = await models.AsyncTournamentRace.get(
                 live_race=async_live_race,
                 user__rtgg_id=entrant_id,
-                status="in_progress"
             )
 
             if entrant['status']['value'] == 'done':
@@ -861,6 +865,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             elif entrant['status']['value'] == 'dnf':
                 race.status = "forfeit"
             elif entrant['status']['value'] == 'dq':
+                # record the time they were disqualified at for historical purposes
+                race.end_time = isodate.parse_datetime(entrant["finished_at"]).astimezone(pytz.utc)
                 race.status = "disqualified"
             else:
                 warnings.append(f"{entrant['user']['name']} is not finished, forfeited, or disqualified.  This should not have happened.")

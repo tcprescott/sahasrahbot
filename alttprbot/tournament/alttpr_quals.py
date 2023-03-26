@@ -86,13 +86,14 @@ class ALTTPRQualifierRace(TournamentRace):
         # lock the room
         await self.rtgg_handler.set_invitational()
         await self.rtgg_handler.edit(streaming_required=False)
-        await self.rtgg_handler.send_message("This room is now locked.  Please contact a Tournament Moderator if you need to be added to the room.")
+        await self.rtgg_handler.send_message("This room is now locked.  Late entries are not permitted.")
 
         preset = async_tournament_live_race.pool.preset
 
         self.seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
 
         await self.rtgg_handler.set_bot_raceinfo(f"{self.seed.url} - {self.seed_code}")
+        await self.rtgg_handler.send_message(f"Seed: {self.seed.url} - {self.seed_code}")
         await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - {self.seed.url} - {self.seed_code}")
 
         tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
@@ -116,10 +117,11 @@ class ALTTPRQualifierRace(TournamentRace):
             race_room_data=self.rtgg_handler.data
         )
 
-        # TODO: RT.gg max message length is 1000 characters, we need to split this up if we have more than 1000 characters
-        await self.rtgg_handler.send_message(f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
-        await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
         self.rtgg_handler.seed_rolled = True
+
+        # TODO: RT.gg max message length is 1000 characters, we need to split this up if we have more than 1000 characters
+        await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
+        await self.rtgg_handler.send_message(f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
 
     async def on_race_start(self):
         async_tournament_live_race = await models.AsyncTournamentLiveRace.get_or_none(
