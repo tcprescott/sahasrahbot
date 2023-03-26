@@ -871,8 +871,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             )
 
             if race is None:
-                logging.warning(f"Unable to find a live race for {entrant_name} ({entrant_id}).  This should not have happened.")
-                warnings.append(f"Unable to find a live race for {entrant_name} ({entrant_id}).  This should not have happened.")
+                # this runner wasn't eligible, so we're going to skip them
                 continue
 
             if entrant['status']['value'] == 'done':
