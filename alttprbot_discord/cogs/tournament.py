@@ -170,7 +170,7 @@ class Tournament(commands.GroupCog, name="tournament"):
             elif tournament_race.player_twitch_names:
                 location = f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
             else:
-                location = None
+                location = "TBD"
 
             try:
                 if scheduled_event:
