@@ -154,10 +154,12 @@ class Tournament(commands.GroupCog, name="tournament"):
                 logging.exception("Error while creating tournament race handler.")
                 continue
 
+            name = tournament_race.event_slug.upper()
             if tournament_race.friendly_name:
-                name = f"{tournament_race.event_slug.upper()} - {tournament_race.friendly_name} - {tournament_race.versus}"
-            else:
-                name = f"{tournament_race.event_slug.upper()} - {tournament_race.versus}"
+                name += f"- {tournament_race.friendly_name}"
+            if tournament_race.versus:
+                name += f" - {tournament_race.versus}"
+
             name = name[:100]
 
             description = f"Start Time: {discord.utils.format_dt(start_time, 'f')}"
@@ -165,8 +167,10 @@ class Tournament(commands.GroupCog, name="tournament"):
 
             if tournament_race.broadcast_channels:
                 location = f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
-            else:
+            elif tournament_race.player_twitch_names:
                 location = f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
+            else:
+                location = None
 
             try:
                 if scheduled_event:
