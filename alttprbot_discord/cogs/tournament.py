@@ -156,7 +156,7 @@ class Tournament(commands.GroupCog, name="tournament"):
 
             name = tournament_race.event_slug.upper()
             if tournament_race.friendly_name:
-                name += f"- {tournament_race.friendly_name}"
+                name += f" - {tournament_race.friendly_name}"
             if tournament_race.versus:
                 name += f" - {tournament_race.versus}"
 

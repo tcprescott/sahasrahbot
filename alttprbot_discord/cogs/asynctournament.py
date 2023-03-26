@@ -124,12 +124,14 @@ class AsyncTournamentView(discord.ui.View):
             )
             if race is None:
                 status = "Not yet played"
+                elapsed_time = "N/A"
             else:
                 status = race.status_formatted
+                elapsed_time = race.elapsed_time_formatted
 
             embed.add_field(
                 name=f"Pool {pool.name}",
-                value=f"**Status:** {status}\n**Finish Time:** {race.elapsed_time_formatted}",
+                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}",
                 inline=False
             )
 
