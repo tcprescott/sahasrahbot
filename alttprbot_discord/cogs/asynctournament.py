@@ -833,7 +833,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_live_race.fetch_related("tournament")
 
-        authorized = await async_live_race.tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin'])
+        authorized = await async_live_race.tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
             return
@@ -855,11 +855,25 @@ class AsyncTournament(commands.GroupCog, name="async"):
         warnings = []
         for entrant in data["entrants"]:
             entrant_id = entrant["user"]["id"]
+            entrant_name = entrant["user"]["name"]
+            logging.info(f"Processing entrant {entrant_name} ({entrant_id})...")
 
-            race = await models.AsyncTournamentRace.get(
+            user = await models.Users.get_or_none(rtgg_id=entrant_id)
+
+            if user is None:
+                logging.warning(f"Entrant {entrant_name} ({entrant_id}) is not in the user table.  This should not have happened.")
+                warnings.append(f"Entrant {entrant_name} ({entrant_id}) is not in the user table.  This should not have happened.")
+                continue
+
+            race = await models.AsyncTournamentRace.get_or_none(
                 live_race=async_live_race,
-                user__rtgg_id=entrant_id,
+                user=user,
             )
+
+            if race is None:
+                logging.warning(f"Unable to find a live race for {entrant_name} ({entrant_id}).  This should not have happened.")
+                warnings.append(f"Unable to find a live race for {entrant_name} ({entrant_id}).  This should not have happened.")
+                continue
 
             if entrant['status']['value'] == 'done':
                 race.end_time = isodate.parse_datetime(entrant["finished_at"]).astimezone(pytz.utc)
