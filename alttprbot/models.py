@@ -617,6 +617,9 @@ class AsyncTournamentRace(Model):
 
     @property
     def elapsed_time(self) -> Optional[timedelta]:
+        if self.start_time is None:
+            return None
+
         if self.status == 'finished':
             return self.end_time - self.start_time
         elif self.status == 'in_progress':
