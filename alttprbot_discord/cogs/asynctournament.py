@@ -272,7 +272,19 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         if permalink.notes:
             embed.add_field(name="Notes", value=permalink.notes, inline=False)
         embed.set_footer(text=f"Race ID: {async_tournament_race.id}")
-        await thread.send(embed=embed, view=AsyncTournamentRaceViewReady())
+        msg = """
+⚠️ Please read these reminders before clicking Ready! ⚠️
+
+1. You must record your run and upload it to an **unlisted YouTube video**, or stream it to YouTube as an **unlisted** stream.
+2. Do not make your video public until the qualifier stage has closed.
+3. If you have any technical issues with Discord or this bot, **do not forfeit**.  Please continue to finish your run and then contact an admin after the run has concluded for further assistance.  We can fix the data in the bot if needed.
+4. If you forfeit, even before you start your run, you will be required to use your reattempt to try again.  No exceptions.
+
+**__DO NOT USE TWITCH.TV__**
+
+Good luck and have fun!
+        """
+        await thread.send(content=msg, embed=embed, view=AsyncTournamentRaceViewReady())
         await interaction.response.edit_message(content=f"Successfully created {thread.mention}.  Please join that thread for more details.", view=None, embed=None)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
