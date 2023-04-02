@@ -718,7 +718,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_tournament_race.fetch_related("tournament")
 
-        user = await models.Users.get(discord_user_id=interaction.user.id)
+        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, async_tournament_race.tournament, ['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to extend the timeout for this tournament race.", ephemeral=True)
@@ -731,8 +731,6 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         async_tournament_race.thread_timeout_time = thread_timeout_time
         await async_tournament_race.save()
-
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
 
         await models.AsyncTournamentAuditLog.create(
             tournament_id=async_tournament_race.tournament_id,
@@ -835,6 +833,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_live_race.fetch_related("tournament")
 
+        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, async_live_race.tournament, ['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
@@ -860,16 +859,16 @@ class AsyncTournament(commands.GroupCog, name="async"):
             entrant_name = entrant["user"]["name"]
             logging.info(f"Processing entrant {entrant_name} ({entrant_id})...")
 
-            user = await models.Users.get_or_none(rtgg_id=entrant_id)
+            race_user = await models.Users.get_or_none(rtgg_id=entrant_id)
 
-            if user is None:
+            if race_user is None:
                 logging.warning(f"Entrant {entrant_name} ({entrant_id}) is not in the user table.  This should not have happened.")
                 warnings.append(f"Entrant {entrant_name} ({entrant_id}) is not in the user table.  This should not have happened.")
                 continue
 
             race = await models.AsyncTournamentRace.get_or_none(
                 live_race=async_live_race,
-                user=user,
+                user=race_user,
             )
 
             if race is None:
@@ -935,7 +934,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("This tournament is not active.", ephemeral=True)
             return
 
-        user = await models.Users.get(discord_id=interaction.user.id)
+        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, tournament, ['admin'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to perform a score recalculation.", ephemeral=True)
