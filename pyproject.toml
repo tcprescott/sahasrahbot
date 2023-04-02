@@ -39,6 +39,7 @@ isodate = "*"
 jishaku = "*"
 pyrankvote = "*"
 racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/1e74910b1520c4be31a84253dabeda264fe54841.zip"}
+markdown = "^3.4.3"
 
 
 [tool.poetry.group.dev.dependencies]

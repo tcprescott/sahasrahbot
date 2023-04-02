@@ -22,7 +22,7 @@
     <tr>
         <td>{{ race.id }}</td>
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
-        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url }}" target="_blank">{{ race.runner_vod_url }}</a>{% endif %}</td>
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}" target="_blank">{{ race.runner_vod_url|e }}</a>{% endif %}</td>
         <td>{% if race.live_race %}
             <a href="{{ race.live_race.racetime_url }}" target="_blank">racetime</a>
             {% else %}

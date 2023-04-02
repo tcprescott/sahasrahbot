@@ -517,7 +517,7 @@ class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
     runner_vod_url = discord.ui.TextInput(label="VOD Link", placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ", row=0)
     runner_notes = discord.ui.TextInput(
         label="Runner Notes",
-        placeholder="Any notes you want to leave for tournament admins regarding this run.",
+        placeholder="Please do not include HTML, though markdown is supported.",
         style=discord.TextStyle.long,
         required=False,
         row=1

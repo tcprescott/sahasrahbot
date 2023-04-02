@@ -24,7 +24,7 @@
         <td>{{ race.user.display_name }}</td>
         <td>{{ race.permalink.pool.name }}</td>
         <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
-        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url }}">{{ race.runner_vod_url }}</a>{% endif %}
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% endif %}
         </td>
         <td>{% if race.live_race %}
             <a href="{{ race.live_race.racetime_url }}" target="_blank">racetime</a>

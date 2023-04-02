@@ -216,8 +216,8 @@ async def async_tournament_review(tournament_id: int, race_id: int):
 
     await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
 
-    if race.user == user:
-        abort(403, "You are not authorized to review your own tournament run.")
+    # if race.user == user:
+    #     abort(403, "You are not authorized to review your own tournament run.")
 
     if race.reviewed_by is None:
         race.reviewed_by = user
@@ -404,7 +404,7 @@ def asynctournamentrace_to_dict(asynctournamentrace: models.AsyncTournamentRace)
             'status': asynctournamentrace.status,
             'live_race': asynctournamentrace.live_race,  # TODO: translate to dictionary
             'reattempted': asynctournamentrace.reattempted,
-            'runner_notes': asynctournamentrace.runner_notes,
+            'runner_notes': asynctournamentrace.runner_notes_html,
             'runner_vod_url': asynctournamentrace.runner_vod_url,
             'review_status': asynctournamentrace.review_status,
             'reviewed_by': users_to_dict(asynctournamentrace.reviewed_by),

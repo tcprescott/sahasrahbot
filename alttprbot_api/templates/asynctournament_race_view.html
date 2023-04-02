@@ -48,7 +48,7 @@
     </tr>
 </table>
 <h2>Runner Notes</h2>
-<p>{{race.runner_notes|e }}</p>
+<p>{{ race.runner_notes_html|safe }}</p>
 <h2>Review</h2>
 <form action="{{ url_for('async.async_tournament_review_submit', tournament_id=tournament.id, race_id=race.id )}}"
     method="post">

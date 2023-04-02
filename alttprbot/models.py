@@ -2,7 +2,8 @@ import os
 
 from datetime import timedelta
 from typing import Optional
-from functools import cached_property
+from bs4 import BeautifulSoup
+import markdown
 
 import discord.utils
 from tortoise import fields
@@ -685,6 +686,15 @@ class AsyncTournamentRace(Model):
     def is_closed(self):
         return self.status in ['finished', 'forfeit', 'disqualified']
 
+    @property
+    def runner_notes_html(self):
+        if self.runner_notes is None:
+            return None
+
+        soup = BeautifulSoup(self.runner_notes, 'html.parser')
+        text = soup.get_text()
+        text = text.replace("\n","<br/>")
+        return markdown.markdown(text)
 
 class AsyncTournamentAuditLog(Model):
     id = fields.IntField(pk=True)
