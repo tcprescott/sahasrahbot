@@ -8,6 +8,7 @@ from quart_discord import requires_authorization
 from alttprbot import models
 from alttprbot.util import asynctournament
 from alttprbot_api import auth
+from alttprbot_api.util import checks
 
 from ..api import discord
 
@@ -171,7 +172,7 @@ async def async_tournament_queue(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -199,7 +200,7 @@ async def async_tournament_review(tournament_id: int, race_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -233,7 +234,7 @@ async def async_tournament_review_submit(tournament_id: int, race_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -270,7 +271,7 @@ async def async_tournament_leaderboard(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -287,7 +288,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -304,7 +305,7 @@ async def async_tournament_pools(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -320,7 +321,7 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 

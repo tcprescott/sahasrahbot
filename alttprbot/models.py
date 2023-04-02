@@ -528,7 +528,8 @@ class AsyncTournamentWhitelist(Model):
 class AsyncTournamentPermissions(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permissions')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT")
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT", null=True)
+    discord_role_id = fields.BigIntField(null=True)
     role = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
