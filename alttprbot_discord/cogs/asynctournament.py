@@ -15,6 +15,7 @@ from slugify import slugify
 
 from alttprbot import models
 from alttprbot.util import asynctournament, triforce_text
+from alttprbot_api.util import checks
 from config import Config as c
 
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
@@ -717,7 +718,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_tournament_race.fetch_related("tournament")
 
-        authorized = await async_tournament_race.tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin', 'mod'])
+        user = await models.Users.get(discord_user_id=interaction.user.id)
+        authorized = await checks.is_async_tournament_user(user, async_tournament_race.tournament, ['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to extend the timeout for this tournament race.", ephemeral=True)
             return
@@ -833,7 +835,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_live_race.fetch_related("tournament")
 
-        authorized = await async_live_race.tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin', 'mod'])
+        authorized = await checks.is_async_tournament_user(user, async_live_race.tournament, ['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
             return
@@ -933,7 +935,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("This tournament is not active.", ephemeral=True)
             return
 
-        authorized = await tournament.permissions.filter(user__discord_user_id=interaction.user.id, role__in=['admin'])
+        user = await models.Users.get(discord_id=interaction.user.id)
+        authorized = await checks.is_async_tournament_user(user, tournament, ['admin'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to perform a score recalculation.", ephemeral=True)
             return
