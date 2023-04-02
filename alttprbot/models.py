@@ -610,7 +610,7 @@ class AsyncTournamentRace(Model):
     reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
-    score = fields.FloatField(null=True)
+    score = fields.FloatField(null=False, default=0)
     score_updated_at = fields.DatetimeField(null=True)
 
     @property
