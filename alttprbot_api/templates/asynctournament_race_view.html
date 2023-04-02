@@ -15,7 +15,7 @@
 <table>
     <tr>
         <th>Runner</th>
-        <td>{{ race.user.display_name }}</td>
+        <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
     </tr>
     <tr>
         <th>Status</th>
@@ -39,7 +39,7 @@
     </tr>
     <tr>
         <th>Permalink</th>
-        <td><a href="{{ race.permalink.url }}" target="_blank">{{ race.permalink.url }}</a></td>
+        <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
     </tr>
     <tr>
         <th>VoD</th>

@@ -19,7 +19,7 @@
     {% for entry in leaderboard %}
     <tr>
         <td>{{ loop.index }}</td>
-        <td>{{ entry.player.display_name }}</td>
+        <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=entry.player.id) }}" target="_blank">{{ entry.player.display_name }}</a></td>
         <td>{{ entry.score_formatted }}</td>
         {% for race in entry.races %}
         <td>{{ race.score_formatted }}</td>

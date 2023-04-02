@@ -674,6 +674,13 @@ class AsyncTournamentRace(Model):
 
         return f"https://discord.com/channels/{self.tournament.guild_id}/{self.thread_id}"
 
+    @property
+    def url(self) -> Optional[str]:
+        if self.live_race:
+            return self.live_race.racetime_url
+
+        return self.thread_url
+
     def is_closed(self):
         return self.status in ['finished', 'forfeit', 'disqualified']
 

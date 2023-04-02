@@ -279,18 +279,67 @@ async def async_tournament_leaderboard(tournament_id: int):
     return await render_template('asynctournament_leaderboard.html', logged_in=True, user=discord_user, tournament=tournament, leaderboard=leaderboard)
 
 
-def asynctournament_to_dict(asynctournament: models.AsyncTournament):
+@asynctournament_blueprint.route('/player/<int:tournament_id>/<int:user_id>', methods=['GET'])
+@requires_authorization
+async def async_tournament_player(tournament_id: int, user_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    player = await models.Users.get_or_none(id=user_id)
+    races = await models.AsyncTournamentRace.filter(tournament=tournament, user_id=user_id, reattempted=False).order_by('-created').prefetch_related('user', 'permalink', 'permalink__pool')
+
+    return await render_template('asynctournament_user.html', logged_in=True, user=discord_user, races=races, tournament=tournament, player=player)
+
+@asynctournament_blueprint.route('/pools/<int:tournament_id>', methods=['GET'])
+@requires_authorization
+async def async_tournament_pools(tournament_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    await tournament.fetch_related('permalink_pools', 'permalink_pools__permalinks')
+
+    return await render_template('asynctournament_pools.html', logged_in=True, user=discord_user, tournament=tournament)
+
+@asynctournament_blueprint.route('/permalink/<int:tournament_id>/<int:permalink_id>', methods=['GET'])
+@requires_authorization
+async def async_tournament_permalink(tournament_id: int, permalink_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    authorized = await tournament.permissions.filter(user=user, role__in=['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
+
+    permalink = await models.AsyncTournamentPermalink.get(id=permalink_id, pool__tournament=tournament).prefetch_related('races', 'races__live_race')
+
+    return await render_template('asynctournament_permalink_view.html', logged_in=True, user=discord_user, tournament=tournament, permalink=permalink)
+
+def asynctournament_to_dict(at: models.AsyncTournament):
     try:
         return {
-            'id': asynctournament.id,
-            'name': asynctournament.name,
-            'active': asynctournament.active,
-            'created': asynctournament.created,
-            'updated': asynctournament.updated,
-            'guild_id': asynctournament.guild_id,
-            'channel_id': asynctournament.channel_id,
-            'owner_id': asynctournament.owner_id,
-            'allowed_reattempts': asynctournament.allowed_reattempts,
+            'id': at.id,
+            'name': at.name,
+            'active': at.active,
+            'created': at.created,
+            'updated': at.updated,
+            'guild_id': at.guild_id,
+            'channel_id': at.channel_id,
+            'owner_id': at.owner_id,
+            'allowed_reattempts': at.allowed_reattempts,
         }
     except AttributeError:
         return None

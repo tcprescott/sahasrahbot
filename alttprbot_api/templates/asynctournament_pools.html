@@ -1,0 +1,20 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Pools for {{ tournament.name }} ({{ tournament.id }})</title>
+{%- endblock head %}
+
+{% block content -%}
+
+<h1>Pools for {{ tournament.name }} ({{ tournament.id }})</h1>
+
+{% for pool in tournament.permalink_pools %}
+<h2>{{ pool.name }}</h2>
+<ul>
+    {% for permalink in pool.permalinks %}
+    <li><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=permalink.id) }}">{{ permalink.url }}</a></li>
+    {% endfor %}
+</ul>
+{% endfor %}
+
+{%- endblock content %}

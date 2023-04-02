@@ -1,0 +1,41 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>History for {{ player.display_name }} - {{ tournament.name }} ({{ tournament.id }})</title>
+{%- endblock head %}
+
+{% block content -%}
+<h1>History for {{ player.display_name }} - {{ tournament.name }} ({{ tournament.id }})</h1>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Player Name</th>
+        <th>Pool</th>
+        <th>Permalink</th>
+        <th>VoD</th>
+        <th>Thread</th>
+        <th>Finish Time</th>
+        <th>Score</th>
+        <th>Run Status</th>
+    </tr>
+    {% for race in races %}
+    <tr>
+        <td>{{ race.id }}</td>
+        <td>{{ race.user.display_name }}</td>
+        <td>{{ race.permalink.pool.name }}</td>
+        <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url }}">{{ race.runner_vod_url }}</a>{% endif %}
+        </td>
+        <td>{% if race.live_race %}
+            <a href="{{ race.live_race.racetime_url }}" target="_blank">racetime</a>
+            {% else %}
+            <a href="{{ race.thread_url }}" target="_blank">thread</a>
+            {% endif %}
+        </td>
+        <td>{{ race.elapsed_time_formatted }}</td>
+        <td>{{ race.score_formatted }}</td>
+        <td>{{ race.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{%- endblock content %}
