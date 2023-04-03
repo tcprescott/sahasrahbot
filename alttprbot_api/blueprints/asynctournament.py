@@ -293,7 +293,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
         return abort(403, "You are not authorized to view this tournament.")
 
     player = await models.Users.get_or_none(id=user_id)
-    races = await models.AsyncTournamentRace.filter(tournament=tournament, user_id=user_id, reattempted=False).order_by('-created').prefetch_related('user', 'permalink', 'permalink__pool')
+    races = await models.AsyncTournamentRace.filter(tournament=tournament, user_id=user_id, reattempted=False).order_by('-created').prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
 
     return await render_template('asynctournament_user.html', logged_in=True, user=discord_user, races=races, tournament=tournament, player=player)
 
