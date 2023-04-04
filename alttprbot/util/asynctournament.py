@@ -15,7 +15,7 @@ from config import Config as c
 # these should probably be in the database
 QUALIFIER_MAX_SCORE = 105
 QUALIFIER_MIN_SCORE = 0
-MAX_POOL_IMBALANCE = 5
+MAX_POOL_IMBALANCE = 3
 
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
