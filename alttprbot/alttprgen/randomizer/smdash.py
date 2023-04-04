@@ -8,7 +8,7 @@ import shortuuid
 ###
 # 1) Make a new temp directory
 # 2) Set working dir to that temp dir
-# 3) Run the command: node utils/dash.cli.js -r /home/tprescott/super_metroid.sfc -p "full"
+# 3) Run the command: node utils/dash.headless.mjs -r /home/tprescott/super_metroid.sfc -p "recall_mm"
 # 4) Find the first file with a .sfc extension in the directory
 # 5) Create a .bps file
 # 6) Copy the bps file to /var/www/sgldash/bps/
@@ -17,7 +17,7 @@ import shortuuid
 ###
 
 ###
-# https://dashrando.net/app/dash.cli.js
+# https://dashrando.net/app/dash.headless.mjs
 ###
 
 
@@ -35,7 +35,7 @@ async def create_smdash(mode="mm", encrypt=False):
         try:
             proc = await asyncio.create_subprocess_exec(
                 '/usr/bin/node',
-                os.path.join(current_working_directory, 'utils', 'dash.cli.js'),
+                os.path.join(current_working_directory, 'utils', 'dash.headless.mjs'),
                 '-r', os.environ.get('SM_ROM'),
                 '-p', mode,
                 stdout=asyncio.subprocess.PIPE,
