@@ -981,6 +981,53 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await interaction.response.send_message("Are you sure you want to close this tournament?\n\nThis action cannot be undone.", view=AsyncTournamentViewConfirmCloseTournament(view=self, interaction=interaction), ephemeral=True)
 
+    @app_commands.command(name="update_run", description="Fixes a run that was recorded incorrectly.")
+    @app_commands.choices(
+        status=[
+            app_commands.Choice(name="finished", value="finished"),
+            app_commands.Choice(name="forfeit", value="forfeit"),
+            app_commands.Choice(name="disqualified", value="disqualified"),
+        ]
+    )
+    async def update_run(self, interaction: discord.Interaction, status: str=None, elapsed_time: str=None, vod_url: str=None):
+        race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related("tournament")
+        if race is None:
+            await interaction.response.send_message("There is no async run in this thread.", ephemeral=True)
+            return
+
+        if not race.tournament.owner_id == interaction.user.id:
+            await interaction.response.send_message("Only the owner of this tournament may update runs.", ephemeral=True)
+            return
+
+        msg = f"{interaction.user.name} administratively updated this run:\n\n"
+
+        if status:
+            race.status = status
+            msg += f"Status: {status}\n"
+
+        if elapsed_time:
+            time_obj = datetime.datetime.strptime(elapsed_time, "%H:%M:%S")
+            timedelta_obj = datetime.timedelta(
+                hours=time_obj.hour, 
+                minutes=time_obj.minute, 
+                seconds=time_obj.second
+            )
+            race.end_time = discord.utils.utcnow()
+            race.start_time = race.end_time - timedelta_obj
+            msg += f"Elapsed time: {elapsed_time}\n"
+
+        if vod_url:
+            race.runner_vod_url = vod_url
+            msg += f"VOD URL: {vod_url}\n"
+
+        if isinstance(race.runner_notes, str):
+            race.runner_notes += f"\n\n{msg}"
+        else:
+            race.runner_notes = msg
+
+        await race.save(update_fields=["status", "start_time", "end_time", "runner_vod_url", "runner_notes"])
+
+        await interaction.response.send_message(msg)
 
 def create_tournament_embed(async_tournament: models.AsyncTournament):
     embed = discord.Embed(title=async_tournament.name)
