@@ -598,7 +598,7 @@ class AsyncTournamentPermalink(Model):
     class PydanticMeta:
         # computed = ['par_time_formatted']
         backward_relations = False
-        excluded = ['created', 'updated']
+        exclude = ['created', 'updated']
 
 class AsyncTournamentPermalinkPool(Model):
     class Meta:
@@ -616,7 +616,7 @@ class AsyncTournamentPermalinkPool(Model):
 
     class PydanticMeta:
         max_recursion = 1
-        excluded = ['created', 'updated', 'tournament']
+        exclude = ['created', 'updated', 'tournament']
 
 class AsyncTournamentLiveRace(Model):
     id = fields.IntField(pk=True)
@@ -641,7 +641,7 @@ class AsyncTournamentLiveRace(Model):
     class PydanticMeta:
         # computed = ['racetime_url']
         backward_relations = False
-        excluded = ['created', 'updated', 'races']
+        exclude = ['created', 'updated', 'races']
 
 class AsyncTournamentRace(Model):
     id = fields.IntField(pk=True)

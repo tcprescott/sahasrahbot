@@ -78,18 +78,13 @@ async def races_api(tournament_id):
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools', methods=['GET'])
 @auth.authorized_key('asynctournament')
 async def pools_api(tournament_id):
-    qs = models.AsyncTournamentPermalinkPool.filter(tournament_id=tournament_id)
+    filter_args = {}
+    if request.args.get('id'):
+        filter_args['id'] = request.args.get('id')
+
+    qs = models.AsyncTournamentPermalinkPool.filter(tournament_id=tournament_id, **filter_args)
     AsyncTournamentPermalinkPool_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentPermalinkPool)
     res = await AsyncTournamentPermalinkPool_Pydantic_List.from_queryset(qs)
-    return Response(res.json(), mimetype='application/json')
-
-
-@asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools/<int:pool_id>', methods=['GET'])
-@auth.authorized_key('asynctournament')
-async def pool_api(tournament_id, pool_id):
-    result = await models.AsyncTournamentPermalinkPool.get_or_none(tournament_id=tournament_id, id=pool_id)
-    AsyncTournamentPermalinkPool_Pydantic = pydantic_model_creator(models.AsyncTournamentPermalinkPool)
-    res = await AsyncTournamentPermalinkPool_Pydantic.from_tortoise_orm(result)
     return Response(res.json(), mimetype='application/json')
 
 
