@@ -221,7 +221,7 @@ async def async_tournament_review(tournament_id: int, race_id: int):
 
     if race.reviewed_by is None:
         race.reviewed_by = user
-        await race.save(update_fields=['reviewed_by'])
+        await race.save()
 
     return await render_template('asynctournament_race_view.html', logged_in=True, user=discord_user, tournament=tournament, race=race, already_claimed=race.reviewed_by != user)
 
