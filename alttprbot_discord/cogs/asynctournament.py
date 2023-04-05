@@ -279,6 +279,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
 2. Do not make your video public until the qualifier stage has closed.
 3. If you have any technical issues with Discord or this bot, **do not forfeit**.  Please continue to finish your run and then contact an admin after the run has concluded for further assistance.  We can fix the data in the bot if needed.
 4. If you forfeit, even before you start your run, you will be required to use your reattempt to try again.  No exceptions.
+5. Check if you are locally recording using **.mkv or .flv** file formats.  Do not use .mp4, as it can result in **corrupted video files** if OBS crashes.
 
 **__DO NOT USE TWITCH.TV__**
 
