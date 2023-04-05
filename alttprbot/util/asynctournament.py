@@ -227,6 +227,7 @@ class LeaderboardEntry:
         return len([r for r in self.races if r is not None and r.status == "disqualified"])
 
 
+# TODO: this is an inefficient way to calculate the leaderboard, but it's the only way I can think of right now
 async def get_leaderboard(tournament: models.AsyncTournament, cache: bool = True):
     """
     Returns a leaderboard for the specified tournament.

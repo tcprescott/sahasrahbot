@@ -1,8 +1,9 @@
 import datetime
 
-import tortoise.exceptions
+from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
+
 from quart import (Blueprint, abort, jsonify, redirect,
-                   render_template, request, url_for)
+                   render_template, request, url_for, Response)
 from quart_discord import requires_authorization
 
 from alttprbot import models
@@ -22,8 +23,10 @@ async def tournaments_api():
     if request.args.get('active'):
         filter_args['active'] = request.args.get('active') == 'true'
 
-    result = await models.AsyncTournament.filter(**filter_args)
-    return jsonify([asynctournament_to_dict(t) for t in result])
+    qs = models.AsyncTournament.filter(**filter_args)
+    AsyncTournament_Pydantic_List = pydantic_queryset_creator(models.AsyncTournament)
+    res = await AsyncTournament_Pydantic_List.from_queryset(qs)
+    return Response(res.json(), mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>', methods=['GET'])
@@ -33,7 +36,9 @@ async def tournament_api(tournament_id):
     if result is None:
         return jsonify({'error': 'Tournament not found.'})
 
-    return jsonify(asynctournament_to_dict(result))
+    AsyncTournament_Pydantic = pydantic_model_creator(models.AsyncTournament)
+    res = await AsyncTournament_Pydantic.from_tortoise_orm(result)
+    return Response(res.json(), mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/races', methods=['GET'])
@@ -42,43 +47,50 @@ async def races_api(tournament_id):
     filter_args = {}
     if request.args.get('id'):
         filter_args['id'] = request.args.get('id')
-    if request.args.get('discord_user_id'):
-        filter_args['discord_user_id'] = request.args.get('discord_user_id')
+    if request.args.get('user_id'):
+        filter_args['user_id'] = request.args.get('user_id')
     if request.args.get('permalink_id'):
         filter_args['permalink_id'] = request.args.get('permalink_id')
     if request.args.get('pool_id'):
         filter_args['permalink__pool_id'] = request.args.get('pool_id')
-    if request.args.get('pool_name'):
-        filter_args['permalink__pool__name'] = request.args.get('pool_name')
     if request.args.get('status'):
         filter_args['status'] = request.args.get('status')
 
-    result = await models.AsyncTournamentRace.filter(tournament_id=tournament_id, **filter_args).prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
-    if result is None:
-        return jsonify({'error': 'Tournament not found.'})
+    if request.args.get('page'):
+        page = int(request.args.get('page'))
+    else:
+        page = 1
 
-    # figure out how to also return the permalink and tournament data
-    return jsonify([asynctournamentrace_to_dict(r) for r in result])
+    if request.args.get('page_size'):
+        page_size = int(request.args.get('page_size'))
+        if page_size > 100:
+            return abort(400, 'page_size cannot be greater than 100.')
+    else:
+        page_size = 20
+
+    qs = models.AsyncTournamentRace.filter(tournament_id=tournament_id, **filter_args).offset((page-1)*page_size).limit(page_size)
+    AsyncTournamentRace_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentRace)
+
+    res = await AsyncTournamentRace_Pydantic_List.from_queryset(qs)
+    return Response(res.json(), mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools', methods=['GET'])
 @auth.authorized_key('asynctournament')
 async def pools_api(tournament_id):
-    result = await models.AsyncTournamentPermalinkPool.filter(tournament_id=tournament_id).prefetch_related('tournament')
-    if result is None:
-        return jsonify({'error': 'No pools found.'})
-
-    return jsonify([asynctournamentpermalinkpool_to_dict(r) for r in result])
+    qs = models.AsyncTournamentPermalinkPool.filter(tournament_id=tournament_id)
+    AsyncTournamentPermalinkPool_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentPermalinkPool)
+    res = await AsyncTournamentPermalinkPool_Pydantic_List.from_queryset(qs)
+    return Response(res.json(), mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools/<int:pool_id>', methods=['GET'])
 @auth.authorized_key('asynctournament')
 async def pool_api(tournament_id, pool_id):
     result = await models.AsyncTournamentPermalinkPool.get_or_none(tournament_id=tournament_id, id=pool_id)
-    if result is None:
-        return jsonify({'error': 'Pool not found.'})
-
-    return jsonify(asynctournamentpermalinkpool_to_dict(result))
+    AsyncTournamentPermalinkPool_Pydantic = pydantic_model_creator(models.AsyncTournamentPermalinkPool)
+    res = await AsyncTournamentPermalinkPool_Pydantic.from_tortoise_orm(result)
+    return Response(res.json(), mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/permalinks', methods=['GET'])
@@ -87,36 +99,13 @@ async def permalinks_api(tournament_id):
     filter_args = {}
     if request.args.get('id'):
         filter_args['id'] = request.args.get('id')
-    if request.args.get('permalink'):
-        filter_args['permalink'] = request.args.get('permalink')
     if request.args.get('pool_id'):
         filter_args['pool_id'] = request.args.get('pool_id')
 
-    result = await models.AsyncTournamentPermalink.filter(pool__tournament_id=tournament_id, **filter_args).prefetch_related('pool')
-    if result is None:
-        return jsonify({'error': 'No permalinks found.'})
-
-    return jsonify([asynctournamentpermalink_to_dict(r) for r in result])
-
-
-@asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/permalinks/<int:permalink_id>', methods=['GET'])
-@auth.authorized_key('asynctournament')
-async def permalink_api(tournament_id, permalink_id):
-    result = await models.AsyncTournamentPermalink.get_or_none(pool__tournament_id=tournament_id, id=permalink_id)
-    if result is None:
-        return jsonify({'error': 'Permalink not found.'})
-
-    return jsonify(asynctournamentpermalink_to_dict(result))
-
-
-@asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/whitelist', methods=['GET'])
-@auth.authorized_key('asynctournament')
-async def whitelist_api(tournament_id):
-    result = await models.AsyncTournamentWhitelist.filter(tournament_id=tournament_id).prefetch_related('tournament')
-    if result is None:
-        return jsonify({'error': 'Tournament not found.'})
-
-    return jsonify([asynctournamentwhitelist_to_dict(r) for r in result])
+    qs = models.AsyncTournamentPermalink.filter(pool__tournament_id=tournament_id, **filter_args)
+    AsyncTournamentPermalink_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentPermalink)
+    res = await AsyncTournamentPermalink_Pydantic_List.from_queryset(qs)
+    return Response(res.json(), mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/leaderboard', methods=['GET'])
@@ -130,10 +119,26 @@ async def leaderboard_api(tournament_id):
 
     return jsonify([
         {
-            'player': users_to_dict(e.player),
+            'player': {
+                'id': e.player.id,
+                'display_name': e.player.display_name,
+                'discord_user_id': e.player.discord_user_id,
+                'twitch_name': e.player.twitch_name,
+                'rtgg_id': e.player.rtgg_id,
+            },
             'score': e.score,
             'rank': idx + 1,
-            'races': [asynctournamentrace_to_dict(race) for race in e.races]
+            'races': [
+                {
+                    'id': race.id,
+                    'start_time': race.start_time,
+                    'end_time': race.end_time,
+                    'score': race.score,
+                    'permalink_id': race.permalink_id,
+                    'elapsed_time': race.elapsed_time_formatted,
+                } if race else None
+                for race in e.races
+            ]
         }
         for idx, e in enumerate(leaderboard)
     ])
@@ -221,7 +226,7 @@ async def async_tournament_review(tournament_id: int, race_id: int):
 
     if race.reviewed_by is None:
         race.reviewed_by = user
-        await race.save()
+        await race.save(update_fields=['reviewed_by'])
 
     return await render_template('asynctournament_race_view.html', logged_in=True, user=discord_user, tournament=tournament, race=race, already_claimed=race.reviewed_by != user)
 
@@ -258,7 +263,7 @@ async def async_tournament_review_submit(tournament_id: int, race_id: int):
     race.reviewed_at = datetime.datetime.now()
     race.reviewed_by = user
 
-    await race.save()
+    await race.save(update_fields=['review_status', 'reviewer_notes', 'reviewed_at', 'reviewed_by'])
 
     return redirect(url_for("async.async_tournament_queue", tournament_id=tournament_id))
 
@@ -329,104 +334,3 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
 
     return await render_template('asynctournament_permalink_view.html', logged_in=True, user=discord_user, tournament=tournament, permalink=permalink)
 
-def asynctournament_to_dict(at: models.AsyncTournament):
-    try:
-        return {
-            'id': at.id,
-            'name': at.name,
-            'active': at.active,
-            'created': at.created,
-            'updated': at.updated,
-            'guild_id': at.guild_id,
-            'channel_id': at.channel_id,
-            'owner_id': at.owner_id,
-            'allowed_reattempts': at.allowed_reattempts,
-        }
-    except AttributeError:
-        return None
-    except tortoise.exceptions.NoValuesFetched:
-        return None
-
-
-def asynctournamentwhitelist_to_dict(asynctournamentwhitelist: models.AsyncTournamentWhitelist):
-    try:
-        return {
-            'id': asynctournamentwhitelist.id,
-            'tournament': asynctournament_to_dict(asynctournamentwhitelist.tournament),
-            'user': users_to_dict(asynctournamentwhitelist.user),
-        }
-    except AttributeError:
-        return None
-    except tortoise.exceptions.NoValuesFetched:
-        return None
-
-
-def asynctournamentpermalink_to_dict(asynctournamentpermalink: models.AsyncTournamentPermalink):
-    try:
-        return {
-            'id': asynctournamentpermalink.id,
-            'permalink': asynctournamentpermalink.url,
-            'pool': asynctournamentpermalinkpool_to_dict(asynctournamentpermalink.pool),
-            'live_race': asynctournamentpermalink.live_race
-        }
-    except AttributeError:
-        return None
-    except tortoise.exceptions.NoValuesFetched:
-        return None
-
-
-def asynctournamentpermalinkpool_to_dict(asynctournamentpermalinkpool: models.AsyncTournamentPermalinkPool):
-    try:
-        return {
-            'id': asynctournamentpermalinkpool.id,
-            'tournament': asynctournament_to_dict(asynctournamentpermalinkpool.tournament),
-            'name': asynctournamentpermalinkpool.name,
-        }
-    except AttributeError:
-        return None
-    except tortoise.exceptions.NoValuesFetched:
-        return None
-
-
-def asynctournamentrace_to_dict(asynctournamentrace: models.AsyncTournamentRace):
-    try:
-        return {
-            'id': asynctournamentrace.id,
-            'tournament': asynctournament_to_dict(asynctournamentrace.tournament),
-            'permalink': asynctournamentpermalink_to_dict(asynctournamentrace.permalink),
-            'user': users_to_dict(asynctournamentrace.user),
-            'thread_id': asynctournamentrace.thread_id,
-            'thread_open_time': asynctournamentrace.thread_open_time,
-            'thread_timeout_time': asynctournamentrace.thread_timeout_time,
-            'start_time': asynctournamentrace.start_time,
-            'end_time': asynctournamentrace.end_time,
-            'elapsed_time': asynctournamentrace.elapsed_time,  # calculated
-            'status': asynctournamentrace.status,
-            'live_race': asynctournamentrace.live_race,  # TODO: translate to dictionary
-            'reattempted': asynctournamentrace.reattempted,
-            'runner_notes': asynctournamentrace.runner_notes_html,
-            'runner_vod_url': asynctournamentrace.runner_vod_url,
-            'review_status': asynctournamentrace.review_status,
-            'reviewed_by': users_to_dict(asynctournamentrace.reviewed_by),
-            'reviewed_at': asynctournamentrace.reviewed_at,
-            'reviewer_notes': asynctournamentrace.reviewer_notes,
-            'score': asynctournamentrace.score,
-        }
-    except AttributeError:
-        return None
-    except tortoise.exceptions.NoValuesFetched:
-        return None
-
-
-def users_to_dict(user: models.Users):
-    try:
-        return {
-            'id': user.id,
-            'discord_user_id': user.discord_user_id,
-            'display_name': user.display_name,
-            'rtgg_id': user.rtgg_id,
-        }
-    except AttributeError:
-        return None
-    except tortoise.exceptions.NoValuesFetched:
-        return None
