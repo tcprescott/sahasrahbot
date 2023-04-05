@@ -581,6 +581,7 @@ class AsyncTournamentPermalink(Model):
     par_updated_at = fields.DatetimeField(null=True)
 
     races: fields.ReverseRelation["AsyncTournamentRace"]
+    live_races: fields.ReverseRelation["AsyncTournamentLiveRace"]
 
     @property
     def par_time_timedelta(self):
