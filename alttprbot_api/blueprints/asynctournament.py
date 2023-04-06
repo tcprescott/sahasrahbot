@@ -258,7 +258,7 @@ async def async_tournament_review_submit(tournament_id: int, race_id: int):
     race.reviewed_at = datetime.datetime.now()
     race.reviewed_by = user
 
-    await race.save(update_fields=['review_status', 'reviewer_notes', 'reviewed_at', 'reviewed_by'])
+    await race.save()
 
     return redirect(url_for("async.async_tournament_queue", tournament_id=tournament_id))
 
