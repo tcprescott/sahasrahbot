@@ -178,6 +178,17 @@ class ALTTPRQualifierRace(TournamentRace):
         msg += f" - {self.episodeid}"
         return msg
 
+    @classmethod
+    async def construct_race_room(cls, episodeid):
+        # test if there's a live race configured for this episode
+        live_race = await models.AsyncTournamentLiveRace.get_or_none(episode_id=episodeid)
+        if live_race is None:
+            # silently skip the creation of the race room
+            return None
+
+        # run the original construct_race_room() classmethod
+        await super(ALTTPRQualifierRace, cls).construct_race_room(episodeid)
+
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
             goal=self.data.racetime_goal,
