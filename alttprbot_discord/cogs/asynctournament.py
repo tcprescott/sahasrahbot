@@ -862,9 +862,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
                 data = await resp.json()
 
-        if not data["status"]["value"] == "finished":
-            await interaction.followup.send(f"{RACETIME_URL}/{async_live_race.racetime_slug} is not finished.", ephemeral=True)
-            return
+        # if not data["status"]["value"] == "finished":
+        #     await interaction.followup.send(f"{RACETIME_URL}/{async_live_race.racetime_slug} is not finished.", ephemeral=True)
+        #     return
 
         warnings = []
         for entrant in data["entrants"]:
@@ -898,7 +898,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 race.end_time = isodate.parse_datetime(entrant["finished_at"]).astimezone(pytz.utc)
                 race.status = "disqualified"
             else:
-                warnings.append(f"{entrant['user']['name']} is not finished, forfeited, or disqualified.  This should not have happened.")
+                warnings.append(f"{entrant['user']['name']} is not finished, forfeited, or disqualified.  THis runner is likely still in progress, and this race will need to be recorded again.")
 
             await race.save()
 
@@ -908,10 +908,10 @@ class AsyncTournament(commands.GroupCog, name="async"):
         ).count()
 
         if races_still_in_progress:
-            warnings.append(f"**There are still {races_still_in_progress} still in progress for this live race**, even after recording.  This should not have happened.")
-
-        async_live_race.status = "finished"
-        await async_live_race.save()
+            warnings.append(f"**There are still {races_still_in_progress} still in progress for this live race**, even after recording.  You'll need to record this race again when they finish.")
+        else:
+            async_live_race.status = "finished"
+            await async_live_race.save(update_fields=["status"])
 
         if warnings:
             await interaction.followup.send("There were some warnings when recording this race.  Please report this to Synack so he can investigate further:\n" + "\n".join(warnings), ephemeral=True)
