@@ -644,6 +644,13 @@ class AsyncTournamentLiveRace(Model):
         backward_relations = False
         exclude = ['created', 'updated', 'races']
 
+class AsyncTournamentReviewNotes(Model):
+    id = fields.IntField(pk=True)
+    race = fields.ForeignKeyField('models.AsyncTournamentRace', related_name='review_notes')
+    author = fields.ForeignKeyField('models.Users', related_name='async_tournament_review_notes', on_delete="RESTRICT")
+    created = fields.DatetimeField(auto_now_add=True)
+    note = fields.TextField(null=False)
+
 class AsyncTournamentRace(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
@@ -667,6 +674,8 @@ class AsyncTournamentRace(Model):
     reviewer_notes = fields.TextField(null=True)
     score = fields.FloatField(default=0)
     score_updated_at = fields.DatetimeField(null=True)
+
+    review_notes: fields.ReverseRelation["AsyncTournamentReviewNotes"]
 
     @property
     def elapsed_time(self) -> Optional[timedelta]:
