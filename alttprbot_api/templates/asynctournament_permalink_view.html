@@ -18,7 +18,7 @@
         <th>Score</th>
         <th>Run Status</th>
     </tr>
-    {% for race in permalink.races|sort(attribute='score', reverse=True) %}
+    {% for race in races %}
     <tr>
         <td>{{ race.id }}</td>
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
