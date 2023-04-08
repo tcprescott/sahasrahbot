@@ -672,7 +672,7 @@ class AsyncTournamentRace(Model):
     reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
-    score = fields.FloatField(default=0)
+    score = fields.FloatField(null=True)
     score_updated_at = fields.DatetimeField(null=True)
 
     review_notes: fields.ReverseRelation["AsyncTournamentReviewNotes"]

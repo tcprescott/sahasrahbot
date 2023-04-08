@@ -15,6 +15,9 @@
         {% for pool in tournament.permalink_pools %}
         <th>{{ pool.name }}</th>
         {% endfor %}
+        <!-- <th>Finished</th>
+        <th>Forfeited</th>
+        <th>Unplayed</th> -->
     </tr>
     {% for entry in leaderboard %}
     <tr>
@@ -24,6 +27,9 @@
         {% for race in entry.races %}
         <td>{{ race.score_formatted }}</td>
         {% endfor %}
+        <!-- <td>{{ entry.finished_race_count }}</td>
+        <td>{{ entry.forfeited_race_count }}</td>
+        <td>{{ entry.unattempted_race_count }}</td> -->
     </tr>
     {% endfor %}
 </table>

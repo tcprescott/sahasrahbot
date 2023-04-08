@@ -8,6 +8,7 @@ import aiocache
 from functools import cached_property
 import discord
 from tortoise.functions import Count
+from tortoise.exceptions import MultipleObjectsReturned
 
 from alttprbot import models
 from config import Config as c
@@ -193,7 +194,7 @@ class LeaderboardEntry:
         Average score of all races.
         """
         scores = [
-            r.score if r is not None else 0
+            r.score if r is not None and r.score is not None else 0
             for r in self.races
         ]
         return sum(scores) / len(scores)
@@ -204,6 +205,13 @@ class LeaderboardEntry:
         Formatted score suitable for web display.
         """
         return f"{self.score:.3f}"
+
+    @cached_property
+    def finished_race_count(self) -> int:
+        """
+        Count of finished races.
+        """
+        return len([r for r in self.races if r is not None and r.status == "finished"])
 
     @cached_property
     def unattempted_race_count(self) -> int:
@@ -217,14 +225,7 @@ class LeaderboardEntry:
         """
         Count of attempted, but forfeited, races.
         """
-        return len([r for r in self.races if r is not None and r.status == "forfeit"])
-
-    @cached_property
-    def disqualified_race_count(self) -> int:
-        """
-        Count of disqualified races.
-        """
-        return len([r for r in self.races if r is not None and r.status == "disqualified"])
+        return len([r for r in self.races if r is not None and r.status in ["forfeit", "disqualified"]])
 
 
 # TODO: this is an inefficient way to calculate the leaderboard, but it's the only way I can think of right now
@@ -253,13 +254,16 @@ async def get_leaderboard(tournament: models.AsyncTournament, cache: bool = True
         for user_id in user_id_list:
             races = []
             for pool in tournament.permalink_pools:
-                race = await models.AsyncTournamentRace.get_or_none(
-                    user_id=user_id,
-                    tournament=tournament,
-                    permalink__pool=pool,
-                    status__in=["finished", "forfet"],
-                    reattempted=False
-                )
+                try:
+                    race = await models.AsyncTournamentRace.get_or_none(
+                        user_id=user_id,
+                        tournament=tournament,
+                        permalink__pool=pool,
+                        status__in=["finished", "forfeit", "disqualified"],
+                        reattempted=False
+                    )
+                except MultipleObjectsReturned as e:
+                    raise MultipleObjectsReturned(f"Recieved multiple results for user id {user_id} in tournament id {tournament.id} permalink pool id {pool.id}") from e
                 races.append(race)
 
             entry = LeaderboardEntry(
