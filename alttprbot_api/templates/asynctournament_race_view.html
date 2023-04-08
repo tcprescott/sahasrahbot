@@ -42,6 +42,22 @@
         <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
     </tr>
     <tr>
+        <th>
+            {% if race.live_race %}
+                Racetime URL
+                {% else %}
+                Thread URL
+                {% endif %}
+        </th>
+        <td>
+            {% if race.live_race %}
+                <a href="{{ race.live_race.racetime_url }}" target="_blank">{{ race.live_race.racetime_url }}</a>
+                {% else %}
+                <a href="{{ race.thread_url }}" target="_blank">{{ race.thread_url }}</a>
+                {% endif %}
+        </td>
+    </tr>
+    <tr>
         <th>VoD</th>
         <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% else
             %}NO VOD SUBMITTED{% endif %}</td>

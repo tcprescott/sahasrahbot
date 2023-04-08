@@ -214,7 +214,7 @@ async def async_tournament_review(tournament_id: int, race_id: int):
     if race.reattempted:
         abort(403, "This race was marked as reattempted and cannot be reviewed.")
 
-    await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool')
+    await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool', 'tournament', 'live_race')
 
     # if race.user == user:
     #     abort(403, "You are not authorized to review your own tournament run.")
