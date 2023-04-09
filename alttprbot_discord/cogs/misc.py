@@ -36,13 +36,14 @@ WELCOME_MESSAGES = {
         'Diesen findest du unter folgender Einladung https://discordapp.com/invite/5zuANcS . Dort gibt es alles - von Einsteigertipps bis zu Turnieren\n\n'
         'Vielen Dank und nochmals herzlich willkommen.'
     ),
-    "portuguese": """
+    "portuguese":
+"""
 Olá e muito bem vindo ao servidor internacional de ALTTPR Randomizer!
 
 Este servidor é usado, principalmente, em língua inglesa e poucos membros da comunidade falam outras línguas, incluindo o Português. Caso você não se sinta confortável em se comunicar em inglês e esteja procurando informações, recursos ou a comunidade em língua Portuguesa, você pode acessar os servidores da Zelda Randomizer Brasil ou da Randomizer Brasil! Nesses dois servidores você será muito bem recebido pela comunidade brasileira e eles possuem diversos recursos, tutoriais e traduzem as principais notícias e atualizações do cenário competitivo do jogo, além de terem seus próprios torneios internos! 
 
 Zelda Randomizer Brasil: https://discord.gg/HBvVB3xAVe
-Randomizer Brasil: https://discord.gg/U4U62Gysku    
+Randomizer Brasil: https://discord.gg/U4U62Gysku
 """
 }
 

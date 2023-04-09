@@ -330,7 +330,6 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
         if not authorized:
             return abort(403, "You are not authorized to view this tournament.")
 
-    
     races = await permalink.races.filter(status__in=['finished', 'forfeit'], reattempted=False).order_by('-score').prefetch_related('live_race')
 
     return await render_template('asynctournament_permalink_view.html', logged_in=True, user=discord_user, tournament=tournament, permalink=permalink, races=races)
