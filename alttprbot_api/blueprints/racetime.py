@@ -140,7 +140,7 @@ async def merge_users(user_to_keep: models.Users, victim: models.Users):
     await models.AsyncTournamentPermissions.filter(user=victim).update(user=user_to_keep)
     await models.AsyncTournamentRace.filter(user=victim).update(user=user_to_keep)
     await models.AsyncTournamentRace.filter(reviewed_by=victim).update(reviewed_by=user_to_keep)
-    await models.AsyncTournamentReviewNotes.filter(user=victim).update(author=user_to_keep)
+    await models.AsyncTournamentReviewNotes.filter(author=victim).update(author=user_to_keep)
 
     await victim.delete()
     await user_to_keep.save()
