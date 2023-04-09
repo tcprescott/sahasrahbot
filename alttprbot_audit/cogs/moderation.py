@@ -15,7 +15,7 @@ import discord
 from discord.ext import commands
 
 from alttprbot.util import http
-from alttprbot import models
+# from alttprbot import models
 
 urlextractor = URLExtract()
 

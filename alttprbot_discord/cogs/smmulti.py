@@ -1,13 +1,12 @@
 import logging
-import re
 
-# from discord.commands import Option
 import discord
+from discord import app_commands
+from discord.ext import commands
+from slugify import slugify
+
 from alttprbot import models
 from alttprbot.alttprgen.smz3multi import generate_multiworld
-from discord.ext import commands
-from discord import app_commands
-from slugify import slugify
 
 # TODO: make these dynamic based on current presets
 PRESET_OPTIONS = {
