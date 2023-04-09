@@ -145,7 +145,7 @@ Your finish times and scores should be kept private until the end of the qualifi
 
             embed.add_field(
                 name=f"Pool {pool.name}",
-                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}**Score:** {score}",
+                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}\n**Score:** {score}",
                 inline=False
             )
 
