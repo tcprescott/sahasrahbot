@@ -114,10 +114,7 @@ class AsyncTournamentView(discord.ui.View):
         pools = await models.AsyncTournamentPermalinkPool.filter(
             tournament=async_tournament
         )
-        description = f"""
-Your history for {async_tournament.name}.
-
-Disclaimer: Score calculation occurs at a fixed interval (hourly).
+        description = f"""Disclaimer: Score calculation occurs at a fixed interval (hourly).
 If your score for a finished race is \"0\" or \"not calculated\", it may take up to an hour for the score to be calculated and displayed here.
 
 This number may also change as more players play the seed, as the score is calculated based on the par time, which is the top 5 runs.  This calculation also occurs hourly.
@@ -126,7 +123,7 @@ Your finish times and scores should be kept private until the end of the qualifi
 """
         embed = discord.Embed(
             title="Async Tournament History",
-            # description=description,
+            description=description,
             color=discord.Color.blurple()
         )
 
@@ -148,8 +145,7 @@ Your finish times and scores should be kept private until the end of the qualifi
 
             embed.add_field(
                 name=f"Pool {pool.name}",
-                # value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}**Score:** {score}",
-                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}",
+                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}**Score:** {score}",
                 inline=False
             )
 
