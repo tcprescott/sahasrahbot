@@ -82,7 +82,7 @@ class SMRandoLeague(TournamentRace):
             if len(self.player_names) != 4:
                 await self.rtgg_handler.send_message("This week's races require 4 players.  Please contact a Tournament Moderator if you need assistance.")
                 return
-            self.seed, seeds = await self.create_multiworld()
+            self.seed, _ = await self.create_multiworld()
             tournamentresults.permalink = self.seed
 
         elif WEEKS[WEEK].get('randomizer') == 'smvaria':

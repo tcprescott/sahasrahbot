@@ -44,6 +44,8 @@ class Errors(commands.Cog, name="errors"):
 
         riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
 
+        edit = None
+
         try:
             if ctx.interaction:  # HybridCommand Support
                 await self.__respond_to_interaction(ctx.interaction)
@@ -58,48 +60,63 @@ class Errors(commands.Cog, name="errors"):
 
         # ConversionError
         except commands.ConversionError as d_error:
-            await edit(content=f"{riplink} {d_error}")
+            if edit is not None:
+                await edit(content=f"{riplink} {d_error}") # pylint: disable=no-member
         # UserInputError
         except commands.MissingRequiredArgument:
-            await edit(content=f"{riplink} Something is missing. `{ctx.clean_prefix}{ctx.command.name} <{'> <'.join(ctx.command.clean_params)}>`")
+            if edit is not None:
+                await edit(content=f"{riplink} Something is missing. `{ctx.clean_prefix}{ctx.command.name} <{'> <'.join(ctx.command.clean_params)}>`")
         # UserInputError -> BadArgument
         except (commands.MemberNotFound, commands.UserNotFound):
-            await edit(content=f"{riplink} Member `{str(d_error).split(' ')[1]}` not found ! Don't hesitate to ping the requested member.")
+            if edit is not None:
+                await edit(content=f"{riplink} Member `{str(d_error).split(' ')[1]}` not found ! Don't hesitate to ping the requested member.")
         # UserInputError -> BadUnionArgument | BadLiteralArgument | ArgumentParsingError
         except (commands.BadArgument, commands.BadUnionArgument, commands.BadLiteralArgument, commands.ArgumentParsingError) as d_error:
-            await edit(content=f"{riplink} {d_error}")
+            if edit is not None:
+                await edit(content=f"{riplink} {d_error}")
         # CommandNotFound
         except commands.CommandNotFound as d_error:
             # await edit(content=f"{riplink} Command `{str(d_error).split(' ')[1]}` not found !")
             pass  # Ignore this error
         # CheckFailure
         except commands.PrivateMessageOnly:
-            await edit(content=f"{riplink} This command canno't be used in a guild, try in direct message.")
+            if edit is not None:
+                await edit(content=f"{riplink} This command canno't be used in a guild, try in direct message.")
         except commands.NoPrivateMessage:
-            await edit(content=f"{riplink} This is not working as excpected.")
+            if edit is not None:
+                await edit(content=f"{riplink} This is not working as excpected.")
         except commands.NotOwner:
-            await edit(content=f"{riplink} You must own this bot to run this command.")
+            if edit is not None:
+                await edit(content=f"{riplink} You must own this bot to run this command.")
         except commands.MissingPermissions as d_error:
-            await edit(content=f"{riplink} Your account require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
+            if edit is not None:
+                await edit(content=f"{riplink} Your account require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
         except commands.BotMissingPermissions as d_error:
-            if not "send_messages" in d_error.missing_permissions:
-                await edit(content=f"{riplink} The bot require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
+            if edit is not None:
+                if not "send_messages" in d_error.missing_permissions:
+                    await edit(content=f"{riplink} The bot require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
         except (commands.CheckAnyFailure, commands.MissingRole, commands.BotMissingRole, commands.MissingAnyRole, commands.BotMissingAnyRole) as d_error:
-            await edit(content=f"{riplink} {d_error}")
+            if edit is not None:
+                await edit(content=f"{riplink} {d_error}")
         except commands.NSFWChannelRequired:
-            await edit(content=f"{riplink} This command require an NSFW channel.")
+            if edit is not None:
+                await edit(content=f"{riplink} This command require an NSFW channel.")
         # DisabledCommand
         except commands.DisabledCommand:
-            await edit(content=f"{riplink} Sorry this command is disabled.")
+            if edit is not None:
+                await edit(content=f"{riplink} Sorry this command is disabled.")
         # CommandInvokeError
         except commands.CommandInvokeError as d_error:
-            await edit(content=f"{riplink} {d_error.original}")
+            if edit is not None:
+                await edit(content=f"{riplink} {d_error.original}")
         # CommandOnCooldown
         except commands.CommandOnCooldown as d_error:
-            await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
+            if edit is not None:
+                await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
         # MaxConcurrencyReached
         except commands.MaxConcurrencyReached as d_error:
-            await edit(content=f"{riplink} Max concurrency reached. Maximum number of concurrent invokers allowed: `{d_error.number}`, per `{d_error.per}`.")
+            if edit is not None:
+                 await edit(content=f"{riplink} Max concurrency reached. Maximum number of concurrent invokers allowed: `{d_error.number}`, per `{d_error.per}`.")
         # HybridCommandError
         except commands.HybridCommandError as d_error:
             await self.get_app_command_error(ctx.interaction, error)
@@ -113,6 +130,7 @@ class Errors(commands.Cog, name="errors"):
         """
 
         riplink = discord.utils.get(self.bot.emojis, name='RIPLink')
+        edit = None
 
         try:
             await self.__respond_to_interaction(interaction)
@@ -121,30 +139,34 @@ class Errors(commands.Cog, name="errors"):
             raise error
         except app_commands.CommandInvokeError as d_error:
             if isinstance(d_error.original, discord.errors.InteractionResponded):
-                await edit(content=f"{riplink} {d_error.original}")
+                if edit is not None:
+                    await edit(content=f"{riplink} {d_error.original}")
                 self.bot.logger.exception("Error during interaction")
             elif isinstance(d_error.original, discord.errors.Forbidden):
-                await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original.text}")
+                if edit is not None:
+                    await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original.text}")
                 self.bot.logger.exception("Error during interaction")
             else:
-                await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
+                if edit is not None:
+                    await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
                 self.bot.logger.exception("Error during interaction")
         except app_commands.CheckFailure as d_error:
             if isinstance(d_error, app_commands.errors.CommandOnCooldown):
-                await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
+                if edit is not None:
+                    await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
             else:
-                await edit(content=f"{riplink} `{type(d_error).__name__}` : {d_error}")
+                if edit is not None:
+                    await edit(content=f"{riplink} `{type(d_error).__name__}` : {d_error}")
         except app_commands.CommandNotFound as d_error:
-            await edit(content=f"{riplink} Command was not found.. Seems to be a discord bug, probably due to desynchronization.\nTry again in a little bit, and if this still happens after an hour contact Synack for help.")
+            if edit is not None:
+                await edit(content=f"{riplink} Command was not found.. Seems to be a discord bug, probably due to desynchronization.\nTry again in a little bit, and if this still happens after an hour contact Synack for help.")
             raise d_error
         except Exception as e:
-            """
-            Caught here:
-            app_commands.TransformerError
-            app_commands.CommandLimitReached
-            app_commands.CommandAlreadyRegistered
-            app_commands.CommandSignatureMismatch
-            """
+            # Caught here:
+            # app_commands.TransformerError
+            # app_commands.CommandLimitReached
+            # app_commands.CommandAlreadyRegistered
+            # app_commands.CommandSignatureMismatch
 
             self.trace_error("get_app_command_error", e)
 

@@ -704,7 +704,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 preset=preset,
             )
 
-            for i in range(num_to_generate):
+            for _ in range(num_to_generate):
                 if oss:
                     settings = {
                         "override_start_screen": [oss, oss, oss, oss, oss]
@@ -1021,8 +1021,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
         if elapsed_time:
             time_obj = datetime.datetime.strptime(elapsed_time, "%H:%M:%S")
             timedelta_obj = datetime.timedelta(
-                hours=time_obj.hour, 
-                minutes=time_obj.minute, 
+                hours=time_obj.hour,
+                minutes=time_obj.minute,
                 seconds=time_obj.second
             )
             race.end_time = discord.utils.utcnow()

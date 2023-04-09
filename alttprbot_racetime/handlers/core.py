@@ -47,7 +47,7 @@ class SahasrahBotCoreHandler(RaceHandler):
                 rtgg_handler=self
             )
             await self.tournament.on_room_resume()
-        except:
+        except Exception:
             self.logger.exception("Error while association tournament race to handler.")
 
     async def setup_konot(self):

@@ -5,13 +5,14 @@ import io
 
 import discord
 from discord.ext import commands
-from emoji import is_emoji
+# from emoji import is_emoji
 
 from alttprbot.database import role  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
 
 from ..util import embed_formatter
 
+# this is a pile of shit and needs to be refactored
 
 class Role(commands.Cog):
     def __init__(self, bot):

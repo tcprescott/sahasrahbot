@@ -24,7 +24,7 @@ DB_PASS = urllib.parse.quote_plus(os.environ.get("DB_PASS", "pass"))
 if os.environ.get("SENTRY_URL"):
     def before_send(event, hint):
         if 'exc_info' in hint:
-            exc_type, exc_value, tb = hint['exc_info']
+            _, exc_value, _ = hint['exc_info']
             if isinstance(exc_value, (SahasrahBotException)):
                 return None
         return event

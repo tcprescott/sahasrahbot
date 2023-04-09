@@ -1,12 +1,10 @@
 import importlib
 import os
 import logging
-import io
 
 import discord
 from discord.ext import commands
 from discord_sentry_reporting import use_sentry
-from sentry_sdk import push_scope
 
 from alttprbot_discord.util import config
 from config import Config as c
@@ -46,7 +44,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
     await discordbot.load_extension("alttprbot_discord.cogs.tournament")
     await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
-    await discordbot.load_extension("alttprbot_discord.cogs.multiworld")
+    await discordbot.load_extension("alttprbot_discord.cogs.smmulti")
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
     await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")

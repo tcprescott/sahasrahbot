@@ -9,9 +9,7 @@ from discord.ext import commands
 from discord import app_commands
 from slugify import slugify
 
-# TODO: make work with discord.py 2.0
-
-
+# TODO: make these dynamic based on current presets
 PRESET_OPTIONS = {
     'sm': [
         discord.SelectOption(label="casual_full"),
@@ -244,7 +242,7 @@ class MultiworldSignupView(discord.ui.View):
         return entrant_discords
 
 
-class Multiworld(commands.Cog):
+class SMMulti(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.persistent_views_added = False
@@ -255,8 +253,12 @@ class Multiworld(commands.Cog):
             self.bot.add_view(MultiworldSignupView())
             self.persistent_views_added = True
 
-    @app_commands.command(description="Creates a multiworld session.")
+    @app_commands.command(description="Stub for the old multiworld command.  This command has been replaced by `/smmulti`.")
     async def multiworld(self, interaction: discord.Interaction):
+        await interaction.response.send_message("This command has been replaced by `/smmulti`.", ephemeral=True)
+
+    @app_commands.command(description="Creates a multiworld session for SM and SMZ3.")
+    async def smmulti(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title='Multiworld Game',
             description=(
@@ -291,16 +293,5 @@ def get_embed_field(name: str, embed: discord.Embed) -> str:
             return field.value
     return None
 
-
-# def get_owner(embed: discord.Embed, guild: discord.Guild) -> discord.Member:
-#     value = get_embed_field("Owner", embed)
-
-#     if value is None:
-#         return
-
-#     user_id = int(re.search('<@([0-9]*)>', value).groups()[0])
-#     return guild.get_member(user_id)
-
-
 async def setup(bot):
-    await bot.add_cog(Multiworld(bot))
+    await bot.add_cog(SMMulti(bot))

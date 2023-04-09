@@ -90,7 +90,7 @@ class SGDailyRaceCore(TournamentRace):
             allowed_mentions=discord.AllowedMentions(roles=True)
         )
 
-    async def update_data(self):
+    async def update_data(self, update_episode=True):
         self.episode = await speedgaming.get_episode(self.episodeid)
 
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)

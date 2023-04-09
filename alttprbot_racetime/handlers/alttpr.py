@@ -6,7 +6,7 @@ import random
 
 from alttprbot import models
 from alttprbot.alttprgen import preset, spoilers, generator
-from alttprbot.database import spoiler_races, tournament_results  # TODO switch to ORM
+from alttprbot.database import spoiler_races  # TODO switch to ORM
 from racetime_bot import monitor_cmd
 
 from .core import SahasrahBotCoreHandler

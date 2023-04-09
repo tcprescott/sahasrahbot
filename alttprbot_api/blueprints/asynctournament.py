@@ -1,6 +1,4 @@
-import csv
 import datetime
-import io
 
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
