@@ -18,7 +18,7 @@ from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 # 6. DASH recall https: // dashrando.net/
 # 7. Coop: Full Item Shuffle, Full Area Shuffle, Boss Shuffle
 
-WEEK = 5
+WEEK = 6
 
 WEEKS = {
     1: {
