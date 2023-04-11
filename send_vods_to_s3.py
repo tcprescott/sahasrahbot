@@ -70,7 +70,7 @@ async def main():
         runner_vod_url__isnull=False,
         status='finished',
         tournament_id=4,
-        review_status='approved',
+        review_status='accepted',
     ).prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
 
     for race in undownloaded_races:
