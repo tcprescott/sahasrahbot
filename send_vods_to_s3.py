@@ -68,7 +68,7 @@ async def main():
     undownloaded_races = await models.AsyncTournamentRace.filter(
         runner_vod_s3_uri__isnull=True,
         runner_vod_url__isnull=False,
-        state='finished',
+        status='finished',
         tournament_id=4,
         review_status='approved',
     ).prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
