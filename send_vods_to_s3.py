@@ -1,3 +1,4 @@
+#!.venv/bin/python
 import asyncio
 import os
 import tempfile
@@ -66,7 +67,10 @@ async def main():
 
     undownloaded_races = await models.AsyncTournamentRace.filter(
         runner_vod_s3_uri__isnull=True,
-        runner_vod_url__isnull=False
+        runner_vod_url__isnull=False,
+        state='finished',
+        tournament_id=4,
+        review_status='approved',
     ).prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
 
     for race in undownloaded_races:
