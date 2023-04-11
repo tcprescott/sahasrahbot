@@ -83,7 +83,6 @@ async def main():
             continue
         race.runner_vod_s3_uri = uri
         await race.save(update_fields=['runner_vod_s3_uri'])
-        break # just do one for now to test
 
 async def test():
     await database()
