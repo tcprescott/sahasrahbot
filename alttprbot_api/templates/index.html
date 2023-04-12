@@ -1,0 +1,34 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Welcome to SahasrahBot!</title>
+{%- endblock head %}
+
+{% block content -%}
+<h1>SahasrahBot's minimalistic Web UI</h1>
+<p>
+    SahasrahBot is a Discord bot that provides a variety of features for the A Link to the Past Randomizer, Super Metroid, SMZ3, and other videogame speedrunning communities.
+    Want to <a href="https://discord.com/api/oauth2/authorize?client_id=572269659290861578&permissions=0&scope=bot%20applications.commands" target="_blank">invite SahasrahBot bot to your server?</a>
+</p>
+<h2>Why does this website exist?</h2>
+<p>
+    This website exists to provide a minimalistic interface to SahasrahBot's API. It is not meant to be a full-featured website.
+    SahasrahBot also uses this website to provide a basic web interface for operations that are not possible (or difficult to implement) through Discord.
+    Maybe someday I (Synack) will make a full-featured website for SahasrahBot, but for now this will have to do.
+</p>
+<p>
+    This bot also has API endpoints that can be used to integrate SahasrahBot into other bots or websites.
+    If you are interested in using SahasrahBot's API, please contact Synack#1337 on Discord or open an issue on SahasrahBot's Github.
+</p>
+<p>
+    Organizing a speedrunning or randomizer tournament that uses <a href="https://racetime.gg" target="_blank">RaceTime.gg</a> and is hosted on <a href="https://twitch.tv/speedgaming">SpeedGaming</a>?
+    SahasrahBot can automatically open race rooms, send DMs to runners, and more!  Contact Synack#1337 on Discord for more information.
+</p>
+<h2>Important links</h2>
+<ul>
+    <li><a href="https://sahasrahbot.synack.live/" target="_blank">SahasrahBot Documentation</a></li>
+    <li><a href="https://github.com/tcprescott/sahasrahbot" target="_blank">SahasrahBot's Github</a></li>
+    <li><a href="/triforcetexts/alttpr2023">ALTTPR Main Tournament 2023 Triforce Text Submissions</a></li>
+    <li><a href="/racetime/verification/initiate">Tell SahasrahBot about your RaceTime.gg account</a></li>
+</ul>
+{%- endblock content %}

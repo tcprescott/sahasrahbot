@@ -30,6 +30,17 @@ sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
 
 
+@sahasrahbotapi.route("/")
+async def index():
+    try:
+        user = await discord.fetch_user()
+        logged_in = True
+    except Unauthorized:
+        user = None
+        logged_in = False
+
+    return await render_template('index.html', logged_in=logged_in, user=user)
+
 @sahasrahbotapi.route("/login/")
 async def login():
     return await discord.create_session(
