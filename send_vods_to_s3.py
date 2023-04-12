@@ -81,6 +81,7 @@ async def main():
         if uri is None:
             print(f"Failed to download video for {race.id}")
             continue
+        await race.refresh_from_db()
         race.runner_vod_s3_uri = uri
         await race.save(update_fields=['runner_vod_s3_uri'])
 
