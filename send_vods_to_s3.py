@@ -54,7 +54,10 @@ def send_vod_to_s3(player_name: str, youtube_url: str, video_name: str, bucket: 
         s3.upload_file(file_name, bucket, key, ExtraArgs={'ACL': 'public-read'})
 
     url_safe_key = urllib.parse.quote(key, safe="~()*!.'")
-    return f'https://{bucket}.sfo2.digitaloceanspaces.com/{url_safe_key}'
+    return f'https://data.synack.live/{url_safe_key}'
+
+# use this to fix existing columns
+# UPDATE asynctournamentrace SET runner_vod_s3_uri = REPLACE(runner_vod_s3_uri, "https://synack.sfo2.digitaloceanspaces.com/", "https://data.synack.live/") where runner_vod_s3_uri like 'https://synack.sfo2.digitaloceanspaces.com/%';
 
 async def database():
     await Tortoise.init(
