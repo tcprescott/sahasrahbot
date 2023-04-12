@@ -78,8 +78,7 @@
     </p>
     <p><label for="reviewer_notes">Reviewer Notes</label>
     </p>
-    <p><textarea name="reviewer_notes" id="reviewer_notes" cols="30" rows="10"
-            required>{% if race.reviewer_notes %}{{ race.reviewer_notes|e }}{% endif %}</textarea>
+    <p><textarea name="reviewer_notes" id="reviewer_notes" cols="30" rows="10">{% if race.reviewer_notes %}{{ race.reviewer_notes|e }}{% endif %}</textarea>
     </p>
     <p><input type="submit" value="Save" /></p>
 </form>
