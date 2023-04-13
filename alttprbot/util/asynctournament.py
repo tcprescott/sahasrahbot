@@ -85,7 +85,7 @@ async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, on
     for race in races:
         race.score = calculate_qualifier_score(par_time=par_time, elapsed_time=race.elapsed_time) if race.status == "finished" else 0
         race.score_updated_at = discord.utils.utcnow()
-        await race.save()
+        await race.save(update_fields=["score", "score_updated_at"])
 
     return True
 
