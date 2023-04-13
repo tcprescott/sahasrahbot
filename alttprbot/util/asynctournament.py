@@ -201,10 +201,8 @@ class LeaderboardEntry:
 
     @cached_property
     def estimate(self) -> float:
-        """Calculate the estimated score for a player, only averaging the races they've finished.
-
-        Returns:
-            float: _description_
+        """
+        Calculate the estimated score for a player, only averaging the races they've finished.
         """
         scores = [
             r.score
