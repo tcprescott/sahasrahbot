@@ -20,7 +20,7 @@
         <th>Forfeited</th>
         <th>Unplayed</th> -->
     </tr>
-    {% for entry in leaderboard|sort(attribute=sort_key) %}
+    {% for entry in leaderboard|sort(attribute=sort_key, reverse=True) %}
     <tr>
         <td>{{ loop.index }}</td>
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=entry.player.id) }}" target="_blank">{{ entry.player.display_name }}</a></td>
