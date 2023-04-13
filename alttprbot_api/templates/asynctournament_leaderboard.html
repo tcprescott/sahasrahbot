@@ -12,6 +12,7 @@
         <th>Rank</th>
         <th>Player Name</th>
         <th>Score</th>
+        {% if estimate %}<th>Estimate</th>{% endif %}
         {% for pool in tournament.permalink_pools %}
         <th>{{ pool.name }}</th>
         {% endfor %}
@@ -24,6 +25,7 @@
         <td>{{ loop.index }}</td>
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=entry.player.id) }}" target="_blank">{{ entry.player.display_name }}</a></td>
         <td>{{ entry.score_formatted }}</td>
+        {% if estimate %}<td>{{ entry.estimate_formatted }}</td>{% endif %}
         {% for race in entry.races %}
         <td>{{ race.score_formatted }}</td>
         {% endfor %}

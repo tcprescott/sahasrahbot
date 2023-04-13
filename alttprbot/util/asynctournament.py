@@ -200,11 +200,34 @@ class LeaderboardEntry:
         return sum(scores) / len(scores)
 
     @cached_property
+    def estimate(self) -> float:
+        """Calculate the estimated score for a player, only averaging the races they've finished.
+
+        Returns:
+            float: _description_
+        """
+        scores = [
+            r.score
+            for r in self.races if r.status == "finished" and r.score is not None
+        ]
+        if not scores:
+            return 0
+
+        return sum(scores) / len(scores)
+
+    @cached_property
     def score_formatted(self) -> str:
         """
         Formatted score suitable for web display.
         """
         return f"{self.score:.3f}"
+
+    @cached_property
+    def estimate_formatted(self) -> str:
+        """
+        Formatted estimate suitable for web display.
+        """
+        return f"{self.estimate:.3f}"
 
     @cached_property
     def finished_race_count(self) -> int:
