@@ -206,7 +206,7 @@ class LeaderboardEntry:
         """
         scores = [
             r.score
-            for r in self.races if r.status == "finished" and r.score is not None
+            for r in self.races if r is not None and r.status == "finished" and r.score is not None
         ]
         if not scores:
             return 0
