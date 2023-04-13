@@ -277,10 +277,12 @@ async def async_tournament_leaderboard(tournament_id: int):
 
     leaderboard = await asynctournament.get_leaderboard(tournament)
 
-    if estimate := request.args.get('estimate', "false") == "true":
-        leaderboard.sort(key=lambda entry: entry.estimate, reverse=True)
+    if estimate := request.args.get('estimate', 'false') == 'true':
+        sort_key = "estimate"
+    else:
+        sort_key = "score"
 
-    return await render_template('asynctournament_leaderboard.html', logged_in=True, user=discord_user, tournament=tournament, leaderboard=leaderboard, estimate=estimate)
+    return await render_template('asynctournament_leaderboard.html', logged_in=True, user=discord_user, tournament=tournament, leaderboard=leaderboard, estimate=estimate, sort_key=sort_key)
 
 
 @asynctournament_blueprint.route('/player/<int:tournament_id>/<int:user_id>', methods=['GET'])
