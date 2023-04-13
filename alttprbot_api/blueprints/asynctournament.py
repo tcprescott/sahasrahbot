@@ -278,7 +278,7 @@ async def async_tournament_leaderboard(tournament_id: int):
     leaderboard = await asynctournament.get_leaderboard(tournament)
 
     if estimate := request.args.get('estimate', "false") == "true":
-        leaderboard.sort(key=lambda x: x['estimate'], reverse=True)
+        leaderboard.sort(key=lambda entry: entry.estimate, reverse=True)
 
     return await render_template('asynctournament_leaderboard.html', logged_in=True, user=discord_user, tournament=tournament, leaderboard=leaderboard, estimate=estimate)
 
