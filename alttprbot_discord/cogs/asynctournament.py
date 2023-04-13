@@ -144,7 +144,7 @@ Your finish times and scores should be kept private until the end of the qualifi
                 score = race.score_formatted
 
             embed.add_field(
-                name=f"Pool {pool.name}",
+                name=pool.name,
                 value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}\n**Score:** {score}",
                 inline=False
             )
@@ -956,9 +956,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("This channel is not configured for async tournaments.", ephemeral=True)
             return
 
-        if tournament.active is False:
-            await interaction.response.send_message("This tournament is not active.", ephemeral=True)
-            return
+        # if tournament.active is False:
+        #     await interaction.response.send_message("This tournament is not active.", ephemeral=True)
+        #     return
 
         user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, tournament, ['admin'])
