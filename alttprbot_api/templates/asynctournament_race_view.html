@@ -63,6 +63,7 @@
             %}NO VOD SUBMITTED{% endif %}</td>
     </tr>
 </table>
+{% if reviewable %}
 <h2>Runner Notes</h2>
 <p>{{ race.runner_notes_html|safe }}</p>
 <h2>Review</h2>
@@ -82,4 +83,5 @@
     </p>
     <p><input type="submit" value="Save" /></p>
 </form>
+{% endif %}
 {%- endblock content %}

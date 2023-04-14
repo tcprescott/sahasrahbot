@@ -21,7 +21,7 @@
     </tr>
     {% for race in races %}
     <tr>
-        <td>{{ race.id }}</td>
+        <td><a href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}">{{ race.id }}</a></td>
         <td>{{ race.user.display_name }}</td>
         <td>{{ race.permalink.pool.name }}</td>
         <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>

@@ -200,8 +200,11 @@ async def async_tournament_review(tournament_id: int, race_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
+    reviewable = True
+
     authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
+        reviewable = False # doesn't matter for now
         return abort(403, "You are not authorized to view this tournament.")
 
     race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
@@ -209,21 +212,21 @@ async def async_tournament_review(tournament_id: int, race_id: int):
         abort(404, "Race not found.")
 
     if race.status != 'finished':
-        abort(403, "This race cannot be reviewed yet.")
+        reviewable = False
 
     if race.reattempted:
-        abort(403, "This race was marked as reattempted and cannot be reviewed.")
+        reviewable = False
 
     await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool', 'tournament', 'live_race')
 
     # if race.user == user:
     #     abort(403, "You are not authorized to review your own tournament run.")
 
-    if race.reviewed_by is None:
+    if race.reviewed_by is None and reviewable:
         race.reviewed_by = user
         await race.save()
 
-    return await render_template('asynctournament_race_view.html', logged_in=True, user=discord_user, tournament=tournament, race=race, already_claimed=race.reviewed_by != user)
+    return await render_template('asynctournament_race_view.html', logged_in=True, user=discord_user, tournament=tournament, race=race, already_claimed=race.reviewed_by != user, reviewable=reviewable)
 
 
 @asynctournament_blueprint.route('/races/<int:tournament_id>/review/<int:race_id>', methods=['POST'])

@@ -62,8 +62,7 @@
         <td>{{ race.reviewed_at if race.reviewed_at else "" }}</td>
         <td>{{ race.review_status }}</td>
         <td>
-            <p><a
-                    href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}">review</a>
+            <p><a href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}">review</a>
             </p>
         </td>
     </tr>
