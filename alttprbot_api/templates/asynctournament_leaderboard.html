@@ -27,7 +27,7 @@
         <td>{{ entry.score_formatted }}</td>
         {% if estimate %}<td>{{ entry.estimate_formatted }}</td>{% endif %}
         {% for race in entry.races %}
-        <td><a href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}" target="_blank">{{ race.score_formatted }}</a></td>
+        <td>{% if race %}<a href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}" target="_blank">{{ race.score_formatted }}</a>{% endif %}</td>
         {% endfor %}
         <!-- <td>{{ entry.finished_race_count }}</td>
         <td>{{ entry.forfeited_race_count }}</td>
