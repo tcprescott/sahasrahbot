@@ -18,6 +18,7 @@
         <th>Score</th>
         <th>Run Status</th>
         <th>Reattempted</th>
+        <th>Review Status</th>
     </tr>
     {% for race in races %}
     <tr>
@@ -34,8 +35,9 @@
         </td>
         <td>{{ race.elapsed_time_formatted }}</td>
         <td>{{ race.score_formatted }}</td>
-        <td>{{ race.status }}</td>
+        <td>{{ race.status_formatted }}</td>
         <td>{{ race.reattempted }}</td>
+        <td>{{ race.review_status_formatted }}</td>
     </tr>
     {% endfor %}
 </table>

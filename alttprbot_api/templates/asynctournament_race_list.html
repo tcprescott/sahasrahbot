@@ -57,10 +57,10 @@
         </td>
         <td>{{ race.elapsed_time_formatted }}</td>
         <td>{{ race.score_formatted }}</td>
-        <td>{{ race.status }}</td>
+        <td>{{ race.status_formatted }}</td>
         <td>{{ race.reviewed_by.display_name }}</td>
         <td>{{ race.reviewed_at if race.reviewed_at else "" }}</td>
-        <td>{{ race.review_status }}</td>
+        <td>{{ race.review_status_formatted }}</td>
         <td>
             <p><a href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}">review</a>
             </p>
