@@ -728,8 +728,8 @@ class AsyncTournamentRace(Model):
     def review_status_formatted(self) -> str:
         if self.review_status == 'pending':
             return "Pending"
-        elif self.review_status == 'approved':
-            return "Approved"
+        elif self.review_status == 'accepted':
+            return "Accepted"
         elif self.review_status == 'rejected':
             return "Rejected"
 
