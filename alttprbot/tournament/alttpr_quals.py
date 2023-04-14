@@ -9,6 +9,7 @@ from alttprbot_discord.bot import discordbot
 from alttprbot.util import speedgaming, triforce_text
 from alttprbot_racetime import bot as racetime
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
+from alttprbot_api.util import checks
 
 
 class ALTTPRQualifierRace(TournamentRace):
@@ -68,11 +69,13 @@ class ALTTPRQualifierRace(TournamentRace):
 
         await async_tournament_live_race.fetch_related('tournament')
 
-        authorized = await models.AsyncTournamentPermissions.filter(
-            tournament=async_tournament_live_race.tournament,
-            user__rtgg_id=message['user']['id'],
-            role__in=['mod', 'admin']
-        )
+        # authorized = await models.AsyncTournamentPermissions.filter(
+        #     tournament=async_tournament_live_race.tournament,
+        #     user__rtgg_id=message['user']['id'],
+        #     role__in=['mod', 'admin']
+        # )
+        user = await models.Users.get(rtgg_id=message['user']['id'])
+        authorized = await checks.is_async_tournament_user(user, async_tournament_live_race.tournament, ['admin', 'mod'])
         if not authorized:
             await self.rtgg_handler.send_message("Only a mod or admin of this tournament may invoke !tournamentrace.  Please contact Synack for further help.")
             return
