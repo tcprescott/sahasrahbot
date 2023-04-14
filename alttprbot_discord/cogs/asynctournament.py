@@ -120,6 +120,9 @@ If your score for a finished race is \"0\" or \"not calculated\", it may take up
 This number may also change as more players play the seed, as the score is calculated based on the par time, which is the top 5 runs.  This calculation also occurs hourly.
 
 Your finish times and scores should be kept private until the end of the qualifier period.
+
+If your run has a review status of "Rejected", this just means your run is undergoing secondary review.  If there's an issue with the run, we will contact you.
+A review status of "Accepted" indicates that all data adjustments have been performed.  "Pending" indicates that your run is still awaiting review.
 """
         embed = discord.Embed(
             title="Async Tournament History",
@@ -138,14 +141,16 @@ Your finish times and scores should be kept private until the end of the qualifi
                 status = "Not yet played"
                 elapsed_time = "N/A"
                 score = "N/A"
+                review_status = "N/A"
             else:
                 status = race.status_formatted
                 elapsed_time = race.elapsed_time_formatted
                 score = race.score_formatted
+                review_status = race.review_status_formatted
 
             embed.add_field(
                 name=pool.name,
-                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}\n**Score:** {score}",
+                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}\n**Score:** {score}\n**Review Status:** {review_status}",
                 inline=False
             )
 
