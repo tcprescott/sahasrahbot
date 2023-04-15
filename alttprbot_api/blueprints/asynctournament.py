@@ -331,9 +331,10 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
     permalink = await models.AsyncTournamentPermalink.get(id=permalink_id, pool__tournament=tournament)
 
     # skip authorization check if this was a live race
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
-    if not authorized:
-        return abort(403, "You are not authorized to view this tournament.")
+    if permalink.live_race is False:
+        authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+        if not authorized:
+            return abort(403, "You are not authorized to view this tournament.")
 
     races = await permalink.races.filter(status__in=['finished', 'forfeit'], reattempted=False).order_by('-score').prefetch_related('live_race')
 
