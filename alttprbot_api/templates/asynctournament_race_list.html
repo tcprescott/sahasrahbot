@@ -7,17 +7,17 @@
 {% block content -%}
 <h1>Moderation Queue - {{ tournament.name }} ({{ tournament.id }})</h1>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all', page=page) }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all', page=1) }}">
         View all in progress</a></p>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='false', reviewer='all', status='finished', review_status='pending', page=page) }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='false', reviewer='all', status='finished', review_status='pending', page=1) }}">
         View runs awaiting verification</a></p>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='all', page=page) }}">
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='all', page=1) }}">
         View all runs</a></p>
 <p><a
-        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='all', review_status='rejected', page=page) }}">
-        View all rejected runs</a></p>
+        href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='false', reviewer='all', status='finished', review_status='rejected', page=1) }}">
+        View rejected runs</a></p>
 <p>Page {{ page }}</p>
 <p>
     {% if page>1 %}<a

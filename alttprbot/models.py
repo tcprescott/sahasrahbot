@@ -726,6 +726,13 @@ class AsyncTournamentRace(Model):
 
     @property
     def review_status_formatted(self) -> str:
+        if self.live_race:
+            return "N/A"
+        if self.reattempted:
+            return "N/A"
+        if self.status != 'finished':
+            return "N/A"
+
         if self.review_status == 'pending':
             return "Pending"
         elif self.review_status == 'accepted':
