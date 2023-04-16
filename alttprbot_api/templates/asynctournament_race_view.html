@@ -59,7 +59,7 @@
     </tr>
     <tr>
         <th>VoD</th>
-        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% else
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}" target="_blank">{{ race.runner_vod_url|e }}</a>{% else
             %}NO VOD SUBMITTED{% endif %}</td>
     </tr>
 </table>
