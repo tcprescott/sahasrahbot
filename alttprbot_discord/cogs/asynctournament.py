@@ -192,9 +192,9 @@ class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
         async_tournament.active = False
         await async_tournament.save()
 
-        for item in self.original_view.children:
-            item.disabled = True
-        await self.original_interaction.followup.edit_message(message_id=self.original_interaction.message.id, view=self.original_view)
+        # for item in self.original_view.children:
+        #     item.disabled = True
+        # await self.original_interaction.followup.edit_message(message_id=self.original_interaction.message.id, view=self.original_view)
 
         await interaction.response.send_message("This tournament has been closed.")
 
