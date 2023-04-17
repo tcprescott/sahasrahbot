@@ -274,7 +274,7 @@ async def async_tournament_leaderboard(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -296,7 +296,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -313,7 +313,7 @@ async def async_tournament_pools(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -332,7 +332,7 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
 
     # skip authorization check if this was a live race
     if permalink.live_race is False:
-        authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+        authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
         if not authorized:
             return abort(403, "You are not authorized to view this tournament.")
 

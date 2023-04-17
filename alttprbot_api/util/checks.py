@@ -4,6 +4,9 @@ from alttprbot_discord.bot import discordbot
 from alttprbot import models
 
 async def is_async_tournament_user(user: models.Users, tournament: models.AsyncTournament, roles: List[str]):
+    if 'public' in roles and not tournament.active:
+        return True
+
     authorized = await tournament.permissions.filter(user=user, role__in=roles)
     if authorized:
         return True
