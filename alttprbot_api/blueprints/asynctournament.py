@@ -133,7 +133,12 @@ async def leaderboard_api(tournament_id):
                     'elapsed_time': race.elapsed_time_formatted,
                 } if race else None
                 for race in e.races
-            ]
+            ],
+            'counts': {
+                'finished': e.finished_race_count,
+                'forfeited': e.forfeited_race_count,
+                'unplayed': e.unattempted_race_count,
+            }
         }
         for idx, e in enumerate(leaderboard)
     ])
