@@ -7,6 +7,7 @@ from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
 
 from alttprbot import models
 from alttprbot_discord.bot import discordbot
+from oauthlib.oauth2.rfc6749.errors import InvalidGrantError
 
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(os.environ.get("APP_SECRET_KEY"), "utf-8")
@@ -131,6 +132,8 @@ async def robots():
 # def not_found(e):
 #     return jsonify(success=False, error=repr(e))
 
-# @sahasrahbotapi.errorhandler(500)
-# def something_bad_happened(e):
-#     return jsonify(success=False, error=repr(e))
+@sahasrahbotapi.errorhandler(500)
+def something_bad_happened(e):
+    if isinstance(e, InvalidGrantError):
+        discord.revoke()
+        return "Your Discord session has expired.  Please try again."
