@@ -2182,18 +2182,6 @@ text-unidecode = ">=1.3"
 unidecode = ["Unidecode (>=1.1.1)"]
 
 [[package]]
-name = "pytube"
-version = "12.1.3"
-description = "Python 3 library for downloading YouTube Videos."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "pytube-12.1.3-py3-none-any.whl", hash = "sha256:b3c3d19afc99a5fe1b8bbe20ce65d5c594de3a9953ce00f88b92a6b258afb656"},
-    {file = "pytube-12.1.3.tar.gz", hash = "sha256:6a56ce9bbc03a6aaf62a1e5a54bae003c70fe2aa1c86c279037c031d59f571b3"},
-]
-
-[[package]]
 name = "pytz"
 version = "2022.7.1"
 description = "World timezone definitions, modern and historical"
@@ -2982,4 +2970,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "eed58d3140c603d071f482cd06467e8944b7e4ab9bbe4dcf1e500c502e1b7337"
+content-hash = "a70491a8747ebbc0b83198e01127cc7bd82eac3643f15e0631d98f6c0b1a1893"
