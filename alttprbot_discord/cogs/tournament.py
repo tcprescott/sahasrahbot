@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from alttprbot.tournament import core
+from alttprbot.tournament import core, alttpr
 from alttprbot_discord.util import alttpr_discord
 from alttprbot import models
 from alttprbot import tournaments
@@ -352,6 +352,74 @@ class Tournament(commands.GroupCog, name="tournament"):
 
         await interaction.followup.send(embed=embed)
 
+
+    # @app_commands.command(description="Generate a randomizer seed for the ALTTPR Main Tournament 2023.")
+    # async def alttpr2023(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member):
+    #     await interaction.response.defer()
+    #     seed, preset, deck = await alttpr.roll_seed([player1, player2])
+
+    #     embed = await seed.embed(emojis=self.bot.emojis)
+    #     embed.insert_field_at(0, name="Preset", value=preset, inline=False)
+    #     if deck:
+    #         embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+
+    #     await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(description="Generate a randomizer seed for the 2022 challenge cup.")
+    @app_commands.guilds(*CC_TOURNAMENT_SERVERS)
+    async def cc2023(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
+        if interaction.guild.chunked is False:
+            await interaction.guild.chunk(cache=True)
+
+        if on_behalf_of and interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in interaction.user.roles:
+            await interaction.response.send_message("You must be a member of the Challenge Cup admin team to roll a seed on someone else's behalf..")
+            return
+
+        if (player3 or player4) and interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in interaction.user.roles:
+            await interaction.response.send_message("You must be a member of the Challenge Cup admin team to roll a seed with more than 2 players.")
+            return
+
+        if interaction.user == opponent:
+            await interaction.response.send_message("You can't race yourself.", ephemeral=True)
+            return
+
+        if on_behalf_of is None:
+            on_behalf_of = interaction.user
+
+        if opponent.bot or on_behalf_of.bot:
+            await interaction.response.send_message("You can't race a bot.", ephemeral=True)
+            return
+
+        players = [opponent, on_behalf_of]
+        if player3:
+            players.append(player3)
+        if player4:
+            players.append(player4)
+
+        await interaction.response.defer()
+        embed = await self.generate_deck_seed(players, "cc2023")
+
+        for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
+            channel = self.bot.get_channel(channel_id)
+            await channel.send(embed=embed)
+
+        for player in players:
+            await player.send(embed=embed)
+
+        await interaction.followup.send("Seed successfully sent to DM.")
+
+    async def generate_deck_seed(self, players, event_slug):
+        seed, preset, deck = await alttpr.roll_seed(players, event_slug=event_slug)
+
+        embed = await seed.embed(emojis=self.bot.emojis)
+        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
+        if deck:
+            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+
+        embed.title = " vs. ".join([p.display_name for p in players])
+        embed.description = " vs. ".join([p.mention for p in players])
+
+        return embed
 
 async def setup(bot):
     await bot.add_cog(Tournament(bot))

@@ -113,6 +113,11 @@ async def on_command_completion(ctx):
 @discordbot.event
 async def on_ready():
     await discordbot.tree.sync()
+    for guild in discordbot.guilds:
+        cmds = discordbot.tree.get_commands(guild=guild)
+        if cmds:
+            discordbot.logger.info(f"Loaded {len(cmds)} commands for {guild.name}")
+            await discordbot.tree.sync(guild=guild)
 
 
 async def start_bot():

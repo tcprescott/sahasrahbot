@@ -1,12 +1,14 @@
 import logging
 import random
 from typing import List
+
 import discord
 
-from alttprbot.alttprgen import generator
 from alttprbot import models
-from alttprbot.tournament.core import TournamentRace, TournamentConfig
+from alttprbot.alttprgen import generator
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot.util import triforce_text
 from alttprbot_discord.bot import discordbot
 
 
@@ -101,9 +103,9 @@ class ALTTPRTournamentRace(TournamentRace):
         await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
 
 
-class ALTTPR2022Race(ALTTPRTournamentRace):
+class ALTTPR2023Race(ALTTPRTournamentRace):
     """
-    ALTTPR2022Race is a class that represents the ALTTPR Main Tournament for the 2022 season.
+    ALTTPR2023Race is a class that represents the ALTTPR Main Tournament for the 2023 season.
     """
     async def roll(self):
         self.seed, self.preset, self.deck = await roll_seed([p[1] for p in self.player_discords], episode_id=self.episodeid)
@@ -181,18 +183,5 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
     for player in players:
         await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug=event_slug)
 
-    data = generator.ALTTPRPreset(preset)
-    await data.fetch()
-
-    discord_user_ids = await models.TriforceTexts.filter(pool_name="alttpr2023", approved=True).distinct().values_list("discord_user_id", flat=True)
-    if discord_user_ids:
-        discord_user_id = random.choice(discord_user_ids)
-        triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2023', discord_user_id=discord_user_id)
-        triforce_text = random.choice(triforce_texts)
-        text = triforce_text.text.encode("utf-8").decode("unicode_escape")
-        logging.info("Using triforce text: %s", text)
-        data.preset_data['settings']['texts'] = {}
-        data.preset_data['settings']['texts']['end_triforce'] = "{NOBORDER}\n" + text
-
-    seed = await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+    seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
     return seed, preset, deck

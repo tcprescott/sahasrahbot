@@ -147,36 +147,6 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
-    async def ex_tourneyqual(self, args, message):
-        if await self.is_locked(message):
-            return
-
-        preset_name = "tournament_hard"
-
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-        data = generator.ALTTPRPreset(preset_name)
-        await data.fetch()
-
-        discord_user_ids = await models.TriforceTexts.filter(pool_name="alttpr2022", approved=True).distinct().values_list("discord_user_id", flat=True)
-        if discord_user_ids:
-            discord_user_id = random.choice(discord_user_ids)
-            triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name='alttpr2022', discord_user_id=discord_user_id)
-            triforce_text = random.choice(triforce_texts)
-            text = triforce_text.text.encode("utf-8").decode("unicode_escape")
-            logging.info("Using triforce text: %s", text)
-            data.preset_data['settings']['texts'] = {}
-            data.preset_data['settings']['texts']['end_triforce'] = "{NOBORDER}\n" + text
-
-        seed = await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
-
-        race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
-        await self.edit(streaming_required=False, start_delay=30, auto_start=False, allow_midrace_chat=False, allow_non_entrant_chat=False)
-        await self.set_invitational()
-        await self.set_bot_raceinfo(race_info)
-        await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
-        self.seed_rolled = True
-
     # TODO: refactor this pile of shit
     @monitor_cmd
     async def ex_cancel(self, args, message):
@@ -185,9 +155,6 @@ class GameHandler(SahasrahBotCoreHandler):
         # await tournament_results.delete_active_tournament_race(self.data.get('name'))
         await spoiler_races.delete_spoiler_race(self.data.get('name'))
         await self.send_message("Reseting bot state.  You may now roll a new game.")
-
-    async def ex_cc(self, args, message):
-        await self.roll_game(preset_name="standard", message=message, allow_quickswap=True)
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.\n\"!mystery <weightset>\" to generate a mystery game.\n\"!spoiler <preset>\" to generate a spoiler race.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
