@@ -126,6 +126,8 @@ async def leaderboard_api(tournament_id):
             'races': [
                 {
                     'id': race.id,
+                    'start_time': race.start_time,
+                    'end_time': race.end_time,
                     'score': race.score,
                     'permalink_id': race.permalink_id,
                     'elapsed_time': race.elapsed_time_formatted,
