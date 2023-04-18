@@ -112,16 +112,18 @@ async def on_command_completion(ctx):
 
 @discordbot.event
 async def on_ready():
-    await discordbot.tree.sync()
+    if c.DEBUG:
+        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
+    else:
+        await discordbot.tree.sync()
+
     for guild in discordbot.guilds:
         cmds = discordbot.tree.get_commands(guild=guild)
         if cmds:
-            discordbot.logger.info(f"Loaded {len(cmds)} commands for {guild.name}")
+            discordbot.logger.info("Loaded {} commands for {}".format(len(cmds), guild.name))
             await discordbot.tree.sync(guild=guild)
 
 
 async def start_bot():
     await load_extensions()
-    if c.DEBUG:
-        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
     await discordbot.start(os.environ.get("DISCORD_TOKEN"))
