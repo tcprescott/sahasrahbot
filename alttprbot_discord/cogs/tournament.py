@@ -23,7 +23,7 @@ MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 3347968447502
 CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
 
 
-class Tournament(commands.GroupCog, name="tournament"):
+class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.create_races.start()
@@ -337,20 +337,20 @@ class Tournament(commands.GroupCog, name="tournament"):
 
         return messages
 
-    @app_commands.command(description="Generate an ALTTPR practice seed from an SG Episode that's already been submitted.")
-    async def practice(self, interaction: discord.Interaction, episode_id: int):
-        await interaction.response.defer()
-        tournament_game = await models.TournamentGames.get_or_none(episode_id=episode_id)
-        if tournament_game is None:
-            await interaction.response.send_message("That episode has not been submitted yet.", ephemeral=True)
-            return
+    # @app_commands.command(description="Generate an ALTTPR practice seed from an SG Episode that's already been submitted.")
+    # async def practice(self, interaction: discord.Interaction, episode_id: int):
+    #     await interaction.response.defer()
+    #     tournament_game = await models.TournamentGames.get_or_none(episode_id=episode_id)
+    #     if tournament_game is None:
+    #         await interaction.response.send_message("That episode has not been submitted yet.", ephemeral=True)
+    #         return
 
-        settings = tournament_game.settings
+    #     settings = tournament_game.settings
 
-        seed = await alttpr_discord.ALTTPRDiscord.generate(settings=settings, endpoint='/api/customizer')  # TODO: don't hardcode endpoint
-        embed = await seed.embed(emojis=self.bot.emojis)
+    #     seed = await alttpr_discord.ALTTPRDiscord.generate(settings=settings, endpoint='/api/customizer')  # TODO: don't hardcode endpoint
+    #     embed = await seed.embed(emojis=self.bot.emojis)
 
-        await interaction.followup.send(embed=embed)
+    #     await interaction.followup.send(embed=embed)
 
 
     # @app_commands.command(description="Generate a randomizer seed for the ALTTPR Main Tournament 2023.")
