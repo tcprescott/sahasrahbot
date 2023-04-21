@@ -12,7 +12,7 @@ import pytz
 from alttprbot_racetime import bot as racetimebot
 
 from alttprbot import models
-from alttprbot.tournament import test, alttprde, alttprmini, dailies, smwde, smrl, alttpr_quals
+from alttprbot.tournament import test, alttprde, alttprmini, dailies, smwde, smrl, alttpr
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -32,7 +32,7 @@ else:
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         'alttprde': alttprde.ALTTPRDETournamentBrackets,
         'alttprmini': alttprmini.ALTTPRMiniTournament,
-        'alttpr': alttpr_quals.ALTTPRQualifierRace,
+        # 'alttpr': alttpr.ALTTPR2023Race, // TODO: re-enable this Saturday night
         # 'boots': boots.ALTTPRCASBootsTournamentRace,
         # 'nologic': nologic.ALTTPRNoLogicRace,
         'smwde': smwde.SMWDETournament,
