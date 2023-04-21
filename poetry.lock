@@ -2631,6 +2631,23 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["argcomplete (>=2.0)", "pre-commit", "pytest", "pytest-mock"]
 
 [[package]]
+name = "twitchapi"
+version = "3.10.0"
+description = "A Python 3.7+ implementation of the Twitch Helix API, PubSub, EventSub and Chat"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "twitchAPI-3.10.0-py3-none-any.whl", hash = "sha256:1ee2186506403d04d6113e6d45f5b3562e18f1588a119c88bffab2a6b3435ac5"},
+    {file = "twitchAPI-3.10.0.tar.gz", hash = "sha256:cd8700b8f55b3c0a86a4bc117c7a3333a453a47f42908ca394a8bd26daa9f6e8"},
+]
+
+[package.dependencies]
+aiohttp = "*"
+python-dateutil = "*"
+typing-extensions = "*"
+
+[[package]]
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -2970,4 +2987,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "a70491a8747ebbc0b83198e01127cc7bd82eac3643f15e0631d98f6c0b1a1893"
+content-hash = "92d760ed9305a413451c68f9afecd9897bf9d30200e87568b0d31626bb9be7f7"
