@@ -271,6 +271,7 @@ class SrlRaces(Model):
     message = fields.CharField(200, null=True)
 
 
+# unusued
 class SRLNick(Model):
     class Meta:
         table = 'srlnick'
@@ -781,3 +782,14 @@ class AsyncTournamentAuditLog(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     details = fields.TextField(null=True)
+
+class TwitchChannels(Model):
+    id = fields.IntField(pk=True)
+    channel_name = fields.BigIntField(null=False, unique=True)
+    token = fields.CharField(100, null=False)
+    refresh_token = fields.CharField(100, null=False)
+    scope = fields.JSONField(null=False)
+    last_refresh = fields.DatetimeField(null=False)
+
+    class PydanticMeta:
+        exclude = ['last_refresh', 'token', 'refresh_token']

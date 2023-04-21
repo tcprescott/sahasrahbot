@@ -6,3 +6,4 @@ from .sgl22 import sgl22_blueprint
 from .tournament import tournament_blueprint
 from .triforcetexts import triforcetexts_blueprint
 from .asynctournament import asynctournament_blueprint
+from .twitch import twitch_blueprint

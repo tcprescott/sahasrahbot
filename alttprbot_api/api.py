@@ -29,6 +29,7 @@ sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
+sahasrahbotapi.register_blueprint(blueprints.twitch_blueprint, url_prefix="/twitch")
 
 
 @sahasrahbotapi.route("/")
