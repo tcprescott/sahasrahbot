@@ -167,7 +167,7 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
         'tournament_hard': 2 * len(players),
         'standardboots': 2 * len(players),
         'invrosia': 2 * len(players),
-        'fadkeysgt': 2 * len(players),
+        'fadkeys_gt': 2 * len(players),
         'tournament_mcboss': 2 * len(players),
     }
     for player in players:
