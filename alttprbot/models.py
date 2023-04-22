@@ -786,10 +786,12 @@ class AsyncTournamentAuditLog(Model):
 class TwitchChannels(Model):
     id = fields.IntField(pk=True)
     channel_name = fields.BigIntField(null=False, unique=True)
+    user_id = fields.BigIntField(null=False)
     token = fields.CharField(100, null=False)
     refresh_token = fields.CharField(100, null=False)
     scope = fields.JSONField(null=False)
-    last_refresh = fields.DatetimeField(null=False)
+    updated = fields.DatetimeField(auto_now=True)
+    created = fields.DatetimeField(auto_now_add=True)
 
     class PydanticMeta:
-        exclude = ['last_refresh', 'token', 'refresh_token']
+        exclude = ['updated', 'created', 'token', 'refresh_token']

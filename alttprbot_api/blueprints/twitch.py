@@ -1,5 +1,5 @@
-from quart import Blueprint, redirect, render_template, request, url_for
-from twitchAPI.oauth import UserAuthenticator
+from quart import Blueprint, redirect, render_template, request, url_for, jsonify
+from twitchAPI.oauth import UserAuthenticator, get_user_info
 from twitchAPI.types import AuthScope
 
 from alttprbot import models
@@ -32,4 +32,9 @@ async def login():
 async def callback():
     auth = UserAuthenticator(twitchapi, [], url="http://localhost:5001/twitch/callback", force_verify=False)
     access_token, refresh_token = await auth.authenticate(user_token=request.args.get('code'))
-    return "success"
+
+    user_info = await get_user_info(access_token)
+
+    user_id = user_info['sub']
+
+    return jsonify(user_info)
