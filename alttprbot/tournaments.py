@@ -110,7 +110,7 @@ async def race_recording_task():
             ])
 
         for race in races:
-            logging.info(f"Recording {race.episode_id}")
+            logging.info(f"Recording {race.episode_id} for {event} to {event_data.data.gsheet_id}")
             try:
                 async with aiohttp.request(
                         method='get',
