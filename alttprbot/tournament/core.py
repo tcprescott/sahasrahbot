@@ -421,3 +421,29 @@ class TournamentRace(object):
             if self.audit_channel:
                 await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
             await self.rtgg_handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a Tournament Moderator for assistance.")
+
+    async def send_race_submission_form(self, warning=False):
+        if self.submission_form is None:
+            return
+
+        if self.tournament_game and self.tournament_game.submitted and not warning:
+            return
+
+        if warning:
+            msg = (
+                f"Your upcoming race room cannot be created because settings have not submitted: `{self.versus}`!\n\n"
+                f"For your convenience, please visit {self.submit_link} to submit the settings.\n\n"
+            )
+        else:
+            msg = (
+                f"Greetings!  Do not forget to submit settings for your upcoming race: `{self.versus}`!\n\n"
+                f"For your convenience, please visit {self.submit_link} to submit the settings.\n\n"
+            )
+
+        for name, player in self.player_discords:
+            if player is None:
+                continue
+            logging.info("Sending tournament submit reminder to %s.", name)
+            await player.send(msg)
+
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})

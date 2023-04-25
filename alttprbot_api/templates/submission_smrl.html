@@ -1,0 +1,56 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>Match Submission</title>
+{%- endblock head %}
+
+{% block content -%}
+
+<script>
+    var disableField = function () {
+        var game = document.getElementById("game").value;
+
+        switch (game) {
+            case '1':
+            case '2':
+            case '3':
+                document.getElementById("g45").hidden = true;
+                break;
+            case '4':
+            case '5':
+                document.getElementById("g45").hidden = false;
+                break;
+        }
+    };
+</script>
+
+<form action="{{ endpoint }}" method="post">
+    <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid"
+        value="{{ episode_id }}" required><br><br>
+    <input type="hidden" id="event" name="event" value="{{ event }}">
+
+    <label for="game">Game #:</label>
+    <select name="game" id="game" onchange="disableField()">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select><br><br>
+
+    <div id="g45" hidden>
+        <div>
+            <label for="preset">Preset</label>
+            <select name="preset" id="preset">
+                <option value="RLS4W2">Countdown, Full Area, Vanilla Bosses (week 2)</option>
+                <option value="RLS4W3">Major/Minor, Full Area, Boss Shuffle (week 3)</option>
+                <option value="RLS4P1">Countdown, Vanilla Area, Boss Shuffle (countdown equivalent to week 4)</option>
+                <option value="standard_mm">Classic DASH</option>
+                <option value="RLS4P2">Chozo, Full Area, Vanilla Bosses</option>
+            </select>
+        </div>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+{%- endblock content %}
