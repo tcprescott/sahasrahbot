@@ -338,7 +338,7 @@ class TournamentPresetHistory(Model):
     id = fields.IntField(pk=True)
     preset = fields.CharField(max_length=255)
     discord_user_id = fields.BigIntField()
-    episode_id = fields.IntField(null=True)
+    episode_id = fields.BigIntField(null=True)
     event_slug = fields.CharField(max_length=255)
     timestamp = fields.DatetimeField(auto_now_add=True)
 

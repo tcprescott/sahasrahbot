@@ -17,11 +17,39 @@ from config import Config as c
 
 MAIN_TOURNAMENT_SERVERS = list(map(int, os.environ.get("MAIN_TOURNAMENT_SERVERS", "").split(',')))
 CC_TOURNAMENT_SERVERS = list(map(int, os.environ.get("CC_TOURNAMENT_SERVERS", "").split(',')))
-CC_TOURNAMENT_AUDIT_CHANNELS = list(map(int, os.environ.get("CC_TOURNAMENT_AUDIT_CHANNELS", "").split(',')))
+CC_TOURNAMENT_AUDIT_CHANNELS = int(os.environ.get("CC_TOURNAMENT_AUDIT_CHANNELS", "0"))
 
 MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 334796844750209024
 CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
 
+class ChallengeCupDeleteHistoryView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger, custom_id='sahabot:delete_history')
+    async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.guild.chunked:
+            await interaction.guild.chunk()
+
+        admin_role = interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID)
+
+        if not admin_role in interaction.user.roles:
+            await interaction.response.send_message("You do not have permission to do that.", ephemeral=True)
+            return
+
+        message_id = interaction.message.id
+
+        await models.TournamentPresetHistory.filter(
+            episode_id=message_id,
+            event_slug='cc2023'
+        ).delete()
+        await interaction.message.add_reaction('🗑️')
+
+        # disable buttons
+        for child in self.children:
+            child.disabled = True
+        await interaction.message.edit(view=self)
+        await interaction.response.send_message("History deleted.", ephemeral=True)
 
 class Tournament(commands.Cog):
     def __init__(self, bot):
@@ -35,7 +63,7 @@ class Tournament(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
-            # self.bot.add_view(tournaments.alttprde.ALTTPRDEPracticeView())
+            self.bot.add_view(ChallengeCupDeleteHistoryView())
             self.persistent_views_added = True
 
     @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
@@ -397,19 +425,16 @@ class Tournament(commands.Cog):
             players.append(player4)
 
         await interaction.response.defer()
-        embed = await self.generate_deck_seed(players, "cc2023")
+        # embed = await self.generate_deck_seed(players, "cc2023")
 
-        for channel_id in CC_TOURNAMENT_AUDIT_CHANNELS:
-            channel = self.bot.get_channel(channel_id)
-            await channel.send(embed=embed)
+        msg_id = None
 
-        for player in players:
-            await player.send(embed=embed)
+        if CC_TOURNAMENT_AUDIT_CHANNELS:
+            channel = self.bot.get_channel(CC_TOURNAMENT_AUDIT_CHANNELS)
+            msg = await channel.send("Generating...")
+            msg_id = msg.id
 
-        await interaction.followup.send("Seed successfully sent to DM.")
-
-    async def generate_deck_seed(self, players, event_slug):
-        seed, preset, deck = await alttpr.roll_seed(players, event_slug=event_slug)
+        seed, preset, deck = await alttpr.roll_seed(players, event_slug="cc2023", episode_id=msg_id)
 
         embed = await seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
@@ -419,7 +444,14 @@ class Tournament(commands.Cog):
         embed.title = " vs. ".join([p.display_name for p in players])
         embed.description = " vs. ".join([p.mention for p in players])
 
-        return embed
+
+        for player in players:
+            await player.send(embed=embed)
+
+        if CC_TOURNAMENT_AUDIT_CHANNELS:
+            await msg.edit(content="Sent to players.", embed=embed, view=ChallengeCupDeleteHistoryView())
+
+        await interaction.followup.send("Seed successfully sent to DM.")
 
 async def setup(bot):
     await bot.add_cog(Tournament(bot))
