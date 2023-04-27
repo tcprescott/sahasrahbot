@@ -24,7 +24,7 @@ CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202
 
 class ChallengeCupDeleteHistoryView(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
 
     @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger, custom_id='sahabot:delete_history')
     async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
