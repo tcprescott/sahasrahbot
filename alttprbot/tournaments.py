@@ -30,8 +30,8 @@ else:
         # REGULAR TOURNEMNTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        'alttprde': alttprde.ALTTPRDETournamentBrackets,
-        'alttprmini': alttprmini.ALTTPRMiniTournament,
+        # 'alttprde': alttprde.ALTTPRDETournamentBrackets,
+        # 'alttprmini': alttprmini.ALTTPRMiniTournament,
         'alttpr': alttpr.ALTTPR2023Race,
         # 'boots': boots.ALTTPRCASBootsTournamentRace,
         # 'nologic': nologic.ALTTPRNoLogicRace,
