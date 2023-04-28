@@ -28,30 +28,30 @@ class ChallengeCupDeleteHistoryView(discord.ui.View):
 
     @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger, custom_id='sahabot:delete_history')
     async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # if not interaction.guild.chunked:
-        #     await interaction.guild.chunk()
+        embed = interaction.message.embeds[0]
+        await interaction.user.send(f"Are you sure you want to delete the history of this race?\n\n{embed.title}", view=ChallengeCupDeleteHistoryConfirmationView(message=interaction.message))
+        await interaction.response.send_message("Check your DMs.", ephemeral=True)
 
-        # admin_role = interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID)
+class ChallengeCupDeleteHistoryConfirmationView(discord.ui.View):
+    def __init__(self, message: discord.Message):
+        super().__init__(timeout=300)
+        self.message = message
 
-        # if not admin_role in interaction.user.roles:
-        #     await interaction.response.send_message("You do not have permission to do that.", ephemeral=True)
-        #     return
+    @discord.ui.button(label='Confirm Delete History', style=discord.ButtonStyle.danger)
+    async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
+        message_id = self.message.id
 
-        # message_id = interaction.message.id
+        await models.TournamentPresetHistory.filter(
+            episode_id=message_id,
+            event_slug='cc2023'
+        ).delete()
+        await self.message.add_reaction('🗑️')
 
-        # await models.TournamentPresetHistory.filter(
-        #     episode_id=message_id,
-        #     event_slug='cc2023'
-        # ).delete()
-        # await interaction.message.add_reaction('🗑️')
-
-        # # disable buttons
-        # for child in self.children:
-        #     child.disabled = True
-        # await interaction.message.edit(view=self)
-        # await interaction.response.send_message("History deleted.", ephemeral=True)
-        await interaction.response.send_message("temporary disabled.", ephemeral=True)
-        
+        # disable buttons
+        for child in self.children:
+            child.disabled = True
+        await self.message.edit(view=self)
+        await interaction.response.send_message("History deleted.")
 
 class Tournament(commands.Cog):
     def __init__(self, bot):
