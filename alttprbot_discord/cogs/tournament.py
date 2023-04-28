@@ -28,6 +28,13 @@ class ChallengeCupDeleteHistoryView(discord.ui.View):
 
     @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger, custom_id='sahabot:delete_history')
     async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.guild.chunked:
+            await interaction.guild.chunk()
+
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("You must be an administrator to delete history.", ephemeral=True)
+            return
+
         embed = interaction.message.embeds[0]
         await interaction.user.send(f"Are you sure you want to delete the history of this race?\n\n{embed.title}", view=ChallengeCupDeleteHistoryConfirmationView(message=interaction.message))
         await interaction.response.send_message("Check your DMs.", ephemeral=True)
