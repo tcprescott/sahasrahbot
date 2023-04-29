@@ -123,9 +123,34 @@ class ALTTPR2023Race(ALTTPRTournamentRace):
         return f"{self.preset} - ({'/'.join(self.seed.code)})"
 
     async def create_embeds(self):
-        await super().create_embeds()
+        if self.rtgg_handler is None:
+            raise SahasrahBotException("No RaceTime.gg handler associated with this tournament game.")
+
+        self.embed = await self.seed.embed(
+            name=self.race_info,
+            notes=self.versus,
+            emojis=discordbot.emojis,
+            include_settings=False
+        )
+
+        self.tournament_embed = await self.seed.tournament_embed(
+            name=self.race_info,
+            notes=self.versus,
+            emojis=discordbot.emojis,
+            include_settings=False
+        )
+
+        self.tournament_embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+        self.embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+
+        if self.broadcast_channels:
+            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+
         self.embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
+        self.tournament_embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
         if self.deck:
+            self.tournament_embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]), inline=False)
             self.embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]), inline=False)
 
     async def configuration(self):

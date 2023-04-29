@@ -46,7 +46,7 @@ class AlttprDoorDiscord(AlttprDoor):
     def generated_goal(self):
         return "door randomizer"
 
-    async def embed(self, emojis=False, name=False, notes=False):
+    async def embed(self, emojis=False, name=False, notes=False, include_settings=True):
         embed = discord.Embed(
             title=name if name else "Requested Seed",
             description=notes if notes else "Requested Door Randomizer Game.",
@@ -73,7 +73,7 @@ class AlttprDoorDiscord(AlttprDoor):
         embed.set_footer(text="Generated", icon_url=discord.utils.get(emojis, name="SahasrahBot").url)
         return embed
 
-    async def tournament_embed(self, emojis=False, name=False, notes=False):
+    async def tournament_embed(self, emojis=False, name=False, notes=False, include_settings=True):
         embed = discord.Embed(
             title=name,
             description=notes,

@@ -402,7 +402,7 @@ class Tournament(commands.Cog):
 
     #     await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(description="Generate a randomizer seed for the 2022 challenge cup.")
+    @app_commands.command(description="Generate a randomizer seed for the 2023 challenge cup.")
     @app_commands.guilds(*CC_TOURNAMENT_SERVERS)
     async def cc2023(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
         if interaction.guild.chunked is False:
@@ -445,7 +445,7 @@ class Tournament(commands.Cog):
 
         seed, preset, deck = await alttpr.roll_seed(players, event_slug="cc2023", episode_id=msg_id)
 
-        embed = await seed.embed(emojis=self.bot.emojis)
+        embed = await seed.embed(emojis=self.bot.emojis, include_settings=False)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         if deck:
             embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)

@@ -1,10 +1,10 @@
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot.tournament import smrl_playoff
+from alttprbot.tournament import alttpr
 # from alttprbot.tournament import alttprleague
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(smrl_playoff.SMRLPlayoffs):
+class TestTournament(alttpr.ALTTPR2023Race):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(
