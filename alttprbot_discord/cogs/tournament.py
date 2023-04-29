@@ -462,5 +462,43 @@ class Tournament(commands.Cog):
 
         await interaction.followup.send("Seed successfully sent to DM.")
 
-async def setup(bot):
+    @app_commands.command(description="Generate a hypothetical deck for a match.  This does not generate a seed or write to history.")
+    @app_commands.guilds(*CC_TOURNAMENT_SERVERS, *MAIN_TOURNAMENT_SERVERS)
+    @app_commands.choices(
+        event_slug=[
+            app_commands.OptionChoice(name="cc2023", value="cc2023"),
+            app_commands.OptionChoice(name="alttpr2023", value="alttpr2023"),
+        ]
+    )
+    async def tournament_deck(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, event_slug: str = None):
+        if on_behalf_of is None:
+            on_behalf_of = interaction.user
+
+        if interaction.user == opponent:
+            await interaction.response.send_message("You must specify two different players.", ephemeral=True)
+            return
+
+        if opponent.bot or on_behalf_of.bot:
+            await interaction.response.send_message("You cannot specify a bot as a player.", ephemeral=True)
+            return
+
+        if event_slug is None:
+            if interaction.guild.id in CC_TOURNAMENT_SERVERS:
+                event_slug = "cc2023"
+            elif interaction.guild.id in MAIN_TOURNAMENT_SERVERS:
+                event_slug = "alttpr2023"
+            else:
+                await interaction.response.send_message("You must specify an event slug.", ephemeral=True)
+                return
+
+        deck = await alttpr.generate_deck([opponent, on_behalf_of])
+        embed = discord.Embed(
+            title=f"{opponent.display_name} vs. {on_behalf_of.display_name}",
+            description=f"{opponent.mention} vs. {on_behalf_of.mention}",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+async def setup(bot: commands.Bot):
     await bot.add_cog(Tournament(bot))

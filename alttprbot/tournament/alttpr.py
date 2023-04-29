@@ -188,6 +188,17 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
             seed = await generator.ALTTPRPreset(existing_preset_for_episode.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
             return seed, existing_preset_for_episode.preset, None
 
+    deck = await generate_deck(players, event_slug=event_slug)
+
+    preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
+
+    for player in players:
+        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug=event_slug)
+
+    seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
+    return seed, preset, deck
+
+async def generate_deck(players: List[discord.Member], event_slug="alttpr2023"):
     deck = {
         'tournament_hard': 2 * len(players),
         'standardboots': 2 * len(players),
@@ -203,10 +214,4 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
         for h in history:
             deck[h.preset] -= 1 if deck[h.preset] > 0 else 0
 
-    preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
-
-    for player in players:
-        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug=event_slug)
-
-    seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
-    return seed, preset, deck
+    return deck
