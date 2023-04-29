@@ -466,8 +466,8 @@ class Tournament(commands.Cog):
     @app_commands.guilds(*CC_TOURNAMENT_SERVERS, *MAIN_TOURNAMENT_SERVERS)
     @app_commands.choices(
         event_slug=[
-            app_commands.OptionChoice(name="cc2023", value="cc2023"),
-            app_commands.OptionChoice(name="alttpr2023", value="alttpr2023"),
+            app_commands.Choice(name="cc2023", value="cc2023"),
+            app_commands.Choice(name="alttpr2023", value="alttpr2023"),
         ]
     )
     async def tournament_deck(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, event_slug: str = None):
@@ -491,7 +491,7 @@ class Tournament(commands.Cog):
                 await interaction.response.send_message("You must specify an event slug.", ephemeral=True)
                 return
 
-        deck = await alttpr.generate_deck([opponent, on_behalf_of])
+        deck = await alttpr.generate_deck([opponent, on_behalf_of], event_slug=event_slug)
         embed = discord.Embed(
             title=f"{opponent.display_name} vs. {on_behalf_of.display_name}",
             description=f"{opponent.mention} vs. {on_behalf_of.mention}",
