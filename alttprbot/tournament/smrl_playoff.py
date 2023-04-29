@@ -79,6 +79,7 @@ class SMRLPlayoffs(TournamentRace):
             racetime_goal='Beat the game',
             event_slug="smrl",
             audit_channel=discordbot.get_channel(1080994224880750682),
+            hours_to_look_forward=336,
             helper_roles=[
                 guild.get_role(500363025958567948),
                 guild.get_role(501810831504179250),

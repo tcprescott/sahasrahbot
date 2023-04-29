@@ -47,6 +47,7 @@ class TournamentConfig:
     room_open_time: int = 35
     auto_record: bool = False
     gsheet_id: str = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
+    hours_to_look_forward: int = 168
 
     lang: str = 'en'
     coop: bool = False
