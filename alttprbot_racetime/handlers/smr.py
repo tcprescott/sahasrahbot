@@ -1,11 +1,10 @@
 import random
 
-from alttprbot.alttprgen import preset, smz3multi, smvaria
+from alttprbot.alttprgen import generator, smz3multi, smvaria
 from alttprbot.alttprgen.randomizer import smdash
 from pyz3r.exceptions import UnableToGenerate, UnableToRetrieve
 
 from .core import SahasrahBotCoreHandler
-
 
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_choozorace(self, args, message):
@@ -119,15 +118,12 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-        try:
-            seed, _ = await preset.get_preset(preset_name, randomizer='sm', spoilers="off")
-        except preset.PresetNotFoundException as e:
-            await self.send_message(str(e))
-            return
+        smpreset = generator.SMPreset(preset_name)
+        await smpreset.generate(tournament=True, spoilers=False)
 
-        race_info = f"SM Total Randomizer - {preset_name} - {seed.url} - ({seed.code})"
+        race_info = f"SM Total Randomizer - {preset_name} - {smpreset.seed.url} - ({smpreset.seed.code})"
         await self.set_bot_raceinfo(race_info)
-        await self.send_message(seed.url)
+        await self.send_message(smpreset.seed.url)
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
 
@@ -192,6 +188,34 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.send_message(f"{url}")
         await self.send_message("Seed rolling complete.  See race info for details.")
         self.seed_rolled = True
+
+    # async def ex_spoiler(self, args, message):
+    #     if await self.is_locked(message):
+    #         return
+
+    #     try:
+    #         preset_name = args[0]
+    #     except IndexError:
+    #         await self.send_message(
+    #             'You must specify a preset!'
+    #         )
+    #         return
+
+    #     await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+    #     smpreset = generator.SMPreset(preset_name)
+    #     await smpreset.generate(tournament=True, spoilers=True)
+    #     spoiler_url = smpreset.spoiler_url()
+
+    #     try:
+    #         studytime = int(args[1])
+    #     except IndexError:
+    #         studytime = 900
+
+    #     await self.set_bot_raceinfo(f"spoiler {preset_name} - {smpreset.seed.url} - ({'/'.join(smpreset.seed.code)})")
+    #     await self.send_message(smpreset.seed.url)
+    #     await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+    #     await self.schedule_spoiler_race(spoiler_url, studytime)
+    #     self.seed_rolled = True
 
     async def ex_help(self, args, message):
         await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <preset>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")

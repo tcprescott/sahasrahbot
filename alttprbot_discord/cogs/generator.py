@@ -399,17 +399,17 @@ class Generator(commands.Cog):
         interaction: discord.Interaction,
         preset: str,
         race: str = "no",
-        spoiler_race: str = "no",
+        # spoiler_race: str = "no",
     ):
         """
         Generates an Super Metroid Randomizer game on https://sm.samus.link
         """
         await interaction.response.defer()
         smpreset = generator.SMPreset(preset)
-        await smpreset.generate(tournament=race == "yes", spoilers=spoiler_race == "yes")
+        await smpreset.generate(tournament=race == "yes", spoilers=False)
         embed = await smpreset.seed.embed()
-        if spoiler_url := smpreset.spoiler_url():
-            embed.add_field(name='Race Spoiler Log', value=spoiler_url)
+        # if spoiler_url := smpreset.spoiler_url():
+        #     embed.add_field(name='Race Spoiler Log', value=spoiler_url)
         await interaction.followup.send(embed=embed)
 
     @sm.autocomplete("preset")

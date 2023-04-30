@@ -1,5 +1,5 @@
 import asyncio
-from .alttpr import GameHandler as TestGameHandler
+from .smr import GameHandler as TestGameHandler
 
 
 class GameHandler(TestGameHandler):
@@ -12,5 +12,5 @@ class GameHandler(TestGameHandler):
             await self.send_message("Invalid number of seconds")
             return
         await self.send_message(f"initated test command, waiting {seconds} seconds")
-        await asyncio.sleep(seconds)
+        await self.countdown_timer(seconds)
         await self.send_message("test command complete")

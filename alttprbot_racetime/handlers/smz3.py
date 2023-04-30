@@ -1,6 +1,6 @@
 import random
 
-from alttprbot.alttprgen import preset, smz3multi
+from alttprbot.alttprgen import generator, smz3multi
 
 from .core import SahasrahBotCoreHandler
 
@@ -72,14 +72,40 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-        try:
-            seed, _ = await preset.get_preset(preset_name, randomizer='smz3', spoilers="off")
-        except preset.PresetNotFoundException as e:
-            await self.send_message(str(e))
+
+        smz3preset = generator.SMZ3Preset(preset_name)
+        await smz3preset.generate(tournament=True, spoilers=False)
+
+        race_info = f"{preset_name} - {smz3preset.seed.url} - ({smz3preset.seed.code})"
+        await self.set_bot_raceinfo(race_info)
+        await self.send_message(smz3preset.seed.url)
+        await self.send_message("Seed rolling complete.  See race info for details.")
+        self.seed_rolled = True
+
+    async def ex_spoiler(self, args, message):
+        if await self.is_locked(message):
             return
 
-        race_info = f"{preset_name} - {seed.url} - ({seed.code})"
-        await self.set_bot_raceinfo(race_info)
-        await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        smz3preset = generator.SMZ3Preset(preset_name)
+        await smz3preset.generate(tournament=True, spoilers=True)
+        spoiler_url = smz3preset.spoiler_url()
+
+        try:
+            studytime = int(args[1])
+        except IndexError:
+            studytime = 25*60
+
+        await self.set_bot_raceinfo(f"spoiler {preset_name} - {smz3preset.seed.url} - ({'/'.join(smz3preset.seed.code)})")
+        await self.send_message(smz3preset.seed.url)
+        await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+        await self.schedule_spoiler_race(spoiler_url, studytime)
         self.seed_rolled = True

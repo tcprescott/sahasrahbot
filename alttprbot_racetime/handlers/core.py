@@ -7,6 +7,10 @@ from alttprbot import models
 from alttprbot import tournaments
 from alttprbot_racetime.misc.konot import KONOT
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
+import asyncio
+import math
+from datetime import datetime
+import discord.utils
 
 
 class SahasrahBotCoreHandler(RaceHandler):
@@ -18,6 +22,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     konot: KONOT = None
     status = None
     unlisted = False
+    spoiler_race: models.SpoilerRaces = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -31,6 +36,92 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         await self.setup_tournament()
         await self.setup_konot()
+        await self.setup_spoiler_race()
+
+    async def setup_spoiler_race(self):
+        self.spoiler_race = await models.SpoilerRaces.get_or_none(
+            srl_id=self.data.get('name')
+        )
+
+        if self.spoiler_race is None:
+            return
+        if self.spoiler_race.started is None:
+            return
+
+        started_time = self.spoiler_race.started
+        now_time = discord.utils.utcnow()
+        remaining_duration = (started_time - now_time).total_seconds() + self.spoiler_race.studytime
+
+        if remaining_duration <= 0:
+            return
+
+        loop = asyncio.get_running_loop()
+        loop.create_task(self.countdown_timer(
+            duration_in_seconds=remaining_duration,
+            beginmessage=True,
+        ))
+
+
+    async def send_spoiler_log(self):
+        if self.spoiler_race is None:
+            return
+
+        self.spoiler_race.started = datetime.utcnow()
+        await self.spoiler_race.save(update_fields=['started'])
+        await self.send_message('Sending spoiler log...')
+        await self.send_message('---------------')
+        await self.send_message(f"This race\'s spoiler log: {self.spoiler_race.spoiler_url}")
+        await self.send_message('---------------')
+        await self.send_message('GLHF! :mudora:')
+        loop = asyncio.get_running_loop()
+        loop.create_task(self.countdown_timer(
+            duration_in_seconds=self.spoiler_race.studytime,
+            beginmessage=True,
+        ))
+
+    async def countdown_timer(self, duration_in_seconds, beginmessage=False):
+        loop = asyncio.get_running_loop()
+
+        reminders = [1800, 1500, 1200, 900, 600, 300,
+                     120, 60, 30, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        start_time = loop.time()
+        end_time = loop.time() + duration_in_seconds
+        while True:
+            # logging.info(datetime.datetime.now())
+            timeleft = math.ceil(
+                start_time - loop.time() + duration_in_seconds)
+            # logging.info(timeleft)
+            if timeleft in reminders:
+                minutes = math.floor(timeleft/60)
+                seconds = math.ceil(timeleft % 60)
+                if minutes == 0 and seconds > 10:
+                    msg = f'{seconds} second(s) remain!'
+                elif minutes == 0 and seconds <= 10:
+                    msg = f"{seconds} second(s) remain!"
+                else:
+                    msg = f'{minutes} minute(s), {seconds} seconds remain!'
+                await self.send_message(msg)
+                reminders.remove(timeleft)
+            if loop.time() >= end_time:
+                if beginmessage:
+                    await self.send_message('Log study has finished.  Begin racing!')
+                break
+            await asyncio.sleep(.1 if timeleft <= 10 else 1)
+
+    async def schedule_spoiler_race(self, spoiler_url: str, studytime: int):
+        self.spoiler_race, _ = await models.SpoilerRaces.update_or_create(
+            srl_id=self.data.get('name'),
+            defaults={
+                'spoiler_url': spoiler_url,
+                'studytime': studytime,
+            }
+        )
+        return self.spoiler_race
+
+    async def delete_spoiler_race(self):
+        if self.spoiler_race:
+            await self.spoiler_race.delete()
+        self.spoiler_race = None
 
     async def setup_tournament(self):
         if self.tournament:
@@ -109,8 +200,10 @@ class SahasrahBotCoreHandler(RaceHandler):
         # raise Exception(data.get('errors'))
 
     async def status_in_progress(self):
+        await self.send_spoiler_log()
         if self.tournament:
             await self.tournament.on_race_start()
+
 
     async def status_pending(self):
         if self.tournament:
