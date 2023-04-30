@@ -211,7 +211,7 @@ class GameHandler(SahasrahBotCoreHandler):
     #     except IndexError:
     #         studytime = 900
 
-    #     await self.set_bot_raceinfo(f"spoiler {preset_name} - {smpreset.seed.url} - ({'/'.join(smpreset.seed.code)})")
+    #     await self.set_bot_raceinfo(f"spoiler {preset_name} - {smpreset.seed.url} - ({smpreset.seed.code})")
     #     await self.send_message(smpreset.seed.url)
     #     await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
     #     await self.schedule_spoiler_race(spoiler_url, studytime)
