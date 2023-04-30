@@ -393,19 +393,23 @@ class Generator(commands.Cog):
         preset="The preset you want generate.",
         race="Is this a race? (default no)"
     )
-    @app_commands.choices(race=YES_NO_CHOICE)
+    @app_commands.choices(race=YES_NO_CHOICE, spoiler_race=YES_NO_CHOICE)
     async def sm(
         self,
         interaction: discord.Interaction,
         preset: str,
         race: str = "no",
+        spoiler_race: str = "no",
     ):
         """
         Generates an Super Metroid Randomizer game on https://sm.samus.link
         """
         await interaction.response.defer()
-        seed = await generator.SMPreset(preset).generate(tournament=race == "yes")
-        embed = await seed.embed()
+        smpreset = generator.SMPreset(preset)
+        await smpreset.generate(tournament=race == "yes", spoilers=spoiler_race == "yes")
+        embed = await smpreset.seed.embed()
+        if spoiler_url := smpreset.spoiler_url():
+            embed.add_field(name='Race Spoiler Log', value=spoiler_url)
         await interaction.followup.send(embed=embed)
 
     @sm.autocomplete("preset")
@@ -418,19 +422,23 @@ class Generator(commands.Cog):
         preset="The preset you want generate.",
         race="Is this a race? (default no)"
     )
-    @app_commands.choices(race=YES_NO_CHOICE)
+    @app_commands.choices(race=YES_NO_CHOICE, spoiler_race=YES_NO_CHOICE)
     async def smz3(
         self,
         interaction: discord.Interaction,
         preset: str,
         race: str = "no",
+        spoiler_race: str = "no",
     ):
         """
         Generates an ALTTP Super Metroid Combo Randomizer game on https://samus.link
         """
         await interaction.response.defer()
-        seed = await generator.SMZ3Preset(preset).generate(tournament=race == "yes")
-        embed = await seed.embed()
+        smz3preset = generator.SMZ3Preset(preset)
+        await smz3preset.generate(tournament=race == "yes", spoilers=spoiler_race == "yes")
+        embed = await smz3preset.seed.embed()
+        if spoiler_url := smz3preset.spoiler_url():
+            embed.add_field(name='Race Spoiler Log', value=spoiler_url)
         await interaction.followup.send(embed=embed)
 
     @smz3.autocomplete("preset")

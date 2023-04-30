@@ -20,7 +20,6 @@ class ALTTPRSpoilerGame:
     spoiler_log_url: str
     seed: ALTTPRDiscord
 
-
 async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False):
     preset_data = ALTTPRPreset(preset)
     await preset_data.fetch()

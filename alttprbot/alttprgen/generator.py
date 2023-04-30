@@ -11,6 +11,7 @@ import pyz3r
 import yaml
 from aiohttp.client_exceptions import ClientResponseError
 from alttprbot import models
+from alttprbot.util.helpers import generate_random_string
 from alttprbot.alttprgen.randomizer import ctjets, mysterydoors
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
@@ -290,58 +291,64 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 
         return mystery
 
-
 class SMPreset(SahasrahBotPresetCore):
     randomizer = 'sm'
+    randomizer_class = SMDiscord
+    spoiler_key: str = None
+    seed: SMDiscord = None
 
-    async def generate(self, tournament=True):
+    async def generate(self, tournament=True, spoilers=False):
         if self.preset_data is None:
             await self.fetch()
 
         settings = self.preset_data['settings']  # pylint: disable=E1136
         settings['race'] = "true" if tournament else "false"
-        seed = await SMDiscord.create(
+
+        if spoilers:
+            if self.spoiler_key is None:
+                self.spoiler_key = generate_random_string(20)
+
+            settings['spoilerKey'] = self.spoiler_key
+        self.seed = await self.randomizer_class.create(
             settings=settings,
         )
-        hash_id = seed.slug_id
 
         await models.AuditGeneratedGames.create(
             randomizer=self.randomizer,
-            hash_id=hash_id,
-            permalink=seed.url,
+            hash_id=self.hash_id,
+            permalink=self.seed.url,
             settings=settings,
             gentype='preset',
             genoption=self.preset,
             customizer=0
         )
-        return seed
+        return self.seed
 
+    @property
+    def hash_id(self):
+        if self.seed is None:
+            return None
+        return self.seed.slug_id
 
-class SMZ3Preset(SahasrahBotPresetCore):
+    @property
+    def guid(self):
+        if self.seed is None:
+            return None
+        return self.seed.data['guid']
+
+    # I hate this, this should actually be a property of the seed
+    def spoiler_url(self, use_yaml=True):
+        if self.seed is None:
+            raise Exception("Seed has not been generated.")
+        if self.spoiler_key is None:
+            return None
+        if self.hash_id is None:
+            raise Exception("Hash ID is not set.")
+        return f"{self.seed.baseurl}/api/spoiler/{self.guid}?key={self.spoiler_key}&yaml={str(use_yaml)}"
+
+class SMZ3Preset(SMPreset):
     randomizer = 'smz3'
-
-    async def generate(self, tournament=True):
-        if self.preset_data is None:
-            await self.fetch()
-
-        settings = self.preset_data['settings']  # pylint: disable=E1136
-        settings['race'] = "true" if tournament else "false"
-        seed = await SMZ3Discord.create(
-            settings=settings,
-        )
-        hash_id = seed.slug_id
-
-        await models.AuditGeneratedGames.create(
-            randomizer=self.randomizer,
-            hash_id=hash_id,
-            permalink=seed.url,
-            settings=settings,
-            gentype='preset',
-            genoption=self.preset,
-            customizer=0
-        )
-        return seed
-
+    randomizer_class = SMZ3Discord
 
 class CTJetsPreset(SahasrahBotPresetCore):
     randomizer = 'ctjets'
