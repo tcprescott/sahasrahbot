@@ -393,13 +393,12 @@ class Generator(commands.Cog):
         preset="The preset you want generate.",
         race="Is this a race? (default no)"
     )
-    @app_commands.choices(race=YES_NO_CHOICE, spoiler_race=YES_NO_CHOICE)
+    @app_commands.choices(race=YES_NO_CHOICE)
     async def sm(
         self,
         interaction: discord.Interaction,
         preset: str,
         race: str = "no",
-        # spoiler_race: str = "no",
     ):
         """
         Generates an Super Metroid Randomizer game on https://sm.samus.link
@@ -408,8 +407,6 @@ class Generator(commands.Cog):
         smpreset = generator.SMPreset(preset)
         await smpreset.generate(tournament=race == "yes", spoilers=False)
         embed = await smpreset.seed.embed()
-        # if spoiler_url := smpreset.spoiler_url():
-        #     embed.add_field(name='Race Spoiler Log', value=spoiler_url)
         await interaction.followup.send(embed=embed)
 
     @sm.autocomplete("preset")
