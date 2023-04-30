@@ -138,7 +138,7 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         try:
-            settings = args[0],
+            settings = args[0]
             skills = args[1]
         except IndexError:
             await self.send_message(
