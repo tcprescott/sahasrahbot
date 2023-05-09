@@ -8,7 +8,7 @@ import logging
 from alttprbot import models
 from alttprbot.database import config  # TODO switch to ORM
 
-from ..util.alttpr_discord import ALTTPRDiscord
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 
 class Daily(commands.Cog):

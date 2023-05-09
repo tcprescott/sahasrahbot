@@ -1,13 +1,14 @@
 import datetime
 import logging
 import os
+import random
 
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
 from alttprbot.tournament import core, alttpr
-from alttprbot_discord.util import alttpr_discord
+# from alttprbot_discord.util import alttpr_discord
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
@@ -492,12 +493,14 @@ class Tournament(commands.Cog):
                 return
 
         deck = await alttpr.generate_deck([opponent, on_behalf_of], event_slug=event_slug)
+        preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
         embed = discord.Embed(
             title=f"{opponent.display_name} vs. {on_behalf_of.display_name}",
             description=f"{opponent.mention} vs. {on_behalf_of.mention}",
             color=discord.Color.blue()
         )
         embed.add_field(name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+        embed.add_field(name="In this hypothetical matchup, this mode was drawn:", value=preset, inline=False)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 async def setup(bot: commands.Bot):
