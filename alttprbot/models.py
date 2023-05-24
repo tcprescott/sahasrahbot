@@ -319,6 +319,7 @@ class Users(Model):
         backward_relations = False
     #     computed = ['racetime_profile']
 
+
 class TournamentGames(Model):
     class Meta:
         table = 'tournament_games'
@@ -536,6 +537,8 @@ class AsyncTournament(Model):
     active = fields.BooleanField(null=False, default=True)
     allowed_reattempts = fields.SmallIntField(null=False, default=0)
 
+    customization = fields.CharField(45, null=False, default='default')
+
     races: fields.ReverseRelation["AsyncTournamentRace"]
     whitelist: fields.ReverseRelation["AsyncTournamentWhitelist"]
     permissions: fields.ReverseRelation["AsyncTournamentPermissions"]
@@ -558,6 +561,7 @@ class AsyncTournamentWhitelist(Model):
     class PydanticMeta:
         backward_relations = False
         exclude = ['discord_user_id', 'tournament']
+
 
 class AsyncTournamentPermissions(Model):
     id = fields.IntField(pk=True)
@@ -595,11 +599,11 @@ class AsyncTournamentPermalink(Model):
         minutes, seconds = divmod(remainder, 60)
         return f"{hours:02}:{minutes:02}:{seconds:02}"
 
-
     class PydanticMeta:
         # computed = ['par_time_formatted']
         backward_relations = False
         exclude = ['created', 'updated']
+
 
 class AsyncTournamentPermalinkPool(Model):
     class Meta:
@@ -618,6 +622,7 @@ class AsyncTournamentPermalinkPool(Model):
     class PydanticMeta:
         max_recursion = 1
         exclude = ['created', 'updated', 'tournament']
+
 
 class AsyncTournamentLiveRace(Model):
     id = fields.IntField(pk=True)
@@ -644,12 +649,14 @@ class AsyncTournamentLiveRace(Model):
         backward_relations = False
         exclude = ['created', 'updated', 'races']
 
+
 class AsyncTournamentReviewNotes(Model):
     id = fields.IntField(pk=True)
     race = fields.ForeignKeyField('models.AsyncTournamentRace', related_name='review_notes')
     author = fields.ForeignKeyField('models.Users', related_name='async_tournament_review_notes', on_delete="RESTRICT")
     created = fields.DatetimeField(auto_now_add=True)
     note = fields.TextField(null=False)
+
 
 class AsyncTournamentRace(Model):
     id = fields.IntField(pk=True)
@@ -668,6 +675,8 @@ class AsyncTournamentRace(Model):
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)
     runner_vod_url = fields.CharField(400, null=True)
+    run_collection_rate = fields.CharField(100, null=True)
+    run_igt = fields.CharField(100, null=True)
     review_status = fields.CharField(20, null=False, default="pending")  # pending, approved, rejected
     reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
@@ -765,13 +774,14 @@ class AsyncTournamentRace(Model):
 
         soup = BeautifulSoup(self.runner_notes, 'html.parser')
         text = soup.get_text()
-        text = text.replace("\n","<br/>")
+        text = text.replace("\n", "<br/>")
         return markdown.markdown(text)
 
     class PydanticMeta:
         # computed = ['elapsed_time']
         backward_relations = False
         exclude = ['created', 'updated', 'tournament']
+
 
 class AsyncTournamentAuditLog(Model):
     id = fields.IntField(pk=True)
