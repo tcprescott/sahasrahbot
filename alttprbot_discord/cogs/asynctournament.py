@@ -1113,9 +1113,9 @@ async def finish_race(interaction: discord.Interaction):
 
     if race.tournament.customization == "gmpmt2023":
         await interaction.response.send_message(f"""
-            Your finish time of **{race.elapsed_time_formatted}** has been recorded. Thank you for playing!
+Your finish time of **{race.elapsed_time_formatted}** has been recorded. Thank you for playing!
 
-            Don't forget to submit your Collection Rate and In-game Time using the button below!
+Don't forget to submit your Collection Rate and In-game Time using the button below, and post in this channel a screenshot of your end card.
             """, view=AsyncTournamentPostRaceView())
     else:
         await interaction.response.send_message(f"Your finish time of **{race.elapsed_time_formatted}** has been recorded.  Thank you for playing!\n\nDon't forget to submit a VoD of your run using the button below!", view=AsyncTournamentPostRaceView())
