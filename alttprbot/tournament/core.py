@@ -78,6 +78,9 @@ class TournamentPlayer(object):
         if guild.chunked is False:
             await guild.chunk(cache=True)
 
+        if discord_name.endswith('#0'):
+            discord_name = discord_name[:-2]  # strip the #0 off the end of the name
+
         playerobj.discord_user = guild.get_member_named(discord_name)
         if playerobj.discord_user is None:
             raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")

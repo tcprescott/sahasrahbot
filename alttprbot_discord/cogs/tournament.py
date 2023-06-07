@@ -23,6 +23,7 @@ CC_TOURNAMENT_AUDIT_CHANNELS = int(os.environ.get("CC_TOURNAMENT_AUDIT_CHANNELS"
 MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 334796844750209024
 CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
 
+
 class ChallengeCupDeleteHistoryView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -39,6 +40,7 @@ class ChallengeCupDeleteHistoryView(discord.ui.View):
         embed = interaction.message.embeds[0]
         await interaction.user.send(f"Are you sure you want to delete the history of this race?\n\n{embed.title}", view=ChallengeCupDeleteHistoryConfirmationView(message=interaction.message))
         await interaction.response.send_message("Check your DMs.", ephemeral=True)
+
 
 class ChallengeCupDeleteHistoryConfirmationView(discord.ui.View):
     def __init__(self, message: discord.Message):
@@ -60,6 +62,7 @@ class ChallengeCupDeleteHistoryConfirmationView(discord.ui.View):
             child.disabled = True
         await self.message.edit(view=self)
         await interaction.response.send_message("History deleted.")
+
 
 class Tournament(commands.Cog):
     def __init__(self, bot):
@@ -368,7 +371,10 @@ class Tournament(commands.Cog):
                             member = None
 
                         if member is None:
-                            member = event_data.guild.get_member_named(player.get('discordTag', ''))
+                            discord_name: str = player.get('discordTag', '')
+                            if discord_name.endswith('#0'):  # strip the #0 off the end of the name
+                                discord_name = discord_name[:-2]
+                            member = event_data.guild.get_member_named(discord_name)
 
                         if member is None:
                             messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
@@ -389,7 +395,6 @@ class Tournament(commands.Cog):
     #     embed = await seed.embed(emojis=self.bot.emojis)
 
     #     await interaction.followup.send(embed=embed)
-
 
     # @app_commands.command(description="Generate a randomizer seed for the ALTTPR Main Tournament 2023.")
     # async def alttpr2023(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member):
@@ -454,7 +459,6 @@ class Tournament(commands.Cog):
         embed.title = " vs. ".join([p.display_name for p in players])
         embed.description = " vs. ".join([p.mention for p in players])
 
-
         for player in players:
             await player.send(embed=embed)
 
@@ -502,6 +506,7 @@ class Tournament(commands.Cog):
         embed.add_field(name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
         embed.add_field(name="In this hypothetical matchup, this mode was drawn:", value=preset, inline=False)
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Tournament(bot))
