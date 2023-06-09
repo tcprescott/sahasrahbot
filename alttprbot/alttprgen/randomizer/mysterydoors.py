@@ -29,6 +29,7 @@ BASE_DOORS_PAYLOAD = {
     "difficulty": "normal",
     "item_functionality": "normal",
     "accessibility": "items",
+    "algorithm": "balanced",
 
     # Shuffle Ganon defaults to TRUE
     "openpyramid": False,
@@ -49,8 +50,19 @@ BASE_DOORS_PAYLOAD = {
     "keyshuffle": False,
     "bigkeyshuffle": False,
     "keysanity": False,
-    "door_shuffle": "basic",
+    "timer": "none",
+    "door_shuffle": "vanilla",
     "intensity": 2,
+    "experimental": False,
+    "dungeon_counters": "default",
+    "collection_rate": False,
+    "bombbag": False,
+    "triforce_pool": 0,
+    "triforce_goal": 0,
+    "restrict_boss_items": "none",
+    "shufflelinks": False,
+    "overworld_map": "default",
+    "pseudoboots": False,
     "hints": True,
     "startinventory": "",
     "beemizer": 0,
@@ -75,6 +87,7 @@ def generate_doors_settings(weights, options):
     options["enemy_damage"] = get_random_option(weights['enemy_damage'])
     options["enemy_health"] = get_random_option(weights['enemy_health'])
     options["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
+    options['algorithm'] = get_random_option(weights.get('algorithm', 'balanced'))
     options['entrance_shuffle'] = get_random_option(weights['entrance_shuffle'])
     options['colorizepots'] = get_random_option(weights.get('colorizepots', False))
 
@@ -84,7 +97,13 @@ def generate_doors_settings(weights, options):
     options["bigkeyshuffle"] = get_random_option(weights.get('bigkeyshuffle', False))
 
     options["timer"] = get_random_option(weights.get('timer', 'none'))
+    options["experimental"] = get_random_option(weights.get('experimental', False))
     options["dungeon_counters"] = get_random_option(weights.get('dungeon_counters', 'default'))
+    options["triforce_pool"] = get_random_option(weights.get('triforce_pool', 0))
+    options["triforce_goal"] = get_random_option(weights.get('triforce_goal', 0))
+    options["restrict_boss_items"] = get_random_option(weights.get('restrict_boss_items', 'none'))
+    options["shufflelinks"] = get_random_option(weights.get('shufflelinks', False))
+    options["overworld_map"] = get_random_option(weights.get('overworld_map', 'default'))
     options["pseudoboots"] = get_random_option(weights.get('pseudoboots', False))
 
     options['intensity'] = get_random_option(weights.get('intensity', 2))
@@ -145,6 +164,7 @@ def generate_doors_settings(weights, options):
     settings["item_functionality"] = options['item_functionality']
     settings["accessibility"] = options['accessibility']
     settings["shopsanity"] = options['shopsanity'] == 'on'
+    settings["algorithm"] = options['algorithm']
     settings["shuffleganon"] = True
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
     settings["openpyramid"] = settings['goals'] in ['crystals', 'trinity'] if settings['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
@@ -165,7 +185,15 @@ def generate_doors_settings(weights, options):
     settings["keysanity"] = options['keysanity'] == 'on' if 'keysanity' in weights else options['dungeon_items'] == 'full'
 
     settings["timer"] = options["timer"]
+    settings["experimental"] = options['experimental'] == 'on'
     settings["dungeon_counters"] = options["dungeon_counters"]
+    settings["collection_rate"] = options["collection_rate"]
+    settings["bombbag"] = options["bombbag"]
+    settings["triforce_pool"] = options["triforce_pool"]
+    settings["triforce_goal"] = options["triforce_goal"]
+    settings["restrict_boss_items"] = options["restrict_boss_items"]
+    settings["shufflelinks"] = options["shufflelinks"]
+    settings["overworld_map"] = options["overworld_map"]
     settings["pseudoboots"] = options["pseudoboots"]
 
     settings["door_shuffle"] = options['door_shuffle']
@@ -198,14 +226,18 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
     options['dropshuffle'] = get_random_option(weights.get('dropshuffle', False))
     options['pottery'] = get_random_option(weights.get('pottery', 'none'))
     options['shopsanity'] = get_random_option(weights.get('shopsanity', False))
+    options["collection_rate"] = get_random_option(weights.get('collection_rate', False))
+    options["bombbag"] = get_random_option(weights.get('bombbag', False))
 
     doors = options['door_shuffle'] != 'vanilla'
     somedropshuffle = options['keydropshuffle'] == 'on' or options['dropshuffle'] == 'on' or options['pottery'] != 'none'
     shopsanity = options['shopsanity'] == 'on'
+    collection_rate = options['collection_rate'] == 'on'
+    bombbag = options['bombbag'] == 'on'
 
     custom_instructions = get_random_option(weights.get('custom_instructions', None))
 
-    if doors or somedropshuffle or shopsanity or weights.get('options', {}).get('force_doors', False):
+    if doors or somedropshuffle or shopsanity or collection_rate or bombbag or weights.get('options', {}).get('force_doors', False):
         settings = generate_doors_settings(weights, options)
         customizer = False
         doors = True
