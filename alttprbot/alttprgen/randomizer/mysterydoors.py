@@ -41,6 +41,9 @@ BASE_DOORS_PAYLOAD = {
     "enemy_damage": "default",
     "enemy_health": "default",
     "keydropshuffle": False,
+    "dropshuffle": False,
+    "pottery": "none",
+    "colorizepots": False,
     "mapshuffle": False,
     "compassshuffle": False,
     "keyshuffle": False,
@@ -73,6 +76,7 @@ def generate_doors_settings(weights, options):
     options["enemy_health"] = get_random_option(weights['enemy_health'])
     options["pot_shuffle"] = get_random_option(weights.get('pot_shuffle', 'off'))
     options['entrance_shuffle'] = get_random_option(weights['entrance_shuffle'])
+    options['colorizepots'] = get_random_option(weights.get('colorizepots', False))
 
     options["mapshuffle"] = get_random_option(weights.get('mapshuffle', False))
     options["compassshuffle"] = get_random_option(weights.get('compassshuffle', False))
@@ -145,17 +149,14 @@ def generate_doors_settings(weights, options):
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
     settings["openpyramid"] = settings['goals'] in ['crystals', 'trinity'] if settings['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
-    settings["shuffleenemies"] = {'none': 'none',
-                                  'shuffled': 'shuffled',
-                                  'random': 'random'
-                                  }[options['enemy_shuffle']]
+    settings["shuffleenemies"] = options['enemy_shuffle']
     settings["shufflebosses"] = options['boss_shuffle']
-    settings["enemy_damage"] = {'default': 'default',
-                                'shuffled': 'shuffled',
-                                'random': 'random'
-                                }[options['enemy_damage']]
+    settings["enemy_damage"] = options['enemy_damage']
     settings["enemy_health"] = options['enemy_health']
     settings["keydropshuffle"] = options['keydropshuffle'] == 'on'
+    settings["dropshuffle"] = options['dropshuffle'] == 'on'
+    settings["pottery"] = options['pottery']
+    settings["colorizepots"] = options['colorizepots'] == 'on'
 
     settings["mapshuffle"] = options['mapshuffle'] == 'on' if 'mapshuffle' in weights else options['dungeon_items'] in ['mc', 'mcs', 'full']
     settings["compassshuffle"] = options['compassshuffle'] == 'on' if 'compassshuffle' in weights else options['dungeon_items'] in ['mc', 'mcs', 'full']
@@ -194,15 +195,17 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
     options = {}
     options['door_shuffle'] = get_random_option(weights.get('door_shuffle', 'vanilla'))
     options['keydropshuffle'] = get_random_option(weights.get('keydropshuffle', False))
+    options['dropshuffle'] = get_random_option(weights.get('dropshuffle', False))
+    options['pottery'] = get_random_option(weights.get('pottery', 'none'))
     options['shopsanity'] = get_random_option(weights.get('shopsanity', False))
 
     doors = options['door_shuffle'] != 'vanilla'
-    keydropshuffle = options['keydropshuffle'] == 'on'
+    somedropshuffle = options['keydropshuffle'] == 'on' or options['dropshuffle'] == 'on' or options['pottery'] != 'none'
     shopsanity = options['shopsanity'] == 'on'
 
     custom_instructions = get_random_option(weights.get('custom_instructions', None))
 
-    if doors or keydropshuffle or shopsanity or weights.get('options', {}).get('force_doors', False):
+    if doors or somedropshuffle or shopsanity or weights.get('options', {}).get('force_doors', False):
         settings = generate_doors_settings(weights, options)
         customizer = False
         doors = True
