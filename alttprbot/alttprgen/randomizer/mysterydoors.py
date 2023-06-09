@@ -128,12 +128,7 @@ def generate_doors_settings(weights, options):
 
     settings["logic"] = "noglitches"
 
-    settings["goal"] = {
-        'ganon': 'ganon',
-        'fast_ganon': 'crystals',
-        'dungeons': 'dungeons',
-        'pedestal': 'pedestal',
-        'triforce-hunt': 'triforcehunt'}[options['goals']]
+    settings["goal"] = 'crystals' if options['goals'] == 'fast_ganon' else ('triforcehunt' if options['goals'] == 'triforce-hunt' else options['goals'])
 
     settings["crystals_gt"] = options['tower_open']
     settings["crystals_ganon"] = options['ganon_open']
@@ -145,10 +140,10 @@ def generate_doors_settings(weights, options):
     settings["difficulty"] = options['item_pool']
     settings["item_functionality"] = options['item_functionality']
     settings["accessibility"] = options['accessibility']
-    settings["openpyramid"] = options['goals'] == 'fast_ganon' if options['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
     settings["shopsanity"] = options['shopsanity'] == 'on'
     settings["shuffleganon"] = True
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
+    settings["openpyramid"] = settings['goals'] in ['crystals', 'trinity'] if settings['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
     settings["shuffleenemies"] = {'none': 'none',
                                   'shuffled': 'shuffled',
