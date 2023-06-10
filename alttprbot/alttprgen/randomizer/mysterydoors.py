@@ -167,7 +167,7 @@ def generate_doors_settings(weights, options):
     settings["algorithm"] = options['algorithm']
     settings["shuffleganon"] = True
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
-    settings["openpyramid"] = settings['goals'] in ['crystals', 'trinity'] if settings['entrance_shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
+    settings["openpyramid"] = settings['goals'] in ['crystals', 'trinity'] if settings['shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
     settings["shuffleenemies"] = options['enemy_shuffle']
     settings["shufflebosses"] = options['boss_shuffle']
