@@ -108,9 +108,13 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         self,
         interaction: discord.Interaction,
         preset: str,
+        progression_spoiler: bool=False
     ):
         await interaction.response.defer()
-        spoiler = await generate_spoiler_game(preset)
+        spoiler = await generate_spoiler_game(
+                preset,
+                spoiler_type='progression' if progression_spoiler else 'spoiler'
+        )
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
