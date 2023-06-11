@@ -35,6 +35,7 @@ title:  Presets
 | [crossedkeydrop](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crossedkeydrop.yaml) |Cross dungeon door shuffle plus key drops.|   *Door Randomizer*|
 | [crosskeydropsoup](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeydropsoup.yaml) |crossworld entrance shuffle, with a touch of keydrop shuffle and starting flute and boots.|   *Door Randomizer*|
 | [crosskeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys.yaml) |Crossworld entrance with keysanity.|   |
+| [crosskeys2023](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/crosskeys2023.yaml) |Crossworld entrance with keysanity and 100% location accessibility as used for the 2023 Crosskeys Tournament.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons.yaml) |Open, but all dungeons required including Castle Tower.|   |
 | [dungeons_boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/dungeons_boots.yaml) |All Dungeons, but you get boots too!| *Customizer*  |
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
