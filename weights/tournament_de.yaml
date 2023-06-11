@@ -1,18 +1,88 @@
-description: "Weights for the first Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS)"
-glitches_required: "none"
-item_placement: "advanced"
-dungeon_items:
-  standard: 30
-  mc: 20
-  mcs: 20
-  full: 30
-accessibility: "items"
+description: "Weights for the fourth Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS)"
+glitches_required: none
+options:
+  force_doors: True
+dungeon_items: standard # for some reason this line is necessary
+door_shuffle:
+  vanilla: 65
+  basic: 18
+  crossed: 17
+intensity:
+  "2": 50
+  "3": 50
+dropshuffle:
+  "on": 35
+  "off": 65
+pottery:
+  none: 65
+  keys: 17
+  cavekeys: 6
+  dungeon: 6
+  lottery: 6
+colorizepots: "on"
+entrance_shuffle:
+  none: 65
+  dungeonsfull: 12
+  restricted: 8
+  crossed: 15
+shufflelinks:
+  "on": 50
+  "off": 50
+world_state:
+  # standard: 30 (handled in subweights below)
+  open: 35
+  inverted: 25
+  retro: 10
+shopsanity:
+  "on": 30
+  "off": 70
+mapshuffle:
+  "on": 35
+  "off": 65
+compassshuffle:
+  "on": 35
+  "off": 65
+keyshuffle:
+  "on": 30
+  "off": 70
+bigkeyshuffle:
+  "on": 40
+  "off": 60
+dungeon_counters:
+  "default": 1
+  "on": 0
+  "off": 0
+  "pickup": 0
+accessibility:
+  items: 60
+  locations: 20
+  none: 20
 goals:
-  ganon: 35
-  fast_ganon: 35
-  dungeons: 20
-  pedestal: 7
-  triforce-hunt: 3
+  ganon: 30
+  fast_ganon: 25
+  dungeons: 15
+  pedestal: 8
+  triforce-hunt: 8
+  trinity: 14
+triforce_goal:
+  "30": 1
+  "31": 1
+  "32": 1
+  "33": 1
+  "34": 1
+  "35": 1
+  "36": 1
+  "37": 1
+  "38": 1
+  "39": 1
+  "40": 1
+triforce_pool:
+  "45": 1
+  "46": 1
+  "47": 1
+  "48": 1
+  "49": 1
+  "50": 1
 tower_open:
   "0": 5
   "1": 5
@@ -27,55 +97,97 @@ ganon_open:
   "1": 0
   "2": 5
   "3": 10
-  "4": 10
+  "4": 15
   "5": 25
   "6": 25
-  "7": 25
-world_state:
-  standard: 30
-  open: 35
-  inverted: 25
-  retro: 10
-entrance_shuffle:
-  none: 60
-  restricted: 15
-  crossed: 25
-boss_shuffle:
-  none: 60
-  full: 25
-  random: 15
+  "7": 20
+hints:
+  "on": 30
+  "off": 70
+weapons:
+  randomized: 50
+  assured: 25
+  vanilla: 15
+  swordless: 10
+item_pool:
+  normal: 70
+  hard: 30
+item_functionality:
+  normal: 85
+  hard: 15
 enemy_shuffle:
   none: 70
   shuffled: 15
   random: 15
-hints:
-  "on": 25
-  "off": 75
-weapons:
-  randomized: 50
-  assured: 20
-  vanilla: 15
-  swordless: 15
-item_pool:
-  normal: 60
-  hard: 25
-  expert: 15
-item_functionality:
-  normal: 75
-  hard: 20
-  expert: 5
-enemy_damage: "default"
+boss_shuffle:
+  none: 60
+  unique: 25
+  random: 15
+enemy_damage:
+  default: 90
+  shuffled: 10
 enemy_health:
   default: 90
   easy: 10
-customizer:
-  eq:
-    "SilverArrowUpgrade":
-      True: 10
-      False: 90
-    "TenBombs":
-      True: 30
-      False: 70
-    "PegasusBoots":
-      True: 177
-      False: 823
+bombbag:
+  "on": 20
+  "off": 80
+subweights:
+  not_standard:
+    chance: 70
+    weights:
+      startinventory:
+        Ocarina:
+          0: 85
+          1: 15
+        Pegasus Boots:
+          0: 85
+          1: 15
+        Bombs (10):
+          0: 70
+          1: 30
+        Rupees (300):
+          0: 70
+          1: 30
+  standard:
+    chance: 30
+    weights:
+      world_state: standard
+      startinventory:
+        Pegasus Boots:
+          0: 85
+          1: 15
+        Bombs (10):
+          0: 70
+          1: 30
+        Rupees (300):
+          0: 70
+          1: 30
+rules:
+  - conditions: # verhindert enemy-dmg shuffle, sowie hard item-pool & -functionality, wenn swordless an ist
+      - Key: weapons
+        Value: swordless
+    actions:
+      enemy_damage: default
+      item_pool: normal
+      item_functionality: normal
+  - conditions: # garantiert keydropshuffle, sobald doors an ist
+      - Key: door_shuffle
+        Value: basic
+    actions:
+      dropshuffle: "on"
+      pottery:
+        keys: 82
+        cavekeys: 6
+        dungeon: 6
+        lottery: 6
+  - conditions: # garantiert keydropshuffle, sobald doors an ist
+      - Key: door_shuffle
+        Value: crossed
+    actions:
+      dropshuffle: "on"
+      pottery:
+        keys: 82
+        cavekeys: 6
+        dungeon: 6
+        lottery: 6
