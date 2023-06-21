@@ -26,10 +26,10 @@ entrance_shuffle:
   restricted: 8
   crossed: 15
 shufflelinks:
-  "on": 50
-  "off": 50
+  on: 50
+  off: 50
 world_state:
-  # standard: 30 (handled in subweights below)
+# standard: 30 (handled in subweights below)
   open: 35
   inverted: 25
   retro: 10
@@ -130,8 +130,8 @@ enemy_health:
   default: 90
   easy: 10
 bombbag:
-  "on": 20
-  "off": 80
+  on: 20
+  off: 80
 subweights:
   not_standard:
     chance: 70
@@ -165,15 +165,15 @@ subweights:
           1: 30
 rules:
   - conditions: # verhindert enemy-dmg shuffle, sowie hard item-pool & -functionality, wenn swordless an ist
-      - Key: weapons
-        Value: swordless
+    - Key: weapons
+      Value: swordless
     actions:
       enemy_damage: default
       item_pool: normal
       item_functionality: normal
   - conditions: # garantiert keydropshuffle, sobald doors an ist
-      - Key: door_shuffle
-        Value: basic
+    - Key: door_shuffle
+      Value: basic
     actions:
       dropshuffle: "on"
       pottery:
@@ -182,8 +182,8 @@ rules:
         dungeon: 6
         lottery: 6
   - conditions: # garantiert keydropshuffle, sobald doors an ist
-      - Key: door_shuffle
-        Value: crossed
+    - Key: door_shuffle
+      Value: crossed
     actions:
       dropshuffle: "on"
       pottery:
