@@ -1,17 +1,18 @@
 from pyz3r.sm import smClass
 import discord
 
+
 class SMDiscord(smClass):
     def __init__(self, *args, **kwargs):
         super(SMDiscord, self).__init__(*args, **kwargs)
         self.randomizer = 'sm'
-        self.baseurl = 'https://sm.samus.link'
+        # self.baseurl = 'https://sm.samus.link'
 
     @property
     def generated_goal(self):
         return self.randomizer
 
-    async def embed(self, name="Requested Seed", notes: str=None, emojis=None, include_settings=True):
+    async def embed(self, name="Requested Seed", notes: str = None, emojis=None, include_settings=True):
         if notes is None:
             notes = f"Requested {self.randomizer.upper()} Randomizer Game."
         embed = discord.Embed(
@@ -41,4 +42,4 @@ class SMZ3Discord(SMDiscord):
     def __init__(self, *args, **kwargs):
         super(SMZ3Discord, self).__init__(*args, **kwargs)
         self.randomizer = 'smz3'
-        self.baseurl = 'https://samus.link'
+        # self.baseurl = 'https://samus.link'

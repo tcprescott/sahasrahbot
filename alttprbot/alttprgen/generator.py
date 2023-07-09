@@ -291,6 +291,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 
         return mystery
 
+
 class SMPreset(SahasrahBotPresetCore):
     randomizer = 'sm'
     randomizer_class = SMDiscord
@@ -309,8 +310,10 @@ class SMPreset(SahasrahBotPresetCore):
                 self.spoiler_key = generate_random_string(20)
 
             settings['spoilerKey'] = self.spoiler_key
+
         self.seed = await self.randomizer_class.create(
             settings=settings,
+            baseurl=self.baseurl
         )
 
         await models.AuditGeneratedGames.create(
@@ -336,6 +339,13 @@ class SMPreset(SahasrahBotPresetCore):
             return None
         return self.seed.data['guid']
 
+    @property
+    def baseurl(self):
+        if release := self.preset_data.get('release', None):
+            return f"https://{release}.sm.samus.link"
+
+        return "https://sm.samus.link"
+
     # I hate this, this should actually be a property of the seed
     def spoiler_url(self, use_yaml=True):
         if self.seed is None:
@@ -346,9 +356,18 @@ class SMPreset(SahasrahBotPresetCore):
             raise Exception("Hash ID is not set.")
         return f"{self.seed.baseurl}/api/spoiler/{self.guid}?key={self.spoiler_key}&yaml={str(use_yaml)}"
 
+
 class SMZ3Preset(SMPreset):
     randomizer = 'smz3'
     randomizer_class = SMZ3Discord
+
+    @property
+    def baseurl(self):
+        if release := self.preset_data.get('release', None):
+            return f"https://{release}.samus.link"
+
+        return "https://samus.link"
+
 
 class CTJetsPreset(SahasrahBotPresetCore):
     randomizer = 'ctjets'

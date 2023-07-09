@@ -1,0 +1,18 @@
+randomizer: "smz3"
+goal_name: beat the games
+release: "beta"
+description: "Grimice's preset for Solski."
+settings:
+    smlogic: hard
+    goal: defeatboth
+    ganonvulnerable: random
+    opentower: random
+    opentourian: random
+    swordlocation: randomized
+    morphlocation: randomized
+    keyshuffle: keysanity
+    seed: ""
+    race: "true"
+    gamemode: normal
+    players: "1"
+    initialitems: "Boots, Random:1"
