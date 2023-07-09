@@ -1,29 +1,33 @@
-from alttprbot.alttprgen.generator import ALTTPRPreset
+from alttprbot.alttprgen.generator import ALTTPRMystery
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 
-ALTTPRMINI_TITLE_MAP = {
-    'Open Deutscher Hard Pool': 'derduden2/german_hard',
-    'Open 6/6 Fast Ganon': 'open_fast_66',
-    'Open All Dungeons': 'dungeons',
-    'Standard': 'standard',
-    'Casual Boots': 'casualboots',
-    'Boss Shuffle': 'enemizer_bossesonly',
-    'Enemy Shuffle Assured': 'teto/enemizer_assured',
-    'Big Key Shuffle': 'catobat/bkshuffle',
-    'Keysanity': 'keysanity',
-}
+# ALTTPRMINI_TITLE_MAP = {
+#     'Open Deutscher Hard Pool': 'derduden2/german_hard',
+#     'Open 6/6 Fast Ganon': 'open_fast_66',
+#     'Open All Dungeons': 'dungeons',
+#     'Standard': 'standard',
+#     'Casual Boots': 'casualboots',
+#     'Boss Shuffle': 'enemizer_bossesonly',
+#     'Enemy Shuffle Assured': 'teto/enemizer_assured',
+#     'Big Key Shuffle': 'catobat/bkshuffle',
+#     'Keysanity': 'keysanity',
+# }
 
 
 class ALTTPRMiniTournament(ALTTPRTournamentRace):
     async def roll(self):
-        try:
-            preset = ALTTPRMINI_TITLE_MAP[self.episode['match1']['title']]
-        except KeyError:
-            await self.rtgg_handler.send_message("Invalid mode chosen, please contact a tournament admin for assistance.")
-            raise
-        self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
+        # try:
+        #     preset = ALTTPRMINI_TITLE_MAP[self.episode['match1']['title']]
+        # except KeyError:
+        #     await self.rtgg_handler.send_message("Invalid mode chosen, please contact a tournament admin for assistance.")
+        #     raise
+        # self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
+
+        mystery = await ALTTPRMystery("tournament_de").generate(tournament=True, spoilers="mystery")
+        self.seed = mystery.seed
+
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)

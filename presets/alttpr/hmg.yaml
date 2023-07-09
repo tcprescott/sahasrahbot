@@ -289,7 +289,7 @@ settings:
     - BossHeartContainer
     - BossHeartContainer
     - BossHeartContainer
-  glitches: major_glitches
+  glitches: hybrid_major_glitches
   goal: ganon
   hints: "off"
   item:
