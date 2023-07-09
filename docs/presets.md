@@ -155,6 +155,7 @@ title:  Presets
 | [fastkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeys.yaml) |Normal logic keysanity, 7/7/4 crystal/boss requirements, pyramid hole open.|   |
 | [fastkeysrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeysrandom.yaml) |Normal logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [fastrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastrandom.yaml) |Normal logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
+| [grimice](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/grimice.yaml) |Grimice's preset for Solski.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) |Hard logic, sword and morph are fully randomized.|   |
 | [hard553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard553.yaml) |Hard logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized.|   |
 | [harddungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/harddungeons.yaml) |Hard logic, all dungeons + SM bosses.|   |

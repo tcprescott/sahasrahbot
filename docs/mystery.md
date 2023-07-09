@@ -48,7 +48,7 @@ title:  Mystery Weights
 | [pogchampion_season8](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season8.yaml) | A pseudoblast from PogChampionship past |  |
 | [pogchampion_season9](https://github.com/tcprescott/sahasrahbot/blob/master/weights/pogchampion_season9.yaml) | pogchampion_season9 | *Subweights* |
 | [timed_ohko](https://github.com/tcprescott/sahasrahbot/blob/master/weights/timed_ohko.yaml) | a test weightset for timed ohko | *Customizer* |
-| [tournament_de](https://github.com/tcprescott/sahasrahbot/blob/master/weights/tournament_de.yaml) | Weights for the first Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS) | *Customizer* |
+| [tournament_de](https://github.com/tcprescott/sahasrahbot/blob/master/weights/tournament_de.yaml) | Weights for the fourth Mini Tournament of the [German ALttPR Community](https://discord.gg/5zuANcS) | *Subweights* |
 | [unweighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/unweighted.yaml) | Every option is equally possible.  GLHF. |  |
 | [veetorp](https://github.com/tcprescott/sahasrahbot/blob/master/weights/veetorp.yaml) | Maybe Veetorp's favorite? IDK. | *Customizer* |
 | [weighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/weighted.yaml) | The default.  Offers every setting, but with some balance. | *Customizer* |
