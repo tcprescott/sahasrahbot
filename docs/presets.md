@@ -147,6 +147,8 @@ title:  Presets
 
 | Preset | Description | |
 |---|---|---|
+| [blitz](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/blitz.yaml) |Normal logic, 0/0/0 crystal/boss requirements, pyramid hole open.|   |
+| [blitzkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/blitzkeys.yaml) |Normal logic, keysanity, 0/0/0 crystal/boss requirements, pyramid hole open.|   |
 | [casual](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casual.yaml) |Normal logic, but Sword and Morph are early.|   |
 | [casualkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/casualkeys.yaml) |Keysanity.  Normal logic, but Sword and Morph are early.|   |
 | [dungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/dungeons.yaml) |Normal logic, all dungeons + SM bosses.|   |
@@ -155,8 +157,11 @@ title:  Presets
 | [fastkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeys.yaml) |Normal logic keysanity, 7/7/4 crystal/boss requirements, pyramid hole open.|   |
 | [fastkeysrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastkeysrandom.yaml) |Normal logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
 | [fastrandom](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/fastrandom.yaml) |Normal logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.|   |
+| [grimice](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/grimice.yaml) |Grimice's preset for Solski.|   |
 | [hard](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard.yaml) |Hard logic, sword and morph are fully randomized.|   |
 | [hard553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hard553.yaml) |Hard logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized.|   |
+| [hardblitz](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardblitz.yaml) |Hard logic, 0/0/0 crystal/boss requirements, pyramid hole open.|   |
+| [hardblitzkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardblitzkeys.yaml) |Hard logic, keysanity, 0/0/0 crystal/boss requirements, pyramid hole open.|   |
 | [harddungeons](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/harddungeons.yaml) |Hard logic, all dungeons + SM bosses.|   |
 | [hardfast](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfast.yaml) |Hard logic, 7/7/4 crystal/boss requirements, pyramid hole open. SGL 2022 tournament settings.|   |
 | [hardfast553](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/hardfast553.yaml) |Hard logic, 5/5/3 crystal/boss requirements, pyramid hole open.|   |
