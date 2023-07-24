@@ -12,7 +12,7 @@ import pytz
 from alttprbot_racetime import bot as racetimebot
 
 from alttprbot import models
-from alttprbot.tournament import test, alttprde, alttprmini, dailies, smwde, smrl_playoff, alttpr
+from alttprbot.tournament import test, alttprde, alttprmini, dailies, smwde, smrl_playoff, alttpr, alttprhmg
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -37,7 +37,7 @@ else:
         # 'nologic': nologic.ALTTPRNoLogicRace,
         'smwde': smwde.SMWDETournament,
         # 'alttprfr': alttprfr.ALTTPRFRTournament,
-        # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
+        'alttprhmg': alttprhmg.ALTTPRHMGTournament,
         # 'alttpres': alttpres.ALTTPRESTournament,
         # 'smz3coop': smz3coop.SMZ3CoopTournament,
         # 'smbingo': smbingo.SMBingoTournament,

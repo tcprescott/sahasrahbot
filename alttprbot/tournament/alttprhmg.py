@@ -6,7 +6,7 @@ from alttprbot.alttprgen import preset
 
 class ALTTPRHMGTournament(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed, self.preset_dict = await preset.get_preset('hybridmg')
+        self.seed, self.preset_dict = await preset.get_preset('hmg')
 
     async def configuration(self):
         guild = discordbot.get_guild(535946014037901333)
