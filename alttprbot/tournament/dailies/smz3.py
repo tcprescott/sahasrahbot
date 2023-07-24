@@ -48,3 +48,28 @@ class SMZ3DailyRace(SGDailyRaceCore):
 
         msg += f" - {self.episodeid}"
         return msg
+
+    async def create_race_room(self):
+        if self.friendly_name.lower().find("spoiler") >= 0:
+            racetime_goal = "Beat the Games(Spoiler Log)"
+        else:
+            racetime_goal = self.data.racetime_goal
+
+        self.rtgg_handler = await self.rtgg_bot.startrace(
+            goal=racetime_goal,
+            invitational=False,
+            unlisted=False,
+            info_user=self.race_info,
+            start_delay=15,
+            time_limit=24,
+            streaming_required=True,
+            auto_start=True,
+            allow_comments=True,
+            hide_comments=True,
+            allow_prerace_chat=True,
+            allow_midrace_chat=True,
+            allow_non_entrant_chat=False,
+            chat_message_delay=0,
+            team_race=True if self.friendly_name.lower().find("co-op") >= 0 else False,
+        )
+        return self.rtgg_handler
