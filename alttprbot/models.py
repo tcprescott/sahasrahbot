@@ -791,3 +791,15 @@ class AsyncTournamentAuditLog(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     details = fields.TextField(null=True)
+
+
+class RacerVerification(Model):
+    id = fields.IntField(pk=True)
+    message_id = fields.BigIntField(null=True)
+    guild_id = fields.BigIntField(null=False)
+    role_id = fields.BigIntField(null=False)
+    racetime_categories = fields.CharField(2000, null=True)  # comma separated list of racetime categories to query
+    use_alttpr_ladder = fields.BooleanField(null=False, default=False)  # use alttpr ladder to verify
+    minimum_races = fields.IntField(null=False)
+    time_period_days = fields.IntField(null=False, default=365)
+    created = fields.DatetimeField(auto_now_add=True)
