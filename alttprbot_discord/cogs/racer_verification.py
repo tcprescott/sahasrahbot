@@ -24,6 +24,10 @@ class RacerVerificationView(discord.ui.View):
         await interaction.response.defer(ephemeral=True)
         racer_verification = await models.RacerVerification.get_or_none(message_id=interaction.message.id, guild_id=interaction.guild.id)
 
+        if racer_verification is None:
+            await interaction.response.send_message("This message is not a valid racer verification message.  This should not have happened.", ephemeral=True)
+            return
+
         user = await models.Users.get_or_none(discord_user_id=interaction.user.id)
         if user is None or user.rtgg_id is None:
             await interaction.response.send_message(f"Please visit https://sahasrahbotapi.synack.live/racetime/verification/initiate to verify your RaceTime.gg ID!", ephemeral=True)
