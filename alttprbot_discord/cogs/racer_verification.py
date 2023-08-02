@@ -30,7 +30,7 @@ class RacerVerificationView(discord.ui.View):
 
         user = await models.Users.get_or_none(discord_user_id=interaction.user.id)
         if user is None or user.rtgg_id is None:
-            await interaction.followup.send(f"Please visit https://sahasrahbotapi.synack.live/racetime/verification/initiate to verify your RaceTime.gg ID!", ephemeral=True)
+            await interaction.followup.send("Please visit https://sahasrahbotapi.synack.live/racetime/verification/initiate to link your RaceTime.gg ID!\n\nAfter that, click the button again!", ephemeral=True)
             return
 
         try:
