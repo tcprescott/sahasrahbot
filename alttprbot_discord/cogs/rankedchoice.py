@@ -33,7 +33,7 @@ class RankedChoiceMessageView(discord.ui.View):
             return
 
         await election.fetch_related('candidates')
-        await election.fetch_related('authorized_voters')
+        # await election.fetch_related('authorized_voters')
         await election.fetch_related('votes')
 
         await rankedchoice.calculate_results(election)
@@ -76,17 +76,18 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
             owner_id=interaction.user.id,
             show_vote_count=show_vote_count,
             seats=seats,
+            voter_role_id=authorized_voters_role.id if authorized_voters_role else None
         )
 
         if interaction.guild.chunked is False:
             await interaction.guild.chunk(cache=True)
 
         await models.RankedChoiceCandidate.bulk_create([models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in candidates.split(',')])
-        if authorized_voters_role:
-            await models.RankedChoiceAuthorizedVoters.bulk_create([models.RankedChoiceAuthorizedVoters(election=election, user_id=user_id) for user_id in [member.id for member in authorized_voters_role.members]])
+        # if authorized_voters_role:
+        #     await models.RankedChoiceAuthorizedVoters.bulk_create([models.RankedChoiceAuthorizedVoters(election=election, user_id=user_id) for user_id in [member.id for member in authorized_voters_role.members]])
 
         await election.fetch_related('candidates')
-        await election.fetch_related('authorized_voters')
+        # await election.fetch_related('authorized_voters')
         await election.fetch_related('votes')
 
         await interaction.response.send_message(embed=rankedchoice.create_embed(election), view=RankedChoiceMessageView(self.bot))

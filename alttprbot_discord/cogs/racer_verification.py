@@ -11,6 +11,8 @@ from discord.ext import commands
 
 from alttprbot import models
 
+RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
+
 
 class RacerVerificationView(discord.ui.View):
     def __init__(self, bot: commands.Bot):
@@ -38,8 +40,7 @@ class RacerVerificationView(discord.ui.View):
             race_count += await get_ladder_count(interaction.user.id, days=racer_verification.time_period_days)
 
         if race_count < racer_verification.minimum_races:
-            for rtgg_category in rtgg_categories:
-                race_count += await get_racetime_count(user.rtgg_id, rtgg_category, days=racer_verification.time_period_days, max_count=racer_verification.minimum_races)
+            race_count += await get_racetime_count(user.rtgg_id, rtgg_categories, days=racer_verification.time_period_days, max_count=racer_verification.minimum_races)
 
         if race_count >= racer_verification.minimum_races:
             role = interaction.guild.get_role(racer_verification.role_id)
@@ -76,7 +77,25 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
             time_period_days=time_period_days
         )
 
-        await interaction.response.send_message(view=RacerVerificationView(self.bot))
+        rtgg_categories = racetime_categories.split(',') if racetime_categories is not None else []
+
+        content = f"""
+This message will be used to verify your status as a racer. You can click the button below to verify your status.
+You must have a RaceTime.gg account linked to your Discord account to use this feature.
+If you do not have a RaceTime.gg account, please visit <https://racetime.gg> to create one.
+
+If you have any questions, please contact a server administrator.
+
+**Requirements:**
+- Must have a RaceTime.gg account linked to your Discord account via SahasrahBot.  You will be supplied a link to do so if this is not already done.
+- Have at least {minimum_races} {'race' if minimum_races == 1 else 'races'} played in the last {time_period_days} {'day' if time_period_days == 1 else 'days'} on RaceTime.gg in the following categories: {', '.join(rtgg_categories)}{ ' or ALTTPR Ladder races ' if use_alttpr_ladder else ''}
+- Must be a member of this Discord server
+"""
+
+        await interaction.response.send_message(
+            content=content,
+            view=RacerVerificationView(self.bot)
+        )
         message = await interaction.original_response()
         racer_verification.message_id = message.id
         await racer_verification.save()
@@ -91,17 +110,21 @@ async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_cou
     while count < max_count:
         async with aiohttp.request(
             method='get',
-            url=f'https://racetime.gg/user/{racetime_id}/races/data',
+            url=f'{RACETIME_URL}/user/{racetime_id}/races/data',
             params={'page': page}
         ) as resp:
-            data = await resp.json()
-            if len(data) == 0:
+            try:
+                data = await resp.json()
+            except aiohttp.ContentTypeError:
+                break
+
+            if len(data['races']) == 0:
                 break
 
             filtered_data = [x for x in data['races']
                              if x['category']['slug'] in category_slugs
                              and x['status']['value'] == 'finished'
-                             and isodate.parse_datetime(x['opened_at']) > datetime.datetime.now() - datetime.timedelta(days=days)
+                             and tz_aware_greater_than(isodate.parse_datetime(x['opened_at']), datetime.datetime.utcnow() - datetime.timedelta(days=days))
                              ]
 
             count += len(filtered_data)
@@ -112,6 +135,14 @@ async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_cou
         page += 1
 
     return count
+
+
+def tz_aware_greater_than(dt1, dt2):
+    if dt1.tzinfo is None:
+        dt1 = pytz.utc.localize(dt1)
+    if dt2.tzinfo is None:
+        dt2 = pytz.utc.localize(dt2)
+    return dt1 > dt2
 
 
 async def get_ladder_count(discord_id, days=365):

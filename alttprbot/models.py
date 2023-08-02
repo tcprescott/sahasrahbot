@@ -485,6 +485,7 @@ class RankedChoiceElection(Model):
     show_vote_count = fields.BooleanField(null=False, default=True)
     active = fields.BooleanField(null=False, default=True)
     private = fields.BooleanField(null=False, default=False)
+    voter_role_id = fields.BigIntField(null=True)
     seats = fields.SmallIntField(null=False, default=1)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)

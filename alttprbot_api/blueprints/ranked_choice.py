@@ -15,6 +15,7 @@ from ..api import discord
 
 ranked_choice_blueprint = Blueprint('ranked_choice', __name__)
 
+
 @ranked_choice_blueprint.route('/ranked_choice/<int:election_id>', methods=['GET'])
 @requires_authorization
 async def get_ballot(election_id: int):
@@ -30,8 +31,10 @@ async def get_ballot(election_id: int):
         return abort(404, "Election is inactive.")
 
     if election.private:
-        await election.fetch_related('authorized_voters')
-        if user.id not in [voter.user_id for voter in election.authorized_voters]:
+        guild = await discordbot.fetch_guild(election.guild_id)
+        voter_role = guild.get_role(election.voter_role_id)
+        member = await guild.fetch_member(user.id)
+        if voter_role not in member.roles:
             return abort(403, "You are not authorized to vote in this election.")
 
     await election.fetch_related('candidates')
@@ -41,6 +44,7 @@ async def get_ballot(election_id: int):
         await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
 
     return await render_template('ranked_choice_vote.html', election=election, logged_in=logged_in, user=user)
+
 
 @ranked_choice_blueprint.route('/ranked_choice/<int:election_id>', methods=['POST'])
 @requires_authorization
@@ -57,8 +61,10 @@ async def submit_ballot(election_id: int):
         return abort(404, "Election is inactive.")
 
     if election.private:
-        authorized_voters = await election.authorized_voters.all()
-        if user.id not in [voter.user_id for voter in authorized_voters]:
+        guild = await discordbot.fetch_guild(election.guild_id)
+        voter_role = guild.get_role(election.voter_role_id)
+        member = await guild.fetch_member(user.id)
+        if voter_role not in member.roles:
             return abort(403, "You are not authorized to vote in this election.")
 
     await election.fetch_related('candidates')
@@ -108,14 +114,17 @@ async def submit_ballot(election_id: int):
 
     return await render_template('ranked_choice_submit.html', election=election, votes=votes, logged_in=logged_in, user=user)
 
+
 def remove_prefix(text, prefix):
     return text[text.startswith(prefix) and len(prefix):]
+
 
 def sort_rank(vote: models.RankedChoiceVotes):
     return vote.rank
 
+
 def dupcheck(x):
-   for elem in x:
-      if x.count(elem) > 1:
-         return True
-      return False
+    for elem in x:
+        if x.count(elem) > 1:
+            return True
+        return False
