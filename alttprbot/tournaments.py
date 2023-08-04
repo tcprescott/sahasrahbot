@@ -12,7 +12,7 @@ import pytz
 from alttprbot_racetime import bot as racetimebot
 
 from alttprbot import models
-from alttprbot.tournament import test, boots, alttprde, alttprmini, dailies, smwde, smrl_playoff, alttpr, alttprhmg
+from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, alttprhmg, alttprleague
 from alttprbot.util import gsheet
 from config import Config as c
 
@@ -48,8 +48,8 @@ else:
         'smz3': dailies.SMZ3DailyRace,
 
         # ALTTPR League
-        # 'invleague': alttprleague.ALTTPRLeague,
-        # 'alttprleague': alttprleague.ALTTPROpenLeague,
+        'invleague': alttprleague.ALTTPRLeague,
+        'alttprleague': alttprleague.ALTTPROpenLeague,
     }
 
 
