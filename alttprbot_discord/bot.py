@@ -34,7 +34,7 @@ if os.environ.get("SENTRY_URL"):
 
 async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.errors")
-    await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
+    # await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
     await discordbot.load_extension("alttprbot_discord.cogs.daily")
     await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
@@ -50,7 +50,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
     await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
     await discordbot.load_extension("alttprbot_discord.cogs.doorsmw")
-    await discordbot.load_extension("alttprbot_discord.cogs.admin")
+    # await discordbot.load_extension("alttprbot_discord.cogs.admin")
     await discordbot.load_extension("alttprbot_discord.cogs.racer_verification")
 
     if c.DEBUG:
