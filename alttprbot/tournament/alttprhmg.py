@@ -17,8 +17,8 @@ class ALTTPRHMGTournament(ALTTPRTournamentRace):
             event_slug="alttprhmg",
             audit_channel=discordbot.get_channel(850226062864023583),
             commentary_channel=discordbot.get_channel(549709098015391764),
-            scheduling_needs_channel=discordbot.get_channel(863817206452977685),
-            scheduling_needs_tracker=True,
+            # scheduling_needs_channel=discordbot.get_channel(863817206452977685),
+            # scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(549709214000480276),
                 guild.get_role(535962854004883467),
