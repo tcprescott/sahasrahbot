@@ -41,7 +41,8 @@ async def get_ballot(election_id: int):
 
     existing_votes = await election.votes.filter(user_id=user.id)
     if existing_votes:
-        await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
+        # await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
+        return await render_template('ranked_choice_submit.html', election=election, votes=existing_votes, logged_in=logged_in, user=user)
 
     return await render_template('ranked_choice_vote.html', election=election, logged_in=logged_in, user=user)
 
@@ -75,7 +76,7 @@ async def submit_ballot(election_id: int):
 
     payload = await request.form
 
-    if dupcheck([v for v in payload.values() if not v == '']):
+    if dupcheck([v for v in payload.values() if not v == '']):  # this is broken and we're not sure why
         return await abort(400, "Each candidate must have a unique rank.")
 
     if dupcheck(list(payload.keys())):
