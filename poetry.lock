@@ -2245,14 +2245,14 @@ files = [
 
 [[package]]
 name = "pyz3r"
-version = "6.0.7"
+version = "6.0.9"
 description = "A python module for interacting with the web API of various randomizers, such as https://alttpr.com or https://samus.link."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyz3r-6.0.7-py3-none-any.whl", hash = "sha256:c59958be9205d623f2753acf5cdaaa9d190ba4fce82b8cced8ba309059bb09be"},
-    {file = "pyz3r-6.0.7.tar.gz", hash = "sha256:7e12690e2630da8e772e35894a689851bf3dac1ee36980239df4aeed843d9ca7"},
+    {file = "pyz3r-6.0.9-py3-none-any.whl", hash = "sha256:8819dab8b894abd0f950d2b2484c030e62f56e7858c75bd9f7d623f8cd00fdf5"},
+    {file = "pyz3r-6.0.9.tar.gz", hash = "sha256:3dc3bd833f9cdfb80574bdb84d4a8a9fa1027ba2b6a6235fcddcb743c75e149c"},
 ]
 
 [package.dependencies]
