@@ -17,17 +17,23 @@ class GameHandler(SahasrahBotCoreHandler):
                 'You must specify a preset!'
             )
             return
-        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True)
 
-    async def ex_festive(self, args, message):
         try:
-            preset_name = args[0]
+            branch = args[1]
         except IndexError:
-            await self.send_message(
-                'You must specify a preset!'
-            )
-            return
-        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, endpoint_prefix="/festive")
+            branch = 'live'
+
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, branch=branch)
+
+    # async def ex_festive(self, args, message):
+    #     try:
+    #         preset_name = args[0]
+    #     except IndexError:
+    #         await self.send_message(
+    #             'You must specify a preset!'
+    #         )
+    #         return
+    #     await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, endpoint_prefix="/festive")
 
     async def ex_noqsrace(self, args, message):
         try:
@@ -37,7 +43,11 @@ class GameHandler(SahasrahBotCoreHandler):
                 'You must specify a preset!'
             )
             return
-        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False)
+        try:
+            branch = args[1]
+        except IndexError:
+            branch = 'live'
+        await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False, branch=branch)
 
     async def ex_spoiler(self, args, message):
         if await self.is_locked(message):
@@ -139,7 +149,7 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_synack(self, args, message):
         await self.send_message("You need to be more creative.")
 
-    async def roll_game(self, preset_name, message, allow_quickswap=True, endpoint_prefix=""):
+    async def roll_game(self, preset_name, message, allow_quickswap=True, endpoint_prefix="", branch=None):
         if await self.is_locked(message):
             return
 
@@ -150,7 +160,8 @@ class GameHandler(SahasrahBotCoreHandler):
                 spoilers="off",
                 tournament=True,
                 allow_quickswap=allow_quickswap,
-                endpoint_prefix=endpoint_prefix
+                endpoint_prefix=endpoint_prefix,
+                branch=branch,
             )
         except preset.PresetNotFoundException as e:
             await self.send_message(str(e))

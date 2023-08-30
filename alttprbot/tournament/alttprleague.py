@@ -19,7 +19,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     spoiler = await spoilers.generate_spoiler_game(self.league_data['preset'])
         #     await spoiler_races.insert_spoiler_race(self.rtgg_handler.data.get('name'), spoiler.spoiler_log_url, 0)
         # else:
-        self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+        self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
 
         await self.create_embeds()
 

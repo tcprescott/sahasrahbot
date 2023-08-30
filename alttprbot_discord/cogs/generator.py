@@ -22,6 +22,12 @@ YES_NO_CHOICE = [
     app_commands.Choice(name="No", value="no"),
 ]
 
+ALTTPR_BRANCH_CHOICE = [
+    app_commands.Choice(name="Live", value="live"),
+    app_commands.Choice(name="Tournament", value="tournament"),
+    app_commands.Choice(name="Beeta", value="beeta"),
+]
+
 class AlttprGenerator(commands.GroupCog, name="alttpr"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -32,11 +38,13 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         race="Is this a race? (default no)",
         hints="Do you want hints? (default no)",
         allow_quickswap="Allow quickswap? (default yes)",
+        branch="Which branch to use (default live)",
     )
     @app_commands.choices(
         race=YES_NO_CHOICE,
         hints=YES_NO_CHOICE,
         allow_quickswap=YES_NO_CHOICE,
+        branch=ALTTPR_BRANCH_CHOICE,
     )
     async def preset(
         self,
@@ -45,13 +53,15 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         race: str = "no",
         hints: str = "no",
         allow_quickswap: str = "yes",
+        branch: str = "live",
     ):
         await interaction.response.defer()
         seed = await generator.ALTTPRPreset(preset).generate(
             hints=hints == "yes",
             spoilers="off" if race == "yes" else "on",
             tournament=race == "yes",
-            allow_quickswap=allow_quickswap == "yes"
+            allow_quickswap=allow_quickswap == "yes",
+            branch=branch,
         )
         if not seed:
             raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
@@ -65,12 +75,14 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         yamlfile="The yaml you want to use to generate the game.",
         race="Is this a race? (default no)",
         hints="Do you want hints? (default no)",
-        allow_quickswap="Allow quickswap? (default yes)"
+        allow_quickswap="Allow quickswap? (default yes)",
+        branch="Which branch to use (default live)"
     )
     @app_commands.choices(
         race=YES_NO_CHOICE,
         hints=YES_NO_CHOICE,
         allow_quickswap=YES_NO_CHOICE,
+        branch=ALTTPR_BRANCH_CHOICE,
     )
     async def custompreset(
         self,
@@ -79,6 +91,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         race: str = "no",
         hints: str = "no",
         allow_quickswap: str = "yes",
+        branch: str = "live",
     ):
         """
         Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user
@@ -94,7 +107,8 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             spoilers="off" if race == "yes" else "on",
             tournament=race == "yes",
             allow_quickswap=allow_quickswap == "yes",
-            hints=hints == "yes"
+            hints=hints == "yes",
+            branch=branch,
         )
 
         embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)

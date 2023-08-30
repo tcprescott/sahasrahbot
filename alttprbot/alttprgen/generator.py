@@ -148,7 +148,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
 
     # TODO: Make this so it isn't an absolute dumpster fire
     # this code really sucks
-    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix="") -> ALTTPRDiscord:
+    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix="", branch=None) -> ALTTPRDiscord:
         if self.preset_data is None:
             await self.fetch()
 
@@ -169,6 +169,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             )
             hash_id = seed.hash
         else:
+            branch = self.preset_data.get('branch', branch) # live, tournament, beeta
             if self.preset_data.get('customizer', False):
                 if 'l' not in settings:
                     settings['l'] = {}
@@ -205,9 +206,19 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             else:
                 endpoint = endpoint_prefix + "/api/randomizer"
 
+            if branch == 'live':
+                baseurl = 'https://alttpr.com'
+            elif branch == 'beeta':
+                baseurl = 'https://beeta.alttpr.com'
+            elif branch == 'tournament':
+                baseurl = 'https://tournament.alttpr.com'
+            else:
+                baseurl = os.environ.get("ALTTPR_BASEURL", 'https://alttpr.com')
+
             seed = await ALTTPRDiscord.generate(
                 settings=settings,
-                endpoint=endpoint
+                endpoint=endpoint,
+                baseurl=baseurl,
             )
             hash_id = seed.hash
 

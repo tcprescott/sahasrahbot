@@ -45,7 +45,8 @@ emoji_code_map = {
 class ALTTPRDiscord(ALTTPR):
     def __init__(self, *args, **kwargs):
         super(ALTTPRDiscord, self).__init__(*args, **kwargs)
-        self.baseurl = os.environ.get("ALTTPR_BASEURL", 'https://alttpr.com')
+        if 'baseurl' not in kwargs:
+            self.baseurl = os.environ.get("ALTTPR_BASEURL", 'https://alttpr.com')
         username = os.environ.get("ALTTPR_USERNAME", None)
         password = os.environ.get("ALTTPR_PASSWORD", None)
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
