@@ -20,14 +20,15 @@ class ALTTPRSpoilerGame:
     spoiler_log_url: str
     seed: ALTTPRDiscord
 
-async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False):
+async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False, branch=None):
     preset_data = ALTTPRPreset(preset)
     await preset_data.fetch()
     seed = await preset_data.generate(
         spoilers="generate",
         tournament=True,
         allow_quickswap=True,
-        endpoint_prefix="/festive" if festive else ""
+        endpoint_prefix="/festive" if festive else "",
+        branch=branch
     )
 
     spoiler_log_url = await write_json_to_disk(seed, spoiler_type)
@@ -39,9 +40,9 @@ async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False):
     )
 
 
-async def generate_spoiler_game_custom(content, spoiler_type='spoiler'):
+async def generate_spoiler_game_custom(content, spoiler_type='spoiler', branch=None):
     preset_data = await ALTTPRPreset.custom(content)
-    seed = await preset_data.generate(spoilers="generate", tournament=True, allow_quickswap=True)
+    seed = await preset_data.generate(spoilers="generate", tournament=True, allow_quickswap=True, branch=branch)
 
     spoiler_log_url = await write_json_to_disk(seed, spoiler_type)
 

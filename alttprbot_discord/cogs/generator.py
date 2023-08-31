@@ -118,16 +118,21 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
 
     @app_commands.command(description="Generates an ALTTP Randomizer Spoiler Race on https://alttpr.com")
     @app_commands.describe(preset="The preset you want to generate.")
+    @app_commands.choices(
+        branch=ALTTPR_BRANCH_CHOICE,
+    )
     async def spoiler(
         self,
         interaction: discord.Interaction,
         preset: str,
-        progression_spoiler: bool=False
+        progression_spoiler: bool=False,
+        branch: str = "live",
     ):
         await interaction.response.defer()
         spoiler = await generate_spoiler_game(
                 preset,
-                spoiler_type='progression' if progression_spoiler else 'spoiler'
+                spoiler_type='progression' if progression_spoiler else 'spoiler',
+                branch=branch
         )
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
@@ -146,10 +151,14 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
     @app_commands.describe(
         yamlfile="The yaml you want to use to generate the game."
     )
+    @app_commands.choices(
+        branch=ALTTPR_BRANCH_CHOICE,
+    )
     async def customspoiler(
         self,
         interaction: discord.Interaction,
         yamlfile: discord.Attachment,
+        branch: str = "live",
     ):
         """
         Generates an ALTTP Randomizer spoiler race game using a custom yaml provided by the user
@@ -157,7 +166,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         await interaction.response.defer()
 
         content = await yamlfile.read()
-        spoiler = await generate_spoiler_game_custom(content)
+        spoiler = await generate_spoiler_game_custom(content, branch=branch)
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)

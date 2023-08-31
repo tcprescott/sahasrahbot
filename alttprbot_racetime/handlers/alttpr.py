@@ -79,6 +79,36 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, studytime)
         self.seed_rolled = True
 
+    async def ex_tournamentspoiler(self, args, message):
+        if await self.is_locked(message):
+            return
+
+        try:
+            preset_name = args[0]
+        except IndexError:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        try:
+            spoiler = await spoilers.generate_spoiler_game(preset_name, branch='tournament')
+        except preset.PresetNotFoundException as e:
+            await self.send_message(str(e))
+            return
+
+        try:
+            studytime = int(args[1])
+        except IndexError:
+            studytime = spoiler.preset.preset_data.get('studytime', 900)
+
+        await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
+        await self.send_message(spoiler.seed.url)
+        await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+        await self.schedule_spoiler_race(spoiler.spoiler_log_url, studytime)
+        self.seed_rolled = True
+
     async def ex_progression(self, args, message):
         if await self.is_locked(message):
             return
