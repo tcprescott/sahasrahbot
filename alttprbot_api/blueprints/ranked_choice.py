@@ -1,6 +1,7 @@
 from quart import Blueprint, render_template, request, abort
 from quart_discord import requires_authorization
 import tortoise.exceptions
+import logging
 
 from alttprbot import models
 from alttprbot.util import rankedchoice
@@ -38,6 +39,7 @@ async def get_ballot(election_id: int):
         try:
             member = await guild.fetch_member(user.id)
         except NotFound:
+            logging.exception(f"Unable to find user {user.id} in guild.")
             return abort(403, "Unable to find you in the server.  Please contact Synack if you believe this is an error.")
 
         if voter_role not in member.roles:
