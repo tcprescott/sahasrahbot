@@ -6,6 +6,8 @@ from alttprbot import models
 from alttprbot.util import rankedchoice
 from alttprbot_discord.bot import discordbot
 
+from discord.errors import NotFound
+
 from ..api import discord
 
 # TODO: add a way to resubmit votes (low priority)
@@ -33,7 +35,11 @@ async def get_ballot(election_id: int):
     if election.private:
         guild = await discordbot.fetch_guild(election.guild_id)
         voter_role = guild.get_role(election.voter_role_id)
-        member = await guild.fetch_member(user.id)
+        try:
+            member = await guild.fetch_member(user.id)
+        except NotFound:
+            return abort(403, "Unable to find you in the server.  Please contact Synack if you believe this is an error.")
+
         if voter_role not in member.roles:
             return abort(403, "You are not authorized to vote in this election.")
 
