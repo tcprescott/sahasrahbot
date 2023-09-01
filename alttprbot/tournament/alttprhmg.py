@@ -1,12 +1,12 @@
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot_discord.bot import discordbot
-from alttprbot.alttprgen import preset
+from alttprbot.alttprgen import generator
 
 
 class ALTTPRHMGTournament(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed, self.preset_dict = await preset.get_preset('hmg')
+        self.seed = await generator.ALTTPRPreset('hmg').generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch='tournament')
 
     async def configuration(self):
         guild = discordbot.get_guild(535946014037901333)
