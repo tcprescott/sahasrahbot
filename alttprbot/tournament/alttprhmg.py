@@ -1,7 +1,7 @@
-from alttprbot.tournament.core import TournamentConfig
-from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot_discord.bot import discordbot
 from alttprbot.alttprgen import generator
+from alttprbot.tournament.alttpr import ALTTPRTournamentRace
+from alttprbot.tournament.core import TournamentConfig
+from alttprbot_discord.bot import discordbot
 
 
 class ALTTPRHMGTournament(ALTTPRTournamentRace):
