@@ -12,7 +12,7 @@ import pytz
 from alttprbot_racetime import bot as racetimebot
 
 from alttprbot import models
-from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, alttprhmg, alttprleague
+from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, alttprhmg, alttprleague, alttprmini
 from alttprbot.util import gsheet
 from config import Config as c
 
