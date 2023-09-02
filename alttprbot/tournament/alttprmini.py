@@ -5,7 +5,7 @@ from alttprbot_discord.bot import discordbot
 
 class ALTTPRMiniTournament(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed = await ALTTPRPreset("nightcl4w/duality").generate(tournament=True, spoilers="off", branch='tournament')
+        self.seed = await ALTTPRPreset("nightcl4w/duality").generate(tournament=True, spoilers="off")
 
 
     async def configuration(self):
