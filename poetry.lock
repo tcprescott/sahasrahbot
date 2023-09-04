@@ -2310,13 +2310,13 @@ Quart = "*"
 
 [[package]]
 name = "racetime-bot"
-version = "1.7.0"
+version = "2.1.0"
 description = ""
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "1e74910b1520c4be31a84253dabeda264fe54841.zip", hash = "sha256:26423faceccc1d4840c1b0a4e3d88e0403350125f84beafa3748d139a8433f4a"},
+    {file = "d5e252c480d0f98648c575ad2f6769a5423af0ff.zip", hash = "sha256:d1b5fe0854b2a1a0ca572235e0b32cd7c7f91150bc40a0a1c5e66b02314acc8c"},
 ]
 
 [package.dependencies]
@@ -2326,8 +2326,7 @@ tenacity = "*"
 
 [package.source]
 type = "url"
-url = "https://github.com/tcprescott/racetime-bot/archive/1e74910b1520c4be31a84253dabeda264fe54841.zip"
-
+url = "https://github.com/tcprescott/racetime-bot/archive/d5e252c480d0f98648c575ad2f6769a5423af0ff.zip"
 [[package]]
 name = "requests"
 version = "2.28.2"
@@ -2987,4 +2986,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "92d760ed9305a413451c68f9afecd9897bf9d30200e87568b0d31626bb9be7f7"
+content-hash = "b04bf997e6afd96bfd622c003b581aa10714f5ac13cda8433d41cb2aef1e666d"

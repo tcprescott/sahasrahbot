@@ -1,6 +1,7 @@
 import random
 
 import discord
+from racetime_bot import msg_actions
 
 from alttprbot import models
 from alttprbot.alttprgen import smz3multi
@@ -132,7 +133,17 @@ class SMRandoLeague(TournamentRace):
         return seed_number, seeds
 
     async def send_room_welcome(self):
-        await self.rtgg_handler.send_message('Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.  You do NOT need to wait for your setup helper to do this or start your race, they will appear later to setup the stream.')
+        await self.rtgg_handler.send_message(
+            'Welcome. Use !tournamentrace (without any arguments) to roll your seed!  This should be done about 5 minutes prior to the start of your race.  You do NOT need to wait for your setup helper to do this or start your race, they will appear later to setup the stream.',
+            actions=[
+                msg_actions.Action(
+                    label='Roll Tournament Seed',
+                    help_text='Create a seed for this specific tournament race.  This should only be done shortly before the race starts.',
+                    message='!tournamentrace'
+                )
+            ],
+            pinned=True
+        )
 
     async def send_audit_message(self, message=None, embed: discord.Embed = None):
         if self.audit_channel:
