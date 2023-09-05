@@ -42,7 +42,7 @@ class GameHandler(SahasrahBotCoreHandler):
                             ),
                             msg_actions.TextInput(
                                 name='countdown',
-                                label='Countdown',
+                                label='Spoiler Countdown (seconds)',
                                 placeholder='eg. 900 (ignored if not spoiler race)',
                                 help_text='How long to wait before sending the spoiler log.  Defaults to 900 seconds.  Ignored if not a spoiler race.',
                                 default='900',
