@@ -20,13 +20,13 @@ class ALTTPRSpoilerGame:
     spoiler_log_url: str
     seed: ALTTPRDiscord
 
-async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False, branch=None):
+async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False, branch=None, allow_quickswap=True):
     preset_data = ALTTPRPreset(preset)
     await preset_data.fetch()
     seed = await preset_data.generate(
         spoilers="generate",
         tournament=True,
-        allow_quickswap=True,
+        allow_quickswap=allow_quickswap,
         endpoint_prefix="/festive" if festive else "",
         branch=branch
     )

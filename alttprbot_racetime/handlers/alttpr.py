@@ -1,5 +1,5 @@
 from alttprbot.alttprgen import preset, spoilers, generator
-from racetime_bot import monitor_cmd
+from racetime_bot import monitor_cmd, msg_actions
 
 from .core import SahasrahBotCoreHandler
 
@@ -9,6 +9,62 @@ class GameHandler(SahasrahBotCoreHandler):
         await super().status_pending()
         await self.edit(hide_comments=True)
 
+    async def intro(self):
+        """
+        Send introduction messages.
+        """
+        if not self.state.get('intro_sent'):
+            await self.send_message(
+                f"Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller! Use {self.command_prefix}help to see what I can do!   Check out https://sahasrahbot.synack.live/rtgg.html for more info.",
+                actions=[
+                    msg_actions.Action(
+                        label='Roll a Game',
+                        message="!newrace --preset=${preset} --quickswap=${quickswap} --spoiler_race=${spoiler_race} --countdown=${countdown} --branch=${branch}",
+                        submit="Roll Game",
+                        survey=msg_actions.Survey(
+                            msg_actions.TextInput(
+                                name='preset',
+                                label='Preset',
+                                placeholder='eg. standard',
+                                help_text='The preset to use for the game.  See https://sahasrahbot.synack.live/rtgg.html for a list of presets.'
+                            ),
+                            msg_actions.BoolInput(
+                                name='quickswap',
+                                label='Quickswap',
+                                help_text='Whether or not to allow quickswap.  Defaults to true.',
+                                default=True,
+                            ),
+                            msg_actions.BoolInput(
+                                name='spoiler_race',
+                                label='Spoiler Race',
+                                help_text='Is this a spoiler race? Default is false.',
+                                default=False,
+                            ),
+                            msg_actions.TextInput(
+                                name='countdown',
+                                label='Countdown',
+                                placeholder='eg. 900 (ignored if not spoiler race)',
+                                help_text='How long to wait before sending the spoiler log.  Defaults to 900 seconds.  Ignored if not a spoiler race.',
+                                default='900',
+                            ),
+                            msg_actions.SelectInput(
+                                name='branch',
+                                label='Branch',
+                                options={
+                                    'live': 'Live',
+                                    'tournament': 'Tournament',
+                                    'beeta': 'Beeta',
+                                },
+                                help_text='Which branch to use for the game.  Defaults to live.',
+                                default='live',
+                            ),
+                        )
+                    )
+                ]
+            )
+            self.state['intro_sent'] = True
+
+    # deprecated
     async def ex_race(self, args, message):
         try:
             preset_name = args[0]
@@ -35,6 +91,7 @@ class GameHandler(SahasrahBotCoreHandler):
     #         return
     #     await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, endpoint_prefix="/festive")
 
+    # TODO: replace this with !newrace
     async def ex_noqsrace(self, args, message):
         try:
             preset_name = args[0]
@@ -49,6 +106,7 @@ class GameHandler(SahasrahBotCoreHandler):
             branch = 'live'
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=False, branch=branch)
 
+    # TODO: delete this in favor of !race
     async def ex_spoiler(self, args, message):
         if await self.is_locked(message):
             return
@@ -79,6 +137,7 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, studytime)
         self.seed_rolled = True
 
+    # TODO: delete this in favor of !race
     async def ex_tournamentspoiler(self, args, message):
         if await self.is_locked(message):
             return
@@ -109,6 +168,7 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, studytime)
         self.seed_rolled = True
 
+    # TODO: delete this in favor of !race
     async def ex_progression(self, args, message):
         if await self.is_locked(message):
             return
@@ -132,6 +192,69 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.send_message(spoiler.seed.url)
         await self.send_message("The progression spoiler for this race will be sent after the race begins in this room.")
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, 0)
+        self.seed_rolled = True
+
+    async def ex2_newrace(self, message, positional_args, keyword_args):
+        if await self.is_locked(message):
+            return
+
+        try:
+            preset_name = positional_args[1]
+        except IndexError:
+            preset_name = keyword_args.get('preset', None)
+
+        if not preset_name:
+            await self.send_message(
+                'You must specify a preset!'
+            )
+            return
+
+        allow_quickswap = keyword_args.get('quickswap', True)
+
+        try:
+            branch = positional_args[2]
+        except IndexError:
+            branch = keyword_args.get('branch', 'live')
+
+        festive = keyword_args.get('festive', False)
+        hints = keyword_args.get('hints', False)
+
+        spoiler_race = keyword_args.get('spoiler_race', False)
+
+        if spoiler_race:
+            await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+            try:
+                spoiler = await spoilers.generate_spoiler_game(preset_name, branch=branch, allow_quickswap=allow_quickswap, festive=festive)
+            except preset.PresetNotFoundException as e:
+                await self.send_message(str(e))
+                return
+
+            countdown = keyword_args.get('countdown', 900)
+
+            await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
+            await self.send_message(spoiler.seed.url)
+            await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {countdown}s countdown timer at that time will begin.")
+            await self.schedule_spoiler_race(spoiler.spoiler_log_url, countdown)
+        else:
+            await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+            try:
+                seed = await generator.ALTTPRPreset(preset_name).generate(
+                    hints=hints,
+                    spoilers="off",
+                    tournament=True,
+                    allow_quickswap=allow_quickswap,
+                    endpoint_prefix="/festive" if festive else "",
+                    branch=branch,
+                )
+            except preset.PresetNotFoundException as e:
+                await self.send_message(str(e))
+                return
+
+            race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
+            await self.set_bot_raceinfo(race_info)
+            await self.send_message(seed.url)
+            await self.send_message("Seed rolling complete.  See race info for details.")
+
         self.seed_rolled = True
 
     async def ex_mystery(self, args, message):
@@ -179,6 +302,7 @@ class GameHandler(SahasrahBotCoreHandler):
     async def ex_synack(self, args, message):
         await self.send_message("You need to be more creative.")
 
+    # deprecated
     async def roll_game(self, preset_name, message, allow_quickswap=True, endpoint_prefix="", branch=None):
         if await self.is_locked(message):
             return

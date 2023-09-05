@@ -2245,14 +2245,14 @@ files = [
 
 [[package]]
 name = "pyz3r"
-version = "6.0.9"
+version = "6.1.0"
 description = "A python module for interacting with the web API of various randomizers, such as https://alttpr.com or https://samus.link."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyz3r-6.0.9-py3-none-any.whl", hash = "sha256:8819dab8b894abd0f950d2b2484c030e62f56e7858c75bd9f7d623f8cd00fdf5"},
-    {file = "pyz3r-6.0.9.tar.gz", hash = "sha256:3dc3bd833f9cdfb80574bdb84d4a8a9fa1027ba2b6a6235fcddcb743c75e149c"},
+    {file = "pyz3r-6.1.0-py3-none-any.whl", hash = "sha256:193512b78a1ca79b8aea5042adce0d80bed94cb75939081f0b15da112f62a6cc"},
+    {file = "pyz3r-6.1.0.tar.gz", hash = "sha256:5bd1815e4d4231bb1969e4e2512e583d01763e78b0d68aae9865e54708848e5f"},
 ]
 
 [package.dependencies]
@@ -2316,7 +2316,7 @@ category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "d5e252c480d0f98648c575ad2f6769a5423af0ff.zip", hash = "sha256:d1b5fe0854b2a1a0ca572235e0b32cd7c7f91150bc40a0a1c5e66b02314acc8c"},
+    {file = "ea10f2313c1e948058f6db5e21834930865011c2.zip", hash = "sha256:a4eff838e0d27c4d240d8b9fc47930af77f3562d5f696613c4354924b509b250"},
 ]
 
 [package.dependencies]
@@ -2326,7 +2326,7 @@ tenacity = "*"
 
 [package.source]
 type = "url"
-url = "https://github.com/tcprescott/racetime-bot/archive/d5e252c480d0f98648c575ad2f6769a5423af0ff.zip"
+url = "https://github.com/tcprescott/racetime-bot/archive/ea10f2313c1e948058f6db5e21834930865011c2.zip"
 [[package]]
 name = "requests"
 version = "2.28.2"
@@ -2986,4 +2986,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "b04bf997e6afd96bfd622c003b581aa10714f5ac13cda8433d41cb2aef1e666d"
+content-hash = "fc3f8a51a1c38a85a80ab24b295be9686cb998a2156b293571ddf7c748d93215"

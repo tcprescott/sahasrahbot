@@ -38,7 +38,7 @@ isodate = "*"
 "discord.py" = "*"
 jishaku = "*"
 pyrankvote = "*"
-racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/d5e252c480d0f98648c575ad2f6769a5423af0ff.zip"}
+racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/ea10f2313c1e948058f6db5e21834930865011c2.zip"}
 markdown = "^3.4.3"
 twitchapi = "^3.10.0"
 
