@@ -19,7 +19,7 @@ class GameHandler(SahasrahBotCoreHandler):
                 actions=[
                     msg_actions.Action(
                         label='Roll a Game',
-                        message="!newrace --preset=${preset} --quickswap=${quickswap} --spoiler_race=${spoiler_race} --countdown=${countdown} --branch=${branch}",
+                        message="!newrace --preset=${preset} ${--quickswap} ${--spoiler_race} --countdown=${countdown} --branch=${branch}",
                         submit="Roll Game",
                         survey=msg_actions.Survey(
                             msg_actions.TextInput(
@@ -29,13 +29,13 @@ class GameHandler(SahasrahBotCoreHandler):
                                 help_text='The preset to use for the game.  See https://sahasrahbot.synack.live/rtgg.html for a list of presets.'
                             ),
                             msg_actions.BoolInput(
-                                name='quickswap',
+                                name='--quickswap',
                                 label='Quickswap',
                                 help_text='Whether or not to allow quickswap.  Defaults to true.',
                                 default=True,
                             ),
                             msg_actions.BoolInput(
-                                name='spoiler_race',
+                                name='--spoiler_race',
                                 label='Spoiler Race',
                                 help_text='Is this a spoiler race? Default is false.',
                                 default=False,
