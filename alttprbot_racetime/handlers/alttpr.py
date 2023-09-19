@@ -13,7 +13,7 @@ class GameHandler(SahasrahBotCoreHandler):
         """
         Send introduction messages.
         """
-        if not self.state.get('intro_sent'):
+        if not self.state.get('intro_sent') and not self.tournament:
             await self.send_message(
                 f"Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller! Use {self.command_prefix}help to see what I can do!   Check out https://sahasrahbot.synack.live/rtgg.html for more info.",
                 actions=[

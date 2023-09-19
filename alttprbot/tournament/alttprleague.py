@@ -3,7 +3,7 @@ import logging
 import aiohttp
 # import tortoise.exceptions
 from alttprbot import models
-# from alttprbot.alttprgen import preset, spoilers
+from alttprbot.alttprgen import spoilers
 # from alttprbot.database import spoiler_races  # TODO switch to ORM
 from alttprbot.alttprgen import generator
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
@@ -15,11 +15,11 @@ class ALTTPRLeague(ALTTPRTournamentRace):
     settings_data: models.TournamentGames = None
 
     async def roll(self):
-        # if self.league_data.get('spoiler', False):
-        #     spoiler = await spoilers.generate_spoiler_game(self.league_data['preset'], branch="tournament")
-        #     await spoiler_races.insert_spoiler_race(self.rtgg_handler.data.get('name'), spoiler.spoiler_log_url, 0)
-        # else:
-        self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
+        if self.league_data.get('spoiler', False):
+            spoiler = await spoilers.generate_spoiler_game(self.league_data['preset'], branch="tournament")
+            await self.rtgg_handler.schedule_spoiler_race(spoiler.spoiler_log_url, 0)
+        else:
+            self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
 
         await self.create_embeds()
 

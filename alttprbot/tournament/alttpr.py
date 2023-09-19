@@ -45,7 +45,10 @@ class ALTTPRTournamentRace(TournamentRace):
 
     async def send_room_welcome(self):
         await self.rtgg_handler.send_message(
-            'Welcome! Use the "Roll Tournament Seed" button below about 5 minutes before your race start.  You do NOT need to wait for your setup helper to do this or start your race, they will appear later to setup the stream.',
+            'Welcome! Use the "Roll Tournament Seed" pinned above about 5 minutes before your race start.  You do NOT need to wait for your setup helper to do this or start your race, they will appear later to setup the stream.',
+        )
+        await self.rtgg_handler.send_message(
+            'Tournament Controls:',
             actions=[
                 msg_actions.Action(
                     label='Roll Tournament Seed',
