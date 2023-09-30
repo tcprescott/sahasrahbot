@@ -28,10 +28,10 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             league_response = await req.json()
 
         try:
-            self.league_data = league_response.get('mode', {})
-        except IndexError:
-            logging.exception("No active league week!")
-            await self.rtgg_handler.send_message("No active League Week!  This should not have happened.  Contact a league admin/mod for help.")
+            self.league_data = league_response['mode']
+        except KeyError:
+            logging.exception("No active league mode!")
+            await self.rtgg_handler.send_message("No active League mode!  This should not have happened.  Contact a league admin/mod for help.")
 
     # async def roll(self):
     #     if self.tournament_game.preset is None:
@@ -51,7 +51,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             racetime_goal='Beat the game',
             event_slug="invleague",
             audit_channel=discordbot.get_channel(546728638272241674),
-            commentary_channel=discordbot.get_channel(611601587139510322),
+            commentary_channel=discordbot.get_channel(1157407211094556703),
             # scheduling_needs_channel=discordbot.get_channel(878075812996337744),
             # scheduling_needs_tracker=True,
             helper_roles=[
@@ -71,7 +71,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
 
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal="Beat the game (assisted)" if self.league_data['coop']  else "Beat the game",
+            goal="Beat the game (assisted)" if self.league_data['coop'] or self.league_data['spoiler'] else "Beat the game",
             invitational=True,
             unlisted=False,
             info_user=self.race_info,
@@ -185,7 +185,7 @@ class ALTTPROpenLeague(ALTTPRLeague):
             racetime_goal='Beat the game',
             event_slug="alttprleague",
             audit_channel=discordbot.get_channel(546728638272241674),
-            commentary_channel=discordbot.get_channel(611601587139510322),
+            commentary_channel=discordbot.get_channel(1157407211094556703),
             # scheduling_needs_channel=discordbot.get_channel(878076083193389096),
             # scheduling_needs_tracker=True,
             helper_roles=[
