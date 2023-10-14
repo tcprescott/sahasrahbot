@@ -19,7 +19,7 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
         role="Choose a role to blast",
     )
     async def blast(self, interaction: discord.Interaction, role: discord.Role):
-        if not await self.bot.is_owner(interaction.user) or interaction.user.guild_permissions.administrator is False:
+        if not await self.bot.is_owner(interaction.user) and interaction.user.guild_permissions.administrator is False:
             await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
             return
 
@@ -52,7 +52,7 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
         role="Choose a role to blast",
     )
     async def report(self, interaction: discord.Interaction, role: discord.Role):
-        if not await self.bot.is_owner(interaction.user) or interaction.user.guild_permissions.administrator is False:
+        if not await self.bot.is_owner(interaction.user) and interaction.user.guild_permissions.administrator is False:
             await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
             return
 
