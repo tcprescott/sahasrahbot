@@ -107,7 +107,7 @@ class SMRandoLeague(TournamentRace):
 
         await tournamentresults.save()
 
-        await self.rtgg_handler.send_message("Seed has been generated!")
+        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         self.rtgg_handler.seed_rolled = True
 
     async def create_multiworld(self):

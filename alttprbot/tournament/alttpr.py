@@ -36,14 +36,11 @@ class ALTTPRTournamentRace(TournamentRace):
         for name, player in self.player_discords:
             await self.send_player_message(name, player, self.embed)
 
-        for player in self.rtgg_handler.data['entrants']:
-            await self.rtgg_handler.send_message(self.seed.url, direct_to=player['user']['id'])
-
         tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed.url
         await tournamentresults.save()
 
-        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in both Discord and RaceTime.gg.  Please contact a Tournament Moderator if you haven't received the DM.")
+        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in Discord.  Please contact a Tournament Moderator if you haven't received the DM.")
         self.rtgg_handler.seed_rolled = True
 
     async def send_room_welcome(self):
