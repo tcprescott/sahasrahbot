@@ -25,9 +25,10 @@ def roll_smdash():
     return random.randrange(1000000, 9999999)
 
 
-async def create_smdash(mode="mm", encrypt=False):
-    if mode not in ['recall_mm', 'recall_full', 'standard_mm', 'standard_full', 'mm', 'full']:
-        raise Exception("Specified preset is not valid.  Presets: recall_mm, recall_full, standard_mm, standard_full")
+async def create_smdash(mode="classic_mm", encrypt=False):
+    presets = ['sgl23', 'recall_mm', 'recall_full', 'classic_mm', 'classic_full']
+    if mode not in presets:
+        raise Exception("Specified preset is not valid.  Presets: " + ", ".join(presets))
 
     with tempfile.TemporaryDirectory() as tmp:
         current_working_directory = os.getcwd()

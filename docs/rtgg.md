@@ -116,9 +116,9 @@ Example `!variarace default regular`
 ### !dash
 Generate a seed using the Super Metroid DASH Randomizer, found at https://dashrando.net
 
-DASH has two distinct modes, *Standard* & *Recall*, with each mode supporting either Major/Minor or Full item randomziation.
+DASH supports many popular features such as boss and area randomization along with unique modes which rebalance existing items and introduce new progression items.
 
-Available presets: `recall_mm`, `standard_mm`, `recall_full`, `standard_full`
+Available presets: `sgl23`, `recall_mm`, `classic_mm`, `classic_full`, `classic_full`
 
 Example `!dashrace recall_mm`
 
