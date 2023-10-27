@@ -53,21 +53,24 @@ async def create_smdash(mode="classic_mm", encrypt=False):
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
 
+        # Temporarily use the original rom file as the encrypted version
+        smdashromenc = smdashrom
+
         ## note to those who are reading this: this encryption process is not publically available.
-        if encrypt:
-            smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
+        #if encrypt:
+            #smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
 
-            proc = await asyncio.create_subprocess_exec(
-                'dotnet',
-                '/opt/randocrypt/RandoCryptCli.dll',
-                smdashrom,
-                os.path.join(tmp, smdashromenc),
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE)
+            #proc = await asyncio.create_subprocess_exec(
+                #'dotnet',
+                #'/opt/randocrypt/RandoCryptCli.dll',
+                #smdashrom,
+                #os.path.join(tmp, smdashromenc),
+                #stdout=asyncio.subprocess.PIPE,
+                #stderr=asyncio.subprocess.PIPE)
 
-            _, stderr = await proc.communicate()
-            if proc.returncode > 0:
-                raise Exception(f'Exception while securing game: {stderr.decode()}')
+            #_, stderr = await proc.communicate()
+            #if proc.returncode > 0:
+                #raise Exception(f'Exception while securing game: {stderr.decode()}')
 
         random_id = shortuuid.ShortUUID().random(length=12)
         patchname = f"DASH_{mode.upper()}_{random_id}.bps"
