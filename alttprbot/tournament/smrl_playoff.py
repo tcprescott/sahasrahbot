@@ -18,7 +18,7 @@ from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 # - Countdown, Full Area, Vanilla Bosses (week 2) - RLS4W2
 # - Major/Minor, Full Area, Boss Shuffle (week 3) - RLS4W3
 # - Countdown, Vanilla Area, Boss Shuffle (countdown equivalent to week 4) - RLS4P1
-# - Classic DASH - standard_mm
+# - Classic DASH - classic_mm
 # - Chozo, Full Area, Vanilla Bosses - RLS4P2
 
 
@@ -142,7 +142,7 @@ class SMRLPlayoffs(TournamentRace):
             preset = 'RLS4GS'
         elif game_number in [4, 5]:
             preset = payload['preset']
-            randomizer = 'smdash' if preset == 'standard_mm' else 'smvaria'
+            randomizer = 'smdash' if preset == 'classic_mm' else 'smvaria'
 
         embed.add_field(name="Episode ID", value=self.episodeid, inline=False)
         embed.add_field(name="Event", value=self.event_slug, inline=False)

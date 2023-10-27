@@ -543,10 +543,11 @@ class Generator(commands.Cog):
         race="Is this a race? (default no)"
     )
     @app_commands.choices(race=YES_NO_CHOICE, mode=[
+        app_commands.Choice(name="SGL23", value="sgl23"),
         app_commands.Choice(name="recall_mm", value="recall_mm"),
         app_commands.Choice(name="recall_full", value="recall_full"),
-        app_commands.Choice(name="standard_mm", value="standard_mm"),
-        app_commands.Choice(name="standard_full", value="standard_full"),
+        app_commands.Choice(name="classic_mm", value="classic_mm"),
+        app_commands.Choice(name="classic_full", value="classic_full"),
     ])
     async def smdash(
         self,
