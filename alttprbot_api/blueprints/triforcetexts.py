@@ -5,7 +5,7 @@ from quart_discord import requires_authorization
 
 from alttprbot import models
 
-from ..api import discord
+from alttprbot_api.api import discord
 
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
 

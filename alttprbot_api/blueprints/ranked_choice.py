@@ -9,7 +9,7 @@ from alttprbot_discord.bot import discordbot
 
 from discord.errors import NotFound
 
-from ..api import discord
+from alttprbot_api.api import discord
 
 # TODO: add a way to resubmit votes (low priority)
 # TODO: client-side verification that ranked choices are unique

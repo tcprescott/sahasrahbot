@@ -9,7 +9,7 @@ from quart_discord import requires_authorization
 from alttprbot import models
 from alttprbot_racetime import bot as racetimebot
 
-from ..api import discord
+from alttprbot_api.api import discord
 
 racetime_blueprint = Blueprint('racetime', __name__)
 

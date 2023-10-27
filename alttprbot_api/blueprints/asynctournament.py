@@ -11,7 +11,7 @@ from alttprbot.util import asynctournament
 from alttprbot_api import auth
 from alttprbot_api.util import checks
 
-from ..api import discord
+from alttprbot_api.api import discord
 
 asynctournament_blueprint = Blueprint('async', __name__)
 

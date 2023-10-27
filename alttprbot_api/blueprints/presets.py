@@ -7,7 +7,7 @@ from quart_discord import Unauthorized, requires_authorization
 from alttprbot import models
 from alttprbot.alttprgen import generator
 
-from ..api import discord
+from alttprbot_api.api import discord
 
 presets_blueprint = Blueprint('presets', __name__)
 

@@ -4,7 +4,7 @@ from quart_discord import requires_authorization
 from alttprbot import models
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 
-from ..api import discord
+from alttprbot_api.api import discord
 
 tournament_blueprint = Blueprint('tournament', __name__)
 
