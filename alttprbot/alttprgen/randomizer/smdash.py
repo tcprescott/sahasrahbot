@@ -53,6 +53,9 @@ async def create_smdash(mode="classic_mm", encrypt=False):
 
         smdashrom = os.path.join(tmp, [f for f in os.listdir(tmp) if f.endswith(".sfc")][0])
 
+        # Temporarily use the original rom file as the encrypted version
+        smdashromenc = smdashrom
+
         ## note to those who are reading this: this encryption process is not publically available.
         #if encrypt:
             #smdashromenc = os.path.splitext(os.path.basename(smdashrom))[0] + "_encrypted.sfc"
