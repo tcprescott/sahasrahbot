@@ -1,8 +1,10 @@
 import asyncio
 import logging
 
-from quart import Blueprint, redirect, render_template
+from quart import Blueprint, redirect, render_template, request
 from quart_discord import Unauthorized
+
+from alttprbot import models
 
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.randomizer import roll_ffr, roll_ootr
@@ -29,6 +31,11 @@ async def sgl23_generate_alttpr():
     seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
     logging.info("SGL23 - Generated ALTTPR seed %s", seed.url)
     await asyncio.sleep(1) # workaround for tournament branch seeds not being available immediately
+    await models.SGL2023OnsiteHistory.create(
+        tournament="alttpr",
+        url=seed.url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
     return redirect(seed.url)
 
 @sgl23_blueprint.route('/sgl23/generate/ootr') # updated
@@ -273,19 +280,50 @@ async def sgl23_generate_ootr():
     }
     seed = await roll_ootr(settings=settings, version='devSGLive22_7.1.143', encrypt=True)
     logging.info("sgl23 - Generated OOTR seed %s", seed['id'])
-    return redirect(f"https://ootrandomizer.com/seed/get?id={seed['id']}")
+    url = f"https://ootrandomizer.com/seed/get?id={seed['id']}"
+    await models.SGL2023OnsiteHistory.create(
+        tournament="ootr",
+        url=url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
+    return redirect(url)
 
 @sgl23_blueprint.route("/sgl23/generate/smr") #updated
 async def sgl23_generate_smr():
     seed_url = await create_smdash(mode="sgl23")
+    await models.SGL2023OnsiteHistory.create(
+        tournament="smr",
+        url=seed_url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
     return redirect(seed_url)
 
 @sgl23_blueprint.route("/sgl23/generate/ffr") # updated
 async def sgl23_generate_ffr():
     _, seed_url = roll_ffr("https://4-7-2.finalfantasyrandomizer.com/?s=00000000&f=m1-dPYu5-7ZlHqdPgC9BsTva4786C4mX5d0uZn85JzpVARtsVYb4TkKKyi4owT82MQwSww28yiLaHtMBNNzxMGjISw8IWcAfUS7AEkSp52Degtu4wErH3htXn4zENBWaNXWqXL6O-k8R3wZ8h55Gye21Spp4emwbbNwehPD")
+    await models.SGL2023OnsiteHistory.create(
+        tournament="ffr",
+        url=seed_url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
     return redirect(seed_url)
 
-@sgl23_blueprint.route("/sgl23/generate/smz3")
-async def sgl23_generate_smz3():
-    seed = await generator.SMZ3Preset("fast").generate(tournament=True)
+@sgl23_blueprint.route("/sgl23/generate/smz3/main")
+async def sgl23_generate_smz3_main():
+    seed = await generator.SMZ3Preset("hardfast").generate(tournament=True)
+    await models.SGL2023OnsiteHistory.create(
+        tournament="smz3_main",
+        url=seed.url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
+    return redirect(seed.url)
+
+@sgl23_blueprint.route("/sgl23/generate/smz3/alt")
+async def sgl23_generate_smz3_alt():
+    seed = await generator.SMZ3Preset("normal").generate(tournament=True)
+    await models.SGL2023OnsiteHistory.create(
+        tournament="smz3_alt",
+        url=seed.url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
     return redirect(seed.url)
