@@ -5,7 +5,7 @@ from quart import Blueprint, redirect, render_template, request
 from quart_discord import Unauthorized
 
 from alttprbot import models
-
+from alttprbot.util import triforce_text
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.randomizer import roll_ffr, roll_ootr
 from alttprbot.alttprgen.randomizer.smdash import create_smdash
@@ -28,9 +28,10 @@ async def sgl23_dashboard():
 @sgl23_blueprint.route('/sgl23/generate/alttpr', methods=["GET"]) # updated
 async def sgl23_generate_alttpr():
     preset = "sglive2023"
-    seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
+    # seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
+    seed = await triforce_text.generate_with_triforce_text(pool_name="sgl23", preset=preset, branch="tournament", balanced=False)
     logging.info("SGL23 - Generated ALTTPR seed %s", seed.url)
-    await asyncio.sleep(1) # workaround for tournament branch seeds not being available immediately
+    await asyncio.sleep(2) # workaround for tournament branch seeds not being available immediately
     await models.SGL2023OnsiteHistory.create(
         tournament="alttpr",
         url=seed.url,

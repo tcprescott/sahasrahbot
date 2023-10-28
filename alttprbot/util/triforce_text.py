@@ -18,11 +18,29 @@ async def get_triforce_text_balanced(pool_name: str):
     triforce_text = random.choice(triforce_texts)
     return triforce_text.text
 
+async def get_triforce_text_random(pool_name: str):
+    """
+    Get a random triforce text from the pool.
+    """
 
-async def generate_with_triforce_text(pool_name: str, preset: str, settings: dict = None):
+    triforce_texts = await models.TriforceTexts.filter(approved=True, pool_name=pool_name)
+    if not triforce_texts:
+        return None
+    triforce_text = random.choice(triforce_texts)
+    return triforce_text.text
+
+async def generate_with_triforce_text(pool_name: str, preset: str, settings: dict = None, branch: str = "live", balanced=True):
+    """
+    Generate a game with a triforce text.
+    """
+
     data = generator.ALTTPRPreset(preset)
     await data.fetch()
-    text = await get_triforce_text_balanced(pool_name=pool_name)
+    if balanced:
+        text = await get_triforce_text_balanced(pool_name=pool_name)
+    else:
+        text = await get_triforce_text_random(pool_name=pool_name)
+
     if text:
         data.preset_data['settings']['texts'] = {}
         data.preset_data['settings']['texts']['end_triforce'] = "{NOBORDER}\n" + text
@@ -30,4 +48,4 @@ async def generate_with_triforce_text(pool_name: str, preset: str, settings: dic
     if settings is not None and isinstance(settings, dict):
         data.preset_data['settings'] = {**data.preset_data['settings'], **settings}
 
-    return await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+    return await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch=branch)
