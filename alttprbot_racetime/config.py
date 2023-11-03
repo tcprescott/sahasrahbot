@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 
 from alttprbot_racetime import handlers
@@ -9,85 +8,77 @@ import config
 
 @dataclass
 class RacetimeBotConfig:
-    client_id: str
-    client_secret: str
+    category_slug: str
     handler_class: SahasrahBotCoreHandler
     bot_class: SahasrahBotRaceTimeBot = SahasrahBotRaceTimeBot
 
+    @property
+    def client_id(self):
+        return getattr(config, f"RACETIME_CLIENT_ID_{self.category_slug.upper()}")
+
+    @property
+    def client_secret(self):
+        return getattr(config, f"RACETIME_CLIENT_SECRET_{self.category_slug.upper()}")
 
 if config.DEBUG:
     RACETIME_CATEGORIES = {
         'test': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_TEST"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_TEST'),
+            category_slug='test',
             handler_class=handlers.test.GameHandler
         )
     }
 else:
     RACETIME_CATEGORIES = {
         'alttpr': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_ALTTPR"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_ALTTPR'),
+            category_slug='alttpr',
             handler_class=handlers.alttpr.GameHandler,
         ),
         'contra': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_CONTRA"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_CONTRA'),
+            category_slug='contra',
             handler_class=handlers.contra.GameHandler,
         ),
         'ct-jets': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_CTJETS"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_CTJETS'),
+            category_slug='ct-jets',
             handler_class=handlers.ctjets.GameHandler,
         ),
         'ff1r': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_FF1R"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_FF1R'),
+            category_slug='ff1r',
             handler_class=handlers.ff1r.GameHandler,
         ),
        'sgl': RacetimeBotConfig(
-           client_id=os.environ.get("RACETIME_CLIENT_ID_SGL"),
-           client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SGL'),
+           category_slug='sgl',
            handler_class=handlers.sgl.GameHandler,
        ),
         'sm': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_SM"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SM'),
+            category_slug='sm',
             handler_class=handlers.sm.GameHandler,
         ),
         'smb3r': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_SMB3R"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMB3R'),
+            category_slug='smb3r',
             handler_class=handlers.smb3r.GameHandler,
         ),
         'smr': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_SMR"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMR'),
+            category_slug='smr',
             handler_class=handlers.smr.GameHandler,
         ),
         'smw-hacks': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_SMWHACKS"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMWHACKS'),
+            category_slug='smw-hacks',
             handler_class=handlers.smwhacks.GameHandler,
         ),
         'smz3': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_SMZ3"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_SMZ3'),
+            category_slug='smz3',
             handler_class=handlers.smz3.GameHandler,
         ),
         'twwr': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_TWWR"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_TWWR'),
+            category_slug='twwr',
             handler_class=handlers.twwr.GameHandler,
         ),
         'z1r': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_Z1R"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_Z1R'),
+            category_slug='z1r',
             handler_class=handlers.z1r.GameHandler,
         ),
         'z2r': RacetimeBotConfig(
-            client_id=os.environ.get("RACETIME_CLIENT_ID_Z2R"),
-            client_secret=os.environ.get('RACETIME_CLIENT_SECRET_Z2R'),
+            category_slug='z2r',
             handler_class=handlers.z2r.GameHandler,
         )
     }
