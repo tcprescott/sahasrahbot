@@ -6,7 +6,9 @@ import pyrankvote
 import os
 import io
 
-APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+import config
+
+APP_URL = config.APP_URL
 
 
 async def calculate_results(election: models.RankedChoiceElection):

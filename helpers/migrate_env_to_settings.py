@@ -1,5 +1,3 @@
-import config
-
 with open('.env', 'r') as env_file:
     lines = env_file.readlines()
 
@@ -22,5 +20,8 @@ with open('config.py', 'a') as settings_file:
 
         if key == 'SGAPIENDPOINT':
             continue
+
+        if key == 'RACETIME_SECURE':
+            value = value == 'true'
 
         settings_file.write(f'\n{key.upper()} = {value}')

@@ -13,10 +13,11 @@ from pytz import UnknownTimeZoneError
 
 from alttprbot.util.holyimage import HolyImage
 
+import config
+
 # TODO: make work with discord.py 2.0
 
-
-ALTTP_RANDOMIZER_SERVERS = list(map(int, os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(',')))
+ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))
 
 WELCOME_MESSAGES = {
     'french': (

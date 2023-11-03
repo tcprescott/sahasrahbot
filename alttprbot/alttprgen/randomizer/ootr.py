@@ -1,8 +1,10 @@
 import aiohttp
 import os
 
-OOTR_BASE_URL = os.environ.get('OOTR_BASE_URL', 'https://ootrandomizer.com')
-OOTR_API_KEY = os.environ.get('OOTR_API_KEY')
+import config
+
+OOTR_BASE_URL = 'https://ootrandomizer.com'
+OOTR_API_KEY = config.OOTR_API_KEY
 
 
 async def roll_ootr(settings, version='6.1.0', encrypt=True):

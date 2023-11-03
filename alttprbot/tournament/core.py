@@ -13,7 +13,9 @@ from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 import dateutil.parser
 import pytz
 
-APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+import config
+
+APP_URL = config.APP_URL
 
 
 class UnableToLookupUserException(SahasrahBotException):
@@ -46,7 +48,7 @@ class TournamentConfig:
     stream_delay: int = 0
     room_open_time: int = 35
     auto_record: bool = False
-    gsheet_id: str = os.environ.get('TOURNAMENT_RESULTS_SHEET', None)
+    gsheet_id: str = config.TOURNAMENT_RESULTS_SHEET
 
     lang: str = 'en'
     coop: bool = False

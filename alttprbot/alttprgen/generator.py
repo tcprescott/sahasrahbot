@@ -22,6 +22,7 @@ from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
 from tortoise.exceptions import DoesNotExist
 
+import config
 
 class PresetNotFoundException(SahasrahBotException):
     pass
@@ -213,7 +214,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             elif branch == 'tournament':
                 baseurl = 'https://tournament.alttpr.com'
             else:
-                baseurl = os.environ.get("ALTTPR_BASEURL", 'https://alttpr.com')
+                baseurl = config.ALTTPR_BASEURL
 
             seed = await ALTTPRDiscord.generate(
                 settings=settings,

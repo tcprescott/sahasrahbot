@@ -9,9 +9,9 @@ from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
 
 import config
 
-RACETIME_HOST = os.environ.get('RACETIME_HOST', 'racetime.gg')
-RACETIME_SECURE = os.environ.get('RACETIME_SECURE', 'true') == 'true'
-RACETIME_PORT = os.environ.get('RACETIME_PORT', None)
+RACETIME_HOST = config.RACETIME_HOST
+RACETIME_SECURE = config.RACETIME_SECURE
+RACETIME_PORT = config.RACETIME_PORT
 
 
 class SahasrahBotRaceTimeBot(Bot):

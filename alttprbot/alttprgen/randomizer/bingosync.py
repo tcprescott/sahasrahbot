@@ -5,8 +5,8 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from alttprbot.exceptions import SahasrahBotException
-
-BINGOSYNC_BASE_URL = os.environ.get('BINGOSYNC_BASE_URL', 'https://bingosync.com')
+ 
+BINGOSYNC_BASE_URL = 'https://bingosync.com'
 
 jar = aiohttp.CookieJar(unsafe=True)
 try:

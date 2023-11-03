@@ -28,8 +28,8 @@ discordbot = commands.Bot(
 discordbot.logger = logging.getLogger('discord')
 discordbot.logger.setLevel(logging.INFO)
 
-if os.environ.get("SENTRY_URL"):
-    use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
+if config.SENTRY_URL:
+    use_sentry(discordbot, dsn=config.SENTRY_URL)
 
 
 async def load_extensions():
@@ -127,4 +127,4 @@ async def on_ready():
 
 async def start_bot():
     await load_extensions()
-    await discordbot.start(os.environ.get("DISCORD_TOKEN"))
+    await discordbot.start(config.DISCORD_TOKEN)

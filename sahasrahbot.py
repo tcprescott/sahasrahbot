@@ -1,8 +1,4 @@
-from dotenv import load_dotenv  # nopep8
-load_dotenv()  # nopep8
-
 import asyncio
-import os
 
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration

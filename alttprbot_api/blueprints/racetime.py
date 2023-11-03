@@ -11,12 +11,14 @@ from alttprbot_racetime import bot as racetimebot
 
 from alttprbot_api.api import discord
 
+import config
+
 racetime_blueprint = Blueprint('racetime', __name__)
 
-RACETIME_CLIENT_ID_OAUTH = os.environ.get('RACETIME_CLIENT_ID_OAUTH')
-RACETIME_CLIENT_SECRET_OAUTH = os.environ.get('RACETIME_CLIENT_SECRET_OAUTH')
-RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
-APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+RACETIME_CLIENT_ID_OAUTH = config.RACETIME_CLIENT_ID_OAUTH
+RACETIME_CLIENT_SECRET_OAUTH = config.RACETIME_CLIENT_SECRET_OAUTH
+RACETIME_URL = config.RACETIME_URL
+APP_URL = config.APP_URL
 
 
 @racetime_blueprint.route('/api/racetime/cmd', methods=['POST'])

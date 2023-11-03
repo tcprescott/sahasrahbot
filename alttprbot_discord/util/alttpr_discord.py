@@ -7,6 +7,8 @@ import html2markdown
 
 from pyz3r import ALTTPR
 
+import config
+
 emoji_code_map = {
     'Bow': 'Bow',
     'Boomerang': 'BestBoomerang',
@@ -46,9 +48,9 @@ class ALTTPRDiscord(ALTTPR):
     def __init__(self, *args, **kwargs):
         super(ALTTPRDiscord, self).__init__(*args, **kwargs)
         if 'baseurl' not in kwargs:
-            self.baseurl = os.environ.get("ALTTPR_BASEURL", 'https://alttpr.com')
-        username = os.environ.get("ALTTPR_USERNAME", None)
-        password = os.environ.get("ALTTPR_PASSWORD", None)
+            self.baseurl = config.ALTTPR_BASEURL
+        username = config.ALTTPR_USERNAME
+        password = config.ALTTPR_PASSWORD
         self.auth = aiohttp.BasicAuth(login=username, password=password) if username and password else None
 
     @property

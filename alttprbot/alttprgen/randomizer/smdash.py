@@ -5,6 +5,8 @@ import tempfile
 import logging
 import shortuuid
 
+import config
+
 ###
 # 1) Make a new temp directory
 # 2) Set working dir to that temp dir
@@ -37,7 +39,7 @@ async def create_smdash(mode="classic_mm", encrypt=False):
             proc = await asyncio.create_subprocess_exec(
                 '/usr/bin/node',
                 os.path.join(current_working_directory, 'utils', 'dash.headless.mjs'),
-                '-r', os.environ.get('SM_ROM'),
+                '-r', config.SM_ROM,
                 '-p', mode,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE)
@@ -79,7 +81,7 @@ async def create_smdash(mode="classic_mm", encrypt=False):
             os.path.join(current_working_directory, 'utils', 'flips'),
             '--create',
             '--bps-delta',
-            os.environ.get('SM_ROM'),
+            config.SM_ROM,
             os.path.join(tmp, smdashromenc if encrypt else smdashrom),
             os.path.join('/var/www/sgldash/bps', patchname),
             stdout=asyncio.subprocess.PIPE,

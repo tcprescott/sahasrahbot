@@ -18,8 +18,8 @@ from alttprbot.util import asynctournament, triforce_text
 from alttprbot_api.util import checks
 import config
 
-RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
-APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+RACETIME_URL = config.RACETIME_URL
+APP_URL = config.APP_URL
 
 YES_NO_CHOICE = [
     app_commands.Choice(name="Yes", value=True),

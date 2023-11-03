@@ -9,13 +9,15 @@ from alttprbot import models
 from alttprbot_discord.bot import discordbot
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
 
-sahasrahbotapi = Quart(__name__)
-sahasrahbotapi.secret_key = bytes(os.environ.get("APP_SECRET_KEY"), "utf-8")
+import config
 
-sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(os.environ.get("DISCORD_CLIENT_ID"))
-sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = os.environ.get("DISCORD_CLIENT_SECRET")
-sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = os.environ.get("APP_URL") + "/callback/discord/"
-sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = os.environ.get("DISCORD_TOKEN")
+sahasrahbotapi = Quart(__name__)
+sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")
+
+sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(config.DISCORD_CLIENT_ID)
+sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
+sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/discord/"
+sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = config.DISCORD_TOKEN
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
 

@@ -30,8 +30,8 @@ discordbot = commands.Bot(
     debug_guild=508335685044928540 if config.DEBUG else None
 )
 
-if os.environ.get("SENTRY_URL"):
-    use_sentry(discordbot, dsn=os.environ.get("SENTRY_URL"))
+if config.SENTRY_URL:
+    use_sentry(discordbot, dsn=config.SENTRY_URL)
 
 async def load_extensions():
     await discordbot.load_extension("alttprbot_audit.cogs.audit")
@@ -78,4 +78,4 @@ async def start_bot():
     await load_extensions()
     if config.DEBUG:
         discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540)) # hard code the discord server id for now
-    await discordbot.start(os.environ.get("AUDIT_DISCORD_TOKEN"))
+    await discordbot.start(config.AUDIT_DISCORD_TOKEN)

@@ -10,7 +10,9 @@ from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
-BINGO_COLLAB_DISCORD_WEBHOOK = os.environ.get('BINGO_COLLAB_DISCORD_WEBHOOK', None)
+import config
+
+BINGO_COLLAB_DISCORD_WEBHOOK = config.BINGO_COLLAB_DISCORD_WEBHOOK
 
 
 class SMBingoTournament(TournamentRace):

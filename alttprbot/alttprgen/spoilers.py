@@ -11,6 +11,7 @@ from alttprbot.alttprgen.generator import ALTTPRPreset, PresetData
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler
 
+import config
 
 @dataclass
 class ALTTPRSpoilerGame:
@@ -64,7 +65,7 @@ async def write_json_to_disk(seed, spoiler_type='spoiler'):
     session = aioboto3.Session()
     async with session.client('s3') as s3:
         await s3.put_object(
-            Bucket=os.environ.get('AWS_SPOILER_BUCKET_NAME'),
+            Bucket=config.AWS_SPOILER_BUCKET_NAME,
             Key=filename,
             Body=payload,
             ACL='public-read',
@@ -72,4 +73,4 @@ async def write_json_to_disk(seed, spoiler_type='spoiler'):
             ContentDisposition='attachment'
         )
 
-    return f"{os.environ.get('SpoilerLogUrlBase')}/{filename}"
+    return f"{config.SPOILERLOGURLBASE}/{filename}"

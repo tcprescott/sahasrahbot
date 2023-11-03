@@ -6,7 +6,9 @@ from alttprbot import models
 from alttprbot.util import rankedchoice
 import os
 
-APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+import config
+
+APP_URL = config.APP_URL
 
 
 class RankedChoiceMessageView(discord.ui.View):

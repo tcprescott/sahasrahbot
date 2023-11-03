@@ -13,6 +13,7 @@ import aioboto3
 import aiofiles
 from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
+import config
 
 class AlttprDoor():
     def __init__(self, settings=None, spoilers=True):
@@ -29,8 +30,8 @@ class AlttprDoor():
             self.settings['create_rom'] = True
             self.settings['create_spoiler'] = True
             self.settings['calc_playthrough'] = False
-            self.settings['rom'] = os.environ.get('ALTTP_ROM')
-            self.settings['enemizercli'] = os.path.join(os.environ.get('ENEMIZER_HOME'), 'EnemizerCLI.Core')
+            self.settings['rom'] = config.ALTTP_ROM
+            self.settings['enemizercli'] = os.path.join(config.ENEMIZER_HOME, 'EnemizerCLI.Core')
 
             # set some defaults we do NOT want to change ever
             self.settings['count'] = 1
@@ -52,7 +53,7 @@ class AlttprDoor():
                             '--settingsfile', settings_file_path,
                             stdout=asyncio.subprocess.PIPE,
                             stderr=asyncio.subprocess.PIPE,
-                            cwd=os.environ.get('DOOR_RANDO_HOME'))
+                            cwd=config.DOOR_RANDO_HOME)
 
                         stdout, stderr = await proc.communicate()
                         logging.info(stdout.decode())
@@ -76,7 +77,7 @@ class AlttprDoor():
                 os.path.join('utils', 'flips'),
                 '--create',
                 '--bps-delta',
-                os.environ.get("ALTTP_ROM"),
+                config.ALTTP_ROM,
                 rom_path,
                 patch_path,
                 stdout=asyncio.subprocess.PIPE,
@@ -93,7 +94,7 @@ class AlttprDoor():
             session = aioboto3.Session()
             async with session.client('s3') as s3:
                 await s3.put_object(
-                    Bucket=os.environ.get('SAHASRAHBOT_BUCKET'),
+                    Bucket=config.SAHASRAHBOT_BUCKET,
                     Key=f"patch/{self.patch_name}",
                     Body=patchfile,
                     ACL='public-read'
@@ -104,7 +105,7 @@ class AlttprDoor():
 
             async with session.client('s3') as s3:
                 await s3.put_object(
-                    Bucket=os.environ.get('SAHASRAHBOT_BUCKET'),
+                    Bucket=config.SAHASRAHBOT_BUCKET,
                     Key=f"spoiler/{self.spoiler_name}",
                     Body=gzip.compress(self.spoilerfile),
                     ACL='public-read' if self.spoilers else 'private',
@@ -128,11 +129,11 @@ class AlttprDoor():
 
     @property
     def spoiler_url(self):
-        return f"https://{os.environ.get('SAHASRAHBOT_BUCKET')}.s3.amazonaws.com/spoiler/{self.spoiler_name}"
+        return f"https://{config.SAHASRAHBOT_BUCKET}.s3.amazonaws.com/spoiler/{self.spoiler_name}"
 
     @property
     def patch_url(self):
-        return f"https://{os.environ.get('SAHASRAHBOT_BUCKET')}.s3.amazonaws.com/patch/{self.patch_name}"
+        return f"https://{config.SAHASRAHBOT_BUCKET}.s3.amazonaws.com/patch/{self.patch_name}"
 
     # Pull the code from the spoiler file, and translate it to what SahasrahBot expects
     @property

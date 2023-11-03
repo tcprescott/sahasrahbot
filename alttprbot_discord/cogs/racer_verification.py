@@ -11,7 +11,9 @@ from discord.ext import commands
 
 from alttprbot import models
 
-RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
+import config
+
+RACETIME_URL = config.RACETIME_URL
 
 
 class RacerVerificationView(discord.ui.View):

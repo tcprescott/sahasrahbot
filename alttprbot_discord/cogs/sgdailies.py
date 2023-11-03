@@ -7,10 +7,12 @@ from discord.ext import commands
 
 from alttprbot.util import speedgaming
 
+import config
+
 # TODO: make work with discord.py 2.0
 
 
-ALTTP_RANDOMIZER_SERVERS = list(map(int, os.environ.get("ALTTP_RANDOMIZER_SERVERS", "").split(',')))
+ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))
 
 
 class SgDaily(commands.Cog):

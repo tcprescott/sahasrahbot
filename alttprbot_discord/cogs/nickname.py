@@ -7,7 +7,9 @@ from discord.ext import commands
 
 from alttprbot import models
 
-APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
+import config
+
+APP_URL = config.APP_URL
 
 
 class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands for rt.gg integration"):

@@ -5,7 +5,9 @@ import discord
 from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
 from alttprbot_discord.bot import discordbot
 
-SG_DISCORD_WEBHOOK = os.environ.get('SG_DISCORD_WEBHOOK', None)
+import config
+
+SG_DISCORD_WEBHOOK = config.SG_DISCORD_WEBHOOK
 
 
 class AlttprSGDailyRace(SGDailyRaceCore):
