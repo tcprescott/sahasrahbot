@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
-import settings
+import config
 
 
 class BontaMultiworld(commands.Cog):
@@ -111,7 +111,7 @@ def make_embed(multiworld):
     )
     embed.add_field(name="Game Token", value=multiworld['token'], inline=False)
     embed.add_field(
-        name="Host", value=f"{settings.MULTIWORLDHOSTBASE}:{multiworld['port']}", inline=False)
+        name="Host", value=f"{config.MULTIWORLDHOSTBASE}:{multiworld['port']}", inline=False)
     for idx, team in enumerate(multiworld.get('players', []), start=1):
         if len(team) < 50:
             embed.add_field(name=f"Team #{idx}", value='\n'.join(team))

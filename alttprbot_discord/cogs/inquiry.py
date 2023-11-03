@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from alttprbot import models
-import settings
+import config
 
 # TODO: make work with discord.py 2.0
 
@@ -40,7 +40,7 @@ class OpenInquiryThread(discord.ui.View):
 
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
     async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if "PRIVATE_THREADS" not in interaction.channel.guild.features and not settings.DEBUG:
+        if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
             await interaction.response.send_message("Private threads must be available on this server.  Please let the server admin know so this may be fixed.", ephemeral=True)
             return
 
@@ -51,7 +51,7 @@ class OpenInquiryThread(discord.ui.View):
         else:
             duration = 24*60
 
-        msg = await interaction.channel.send("test thread") if settings.DEBUG else None
+        msg = await interaction.channel.send("test thread") if config.DEBUG else None
         thread: discord.Thread = await interaction.channel.create_thread(name=f"Inquiry {interaction.user.name} {random.randint(0,999)}", message=msg, auto_archive_duration=duration)
         role_ping = interaction.guild.get_role(self.inquiry_message_config.role_id)
 
@@ -93,7 +93,7 @@ class Inquiry(commands.Cog):
             await interaction.response.send_message("You must have manage threads permission to use this feature.", ephemeral=True)
             return
 
-        if "PRIVATE_THREADS" not in interaction.guild.features and not settings.DEBUG:
+        if "PRIVATE_THREADS" not in interaction.guild.features and not config.DEBUG:
             await interaction.response.send_message("Private threads must be available on this server.", ephemeral=True)
             return
 

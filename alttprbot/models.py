@@ -9,7 +9,9 @@ import discord.utils
 from tortoise import fields
 from tortoise.models import Model
 
-RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
+import config
+
+RACETIME_URL = config.RACETIME_URL
 
 
 class AuditGeneratedGames(Model):

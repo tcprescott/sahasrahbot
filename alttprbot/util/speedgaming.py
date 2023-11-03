@@ -9,7 +9,7 @@ from typing import List
 
 from alttprbot.exceptions import SahasrahBotException
 
-import settings
+import config
 
 
 class SGEpisodeNotFoundException(SahasrahBotException):
@@ -21,7 +21,7 @@ class SGEventNotFoundException(SahasrahBotException):
 
 
 async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
-    if settings.DEBUG and event == 'test':
+    if config.DEBUG and event == 'test':
         test_schedule = []
         for episode_id in [1]:
             episode = await get_episode(episode_id)
@@ -38,7 +38,7 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
     }
     async with aiohttp.request(
         method='get',
-        url=f'{settings.SG_API_ENDPOINT}/schedule',
+        url=f'{config.SG_API_ENDPOINT}/schedule',
         params=params,
     ) as resp:
         schedule: List[dict] = await resp.json(content_type='text/html')
@@ -53,7 +53,7 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
 
 async def get_episode(episodeid: int, complete=False):
     # if we're developing locally, we want to have some artifical data to use that isn't from SpeedGaming
-    if settings.DEBUG:
+    if config.DEBUG:
         if episodeid == 1:
             async with aiofiles.open('test_input/sg_1.json', 'r') as f:
                 result = json.loads(await f.read(), strict=False)
@@ -68,14 +68,14 @@ async def get_episode(episodeid: int, complete=False):
         else:
             async with aiohttp.request(
                 method='get',
-                url=f'{settings.SG_API_ENDPOINT}/episode',
+                url=f'{config.SG_API_ENDPOINT}/episode',
                 params={'id': episodeid},
             ) as resp:
                 result = await resp.json(content_type='text/html')
     else:
         async with aiohttp.request(
             method='get',
-            url=f'{settings.SG_API_ENDPOINT}/episode',
+            url=f'{config.SG_API_ENDPOINT}/episode',
             params={'id': episodeid},
         ) as resp:
             result = await resp.json(content_type='text/html')

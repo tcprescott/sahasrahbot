@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from alttprbot_racetime import handlers
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 from alttprbot_racetime.handlers.core import SahasrahBotCoreHandler
-import settings
+import config
 
 
 @dataclass
@@ -15,7 +15,7 @@ class RacetimeBotConfig:
     bot_class: SahasrahBotRaceTimeBot = SahasrahBotRaceTimeBot
 
 
-if settings.DEBUG:
+if config.DEBUG:
     RACETIME_CATEGORIES = {
         'test': RacetimeBotConfig(
             client_id=os.environ.get("RACETIME_CLIENT_ID_TEST"),

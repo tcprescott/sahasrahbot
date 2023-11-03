@@ -1,10 +1,10 @@
-import settings
+import config
 
 with open('.env', 'r') as env_file:
     lines = env_file.readlines()
 
 
-with open('settings.py', 'a') as settings_file:
+with open('config.py', 'a') as settings_file:
     for line in lines:
         if line.startswith('#'):
             continue

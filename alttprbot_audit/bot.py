@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 from alttprbot_discord.util import config
-import settings
+import config
 
 config.init()
 
@@ -27,7 +27,7 @@ discordbot = commands.Bot(
         roles=False
     ),
     intents=discord.Intents.all(),
-    debug_guild=508335685044928540 if settings.DEBUG else None
+    debug_guild=508335685044928540 if config.DEBUG else None
 )
 
 if os.environ.get("SENTRY_URL"):
@@ -76,6 +76,6 @@ async def on_ready():
 
 async def start_bot():
     await load_extensions()
-    if settings.DEBUG:
+    if config.DEBUG:
         discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540)) # hard code the discord server id for now
     await discordbot.start(os.environ.get("AUDIT_DISCORD_TOKEN"))

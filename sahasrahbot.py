@@ -3,7 +3,6 @@ load_dotenv()  # nopep8
 
 import asyncio
 import os
-import urllib.parse
 
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
@@ -15,13 +14,9 @@ from alttprbot_audit.bot import start_bot as start_audit_bot
 from alttprbot_racetime.bot import start_racetime
 from alttprbot.exceptions import SahasrahBotException
 
-DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_PORT = int(os.environ.get("DB_PORT", "3306"))
-DB_NAME = os.environ.get("DB_NAME", "sahasrahbot")
-DB_USER = os.environ.get("DB_USER", "user")
-DB_PASS = urllib.parse.quote_plus(os.environ.get("DB_PASS", "pass"))
+import config
 
-if os.environ.get("SENTRY_URL"):
+if config.SENTRY_URL:
     def before_send(event, hint):
         if 'exc_info' in hint:
             _, exc_value, _ = hint['exc_info']
@@ -30,7 +25,7 @@ if os.environ.get("SENTRY_URL"):
         return event
 
     sentry_sdk.init(
-        os.environ.get("SENTRY_URL"),
+        config.SENTRY_URL,
         integrations=[AioHttpIntegration()],
         before_send=before_send
     )
@@ -38,7 +33,7 @@ if os.environ.get("SENTRY_URL"):
 
 async def database():
     await Tortoise.init(
-        db_url=f'mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}',
+        db_url=f'mysql://{config.DB_USER}:{config.DB_PASS}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
 

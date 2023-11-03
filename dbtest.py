@@ -4,11 +4,11 @@ import asyncio
 
 from tortoise import Tortoise
 
-import settings
+import config
 
 async def database():
     await Tortoise.init(
-        db_url=f'mysql://{settings.DB_USER}:{settings.DB_PASS}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}',
+        db_url=f'mysql://{config.DB_USER}:{config.DB_PASS}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
 

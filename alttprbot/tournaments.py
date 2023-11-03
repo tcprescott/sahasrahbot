@@ -1,7 +1,6 @@
 import datetime
 import json
 import logging
-import os
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -15,14 +14,14 @@ from alttprbot import models
 from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, alttprhmg, alttprleague, alttprmini
 from alttprbot.util import gsheet
 
-import settings
+import config
 
-RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
+RACETIME_URL = config.RACETIME_URL
 
-RACETIME_SESSION_TOKEN = os.environ.get('RACETIME_SESSION_TOKEN')
-RACETIME_CSRF_TOKEN = os.environ.get('RACETIME_CSRF_TOKEN')
+RACETIME_SESSION_TOKEN = config.RACETIME_SESSION_TOKEN
+RACETIME_CSRF_TOKEN = config.RACETIME_CSRF_TOKEN
 
-if settings.DEBUG:
+if config.DEBUG:
     TOURNAMENT_DATA = {
         'test': test.TestTournament
     }
