@@ -12,7 +12,7 @@ from alttprbot.tournament import core, alttpr
 from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
-from config import Config as c
+import settings
 
 # TODO: use asyncio.semaphore() to limit the number of concurrent tasks
 
@@ -20,8 +20,8 @@ MAIN_TOURNAMENT_SERVERS = list(map(int, os.environ.get("MAIN_TOURNAMENT_SERVERS"
 CC_TOURNAMENT_SERVERS = list(map(int, os.environ.get("CC_TOURNAMENT_SERVERS", "").split(',')))
 CC_TOURNAMENT_AUDIT_CHANNELS = int(os.environ.get("CC_TOURNAMENT_AUDIT_CHANNELS", "0"))
 
-MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 334796844750209024
-CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if c.DEBUG else 503724516854202370
+MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if settings.DEBUG else 334796844750209024
+CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if settings.DEBUG else 503724516854202370
 
 
 class ChallengeCupDeleteHistoryView(discord.ui.View):
@@ -79,7 +79,7 @@ class Tournament(commands.Cog):
             self.bot.add_view(ChallengeCupDeleteHistoryView())
             self.persistent_views_added = True
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 5, reconnect=True)
+    @tasks.loop(minutes=0.25 if settings.DEBUG else 5, reconnect=True)
     async def create_races(self):
         try:
             logging.info("scanning SG schedule for tournament races to create")
@@ -97,7 +97,7 @@ class Tournament(commands.Cog):
             logging.exception("An error occured while processing create_races.")
         logging.info('done')
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
+    @tasks.loop(minutes=0.25 if settings.DEBUG else 15, reconnect=True)
     async def week_races(self):
         try:
             logging.info('scanning for unsubmitted races')
@@ -122,7 +122,7 @@ class Tournament(commands.Cog):
         except Exception:
             logging.exception("Encountered a problem when attempting to run week_races.")
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 240, reconnect=True)
+    @tasks.loop(minutes=0.25 if settings.DEBUG else 240, reconnect=True)
     async def find_races_with_bad_discord(self):
         logging.info('scanning for races with bad discord info')
         for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
@@ -132,7 +132,7 @@ class Tournament(commands.Cog):
             if messages and event_data.audit_channel:
                 await event_data.audit_channel.send("<@185198185990324225>\n\n" + "\n".join(messages))
 
-    @tasks.loop(minutes=0.25 if c.DEBUG else 15, reconnect=True)
+    @tasks.loop(minutes=0.25 if settings.DEBUG else 15, reconnect=True)
     async def record_races(self):
         try:
             logging.info("recording tournament races")

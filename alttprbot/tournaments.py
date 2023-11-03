@@ -14,14 +14,15 @@ from alttprbot_racetime import bot as racetimebot
 from alttprbot import models
 from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, alttprhmg, alttprleague, alttprmini
 from alttprbot.util import gsheet
-from config import Config as c
+
+import settings
 
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 
 RACETIME_SESSION_TOKEN = os.environ.get('RACETIME_SESSION_TOKEN')
 RACETIME_CSRF_TOKEN = os.environ.get('RACETIME_CSRF_TOKEN')
 
-if c.DEBUG:
+if settings.DEBUG:
     TOURNAMENT_DATA = {
         'test': test.TestTournament
     }

@@ -7,8 +7,6 @@ import os
 
 import aioboto3
 
-# from config import Config as c
-
 from alttprbot.alttprgen.generator import ALTTPRPreset, PresetData
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler

@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 from alttprbot_discord.util import config
-from config import Config as c
+import settings
 
 config.init()
 
@@ -53,7 +53,7 @@ async def load_extensions():
     # await discordbot.load_extension("alttprbot_discord.cogs.admin")
     await discordbot.load_extension("alttprbot_discord.cogs.racer_verification")
 
-    if c.DEBUG:
+    if settings.DEBUG:
         await discordbot.load_extension("alttprbot_discord.cogs.test")
 
     if importlib.util.find_spec('jishaku'):
@@ -113,7 +113,7 @@ async def on_command_completion(ctx):
 
 @discordbot.event
 async def on_ready():
-    if c.DEBUG:
+    if settings.DEBUG:
         discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
     else:
         await discordbot.tree.sync()

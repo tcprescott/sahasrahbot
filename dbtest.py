@@ -1,24 +1,14 @@
 # This script exists so I can quickly connect to the database using ipython for experimentation.
 
 import asyncio
-import os
-import urllib.parse
 
-from dotenv import load_dotenv
 from tortoise import Tortoise
 
-load_dotenv()
-
-DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_PORT = int(os.environ.get("DB_PORT", "3306"))
-DB_NAME = os.environ.get("DB_NAME", "sahasrahbot")
-DB_USER = os.environ.get("DB_USER", "user")
-DB_PASS = urllib.parse.quote_plus(os.environ.get("DB_PASS", "pass"))
-
+import settings
 
 async def database():
     await Tortoise.init(
-        db_url=f'mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}',
+        db_url=f'mysql://{settings.DB_USER}:{settings.DB_PASS}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
 

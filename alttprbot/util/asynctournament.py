@@ -11,7 +11,7 @@ from tortoise.functions import Count
 from tortoise.exceptions import MultipleObjectsReturned
 
 from alttprbot import models
-from config import Config as c
+import settings
 
 # these should probably be in the database
 QUALIFIER_MAX_SCORE = 105
@@ -151,7 +151,7 @@ async def populate_test_data(tournament: models.AsyncTournament, participant_cou
     """
 
     # only run this in a local testing environment
-    if not c.DEBUG:
+    if not settings.DEBUG:
         raise Exception("This function should only be ran in a local testing environment.")
 
     await tournament.fetch_related("permalink_pools")

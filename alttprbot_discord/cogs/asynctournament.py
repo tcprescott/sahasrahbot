@@ -16,7 +16,7 @@ from slugify import slugify
 from alttprbot import models
 from alttprbot.util import asynctournament, triforce_text
 from alttprbot_api.util import checks
-from config import Config as c
+import settings
 
 RACETIME_URL = os.environ.get('RACETIME_URL', 'https://racetime.gg')
 APP_URL = os.environ.get('APP_URL', 'https://sahasrahbotapi.synack.live')
@@ -965,7 +965,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         else:
             await interaction.followup.send("The recording of this race finished without any warnings!", ephemeral=True)
 
-    if c.DEBUG:
+    if settings.DEBUG:
         @ app_commands.command(name="test", description="Populate tournament with dummy data.")
         async def test(self, interaction: discord.Interaction, participant_count: int = 1):
             if not await self.bot.is_owner(interaction.user):

@@ -7,7 +7,7 @@ from racetime_bot import Bot
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
 
-from config import Config as c
+import settings
 
 RACETIME_HOST = os.environ.get('RACETIME_HOST', 'racetime.gg')
 RACETIME_SECURE = os.environ.get('RACETIME_SECURE', 'true') == 'true'
@@ -30,7 +30,7 @@ class SahasrahBotRaceTimeBot(Bot):
             'conn': ws_conn,
             'logger': self.logger,
             'state': state,
-            'command_prefix': c.RACETIME_COMMAND_PREFIX,
+            'command_prefix': settings.RACETIME_COMMAND_PREFIX,
         }
 
     def get_handler_class(self):

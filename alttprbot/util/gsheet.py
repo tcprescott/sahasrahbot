@@ -1,10 +1,10 @@
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
-from config import Config as c
+import settings
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(
-        c.gsheet_api_oauth,
+        settings.GSHEET_API_OAUTH,
         [
             'https://spreadsheets.google.com/feeds',
             'https://www.googleapis.com/auth/drive',
