@@ -6,10 +6,10 @@ import discord
 from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
-from alttprbot_discord.util import config
+from alttprbot_discord.util import guild_config
 import config
 
-config.init()
+guild_config.init()
 
 
 async def determine_prefix(bot, message):

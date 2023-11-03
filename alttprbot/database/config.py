@@ -1,4 +1,4 @@
-from alttprbot_discord.util.config import CACHE
+from alttprbot_discord.util.guild_config import CACHE
 from ..util import orm
 
 

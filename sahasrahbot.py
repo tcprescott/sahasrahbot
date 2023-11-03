@@ -1,4 +1,5 @@
 import asyncio
+import urllib.parse
 
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
@@ -29,7 +30,7 @@ if config.SENTRY_URL:
 
 async def database():
     await Tortoise.init(
-        db_url=f'mysql://{config.DB_USER}:{config.DB_PASS}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
+        db_url=f'mysql://{config.DB_USER}:{urllib.parse.quote_plus(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
 
