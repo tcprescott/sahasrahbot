@@ -1,8 +1,10 @@
 import re
 from io import BytesIO
 
-from quart import Blueprint, redirect, render_template, request, send_file, url_for
+from quart import Blueprint, redirect, render_template, request, send_file, url_for, jsonify
 from quart_discord import Unauthorized, requires_authorization
+
+from tortoise.query_utils import Prefetch
 
 from alttprbot import models
 from alttprbot.alttprgen import generator
@@ -178,3 +180,62 @@ async def update_preset(namespace, randomizer, preset):
 # async def update_namespace():
 #     user = await discord.fetch_user()
 #     namespace = await generator.create_or_retrieve_namespace(user.id, user.name)
+
+@presets_blueprint.route('/presets/api/namespaces', methods=['GET'])
+async def api_get_namespaces():
+    namespaces = await models.PresetNamespaces.all().values('name')
+    return jsonify([n['name'] for n in namespaces])
+
+@presets_blueprint.route('/presets/api/<string:randomizer>/list', methods=['GET'])
+async def api_get_presets(randomizer):
+    # this is terrible
+    generators = {
+        'alttpr': generator.ALTTPRPreset,
+        'smz3': generator.SMZ3Preset,
+        'sm': generator.SMPreset,
+        'alttprmystery': generator.ALTTPRMystery,
+        'ctjets': generator.CTJetsPreset
+    }
+    global_presets = await generators[randomizer]().get_presets(namespace=None)
+    namespaces = await models.PresetNamespaces.all().prefetch_related(Prefetch('presets', queryset=models.Presets.filter(randomizer=randomizer)))
+
+    output = {
+        'global': global_presets,
+        'namespaces': [
+            {
+                'name': namespace.name,
+                'presets': [
+                    n.preset_name for n in namespace.presets
+                ]
+            } for namespace in namespaces
+            if namespace.presets
+        ]
+    }
+
+    return jsonify(output)
+
+@presets_blueprint.route('/presets/api/<string:randomizer>', methods=['GET'])
+async def api_get_preset(randomizer):
+    # this is terrible
+    preset = request.args.get('preset')
+    generators = {
+        'alttpr': generator.ALTTPRPreset,
+        'smz3': generator.SMZ3Preset,
+        'sm': generator.SMPreset,
+        'alttprmystery': generator.ALTTPRMystery,
+        'ctjets': generator.CTJetsPreset
+    }
+    try:
+        resp = generators[randomizer](preset=preset)
+        await resp.fetch()
+        return jsonify(
+            {
+                'preset': preset,
+                'randomizer': randomizer,
+                'data': resp.raw
+            }
+        )
+    except generator.PresetNotFoundException:
+        return jsonify(
+            {}
+        )

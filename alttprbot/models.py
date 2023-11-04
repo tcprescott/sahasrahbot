@@ -193,6 +193,8 @@ class PresetNamespaces(Model):
     name = fields.CharField(50, null=False, unique=True)
     discord_user_id = fields.BigIntField(null=False, unique=True)
 
+    presets = fields.ReverseRelation['Presets']
+
 
 class PresetNamespaceCollaborators(Model):
     class Meta:

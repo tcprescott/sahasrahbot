@@ -60,6 +60,7 @@ class PresetData:
 class SahasrahBotPresetCore():
     randomizer: str = "default"
     preset_data: dict = None
+    raw: str = None
 
     @property
     def global_preset_path(self) -> str:
@@ -132,16 +133,17 @@ class SahasrahBotPresetCore():
         if self.namespace is None:
             raise AttemptToSaveGlobalPreset("You cannot save a global preset.")
 
-        body = yaml.dump(self.preset_data)
+        self.raw = yaml.dump(self.preset_data)
         namespace_data = await models.PresetNamespaces.get(name=self.namespace)
 
-        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset, namespace=namespace_data, defaults={'content': body})
+        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset, namespace=namespace_data, defaults={'content': self.raw})
 
     async def _fetch_global(self):
         basename = os.path.basename(f'{self.preset}.yaml')
         try:
             async with aiofiles.open(os.path.join(self.global_preset_path, basename)) as f:
-                self.preset_data = yaml.safe_load(await f.read())
+                self.raw = await f.read()
+                self.preset_data = yaml.safe_load(self.raw)
         except FileNotFoundError as err:
             raise PresetNotFoundException(
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
@@ -152,7 +154,8 @@ class SahasrahBotPresetCore():
         if data is None:
             raise PresetNotFoundException(f'Could not find preset {self.preset} in namespace {self.namespace}.')
 
-        self.preset_data = yaml.safe_load(data.content)
+        self.raw = data.content
+        self.preset_data = yaml.safe_load(self.raw)
 
 
 class ALTTPRPreset(SahasrahBotPresetCore):
