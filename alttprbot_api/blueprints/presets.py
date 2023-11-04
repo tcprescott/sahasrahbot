@@ -181,11 +181,6 @@ async def update_preset(namespace, randomizer, preset):
 #     user = await discord.fetch_user()
 #     namespace = await generator.create_or_retrieve_namespace(user.id, user.name)
 
-@presets_blueprint.route('/presets/api/namespaces', methods=['GET'])
-async def api_get_namespaces():
-    namespaces = await models.PresetNamespaces.all().values('name')
-    return jsonify([n['name'] for n in namespaces])
-
 @presets_blueprint.route('/presets/api/<string:randomizer>/list', methods=['GET'])
 async def api_get_presets(randomizer):
     # this is terrible
