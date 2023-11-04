@@ -45,8 +45,8 @@ class WeightsetNotFoundException(SahasrahBotException):
 
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
-async def get_full_preset_list(path) -> List[str]:
-    return [f for f in os.listdir(path) if f.endswith(".yaml")]
+async def get_global_preset_list(path) -> List[str]:
+    return [os.path.splitext(f)[0] for f in os.listdir(path) if f.endswith(".yaml")]
 
 
 @dataclass
@@ -95,8 +95,19 @@ class SahasrahBotPresetCore():
         return preset
 
     async def search(self, value: str) -> List[str]:
-        preset_files = await get_full_preset_list(self.global_preset_path)
-        return sorted([os.path.splitext(a)[0] for a in preset_files if a.startswith(value.lower())][:25])
+        preset_files = await self.get_presets()
+        return sorted([a for a in preset_files if a.startswith(value.lower())][:25])
+
+    async def get_presets(self, namespace=None) -> list:
+        if namespace is None:
+            return await get_global_preset_list(self.global_preset_path)
+
+        namespace_data = await models.PresetNamespaces.get_or_none(name=namespace)
+        if namespace_data is None:
+            raise NamespaceNotFound(f"Could not find namespace {namespace}.")
+
+        presets = await models.Presets.filter(namespace__name=namespace_data.name, randomizer=self.randomizer)
+        return [preset.preset_name for preset in presets]
 
     async def fetch(self) -> PresetData:
         if self.preset is None:
