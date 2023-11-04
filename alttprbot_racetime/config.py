@@ -14,7 +14,7 @@ class RacetimeBotConfig:
 
     @property
     def client_id(self):
-        return getattr(config, f"RACETIME_CLIENT_ID_{self.category_slug.upper()}")
+        return getattr(config, f"RACETIME_CLIENT_ID_{self.category_slug.upper().replace('-', ''))}")
 
     @property
     def client_secret(self):

@@ -13,15 +13,15 @@ with open('config.py', 'a') as settings_file:
         value = value.strip()
 
         if key == 'DEBUG':
-            continue
+            value = value == 'true'
 
         if key == 'gsheet_api_oauth':
             continue
 
-        if key == 'SGAPIENDPOINT':
-            continue
+        if key == 'SgApiEndpoint':
+            key = 'SG_API_ENDPOINT'
 
         if key == 'RACETIME_SECURE':
-            value = value == 'true'
+            value = value == 'True'
 
         settings_file.write(f'\n{key.upper()} = {value}')
