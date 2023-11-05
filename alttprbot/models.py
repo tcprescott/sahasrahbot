@@ -399,7 +399,7 @@ class TriforceTexts(Model):
     text = fields.CharField(200, null=False)
     discord_user_id = fields.BigIntField(null=True)
     author = fields.CharField(200, null=True)
-    approved = fields.BooleanField(default=False)
+    approved = fields.BooleanField(null=True)
     broadcasted = fields.BooleanField(null=False, default=False)
     timestamp = fields.DatetimeField(auto_now=True)
 

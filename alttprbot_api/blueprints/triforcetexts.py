@@ -111,7 +111,19 @@ async def moderation(pool_name):
     if user.id not in moderators:
         return await render_template('error.html', logged_in=logged_in, user=user, title="Access Denied", message="You do not have permission to access this page.")
 
-    texts = await models.TriforceTexts.filter(pool_name=pool_name, approved=False)
+    filt = {
+        'pool_name': pool_name
+    }
+    approved = request.args.get('approved', 'pending')
+
+    if approved == 'true':
+        filt['approved'] = True
+    elif approved == 'false':
+        filt['approved'] = False
+    elif approved == 'pending':
+        filt['approved__isnull'] = True
+
+    texts = await models.TriforceTexts.filter(**filt)
 
     return await render_template('triforce_text_moderation.html', logged_in=logged_in, user=user, pool_name=pool_name, texts=texts)
 
@@ -132,7 +144,8 @@ async def moderation_action(pool_name, text_id, action):
     text = await models.TriforceTexts.get(id=text_id)
 
     if action == 'reject':
-        await text.delete()
+        text.approved = False
+        await text.save()
 
     if action == 'approve':
         text.approved = True
