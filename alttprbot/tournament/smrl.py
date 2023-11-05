@@ -98,8 +98,7 @@ class SMRandoLeague(TournamentRace):
 
         elif WEEKS[WEEK].get('randomizer') == 'smdash':
             self.seed = await smdash.create_smdash(
-                mode=WEEKS[WEEK].get('preset'),
-                encrypt=True,
+                mode=WEEKS[WEEK].get('preset')
             )
             await self.rtgg_handler.send_message(self.seed)
             await self.rtgg_handler.set_bot_raceinfo(self.seed)

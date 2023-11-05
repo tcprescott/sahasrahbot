@@ -49,8 +49,7 @@ class SMRLPlayoffs(TournamentRace):
 
         elif randomizer == 'smdash':
             self.seed = await smdash.create_smdash(
-                mode=preset,
-                encrypt=True,
+                mode=preset
             )
             await self.rtgg_handler.send_message(self.seed)
             await self.rtgg_handler.set_bot_raceinfo(self.seed)

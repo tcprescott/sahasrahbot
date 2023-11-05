@@ -174,7 +174,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         try:
-            url = await smdash.create_smdash(mode=args[0], encrypt=True)
+            url = await smdash.create_smdash(mode=args[0])
         except IndexError:
             await self.send_message(
                 'You must specify a preset!'

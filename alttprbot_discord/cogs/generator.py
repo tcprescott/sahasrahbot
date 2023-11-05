@@ -539,10 +539,9 @@ class Generator(commands.Cog):
 
     @app_commands.command()
     @app_commands.describe(
-        mode="The mode you want to generate.",
-        race="Is this a race? (default no)"
+        mode="The mode you want to generate."
     )
-    @app_commands.choices(race=YES_NO_CHOICE, mode=[
+    @app_commands.choices(mode=[
         app_commands.Choice(name="SGL23", value="sgl23"),
         app_commands.Choice(name="recall_mm", value="recall_mm"),
         app_commands.Choice(name="recall_full", value="recall_full"),
@@ -552,14 +551,13 @@ class Generator(commands.Cog):
     async def smdash(
         self,
         interaction: discord.Interaction,
-        mode: str,
-        race: str = "no",
+        mode: str
     ):
         """
         Generates a Super Metroid Dash Randomizer game on https://dashrando.net
         """
         await interaction.response.defer()
-        url = await smdash.create_smdash(mode=mode, encrypt=race == "yes")
+        url = await smdash.create_smdash(mode=mode)
         await interaction.followup.send(url)
 
     @app_commands.command()
