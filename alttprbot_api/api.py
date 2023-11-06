@@ -1,3 +1,5 @@
+import os
+
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
 from quart import (Quart, abort, jsonify, redirect, render_template, request,
                    session, url_for)
@@ -15,6 +17,7 @@ sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(config.DISCORD_CLIENT_ID)
 sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
 sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/discord/"
 sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = config.DISCORD_TOKEN
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
 
