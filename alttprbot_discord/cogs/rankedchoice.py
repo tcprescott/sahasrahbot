@@ -1,12 +1,10 @@
-
-from discord.ext import commands
-from discord import app_commands
 import discord
-from alttprbot import models
-from alttprbot.util import rankedchoice
-import os
+from discord import app_commands
+from discord.ext import commands
 
 import config
+from alttprbot import models
+from alttprbot.util import rankedchoice
 
 APP_URL = config.APP_URL
 
@@ -20,7 +18,8 @@ class RankedChoiceMessageView(discord.ui.View):
     # async def vote(self, button: discord.ui.Button, interaction: discord.Interaction):
     #     await interaction.response.send_message(f"Vote at https://sahasrahbotapi.synack.live/ranked_choice/{self.election.id}", ephemeral=True)
 
-    @discord.ui.button(label="End Election", custom_id="sahasrahbot:rankedchoice:end_election", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="End Election", custom_id="sahasrahbot:rankedchoice:end_election",
+                       style=discord.ButtonStyle.danger)
     async def end_election(self, interaction: discord.Interaction, button: discord.ui.Button):
         # await interaction.response.send_message("Ending the election is not yet implemented.", ephemeral=True)
         await interaction.response.defer()
@@ -53,7 +52,7 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         self.bot = bot
         self.persistent_views_added = False
 
-    @ commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
             self.bot.add_view(RankedChoiceMessageView(self.bot))
@@ -64,9 +63,12 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
     @app_commands.describe(description="The description of the election.")
     @app_commands.describe(candidates="The candidates for the election, separated by commas.")
     @app_commands.describe(seats="The number of seats to fill in the election.")
-    @app_commands.describe(authorized_voters_role="The role that is authorized to vote in the election.  If not specified, anyone can vote.")
+    @app_commands.describe(
+        authorized_voters_role="The role that is authorized to vote in the election.  If not specified, anyone can vote.")
     @app_commands.describe(show_vote_count="Whether or not to show who has voted in this election.")
-    async def create(self, interaction: discord.Interaction, title: str, candidates: str, seats: int = 1, description: str = None, authorized_voters_role: discord.Role = None, show_vote_count: bool = True):
+    async def create(self, interaction: discord.Interaction, title: str, candidates: str, seats: int = 1,
+                     description: str = None, authorized_voters_role: discord.Role = None,
+                     show_vote_count: bool = True):
         election = await models.RankedChoiceElection.create(
             title=title,
             description=description,
@@ -84,7 +86,9 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         if interaction.guild.chunked is False:
             await interaction.guild.chunk(cache=True)
 
-        await models.RankedChoiceCandidate.bulk_create([models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in candidates.split(',')])
+        await models.RankedChoiceCandidate.bulk_create(
+            [models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in
+             candidates.split(',')])
         # if authorized_voters_role:
         #     await models.RankedChoiceAuthorizedVoters.bulk_create([models.RankedChoiceAuthorizedVoters(election=election, user_id=user_id) for user_id in [member.id for member in authorized_voters_role.members]])
 
@@ -92,7 +96,8 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         # await election.fetch_related('authorized_voters')
         await election.fetch_related('votes')
 
-        await interaction.response.send_message(embed=rankedchoice.create_embed(election), view=RankedChoiceMessageView(self.bot))
+        await interaction.response.send_message(embed=rankedchoice.create_embed(election),
+                                                view=RankedChoiceMessageView(self.bot))
         message = await interaction.original_response()
         election.message_id = message.id
         await election.save()

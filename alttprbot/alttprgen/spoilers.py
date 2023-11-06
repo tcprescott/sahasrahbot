@@ -1,23 +1,23 @@
-from dataclasses import dataclass
 import gzip
 import json
 import random
 import string
-import os
+from dataclasses import dataclass
 
 import aioboto3
 
+import config
+from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler
 from alttprbot.alttprgen.generator import ALTTPRPreset, PresetData
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot.alttprgen.ext.progression_spoiler import create_progression_spoiler
 
-import config
 
 @dataclass
 class ALTTPRSpoilerGame:
     preset: PresetData
     spoiler_log_url: str
     seed: ALTTPRDiscord
+
 
 async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False, branch=None, allow_quickswap=True):
     preset_data = ALTTPRPreset(preset)

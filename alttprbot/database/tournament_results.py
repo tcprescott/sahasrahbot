@@ -5,7 +5,8 @@ from ..util import orm
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
 
-async def insert_tournament_race(srl_id: str, episode_id: str, event: str, permalink=None, week=None, spoiler=None, status=None):
+async def insert_tournament_race(srl_id: str, episode_id: str, event: str, permalink=None, week=None, spoiler=None,
+                                 status=None):
     key = f'tournament_race_{srl_id}'
     await orm.execute(
         'INSERT INTO tournament_results(srl_id, episode_id, permalink, spoiler, event, week, status) VALUES (%s,%s,%s,%s,%s,%s,%s);',
@@ -70,6 +71,7 @@ async def delete_active_tournament_race(srl_id: str):
     )
     await CACHE.delete(key)
 
+
 async def delete_active_tournament_race_all(srl_id: str):
     key = f'tournament_race_{srl_id}'
     await orm.execute(
@@ -78,17 +80,20 @@ async def delete_active_tournament_race_all(srl_id: str):
     )
     await CACHE.delete(key)
 
+
 async def update_tournament_race_status(srl_id: int, status="STARTED"):
     await orm.execute(
         'UPDATE tournament_results SET status = %s WHERE srl_id = %s', [
             status, srl_id]
     )
 
+
 async def get_unrecorded_races():
     results = await orm.select(
         'SELECT * from tournament_results where `written_to_gsheet` is NULL;'
     )
     return results
+
 
 async def mark_as_written(srl_id):
     key = f'tournament_race_{srl_id}'

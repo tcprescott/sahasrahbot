@@ -1,17 +1,14 @@
 import datetime
-import os
 from urllib.parse import quote
 
 import aiohttp
 from quart import Blueprint, abort, jsonify, redirect, render_template, request
 from quart_discord import requires_authorization
 
-from alttprbot import models
-from alttprbot_racetime import bot as racetimebot
-
-from alttprbot_api.api import discord
-
 import config
+from alttprbot import models
+from alttprbot_api.api import discord
+from alttprbot_racetime import bot as racetimebot
 
 racetime_blueprint = Blueprint('racetime', __name__)
 
@@ -30,7 +27,8 @@ async def bot_command():
     cmd = data['cmd']
     auth_key = request.args['auth_key']
 
-    access = await models.AuthorizationKeyPermissions.get_or_none(auth_key__key=auth_key, type='racetimecmd', subtype=category)
+    access = await models.AuthorizationKeyPermissions.get_or_none(auth_key__key=auth_key, type='racetimecmd',
+                                                                  subtype=category)
     if access is None:
         return abort(403)
 
@@ -109,7 +107,8 @@ async def return_racetime_verify():
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers, raise_for_status=True) as resp:
+    async with aiohttp.request(url=f"{RACETIME_URL}/o/userinfo", method="get", headers=headers,
+                               raise_for_status=True) as resp:
         userinfo_data = await resp.json()
 
     rtgg_id = userinfo_data['id']
@@ -123,11 +122,16 @@ async def return_racetime_verify():
         kept_user.display_name = user.name
         await kept_user.save()
     elif rtgg_user is None:
-        await models.Users.update_or_create(discord_user_id=user.id, defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token, 'display_name': user.name})
+        await models.Users.update_or_create(discord_user_id=user.id,
+                                            defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token,
+                                                      'display_name': user.name})
     else:
-        await models.Users.update_or_create(rtgg_id=rtgg_id, defaults={'discord_user_id': user.id, 'rtgg_access_token': token, 'display_name': user.name})
+        await models.Users.update_or_create(rtgg_id=rtgg_id,
+                                            defaults={'discord_user_id': user.id, 'rtgg_access_token': token,
+                                                      'display_name': user.name})
 
-    return await render_template('racetime_verified.html', logged_in=True, user=user, racetime_name=userinfo_data['name'])
+    return await render_template('racetime_verified.html', logged_in=True, user=user,
+                                 racetime_name=userinfo_data['name'])
 
 
 async def merge_users(user_to_keep: models.Users, victim: models.Users):

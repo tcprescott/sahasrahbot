@@ -1,19 +1,17 @@
 import logging
-import os
 from dataclasses import dataclass
 
-import discord
-
-from alttprbot import models
-from alttprbot.util import speedgaming
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
-from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 import dateutil.parser
+import discord
 import pytz
 
 import config
+from alttprbot import models
+from alttprbot.exceptions import SahasrahBotException
+from alttprbot.util import speedgaming
+from alttprbot_discord.bot import discordbot
+from alttprbot_racetime import bot as racetime
+from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 
 APP_URL = config.APP_URL
 
@@ -155,7 +153,9 @@ class TournamentRace(object):
         tournament_race.rtgg_handler = handler
 
         logging.info(handler.data.get('name'))
-        await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'), defaults={'episode_id': tournament_race.episodeid, 'event': tournament_race.event_slug, 'spoiler': None})
+        await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'),
+                                                        defaults={'episode_id': tournament_race.episodeid,
+                                                                  'event': tournament_race.event_slug, 'spoiler': None})
 
         for rtggid in tournament_race.player_racetime_ids:
             await handler.invite_user(rtggid)
@@ -260,7 +260,8 @@ class TournamentRace(object):
 
         # then, if that doesn't work, try their discord tag kept by SG
         if looked_up_player is None and not player['discordTag'] == '':
-            looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'], guild=self.guild)
+            looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'],
+                                                                             guild=self.guild)
 
         # and failing all that, bomb
         if looked_up_player is None:
@@ -397,7 +398,7 @@ class TournamentRace(object):
 
     @property
     def hours_before_room_open(self):
-        return ((self.data.stream_delay + self.data.room_open_time)/60)
+        return ((self.data.stream_delay + self.data.room_open_time) / 60)
 
     async def create_embeds(self):
         pass
@@ -418,14 +419,18 @@ class TournamentRace(object):
             raise SahasrahBotException("No RaceTime.gg handler associated with this tournament game.")
 
         if player is None:
-            await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True))
-            await self.rtgg_handler.send_message(f"Could not send DM to {name}.  Please contact a Tournament Moderator for assistance.")
+            await self.audit_channel.send(f"@here could not send DM to {name}",
+                                          allowed_mentions=discord.AllowedMentions(everyone=True))
+            await self.rtgg_handler.send_message(
+                f"Could not send DM to {name}.  Please contact a Tournament Moderator for assistance.")
         try:
             await player.send(embed=embed)
         except discord.HTTPException:
             if self.audit_channel:
-                await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True))
-            await self.rtgg_handler.send_message(f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a Tournament Moderator for assistance.")
+                await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}",
+                                              allowed_mentions=discord.AllowedMentions(everyone=True))
+            await self.rtgg_handler.send_message(
+                f"Could not send DM to {player.name}#{player.discriminator}.  Please contact a Tournament Moderator for assistance.")
 
     async def send_race_submission_form(self, warning=False):
         if self.submission_form is None:
@@ -451,4 +456,5 @@ class TournamentRace(object):
             logging.info("Sending tournament submit reminder to %s.", name)
             await player.send(msg)
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
+                                                      defaults={'event': self.event_slug, 'submitted': 1})

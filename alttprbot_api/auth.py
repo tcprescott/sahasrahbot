@@ -2,6 +2,7 @@
 # Authorization
 ####################
 from functools import wraps
+
 from quart import request
 from quart.wrappers import Response
 
@@ -21,5 +22,7 @@ def authorized_key(auth_key_type):
                 return Response(status=401)
 
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator

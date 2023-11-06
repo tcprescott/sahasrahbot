@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from alttprbot.database import config # TODO switch to ORM
+from alttprbot.database import config  # TODO switch to ORM
 
 
 def restrict_to_channels_by_guild_config(parameter, default=True):
@@ -17,6 +17,7 @@ def restrict_to_channels_by_guild_config(parameter, default=True):
             return True
 
         return False
+
     return commands.check(predicate)
 
 
@@ -27,6 +28,7 @@ def restrict_command_globally(parameter, default=False):
             return default
 
         return result['value'] == 'true'
+
     return commands.check(predicate)
 
 
@@ -35,11 +37,14 @@ def has_any_channel(*channels):
         if ctx.guild is None:
             return False
         return ctx.channel and ctx.channel.name in channels
+
     return commands.check(predicate)
+
 
 def has_any_channel_id(*channels):
     async def predicate(ctx):
         if ctx.guild is None:
             return False
         return ctx.channel and ctx.channel.id in channels
+
     return commands.check(predicate)

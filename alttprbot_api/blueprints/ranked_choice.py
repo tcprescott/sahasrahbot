@@ -1,15 +1,14 @@
+import logging
+
+import tortoise.exceptions
+from discord.errors import NotFound
 from quart import Blueprint, render_template, request, abort
 from quart_discord import requires_authorization
-import tortoise.exceptions
-import logging
 
 from alttprbot import models
 from alttprbot.util import rankedchoice
-from alttprbot_discord.bot import discordbot
-
-from discord.errors import NotFound
-
 from alttprbot_api.api import discord
+from alttprbot_discord.bot import discordbot
 
 # TODO: add a way to resubmit votes (low priority)
 # TODO: client-side verification that ranked choices are unique
@@ -40,7 +39,8 @@ async def get_ballot(election_id: int):
             member = await guild.fetch_member(user.id)
         except NotFound:
             logging.exception(f"Unable to find user {user.id} in guild.")
-            return abort(403, "Unable to find you in the server.  Please contact Synack if you believe this is an error.")
+            return abort(403,
+                         "Unable to find you in the server.  Please contact Synack if you believe this is an error.")
 
         if voter_role not in member.roles:
             return abort(403, "You are not authorized to vote in this election.")
@@ -50,7 +50,8 @@ async def get_ballot(election_id: int):
     existing_votes = await election.votes.filter(user_id=user.id)
     if existing_votes:
         # await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
-        return await render_template('ranked_choice_submit.html', election=election, votes=existing_votes, logged_in=logged_in, user=user)
+        return await render_template('ranked_choice_submit.html', election=election, votes=existing_votes,
+                                     logged_in=logged_in, user=user)
 
     return await render_template('ranked_choice_vote.html', election=election, logged_in=logged_in, user=user)
 
@@ -80,7 +81,8 @@ async def submit_ballot(election_id: int):
 
     existing_votes = await election.votes.filter(user_id=user.id)
     if existing_votes:
-        await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
+        await abort(403,
+                    "You have already voted in this election.  Please contact Synack if you need to change your vote.")
 
     payload = await request.form
 
@@ -88,7 +90,8 @@ async def submit_ballot(election_id: int):
         return await abort(400, "Each candidate must have a unique rank.")
 
     if dupcheck(list(payload.keys())):
-        return await abort(400, "You can only vote for each candidate once.  This should not have happened.  Please contact Synack.")
+        return await abort(400,
+                           "You can only vote for each candidate once.  This should not have happened.  Please contact Synack.")
 
     votes = []
 
@@ -121,7 +124,8 @@ async def submit_ballot(election_id: int):
 
     await rankedchoice.refresh_election_post(election, discordbot)
 
-    return await render_template('ranked_choice_submit.html', election=election, votes=votes, logged_in=logged_in, user=user)
+    return await render_template('ranked_choice_submit.html', election=election, votes=votes, logged_in=logged_in,
+                                 user=user)
 
 
 def remove_prefix(text, prefix):

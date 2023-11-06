@@ -1,16 +1,16 @@
-
-import re
 import csv
 import io
+import re
 
 import discord
 from discord.ext import commands
-# from emoji import is_emoji
 
 from alttprbot.database import role  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
-
 from ..util import embed_formatter
+
+
+# from emoji import is_emoji
 
 # this is a pile of shit and needs to be refactored
 
@@ -58,15 +58,16 @@ class Role(commands.Cog):
         pass
 
     @reactionrole.command(name='create', aliases=['c'])
-    async def role_create(self, ctx, group_id: int, role_name: discord.Role, name, description, emoji, protect_mentions: bool = True):
+    async def role_create(self, ctx, group_id: int, role_name: discord.Role, name, description, emoji,
+                          protect_mentions: bool = True):
         existing_roles = await role.get_group_roles(group_id, ctx.guild.id)
         if len(existing_roles) >= 20:
             raise SahasrahBotException(
                 'No more than 20 roles can be on a group.  Please create a new group.')
 
-#        if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
-#            raise SahasrahBotException(
-#                'Custom emoji is not available to this bot.')
+        #        if discord.utils.find(lambda e: str(e) == emoji, ctx.bot.emojis) is None and not is_emoji(emoji):
+        #            raise SahasrahBotException(
+        #                'Custom emoji is not available to this bot.')
 
         await role.create_role(ctx.guild.id, group_id, role_name.id, name, emoji, description, protect_mentions)
         await refresh_bot_message(ctx, group_id)
@@ -101,7 +102,8 @@ class Role(commands.Cog):
         pass
 
     @reactiongroup.command(name='create', aliases=['c'])
-    async def group_create(self, ctx, channel: discord.TextChannel, name, description=None, bot_managed: bool = True, message_id: int = None):
+    async def group_create(self, ctx, channel: discord.TextChannel, name, description=None, bot_managed: bool = True,
+                           message_id: int = None):
         if bot_managed:
             message = await channel.send('temp message')
         else:
@@ -167,11 +169,11 @@ async def refresh_bot_message(ctx, group_id):
     for item in roles:
         #        try:
         await message.add_reaction(strip_custom_emoji(item['emoji']))
-#        except discord.errors.HTTPException as err:
-#            if err.code == 10014:
-#                await ctx.reply("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
-#            else:
-#                raise
+    #        except discord.errors.HTTPException as err:
+    #            if err.code == 10014:
+    #                await ctx.reply("That emoji is unknown to this bot.  It may be a subscriber-only or an emoji from a server this bot cannot access.  Please manually add it to the role menu!\n\nPlease note that the emoji could not be displayed on the role menu.")
+    #            else:
+    #                raise
 
     if group['bot_managed']:
         embed = embed_formatter.reaction_menu(ctx, group, roles)
@@ -182,6 +184,7 @@ def strip_custom_emoji(emoji):
     emoji = re.sub('^<', '', emoji)
     emoji = re.sub('>$', '', emoji)
     return emoji
+
 
 async def setup(bot):
     await bot.add_cog(Role(bot))

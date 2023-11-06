@@ -10,6 +10,7 @@ from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 
+
 # game schedule
 # 1. Chozo, Vanilla Area, Boss Shuffle - RLS4W5
 # 2. DASH recall - recall_mm
@@ -24,7 +25,8 @@ from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 
 class SMRLPlayoffs(TournamentRace):
     async def process_tournament_race(self, args, message):
-        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message(
+            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
 
@@ -32,7 +34,9 @@ class SMRLPlayoffs(TournamentRace):
 
         # await self.send_audit_message(embed=self.embed)
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(
+            srl_id=self.rtgg_handler.data.get('name'),
+            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
 
         randomizer = self.tournament_game.settings['randomizer']
         preset = self.tournament_game.settings['preset']
@@ -155,7 +159,9 @@ class SMRLPlayoffs(TournamentRace):
             'preset': preset
         }
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': settings, 'event': self.event_slug, 'game_number': game_number})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
+                                                      defaults={'settings': settings, 'event': self.event_slug,
+                                                                'game_number': game_number})
 
         if self.audit_channel:
             await self.audit_channel.send(embed=embed)
@@ -164,14 +170,17 @@ class SMRLPlayoffs(TournamentRace):
             if player is None:
                 logging.error("Could not send DM to %s", name)
                 if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                    await self.audit_channel.send(f"@here could not send DM to {name}",
+                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
                 continue
             try:
                 await player.send(embed=embed)
             except discord.HTTPException:
                 logging.exception("Could not send DM to %s", name)
                 if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}",
+                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+
 
 def get_embed_field(name: str, embed: discord.Embed) -> str:
     for field in embed.fields:

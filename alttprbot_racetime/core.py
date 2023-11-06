@@ -1,13 +1,12 @@
-import os
 import ssl
 
 import aiohttp
-from alttprbot import models
 from racetime_bot import Bot
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
 
 import config
+from alttprbot import models
 
 RACETIME_HOST = config.RACETIME_HOST
 RACETIME_SECURE = config.RACETIME_SECURE
@@ -49,8 +48,8 @@ class SahasrahBotRaceTimeBot(Bot):
                         retry=retry_if_exception_type(aiohttp.ClientResponseError)):
                     with attempt:
                         async with self.http.get(
-                            self.http_uri(f'/{unlisted_room.room_name}/data'),
-                            ssl=self.ssl_context,
+                                self.http_uri(f'/{unlisted_room.room_name}/data'),
+                                ssl=self.ssl_context,
                         ) as resp:
                             race_data = await resp.json()
 

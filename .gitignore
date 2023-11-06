@@ -12,3 +12,4 @@ weights/bot_testing.yaml
 settings.py
 .vscode/
 config.py
+.idea/

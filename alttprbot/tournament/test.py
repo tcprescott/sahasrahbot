@@ -1,5 +1,5 @@
-from alttprbot.tournament.core import TournamentConfig
 from alttprbot.tournament import alttpr
+from alttprbot.tournament.core import TournamentConfig
 # from alttprbot.tournament import alttprleague
 from alttprbot_discord.bot import discordbot
 

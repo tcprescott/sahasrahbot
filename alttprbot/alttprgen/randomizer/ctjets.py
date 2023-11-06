@@ -28,7 +28,8 @@ async def roll_ctjets(settings: dict, version: str = '3_1_0'):
             'Referer': f'https://ctjot.com/{version}/options/',
         }
 
-        async with session.post(url=f'https://ctjot.com/{version}/generate-rom/', data=formdata, headers=headers) as resp:
+        async with session.post(url=f'https://ctjot.com/{version}/generate-rom/', data=formdata,
+                                headers=headers) as resp:
             soup = BeautifulSoup(await resp.text(), features="html5lib")
 
         relative_uri = soup.find('a', text='Seed share link')['href']

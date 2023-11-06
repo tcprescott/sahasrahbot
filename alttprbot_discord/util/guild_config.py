@@ -1,15 +1,17 @@
 import aiocache
-from discord.guild import Guild
 import tortoise.exceptions
+from discord.guild import Guild
 
 from alttprbot import models
 
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
+
 async def config_set(self, parameter, value):
     await models.Config.update_or_create(guild_id=self.id, parameter=parameter, defaults={'value': value})
     await CACHE.delete(f'{parameter}_{self.id}_config')
     await CACHE.delete(f'{self.id}_guildconfig')
+
 
 async def config_get(self, parameter, default=None):
     if await CACHE.exists(f'{parameter}_{self.id}_config'):
@@ -26,10 +28,12 @@ async def config_get(self, parameter, default=None):
         await CACHE.delete(f'{self.id}_guildconfig')
         return default
 
+
 async def config_delete(self, parameter):
     await models.Config.filter(guild_id=self.id, parameter=parameter).delete()
     await CACHE.delete(f'{parameter}_{self.id}_config')
     await CACHE.delete(f'{self.id}_guildconfig')
+
 
 async def config_list(self):
     if await CACHE.exists(f'{self.id}_guildconfig'):
@@ -39,6 +43,7 @@ async def config_list(self):
     values = await models.Config.filter(guild_id=self.id).values()
     await CACHE.set(f'{self.id}_guildconfig', values)
     return values
+
 
 def init():
     Guild.config_set = config_set

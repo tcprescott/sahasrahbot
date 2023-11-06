@@ -5,14 +5,14 @@ from quart import Blueprint, redirect, render_template, request
 from quart_discord import Unauthorized
 
 from alttprbot import models
-from alttprbot.util import triforce_text
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.randomizer import roll_ffr, roll_ootr
 from alttprbot.alttprgen.randomizer.smdash import create_smdash
-
+from alttprbot.util import triforce_text
 from alttprbot_api.api import discord
 
 sgl23_blueprint = Blueprint('sgl23', __name__)
+
 
 @sgl23_blueprint.route('/sgl23', methods=["GET"])
 async def sgl23_dashboard():
@@ -25,13 +25,15 @@ async def sgl23_dashboard():
 
     return await render_template("sgl23_dashboard.html", logged_in=logged_in, user=user)
 
-@sgl23_blueprint.route('/sgl23/generate/alttpr', methods=["GET"]) # updated
+
+@sgl23_blueprint.route('/sgl23/generate/alttpr', methods=["GET"])  # updated
 async def sgl23_generate_alttpr():
     preset = "sglive2023"
     # seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
-    seed = await triforce_text.generate_with_triforce_text(pool_name="sgl23", preset=preset, branch="tournament", balanced=False)
+    seed = await triforce_text.generate_with_triforce_text(pool_name="sgl23", preset=preset, branch="tournament",
+                                                           balanced=False)
     logging.info("SGL23 - Generated ALTTPR seed %s", seed.url)
-    await asyncio.sleep(2) # workaround for tournament branch seeds not being available immediately
+    await asyncio.sleep(2)  # workaround for tournament branch seeds not being available immediately
     await models.SGL2023OnsiteHistory.create(
         tournament="alttpr",
         url=seed.url,
@@ -39,12 +41,13 @@ async def sgl23_generate_alttpr():
     )
     return redirect(seed.url)
 
-@sgl23_blueprint.route('/sgl23/generate/ootr') # updated
+
+@sgl23_blueprint.route('/sgl23/generate/ootr')  # updated
 async def sgl23_generate_ootr():
     settings = {
         "enable_distribution_file": False,
         "enable_cosmetic_file": False,
-        "create_spoiler": False, # disable spoilers
+        "create_spoiler": False,  # disable spoilers
         "web_output_type": "z64",
         "web_common_key_string": "",
         "web_wad_channel_id": "NICE",
@@ -138,28 +141,28 @@ async def sgl23_generate_ootr():
         "logic_no_night_tokens_without_suns_song": False,
         "disabled_locations":
             [
-            "Deku Theater Mask of Truth",
-            "Kak 40 Gold Skulltula Reward",
-            "Kak 50 Gold Skulltula Reward",
+                "Deku Theater Mask of Truth",
+                "Kak 40 Gold Skulltula Reward",
+                "Kak 50 Gold Skulltula Reward",
             ],
         "allowed_tricks":
             [
-            "logic_fewer_tunic_requirements",
-            "logic_grottos_without_agony",
-            "logic_child_deadhand",
-            "logic_man_on_roof",
-            "logic_dc_jump",
-            "logic_rusted_switches",
-            "logic_windmill_poh",
-            "logic_crater_bean_poh_with_hovers",
-            "logic_forest_vines",
-            "logic_lens_botw",
-            "logic_lens_castle",
-            "logic_lens_gtg",
-            "logic_lens_shadow",
-            "logic_lens_shadow_platform",
-            "logic_lens_bongo",
-            "logic_lens_spirit",
+                "logic_fewer_tunic_requirements",
+                "logic_grottos_without_agony",
+                "logic_child_deadhand",
+                "logic_man_on_roof",
+                "logic_dc_jump",
+                "logic_rusted_switches",
+                "logic_windmill_poh",
+                "logic_crater_bean_poh_with_hovers",
+                "logic_forest_vines",
+                "logic_lens_botw",
+                "logic_lens_castle",
+                "logic_lens_gtg",
+                "logic_lens_shadow",
+                "logic_lens_shadow_platform",
+                "logic_lens_bongo",
+                "logic_lens_spirit",
             ],
         "tricks_list_msg": None,
         "starting_equipment": ["deku_shield"],
@@ -289,7 +292,8 @@ async def sgl23_generate_ootr():
     )
     return redirect(url)
 
-@sgl23_blueprint.route("/sgl23/generate/smr") #updated
+
+@sgl23_blueprint.route("/sgl23/generate/smr")  # updated
 async def sgl23_generate_smr():
     seed_url = await create_smdash(mode="sgl23")
     await models.SGL2023OnsiteHistory.create(
@@ -299,15 +303,18 @@ async def sgl23_generate_smr():
     )
     return redirect(seed_url)
 
-@sgl23_blueprint.route("/sgl23/generate/ffr") # updated
+
+@sgl23_blueprint.route("/sgl23/generate/ffr")  # updated
 async def sgl23_generate_ffr():
-    _, seed_url = roll_ffr("https://4-7-2.finalfantasyrandomizer.com/?s=00000000&f=m1-dPYu5-7ZlHqdPgC9BsTva4786C4mX5d0uZn85JzpVARtsVYb4TkKKyi4owT82MQwSww28yiLaHtMBNNzxMGjISw8IWcAfUS7AEkSp52Degtu4wErH3htXn4zENBWaNXWqXL6O-k8R3wZ8h55Gye21Spp4emwbbNwehPD")
+    _, seed_url = roll_ffr(
+        "https://4-7-2.finalfantasyrandomizer.com/?s=00000000&f=m1-dPYu5-7ZlHqdPgC9BsTva4786C4mX5d0uZn85JzpVARtsVYb4TkKKyi4owT82MQwSww28yiLaHtMBNNzxMGjISw8IWcAfUS7AEkSp52Degtu4wErH3htXn4zENBWaNXWqXL6O-k8R3wZ8h55Gye21Spp4emwbbNwehPD")
     await models.SGL2023OnsiteHistory.create(
         tournament="ffr",
         url=seed_url,
         ip_address=request.headers.get('X-Real-IP', request.remote_addr),
     )
     return redirect(seed_url)
+
 
 @sgl23_blueprint.route("/sgl23/generate/smz3/main")
 async def sgl23_generate_smz3_main():
@@ -318,6 +325,7 @@ async def sgl23_generate_smz3_main():
         ip_address=request.headers.get('X-Real-IP', request.remote_addr),
     )
     return redirect(seed.url)
+
 
 @sgl23_blueprint.route("/sgl23/generate/smz3/alt")
 async def sgl23_generate_smz3_alt():

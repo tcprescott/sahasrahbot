@@ -4,6 +4,7 @@ from alttprbot.alttprgen import generator
 
 settingsgen_blueprint = Blueprint('settingsgen', __name__)
 
+
 @settingsgen_blueprint.route('/api/settingsgen/mystery', methods=['POST'])
 async def mysterygen():
     weights = await request.get_json()

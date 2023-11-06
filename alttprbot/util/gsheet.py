@@ -1,6 +1,8 @@
-from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
+from oauth2client.service_account import ServiceAccountCredentials
+
 import config
+
 
 def get_creds():
     return ServiceAccountCredentials.from_json_keyfile_dict(
@@ -11,5 +13,6 @@ def get_creds():
             'https://www.googleapis.com/auth/spreadsheets'
         ]
     )
+
 
 drive_service = build('drive', 'v3', credentials=get_creds())

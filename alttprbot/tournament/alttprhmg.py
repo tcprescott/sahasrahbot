@@ -6,7 +6,8 @@ from alttprbot_discord.bot import discordbot
 
 class ALTTPRHMGTournament(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed = await generator.ALTTPRPreset('hmg').generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch='tournament')
+        self.seed = await generator.ALTTPRPreset('hmg').generate(allow_quickswap=True, tournament=True, hints=False,
+                                                                 spoilers="off", branch='tournament')
 
     async def configuration(self):
         guild = discordbot.get_guild(535946014037901333)

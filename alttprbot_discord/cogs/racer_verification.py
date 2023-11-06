@@ -1,17 +1,14 @@
-import os
-import logging
-import aiohttp
 import datetime
+
+import aiohttp
+import discord
 import isodate
 import pytz
-
-import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot import models
-
 import config
+from alttprbot import models
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -21,18 +18,24 @@ class RacerVerificationView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="Verify your status", custom_id="racerverify:verifystatus", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Verify your status", custom_id="racerverify:verifystatus",
+                       style=discord.ButtonStyle.primary)
     async def verify_status(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
-        racer_verification = await models.RacerVerification.get_or_none(message_id=interaction.message.id, guild_id=interaction.guild.id)
+        racer_verification = await models.RacerVerification.get_or_none(message_id=interaction.message.id,
+                                                                        guild_id=interaction.guild.id)
 
         if racer_verification is None:
-            await interaction.followup.send("This message is not a valid racer verification message.  This should not have happened.", ephemeral=True)
+            await interaction.followup.send(
+                "This message is not a valid racer verification message.  This should not have happened.",
+                ephemeral=True)
             return
 
         user = await models.Users.get_or_none(discord_user_id=interaction.user.id)
         if user is None or user.rtgg_id is None:
-            await interaction.followup.send("Please visit https://sahasrahbotapi.synack.live/racetime/verification/initiate to link your RaceTime.gg ID!\n\nAfter that, click the button again!", ephemeral=True)
+            await interaction.followup.send(
+                "Please visit https://sahasrahbotapi.synack.live/racetime/verification/initiate to link your RaceTime.gg ID!\n\nAfter that, click the button again!",
+                ephemeral=True)
             return
 
         try:
@@ -46,14 +49,18 @@ class RacerVerificationView(discord.ui.View):
             race_count += await get_ladder_count(interaction.user.id, days=racer_verification.time_period_days)
 
         if race_count < racer_verification.minimum_races:
-            race_count += await get_racetime_count(user.rtgg_id, rtgg_categories, days=racer_verification.time_period_days, max_count=racer_verification.minimum_races)
+            race_count += await get_racetime_count(user.rtgg_id, rtgg_categories,
+                                                   days=racer_verification.time_period_days,
+                                                   max_count=racer_verification.minimum_races)
 
         if race_count >= racer_verification.minimum_races:
             role = interaction.guild.get_role(racer_verification.role_id)
             await interaction.user.add_roles(role, reason="Racer Verification")
             await interaction.followup.send("Congratulations!  You have been verified!", ephemeral=True)
         else:
-            await interaction.followup.send("Sorry, you do not meet the requirements for verification.  If you believe this is in error, please contact a server administrator for assistance.", ephemeral=True)
+            await interaction.followup.send(
+                "Sorry, you do not meet the requirements for verification.  If you believe this is in error, please contact a server administrator for assistance.",
+                ephemeral=True)
 
 
 class RacerVerification(commands.GroupCog, name="racerverification"):
@@ -61,14 +68,15 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
         self.bot = bot
         self.persistent_views_added = False
 
-    @ commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
             self.bot.add_view(RacerVerificationView(self.bot))
             self.persistent_views_added = True
 
     @app_commands.command(description="Create a racer verification message.")
-    async def create(self, interaction: discord.Interaction, role: discord.Role, racetime_categories: str = None, use_alttpr_ladder: bool = False, minimum_races: int = 1, time_period_days: int = 365):
+    async def create(self, interaction: discord.Interaction, role: discord.Role, racetime_categories: str = None,
+                     use_alttpr_ladder: bool = False, minimum_races: int = 1, time_period_days: int = 365):
         if interaction.user.id != interaction.guild.owner_id:
             await interaction.response.send_message("You are not the owner of this server.", ephemeral=True)
             return
@@ -94,7 +102,7 @@ If you have any questions, please contact a server administrator.
 
 **Requirements:**
 - Must have a RaceTime.gg account linked to your Discord account via SahasrahBot.  You will be supplied a link to do so if this is not already done.
-- Have at least {minimum_races} {'race' if minimum_races == 1 else 'races'} played in the last {time_period_days} {'day' if time_period_days == 1 else 'days'} on RaceTime.gg in the following categories: {', '.join(rtgg_categories)}{ ' or ALTTPR Ladder races ' if use_alttpr_ladder else ''}
+- Have at least {minimum_races} {'race' if minimum_races == 1 else 'races'} played in the last {time_period_days} {'day' if time_period_days == 1 else 'days'} on RaceTime.gg in the following categories: {', '.join(rtgg_categories)}{' or ALTTPR Ladder races ' if use_alttpr_ladder else ''}
 - Must be a member of this Discord server
 """
 
@@ -115,9 +123,9 @@ async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_cou
 
     while count < max_count:
         async with aiohttp.request(
-            method='get',
-            url=f'{RACETIME_URL}/user/{racetime_id}/races/data',
-            params={'page': page}
+                method='get',
+                url=f'{RACETIME_URL}/user/{racetime_id}/races/data',
+                params={'page': page}
         ) as resp:
             try:
                 data = await resp.json()
@@ -130,7 +138,8 @@ async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_cou
             filtered_data = [x for x in data['races']
                              if x['category']['slug'] in category_slugs
                              and x['status']['value'] == 'finished'
-                             and tz_aware_greater_than(isodate.parse_datetime(x['opened_at']), datetime.datetime.utcnow() - datetime.timedelta(days=days))
+                             and tz_aware_greater_than(isodate.parse_datetime(x['opened_at']),
+                                                       datetime.datetime.utcnow() - datetime.timedelta(days=days))
                              ]
 
             count += len(filtered_data)
@@ -157,10 +166,10 @@ async def get_ladder_count(discord_id, days=365):
     start = (now - delta).strftime('%m%d%Y')
     end = now.strftime('%m%d%Y')
     async with aiohttp.request(
-        method='get',
-        url=f'https://alttprladder.com/api/v1/PublicAPI/GetRacerRaceHistory?discordid={discord_id}&startdt={start}&enddt={end}',
-        headers={'User-Agent': 'SahasrahBot'},
-        raise_for_status=True
+            method='get',
+            url=f'https://alttprladder.com/api/v1/PublicAPI/GetRacerRaceHistory?discordid={discord_id}&startdt={start}&enddt={end}',
+            headers={'User-Agent': 'SahasrahBot'},
+            raise_for_status=True
     ) as resp:
         data = await resp.json()
 

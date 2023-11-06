@@ -1,7 +1,6 @@
 import random
 
 from alttprbot.alttprgen import generator, smz3multi
-
 from .core import SahasrahBotCoreHandler
 
 
@@ -38,7 +37,8 @@ class GameHandler(SahasrahBotCoreHandler):
         try:
             teams = self.teams
             for team in teams:
-                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='smz3', seed_number=seed_number)
+                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='smz3',
+                                                           seed_number=seed_number)
                 await self.send_message(f"Team {team}: {seed.url}")
                 await self.send_message("------")
         except Exception as e:
@@ -57,7 +57,8 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(args, message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!race <preset>, !multiworld <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html#smz3-commands for more info.")
+        await self.send_message(
+            "Available commands:\n\"!race <preset>, !multiworld <preset>\" to generate a race preset.  Check out https://sahasrahbot.synack.live/rtgg.html#smz3-commands for more info.")
 
     async def roll_game(self, args, message):
         if await self.is_locked(message):
@@ -102,10 +103,11 @@ class GameHandler(SahasrahBotCoreHandler):
         try:
             studytime = int(args[1])
         except IndexError:
-            studytime = 25*60
+            studytime = 25 * 60
 
         await self.set_bot_raceinfo(f"spoiler {preset_name} - {smz3preset.seed.url} - ({smz3preset.seed.code})")
         await self.send_message(smz3preset.seed.url)
-        await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+        await self.send_message(
+            f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await self.schedule_spoiler_race(spoiler_url, studytime)
         self.seed_rolled = True

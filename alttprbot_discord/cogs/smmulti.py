@@ -149,7 +149,8 @@ class MultiworldSignupView(discord.ui.View):
             return
 
         if not multiworld.randomizer or not multiworld.preset:
-            await interaction.response.send_message("Please ensure you choose both a randomizer and preset before starting.", ephemeral=True)
+            await interaction.response.send_message(
+                "Please ensure you choose both a randomizer and preset before starting.", ephemeral=True)
             return
 
         embed = set_embed_field("Status", "⌚ Game closed for entry.  Rolling...", embed)
@@ -161,13 +162,15 @@ class MultiworldSignupView(discord.ui.View):
         if len(players) < 2:
             embed = set_embed_field("Status", "👍 Open for entry", embed)
             await interaction.message.edit(embed=embed, view=self)
-            await interaction.response.send_message("You must have at least two players to create a multiworld.", ephemeral=True)
+            await interaction.response.send_message("You must have at least two players to create a multiworld.",
+                                                    ephemeral=True)
             return
 
         await interaction.response.defer()
 
         player_names = [slugify(p.display_name, lowercase=False, max_length=19, separator=" ") for p in players]
-        seed = await generate_multiworld(multiworld.preset, player_names, tournament=False, randomizer=multiworld.randomizer)
+        seed = await generate_multiworld(multiworld.preset, player_names, tournament=False,
+                                         randomizer=multiworld.randomizer)
 
         dm_embed = discord.Embed(
             title=f"{multiworld.randomizer.upper()} Multiworld Game"
@@ -246,13 +249,14 @@ class SMMulti(commands.Cog):
         self.bot = bot
         self.persistent_views_added = False
 
-    @ commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         if not self.persistent_views_added:
             self.bot.add_view(MultiworldSignupView())
             self.persistent_views_added = True
 
-    @app_commands.command(description="Stub for the old multiworld command.  This command has been replaced by `/smmulti`.")
+    @app_commands.command(
+        description="Stub for the old multiworld command.  This command has been replaced by `/smmulti`.")
     async def multiworld(self, interaction: discord.Interaction):
         await interaction.response.send_message("This command has been replaced by `/smmulti`.", ephemeral=True)
 
@@ -291,6 +295,7 @@ def get_embed_field(name: str, embed: discord.Embed) -> str:
         if field.name == name:
             return field.value
     return None
+
 
 async def setup(bot):
     await bot.add_cog(SMMulti(bot))

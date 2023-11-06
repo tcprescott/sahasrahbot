@@ -2,9 +2,9 @@ import discord
 from aiohttp import ClientResponseError
 from discord.ext import commands
 
+import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
-import config
 
 
 class BontaMultiworld(commands.Cog):
@@ -49,9 +49,9 @@ class BontaMultiworld(commands.Cog):
 
     @commands.command(
         help=(
-            'Sends a command to the multiworld server.\n'
-            'The msg should be wrapped in quotes.  For example: $mwmsg abc123 "/kick Synack"\n'
-            'Only the creator of the game, or the owner of this bot, may send commands.'
+                'Sends a command to the multiworld server.\n'
+                'The msg should be wrapped in quotes.  For example: $mwmsg abc123 "/kick Synack"\n'
+                'Only the creator of the game, or the owner of this bot, may send commands.'
         ),
         brief='Send a command to the multiworld server.'
     )
@@ -62,14 +62,17 @@ class BontaMultiworld(commands.Cog):
             raise SahasrahBotException("That game does not exist.")
 
         if not (result['admin'] == ctx.author.id or (
-            (discord.utils.get(ctx.author.roles, id=507932829527703554) or discord.utils.get(ctx.author.roles, id=482266765137805333)) and result['meta']['guild'] == "Communauté ALttPR francophone")
+                (discord.utils.get(ctx.author.roles, id=507932829527703554) or discord.utils.get(ctx.author.roles,
+                                                                                                 id=482266765137805333)) and
+                result['meta']['guild'] == "Communauté ALttPR francophone")
         ):
             raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
         data = {
             'msg': msg
         }
-        response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data, returntype='json')
+        response = await http.request_json_put(url=f'http://localhost:5000/game/{token}/msg', data=data,
+                                               returntype='json')
 
         if response.get('success', True) is False:
             raise SahasrahBotException(response.get(
@@ -78,11 +81,11 @@ class BontaMultiworld(commands.Cog):
         if 'resp' in response and response['resp'] is not None:
             await ctx.reply(response['resp'])
 
-    @ commands.command(
+    @commands.command(
         help=(
-            'Resume an existing multiworld that was previously closed.\n'
-            'Specify the existing token, and port number.\n\n'
-            'Multidata and multisave file are removed from the server after 7 days.'
+                'Resume an existing multiworld that was previously closed.\n'
+                'Specify the existing token, and port number.\n\n'
+                'Multidata and multisave file are removed from the server after 7 days.'
         ),
         brief='Resume a multiworld that was previously closed.'
     )
