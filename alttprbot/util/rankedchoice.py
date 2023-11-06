@@ -1,12 +1,12 @@
-import discord
-from discord.ext import commands
-from alttprbot import models
-from typing import List
-import pyrankvote
-import os
 import io
+from typing import List
+
+import discord
+import pyrankvote
+from discord.ext import commands
 
 import config
+from alttprbot import models
 
 APP_URL = config.APP_URL
 

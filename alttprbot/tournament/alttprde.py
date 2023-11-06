@@ -3,6 +3,7 @@ import logging
 import random
 
 import discord
+from pyz3r.customizer import BASE_CUSTOMIZER_PAYLOAD
 from werkzeug.datastructures import MultiDict
 
 from alttprbot import models
@@ -11,7 +12,6 @@ from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util import alttpr_discord
-from pyz3r.customizer import BASE_CUSTOMIZER_PAYLOAD
 
 ALTTPRDE_TITLE_MAP = {
     'Standard': 'standard',

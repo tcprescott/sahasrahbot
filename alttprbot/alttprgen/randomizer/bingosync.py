@@ -1,11 +1,10 @@
-import os
 import logging
 
 import aiohttp
 from bs4 import BeautifulSoup
 
 from alttprbot.exceptions import SahasrahBotException
- 
+
 BINGOSYNC_BASE_URL = 'https://bingosync.com'
 
 jar = aiohttp.CookieJar(unsafe=True)

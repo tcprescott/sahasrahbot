@@ -10,6 +10,7 @@ from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot_discord.bot import discordbot
 from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
 
+
 # game schedule
 # 1. Chozo, Vanilla Area, Boss Shuffle - RLS4W5
 # 2. DASH recall - recall_mm

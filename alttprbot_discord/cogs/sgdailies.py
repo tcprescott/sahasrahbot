@@ -1,13 +1,10 @@
-import os
-
 import dateutil.parser
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot.util import speedgaming
-
 import config
+from alttprbot.util import speedgaming
 
 # TODO: make work with discord.py 2.0
 

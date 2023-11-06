@@ -1,7 +1,6 @@
 import random
 
 from alttprbot.alttprgen import generator, smz3multi
-
 from .core import SahasrahBotCoreHandler
 
 

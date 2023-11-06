@@ -1,7 +1,8 @@
 from typing import List
-from alttprbot_discord.bot import discordbot
 
 from alttprbot import models
+from alttprbot_discord.bot import discordbot
+
 
 async def is_async_tournament_user(user: models.Users, tournament: models.AsyncTournament, roles: List[str]):
     if 'public' in roles and not tournament.active:

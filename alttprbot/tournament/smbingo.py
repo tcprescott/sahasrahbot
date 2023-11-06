@@ -1,16 +1,14 @@
-import string
 import random
-import os
+import string
 
 import aiohttp
 import discord
 
-from alttprbot.alttprgen.randomizer.bingosync import BingoSync
+import config
 from alttprbot import models
+from alttprbot.alttprgen.randomizer.bingosync import BingoSync
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot_discord.bot import discordbot
-
-import config
 
 BINGO_COLLAB_DISCORD_WEBHOOK = config.BINGO_COLLAB_DISCORD_WEBHOOK
 

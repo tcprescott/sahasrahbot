@@ -4,8 +4,9 @@ import io
 from contextlib import closing
 
 import discord
-from alttprbot import models
 from discord.ext import commands, tasks
+
+from alttprbot import models
 
 
 class Audit(commands.Cog):

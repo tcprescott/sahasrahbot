@@ -2,9 +2,9 @@ import discord
 from aiohttp import ClientResponseError
 from discord.ext import commands
 
+import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import http
-import config
 
 
 class BontaMultiworld(commands.Cog):

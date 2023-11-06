@@ -1,6 +1,6 @@
-from alttprbot.alttprgen import preset, spoilers, generator
 from racetime_bot import monitor_cmd, msg_actions
 
+from alttprbot.alttprgen import preset, spoilers, generator
 from .core import SahasrahBotCoreHandler
 
 

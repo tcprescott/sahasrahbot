@@ -1,15 +1,14 @@
+import logging
+
+import tortoise.exceptions
+from discord.errors import NotFound
 from quart import Blueprint, render_template, request, abort
 from quart_discord import requires_authorization
-import tortoise.exceptions
-import logging
 
 from alttprbot import models
 from alttprbot.util import rankedchoice
-from alttprbot_discord.bot import discordbot
-
-from discord.errors import NotFound
-
 from alttprbot_api.api import discord
+from alttprbot_discord.bot import discordbot
 
 # TODO: add a way to resubmit votes (low priority)
 # TODO: client-side verification that ranked choices are unique

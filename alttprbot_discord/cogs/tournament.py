@@ -1,18 +1,17 @@
 import datetime
 import logging
-import os
 import random
 
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from alttprbot.tournament import core, alttpr
+import config
 # from alttprbot_discord.util import alttpr_discord
 from alttprbot import models
 from alttprbot import tournaments
+from alttprbot.tournament import core, alttpr
 from alttprbot.util import speedgaming
-import config
 
 # TODO: use asyncio.semaphore() to limit the number of concurrent tasks
 

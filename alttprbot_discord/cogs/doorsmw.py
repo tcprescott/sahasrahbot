@@ -3,8 +3,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot.exceptions import SahasrahBotException
 import config
+from alttprbot.exceptions import SahasrahBotException
 
 
 class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door Randomizer multiworld."):

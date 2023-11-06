@@ -3,12 +3,10 @@ from io import BytesIO
 
 from quart import Blueprint, redirect, render_template, request, send_file, url_for, jsonify
 from quart_discord import Unauthorized, requires_authorization
-
 from tortoise.query_utils import Prefetch
 
 from alttprbot import models
 from alttprbot.alttprgen import generator
-
 from alttprbot_api.api import discord
 
 presets_blueprint = Blueprint('presets', __name__)

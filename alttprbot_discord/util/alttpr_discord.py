@@ -1,10 +1,8 @@
 import datetime
-import os
 
 import aiohttp
 import discord
 import html2markdown
-
 from pyz3r import ALTTPR
 
 import config

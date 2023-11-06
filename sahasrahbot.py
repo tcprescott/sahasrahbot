@@ -5,13 +5,12 @@ import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from tortoise import Tortoise
 
-from alttprbot_api.api import sahasrahbotapi
-from alttprbot_discord.bot import start_bot as start_discord_bot
-from alttprbot_audit.bot import start_bot as start_audit_bot
-from alttprbot_racetime.bot import start_racetime
-from alttprbot.exceptions import SahasrahBotException
-
 import config
+from alttprbot.exceptions import SahasrahBotException
+from alttprbot_api.api import sahasrahbotapi
+from alttprbot_audit.bot import start_bot as start_audit_bot
+from alttprbot_discord.bot import start_bot as start_discord_bot
+from alttprbot_racetime.bot import start_racetime
 
 if config.SENTRY_URL:
     def before_send(event, hint):

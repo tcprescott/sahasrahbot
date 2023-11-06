@@ -1,15 +1,16 @@
-import discord
 import datetime
-import pytz
+
+import discord
 import isodate
+import pytz
 
 from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
-from alttprbot_discord.bot import discordbot
 from alttprbot.util import speedgaming, triforce_text
+from alttprbot_api.util import checks
+from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
-from alttprbot_api.util import checks
 
 
 class ALTTPRQualifierRace(TournamentRace):

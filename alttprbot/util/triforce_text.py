@@ -1,4 +1,5 @@
 import random
+
 from alttprbot import models
 from alttprbot.alttprgen import generator
 

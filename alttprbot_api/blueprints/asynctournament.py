@@ -1,17 +1,15 @@
 import datetime
 
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
-
 from quart import (Blueprint, abort, jsonify, redirect,
                    render_template, request, url_for, Response)
 from quart_discord import requires_authorization, Unauthorized
+from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from alttprbot import models
 from alttprbot.util import asynctournament
 from alttprbot_api import auth
-from alttprbot_api.util import checks
-
 from alttprbot_api.api import discord
+from alttprbot_api.util import checks
 
 asynctournament_blueprint = Blueprint('async', __name__)
 

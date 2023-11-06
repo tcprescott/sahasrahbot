@@ -1,4 +1,3 @@
-import os
 import urllib.parse
 
 import config

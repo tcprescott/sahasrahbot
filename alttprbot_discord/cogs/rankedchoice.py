@@ -1,12 +1,11 @@
 
-from discord.ext import commands
-from discord import app_commands
 import discord
-from alttprbot import models
-from alttprbot.util import rankedchoice
-import os
+from discord import app_commands
+from discord.ext import commands
 
 import config
+from alttprbot import models
+from alttprbot.util import rankedchoice
 
 APP_URL = config.APP_URL
 

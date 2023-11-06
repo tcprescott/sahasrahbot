@@ -3,18 +3,17 @@ import json
 import logging
 
 import aiohttp
-from bs4 import BeautifulSoup
-import gspread_asyncio
 import gspread.exceptions
+import gspread_asyncio
 import isodate
 import pytz
-from alttprbot_racetime import bot as racetimebot
+from bs4 import BeautifulSoup
 
+import config
 from alttprbot import models
 from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, alttprhmg, alttprleague, alttprmini
 from alttprbot.util import gsheet
-
-import config
+from alttprbot_racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
 

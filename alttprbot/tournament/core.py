@@ -1,19 +1,17 @@
 import logging
-import os
 from dataclasses import dataclass
 
-import discord
-
-from alttprbot import models
-from alttprbot.util import speedgaming
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
-from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 import dateutil.parser
+import discord
 import pytz
 
 import config
+from alttprbot import models
+from alttprbot.exceptions import SahasrahBotException
+from alttprbot.util import speedgaming
+from alttprbot_discord.bot import discordbot
+from alttprbot_racetime import bot as racetime
+from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 
 APP_URL = config.APP_URL
 

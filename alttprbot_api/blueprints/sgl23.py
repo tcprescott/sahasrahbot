@@ -5,11 +5,10 @@ from quart import Blueprint, redirect, render_template, request
 from quart_discord import Unauthorized
 
 from alttprbot import models
-from alttprbot.util import triforce_text
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.randomizer import roll_ffr, roll_ootr
 from alttprbot.alttprgen.randomizer.smdash import create_smdash
-
+from alttprbot.util import triforce_text
 from alttprbot_api.api import discord
 
 sgl23_blueprint = Blueprint('sgl23', __name__)

@@ -1,6 +1,6 @@
 import aiocache
-from discord.guild import Guild
 import tortoise.exceptions
+from discord.guild import Guild
 
 from alttprbot import models
 

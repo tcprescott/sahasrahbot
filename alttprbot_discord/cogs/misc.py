@@ -1,19 +1,17 @@
 import asyncio
 import datetime
 import random
-import os
-from aiocache import cached, Cache
-import aiohttp
 
+import aiohttp
 import discord
+import pytz
+from aiocache import cached, Cache
 from discord import app_commands
 from discord.ext import commands
-import pytz
 from pytz import UnknownTimeZoneError
 
-from alttprbot.util.holyimage import HolyImage
-
 import config
+from alttprbot.util.holyimage import HolyImage
 
 # TODO: make work with discord.py 2.0
 

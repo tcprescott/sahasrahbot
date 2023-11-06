@@ -1,15 +1,14 @@
 import json
+import logging
 from datetime import timedelta, datetime
+from typing import List
 
 import aiofiles
 import aiohttp
 import pytz
-import logging
-from typing import List
-
-from alttprbot.exceptions import SahasrahBotException
 
 import config
+from alttprbot.exceptions import SahasrahBotException
 
 
 class SGEpisodeNotFoundException(SahasrahBotException):

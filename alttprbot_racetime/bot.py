@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from alttprbot_racetime.config import RACETIME_CATEGORIES
 
 logger = logging.getLogger()

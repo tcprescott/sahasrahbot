@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from alttprbot.database import config # TODO switch to ORM
+from alttprbot.database import config  # TODO switch to ORM
 
 
 def restrict_to_channels_by_guild_config(parameter, default=True):

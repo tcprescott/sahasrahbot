@@ -1,17 +1,14 @@
-import os
-import logging
-import aiohttp
 import datetime
+
+import aiohttp
+import discord
 import isodate
 import pytz
-
-import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot import models
-
 import config
+from alttprbot import models
 
 RACETIME_URL = config.RACETIME_URL
 

@@ -1,11 +1,10 @@
 import logging
 
 import aiohttp
-# import tortoise.exceptions
+
 from alttprbot import models
-from alttprbot.alttprgen import spoilers
-# from alttprbot.database import spoiler_races  # TODO switch to ORM
 from alttprbot.alttprgen import generator
+from alttprbot.alttprgen import spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot

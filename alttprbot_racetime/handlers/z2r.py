@@ -1,6 +1,7 @@
 import random
-from .core import SahasrahBotCoreHandler
+
 from alttprbot.alttprgen.randomizer import z2r
+from .core import SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):

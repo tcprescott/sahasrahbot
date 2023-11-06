@@ -1,7 +1,7 @@
 # import pyz3r
 from alttprbot.alttprgen.preset import fetch_preset
-from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
 
 
 class PresetNotFoundException(SahasrahBotException):

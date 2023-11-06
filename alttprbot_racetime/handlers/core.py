@@ -1,16 +1,16 @@
-from itertools import groupby
-
-import tortoise.exceptions
-
-from alttprbot_discord.bot import discordbot
-from alttprbot import models
-from alttprbot import tournaments
-from alttprbot_racetime.misc.konot import KONOT
-from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 import asyncio
 import math
 from datetime import datetime
+from itertools import groupby
+
 import discord.utils
+import tortoise.exceptions
+from racetime_bot import RaceHandler, can_monitor, monitor_cmd
+
+from alttprbot import models
+from alttprbot import tournaments
+from alttprbot_discord.bot import discordbot
+from alttprbot_racetime.misc.konot import KONOT
 
 
 class SahasrahBotCoreHandler(RaceHandler):

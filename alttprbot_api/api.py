@@ -1,15 +1,12 @@
-import os
-
+from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
 from quart import (Quart, abort, jsonify, redirect, render_template, request,
                    session, url_for)
 from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
                            requires_authorization)
 
+import config
 from alttprbot import models
 from alttprbot_discord.bot import discordbot
-from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
-
-import config
 
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")

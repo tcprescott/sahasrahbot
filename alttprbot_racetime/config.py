@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
+import config
 from alttprbot_racetime import handlers
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
 from alttprbot_racetime.handlers.core import SahasrahBotCoreHandler
-import config
 
 
 @dataclass

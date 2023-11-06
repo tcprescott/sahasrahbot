@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from alttprbot import models
 
+
 # TODO: make work with discord.py 2.0
 
 

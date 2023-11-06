@@ -1,16 +1,17 @@
 
-import re
 import csv
 import io
+import re
 
 import discord
 from discord.ext import commands
-# from emoji import is_emoji
 
 from alttprbot.database import role  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
-
 from ..util import embed_formatter
+
+
+# from emoji import is_emoji
 
 # this is a pile of shit and needs to be refactored
 

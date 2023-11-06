@@ -2,7 +2,6 @@ import asyncio
 import csv
 import datetime
 import logging
-import os
 
 import aiohttp
 import discord
@@ -13,10 +12,10 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from slugify import slugify
 
+import config
 from alttprbot import models
 from alttprbot.util import asynctournament, triforce_text
 from alttprbot_api.util import checks
-import config
 
 RACETIME_URL = config.RACETIME_URL
 APP_URL = config.APP_URL

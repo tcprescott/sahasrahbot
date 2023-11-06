@@ -1,6 +1,6 @@
+from alttprbot.alttprgen import generator
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot.alttprgen import generator
 from alttprbot_discord.bot import discordbot
 
 

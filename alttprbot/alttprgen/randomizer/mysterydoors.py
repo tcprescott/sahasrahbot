@@ -2,10 +2,11 @@ import copy
 import logging
 from dataclasses import dataclass
 from typing import Union
-from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 from pyz3r.mystery import get_random_option, generate_random_settings
+
+from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
 
 
 @dataclass

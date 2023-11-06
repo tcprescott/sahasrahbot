@@ -1,11 +1,9 @@
-import os
-
 import aiohttp
 import discord
-from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
-from alttprbot_discord.bot import discordbot
 
 import config
+from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
+from alttprbot_discord.bot import discordbot
 
 SG_DISCORD_WEBHOOK = config.SG_DISCORD_WEBHOOK
 

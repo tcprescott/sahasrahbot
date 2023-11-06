@@ -1,17 +1,14 @@
 import datetime
-import os
 from urllib.parse import quote
 
 import aiohttp
 from quart import Blueprint, abort, jsonify, redirect, render_template, request
 from quart_discord import requires_authorization
 
-from alttprbot import models
-from alttprbot_racetime import bot as racetimebot
-
-from alttprbot_api.api import discord
-
 import config
+from alttprbot import models
+from alttprbot_api.api import discord
+from alttprbot_racetime import bot as racetimebot
 
 racetime_blueprint = Blueprint('racetime', __name__)
 

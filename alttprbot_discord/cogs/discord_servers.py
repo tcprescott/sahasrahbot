@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from alttprbot import models
 
+
 class DiscordServers(commands.GroupCog, name="discordservers", description="Manage catagories."):
     def __init__(self, bot):
         self.bot: commands.Bot = bot

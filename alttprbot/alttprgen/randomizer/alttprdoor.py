@@ -2,18 +2,19 @@
 import asyncio
 import gzip
 import json
+import logging
 import os
 import random
 import re
 import string
 import tempfile
-import logging
 
 import aioboto3
 import aiofiles
 from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
 import config
+
 
 class AlttprDoor():
     def __init__(self, settings=None, spoilers=True):

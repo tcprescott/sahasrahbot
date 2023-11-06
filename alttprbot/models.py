@@ -1,11 +1,9 @@
-import os
-
 from datetime import timedelta
 from typing import Optional
-from bs4 import BeautifulSoup
-import markdown
 
 import discord.utils
+import markdown
+from bs4 import BeautifulSoup
 from tortoise import fields
 from tortoise.models import Model
 

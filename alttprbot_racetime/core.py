@@ -1,13 +1,12 @@
-import os
 import ssl
 
 import aiohttp
-from alttprbot import models
 from racetime_bot import Bot
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
 
 import config
+from alttprbot import models
 
 RACETIME_HOST = config.RACETIME_HOST
 RACETIME_SECURE = config.RACETIME_SECURE

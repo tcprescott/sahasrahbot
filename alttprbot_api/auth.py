@@ -2,6 +2,7 @@
 # Authorization
 ####################
 from functools import wraps
+
 from quart import request
 from quart.wrappers import Response
 

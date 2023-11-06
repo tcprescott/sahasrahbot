@@ -1,10 +1,11 @@
 import random
 
-from alttprbot.alttprgen import generator, smz3multi, smvaria
-from alttprbot.alttprgen.randomizer import smdash
 from pyz3r.exceptions import UnableToGenerate, UnableToRetrieve
 
+from alttprbot.alttprgen import generator, smz3multi, smvaria
+from alttprbot.alttprgen.randomizer import smdash
 from .core import SahasrahBotCoreHandler
+
 
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_choozorace(self, args, message):

@@ -1,17 +1,18 @@
 import asyncio
-from dataclasses import dataclass
 import logging
 import random
+from dataclasses import dataclass
 from datetime import timedelta
-from typing import List
-import aiocache
 from functools import cached_property
-import discord
-from tortoise.functions import Count
-from tortoise.exceptions import MultipleObjectsReturned
+from typing import List
 
-from alttprbot import models
+import aiocache
+import discord
+from tortoise.exceptions import MultipleObjectsReturned
+from tortoise.functions import Count
+
 import config
+from alttprbot import models
 
 # these should probably be in the database
 QUALIFIER_MAX_SCORE = 105

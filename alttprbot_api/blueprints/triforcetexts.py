@@ -4,7 +4,6 @@ from quart import Blueprint, render_template, request, url_for, redirect, sessio
 from quart_discord import requires_authorization, Unauthorized
 
 from alttprbot import models
-
 from alttprbot_api.api import discord
 
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)

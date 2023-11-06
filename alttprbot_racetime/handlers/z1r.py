@@ -1,6 +1,6 @@
-from alttprbot.alttprgen.randomizer.z1r import roll_z1r
 import random
 
+from alttprbot.alttprgen.randomizer.z1r import roll_z1r
 from .core import SahasrahBotCoreHandler
 
 PRESETS = {

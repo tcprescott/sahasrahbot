@@ -1,5 +1,5 @@
-from pyz3r.sm import smClass
 import discord
+from pyz3r.sm import smClass
 
 
 class SMDiscord(smClass):

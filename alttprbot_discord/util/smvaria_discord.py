@@ -1,6 +1,7 @@
-from pyz3r.smvaria import SuperMetroidVaria
-import discord
 import datetime
+
+import discord
+from pyz3r.smvaria import SuperMetroidVaria
 
 
 class SuperMetroidVariaDiscord(SuperMetroidVaria):

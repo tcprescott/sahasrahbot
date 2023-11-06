@@ -1,13 +1,11 @@
-import os
 import logging
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot import models
-
 import config
+from alttprbot import models
 
 APP_URL = config.APP_URL
 

@@ -1,20 +1,20 @@
+import datetime
+import hashlib
 import io
 import logging
-import zipfile
-import datetime
-from typing import List
-import hashlib
 import re
-
+import zipfile
+from typing import List
 from urllib.parse import urlparse
-from urlextract import URLExtract
 
 import aiocache
 import aiohttp
 import discord
 from discord.ext import commands
+from urlextract import URLExtract
 
 from alttprbot.util import http
+
 # from alttprbot import models
 
 urlextractor = URLExtract()
