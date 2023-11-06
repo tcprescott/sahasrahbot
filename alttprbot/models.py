@@ -813,5 +813,5 @@ class SGL2023OnsiteHistory(Model):
     id = fields.IntField(pk=True)
     date = fields.DatetimeField(auto_now_add=True)
     tournament = fields.CharField(45, null=False)
-    url = fields.CharField(200, null=False)
+    url = fields.CharField(300, null=False)
     ip_address = fields.CharField(200, null=False) # will store X-Forwarded-For header
