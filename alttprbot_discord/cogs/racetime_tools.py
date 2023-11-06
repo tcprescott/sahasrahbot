@@ -22,22 +22,24 @@ class RacetimeTools(commands.Cog):
     async def on_racetime_invitational(self, handler, data):
         pass
 
-    @ commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_racetime_in_progress(self, handler, data):
         await self.watchlisted_players(handler)
         await self.new_players(handler)
 
-    @ commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_racetime_cancelled(self, handler, data):
         pass
 
-    @ commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_racetime_finished(self, handler, data):
         pass
 
     async def watchlisted_players(self, handler):
         entrant_ids = [a['user']['id'] for a in handler.data['entrants']]
-        watchlisted_players = await models.RTGGWatcherPlayer.filter(racetime_id__in=entrant_ids, rtgg_watcher__category=handler.bot.category_slug).prefetch_related("rtgg_watcher")
+        watchlisted_players = await models.RTGGWatcherPlayer.filter(racetime_id__in=entrant_ids,
+                                                                    rtgg_watcher__category=handler.bot.category_slug).prefetch_related(
+            "rtgg_watcher")
         for watchlisted_player in watchlisted_players:
             channel = self.bot.get_channel(watchlisted_player.rtgg_watcher.channel_id)
             player_data_uri = handler.bot.http_uri(f"/user/{watchlisted_player.racetime_id}/data")

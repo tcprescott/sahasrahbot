@@ -21,7 +21,8 @@ class Daily(commands.Cog):
         daily_challenge = await find_daily_hash()
         hash_id = daily_challenge['hash']
         seed = await get_daily_seed(hash_id)
-        embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+        embed = await seed.embed(emojis=self.bot.emojis,
+                                 notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await interaction.response.send_message(embed=embed)
 
     @tasks.loop(minutes=5, reconnect=True)
@@ -30,14 +31,16 @@ class Daily(commands.Cog):
         hash_id = daily_challenge['hash']
         if await update_daily(hash_id):
             seed = await get_daily_seed(hash_id)
-            embed = await seed.embed(emojis=self.bot.emojis, notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
+            embed = await seed.embed(emojis=self.bot.emojis,
+                                     notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             daily_announcer_channels = await config.get_all_parameters_by_name('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
                 guild = self.bot.get_guild(result['guild_id'])
                 for channel_name in result['value'].split(","):
                     channel = discord.utils.get(guild.text_channels, name=channel_name)
                     message: discord.Message = await channel.send(embed=embed)
-                    await message.create_thread(name=seed.data['spoiler']['meta'].get('name'), auto_archive_duration=1440)
+                    await message.create_thread(name=seed.data['spoiler']['meta'].get('name'),
+                                                auto_archive_duration=1440)
 
     @announce_daily.before_loop
     async def before_create_races(self):

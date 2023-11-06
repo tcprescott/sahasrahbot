@@ -20,6 +20,7 @@ class RacetimeBotConfig:
     def client_secret(self):
         return getattr(config, f"RACETIME_CLIENT_SECRET_{self.category_slug.upper().replace('-', '')}")
 
+
 if config.DEBUG:
     RACETIME_CATEGORIES = {
         'test': RacetimeBotConfig(
@@ -45,10 +46,10 @@ else:
             category_slug='ff1r',
             handler_class=handlers.ff1r.GameHandler,
         ),
-       'sgl': RacetimeBotConfig(
-           category_slug='sgl',
-           handler_class=handlers.sgl.GameHandler,
-       ),
+        'sgl': RacetimeBotConfig(
+            category_slug='sgl',
+            handler_class=handlers.sgl.GameHandler,
+        ),
         'sm': RacetimeBotConfig(
             category_slug='sm',
             handler_class=handlers.sm.GameHandler,

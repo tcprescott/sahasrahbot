@@ -1,7 +1,6 @@
 with open('.env', 'r') as env_file:
     lines = env_file.readlines()
 
-
 with open('config.py', 'a') as settings_file:
     for line in lines:
         if line.startswith('#'):

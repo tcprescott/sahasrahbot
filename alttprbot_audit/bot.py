@@ -18,6 +18,7 @@ async def determine_prefix(bot, message):
     prefix = await message.guild.config_get("CommandPrefix", "$")
     return prefix
 
+
 discordbot = commands.Bot(
     command_prefix=determine_prefix,
     allowed_mentions=discord.AllowedMentions(
@@ -32,9 +33,11 @@ discordbot = commands.Bot(
 if config.SENTRY_URL:
     use_sentry(discordbot, dsn=config.SENTRY_URL)
 
+
 async def load_extensions():
     await discordbot.load_extension("alttprbot_audit.cogs.audit")
     await discordbot.load_extension("alttprbot_audit.cogs.moderation")
+
 
 @discordbot.event
 async def on_command_error(ctx, error):
@@ -69,12 +72,15 @@ async def on_command_error(ctx, error):
             )
         raise error_to_display
 
+
 @discordbot.event
 async def on_ready():
     await discordbot.tree.sync()
 
+
 async def start_bot():
     await load_extensions()
     if config.DEBUG:
-        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540)) # hard code the discord server id for now
+        discordbot.tree.copy_global_to(
+            guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
     await discordbot.start(config.AUDIT_DISCORD_TOKEN)

@@ -197,6 +197,7 @@ class PresetNamespaces(Model):
 class PresetNamespaceCollaborators(Model):
     class Meta:
         unique_together = ('namespace', 'discord_user_id')
+
     id = fields.IntField(pk=True)
     namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='collaborators')
     discord_user_id = fields.BigIntField(null=False)
@@ -569,7 +570,8 @@ class AsyncTournamentWhitelist(Model):
 class AsyncTournamentPermissions(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permissions')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT", null=True)
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT",
+                                  null=True)
     discord_role_id = fields.BigIntField(null=True)
     role = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
@@ -673,7 +675,8 @@ class AsyncTournamentRace(Model):
     end_time = fields.DatetimeField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
-    status = fields.CharField(45, null=False, default='pending')  # pending, in_progress, finished, forfeit, disqualified
+    status = fields.CharField(45, null=False,
+                              default='pending')  # pending, in_progress, finished, forfeit, disqualified
     live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True)  # only set if run was raced live
     reattempted = fields.BooleanField(null=False, default=False)
     runner_notes = fields.TextField(null=True)
@@ -789,7 +792,8 @@ class AsyncTournamentRace(Model):
 class AsyncTournamentAuditLog(Model):
     id = fields.IntField(pk=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='audit_log')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True, on_delete="RESTRICT")
+    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True,
+                                  on_delete="RESTRICT")
     action = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
@@ -807,9 +811,10 @@ class RacerVerification(Model):
     time_period_days = fields.IntField(null=False, default=365)
     created = fields.DatetimeField(auto_now_add=True)
 
+
 class SGL2023OnsiteHistory(Model):
     id = fields.IntField(pk=True)
     date = fields.DatetimeField(auto_now_add=True)
     tournament = fields.CharField(45, null=False)
     url = fields.CharField(200, null=False)
-    ip_address = fields.CharField(200, null=False) # will store X-Forwarded-For header
+    ip_address = fields.CharField(200, null=False)  # will store X-Forwarded-For header

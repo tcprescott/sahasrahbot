@@ -29,6 +29,7 @@ ALTTPR_BRANCH_CHOICE = [
     app_commands.Choice(name="Beeta", value="beeta"),
 ]
 
+
 class AlttprGenerator(commands.GroupCog, name="alttpr"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -48,13 +49,13 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         branch=ALTTPR_BRANCH_CHOICE,
     )
     async def preset(
-        self,
-        interaction: discord.Interaction,
-        preset: str,
-        race: str = "no",
-        hints: str = "no",
-        allow_quickswap: str = "yes",
-        branch: str = "live",
+            self,
+            interaction: discord.Interaction,
+            preset: str,
+            race: str = "no",
+            hints: str = "no",
+            allow_quickswap: str = "yes",
+            branch: str = "live",
     ):
         await interaction.response.defer()
         seed = await generator.ALTTPRPreset(preset).generate(
@@ -71,7 +72,8 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
 
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(description="Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user")
+    @app_commands.command(
+        description="Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user")
     @app_commands.describe(
         yamlfile="The yaml you want to use to generate the game.",
         race="Is this a race? (default no)",
@@ -86,13 +88,13 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         branch=ALTTPR_BRANCH_CHOICE,
     )
     async def custompreset(
-        self,
-        interaction: discord.Interaction,
-        yamlfile: discord.Attachment,
-        race: str = "no",
-        hints: str = "no",
-        allow_quickswap: str = "yes",
-        branch: str = "live",
+            self,
+            interaction: discord.Interaction,
+            yamlfile: discord.Attachment,
+            race: str = "no",
+            hints: str = "no",
+            allow_quickswap: str = "yes",
+            branch: str = "live",
     ):
         """
         Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user
@@ -113,7 +115,9 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         )
 
         embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
-        embed.add_field(name="Saved as preset!", value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`", inline=False)
+        embed.add_field(name="Saved as preset!",
+                        value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`",
+                        inline=False)
 
         await interaction.followup.send(embed=embed)
 
@@ -123,17 +127,17 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         branch=ALTTPR_BRANCH_CHOICE,
     )
     async def spoiler(
-        self,
-        interaction: discord.Interaction,
-        preset: str,
-        progression_spoiler: bool=False,
-        branch: str = "live",
+            self,
+            interaction: discord.Interaction,
+            preset: str,
+            progression_spoiler: bool = False,
+            branch: str = "live",
     ):
         await interaction.response.defer()
         spoiler = await generate_spoiler_game(
-                preset,
-                spoiler_type='progression' if progression_spoiler else 'spoiler',
-                branch=branch
+            preset,
+            spoiler_type='progression' if progression_spoiler else 'spoiler',
+            branch=branch
         )
 
         embed = await spoiler.seed.embed(emojis=self.bot.emojis)
@@ -148,7 +152,8 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         presets = await generator.ALTTPRPreset().search(current)
         return [app_commands.Choice(name=preset, value=preset) for preset in presets]
 
-    @app_commands.command(description="Generates an ALTTP Randomizer spoiler race game using a custom yaml provided by the user")
+    @app_commands.command(
+        description="Generates an ALTTP Randomizer spoiler race game using a custom yaml provided by the user")
     @app_commands.describe(
         yamlfile="The yaml you want to use to generate the game."
     )
@@ -156,10 +161,10 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         branch=ALTTPR_BRANCH_CHOICE,
     )
     async def customspoiler(
-        self,
-        interaction: discord.Interaction,
-        yamlfile: discord.Attachment,
-        branch: str = "live",
+            self,
+            interaction: discord.Interaction,
+            yamlfile: discord.Attachment,
+            branch: str = "live",
     ):
         """
         Generates an ALTTP Randomizer spoiler race game using a custom yaml provided by the user
@@ -182,11 +187,11 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
     )
     @app_commands.choices(race=YES_NO_CHOICE, mask_settings=YES_NO_CHOICE)
     async def mystery(
-        self,
-        interaction: discord.Interaction,
-        weightset: str,
-        race: str = "yes",
-        mask_settings: str = "yes",
+            self,
+            interaction: discord.Interaction,
+            weightset: str,
+            race: str = "yes",
+            mask_settings: str = "yes",
     ):
         await interaction.response.defer()
         mystery = await generator.ALTTPRMystery(weightset).generate(
@@ -202,7 +207,8 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
 
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(description="Generates an ALTTP Randomizer Mystery game on https://alttpr.com using a custom yaml")
+    @app_commands.command(
+        description="Generates an ALTTP Randomizer Mystery game on https://alttpr.com using a custom yaml")
     @app_commands.describe(
         yamlfile="The mystery yaml you want to use to generate the game.",
         race="Is this a race? (choosing no never masks settings) (default yes)",
@@ -210,11 +216,11 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
     )
     @app_commands.choices(race=YES_NO_CHOICE, mask_settings=YES_NO_CHOICE)
     async def custommystery(
-        self,
-        interaction: discord.Interaction,
-        yamlfile: discord.Attachment,
-        race: str = "yes",
-        mask_settings: str = "yes",
+            self,
+            interaction: discord.Interaction,
+            yamlfile: discord.Attachment,
+            race: str = "yes",
+            mask_settings: str = "yes",
     ):
         await interaction.response.defer()
 
@@ -230,7 +236,9 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
 
-        embed.add_field(name="Saved as custom weightset!", value=f"You can generate this weightset again by using the weightset name of `{namespace.name}/latest`.", inline=False)
+        embed.add_field(name="Saved as custom weightset!",
+                        value=f"You can generate this weightset again by using the weightset name of `{namespace.name}/latest`.",
+                        inline=False)
 
         await interaction.followup.send(embed=embed)
 
@@ -239,15 +247,14 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         weightsets = await generator.ALTTPRMystery().search(current)
         return [app_commands.Choice(name=weightset, value=weightset) for weightset in weightsets]
 
-
     @app_commands.command(description="Create a series a \"Kiss Priest\" games.  This was created by hycutype.")
     @app_commands.describe(
         count="The number of games you want to generate.  Default is 10.",
     )
     async def kisspriest(
-        self,
-        interaction: discord.Interaction,
-        count: app_commands.Range[int, 1, 10] = 10,
+            self,
+            interaction: discord.Interaction,
+            count: app_commands.Range[int, 1, 10] = 10,
     ):
         await interaction.response.defer()
 
@@ -263,6 +270,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
                 inline=False
             )
         await interaction.followup.send(embed=embed)
+
 
 class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities for the ALTTP Randomizer"):
     def __init__(self, bot: commands.Bot) -> None:
@@ -372,10 +380,10 @@ class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities 
         preset_file="A valid SahasrahBot preset file."
     )
     async def savepreset(
-        self,
-        interaction: discord.Interaction,
-        preset_name: str,
-        preset_file: discord.Attachment
+            self,
+            interaction: discord.Interaction,
+            preset_name: str,
+            preset_file: discord.Attachment
     ):
         """
         Save a preset to your namespace.
@@ -393,8 +401,8 @@ class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities 
         hash_id="The hash ID of the game to verify."
     )
     async def verifygame(
-        self, interaction: discord.Interaction,
-        hash_id: str
+            self, interaction: discord.Interaction,
+            hash_id: str
     ):
         """
         Verify a game was generated by SahasrahBot.
@@ -412,6 +420,7 @@ class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities 
             f"**Permalink:** <{result.permalink}>"
         ), ephemeral=True)
 
+
 class Generator(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -423,10 +432,10 @@ class Generator(commands.Cog):
     )
     @app_commands.choices(race=YES_NO_CHOICE)
     async def sm(
-        self,
-        interaction: discord.Interaction,
-        preset: str,
-        race: str = "no",
+            self,
+            interaction: discord.Interaction,
+            preset: str,
+            race: str = "no",
     ):
         """
         Generates an Super Metroid Randomizer game on https://sm.samus.link
@@ -449,11 +458,11 @@ class Generator(commands.Cog):
     )
     @app_commands.choices(race=YES_NO_CHOICE, spoiler_race=YES_NO_CHOICE)
     async def smz3(
-        self,
-        interaction: discord.Interaction,
-        preset: str,
-        race: str = "no",
-        spoiler_race: str = "no",
+            self,
+            interaction: discord.Interaction,
+            preset: str,
+            race: str = "no",
+            spoiler_race: str = "no",
     ):
         """
         Generates an ALTTP Super Metroid Combo Randomizer game on https://samus.link
@@ -479,11 +488,11 @@ class Generator(commands.Cog):
     )
     @app_commands.choices(race=YES_NO_CHOICE)
     async def smvaria(
-        self,
-        interaction: discord.Interaction,
-        settings: str,
-        skills: str,
-        race: str = "no",
+            self,
+            interaction: discord.Interaction,
+            settings: str,
+            skills: str,
+            race: str = "no",
     ):
         """
         Generates an Super Metroid Varia Randomizer game on https://varia.run
@@ -498,7 +507,8 @@ class Generator(commands.Cog):
 
     @smvaria.autocomplete("skills")
     async def autocomplete_smvaria_skills(self, interaction: discord.Interaction, current: str):
-        skills = ['SMRAT2021', 'Season_Races', 'Torneio_SGPT2', 'casual', 'expert', 'master', 'newbie', 'regular', 'samus', 'solution', 'veteran']
+        skills = ['SMRAT2021', 'Season_Races', 'Torneio_SGPT2', 'casual', 'expert', 'master', 'newbie', 'regular',
+                  'samus', 'solution', 'veteran']
         return sorted([a for a in skills if a.startswith(current)][:25])
 
     @smvaria.autocomplete("settings")
@@ -550,9 +560,9 @@ class Generator(commands.Cog):
         app_commands.Choice(name="classic_full", value="classic_full"),
     ])
     async def smdash(
-        self,
-        interaction: discord.Interaction,
-        mode: str
+            self,
+            interaction: discord.Interaction,
+            mode: str
     ):
         """
         Generates a Super Metroid Dash Randomizer game on https://dashrando.net
@@ -566,9 +576,9 @@ class Generator(commands.Cog):
         preset="The preset you want to generate."
     )
     async def ctjets(
-        self,
-        interaction: discord.Interaction,
-        preset: str
+            self,
+            interaction: discord.Interaction,
+            preset: str
     ):
         """
         Generates a Chrono Trigger: Jets of Time randomizer game on http://ctjot.com
@@ -577,11 +587,11 @@ class Generator(commands.Cog):
         seed_uri = await generator.CTJetsPreset(preset).generate()
         await interaction.followup.send(seed_uri)
 
-
     @ctjets.autocomplete("preset")
     async def ctjets_autocomplete(self, interaction: discord.Interaction, current: str):
         presets = await generator.CTJetsPreset().search(current)
         return [app_commands.Choice(name=preset, value=preset) for preset in presets]
+
 
 class Z2RGenerator(commands.GroupCog, name="z2r", description="Generate a seed for Zelda 2 Randomizer"):
     def __init__(self, bot: commands.Bot) -> None:
@@ -593,9 +603,9 @@ class Z2RGenerator(commands.GroupCog, name="z2r", description="Generate a seed f
     )
     @app_commands.choices(preset=[app_commands.Choice(name=preset, value=preset) for preset in z2r.Z2R_PRESETS.keys()])
     async def preset(
-        self,
-        interaction: discord.Interaction,
-        preset: str,
+            self,
+            interaction: discord.Interaction,
+            preset: str,
     ):
         """
         Generate a Zelda 2 Randomizer game using the specified preset.

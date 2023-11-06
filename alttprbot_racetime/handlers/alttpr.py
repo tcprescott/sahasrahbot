@@ -133,7 +133,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
         await self.send_message(spoiler.seed.url)
-        await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+        await self.send_message(
+            f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, studytime)
         self.seed_rolled = True
 
@@ -164,7 +165,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
         await self.send_message(spoiler.seed.url)
-        await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
+        await self.send_message(
+            f"The spoiler log for this race will be sent after the race begins in this room.  A {studytime}s countdown timer at that time will begin.")
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, studytime)
         self.seed_rolled = True
 
@@ -190,7 +192,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
         await self.send_message(spoiler.seed.url)
-        await self.send_message("The progression spoiler for this race will be sent after the race begins in this room.")
+        await self.send_message(
+            "The progression spoiler for this race will be sent after the race begins in this room.")
         await self.schedule_spoiler_race(spoiler.spoiler_log_url, 0)
         self.seed_rolled = True
 
@@ -224,7 +227,8 @@ class GameHandler(SahasrahBotCoreHandler):
         if spoiler_race:
             await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
             try:
-                spoiler = await spoilers.generate_spoiler_game(preset_name, branch=branch, allow_quickswap=allow_quickswap, festive=festive)
+                spoiler = await spoilers.generate_spoiler_game(preset_name, branch=branch,
+                                                               allow_quickswap=allow_quickswap, festive=festive)
             except preset.PresetNotFoundException as e:
                 await self.send_message(str(e))
                 return
@@ -233,7 +237,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
             await self.set_bot_raceinfo(f"spoiler {preset_name} - {spoiler.seed.url} - ({'/'.join(spoiler.seed.code)})")
             await self.send_message(spoiler.seed.url)
-            await self.send_message(f"The spoiler log for this race will be sent after the race begins in this room.  A {countdown}s countdown timer at that time will begin.")
+            await self.send_message(
+                f"The spoiler log for this race will be sent after the race begins in this room.  A {countdown}s countdown timer at that time will begin.")
             await self.schedule_spoiler_race(spoiler.spoiler_log_url, countdown)
         else:
             await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
@@ -273,7 +278,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
         if mystery.custom_instructions:
             await self.send_message(f"Instructions: {mystery.custom_instructions}")
-            await self.set_bot_raceinfo(f"Instructions: {mystery.custom_instructions} - mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
+            await self.set_bot_raceinfo(
+                f"Instructions: {mystery.custom_instructions} - mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
         else:
             await self.set_bot_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
 
@@ -291,13 +297,15 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.send_message("Reseting bot state.  You may now roll a new game.")
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!race <preset>\" to generate a race preset.\n\"!mystery <weightset>\" to generate a mystery game.\n\"!spoiler <preset>\" to generate a spoiler race.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message(
+            "Available commands:\n\"!race <preset>\" to generate a race preset.\n\"!mystery <weightset>\" to generate a mystery game.\n\"!spoiler <preset>\" to generate a spoiler race.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
 
     async def ex_register(self, args, message):
         await self.send_message("Lazy Kid ain't got nothing compared to me.")
 
     async def ex_vt(self, args, message):
-        await self.send_message("You summon Veetorp, he looks around confused and curses your next game with bad (CS)PRNG.")
+        await self.send_message(
+            "You summon Veetorp, he looks around confused and curses your next game with bad (CS)PRNG.")
 
     async def ex_synack(self, args, message):
         await self.send_message("You need to be more creative.")

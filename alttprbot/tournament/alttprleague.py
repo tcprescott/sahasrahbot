@@ -19,7 +19,10 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             self.seed = spoiler.seed
             await self.rtgg_handler.schedule_spoiler_race(spoiler.spoiler_log_url, 0)
         else:
-            self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
+            self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True,
+                                                                                          tournament=True, hints=False,
+                                                                                          spoilers="off",
+                                                                                          branch="tournament")
 
         await self.create_embeds()
 
@@ -31,7 +34,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             self.league_data = league_response['mode']
         except KeyError:
             logging.exception("No active league mode!")
-            await self.rtgg_handler.send_message("No active League mode!  This should not have happened.  Contact a league admin/mod for help.")
+            await self.rtgg_handler.send_message(
+                "No active League mode!  This should not have happened.  Contact a league admin/mod for help.")
 
     # async def roll(self):
     #     if self.tournament_game.preset is None:
@@ -62,7 +66,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
                 guild.get_role(674109759179194398),
             ],
             stream_delay=10,
-            create_scheduled_events = True,
+            create_scheduled_events=True,
         )
 
     async def create_race_room(self):
@@ -71,7 +75,8 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
 
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal="Beat the game (assisted)" if self.league_data['coop'] or self.league_data['spoiler'] else "Beat the game",
+            goal="Beat the game (assisted)" if self.league_data['coop'] or self.league_data[
+                'spoiler'] else "Beat the game",
             invitational=True,
             unlisted=False,
             info_user=self.race_info,
@@ -196,5 +201,5 @@ class ALTTPROpenLeague(ALTTPRLeague):
                 guild.get_role(674109759179194398),
             ],
             stream_delay=10,
-            create_scheduled_events = True,
+            create_scheduled_events=True,
         )

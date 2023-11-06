@@ -61,6 +61,7 @@ async def load_extensions():
     # if importlib.util.find_spec('sahasrahbot_private'):
     #     await discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
+
 # @discordbot.event
 # async def on_command_error(ctx, error):
 #     riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
@@ -113,7 +114,8 @@ async def on_command_completion(ctx):
 @discordbot.event
 async def on_ready():
     if config.DEBUG:
-        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
+        discordbot.tree.copy_global_to(
+            guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
     else:
         await discordbot.tree.sync()
 

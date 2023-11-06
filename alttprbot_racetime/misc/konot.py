@@ -81,4 +81,5 @@ class KONOT(object):
         for racetime_id in self.calc_advancing():
             await handler.invite_user(racetime_id)
 
-        await self.rtgg_handler.send_message(f"Next race room at {self.rtgg_handler.bot.http_uri('/' + handler.data.get('name'))}")
+        await self.rtgg_handler.send_message(
+            f"Next race room at {self.rtgg_handler.bot.http_uri('/' + handler.data.get('name'))}")

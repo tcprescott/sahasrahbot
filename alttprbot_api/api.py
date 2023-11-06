@@ -41,6 +41,7 @@ async def index():
 
     return await render_template('index.html', logged_in=logged_in, user=user)
 
+
 @sahasrahbotapi.route("/login/")
 async def login():
     return await discord.create_session(
@@ -122,6 +123,7 @@ async def purge_me_action():
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
 async def robots():
     return 'User-agent: *\nDisallow: /\n'
+
 
 # @sahasrahbotapi.errorhandler(400)
 # def bad_request(e):

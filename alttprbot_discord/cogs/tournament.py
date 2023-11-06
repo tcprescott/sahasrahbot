@@ -27,7 +27,8 @@ class ChallengeCupDeleteHistoryView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger, custom_id='sahabot:delete_history')
+    @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger,
+                       custom_id='sahabot:delete_history')
     async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not interaction.guild.chunked:
             await interaction.guild.chunk()
@@ -37,7 +38,8 @@ class ChallengeCupDeleteHistoryView(discord.ui.View):
             return
 
         embed = interaction.message.embeds[0]
-        await interaction.user.send(f"Are you sure you want to delete the history of this race?\n\n{embed.title}", view=ChallengeCupDeleteHistoryConfirmationView(message=interaction.message))
+        await interaction.user.send(f"Are you sure you want to delete the history of this race?\n\n{embed.title}",
+                                    view=ChallengeCupDeleteHistoryConfirmationView(message=interaction.message))
         await interaction.response.send_message("Check your DMs.", ephemeral=True)
 
 
@@ -85,7 +87,8 @@ class Tournament(commands.Cog):
             for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
                 event_data: core.TournamentConfig = await tournament_class.get_config()
                 try:
-                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5, hours_future=event_data.hours_before_room_open)
+                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0.5,
+                                                                                hours_future=event_data.hours_before_room_open)
                 except Exception:
                     logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                     continue
@@ -104,7 +107,8 @@ class Tournament(commands.Cog):
                 event_data: core.TournamentRace = await tournament_class.get_config()
 
                 try:
-                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0, hours_future=168)
+                    episodes = await speedgaming.get_upcoming_episodes_by_event(event_slug, hours_past=0,
+                                                                                hours_future=168)
                 except Exception:
                     logging.exception("Encountered a problem when attempting to retrieve SG schedule.")
                     continue
@@ -172,10 +176,12 @@ class Tournament(commands.Cog):
     async def update_scheduled_event(self, event_data: core.TournamentRace, event_slug: str, episodes: dict):
 
         # remove dead events
-        dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes], event_slug=event_slug)
+        dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes],
+                                                          event_slug=event_slug)
         for dead_event in dead_events:
             try:
-                event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(dead_event.scheduled_event_id)
+                event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(
+                    dead_event.scheduled_event_id)
 
                 if event.status == discord.EventStatus.scheduled:
                     await event.delete()
@@ -215,7 +221,8 @@ class Tournament(commands.Cog):
             try:
                 if scheduled_event:
                     try:
-                        event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
+                        event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(
+                            scheduled_event.scheduled_event_id)
 
                         # check if existing event requires an update
                         if not event.name == name or not event.description == description or not event.start_time == start_time or not event.end_time == end_time or not event.location == location:
@@ -234,7 +241,9 @@ class Tournament(commands.Cog):
                             end_time=end_time,
                             location=location
                         )
-                        await models.ScheduledEvents.update_or_create(episode_id=episode_id, defaults={'scheduled_event_id': event.id, 'event_slug': event_slug})
+                        await models.ScheduledEvents.update_or_create(episode_id=episode_id,
+                                                                      defaults={'scheduled_event_id': event.id,
+                                                                                'event_slug': event_slug})
                 else:
                     # create an event
                     event = await event_data.guild.create_scheduled_event(
@@ -244,7 +253,8 @@ class Tournament(commands.Cog):
                         end_time=end_time,
                         location=location
                     )
-                    await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id, event_slug=event_slug)
+                    await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id,
+                                                        event_slug=event_slug)
             except Exception:
                 logging.exception("Unable to create guild event.")
 
@@ -254,30 +264,37 @@ class Tournament(commands.Cog):
         broadcasters_needed = []
 
         for episode in episodes:
-            broadcast_channels = [c['slug'] for c in episode['channels'] if c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == event_data.lang]
+            broadcast_channels = [c['slug'] for c in episode['channels'] if
+                                  c['id'] not in [0, 31, 36, 62, 63, 64, 65] and c['language'] == event_data.lang]
             if not broadcast_channels:
                 continue
 
             start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
             start_time_string = f"<t:{round(start_time.timestamp())}:f>"
 
-            commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == event_data.lang]
+            commentators_approved = [p for p in episode['commentators'] if
+                                     p['approved'] and p['language'] == event_data.lang]
 
             if (c_needed := 2 - len(commentators_approved)) > 0:
-                comms_needed += [f"*{start_time_string}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
+                comms_needed += [
+                    f"*{start_time_string}* - Need **{c_needed}** - [Sign Up!](http://speedgaming.org/commentator/signup/{episode['id']}/)"]
 
             trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == event_data.lang]
 
             t_needed = (2 if len(episode['match1']['players']) > 2 else 1) - len(trackers_approved)
 
             if t_needed > 0:
-                trackers_needed += [f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
+                trackers_needed += [
+                    f"*{start_time_string}* - Need **{t_needed}** - [Sign Up!](http://speedgaming.org/tracker/signup/{episode['id']}/)"]
 
-            if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4', 'ALTTPRandomizer5', 'ALTTPRandomizer6']:
-                broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == event_data.lang]
+            if broadcast_channels[0] in ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4',
+                                         'ALTTPRandomizer5', 'ALTTPRandomizer6']:
+                broadcasters_approved = [p for p in episode['broadcasters'] if
+                                         p['approved'] and p['language'] == event_data.lang]
 
                 if (b_needed := 1 - len(broadcasters_approved)) > 0:
-                    broadcasters_needed += [f"*{start_time_string}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
+                    broadcasters_needed += [
+                        f"*{start_time_string}* - Need **{b_needed}** - [Sign Up!](http://speedgaming.org/broadcaster/signup/{episode['id']}/)"]
 
         embed = discord.Embed(
             title="Scheduling Needs",
@@ -376,7 +393,8 @@ class Tournament(commands.Cog):
                             member = event_data.guild.get_member_named(discord_name)
 
                         if member is None:
-                            messages.append(f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
+                            messages.append(
+                                f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
         return messages
 
@@ -409,16 +427,21 @@ class Tournament(commands.Cog):
 
     @app_commands.command(description="Generate a randomizer seed for the 2023 challenge cup.")
     @app_commands.guilds(*CC_TOURNAMENT_SERVERS)
-    async def cc2023(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, player3: discord.Member = None, player4: discord.Member = None):
+    async def cc2023(self, interaction: discord.Interaction, opponent: discord.Member,
+                     on_behalf_of: discord.Member = None, player3: discord.Member = None,
+                     player4: discord.Member = None):
         if interaction.guild.chunked is False:
             await interaction.guild.chunk(cache=True)
 
         if on_behalf_of and interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in interaction.user.roles:
-            await interaction.response.send_message("You must be a member of the Challenge Cup admin team to roll a seed on someone else's behalf..")
+            await interaction.response.send_message(
+                "You must be a member of the Challenge Cup admin team to roll a seed on someone else's behalf..")
             return
 
-        if (player3 or player4) and interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in interaction.user.roles:
-            await interaction.response.send_message("You must be a member of the Challenge Cup admin team to roll a seed with more than 2 players.")
+        if (player3 or player4) and interaction.guild.get_role(
+                CC_TOURNAMENT_ADMIN_ROLE_ID) not in interaction.user.roles:
+            await interaction.response.send_message(
+                "You must be a member of the Challenge Cup admin team to roll a seed with more than 2 players.")
             return
 
         if interaction.user == opponent:
@@ -453,7 +476,8 @@ class Tournament(commands.Cog):
         embed = await seed.embed(emojis=self.bot.emojis, include_settings=False)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         if deck:
-            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]), inline=False)
+            embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]),
+                                  inline=False)
 
         embed.title = " vs. ".join([p.display_name for p in players])
         embed.description = " vs. ".join([p.mention for p in players])
@@ -466,7 +490,8 @@ class Tournament(commands.Cog):
 
         await interaction.followup.send("Seed successfully sent to DM.")
 
-    @app_commands.command(description="Generate a hypothetical deck for a match.  This does not generate a seed or write to history.")
+    @app_commands.command(
+        description="Generate a hypothetical deck for a match.  This does not generate a seed or write to history.")
     @app_commands.guilds(*CC_TOURNAMENT_SERVERS, *MAIN_TOURNAMENT_SERVERS)
     @app_commands.choices(
         event_slug=[
@@ -474,7 +499,8 @@ class Tournament(commands.Cog):
             app_commands.Choice(name="alttpr2023", value="alttpr2023"),
         ]
     )
-    async def tournament_deck(self, interaction: discord.Interaction, opponent: discord.Member, on_behalf_of: discord.Member = None, event_slug: str = None):
+    async def tournament_deck(self, interaction: discord.Interaction, opponent: discord.Member,
+                              on_behalf_of: discord.Member = None, event_slug: str = None):
         if on_behalf_of is None:
             on_behalf_of = interaction.user
 

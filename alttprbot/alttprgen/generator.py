@@ -137,7 +137,8 @@ class SahasrahBotPresetCore():
         self.raw = yaml.dump(self.preset_data)
         namespace_data = await models.PresetNamespaces.get(name=self.namespace)
 
-        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset, namespace=namespace_data, defaults={'content': self.raw})
+        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset,
+                                              namespace=namespace_data, defaults={'content': self.raw})
 
     async def _fetch_global(self):
         basename = os.path.basename(f'{self.preset}.yaml')
@@ -150,7 +151,8 @@ class SahasrahBotPresetCore():
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
     async def _fetch_namespaced(self):
-        data = await models.Presets.get_or_none(preset_name=self.preset, randomizer=self.randomizer, namespace__name=self.namespace)
+        data = await models.Presets.get_or_none(preset_name=self.preset, randomizer=self.randomizer,
+                                                namespace__name=self.namespace)
 
         if data is None:
             raise PresetNotFoundException(f'Could not find preset {self.preset} in namespace {self.namespace}.')
@@ -164,7 +166,8 @@ class ALTTPRPreset(SahasrahBotPresetCore):
 
     # TODO: Make this so it isn't an absolute dumpster fire
     # this code really sucks
-    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False, endpoint_prefix="", branch=None) -> ALTTPRDiscord:
+    async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False,
+                       endpoint_prefix="", branch=None) -> ALTTPRDiscord:
         if self.preset_data is None:
             await self.fetch()
 
@@ -185,7 +188,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             )
             hash_id = seed.hash
         else:
-            branch = self.preset_data.get('branch', branch) # live, tournament, beeta
+            branch = self.preset_data.get('branch', branch)  # live, tournament, beeta
             if self.preset_data.get('customizer', False):
                 if 'l' not in settings:
                     settings['l'] = {}
@@ -204,7 +207,9 @@ class ALTTPRPreset(SahasrahBotPresetCore):
                                 except ValueError:
                                     continue
                             else:
-                                logging.info("Skipping \"%s\" because it is already populated with \"%s\" and override is true.", base64.b64decode(location).decode("utf8"), settings['l'][location])
+                                logging.info(
+                                    "Skipping \"%s\" because it is already populated with \"%s\" and override is true.",
+                                    base64.b64decode(location).decode("utf8"), settings['l'][location])
 
             if hints:
                 settings['hints'] = 'on'
@@ -263,7 +268,8 @@ class ALTTPRMystery(SahasrahBotPresetCore):
             await self.fetch()
 
         try:
-            async for attempt in AsyncRetrying(stop=stop_after_attempt(5), retry=retry_if_exception_type(ClientResponseError)):
+            async for attempt in AsyncRetrying(stop=stop_after_attempt(5),
+                                               retry=retry_if_exception_type(ClientResponseError)):
                 with attempt:
                     try:
                         mystery = await mystery_generate(self.preset_data, spoilers=spoilers)
@@ -422,7 +428,8 @@ async def mystery_generate(weights, spoilers="mystery"):
     if 'preset' in weights:
         rolledpreset = pyz3r.mystery.get_random_option(weights['preset'])
         if rolledpreset == 'none':
-            return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
+            return mysterydoors.generate_doors_mystery(weights=weights,
+                                                       spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
         else:
             data = ALTTPRPreset(rolledpreset)
             await data.fetch()
@@ -443,16 +450,19 @@ async def mystery_generate(weights, spoilers="mystery"):
                 custom_instructions=custom_instructions
             )
     else:
-        return mysterydoors.generate_doors_mystery(weights=weights, spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
+        return mysterydoors.generate_doors_mystery(weights=weights,
+                                                   spoilers=spoilers)  # pylint: disable=unbalanced-tuple-unpacking
 
 
 async def create_or_retrieve_namespace(discord_user_id, discord_user_name):
     tempnamespaceslug = slugify(discord_user_name, max_length=20)
     try:
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id,
+                                                                   defaults={'name': tempnamespaceslug})
     except DoesNotExist:
         tempnamespaceslug = tempnamespaceslug + str(random.randint(0, 99))
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id, defaults={'name': tempnamespaceslug})
+        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id,
+                                                                   defaults={'name': tempnamespaceslug})
 
     await namespace.fetch_related('collaborators')
     return namespace

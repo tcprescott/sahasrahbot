@@ -9,6 +9,7 @@ PRESETS = {
     'abns_elite8': 'PPcIk!s3aupL9yxEvapydBFdC9X8E2A'
 }
 
+
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_flags(self, args, message):
         try:
@@ -41,7 +42,8 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.set_bot_raceinfo(f"Flags: {flags} Seed: {seed_number}")
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!race <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#the-legend-of-zelda-randomizer-z1r for more info.")
+        await self.send_message(
+            "Available commands:\n\"!race <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#the-legend-of-zelda-randomizer-z1r for more info.")
 
     async def roll_game(self, flags, message):
         if await self.is_locked(message):

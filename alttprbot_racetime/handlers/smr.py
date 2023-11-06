@@ -13,11 +13,14 @@ class GameHandler(SahasrahBotCoreHandler):
             return
 
         if len(args) != 7:
-            await self.send_message("%s %s provided, 7 required (item split, area, boss, difficulty, escape, morph, start)" % (len(args), "argument" if 1 == len(args) else "arguments"))
+            await self.send_message(
+                "%s %s provided, 7 required (item split, area, boss, difficulty, escape, morph, start)" % (
+                len(args), "argument" if 1 == len(args) else "arguments"))
             return
 
         try:
-            seed = await smvaria.generate_choozo(self, True, args[0], args[1], args[2], args[3], args[4], args[5], args[6])
+            seed = await smvaria.generate_choozo(self, True, args[0], args[1], args[2], args[3], args[4], args[5],
+                                                 args[6])
         except Exception as e:
             await self.send_message(str(e))
             return
@@ -65,7 +68,8 @@ class GameHandler(SahasrahBotCoreHandler):
         try:
             teams = self.teams
             for team in teams:
-                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='sm', seed_number=seed_number)
+                seed = await smz3multi.generate_multiworld(preset_name, teams[team], tournament=True, randomizer='sm',
+                                                           seed_number=seed_number)
                 await self.send_message(f"Team {team}: {seed.url}")
                 await self.send_message("------")
         except Exception as e:
@@ -219,4 +223,5 @@ class GameHandler(SahasrahBotCoreHandler):
     #     self.seed_rolled = True
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <preset>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+        await self.send_message(
+            "Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <preset>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")

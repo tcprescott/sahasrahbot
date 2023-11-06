@@ -7,7 +7,6 @@ logger = logging.getLogger()
 logger_handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.INFO)
 
-
 logger_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(name)s (%(levelname)s) :: %(message)s'
 ))

@@ -42,6 +42,7 @@ emoji_code_map = {
     'Big Key': 'BigKey'
 }
 
+
 class ALTTPRDiscord(ALTTPR):
     def __init__(self, *args, **kwargs):
         super(ALTTPRDiscord, self).__init__(*args, **kwargs)
@@ -89,12 +90,15 @@ class ALTTPRDiscord(ALTTPR):
 
         if not (settings['dungeon_items'] == 'full' and settings['goal'] == 'dungeons'):
             if settings['mode'] == 'open':
-                if settings['shuffle'] == 'none' and not is_enemizer(settings) and (settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal') and not settings['weapons'] == 'swordless':
+                if settings['shuffle'] == 'none' and not is_enemizer(settings) and (
+                        settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal') and not \
+                settings['weapons'] == 'swordless':
                     settings_list.append('casual')
                 settings_list.append('open')
             elif settings['mode'] == 'standard' and settings['weapons'] == 'randomized':
                 settings_list.append('standard')
-            elif settings['mode'] == 'standard' and settings['weapons'] == 'assured' and (settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal'):
+            elif settings['mode'] == 'standard' and settings['weapons'] == 'assured' and (
+                    settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal'):
                 settings_list.append('casual')
             elif settings['mode'] == 'inverted':
                 settings_list.append('inverted')
@@ -170,14 +174,14 @@ class ALTTPRDiscord(ALTTPR):
                     embed.add_field(
                         name='Settings',
                         value=(f"**Item Placement:** {settings_map['item_placement'][meta['item_placement']]}\n"
-                            f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
-                            f"**Accessibility:** {settings_map['accessibility'][meta['accessibility']]}\n"
-                            f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
-                            f"**Hints:** {meta['hints']}\n"
-                            f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
-                            f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
-                            f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
-                            ),
+                               f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
+                               f"**Accessibility:** {settings_map['accessibility'][meta['accessibility']]}\n"
+                               f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
+                               f"**Hints:** {meta['hints']}\n"
+                               f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
+                               f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
+                               f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
+                               ),
                         inline=False
                     )
                 else:
@@ -206,7 +210,7 @@ class ALTTPRDiscord(ALTTPR):
                         value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Pot Shuffle:** {pot}\n**Hints:** {hints}".format(
                             mode=settings_map['world_state'][meta['mode']],
                             entrance=settings_map['entrance_shuffle'][meta['shuffle']
-                                                                    ] if 'shuffle' in meta else "None",
+                            ] if 'shuffle' in meta else "None",
                             boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
                             enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
                             pot=meta.get('enemizer.pot_shuffle', 'off'),
@@ -265,14 +269,14 @@ class ALTTPRDiscord(ALTTPR):
                     embed.add_field(
                         name='Settings',
                         value=(f"**Item Placement:** {settings_map['item_placement'][meta['item_placement']]}\n"
-                            f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
-                            f"**Accessibility:** {settings_map['accessibility'][meta['accessibility']]}\n"
-                            f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
-                            f"**Hints:** {meta['hints']}\n"
-                            f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
-                            f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
-                            f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
-                            ),
+                               f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
+                               f"**Accessibility:** {settings_map['accessibility'][meta['accessibility']]}\n"
+                               f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
+                               f"**Hints:** {meta['hints']}\n"
+                               f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
+                               f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
+                               f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
+                               ),
                         inline=False
                     )
                 else:
@@ -301,7 +305,7 @@ class ALTTPRDiscord(ALTTPR):
                         value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Pot Shuffle:** {pot}\n**Hints:** {hints}".format(
                             mode=settings_map['world_state'][meta['mode']],
                             entrance=settings_map['entrance_shuffle'][meta['shuffle']
-                                                                    ] if 'shuffle' in meta else "None",
+                            ] if 'shuffle' in meta else "None",
                             boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
                             enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
                             pot=meta.get('enemizer.pot_shuffle', 'off'),
@@ -336,4 +340,5 @@ class ALTTPRDiscord(ALTTPR):
 
 
 def is_enemizer(settings):
-    return settings['enemizer.boss_shuffle'] != 'none' or settings['enemizer.enemy_shuffle'] != 'none' or settings['enemizer.enemy_damage'] != 'default' or settings['enemizer.enemy_health'] != 'default'
+    return settings['enemizer.boss_shuffle'] != 'none' or settings['enemizer.enemy_shuffle'] != 'none' or settings[
+        'enemizer.enemy_damage'] != 'default' or settings['enemizer.enemy_health'] != 'default'

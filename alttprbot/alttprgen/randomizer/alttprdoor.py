@@ -1,4 +1,3 @@
-
 import asyncio
 import gzip
 import json
@@ -45,7 +44,8 @@ class AlttprDoor():
 
             attempts = 0
             try:
-                async for attempt in AsyncRetrying(stop=stop_after_attempt(10), retry=retry_if_exception_type(Exception)):
+                async for attempt in AsyncRetrying(stop=stop_after_attempt(10),
+                                                   retry=retry_if_exception_type(Exception)):
                     with attempt:
                         attempts += 1
                         proc = await asyncio.create_subprocess_exec(
@@ -116,9 +116,9 @@ class AlttprDoor():
 
     @classmethod
     async def create(
-        cls,
-        settings,
-        spoilers=True
+            cls,
+            settings,
+            spoilers=True
     ):
         seed = cls(settings=settings, spoilers=spoilers)
         await seed.generate_game()
@@ -158,7 +158,8 @@ class AlttprDoor():
 
     @property
     def version(self):
-        return re.search("ALttP Dungeon Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
+        return \
+        re.search("ALttP Dungeon Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
 
     @property
     def doors(self):

@@ -61,7 +61,6 @@ class SahasrahBotCoreHandler(RaceHandler):
             beginmessage=True,
         ))
 
-
     async def send_spoiler_log(self):
         if self.spoiler_race is None:
             return
@@ -92,7 +91,7 @@ class SahasrahBotCoreHandler(RaceHandler):
                 start_time - loop.time() + duration_in_seconds)
             # logging.info(timeleft)
             if timeleft in reminders:
-                minutes = math.floor(timeleft/60)
+                minutes = math.floor(timeleft / 60)
                 seconds = math.ceil(timeleft % 60)
                 if minutes == 0 and seconds > 10:
                     msg = f'{seconds} second(s) remain!'
@@ -190,7 +189,8 @@ class SahasrahBotCoreHandler(RaceHandler):
         unlisted = self.data.get('unlisted', False)
         if unlisted != self.unlisted:
             if unlisted:
-                await models.RTGGUnlistedRooms.update_or_create(room_name=self.data.get('name'), defaults={'category': self.bot.category_slug})
+                await models.RTGGUnlistedRooms.update_or_create(room_name=self.data.get('name'),
+                                                                defaults={'category': self.bot.category_slug})
             else:
                 await models.RTGGUnlistedRooms.filter(room_name=self.data.get('name')).delete()
         self.unlisted = unlisted
@@ -203,7 +203,6 @@ class SahasrahBotCoreHandler(RaceHandler):
         await self.send_spoiler_log()
         if self.tournament:
             await self.tournament.on_race_start()
-
 
     async def status_pending(self):
         if self.tournament:
@@ -242,7 +241,8 @@ class SahasrahBotCoreHandler(RaceHandler):
             raise Exception('This is not a team race.')
 
         entrants = [(e['user']['name'], e['team']['name']) for e in self.data['entrants']]
-        return {key: [v[0] for v in val] for key, val in groupby(sorted(entrants, key=lambda ele: ele[1]), key=lambda ele: ele[1])}
+        return {key: [v[0] for v in val] for key, val in
+                groupby(sorted(entrants, key=lambda ele: ele[1]), key=lambda ele: ele[1])}
 
     @property
     def is_equal_teams(self):
@@ -268,7 +268,8 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.send_message("This room is not associated with a tournament.")
 
     async def ex_konot(self, args, message):
-        await self.send_message("Setting up new KONOT race series!  The last player(s) to finish will be eliminated.  Once this race finishes, a new race will be created and the players advancing will be invited to the new room.")
+        await self.send_message(
+            "Setting up new KONOT race series!  The last player(s) to finish will be eliminated.  Once this race finishes, a new race will be created and the players advancing will be invited to the new room.")
         await self.set_bot_raceinfo("KONOT Series, Segment #1")
         self.konot = await KONOT.create_new(self.data['category']['slug'], self)
 

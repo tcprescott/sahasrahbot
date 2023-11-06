@@ -19,16 +19,17 @@ class SgDaily(commands.Cog):
     @app_commands.command(name="sgdaily", description="Retrieves the next SG daily race.")
     @app_commands.guilds(*ALTTP_RANDOMIZER_SERVERS)
     async def sgdaily_cmd(
-        self,
-        interaction: discord.Interaction,
-        number_of_days: app_commands.Range[int, 1, 8] = 1,
+            self,
+            interaction: discord.Interaction,
+            number_of_days: app_commands.Range[int, 1, 8] = 1,
     ):
         """
         Retrieves the next SG daily race.
         """
         sg_schedule = await speedgaming.get_upcoming_episodes_by_event("alttprdaily", hours_past=0, hours_future=192)
         if len(sg_schedule) == 0:
-            await interaction.response.send_message("There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
+            await interaction.response.send_message(
+                "There are no currently SpeedGaming ALTTPR Daily Races scheduled within the next 8 days.")
             return
 
         if number_of_days == 1:
@@ -46,7 +47,8 @@ class SgDaily(commands.Cog):
             when = dateutil.parser.parse(episode['when'])
             if number_of_days == 1:
                 embed.add_field(
-                    name='Time', value=f"{discord.utils.format_dt(when, 'f')} ({discord.utils.format_dt(when, 'R')})", inline=False)
+                    name='Time', value=f"{discord.utils.format_dt(when, 'f')} ({discord.utils.format_dt(when, 'R')})",
+                    inline=False)
                 broadcast_channels = [a['slug'] for a in episode['channels'] if not " " in a['name']]
                 if broadcast_channels:
                     embed.add_field(name="Twitch Channels", value=', '.join(

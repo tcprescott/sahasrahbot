@@ -69,7 +69,8 @@ WEEKS = {
 
 class SMRandoLeague(TournamentRace):
     async def process_tournament_race(self, args, message):
-        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message(
+            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
 
@@ -77,11 +78,14 @@ class SMRandoLeague(TournamentRace):
 
         # await self.send_audit_message(embed=self.embed)
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(
+            srl_id=self.rtgg_handler.data.get('name'),
+            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
 
         if WEEKS[WEEK].get('randomizer') == 'smmulti':
             if len(self.player_names) != 4:
-                await self.rtgg_handler.send_message("This week's races require 4 players.  Please contact a Tournament Moderator if you need assistance.")
+                await self.rtgg_handler.send_message(
+                    "This week's races require 4 players.  Please contact a Tournament Moderator if you need assistance.")
                 return
             self.seed, _ = await self.create_multiworld()
             tournamentresults.permalink = self.seed

@@ -51,12 +51,14 @@ TRIFORCE_TEXTS = [
     'Stiefel\nSein\nMann',
 ]
 
+
 class ALTTPRDETournamentGroups(ALTTPRTournamentRace):
     async def roll(self):
         try:
             preset = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
         except KeyError:
-            await self.rtgg_handler.send_message("Invalid mode chosen, please contact a tournament admin for assistance.")
+            await self.rtgg_handler.send_message(
+                "Invalid mode chosen, please contact a tournament admin for assistance.")
             raise
         self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
 
@@ -178,7 +180,8 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
         else:
             raise Exception("Invalid game number.")
 
-        payload_formatted = '\n'.join([f"**{key}**: {val}" for key, val in payload.items() if not key in ['episodeid', 'game']])
+        payload_formatted = '\n'.join(
+            [f"**{key}**: {val}" for key, val in payload.items() if not key in ['episodeid', 'game']])
         embed.add_field(name="Settings", value=payload_formatted, inline=False)
 
         settings['name'] = f"ALTTPRDE - {self.versus} - Game {payload['game']}"
@@ -191,7 +194,9 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
 
         embed.add_field(name="Submitted by", value=submitted_by, inline=False)
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'settings': settings, 'event': self.event_slug, 'game_number': payload['game']})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
+                                                      defaults={'settings': settings, 'event': self.event_slug,
+                                                                'game_number': payload['game']})
 
         if self.audit_channel:
             await self.audit_channel.send(embed=embed)
@@ -200,14 +205,16 @@ class ALTTPRDETournamentBrackets(ALTTPRTournamentRace):
             if player is None:
                 logging.error(f"Could not send DM to {name}")
                 if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                    await self.audit_channel.send(f"@here could not send DM to {name}",
+                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
                 continue
             try:
                 await player.send(embed=embed)
             except discord.HTTPException:
                 logging.exception(f"Could not send DM to {name}")
                 if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}",
+                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
 
 
 def apply_pool(settings, pool1, pool2, pool3):
@@ -277,15 +284,18 @@ def apply_pool(settings, pool1, pool2, pool3):
         if settings['weapons'] == 'swordless':
             raise Exception("Cannot have swordless and start with sword.")
         settings['eq'].append('ProgressiveSword')
-        settings['custom']['item']['count']['ProgressiveSword'] = max(settings['custom']['item']['count']['ProgressiveSword']-1, 0)
+        settings['custom']['item']['count']['ProgressiveSword'] = max(
+            settings['custom']['item']['count']['ProgressiveSword'] - 1, 0)
         settings['custom']['item']['count']['TwentyRupees'] += 1
     elif pool3 == 'start_boots':
         settings['eq'].append('PegasusBoots')
-        settings['custom']['item']['count']['PegasusBoots'] = max(settings['custom']['item']['count']['PegasusBoots']-1, 0)
+        settings['custom']['item']['count']['PegasusBoots'] = max(
+            settings['custom']['item']['count']['PegasusBoots'] - 1, 0)
         settings['custom']['item']['count']['TwentyRupees'] += 1
     elif pool3 == 'start_flute':
         settings['eq'].append('OcarinaInactive' if settings['mode'] == 'standard' else 'OcarinaActive')
-        settings['custom']['item']['count']['OcarinaInactive'] = max(settings['custom']['item']['count']['OcarinaInactive']-1, 0)
+        settings['custom']['item']['count']['OcarinaInactive'] = max(
+            settings['custom']['item']['count']['OcarinaInactive'] - 1, 0)
         settings['custom']['item']['count']['TwentyRupees'] += 1
     elif pool3 == 'start_bombs':
         settings['eq'].append('TenBombs')

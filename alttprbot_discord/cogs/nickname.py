@@ -33,9 +33,10 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
             if result is None or result.rtgg_id is None:
                 try:
                     await member.send(
-                        (f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n"
-                         f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
-                         "If you have any questions, please contact Synack.  Thank you!")
+                        (
+                            f"Greetings {member.name}!  We have detected that you do not have a RaceTime.gg ID linked to SahasrahBot.\n"
+                            f"Please visit <{APP_URL}/racetime/verification/initiate> to verify your RaceTime.gg ID!  We will need this info.\n\n"
+                            "If you have any questions, please contact Synack.  Thank you!")
                     )
                     msg.append(f"Send DM to {member.name}#{member.discriminator}")
                 except (discord.Forbidden, discord.HTTPException) as e:
@@ -47,7 +48,8 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
         else:
             await interaction.followup.send("No messages sent.", ephemeral=True)
 
-    @app_commands.command(description="Used by Synack to report users who have not linked their racetime account to SahasrahBot.")
+    @app_commands.command(
+        description="Used by Synack to report users who have not linked their racetime account to SahasrahBot.")
     @app_commands.describe(
         role="Choose a role to blast",
     )

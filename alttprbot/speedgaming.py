@@ -130,13 +130,14 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
         'to': sched_to.isoformat()
     }
     async with aiohttp.request(
-        method='get',
-        url=f'{config.SG_API_ENDPOINT}/schedule',
-        params=params,
+            method='get',
+            url=f'{config.SG_API_ENDPOINT}/schedule',
+            params=params,
     ) as resp:
         schedule = await resp.json(content_type='text/html')
         episode_ids = [episode['id'] for episode in schedule]
-        logging.info(f'Retrieved schedule for {event} ({resp.status} {resp.reason}).  Received {len(schedule)} matches.  From: {sched_from} To: {sched_to}.  Match IDs: {", ".join(map(str, episode_ids))}')
+        logging.info(
+            f'Retrieved schedule for {event} ({resp.status} {resp.reason}).  Received {len(schedule)} matches.  From: {sched_from} To: {sched_to}.  Match IDs: {", ".join(map(str, episode_ids))}')
 
     if 'error' in schedule:
         raise SGEventNotFoundException(f"Unable to retrieve schedule for {event}. {schedule.get('error')}")
@@ -160,16 +161,16 @@ async def get_episode(episodeid: int, complete=False):
             result = {"error": "Failed to find episode with id 0."}
         else:
             async with aiohttp.request(
-                method='get',
-                url=f'{config.SG_API_ENDPOINT}/episode',
-                params={'id': episodeid},
+                    method='get',
+                    url=f'{config.SG_API_ENDPOINT}/episode',
+                    params={'id': episodeid},
             ) as resp:
                 result = await resp.text()
     else:
         async with aiohttp.request(
-            method='get',
-            url=f'{config.SG_API_ENDPOINT}/episode',
-            params={'id': episodeid},
+                method='get',
+                url=f'{config.SG_API_ENDPOINT}/episode',
+                params={'id': episodeid},
         ) as resp:
             result = await resp.text()
 

@@ -42,17 +42,20 @@ class Moderation(commands.Cog):
         if user_permissions.manage_guild or user_permissions.moderate_members or user_permissions.administrator:
             return
 
-        if hasattr(message.author, 'joined_at') and message.author.joined_at > discord.utils.utcnow()-datetime.timedelta(days=1):
+        if hasattr(message.author,
+                   'joined_at') and message.author.joined_at > discord.utils.utcnow() - datetime.timedelta(days=1):
             for url in urlextractor.gen_urls(message.content):
                 link_domain = urlparse(url).netloc
                 link_domain_hashed = hashlib.sha256(link_domain.encode('utf-8')).hexdigest()
                 if link_domain in ['discord.gg']:
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, you must be on this server for longer than 24 hours before posting discord invite links.  Please contact a moderator if you want to post an invite link.')
+                    await message.channel.send(
+                        f'{message.author.mention}, you must be on this server for longer than 24 hours before posting discord invite links.  Please contact a moderator if you want to post an invite link.')
             for attachment in message.attachments:
                 if attachment.filename.endswith(('.bat', '.exe', '.sh', '.py')):
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, please do not upload executable files.  If your message was deleted in error, please contact a moderator.')
+                    await message.channel.send(
+                        f'{message.author.mention}, please do not upload executable files.  If your message was deleted in error, please contact a moderator.')
 
         try:
             phishing_hashes = await bad_domain_hashes()
@@ -61,8 +64,10 @@ class Moderation(commands.Cog):
                 link_domain_hashed = hashlib.sha256(link_domain.encode('utf-8')).hexdigest()
                 if link_domain_hashed in phishing_hashes:
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, your message seemed a bit... phishy.  🐟\n\nIf you\'re not a bot, please contact a moderator for assistance.')
-                    await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=30), reason="automated timeout for phishing")
+                    await message.channel.send(
+                        f'{message.author.mention}, your message seemed a bit... phishy.  🐟\n\nIf you\'re not a bot, please contact a moderator for assistance.')
+                    await message.author.timeout(until=discord.utils.utcnow() + datetime.timedelta(minutes=30),
+                                                 reason="automated timeout for phishing")
         except Exception:
             logging.exception("Unable to scan message for phishing links.")
 
@@ -74,11 +79,13 @@ class Moderation(commands.Cog):
                     for zippedfile in zippedfiles:
                         if zippedfile.endswith(('.sfc', '.smc')):
                             await message.delete()
-                            await message.channel.send(f'{message.author.mention}, a ROM was detected in the zip archive posted.  If your message was deleted in error, please contact a moderator.')
+                            await message.channel.send(
+                                f'{message.author.mention}, a ROM was detected in the zip archive posted.  If your message was deleted in error, please contact a moderator.')
 
                 elif attachment.filename.endswith(('.sfc', '.smc')):
                     await message.delete()
-                    await message.channel.send(f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
+                    await message.channel.send(
+                        f'{message.author.mention}, please do not post ROMs.  If your message was deleted in error, please contact a moderator.')
 
         # five_minutes = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
 
@@ -118,9 +125,9 @@ async def inspect_zip(url):
 async def bad_domain_hashes() -> List:
     async with aiohttp.ClientSession() as session:
         async with session.request(
-            method='get',
-            url='https://cdn.discordapp.com/bad-domains/hashes.json',
-            raise_for_status=True
+                method='get',
+                url='https://cdn.discordapp.com/bad-domains/hashes.json',
+                raise_for_status=True
         ) as resp:
             hashes: list = await resp.json()
 

@@ -19,7 +19,8 @@ class ConfirmInquiryThread(discord.ui.View):
     # async def on_error(self, error: Exception, item, interaction) -> None:
     #     raise error
 
-    @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬", custom_id="sahasrahbot:open_inquiry")
+    @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬",
+                       custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):
         inquiry_message_config = await models.InquiryMessageConfig.get(message_id=interaction.message.id)
         role = interaction.guild.get_role(inquiry_message_config.role_id)
@@ -42,22 +43,27 @@ class OpenInquiryThread(discord.ui.View):
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
     async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
-            await interaction.response.send_message("Private threads must be available on this server.  Please let the server admin know so this may be fixed.", ephemeral=True)
+            await interaction.response.send_message(
+                "Private threads must be available on this server.  Please let the server admin know so this may be fixed.",
+                ephemeral=True)
             return
 
         if "SEVEN_DAY_THREAD_ARCHIVE" in interaction.channel.guild.features:
-            duration = 7*24*60
+            duration = 7 * 24 * 60
         elif "THREE_DAY_THREAD_ARCHIVE" in interaction.channel.guild.features:
-            duration = 3*24*60
+            duration = 3 * 24 * 60
         else:
-            duration = 24*60
+            duration = 24 * 60
 
         msg = await interaction.channel.send("test thread") if config.DEBUG else None
-        thread: discord.Thread = await interaction.channel.create_thread(name=f"Inquiry {interaction.user.name} {random.randint(0,999)}", message=msg, auto_archive_duration=duration)
+        thread: discord.Thread = await interaction.channel.create_thread(
+            name=f"Inquiry {interaction.user.name} {random.randint(0, 999)}", message=msg,
+            auto_archive_duration=duration)
         role_ping = interaction.guild.get_role(self.inquiry_message_config.role_id)
 
         await thread.add_user(interaction.user)
-        await interaction.response.send_message(f"A new thread called {thread.mention} has been opened for this inquiry.", ephemeral=True)
+        await interaction.response.send_message(
+            f"A new thread called {thread.mention} has been opened for this inquiry.", ephemeral=True)
 
         if interaction.guild.chunked is False:
             await interaction.guild.chunk(cache=True)
@@ -83,15 +89,16 @@ class Inquiry(commands.Cog):
     @app_commands.command(description="Adds a message that allows users to create a private thread to open an inquiry.")
     @app_commands.describe(role="Role that has the members that should join the thread")
     async def inquiry(
-        self,
-        interaction: discord.Interaction,
-        role: discord.Role
+            self,
+            interaction: discord.Interaction,
+            role: discord.Role
     ):
         """
         Adds a message that allows users to create a private thread to open an inquiry.
         """
         if not interaction.channel.permissions_for(interaction.user).manage_threads:
-            await interaction.response.send_message("You must have manage threads permission to use this feature.", ephemeral=True)
+            await interaction.response.send_message("You must have manage threads permission to use this feature.",
+                                                    ephemeral=True)
             return
 
         if "PRIVATE_THREADS" not in interaction.guild.features and not config.DEBUG:
@@ -99,19 +106,24 @@ class Inquiry(commands.Cog):
             return
 
         if not interaction.channel.permissions_for(interaction.guild.me).create_private_threads:
-            await interaction.response.send_message("This bot needs permission to create private threads in this channel.", ephemeral=True)
+            await interaction.response.send_message(
+                "This bot needs permission to create private threads in this channel.", ephemeral=True)
             return
 
         if interaction.channel.permissions_for(interaction.guild.default_role).send_messages:
-            await interaction.response.send_message("`@everyone` should not be allowed to send messages in this channel.", ephemeral=True)
+            await interaction.response.send_message(
+                "`@everyone` should not be allowed to send messages in this channel.", ephemeral=True)
             return
 
         if not interaction.channel.permissions_for(interaction.guild.default_role).send_messages_in_threads:
-            await interaction.response.send_message("`@everyone` needs to be able to send messages in threads.", ephemeral=True)
+            await interaction.response.send_message("`@everyone` needs to be able to send messages in threads.",
+                                                    ephemeral=True)
             return
 
         if not interaction.channel.permissions_for(role).read_messages:
-            await interaction.response.send_message(f"{role.mention} is not allowed to see this channel.", ephemeral=True, allowed_mentions=discord.AllowedMentions(roles=False))
+            await interaction.response.send_message(f"{role.mention} is not allowed to see this channel.",
+                                                    ephemeral=True,
+                                                    allowed_mentions=discord.AllowedMentions(roles=False))
             return
 
         await interaction.response.send_message(

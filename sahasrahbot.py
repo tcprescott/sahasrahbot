@@ -20,6 +20,7 @@ if config.SENTRY_URL:
                 return None
         return event
 
+
     sentry_sdk.init(
         config.SENTRY_URL,
         integrations=[AioHttpIntegration()],
@@ -32,6 +33,7 @@ async def database():
         db_url=f'mysql://{config.DB_USER}:{urllib.parse.quote_plus(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
         modules={'models': ['alttprbot.models']}
     )
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

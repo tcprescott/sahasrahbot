@@ -22,5 +22,7 @@ def authorized_key(auth_key_type):
                 return Response(status=401)
 
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator

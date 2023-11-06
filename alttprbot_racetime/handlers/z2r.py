@@ -64,7 +64,8 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game('sgl', message)
 
     async def ex_help(self, args, message):
-        await self.send_message("Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
+        await self.send_message(
+            "Available commands:\n\"!flags <flags>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html#zelda-2-randomizer-z2r for more info.")
 
     async def roll_game(self, preset, message):
         if await self.is_locked(message):

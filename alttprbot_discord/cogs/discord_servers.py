@@ -15,11 +15,11 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def add_category(self, interaction: discord.Interaction,
-        channel: discord.TextChannel,
-        category_title: str,
-        category_description: str = None,
-        order: int = 0
-    ):
+                           channel: discord.TextChannel,
+                           category_title: str,
+                           category_description: str = None,
+                           order: int = 0
+                           ):
         await models.DiscordServerCategories.create(
             order=order,
             guild_id=interaction.guild.id,
@@ -60,7 +60,8 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.command()
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
-    async def update_category(self, interaction: discord.Interaction, category_id: int, category_title: str, category_description: str, order: int = 0):
+    async def update_category(self, interaction: discord.Interaction, category_id: int, category_title: str,
+                              category_description: str, order: int = 0):
         await models.DiscordServerCategories.filter(id=category_id).update(
             order=order,
             category_title=category_title,
@@ -71,7 +72,8 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.command()
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
-    async def add_server(self, interaction: discord.Interaction, category_id: int, invite_url: str, server_description: str):
+    async def add_server(self, interaction: discord.Interaction, category_id: int, invite_url: str,
+                         server_description: str):
         """
         Add a server to a category.
         """
@@ -82,7 +84,8 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
             category_id=category_id,
             server_description=server_description
         )
-        await interaction.response.send_message(f"Added server {invite.guild.name} to category {category_id}", ephemeral=True)
+        await interaction.response.send_message(f"Added server {invite.guild.name} to category {category_id}",
+                                                ephemeral=True)
 
     @app_commands.command()
     @app_commands.guild_only()
@@ -121,7 +124,8 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.command()
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
-    async def update_server(self, interaction: discord.Interaction, server_id: int, invite_url: str, category_id: int, server_description: str = None):
+    async def update_server(self, interaction: discord.Interaction, server_id: int, invite_url: str, category_id: int,
+                            server_description: str = None):
         """
         Update a server in the discord server list.
         """
@@ -145,7 +149,8 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         def is_me(m):
             return m.author == self.bot.user
 
-        categories = await models.DiscordServerCategories.filter(guild_id=interaction.guild.id).prefetch_related('server_list')
+        categories = await models.DiscordServerCategories.filter(guild_id=interaction.guild.id).prefetch_related(
+            'server_list')
         channels_to_update = list(set([c.channel_id for c in categories]))
 
         for c in channels_to_update:
@@ -157,13 +162,13 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
             channel = discord.utils.get(
                 interaction.guild.channels, id=category.channel_id)
 
-            list_of_servers = [server_list[i:i+10]
+            list_of_servers = [server_list[i:i + 10]
                                for i in range(0, len(server_list), 10)]
 
             for idx, servers in enumerate(list_of_servers):
                 msgs = [
                     f"**__{category.category_title}__**" if len(
-                        list_of_servers) == 1 else f"**__{category.category_title} - Part {idx+1}__**"
+                        list_of_servers) == 1 else f"**__{category.category_title} - Part {idx + 1}__**"
                 ]
                 msgs += [f"{s.server_description}: https://discord.gg/{s.invite_id}" for s in servers]
                 await channel.send('\n'.join(msgs))

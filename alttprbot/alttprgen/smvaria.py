@@ -9,6 +9,7 @@ async def generate_preset(settings, skills, race=False):
     )
     return seed
 
+
 async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morph, start):
     if split not in ['FullCountdown', 'M/m', 'RandomSplit']:
         raise ValueError("Invalid item split setting.  Must be FullCountdown, M/m or RandomSplit.")
@@ -19,8 +20,10 @@ async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morp
     if boss not in ['RandomBoss', 'VanillaBoss']:
         raise ValueError("Invalid boss setting.  Must be RandomBoss or VanillaBoss.")
 
-    if difficulty not in ['HarderDifficulty', 'HardDifficulty', 'MediumDifficulty', 'EasyDifficulty', 'BasicDifficulty']:
-        raise ValueError("Invalid difficulty setting.  Must be HarderDifficulty, HardDifficulty, MediumDifficulty, EasyDifficulty or BasicDifficulty.")
+    if difficulty not in ['HarderDifficulty', 'HardDifficulty', 'MediumDifficulty', 'EasyDifficulty',
+                          'BasicDifficulty']:
+        raise ValueError(
+            "Invalid difficulty setting.  Must be HarderDifficulty, HardDifficulty, MediumDifficulty, EasyDifficulty or BasicDifficulty.")
 
     if escape not in ['RandomEscape', 'VanillaEscape']:
         raise ValueError("Invalid escape setting.  Must be RandomEscape or VanillaEscape.")
@@ -29,7 +32,8 @@ async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morp
         raise ValueError("Invalid morph setting.  Must be LateMorph, RandomMorph or EarlyMorph.")
 
     if start not in ['DeepStart', 'RandomStart', 'NotDeepStart', 'ShallowStart', 'VanillaStart']:
-        raise ValueError("Invalid start setting.  Must be DeepStart, RandomStart, NotDeepStart, ShallowStart or VanillaStart.")
+        raise ValueError(
+            "Invalid start setting.  Must be DeepStart, RandomStart, NotDeepStart, ShallowStart or VanillaStart.")
 
     splitDict = {
         "FullCountdown": "FullWithHUD",
@@ -125,6 +129,7 @@ async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morp
     if not hasattr(seed, 'guid'):
         raise Exception("Error: %s" % seed.data)
     return seed
+
 
 async def generate_league_playoff(majors, area, bosses):
     if majors not in ['FullTraditional', 'FullRandom', 'Major', 'Chozo']:

@@ -48,7 +48,8 @@ class ALTTPRQualifierRace(TournamentRace):
     #   a. Write this list to the audit channel.
     #   b. Create Users if they don't exist.
     async def process_tournament_race(self, args, message):
-        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message(
+            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
         await self.update_data()
 
         async_tournament_live_race = await models.AsyncTournamentLiveRace.get_or_none(
@@ -57,15 +58,18 @@ class ALTTPRQualifierRace(TournamentRace):
 
         # a whole bunch of guard conditions we need to satisfy before we can roll a seed
         if async_tournament_live_race is None:
-            await self.rtgg_handler.send_message("No live race found for this episode.  Please contact Synack for further help.")
+            await self.rtgg_handler.send_message(
+                "No live race found for this episode.  Please contact Synack for further help.")
             return
 
         if async_tournament_live_race.permalink is not None:
-            await self.rtgg_handler.send_message("Seed has already been generated for this live race.  Please contact Synack for further help.")
+            await self.rtgg_handler.send_message(
+                "Seed has already been generated for this live race.  Please contact Synack for further help.")
             return
 
         if async_tournament_live_race.pool is None:
-            await self.rtgg_handler.send_message("No pool has been set for this live race.  Please contact Synack for further help.")
+            await self.rtgg_handler.send_message(
+                "No pool has been set for this live race.  Please contact Synack for further help.")
             return
 
         await async_tournament_live_race.fetch_related('tournament')
@@ -76,15 +80,18 @@ class ALTTPRQualifierRace(TournamentRace):
         #     role__in=['mod', 'admin']
         # )
         user = await models.Users.get(rtgg_id=message['user']['id'])
-        authorized = await checks.is_async_tournament_user(user, async_tournament_live_race.tournament, ['admin', 'mod'])
+        authorized = await checks.is_async_tournament_user(user, async_tournament_live_race.tournament,
+                                                           ['admin', 'mod'])
         if not authorized:
-            await self.rtgg_handler.send_message("Only a mod or admin of this tournament may invoke !tournamentrace.  Please contact Synack for further help.")
+            await self.rtgg_handler.send_message(
+                "Only a mod or admin of this tournament may invoke !tournamentrace.  Please contact Synack for further help.")
             return
 
         await async_tournament_live_race.fetch_related('pool')
 
         if async_tournament_live_race.pool.preset is None:
-            await self.rtgg_handler.send_message("No preset has been set for this pool.  Please contact Synack for further help.")
+            await self.rtgg_handler.send_message(
+                "No preset has been set for this pool.  Please contact Synack for further help.")
             return
 
         # lock the room
@@ -98,9 +105,12 @@ class ALTTPRQualifierRace(TournamentRace):
 
         await self.rtgg_handler.set_bot_raceinfo(f"{self.seed.url} - {self.seed_code}")
         await self.rtgg_handler.send_message(f"Seed: {self.seed.url} - {self.seed_code}")
-        await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - {self.seed.url} - {self.seed_code}")
+        await self.send_audit_message(
+            f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - {self.seed.url} - {self.seed_code}")
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(
+            srl_id=self.rtgg_handler.data.get('name'),
+            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed.url
         await tournamentresults.save()
 
@@ -124,8 +134,10 @@ class ALTTPRQualifierRace(TournamentRace):
         self.rtgg_handler.seed_rolled = True
 
         # TODO: RT.gg max message length is 1000 characters, we need to split this up if we have more than 1000 characters
-        await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
-        await self.rtgg_handler.send_message(f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
+        await self.send_audit_message(
+            f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} -Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
+        await self.rtgg_handler.send_message(
+            f"Eligible entrants for this pool: {', '.join(eligible_entrants_for_pool)}")
 
     async def on_race_start(self):
         async_tournament_live_race = await models.AsyncTournamentLiveRace.get_or_none(
@@ -137,9 +149,12 @@ class ALTTPRQualifierRace(TournamentRace):
             race_room_data=self.rtgg_handler.data
         )
 
-        await self.send_audit_message(f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - Entrants: {', '.join(in_progress_entrants)}")
-        await self.rtgg_handler.send_message(f"Final eligible entrants for this pool: {', '.join(in_progress_entrants)}")
-        await self.rtgg_handler.send_message("Good luck, have fun!  Mid-race chat is disabled.  If you need assistance, please ping @Admins in Discord.")
+        await self.send_audit_message(
+            f"{self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])} - Entrants: {', '.join(in_progress_entrants)}")
+        await self.rtgg_handler.send_message(
+            f"Final eligible entrants for this pool: {', '.join(in_progress_entrants)}")
+        await self.rtgg_handler.send_message(
+            "Good luck, have fun!  Mid-race chat is disabled.  If you need assistance, please ping @Admins in Discord.")
 
     @property
     def seed_code(self):
@@ -237,7 +252,8 @@ class ALTTPRQualifierRace(TournamentRace):
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
 
-async def write_eligible_async_entrants(async_tournament_live_race: models.AsyncTournamentLiveRace, permalink: models.AsyncTournamentPermalink, race_room_data: dict):
+async def write_eligible_async_entrants(async_tournament_live_race: models.AsyncTournamentLiveRace,
+                                        permalink: models.AsyncTournamentPermalink, race_room_data: dict):
     entrants = race_room_data.get('entrants', [])
 
     eligible_entrants_for_pool = []
@@ -288,13 +304,15 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
 
     return eligible_entrants_for_pool
 
+
 # We need to update the entrants to in_progress and delete any pending entrants that didn't actually join
 # TODO: We need to handle people who are accepted after the race room is locked.  We may need to refactor this to
 # iterate through entrants a second time, and do a update_or_create, updating the status to in_progress if they
 # already exist, and creating them if they don't.
 
 
-async def process_async_tournament_start(async_tournament_live_race: models.AsyncTournamentLiveRace, race_room_data: dict):
+async def process_async_tournament_start(async_tournament_live_race: models.AsyncTournamentLiveRace,
+                                         race_room_data: dict):
     start_time = isodate.parse_datetime(race_room_data['started_at']).astimezone(pytz.utc)
     entrants = race_room_data.get('entrants', [])
 

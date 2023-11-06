@@ -48,8 +48,8 @@ class SahasrahBotRaceTimeBot(Bot):
                         retry=retry_if_exception_type(aiohttp.ClientResponseError)):
                     with attempt:
                         async with self.http.get(
-                            self.http_uri(f'/{unlisted_room.room_name}/data'),
-                            ssl=self.ssl_context,
+                                self.http_uri(f'/{unlisted_room.room_name}/data'),
+                                ssl=self.ssl_context,
                         ) as resp:
                             race_data = await resp.json()
 

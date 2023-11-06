@@ -65,7 +65,8 @@ async def create_tournament_race_room(event, episodeid):
     rtgg_bot = racetimebot.racetime_bots[event_data.data.racetime_category]
     race = await models.TournamentResults.get_or_none(episode_id=episodeid)
     if race:
-        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"), raise_for_status=True) as resp:
+        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"),
+                                   raise_for_status=True) as resp:
             race_data = json.loads(await resp.read())
         status = race_data.get('status', {}).get('value')
         if not status == 'cancelled':
@@ -118,8 +119,10 @@ async def race_recording_task():
                     race_data = json.loads(await resp.read())
 
                 if race_data['status']['value'] == 'finished':
-                    winner = [e for e in race_data['entrants'] if e['place'] == 1][0]  # pylint: disable=used-before-assignment
-                    runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]  # pylint: disable=used-before-assignment
+                    winner = [e for e in race_data['entrants'] if e['place'] == 1][
+                        0]  # pylint: disable=used-before-assignment
+                    runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][
+                        0]  # pylint: disable=used-before-assignment
 
                     started_at = isodate.parse_datetime(race_data['started_at']).astimezone(pytz.timezone('US/Eastern'))
                     ended_at = isodate.parse_datetime(race_data['ended_at'])
@@ -134,8 +137,10 @@ async def race_recording_task():
                         f"{RACETIME_URL}/{race.srl_id}",
                         winner['user']['name'],
                         runnerup['user']['name'],
-                        str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'], str) else None,
-                        str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(runnerup['finish_time'], str) else None,
+                        str(isodate.parse_duration(winner['finish_time'])) if isinstance(winner['finish_time'],
+                                                                                         str) else None,
+                        str(isodate.parse_duration(runnerup['finish_time'])) if isinstance(runnerup['finish_time'],
+                                                                                           str) else None,
                         race.permalink,
                         race.spoiler
                     ])
@@ -168,11 +173,11 @@ async def racetime_auto_record(race_data):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.request(
-                method='get',
-                url=url,
-                cookies={'sessionid': RACETIME_SESSION_TOKEN,
-                         'csrftoken': RACETIME_CSRF_TOKEN},
-                raise_for_status=True
+                    method='get',
+                    url=url,
+                    cookies={'sessionid': RACETIME_SESSION_TOKEN,
+                             'csrftoken': RACETIME_CSRF_TOKEN},
+                    raise_for_status=True
             ) as resp:
                 soup = BeautifulSoup(await resp.text(), features="html5lib")
         except Exception as e:
@@ -183,14 +188,14 @@ async def racetime_auto_record(race_data):
 
         try:
             async with aiohttp.request(
-                method='post',
-                url=record_url,
-                cookies={'sessionid': RACETIME_SESSION_TOKEN,
-                         'csrftoken': RACETIME_CSRF_TOKEN},
-                headers={'Origin': RACETIME_URL,
-                         'Referer': url},
-                data=data,
-                raise_for_status=True
+                    method='post',
+                    url=record_url,
+                    cookies={'sessionid': RACETIME_SESSION_TOKEN,
+                             'csrftoken': RACETIME_CSRF_TOKEN},
+                    headers={'Origin': RACETIME_URL,
+                             'Referer': url},
+                    data=data,
+                    raise_for_status=True
             ) as resp:
                 pass
         except Exception:

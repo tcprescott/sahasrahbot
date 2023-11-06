@@ -3,10 +3,10 @@ from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 
+
 class ALTTPRMiniTournament(ALTTPRTournamentRace):
     async def roll(self):
         self.seed = await ALTTPRPreset("nightcl4w/duality").generate(tournament=True, spoilers="off")
-
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)

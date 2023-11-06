@@ -17,12 +17,14 @@ class ALTTPRTournamentRace(TournamentRace):
     """
     ALTTPTournamentRace represets a generic ALTTP tournament
     """
+
     async def roll(self):
         # self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
         pass
 
     async def process_tournament_race(self, args, message):
-        await self.rtgg_handler.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.rtgg_handler.send_message(
+            "Generating game, please wait.  If nothing happens after a minute, contact Synack.")
 
         await self.update_data()
         await self.roll()
@@ -39,11 +41,14 @@ class ALTTPRTournamentRace(TournamentRace):
         for player in self.rtgg_handler.data['entrants']:
             await self.rtgg_handler.send_message(self.seed.url, direct_to=player['user']['id'])
 
-        tournamentresults, _ = await models.TournamentResults.update_or_create(srl_id=self.rtgg_handler.data.get('name'), defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
+        tournamentresults, _ = await models.TournamentResults.update_or_create(
+            srl_id=self.rtgg_handler.data.get('name'),
+            defaults={'episode_id': self.episodeid, 'event': self.event_slug, 'spoiler': None})
         tournamentresults.permalink = self.seed.url
         await tournamentresults.save()
 
-        await self.rtgg_handler.send_message("Seed has been generated, you should have received a DM in both Discord and RaceTime.gg.  Please contact a Tournament Moderator if you haven't received the DM.")
+        await self.rtgg_handler.send_message(
+            "Seed has been generated, you should have received a DM in both Discord and RaceTime.gg.  Please contact a Tournament Moderator if you haven't received the DM.")
         self.rtgg_handler.seed_rolled = True
 
     async def send_room_welcome(self):
@@ -86,12 +91,17 @@ class ALTTPRTournamentRace(TournamentRace):
             emojis=discordbot.emojis
         )
 
-        self.tournament_embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
-        self.embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+        self.tournament_embed.insert_field_at(0, name='RaceTime.gg',
+                                              value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']),
+                                              inline=False)
+        self.embed.insert_field_at(0, name='RaceTime.gg',
+                                   value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
 
         if self.broadcast_channels:
-            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
-            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
+                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
+                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
 
     async def send_race_submission_form(self, warning=False):
         if self.bracket_settings is not None and not warning:
@@ -117,15 +127,18 @@ class ALTTPRTournamentRace(TournamentRace):
             logging.info("Sending tournament submit reminder to %s.", name)
             await player.send(msg)
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
+        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
+                                                      defaults={'event': self.event_slug, 'submitted': 1})
 
 
 class ALTTPR2023Race(ALTTPRTournamentRace):
     """
     ALTTPR2023Race is a class that represents the ALTTPR Main Tournament for the 2023 season.
     """
+
     async def roll(self):
-        self.seed, self.preset, self.deck = await roll_seed([p[1] for p in self.player_discords], episode_id=self.episodeid)
+        self.seed, self.preset, self.deck = await roll_seed([p[1] for p in self.player_discords],
+                                                            episode_id=self.episodeid)
         await self.rtgg_handler.send_message("-----------------")
         await self.rtgg_handler.send_message(f"Your preset is: {self.preset}")
         if self.deck:
@@ -157,18 +170,26 @@ class ALTTPR2023Race(ALTTPRTournamentRace):
             include_settings=False
         )
 
-        self.tournament_embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
-        self.embed.insert_field_at(0, name='RaceTime.gg', value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
+        self.tournament_embed.insert_field_at(0, name='RaceTime.gg',
+                                              value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']),
+                                              inline=False)
+        self.embed.insert_field_at(0, name='RaceTime.gg',
+                                   value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
 
         if self.broadcast_channels:
-            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
-            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join([f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
+                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
+            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
+                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
 
         self.embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
         self.tournament_embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
         if self.deck:
-            self.tournament_embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]), inline=False)
-            self.embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]), inline=False)
+            self.tournament_embed.insert_field_at(1, name="Deck",
+                                                  value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]),
+                                                  inline=False)
+            self.embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]),
+                                       inline=False)
 
     async def configuration(self):
         guild = discordbot.get_guild(334795604918272012)
@@ -200,9 +221,13 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
     Roll a seed for the given players.
     """
     if not episode_id is None:
-        existing_preset_for_episode = await models.TournamentPresetHistory.filter(episode_id=episode_id, event_slug=event_slug).first()
+        existing_preset_for_episode = await models.TournamentPresetHistory.filter(episode_id=episode_id,
+                                                                                  event_slug=event_slug).first()
         if existing_preset_for_episode:
-            seed = await generator.ALTTPRPreset(existing_preset_for_episode.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
+            seed = await generator.ALTTPRPreset(existing_preset_for_episode.preset).generate(allow_quickswap=True,
+                                                                                             tournament=True,
+                                                                                             hints=False,
+                                                                                             spoilers="off")
             return seed, existing_preset_for_episode.preset, None
 
     deck = await generate_deck(players, event_slug=event_slug)
@@ -210,10 +235,12 @@ async def roll_seed(players: List[discord.Member], episode_id: int = None, event
     preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
 
     for player in players:
-        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id, event_slug=event_slug)
+        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id,
+                                                    event_slug=event_slug)
 
     seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
     return seed, preset, deck
+
 
 async def generate_deck(players: List[discord.Member], event_slug="alttpr2023"):
     deck = {
@@ -224,7 +251,8 @@ async def generate_deck(players: List[discord.Member], event_slug="alttpr2023"):
         'tournament_mcboss': 2 * len(players),
     }
     for player in players:
-        history = await models.TournamentPresetHistory.filter(discord_user_id=player.id, event_slug=event_slug).order_by('-timestamp').limit(5)
+        history = await models.TournamentPresetHistory.filter(discord_user_id=player.id,
+                                                              event_slug=event_slug).order_by('-timestamp').limit(5)
         if history:
             deck[history[0].preset] -= 1 if deck[history[0].preset] > 0 else 0
 

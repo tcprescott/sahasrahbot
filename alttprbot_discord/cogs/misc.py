@@ -36,15 +36,16 @@ WELCOME_MESSAGES = {
         'Vielen Dank und nochmals herzlich willkommen.'
     ),
     "portuguese":
-"""
-Olá e muito bem vindo ao servidor internacional de ALTTPR Randomizer!
-
-Este servidor é usado, principalmente, em língua inglesa e poucos membros da comunidade falam outras línguas, incluindo o Português. Caso você não se sinta confortável em se comunicar em inglês e esteja procurando informações, recursos ou a comunidade em língua Portuguesa, você pode acessar os servidores da Zelda Randomizer Brasil ou da Randomizer Brasil! Nesses dois servidores você será muito bem recebido pela comunidade brasileira e eles possuem diversos recursos, tutoriais e traduzem as principais notícias e atualizações do cenário competitivo do jogo, além de terem seus próprios torneios internos! 
-
-Zelda Randomizer Brasil: https://discord.gg/HBvVB3xAVe
-Randomizer Brasil: https://discord.gg/U4U62Gysku
-"""
+        """
+        Olá e muito bem vindo ao servidor internacional de ALTTPR Randomizer!
+        
+        Este servidor é usado, principalmente, em língua inglesa e poucos membros da comunidade falam outras línguas, incluindo o Português. Caso você não se sinta confortável em se comunicar em inglês e esteja procurando informações, recursos ou a comunidade em língua Portuguesa, você pode acessar os servidores da Zelda Randomizer Brasil ou da Randomizer Brasil! Nesses dois servidores você será muito bem recebido pela comunidade brasileira e eles possuem diversos recursos, tutoriais e traduzem as principais notícias e atualizações do cenário competitivo do jogo, além de terem seus próprios torneios internos! 
+        
+        Zelda Randomizer Brasil: https://discord.gg/HBvVB3xAVe
+        Randomizer Brasil: https://discord.gg/U4U62Gysku
+        """
 }
+
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
@@ -57,6 +58,7 @@ async def get_holy_images() -> dict:
         async with session.get('http://alttp.mymm1.com/holyimage/holyimages.json') as resp:
             return await resp.json()
 
+
 class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -66,7 +68,7 @@ class Misc(commands.Cog):
         if self.bot.user in message.mentions:
             emoji = discord.utils.get(self.bot.emojis, name='SahasrahBot')
             if emoji:
-                await asyncio.sleep(random.random()*5)
+                await asyncio.sleep(random.random() * 5)
                 await message.add_reaction(emoji)
 
     @app_commands.command(description="Welcome messages for various languages.")
@@ -93,10 +95,10 @@ class Misc(commands.Cog):
     @app_commands.command(description="Retrieves a holy image from http://alttp.mymm1.com/holyimage/")
     @app_commands.describe(slug="The slug of the holy image to get.", game="The game to get the holy image from.")
     async def holyimage(
-        self,
-        interaction: discord.Interaction,
-        slug: str,
-        game: str = None
+            self,
+            interaction: discord.Interaction,
+            slug: str,
+            game: str = None
     ):
         if game is None:
             if interaction.guild is None:
@@ -141,15 +143,15 @@ class Misc(commands.Cog):
         timezone="Timezone to get the date for. Defaults to US/Eastern"
     )
     async def datetime_cmd(
-        self,
-        interaction: discord.Interaction,
-        year: app_commands.Range[int, 1970, 9999] = None,
-        month: app_commands.Range[int, 1, 12] = None,
-        day: app_commands.Range[int, 1, 31] = None,
-        hour: app_commands.Range[int, 0, 23] = 0,
-        minute: app_commands.Range[int, 0, 59] = 0,
-        second: app_commands.Range[int, 0, 59] = 0,
-        timezone: str  = "US/Eastern"
+            self,
+            interaction: discord.Interaction,
+            year: app_commands.Range[int, 1970, 9999] = None,
+            month: app_commands.Range[int, 1, 12] = None,
+            day: app_commands.Range[int, 1, 31] = None,
+            hour: app_commands.Range[int, 0, 23] = 0,
+            minute: app_commands.Range[int, 0, 59] = 0,
+            second: app_commands.Range[int, 0, 59] = 0,
+            timezone: str = "US/Eastern"
     ):
         if year is None:
             year = datetime.datetime.now().year
@@ -164,7 +166,8 @@ class Misc(commands.Cog):
             await interaction.response.send_message(f"Unknown timezone: {timezone}", ephemeral=True)
             return
         except ValueError:
-            await interaction.response.send_message(f"Invalid date: {year}-{month}-{day} {hour}:{minute}:{second} {timezone}", ephemeral=True)
+            await interaction.response.send_message(
+                f"Invalid date: {year}-{month}-{day} {hour}:{minute}:{second} {timezone}", ephemeral=True)
             return
 
         markdown = "Discord formatted datetime\n\n"
@@ -184,6 +187,7 @@ class Misc(commands.Cog):
     async def datetime_autocomplete_tz(self, interaction: discord.Interaction, current: str):
         timezones = sorted([val for val in pytz.all_timezones if val.startswith(current)][:25])
         return [app_commands.Choice(name=timezone, value=timezone) for timezone in timezones]
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Misc(bot))
