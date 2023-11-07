@@ -356,7 +356,7 @@ async def sgl23_reports_capacity():
     report = await create_capacity_report()
     return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=5, logged_in=logged_in, user=user)
 
-@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache)
+@aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def create_capacity_report():
     events = {
         'sgl23alttpr': timedelta(hours=2),
