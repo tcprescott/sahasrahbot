@@ -1,6 +1,11 @@
 import asyncio
+import dateutil.parser
+from dateutil.tz import tzutc
+from datetime import datetime, timedelta
 import logging
 
+import aiocache
+from pytz import timezone
 from quart import Blueprint, redirect, render_template, request
 from quart_discord import Unauthorized
 
@@ -8,8 +13,10 @@ from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen.randomizer import roll_ffr, roll_ootr
 from alttprbot.alttprgen.randomizer.smdash import create_smdash
-from alttprbot.util import triforce_text
+from alttprbot.util import triforce_text, speedgaming
 from alttprbot_api.api import discord
+
+import config
 
 sgl23_blueprint = Blueprint('sgl23', __name__)
 
@@ -336,3 +343,65 @@ async def sgl23_generate_smz3_alt():
         ip_address=request.headers.get('X-Real-IP', request.remote_addr),
     )
     return redirect(seed.url)
+
+@sgl23_blueprint.route("/sgl23/reports/capacity")
+async def sgl23_reports_capacity():
+    try:
+        user = await discord.fetch_user()
+        logged_in = True
+    except Unauthorized:
+        user = None
+        logged_in = False
+
+    report = await create_capacity_report()
+    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=5, logged_in=logged_in, user=user)
+
+@aiocache.cached(ttl=300, cache=aiocache.SimpleMemoryCache)
+async def create_capacity_report():
+    events = {
+        'sgl23alttpr': timedelta(hours=2),
+        'sgl23ootr': timedelta(hours=3, minutes=30),
+        'sgl23smr': timedelta(hours=2, minutes=30),
+        'sgl23ffr': timedelta(hours=1, minutes=45),
+        'sgl23smz3': timedelta(hours=2, minutes=30),
+        'sgl23twwr': timedelta(hours=2, minutes=30),
+        'sgl23z1r': timedelta(hours=2),
+        'sgl23smb3r': timedelta(hours=2),
+    }
+
+    results = {}
+    hours = 48
+    tz = timezone('US/Eastern')
+
+    if config.DEBUG:
+        current_time = datetime(2023, 11, 9, 9, 0, 0, tzinfo=tz)
+    else:
+        current_time = datetime.now(tz)
+
+    nearest_15 = round_dt_to_delta(current_time)
+
+    for event, run_time in events.items():
+        episodes = await speedgaming.get_upcoming_episodes_by_event(event, hours_past=4, hours_future=hours, static_time=nearest_15)
+        start_times = []
+        for episode in episodes:
+            start_time = dateutil.parser.parse(episode['whenCountdown'])
+            start_time = start_time.astimezone(tz)
+            start_times.append(start_time)
+
+        # result[event] = {}
+
+        intervals_to_check = [nearest_15 + timedelta(minutes=x) for x in range(0, 60*hours, 15)]
+        for time_interval in intervals_to_check: # 48 hours in 15 minute intervals
+            # format time_interval as a string for human readability
+            time_interval_formatted = time_interval.strftime('%Y-%m-%d %H:%M:%S')
+            results.setdefault(time_interval_formatted, {}).setdefault(event, sum(1 for x in start_times if x <= time_interval <= x + run_time))
+
+    # sum the number of matches running in each category at each 15 minute interval
+    for time_interval, counts in results.items():
+        results[time_interval]['total'] = sum(counts.values())
+
+    return results
+
+def round_dt_to_delta(dt, delta=timedelta(minutes=15)):
+    ref = datetime.min.replace(tzinfo=dt.tzinfo)
+    return ref + round((dt - ref) / delta) * delta

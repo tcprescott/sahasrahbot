@@ -19,7 +19,7 @@ class SGEventNotFoundException(SahasrahBotException):
     pass
 
 
-async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
+async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4, static_time: datetime=None):
     if config.DEBUG and event == 'test':
         test_schedule = []
         for episode_id in [1]:
@@ -27,7 +27,10 @@ async def get_upcoming_episodes_by_event(event, hours_past=4, hours_future=4):
             test_schedule.append(episode)
         return test_schedule
 
-    now = datetime.now(tz=pytz.timezone('US/Eastern'))
+    if static_time:
+        now = static_time
+    else:
+        now = datetime.now(tz=pytz.timezone('US/Eastern'))
     sched_from = now - timedelta(hours=hours_past)
     sched_to = now + timedelta(hours=hours_future)
     params = {

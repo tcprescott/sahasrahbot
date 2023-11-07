@@ -1,0 +1,46 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>SGL23 Admin "Dashboard"</title>
+{%- endblock head %}
+
+{% block content -%}
+
+<style>
+    small {
+        font-size: 12px;
+    }
+</style>
+
+<h1>SpeedGaming Live 2023 Tournament Room Capacity Report</h1>
+<p>Note: This data refreshes every 5 minutes.</p>
+<table border="1">
+    <tr>
+        <th>Time</th>
+        <th>Total</th>
+        <th>ALTTPR</th>
+        <th>OOTR</th>
+        <th>SMR</th>
+        <th>SMZ3</th>
+        <th>FFR</th>
+        <th>TWWR</th>
+        <th>Z1R</th>
+        <th>SMB3R</th>
+    </tr>
+    {% for interval, data in report.items() %}
+    <tr {% if data['total'] > alert_threshold %}bgcolor="yellow"{% endif %}</tr>
+        <td>{{ interval }}</td>
+        <td>{{ data['total'] }}</td>
+        <td>{{ data['sgl23alttpr'] }}</td>
+        <td>{{ data['sgl23ootr'] }}</td>
+        <td>{{ data['sgl23smr'] }}</td>
+        <td>{{ data['sgl23smz3'] }}</td>
+        <td>{{ data['sgl23ffr'] }}</td>
+        <td>{{ data['sgl23twwr'] }}</td>
+        <td>{{ data['sgl23z1r'] }}</td>
+        <td>{{ data['sgl23smb3r'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{%- endblock content %}
