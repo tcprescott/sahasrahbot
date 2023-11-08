@@ -354,7 +354,7 @@ async def sgl23_reports_capacity():
         logged_in = False
 
     report = await create_capacity_report()
-    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=20, logged_in=logged_in, user=user)
+    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=25, logged_in=logged_in, user=user)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def create_capacity_report():
