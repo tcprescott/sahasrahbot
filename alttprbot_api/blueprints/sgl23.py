@@ -398,11 +398,15 @@ async def create_capacity_report():
             if time_interval.hour < 8 or time_interval.hour >= 24:
                 continue
             time_interval_formatted = time_interval.strftime('%A %I:%M %p')
-            results.setdefault(time_interval_formatted, {}).setdefault(event, sum(1 for x in start_times if x <= time_interval <= x + run_time))
+            results.setdefault(time_interval_formatted, {}).setdefault("runtime", {}).setdefault(event, sum(1 for x in start_times if x <= time_interval < x + run_time))
+            results.setdefault(time_interval_formatted, {}).setdefault("starting", {}).setdefault(event, sum(1 for x in start_times if x <= time_interval < x + timedelta(minutes=15)))
+
 
     # sum the number of matches running in each category at each 15 minute interval
-    for time_interval, counts in results.items():
-        results[time_interval]['total'] = sum(counts.values())
+    for time_interval, data in results.items():
+        results[time_interval]['runtime_total'] = sum(data['runtime'].values())
+    for time_interval, data in results.items():
+        results[time_interval]['starting_total'] = sum(data['starting'].values())
 
     return results
 

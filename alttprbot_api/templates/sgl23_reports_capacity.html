@@ -12,7 +12,7 @@
     }
     table {
         border-collapse: collapse;
-        width: 80%;
+        width: 50%;
     }
 
     th, td {
@@ -39,6 +39,7 @@
     <tr>
         <th>Time</th>
         <th>Total</th>
+        <th>Starting this 15m</th>
         <th bgcolor="black">&nbsp;</th>
         <th>ALTTPR</th>
         <th>OOTR</th>
@@ -50,18 +51,19 @@
         <th>SMB3R</th>
     </tr>
     {% for interval, data in report.items() %}
-    <tr {% if data['total'] > alert_threshold %}class="alert"{% endif %}</tr>
+    <tr {% if data['runtime_total'] > alert_threshold %}class="alert"{% endif %}</tr>
         <td>{{ interval }}</td>
-        <td>{{ data['total'] }}</td>
+        <td>{{ data['runtime_total'] }}</td>
+        <td>{{ data['starting_total'] }}</td>
         <td bgcolor="black">&nbsp;</td>
-        <td>{{ data['sgl23alttpr'] }}</td>
-        <td>{{ data['sgl23ootr'] }}</td>
-        <td>{{ data['sgl23smr'] }}</td>
-        <td>{{ data['sgl23smz3'] }}</td>
-        <td>{{ data['sgl23ffr'] }}</td>
-        <td>{{ data['sgl23twwr'] }}</td>
-        <td>{{ data['sgl23z1r'] }}</td>
-        <td>{{ data['sgl23smb3r'] }}</td>
+        <td>{{ data['runtime']['sgl23alttpr'] }}</td>
+        <td>{{ data['runtime']['sgl23ootr'] }}</td>
+        <td>{{ data['runtime']['sgl23smr'] }}</td>
+        <td>{{ data['runtime']['sgl23smz3'] }}</td>
+        <td>{{ data['runtime']['sgl23ffr'] }}</td>
+        <td>{{ data['runtime']['sgl23twwr'] }}</td>
+        <td>{{ data['runtime']['sgl23z1r'] }}</td>
+        <td>{{ data['runtime']['sgl23smb3r'] }}</td>
     </tr>
     {% endfor %}
 </table>
