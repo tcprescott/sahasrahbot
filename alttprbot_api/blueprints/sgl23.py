@@ -354,7 +354,8 @@ async def sgl23_reports_capacity():
         logged_in = False
 
     report = await create_capacity_report()
-    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=25, logged_in=logged_in, user=user)
+    threshold = 10 if config.DEBUG else 25
+    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=threshold, logged_in=logged_in, user=user)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def create_capacity_report():
@@ -396,7 +397,7 @@ async def create_capacity_report():
             # skip overnight hours (midnight to 8am)
             if time_interval.hour < 8 or time_interval.hour >= 24:
                 continue
-            time_interval_formatted = time_interval.strftime('%A %-I:%M %p')
+            time_interval_formatted = time_interval.strftime('%A %I:%M %p')
             results.setdefault(time_interval_formatted, {}).setdefault(event, sum(1 for x in start_times if x <= time_interval <= x + run_time))
 
     # sum the number of matches running in each category at each 15 minute interval

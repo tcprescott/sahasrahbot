@@ -10,6 +10,27 @@
     small {
         font-size: 12px;
     }
+    table {
+        border-collapse: collapse;
+        width: 80%;
+    }
+
+    th, td {
+        text-align: left;
+        /* padding: 8px; */
+    }
+
+    tr:nth-child(even) {
+        background-color: Lightgreen;
+    }
+
+    tr.alert {
+        background-color: yellow;
+    }
+
+    tr:hover {
+        background-color: lightblue;
+    }
 </style>
 
 <h1>SpeedGaming Live 2023 Tournament Room Capacity Report</h1>
@@ -18,6 +39,7 @@
     <tr>
         <th>Time</th>
         <th>Total</th>
+        <th bgcolor="black">&nbsp;</th>
         <th>ALTTPR</th>
         <th>OOTR</th>
         <th>SMR</th>
@@ -28,9 +50,10 @@
         <th>SMB3R</th>
     </tr>
     {% for interval, data in report.items() %}
-    <tr {% if data['total'] > alert_threshold %}bgcolor="yellow"{% endif %}</tr>
+    <tr {% if data['total'] > alert_threshold %}class="alert"{% endif %}</tr>
         <td>{{ interval }}</td>
         <td>{{ data['total'] }}</td>
+        <td bgcolor="black">&nbsp;</td>
         <td>{{ data['sgl23alttpr'] }}</td>
         <td>{{ data['sgl23ootr'] }}</td>
         <td>{{ data['sgl23smr'] }}</td>
