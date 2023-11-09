@@ -393,7 +393,10 @@ async def create_capacity_report():
         intervals_to_check = [nearest_15 + timedelta(minutes=x) for x in range(0, 60*hours, 15)]
         for time_interval in intervals_to_check: # 48 hours in 15 minute intervals
             # format time_interval as a string for human readability
-            time_interval_formatted = time_interval.strftime('%Y-%m-%d %H:%M:%S')
+            # skip overnight hours (midnight to 8am)
+            if time_interval.hour < 8 or time_interval.hour >= 24:
+                continue
+            time_interval_formatted = time_interval.strftime('%A %-I:%M %p')
             results.setdefault(time_interval_formatted, {}).setdefault(event, sum(1 for x in start_times if x <= time_interval <= x + run_time))
 
     # sum the number of matches running in each category at each 15 minute interval
