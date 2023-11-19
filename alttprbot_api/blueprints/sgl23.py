@@ -336,7 +336,7 @@ async def sgl23_generate_smz3_main():
 
 @sgl23_blueprint.route("/sgl23/generate/smz3/alt")
 async def sgl23_generate_smz3_alt():
-    seed = await generator.SMZ3Preset("normal").generate(tournament=True)
+    seed = await generator.SMZ3Preset("fast").generate(tournament=True)
     await models.SGL2023OnsiteHistory.create(
         tournament="smz3_alt",
         url=seed.url,
