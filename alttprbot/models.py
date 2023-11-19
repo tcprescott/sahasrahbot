@@ -365,33 +365,6 @@ class TournamentResults(Model):
     written_to_gsheet = fields.SmallIntField(null=True)
 
 
-class Tournaments(Model):
-    class Meta:
-        table = 'tournaments'
-        unique_together = ('schedule_type', 'slug')
-
-    id = fields.IntField(pk=True)
-    schedule_type = fields.CharField(45, null=True)
-    slug = fields.CharField(45, null=True)
-    guild_id = fields.BigIntField(null=True)
-    helper_roles = fields.CharField(2000, null=True)
-    audit_channel_id = fields.BigIntField(null=True)
-    commentary_channel_id = fields.BigIntField(null=True)
-    scheduling_needs_channel_id = fields.BigIntField(null=True)
-    scheduling_needs_tracker = fields.SmallIntField(null=True)
-    mod_channel_id = fields.BigIntField(null=True)
-    tracker_roles = fields.CharField(2000, null=True)
-    commentator_roles = fields.CharField(2000, null=True)
-    mod_roles = fields.CharField(2000, null=True)
-    admin_roles = fields.CharField(2000, null=True)
-    category = fields.CharField(200, null=True)
-    goal = fields.CharField(200, null=True)
-    active = fields.SmallIntField(null=True)
-    has_submission = fields.BooleanField(null=True)
-    lang = fields.CharField(20, null=True)
-    coop = fields.BooleanField(null=True)
-
-
 class TriforceTexts(Model):
     id = fields.IntField(pk=True)
     pool_name = fields.CharField(45, null=False)
@@ -429,39 +402,6 @@ class SpeedGamingDailies(Model):
     racetime_goal = fields.CharField(45, null=True)
     race_info = fields.CharField(2000, null=False)
     active = fields.SmallIntField(null=True)
-
-
-class SGL2020Tournament(Model):
-    class Meta:
-        table = 'sgl2020_tournament'
-
-    episode_id = fields.IntField(pk=True, generated=False)
-    room_name = fields.CharField(100, null=True)
-    event = fields.CharField(45, null=True)
-    platform = fields.CharField(45, null=True)
-    permalink = fields.CharField(200, null=True)
-    seed = fields.CharField(200, null=True)
-    password = fields.CharField(200, null=True)
-    status = fields.CharField(45, null=True)
-    created = fields.DatetimeField(auto_now_add=True)
-    updated = fields.DatetimeField(auto_now=True)
-
-
-class SGL2020TournamentBO3(Model):
-    class Meta:
-        table = 'sgl2020_tournament_bo3'
-
-    id = fields.IntField(pk=True)
-    episode_id = fields.IntField(null=True)
-    room_name = fields.CharField(100, null=True)
-    event = fields.CharField(45, null=True)
-    platform = fields.CharField(45, null=True)
-    permalink = fields.CharField(200, null=True)
-    seed = fields.CharField(200, null=True)
-    password = fields.CharField(200, null=True)
-    status = fields.CharField(45, null=True)
-    created = fields.DatetimeField(auto_now_add=True)
-    updated = fields.DatetimeField(auto_now=True)
 
 
 class VoiceRole(Model):
