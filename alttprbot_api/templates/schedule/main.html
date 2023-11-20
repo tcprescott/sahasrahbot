@@ -1,0 +1,25 @@
+{% extends "base.html" -%}
+
+{% block head -%}
+<title>{{ event.name}}</title>
+{%- endblock head %}
+
+{% block content -%}
+<h1>{{ event.name}}</h1>
+<p>{{ event.description }}</p>
+<p><a href="{{ url_for('schedule.schedule_submit', slug=event.event_slug)}}">submit match</a></p>
+<h2>Episodes</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>When</th>
+    </tr>
+    {% for episode in event.episodes %}
+    <tr>
+        <td><a href="{{ url_for('schedule.schedule_episode', slug=event.event_slug, episode_id=episode.id) }}">{{ episode.id }}</a></td>
+        <td>{{ episode.when_countdown }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{%- endblock content %}

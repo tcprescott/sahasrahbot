@@ -32,6 +32,10 @@ sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
 
+# not ready for prime time
+if config.DEBUG:
+    sahasrahbotapi.register_blueprint(blueprints.schedule_blueprint, url_prefix="/schedule")
+
 
 @sahasrahbotapi.route("/")
 async def index():

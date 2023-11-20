@@ -290,7 +290,7 @@ class Users(Model):
     twitch_name = fields.CharField(200, null=True)
     rtgg_id = fields.CharField(200, null=True, unique=True)
     rtgg_access_token = fields.CharField(200, null=True)
-    display_name = fields.CharField(200, index=True, null=True)
+    display_name = fields.CharField(200, index=True, null=True, unique=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     test_user = fields.BooleanField(default=False)
