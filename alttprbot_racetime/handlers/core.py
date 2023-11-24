@@ -262,6 +262,15 @@ class SahasrahBotCoreHandler(RaceHandler):
         if await self.is_locked(message):
             return
 
+        entrant_ids = [e['user']['id'] for e in self.data['entrants'] if e['status']['value'] in ['ready', 'not_ready', 'in_progress', 'done', 'dnf', 'dq'] ]
+        user_id = message.get('user', {}).get('id', None)
+        # only entrants or race monitors can roll seeds
+        if user_id not in entrant_ids and not can_monitor(message):
+            await self.send_message(
+                'Only entrants or race monitors may roll a tournament seed.'
+            )
+            return
+
         if self.tournament:
             await self.tournament.process_tournament_race(args, message)
         else:
