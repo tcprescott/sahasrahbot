@@ -1,12 +1,7 @@
-description: This'll always be HMG.  Always.
-glitches_required: "major_glitches"
-item_functionality: "normal"
+description: HMG mystery weights, updated 12/2023
+glitches_required: "hybrid_major_glitches"
 item_placement: "advanced"
-dungeon_items: standard
-
-options:
-  FillItemPoolWith: TwentyRupees2
-
+dungeon_items: "standard" # overridden below
 accessibility:
   items: 70
   locations: 0
@@ -15,8 +10,9 @@ goals:
   ganon: 40
   fast_ganon: 20
   dungeons: 10
-  pedestal: 20
-  triforce-hunt: 10
+  pedestal: 15
+  ganonhunt: 10
+  triforce-hunt: 5
 tower_open: "random"
 ganon_open:
   "3": 10
@@ -25,8 +21,8 @@ ganon_open:
   "6": 25
   "7": 30
 world_state:
-  standard: 15
-  open: 70
+  standard: 20
+  open: 65
   inverted: 10
   retro: 5
 entrance_shuffle:
@@ -44,7 +40,7 @@ boss_shuffle:
 enemy_shuffle:
   none: 60
   shuffled: 40
-  random: 00
+  random: 0
 hints: "off"
 weapons:
   randomized: 50
@@ -56,6 +52,7 @@ item_pool:
   hard: 15
   expert: 5
   crowd_control: 0
+item_functionality: "normal"
 enemy_damage:
   default: 80
   shuffled: 20
@@ -82,6 +79,7 @@ customizer:
     canOneFrameClipUW: true
     canSuperBunny: true
     canSuperSpeed: true
+    canTransitionWrapped: false
     canWaterFairyRevive: false
     canWaterWalk: true
     customPrizePacks: false
@@ -97,5 +95,4 @@ customizer:
     region.wildBigKeys:
       True: 40
       False: 60
-
 rom.logicMode: MajorGlitches

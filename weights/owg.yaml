@@ -1,17 +1,7 @@
-description: This'll always be OWG.  Always.
-glitches_required:
-  none: 0
-  overworld_glitches: 100
-  major_glitches: 0
-  no_logic: 0
-item_placement:
-  basic: 25
-  advanced: 75
-dungeon_items:
-  standard: 60
-  mc: 10
-  mcs: 10
-  full: 20
+description: OWG mystery weights, updated 12/2023
+glitches_required: "overworld_glitches"
+item_placement: "advanced"
+dungeon_items: "standard" # overridden below
 accessibility:
   items: 70
   locations: 0
@@ -20,28 +10,16 @@ goals:
   ganon: 40
   fast_ganon: 20
   dungeons: 10
-  pedestal: 20
-  triforce-hunt: 10
-tower_open:
-  "0": 5
-  "1": 5
-  "2": 5
-  "3": 5
-  "4": 5
-  "5": 5
-  "6": 5
-  "7": 50
-  random: 15
+  pedestal: 15
+  ganonhunt: 10
+  triforce-hunt: 5
+tower_open: "random"
 ganon_open:
-  "0": 5
-  "1": 5
-  "2": 5
-  "3": 5
-  "4": 5
-  "5": 5
-  "6": 5
-  "7": 50
-  random: 15
+  "3": 10
+  "4": 15
+  "5": 20
+  "6": 25
+  "7": 30
 world_state:
   standard: 10
   open: 70
@@ -67,19 +45,16 @@ hints:
   "on": 50
   "off": 50
 weapons:
-  randomized: 20
-  assured: 60
+  randomized: 50
+  assured: 25
   vanilla: 15
-  swordless: 5
+  swordless: 10
 item_pool:
   normal: 80
   hard: 15
   expert: 5
   crowd_control: 0
-item_functionality:
-  normal: 80
-  hard: 15
-  expert: 5
+item_functionality: "normal"
 enemy_damage:
   default: 80
   shuffled: 10
@@ -89,3 +64,20 @@ enemy_health:
   easy: 5
   hard: 10
   expert: 5
+customizer:
+  eq:
+    "PegasusBoots": true
+  custom:
+    customPrizePacks: false
+    region.wildMaps:
+      True: 40
+      False: 60
+    region.wildCompasses:
+      True: 40
+      False: 60
+    region.wildKeys:
+      True: 40
+      False: 60
+    region.wildBigKeys:
+      True: 40
+      False: 60
