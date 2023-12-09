@@ -11,7 +11,7 @@ authors = ["Thomas Prescott <tcprescott@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.11"
 quart = "*"
 Quart-Discord = ">=2.1.4"
 aerich = ">=0.5.5"
