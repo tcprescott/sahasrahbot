@@ -7,6 +7,7 @@ import random
 import re
 import string
 import tempfile
+import sys
 
 import aioboto3
 import aiofiles
@@ -31,7 +32,12 @@ class AlttprDoor():
             self.settings['create_spoiler'] = True
             self.settings['calc_playthrough'] = False
             self.settings['rom'] = config.ALTTP_ROM
-            self.settings['enemizercli'] = os.path.join(config.ENEMIZER_HOME, 'EnemizerCLI.Core')
+            self.settings['enemizercli'] = os.path.join(
+                "utils",
+                "enemizer",
+                'os.10.12-x64' if sys.platform == 'darwin' else 'ubuntu.16.04-x64',
+                'EnemizerCLI.Core'
+            )
 
             # set some defaults we do NOT want to change ever
             self.settings['count'] = 1
@@ -54,7 +60,7 @@ class AlttprDoor():
                             '--settingsfile', settings_file_path,
                             stdout=asyncio.subprocess.PIPE,
                             stderr=asyncio.subprocess.PIPE,
-                            cwd=config.DOOR_RANDO_HOME)
+                            cwd="utils/ALttPDoorRandomizer")
 
                         stdout, stderr = await proc.communicate()
                         logging.info(stdout.decode())
@@ -75,7 +81,7 @@ class AlttprDoor():
             spoiler_path = os.path.join(tmp, self.spoiler_name)
 
             proc = await asyncio.create_subprocess_exec(
-                os.path.join('utils', 'flips'),
+                os.path.join('utils', 'macos' if sys.platform == 'darwin' else 'linux', 'flips'),
                 '--create',
                 '--bps-delta',
                 config.ALTTP_ROM,
