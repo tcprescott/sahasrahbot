@@ -21,6 +21,13 @@ class AlttprDoor():
         self.settings = settings
         self.spoilers = spoilers
 
+        self.hash = None
+        self.attempts = 0
+        self.patch_name = None
+        self.rom_name = None
+        self.spoiler_name = None
+        self.spoilerfile = None
+
     async def generate_game(self):
         with tempfile.TemporaryDirectory() as tmp:
             settings_file_path = os.path.join(tmp, "settings.json")
@@ -33,9 +40,10 @@ class AlttprDoor():
             self.settings['calc_playthrough'] = False
             self.settings['rom'] = config.ALTTP_ROM
             self.settings['enemizercli'] = os.path.join(
+                os.getcwd(),
                 "utils",
                 "enemizer",
-                'os.10.12-x64' if sys.platform == 'darwin' else 'ubuntu.16.04-x64',
+                'osx.10.12-x64' if sys.platform == 'darwin' else 'ubuntu.16.04-x64',
                 'EnemizerCLI.Core'
             )
 
