@@ -195,7 +195,7 @@ If you have any questions, please contact a server administrator.
 """
 
         if reverify_period_days is not None:
-            content += f"- Must reverify every {reverify_period_days} {'day' if reverify_period_days == 1 else 'days'}.  This process is automatic and requires no action on by you.\n"
+            content += f"- Must reverify every {reverify_period_days} {'day' if reverify_period_days == 1 else 'days'}.  This process is automatic and requires no action by you.\n"
 
         await interaction.response.send_message(
             content=content,
