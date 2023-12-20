@@ -49,7 +49,7 @@ class RankedChoiceMessageView(discord.ui.View):
 
 class RankedChoice(commands.GroupCog, name="rankedchoice"):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
         self.persistent_views_added = False
 
     @commands.Cog.listener()
@@ -69,6 +69,11 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
     async def create(self, interaction: discord.Interaction, title: str, candidates: str, seats: int = 1,
                      description: str = None, authorized_voters_role: discord.Role = None,
                      show_vote_count: bool = True):
+
+        if interaction.user.guild_permissions.administrator is False and self.bot.is_owner(interaction.user) is False:
+            await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
+            return
+
         election = await models.RankedChoiceElection.create(
             title=title,
             description=description,

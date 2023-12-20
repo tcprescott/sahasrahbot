@@ -743,14 +743,28 @@ class AsyncTournamentAuditLog(Model):
 class RacerVerification(Model):
     id = fields.IntField(pk=True)
     message_id = fields.BigIntField(null=True)
+    channel_id = fields.BigIntField(null=True)
     guild_id = fields.BigIntField(null=False)
     role_id = fields.BigIntField(null=False)
     racetime_categories = fields.CharField(2000, null=True)  # comma separated list of racetime categories to query
     use_alttpr_ladder = fields.BooleanField(null=False, default=False)  # use alttpr ladder to verify
     minimum_races = fields.IntField(null=False)
     time_period_days = fields.IntField(null=False, default=365)
+    reverify_period_days = fields.IntField(null=True, default=None) # if set, will reverify every X days
+    revoke_ineligible = fields.BooleanField(null=False, default=False) # if set, will revoke role if ineligible
+    audit_channel_id = fields.BigIntField(null=True, default=None) # if set, will notify this channel if reverify fails
     created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
 
+    verified_racers: fields.ReverseRelation['VerifiedRacer']
+
+class VerifiedRacer(Model):
+    id = fields.IntField(pk=True)
+    user = fields.ForeignKeyField('models.Users', related_name='verified_racer', on_delete="RESTRICT")
+    racer_verification = fields.ForeignKeyField('models.RacerVerification', related_name='verified_racer', on_delete="CASCADE")
+    estimated_count = fields.IntField(null=True)
+    created = fields.DatetimeField(auto_now_add=True)
+    last_verified = fields.DatetimeField(null=True)
 
 class SGL2023OnsiteHistory(Model):
     id = fields.IntField(pk=True)
