@@ -259,7 +259,7 @@ If you have any questions, please contact a server administrator.
                     await verified_racer.delete()
                     # send a message to the user
                     await verified_racer_member.send(
-                        f"Your verification for __{verified_racer_role.name} has expired.  Please re-verify by clicking the button in the message in the {guild.name} server.\n\nIf you believe this is in error, please contact a server administrator for assistance."
+                        f"Your verification for __{verified_racer_role.name}__ has expired.  Please re-verify by clicking the button in the message in the {guild.name} server.\n\nIf you believe this is in error, please contact a server administrator for assistance."
                     )
 
         return revoked_users
