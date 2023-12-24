@@ -262,6 +262,14 @@ class RTGGAnnouncerMessages(Model):
     message_id = fields.BigIntField(null=False)
     room_name = fields.CharField(50)
 
+class RTGGOverrideWhitelist(Model):
+    id = fields.IntField(pk=True)
+    racetime_id = fields.CharField(50, null=False)
+    category = fields.CharField(50, null=False)
+    created = fields.DatetimeField(auto_now_add=True)
+    updated = fields.DatetimeField(auto_now=True)
+    reason = fields.CharField(200, null=True)
+    expires = fields.DatetimeField(null=True)
 
 class SrlRaces(Model):
     class Meta:

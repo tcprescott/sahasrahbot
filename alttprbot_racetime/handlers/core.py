@@ -195,6 +195,24 @@ class SahasrahBotCoreHandler(RaceHandler):
                 await models.RTGGUnlistedRooms.filter(room_name=self.data.get('name')).delete()
         self.unlisted = unlisted
 
+    # TODO: this should be implemented in the base class
+    async def override_stream(self, user):
+        """
+        Override the streaming requirements for a user.
+
+        `user` should be the hashid of the user.
+        """
+        await self.ws.send_json({
+            'action': 'override_stream',
+            'data': {
+                'user': user
+            }
+        })
+        self.logger.info('[%(race)s] overrode stream for %(user)s' % {
+            'race': self.data.get('name'),
+            'user': user
+        })
+
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
         # raise Exception(data.get('errors'))
@@ -327,3 +345,18 @@ class SahasrahBotCoreHandler(RaceHandler):
             racetime_id = message.get('user', {}).get('id', None)
             if await self.tournament.can_gatekeep(racetime_id):
                 await self.add_monitor(racetime_id)
+
+    async def ex_override(self, args, message):
+        racetime_id = message.get('user', {}).get('id', None)
+        racetime_category = self.data['category']['slug']
+        whitelisted_user = await models.RTGGOverrideWhitelist.get_or_none(racetime_id=racetime_id, category=racetime_category)
+
+        if whitelisted_user is None:
+            await self.send_message("You do not have permission to override the stream requirement for this category.  Please contact a category owner if you need this to be changed.")
+            return
+
+        if whitelisted_user.expires is not None and whitelisted_user.expires < datetime.utcnow():
+            await self.send_message("Your streaming exemption has expired.  Please contact a category owner if you need this to be renewed.")
+            return
+
+        await self.override_stream(racetime_id)
