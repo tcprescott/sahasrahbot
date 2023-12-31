@@ -46,8 +46,8 @@ subweights:
               "on": 80
               "off": 20
             pottery:
-              "on": 15
-              "off": 85
+              "lottery": 15
+              "none": 85
             accessibility:
               items: 75
               locations: 10
@@ -122,8 +122,8 @@ subweights:
               "keys": 25
               "underworld": 15
             pottery:
-              "on": 20
-              "off": 80
+              "lottery": 20
+              "none": 80
             accessibility:
               items: 70
               locations: 0
@@ -196,8 +196,8 @@ subweights:
               "underworld": 25
               "off": 75
             pottery:
-              "on": 30
-              "off": 70
+              "lottery": 30
+              "none": 70
             shopsanity:
               "on": 50
               "off": 50
@@ -358,8 +358,8 @@ subweights:
               "on": 95
               "off": 5
             pottery:
-              "on": 15
-              "off": 85
+              "lottery": 15
+              "none": 85
             accessibility:
               items: 75
               locations: 10
@@ -442,8 +442,8 @@ subweights:
               "none": 80
               "underworld": 20
             pottery:
-              "on": 20
-              "off": 80
+              "lottery": 20
+              "none": 80
             accessibility:
               items: 70
               locations: 0
