@@ -1,6 +1,5 @@
-description: pogchampion_season9
+Andy Weights
 
-# Always true
 allow_quickswap: true
 pseudoboots: true
 glitches_required: "none"
@@ -25,525 +24,779 @@ startinventory:
   "Pegasus Boots":
     0: 50
     1: 50
-
+	
 subweights:
-  insanity:
-    chance: 7
-    weights:
-      mapshuffle:
-        "on": 75
-        "off": 25
-      compassshuffle:
-        "on": 75
-        "off": 25
-      keyshuffle:
-        "on": 75
-        "off": 25
-      bigkeyshuffle:
-        "on": 75
-        "off": 25
-      keydropshuffle:
-        "on": 5
-        "off": 95
-      accessibility:
-        items: 75
-        locations: 10
-        none: 15
-      goals:
-        ganon: 15
-        fast_ganon: 70
-        dungeons: 5
-        pedestal: 10
-      tower_open: "random"
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 10
-        "3": 10
-        "4": 20
-        "5": 20
-        "6": 20
-        "7": 20
-      world_state:
-        open: 70
-        inverted: 25
-        retro: 5
-      entrance_shuffle: "insanity"
-      boss_shuffle:
-        none: 70
-        simple: 10
-        full: 10
-        random: 10
-      enemy_shuffle:
-        none: 70
-        shuffled: 30
-        random: 0
-      enemy_damage:
-        default: 90
-        shuffled: 10
-        random: 0
-      enemy_health:
-        default: 90
-        hard: 10
-      hints:
-        "on": 60
-        "off": 40
-      weapons:
-        randomized: 65
-        assured: 20
-        vanilla: 5
-        swordless: 10
-      item_pool:
-        normal: 75
-        hard: 25
-        expert: 0
-      startinventory:
-        "Ocarina": 1
-  doors:
-    chance: 10
-    weights:
-      door_shuffle:
-        basic: 70
-        crossed: 30
-      dungeon_counters: "on"
-      keydropshuffle: "on"
-      intensity: 3
-      mapshuffle:
-        "on": 75
-        "off": 25
-      compassshuffle:
-        "on": 75
-        "off": 25
-      keyshuffle:
-        "on": 75
-        "off": 25
-      bigkeyshuffle:
-        "on": 75
-        "off": 25
-      accessibility:
-        items: 60
-        locations: 30
-        none: 10
-      goals:
-        ganon: 25
-        fast_ganon: 50
-        dungeons: 10
-        pedestal: 15
-      tower_open: "random"
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 10
-        "3": 10
-        "4": 20
-        "5": 20
-        "6": 20
-        "7": 20
-      world_state:
-        standard: 30
-        open: 50
-        inverted: 20
-        retro: 0
-      entrance_shuffle:
-        none: 33
-        restricted: 7
-        crossed: 60
-      boss_shuffle:
-        none: 70
-        simple: 10
-        full: 10
-        random: 10
-      enemy_shuffle:
-        none: 90
-        shuffled: 10
-      enemy_damage:
-        default: 90
-        shuffled: 10
-        random: 0
-      enemy_health:
-        default: 90
-        hard: 10
-      hints: "on"
-      weapons:
-        randomized: 65
-        assured: 24
-        vanilla: 1
-        swordless: 10
-      item_pool:
-        normal: 85
-        hard: 15
-  shopsanity:
-    chance: 18
-    weights:
-      shopsanity: "on"
-      mapshuffle:
-        "on": 70
-        "off": 30
-      compassshuffle:
-        "on": 70
-        "off": 30
-      keyshuffle:
-        "on": 70
-        "off": 30
-      bigkeyshuffle:
-        "on": 70
-        "off": 30
-      keydropshuffle:
-        "on": 20
-        "off": 80
-      accessibility:
-        items: 70
-        locations: 0
-        none: 30
-      goals:
-        ganon: 30
-        fast_ganon: 40
-        dungeons: 15
-        pedestal: 15
-      tower_open: "random"
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 10
-        "3": 10
-        "4": 20
-        "5": 20
-        "6": 20
-        "7": 20
-      world_state:
-        standard: 30
-        open: 40
-        inverted: 25
-        retro: 15
-      entrance_shuffle:
-        none: 30
-        restricted: 7
-        crossed: 63
-      boss_shuffle:
-        none: 60
-        simple: 5
-        full: 10
-        random: 25
-      enemy_shuffle:
-        none: 75
-        shuffled: 25
-      enemy_damage:
-        default: 75
-        shuffled: 10
-        random: 15
-      enemy_health:
-        default: 85
-        easy: 0
-        hard: 10
-        expert: 5
-      hints:
-        "on": 50
-        "off": 50
-      weapons:
-        randomized: 65
-        assured: 24
-        vanilla: 1
-        swordless: 10
-      item_pool:
-        normal: 50
-        hard: 40
-        expert: 10
-  chaosinventory:
-    chance: 15
-    weights:
-      mapshuffle:
-        "on": 85
-        "off": 15
-      compassshuffle:
-        "on": 85
-        "off": 15
-      keyshuffle:
-        "on": 85
-        "off": 15
-      bigkeyshuffle:
-        "on": 85
-        "off": 15
-      keydropshuffle:
-        "on": 20
-        "off": 80
-      accessibility:
-        items: 60
-        locations: 30
-        none: 10
-      goals:
-        ganon: 35
-        fast_ganon: 35
-        dungeons: 20
-        pedestal: 10
-      tower_open:
-        "0": 5
-        "1": 5
-        "2": 10
-        "3": 10
-        "4": 10
-        "5": 20
-        "6": 20
-        "7": 20
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 10
-        "3": 10
-        "4": 20
-        "5": 20
-        "6": 20
-        "7": 20
-      world_state:
-        open: 70
-        inverted: 30
-      entrance_shuffle:
-        none: 75
-        restricted: 4
-        crossed: 21
-      boss_shuffle:
-        simple: 33
-        full: 33
-        random: 34
-      enemy_shuffle:
-        shuffled: 100
-      enemy_damage:
-        shuffled: 75
-        random: 25
-      enemy_health:
-        default: 10
-        hard: 60
-        expert: 30
-      hints:
-        "on": 50
-        "off": 50
-      weapons:
-        randomized: 65
-        assured: 24
-        vanilla: 1
-        swordless: 10
-      item_pool:
-        normal: 60
-        hard: 35
-        expert: 5
-      startinventory:
-        "Bombos":
-          0: 80
-          1: 20
-        "Book of Mudora":
-          0: 80
-          1: 20
-        "Cane of Somaria":
-          0: 80
-          1: 20
-        "Cape":
-          0: 80
-          1: 20
-        "Ether":
-          0: 80
-          1: 20
-        "Fire Rod":
-          0: 80
-          1: 20
-        "Flippers":
-          0: 80
-          1: 20
-        "Hammer":
-          0: 80
-          1: 20
-        "Hookshot":
-          0: 80
-          1: 20
-        "Ice Rod":
-          0: 80
-          1: 20
-        "Lamp":
-          0: 80
-          1: 20
-        "Magic Mirror":
-          0: 80
-          1: 20
-        "Moon Pearl":
-          0: 80
-          1: 20
-        "Mushroom":
-          0: 80
-          1: 20
-        "Ocarina":
-          0: 80
-          1: 20
-        "Magic Powder":
-          0: 80
-          1: 20
-        "Quake":
-          0: 80
-          1: 20
-        "Shovel":
-          0: 80
-          1: 20
-        "Bug Catching Net":
-          0: 80
-          1: 20
-        "Cane of Byrna":
-          0: 80
-          1: 20
-        "Blue Boomerang":
-          0: 80
-          1: 20
-        "Red Boomerang":
-          0: 80
-          1: 20
-  entrance:
-    chance: 20
-    weights:
-      mapshuffle:
-        "on": 70
-        "off": 30
-      compassshuffle:
-        "on": 70
-        "off": 30
-      keyshuffle:
-        "on": 70
-        "off": 30
-      bigkeyshuffle:
-        "on": 70
-        "off": 30
-      keydropshuffle:
-        "on": 20
-        "off": 80
-      accessibility:
-        items: 70
-        locations: 0
-        none: 30
-      goals:
-        ganon: 15
-        fast_ganon: 55
-        dungeons: 15
-        pedestal: 15
-      tower_open: "random"
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 10
-        "3": 10
-        "4": 20
-        "5": 20
-        "6": 20
-        "7": 20
-      world_state:
-        standard: 25
-        open: 40
-        inverted: 25
-        retro: 10
-      entrance_shuffle:
-        simple: 1
-        restricted: 10
-        crossed: 89
-      boss_shuffle:
-        none: 40
-        simple: 10
-        full: 15
-        random: 35
-      enemy_shuffle:
-        none: 75
-        shuffled: 25
-      enemy_damage:
-        default: 80
-        shuffled: 10
-        random: 10
-      enemy_health:
-        default: 85
-        easy: 0
-        hard: 10
-        expert: 5
-      hints:
-        "on": 50
-        "off": 50
-      weapons:
-        randomized: 65
-        assured: 24
-        vanilla: 1
-        swordless: 10
-      item_pool:
-        normal: 50
-        hard: 40
-        expert: 10
-  normal:
-    chance: 30
-    weights:
-      mapshuffle:
-        "on": 75
-        "off": 25
-      compassshuffle:
-        "on": 75
-        "off": 25
-      keyshuffle:
-        "on": 75
-        "off": 25
-      bigkeyshuffle:
-        "on": 75
-        "off": 25
-      keydropshuffle:
-        "on": 15
-        "off": 85
-      accessibility:
-        items: 55
-        locations: 10
-        none: 35
-      goals:
-        ganon: 35
-        fast_ganon: 35
-        dungeons: 20
-        pedestal: 10
-      tower_open:
-        "0": 5
-        "1": 5
-        "2": 5
-        "3": 5
-        "4": 15
-        "5": 15
-        "6": 15
-        "7": 35
-      ganon_open:
-        "0": 0
-        "1": 0
-        "2": 0
-        "3": 10
-        "4": 10
-        "5": 20
-        "6": 30
-        "7": 30
-      world_state:
-        standard: 40
-        open: 25
-        inverted: 25
-        retro: 10
-      entrance_shuffle: "none"
-      boss_shuffle:
-        none: 70
-        simple: 10
-        full: 10
-        random: 10
-      enemy_shuffle:
-        none: 65
-        shuffled: 35
-      enemy_damage:
-        default: 60
-        shuffled: 25
-        random: 15
-      enemy_health:
-        default: 60
-        easy: 0
-        hard: 25
-        expert: 15
-      hints:
-        "on": 33
-        "off": 67
-      weapons:
-        randomized: 65
-        assured: 24
-        vanilla: 1
-        swordless: 10
-      item_pool:
-        normal: 50
-        hard: 35
-        expert: 15
+  Andy:
+    chance: 70
+    subweights:
+      insanity:
+        chance: 10
+        weights:
+          mapshuffle:
+            "on": 80
+            "off": 20
+          compassshuffle:
+            "on": 80
+            "off": 20
+          keyshuffle:
+            "on": 80
+            "off": 20
+          bigkeyshuffle:
+            "on": 80
+            "off": 20
+          pottery:
+            "on": 15
+            "off": 85
+          accessibility:
+            items: 75
+            locations: 10
+            none: 15
+          goals:
+            ganon: 25
+            fast_ganon: 60
+            dungeons: 5
+            pedestal: 10
+          tower_open: "random"
+          ganon_open:
+            "0": 0
+            "1": 10
+            "2": 10
+            "3": 10
+            "4": 10
+            "5": 20
+            "6": 20
+            "7": 20
+          world_state:
+            open: 70
+            inverted: 30
+          retro: 0
+          entrance_shuffle: "insanity"
+          boss_shuffle:
+            none: 50
+            simple: 0
+            full: 35
+            random: 15
+          enemy_shuffle:
+            none: 50
+            shuffled: 0
+            random: 50
+          enemy_damage:
+            default: 80
+            shuffled: 0
+            random: 20
+          enemy_health:
+            default: 90
+            hard: 10
+          hints:
+            "on": 75
+            "off": 25
+          weapons:
+            randomized: 65
+            assured: 20
+            vanilla: 5
+            swordless: 10
+          item_pool:
+            normal: 75
+            hard: 25
+            expert: 0
+          startinventory:
+            "Ocarina": 1
+      entrance:
+        chance: 40
+        weights:
+          mapshuffle:
+              "on": 80
+              "off": 20
+          compassshuffle:
+            "on": 80
+            "off": 20
+          keyshuffle:
+            "on": 80
+            "off": 20
+          bigkeyshuffle:
+            "on": 80
+            "off": 20
+          dropshuffle:
+            "none": 60
+          "keys": 25
+            "underworld": 15 
+          pottery:
+            "on": 20 
+            "off": 80
+          accessibility:
+            items: 70
+            locations: 0
+            none: 30
+          goals:
+            ganon: 20
+            fast_ganon: 55
+            dungeons: 15
+            pedestal: 10
+          tower_open: "random"
+          ganon_open:
+            "0": 0
+            "1": 10
+            "2": 10
+            "3": 10
+            "4": 10
+            "5": 20
+            "6": 20
+            "7": 20
+          world_state:
+            standard: 20
+            open: 40
+            inverted: 25
+            retro: 15
+          entrance_shuffle:
+            swapped: 35
+            crossed: 65
+          boss_shuffle:
+            none: 50
+            random: 50
+          enemy_shuffle:
+            none: 50
+            shuffled: 50
+          enemy_damage:
+            default: 80
+            random: 20
+          enemy_health:
+            default: 85
+            easy: 0
+            hard: 10
+            expert: 5
+          hints:
+            "on": 65
+            "off": 35
+          weapons:
+            randomized: 65
+            assured: 24
+            vanilla: 1
+            swordless: 10
+          item_pool:
+            normal: 50
+            hard: 40
+            expert: 10
+      normal:
+        chance: 30
+        weights:
+          mapshuffle:
+            "on": 75
+            "off": 25
+          compassshuffle:
+            "on": 75
+            "off": 25
+          keyshuffle:
+            "on": 75
+            "off": 25
+          bigkeyshuffle:
+            "on": 75
+            "off": 25
+          dropshuffle:
+            "underworld": 25
+            "off": 75
+          pottery:
+            "on": 30 
+            "off": 70
+          shopsanity:
+            "on": 50
+            "off": 50
+          accessibility:
+            items: 55
+            locations: 10
+            none: 35
+          goals:
+            ganon: 35
+            fast_ganon: 35
+            dungeons: 20
+            pedestal: 10
+          tower_open:
+            "0": 5
+            "1": 5
+            "2": 5
+            "3": 15
+            "4": 15
+            "5": 15
+            "6": 15
+            "7": 25
+          ganon_open:
+            "0": 0
+            "1": 0
+            "2": 5
+            "3": 10
+            "4": 10
+            "5": 20
+            "6": 25
+            "7": 30
+          world_state:
+            standard: 40
+            open: 35
+            inverted: 25
+          entrance_shuffle: "none"
+          boss_shuffle:
+            none: 40
+            simple: 0
+            full: 30
+            random: 30
+          enemy_shuffle:
+            none: 40
+            shuffled: 60
+          enemy_damage:
+            default: 65
+            shuffled: 0
+            random: 35
+          enemy_health:
+            default: 75
+            easy: 0
+            hard: 25
+            expert: 0
+          hints:
+            "on": 50
+            "off": 50
+          weapons:
+            randomized: 65
+            assured: 24
+            vanilla: 1
+            swordless: 10
+          item_pool:
+            normal: 50
+            hard: 35
+            expert: 15
+      doors:
+        chance: 20
+        weights:
+          door_shuffle:
+            basic: 50
+            crossed: 50
+          dungeon_counters: "on"
+          dropshuffle:
+        "keys": 70
+        "underworld": 30
+          intensity: 3
+          mapshuffle:
+            "on": 75
+            "off": 25
+          compassshuffle:
+            "on": 75
+            "off": 25
+          keyshuffle:
+            "on": 75
+            "off": 25
+          bigkeyshuffle:
+            "on": 75
+            "off": 25
+          accessibility:
+            items: 60
+            locations: 30
+            none: 10
+          goals:
+            ganon: 25
+            fast_ganon: 50
+            dungeons: 10
+            pedestal: 15
+          tower_open: "random"
+          ganon_open:
+            "0": 10
+            "1": 10
+            "2": 20
+            "3": 20
+            "4": 20
+            "5": 20
+            "6": 0
+            "7": 0
+          world_state:
+            standard: 30
+            open: 50
+            inverted: 20
+            retro: 0
+          entrance_shuffle:
+            none: 50
+            restricted: 0
+            crossed: 50
+          boss_shuffle:
+            none: 50
+            simple: 0
+            full: 25
+            random: 25
+          enemy_shuffle:
+            none: 80
+            shuffled: 20
+          enemy_damage:
+            default: 90
+            shuffled: 10
+            random: 0
+          enemy_health:
+            default: 90
+            hard: 10
+          hints: "on"
+          weapons:
+            randomized: 65
+            assured: 24
+            vanilla: 1
+            swordless: 10
+          item_pool:
+            normal: 85
+            hard: 15
+				
+  Chat:
+    chance: 30		
+    subweights:
+      insanity:
+        chance: 22
+        weights:
+          mapshuffle:
+            "on": 94
+            "off": 6
+          compassshuffle:
+            "on": 88
+            "off": 12
+          keyshuffle:
+            "on": 95
+            "off": 5
+          bigkeyshuffle:
+            "on": 95
+            "off": 5
+          pottery:
+            "on": 15
+            "off": 85
+          accessibility:
+            items: 75
+            locations: 10
+            none: 15
+          goals:
+            ganon: 26
+            fast_ganon: 22
+            dungeons: 36
+            pedestal: 16
+          tower_open:
+            "0": 8
+            "1": 9
+            "2": 9
+            "3": 14
+            "4": 14
+            "5": 15
+            "6": 15
+            "7": 16
+          ganon_open:
+            "0": 3
+            "1": 3
+            "2": 3
+            "3": 18
+            "4": 18
+            "5": 19
+            "6": 17
+            "7": 18
+          world_state:
+            open: 30
+            standard: 15
+            inverted: 38
+            retro: 17
+          entrance_shuffle: "insanity"
+          boss_shuffle:
+            none: 69
+            simple: 0
+            full: 0
+            random: 31
+          enemy_shuffle:
+            none: 77
+            shuffled: 0
+            random: 23
+          enemy_damage:
+            default: 54
+            shuffled: 0
+            random: 46
+          enemy_health:
+            default: 100
+            hard: 0
+          hints:
+            "on": 68
+            "off": 32
+          weapons:
+            randomized: 68
+            assured: 7
+            vanilla: 5
+            swordless: 20
+          item_pool:
+            normal: 75
+            hard: 25
+            expert: 0
+          startinventory:
+            "Ocarina": 1
+      entrance:
+        chance: 13
+        weights:
+          mapshuffle:
+            "on": 94
+            "off": 6
+          compassshuffle:
+            "on": 85
+            "off": 15
+          keyshuffle:
+            "on": 96
+            "off": 4
+          bigkeyshuffle:
+            "on": 97
+            "off": 3
+          dropshuffle:
+            "none": 80
+            "underworld": 20
+          pottery:
+            "on": 20
+            "off": 80
+          accessibility:
+            items: 70
+            locations: 0
+            none: 30
+          goals:
+            ganon: 26
+            fast_ganon: 22
+            dungeons: 36
+            pedestal: 16
+          tower_open: 
+            "0": 7
+            "1": 8
+            "2": 8
+            "3": 17
+            "4": 17
+            "5": 18
+            "6": 12
+            "7": 13
+          ganon_open:
+            "0": 3
+            "1": 3
+            "2": 3
+            "3": 18
+            "4": 18
+            "5": 19
+            "6": 17
+            "7": 18
+          world_state:
+            open: 30
+            standard: 15
+            inverted: 38
+            retro: 17
+          entrance_shuffle:
+            swapped: 43
+            crossed: 57
+          shufflelinks:
+            "on": 81
+            "off": 19
+          boss_shuffle:
+            none: 67
+            random: 33
+          enemy_shuffle:
+            none: 72
+            shuffled: 28
+          enemy_damage:
+            default: 64
+            random: 36
+          enemy_health:
+            default: 100
+            easy: 0
+            hard: 0
+            expert: 0
+          hints:
+            "on": 70
+            "off": 30
+          weapons:
+            randomized: 68
+            assured: 7
+            vanilla: 5
+            swordless: 20
+          item_pool:
+            normal: 70
+            hard: 30
+            expert: 0
+      doors:
+        chance: 30
+        weights:
+          door_shuffle:
+            basic: 10
+            partitioned: 22
+            crossed: 68
+          dungeon_counters: "on"
+          dropshuffle:
+            "keys": 70
+            "underworld": 30
+          intensity: 
+            1: 15
+            2: 25
+            3: 60
+          mapshuffle:
+            "on": 90
+            "off": 10
+          compassshuffle:
+            "on": 82
+            "off": 18
+          keyshuffle:
+            "on": 89
+            "off": 11
+          bigkeyshuffle:
+            "on": 91
+            "off": 9
+          accessibility:
+            locations: 100
+          goals:
+            ganon: 26
+            fast_ganon: 22
+            dungeons: 36
+            pedestal: 16
+          tower_open:
+            "0": 8
+            "1": 9
+            "2": 9
+            "3": 14
+            "4": 14
+            "5": 15
+            "6": 15
+            "7": 16
+          ganon_open:
+            "0": 3
+            "1": 3
+            "2": 3
+            "3": 18
+            "4": 18
+            "5": 19
+            "6": 17
+            "7": 18
+          world_state:
+            open: 30
+            standard: 15
+            inverted: 38
+            retro: 17
+          entrance_shuffle:
+            none: 12
+            full: 88
+          shufflelinks:
+            "yes": 70
+            "no": 30
+          boss_shuffle:
+            none: 67
+            simple: 0
+            full: 0
+            random: 33
+          enemy_shuffle:
+            none: 75
+            shuffled: 25
+          enemy_damage:
+            default: 61
+            shuffled: 0
+            random: 39
+          enemy_health:
+            default: 90
+            hard: 10
+          hints:
+            "on": 77
+            "off": 23
+          weapons:
+            randomized: 68
+            assured: 7
+            vanilla: 5
+            swordless: 20
+          item_pool:
+            normal: 85
+            hard: 15
+      chaosinventory:
+        chance: 13
+        weights:
+          mapshuffle:
+            "on": 84
+            "off": 16
+          compassshuffle:
+            "on": 80
+            "off": 20
+          keyshuffle:
+            "on": 88
+            "off": 12
+          bigkeyshuffle:
+            "on": 92
+            "off": 8
+          dropshuffle:
+            "underworld": 10
+            "keys": 10
+            "off": 80
+          accessibility:
+            items: 60
+            locations: 30
+            none: 10
+          goals:
+            ganon: 26
+            fast_ganon: 22
+            dungeons: 36
+            pedestal: 16
+          tower_open:
+            "0": 8
+            "1": 9
+            "2": 9
+            "3": 14
+            "4": 14
+            "5": 15
+            "6": 15
+            "7": 16
+          ganon_open:
+            "0": 3
+            "1": 3
+            "2": 3
+            "3": 18
+            "4": 18
+            "5": 19
+            "6": 17
+            "7": 18
+          world_state:
+            open: 30
+            standard: 15
+            inverted: 38
+            retro: 17
+          entrance_shuffle:
+            none: 34
+            swapped: 33
+            crossed: 33
+          boss_shuffle:
+            simple: 33
+            full: 33
+            random: 34
+          enemy_shuffle:
+            shuffled: 100
+          enemy_damage:
+            shuffled: 75
+            random: 25
+          enemy_health:
+            default: 30
+            hard: 40
+            expert: 30
+          hints:
+            "on": 69
+            "off": 31
+          weapons:
+            randomized: 68
+            assured: 7
+            vanilla: 5
+            swordless: 20
+          item_pool:
+            normal: 60
+            hard: 35
+            expert: 5
+          startinventory:
+            "Bombos":
+              0: 80
+              1: 20
+            "Book of Mudora":
+              0: 80
+              1: 20
+            "Cane of Somaria":
+              0: 80
+              1: 20
+            "Cape":
+              0: 80
+              1: 20
+            "Ether":
+              0: 80
+              1: 20
+            "Fire Rod":
+              0: 80
+              1: 20
+            "Flippers":
+              0: 80
+              1: 20
+            "Hammer":
+              0: 80
+              1: 20
+            "Hookshot":
+              0: 80
+              1: 20
+            "Ice Rod":
+              0: 80
+              1: 20
+            "Lamp":
+              0: 80
+              1: 20
+            "Magic Mirror":
+              0: 80
+              1: 20
+            "Moon Pearl":
+              0: 80
+              1: 20
+            "Mushroom":
+              0: 80
+              1: 20
+            "Ocarina":
+              0: 80
+              1: 20
+            "Magic Powder":
+              0: 80
+              1: 20
+            "Quake":
+              0: 80
+              1: 20
+            "Shovel":
+              0: 80
+              1: 20
+            "Bug Catching Net":
+              0: 80
+              1: 20
+            "Cane of Byrna":
+              0: 80
+              1: 20
+            "Blue Boomerang":
+              0: 80
+              1: 20
+            "Red Boomerang":
+              0: 80
+              1: 20
+      bingo:
+        chance: 22
+        weights:
+          custom_instructions: "TRIPLE BINGO RACE. Check https://l.synack.live/pogbingo for instructions"
+          mapshuffle:
+            "on": 95
+            "off": 5
+          compassshuffle:
+            "on": 95
+            "off": 5
+          keyshuffle:
+            "on": 95
+            "off": 5
+          bigkeyshuffle:
+            "on": 95
+            "off": 5
+          accessibility: "locations"
+          goals: "dungeons"
+          tower_open: 
+            "0": 7
+            "1": 8
+            "2": 8
+            "3": 17
+            "4": 17
+            "5": 18
+            "6": 12
+            "7": 13
+          ganon_open: "7"
+          world_state:
+            standard: 15
+            open: 30
+            inverted: 38
+            retro: 17
+          entrance_shuffle:
+            none: 40
+            restricted: 0
+            crossed: 60
+          shopsanity:
+            "on": 50
+            "off": 50
+          boss_shuffle: "none"
+          enemy_shuffle: "none"
+          enemy_damage:
+            default: 85
+            shuffled: 15
+            random: 0
+          enemy_health:
+            default: 85
+            hard: 15
+          hints:
+            "on": 69
+            "off": 31
+          weapons:
+            randomized: 68
+            assured: 7
+            vanilla: 5
+            swordless: 20
+          item_pool: "normal"
