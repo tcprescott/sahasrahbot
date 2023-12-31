@@ -2,6 +2,7 @@ import copy
 import logging
 from dataclasses import dataclass
 from typing import Union
+import random
 
 from pyz3r.mystery import get_random_option, generate_random_settings
 
@@ -110,12 +111,21 @@ def generate_doors_settings(weights, options):
     options['intensity'] = get_random_option(weights.get('intensity', 2))
     options['beemizer'] = get_random_option(weights.get('beemizer', 0))
 
-    inventoryweights = weights.get('startinventory', {})
+    inventoryweights: dict = weights.get('startinventory', {})
+
+    startinventory_limit = get_random_option(weights.get('startinventorylimit', None))
+
+    # shuffle order of startinventory
     startitems = []
     for item in inventoryweights:
         count = get_random_option(weights['startinventory'][item])
         if count > 0:
             startitems += count * [item]
+
+    # if we have a startinventory limit, limit the number of items by random sampling
+    if startinventory_limit is not None and len(startitems) > startinventory_limit:
+        startitems = random.sample(startitems, k=startinventory_limit)
+
     options['startinventory'] = ','.join(startitems)
 
     # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
