@@ -149,7 +149,7 @@ subweights:
               inverted: 25
               retro: 15
             entrance_shuffle:
-              swapped: 35
+              simple: 35
               crossed: 65
             boss_shuffle:
               none: 50
@@ -232,7 +232,7 @@ subweights:
               standard: 40
               open: 35
               inverted: 25
-            entrance_shuffle: "none"
+            entrance_shuffle: "vanilla"
             boss_shuffle:
               none: 40
               simple: 0
@@ -310,7 +310,7 @@ subweights:
               inverted: 20
               retro: 0
             entrance_shuffle:
-              none: 50
+              vanilla: 50
               restricted: 0
               crossed: 50
             boss_shuffle:
@@ -477,7 +477,7 @@ subweights:
               inverted: 38
               retro: 17
             entrance_shuffle:
-              swapped: 43
+              simple: 43
               crossed: 57
             shufflelinks:
               "on": 81
@@ -566,7 +566,7 @@ subweights:
               inverted: 38
               retro: 17
             entrance_shuffle:
-              none: 12
+              vanilla: 12
               full: 88
             shufflelinks:
               "yes": 70
@@ -649,8 +649,8 @@ subweights:
               inverted: 38
               retro: 17
             entrance_shuffle:
-              none: 34
-              swapped: 33
+              vanilla: 34
+              simple: 33
               crossed: 33
             boss_shuffle:
               simple: 33
@@ -779,7 +779,7 @@ subweights:
               inverted: 38
               retro: 17
             entrance_shuffle:
-              none: 40
+              vanilla: 40
               restricted: 0
               crossed: 60
             shopsanity:
