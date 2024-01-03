@@ -174,6 +174,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
         settings = self.preset_data['settings']  # pylint: disable=E1136
         doors = self.preset_data.get('doors', False)
         if doors:
+            branch = self.preset_data.get('branch', branch)  # stable, volatile
             if hints:
                 settings['hints'] = 'on'
             elif nohints:
@@ -184,7 +185,8 @@ class ALTTPRPreset(SahasrahBotPresetCore):
 
             seed = await AlttprDoorDiscord.create(
                 settings=settings,
-                spoilers=spoilers == "on"
+                spoilers=spoilers == "on",
+                branch=branch
             )
             hash_id = seed.hash
         else:
@@ -278,6 +280,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
                             seed = await AlttprDoorDiscord.create(
                                 settings=mystery.settings,
                                 spoilers=spoilers != "mystery",
+                                branch=mystery.branch
                             )
                         else:
                             if mystery.customizer:

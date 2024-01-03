@@ -18,6 +18,7 @@ class AlttprMystery:
     doors: bool = False
     custom_instructions: str = None
     seed: Union[AlttprDoorDiscord, ALTTPRDiscord] = None
+    branch: str = None
 
 
 BASE_DOORS_PAYLOAD = {
@@ -73,6 +74,8 @@ BASE_DOORS_PAYLOAD = {
 
 
 def generate_doors_settings(weights, options):
+    branch = weights.get('options', {}).get('branch', 'stable')
+
     options["glitches"] = get_random_option(weights['glitches_required'])
     options["dungeon_items"] = get_random_option(weights['dungeon_items'])
     options["accessibility"] = get_random_option(weights['accessibility'])
@@ -110,6 +113,11 @@ def generate_doors_settings(weights, options):
 
     options['intensity'] = get_random_option(weights.get('intensity', 2))
     options['beemizer'] = get_random_option(weights.get('beemizer', 0))
+
+    # volatile settings
+    if branch == "volatile":
+        options["keyshuffle"] = get_random_option(weights.get('keyshuffle', "none"))
+        options["dropshuffle"] = get_random_option(weights.get('dropshuffle', "none"))
 
     inventoryweights: dict = weights.get('startinventory', {})
 
@@ -224,6 +232,11 @@ def generate_doors_settings(weights, options):
     settings["startinventory"] = options['startinventory']
     settings["usestartinventory"] = len(startitems) > 0
 
+    # volatile settings
+    if branch == "volatile":
+        settings["keyshuffle"] = options["keyshuffle"]
+        settings["dropshuffle"] = options["dropshuffle"]
+
     return settings
 
 
@@ -264,15 +277,18 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
         settings = generate_doors_settings(weights, options)
         customizer = False
         doors = True
+        branch = weights.get('options', {}).get('branch', 'stable')
         # return settings, False, True
     else:
         settings, customizer = generate_random_settings(weights, tournament=tournament, spoilers=spoilers)
         doors = False
+        branch = None
 
     return AlttprMystery(
         weights=weights,
         settings=settings,
         customizer=customizer,
         doors=doors,
-        custom_instructions=custom_instructions
+        custom_instructions=custom_instructions,
+        branch=branch
     )

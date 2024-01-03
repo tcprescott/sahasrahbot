@@ -17,9 +17,10 @@ import config
 
 
 class AlttprDoor():
-    def __init__(self, settings=None, spoilers=True):
+    def __init__(self, settings=None, spoilers=True, branch="stable"):
         self.settings = settings
         self.spoilers = spoilers
+        self.branch = branch
 
         self.hash = None
         self.attempts = 0
@@ -39,13 +40,14 @@ class AlttprDoor():
             self.settings['create_spoiler'] = True
             self.settings['calc_playthrough'] = False
             self.settings['rom'] = config.ALTTP_ROM
-            self.settings['enemizercli'] = os.path.join(
-                os.getcwd(),
-                "utils",
-                "enemizer",
-                'osx.10.12-x64' if sys.platform == 'darwin' else 'ubuntu.16.04-x64',
-                'EnemizerCLI.Core'
-            )
+            if not self.branch == "volatile":
+                self.settings['enemizercli'] = os.path.join(
+                    os.getcwd(),
+                    "utils",
+                    "enemizer",
+                    'osx.10.12-x64' if sys.platform == 'darwin' else 'ubuntu.16.04-x64',
+                    'EnemizerCLI.Core'
+                )
 
             # set some defaults we do NOT want to change ever
             self.settings['count'] = 1
@@ -68,7 +70,7 @@ class AlttprDoor():
                             '--settingsfile', settings_file_path,
                             stdout=asyncio.subprocess.PIPE,
                             stderr=asyncio.subprocess.PIPE,
-                            cwd="utils/ALttPDoorRandomizer")
+                            cwd=self.door_rando_location)
 
                         stdout, stderr = await proc.communicate()
                         logging.info(stdout.decode())
@@ -132,9 +134,10 @@ class AlttprDoor():
     async def create(
             cls,
             settings,
-            spoilers=True
+            spoilers=True,
+            branch="stable"
     ):
-        seed = cls(settings=settings, spoilers=spoilers)
+        seed = cls(settings=settings, spoilers=spoilers, branch=branch)
         await seed.generate_game()
         return seed
 
@@ -178,3 +181,10 @@ class AlttprDoor():
     @property
     def doors(self):
         return True
+
+    @property
+    def door_rando_location(self):
+        if self.branch == "volatile":
+            return "utils/ALttPDoorRandomizerVolatile"
+
+        return "utils/ALttPDoorRandomizer"
