@@ -197,7 +197,7 @@ subweights:
               "off": 25
             dropshuffle:
               "underworld": 25
-              "off": 75
+              "none": 75
             pottery:
               "lottery": 30
               "none": 70
@@ -618,7 +618,7 @@ subweights:
             dropshuffle:
               "underworld": 10
               "keys": 10
-              "off": 80
+              "none": 80
             accessibility:
               items: 60
               locations: 30
