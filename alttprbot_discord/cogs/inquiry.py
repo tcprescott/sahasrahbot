@@ -4,6 +4,7 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands
+from discord.interactions import Interaction
 
 import config
 from alttprbot import models
@@ -42,6 +43,23 @@ class OpenInquiryThread(discord.ui.View):
 
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
     async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(OpenInquiryModal(inquiry_message_config=self.inquiry_message_config))
+
+class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
+    description = discord.ui.TextInput(
+        label="Brief Summary",
+        placeholder="Please provide a brief summary of your inquiry.",
+        min_length=10,
+        max_length=200,
+        required=True,
+        row=1,
+    )
+
+    def __init__(self, inquiry_message_config):
+        super().__init__()
+        self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
+
+    async def on_submit(self, interaction: Interaction) -> None:
         if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
             await interaction.response.send_message(
                 "Private threads must be available on this server.  Please let the server admin know so this may be fixed.",
@@ -69,11 +87,15 @@ class OpenInquiryThread(discord.ui.View):
             await interaction.guild.chunk(cache=True)
 
         for member in role_ping.members:
-            logging.info(f"Adding {member.name}#{member.discriminator} to thread {thread.name}")
+            logging.info(f"Adding {member.name} to thread {thread.name}")
             await thread.add_user(member)
 
-        logging.info(f"Adding {interaction.user.name}#{interaction.user.discriminator} to thread {thread.name}")
+        logging.info(f"Adding {interaction.user.name} to thread {thread.name}")
 
+        await thread.send(
+            f"{interaction.user.mention} has opened an inquiry.\n\n**Description:** {self.description.value}",
+            allowed_mentions=discord.AllowedMentions.none()
+        )
 
 class Inquiry(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
