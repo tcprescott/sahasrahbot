@@ -30,7 +30,7 @@ ALTTPRDE_TITLE_MAP = {
 class ALTTPRDETournament(ALTTPRTournamentRace):
     async def roll(self):
         try:
-            match_title = ALTTPRDE_TITLE_MAP[self.episode['match1']['title']]
+            match_title = self.episode['match1']['title']
             # we need to strip out anything before the : in the title
             match_title = match_title.split(':')[-1].strip()
             preset = ALTTPRDE_TITLE_MAP[match_title]
