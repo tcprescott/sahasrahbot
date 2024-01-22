@@ -60,23 +60,6 @@ enemy_health:
   default: 85
   easy: 5
   hard: 10
-customizer:
-  eq:
-    "PegasusBoots": true
-  custom:
-    customPrizePacks: false
-    region.wildMaps:
-      True: 70
-      False: 30
-    region.wildCompasses:
-      True: 70
-      False: 30
-    region.wildKeys:
-      True: 80
-      False: 20
-    region.wildBigKeys:
-      True: 80
-      False: 20
 rom.logicMode: no_logic
 subweights:
   doublehammer:
@@ -86,6 +69,22 @@ subweights:
       customizer:
         pool:
           "Hammer": 2
+        eq:
+          "PegasusBoots": true
+        custom:
+          customPrizePacks: false
+          region.wildMaps:
+            True: 70
+            False: 30
+          region.wildCompasses:
+            True: 70
+            False: 30
+          region.wildKeys:
+            True: 80
+            False: 20
+          region.wildBigKeys:
+            True: 80
+            False: 20
   doublerods:
     chance: 50
     weights:
@@ -93,7 +92,39 @@ subweights:
         pool:
           "FireRod": 2
           "IceRod": 2
+        eq:
+          "PegasusBoots": true
+        custom:
+          customPrizePacks: false
+          region.wildMaps:
+            True: 70
+            False: 30
+          region.wildCompasses:
+            True: 70
+            False: 30
+          region.wildKeys:
+            True: 80
+            False: 20
+          region.wildBigKeys:
+            True: 80
+            False: 20
   normal:
     chance: 45
     weights:
-      glitches_required: "no_logic" # no changes
+      customizer:
+        eq:
+          "PegasusBoots": true
+        custom:
+          customPrizePacks: false
+          region.wildMaps:
+            True: 70
+            False: 30
+          region.wildCompasses:
+            True: 70
+            False: 30
+          region.wildKeys:
+            True: 80
+            False: 20
+          region.wildBigKeys:
+            True: 80
+            False: 20
