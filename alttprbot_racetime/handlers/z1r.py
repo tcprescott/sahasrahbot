@@ -6,7 +6,8 @@ from .core import SahasrahBotCoreHandler
 PRESETS = {
     'abns_swiss': 'J780EYa2ywOnCpVR1VGodM1jVyu!o5F',
     'abns_bracket': 'PPcIk!s3aupL7C41f6AhZ3mi8IwACwv',
-    'abns_elite8': 'PPcIk!s3aupL9yxEvapydBFdC9X8E2A'
+    'abns_elite8': 'PPcIk!s3aupL9yxEvapydBFdC9X8E2A',
+    'consternation': 'ItRtYLs2xToBiCHEvfcY6eRIcxG!VfM'
 }
 
 
@@ -24,8 +25,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
     async def ex_z1rtournament(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
-        await self.send_message(f"Z1R 2023 Tournament - Flags: KUeUOiDAFHkdMHEQpQYmfZSa5931R5R Seed: {seed_number}")
-        await self.set_bot_raceinfo(f"Flags: KUeUOiDAFHkdMHEQpQYmfZSa5931R5R Seed: {seed_number}")
+        await self.send_message(f"Z1R 2024 Tournament - Flags: ItRtYcBhrKWVT6C67oOLsUpgEaHopla Seed: {seed_number}")
+        await self.set_bot_raceinfo(f"Flags: ItRtYcBhrKWVT6C67oOLsUpgEaHopla Seed: {seed_number}")
 
     async def ex_race(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
