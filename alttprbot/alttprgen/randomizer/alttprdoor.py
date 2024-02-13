@@ -184,7 +184,7 @@ class AlttprDoor():
 
     @property
     def door_rando_location(self):
-        if self.branch == "volatile":
-            return "utils/ALttPDoorRandomizerVolatile"
+        if self.branch in ["volatile", "unstable"]:
+            return "utils/ALttPDoorRandomizerUnstable"
 
         return "utils/ALttPDoorRandomizer"

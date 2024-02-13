@@ -1,0 +1,91 @@
+description: "BigJon's favorite"
+glitches_required:
+  none: 100
+  overworld_glitches: 0
+  major_glitches: 0
+  no_logic: 0
+item_placement:
+  basic: 50
+  advanced: 50
+dungeon_items:
+  standard: 60
+  mc: 20
+  mcs: 20
+  full: 20
+accessibility:
+  items: 50
+  locations: 50
+  none: 0
+goals:
+  ganon: 20
+  fast_ganon: 20
+  dungeons: 20
+  pedestal: 20
+  triforce-hunt: 20
+tower_open:
+  "0": 12.5
+  "1": 12.5
+  "2": 12.5
+  "3": 12.5
+  "4": 12.5
+  "5": 12.5
+  "6": 12.5
+  "7": 12.5
+  random: 12.5
+ganon_open:
+  "0": 12.5
+  "1": 12.5
+  "2": 12.5
+  "3": 12.5
+  "4": 12.5
+  "5": 12.5
+  "6": 12.5
+  "7": 12.5
+  random: 12.5
+world_state:
+  standard: 25
+  open: 25
+  inverted: 25
+  retro: 25
+entrance_shuffle:
+  none: 50
+  simple: 10
+  restricted: 10
+  full: 10
+  crossed: 10
+  insanity: 10
+boss_shuffle:
+  none: 25
+  simple: 25
+  full: 25
+  random: 25
+enemy_shuffle:
+  none: 33
+  shuffled: 33
+  random: 34
+hints:
+  "on": 50
+  "off": 50
+weapons:
+  randomized: 25
+  assured: 25
+  vanilla: 25
+  swordless: 25
+item_pool:
+  normal: 100
+  hard: 0
+  expert: 0
+  crowd_control: 0
+item_functionality:
+  normal: 100
+  hard: 0
+  expert: 0
+enemy_damage:
+  default: 50
+  shuffled: 50
+  random: 0
+enemy_health:
+  default: 50
+  easy: 50
+  hard: 0
+  expert: 0

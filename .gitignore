@@ -8,7 +8,7 @@ data/*.sfc
 presets/bot_testing.yaml
 public/spoilers
 test_input/
-weights/bot_testing.yaml
+presets/alttprmystery/bot_testing.yaml
 .venv/
 settings.py
 .vscode/

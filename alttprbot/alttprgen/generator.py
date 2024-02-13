@@ -263,7 +263,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 
     @property
     def global_preset_path(self) -> str:
-        return "weights"
+        return "presets/alttprmystery"
 
     async def generate(self, spoilers="off", tournament=True, allow_quickswap=True):
         if self.preset_data is None:
