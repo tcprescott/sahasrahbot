@@ -1,6 +1,6 @@
 [submodule "utils/ALttPDoorRandomizer"]
 	path = utils/ALttPDoorRandomizer
 	url = https://github.com/tcprescott/ALttPDoorRandomizer
-[submodule "ALttPDoorRandomizerUnstable"]
-	path = ALttPDoorRandomizerUnstable
+[submodule "utils/ALttPDoorRandomizerUnstable"]
+	path = utils/ALttPDoorRandomizerUnstable
 	url = https://github.com/aerinon/ALttPDoorRandomizer
