@@ -6,6 +6,9 @@
 
 {% block content -%}
 
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>{{ permalink.pool.name }} - <a href="{{ permalink.url }}">{{ permalink.url }}</a> - {{ tournament.name }} ({{ tournament.id }})</h1>
 
 <table border="1">
@@ -37,5 +40,7 @@
     </tr>
     {% endfor %}
 </table>
-
+</div>
+</div>
+</section>
 {%- endblock content %}

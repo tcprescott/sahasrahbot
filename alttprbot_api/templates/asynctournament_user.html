@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>History for {{ player.display_name }} - {{ tournament.name }} ({{ tournament.id }})</h1>
 <table border="1">
     <tr>
@@ -41,4 +44,7 @@
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
+</section>
 {%- endblock content %}

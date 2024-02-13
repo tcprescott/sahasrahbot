@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>{{ election.title }}</h1>
 <p>Below is your votes.  If this is not correct, please contact Synack ASAP to have your ballot cleared so you may vote again.</p>
 <p>Your vote is confidential.</p>
@@ -22,4 +25,7 @@
         {% endfor %}
     </div>
 </table>
+</div>
+</div>
+</section>
 {%- endblock content %}

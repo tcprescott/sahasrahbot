@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>Moderation Queue - {{ tournament.name }} ({{ tournament.id }})</h1>
 <p><a
         href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live='all', reviewer='all', status='in_progress', review_status='all', page=1) }}">
@@ -68,4 +71,7 @@
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
+</section>
 {%- endblock content %}

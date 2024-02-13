@@ -6,6 +6,9 @@
 
 {% block content -%}
 
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>Pools for {{ tournament.name }} ({{ tournament.id }})</h1>
 
 {% for pool in tournament.permalink_pools %}
@@ -16,5 +19,7 @@
     {% endfor %}
 </ul>
 {% endfor %}
-
+</div>
+</div>
+</section>
 {%- endblock content %}

@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 {%- if not texts %}
 <div class="alert alert-info">
     <strong>There are no texts to moderate!</strong>
@@ -37,5 +40,8 @@
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
+</section>
 {%- endif %}
 {%- endblock content %}

@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>{{ race.user.display_name }} - {{ race.permalink.pool.name }}</h1>
 {% if already_claimed %}
 <p style="background-color: yellow;border-style:solid;border-color: red;">
@@ -83,5 +86,8 @@
     </p>
     <p><input type="submit" value="Save" /></p>
 </form>
+</div>
+</div>
+</section>
 {% endif %}
 {%- endblock content %}

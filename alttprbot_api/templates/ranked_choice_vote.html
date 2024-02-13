@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>{{ election.title }}</h1>
 <p>Rank each candidate using 1 for the most favorable, up to 999 for the least favorable.  You can leave a field blank to not vote at all for a candidate.</p>
 <p>Your vote is confidential.  Your vote is not final until you click Submit.</p>
@@ -25,4 +28,7 @@
     </table>
     <input type="submit" value="Submit"/>
 </form>
+</div>
+</div>
+</section>
 {%- endblock content %}  

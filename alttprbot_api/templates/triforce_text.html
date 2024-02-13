@@ -5,7 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
-<div>
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
     <h1>Triforce Text Submission</h1>
     <p>This is a form for submitting text to the Triforce. All submissions are subject to review and approval by the
         tournament staff. Submissions that may be rejected include, but are not limited to:</p>
@@ -30,7 +32,6 @@
             で ど ら り る れ ろ ば び ぶ べ ぼ ぱ ぴ ぷ ぺ ぽ ゃ ゅ ょ っ ぁ ぃ ぅ ぇ ぉ ア イ ウ エ オ ヤ ユ ヨ カ キ ク ケ コ ワ ヲ ン サ シ ス セ ソ ガ ギ グ タ チ ツ テ
             ト ゲ ゴ ザ ナ ニ ヌ ネ ノ ジ ズ ゼ ハ ヒ フ ヘ ホ ゾ ダ マ ミ ム メ モ ヅ デ ド ラ リ ル レ ロ バ ビ ブ ベ ボ パ ピ プ ペ ポ ャ ュ ョ ッ ァ ィ ゥ ェ ォ </li>
     </ul>
-</div>
 <form action="{{ url_for('triforcetexts.submit', pool_name=pool_name) }}" method="post">
     {% if author_name_field %} Author Name: <input type="text" id="author_name" name="author_name" maxlength="50" title="Your name" /><br /><hr />{% endif %}
     Line 1: <input type="text" id="first_line" name="first_line" maxlength="19" title="Line one"
@@ -41,4 +42,7 @@
         pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
     <input type="submit" value="Submit" />
 </form>
+</div>
+</div>
+</section>
 {%- endblock content %}

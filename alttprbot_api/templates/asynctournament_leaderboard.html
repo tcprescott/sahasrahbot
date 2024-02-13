@@ -7,6 +7,9 @@
 {% block content -%}
 <h1>Tournament Leaderboard - {{ tournament.name }} ({{ tournament.id }})</h1>
 
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <table border="1">
     <tr>
         <th>Rank</th>
@@ -39,5 +42,7 @@
     </tr>
     {% endfor %}
 </table>
-
+</div>
+</div>
+</section>
 {%- endblock content %}
