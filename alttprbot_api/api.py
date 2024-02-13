@@ -2,7 +2,7 @@ import os
 
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
 from quart import (Quart, abort, jsonify, redirect, render_template, request,
-                   session, url_for)
+                   session, url_for, send_from_directory)
 from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
                            requires_authorization)
 
@@ -35,6 +35,9 @@ sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_pref
 # not ready for prime time
 if config.DEBUG:
     sahasrahbotapi.register_blueprint(blueprints.schedule_blueprint, url_prefix="/schedule")
+
+if config.DEBUG:
+    sahasrahbotapi.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 @sahasrahbotapi.route("/")
@@ -131,6 +134,13 @@ async def purge_me_action():
 async def robots():
     return 'User-agent: *\nDisallow: /\n'
 
+@sahasrahbotapi.route('/assets/<path:path>', methods=['GET'])
+async def assets(path):
+    return await send_from_directory('alttprbot_api/static/assets', path)
+
+@sahasrahbotapi.route('/images/<path:path>', methods=['GET'])
+async def images(path):
+    return await send_from_directory('alttprbot_api/static/images', path)
 
 # @sahasrahbotapi.errorhandler(400)
 # def bad_request(e):

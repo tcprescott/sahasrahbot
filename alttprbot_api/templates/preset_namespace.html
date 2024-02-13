@@ -5,7 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
-
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h2>{{ ns_data.name }}</h2>
 <a href="{{ url_for('presets.new_preset_submit', namespace=ns_data.name)}}">Create a new preset</a>
 <hr />
@@ -29,5 +31,7 @@
     </tr>
     {% endfor %}
 </table>
-
+</div>
+</div>
+</section>
 {%- endblock content %}

@@ -1,9 +1,17 @@
 {% extends "base.html" -%}
 
 {% block head -%}
-<title>About {{ user.name }}#{{ user.discriminator }}</title>
+<title>About {{ user.name }}</title>
 {%- endblock head %}
 
 {% block content -%}
-<img src='{{ user.avatar_url }}' />
+<div class="wrapper">
+    <div class="inner">
+        <h3>About {{ user.name }}</h3>
+        <img src='{{ user.avatar_url }}' />
+        <p>
+            In the future, this will have more information we have about you, such as your racetime information.  You can also update your information here in the future.
+        </p>
+    </div>
+</div>
 {%- endblock content %}

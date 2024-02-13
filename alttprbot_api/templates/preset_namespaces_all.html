@@ -5,14 +5,20 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 
 <a href="{{ url_for('presets.my_presets') }}">Access your namespace or create a new namespace (requires login).</a>
 
-<p>All namespaces</p>
-<ul>
+<h2>All namespaces</h2>
+<ul class="col-6 col-12-medium">
     {% for namespace in namespaces %}
     <li><a href="{{ url_for('presets.presets_for_namespace', namespace=namespace.name) }}">{{ namespace.name }}</a></li>
     {% endfor %}
 </ul>
-
+    
+            </div>
+        </div>
+</section>
 {%- endblock content %}

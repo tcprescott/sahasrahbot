@@ -180,6 +180,9 @@ async def update_preset(namespace, randomizer, preset):
 
     preset_data.content = request_files['presetfile'].read().decode()
 
+    if preset_data.content == '':
+        return await render_template('error.html', logged_in=True, user=user, title="Oops!",
+                                     message="Empty or missing preset file provided.")
     await preset_data.save()
 
     return redirect(url_for('presets.get_preset', namespace=namespace, randomizer=randomizer, preset=preset))
