@@ -5,6 +5,9 @@
 {%- endblock head %}
 
 {% block content -%}
+<section id="wrapper">
+    <div class="wrapper">
+        <div class="inner">
 <h1>{{ event.name}}</h1>
 <p>{{ event.description }}</p>
 <p><a href="{{ url_for('schedule.schedule_submit', slug=event.event_slug)}}">submit match</a></p>
@@ -13,13 +16,49 @@
     <tr>
         <th>ID</th>
         <th>When</th>
+        <th>Players</th>
+        <th>Channel</th>
+        {% if event.max_commentators > 0 %}<th>Commentators</th>{% endif %}
+        {% if event.max_trackers > 0 %}<th>Trackers</th>{% endif %}
+        {% if event.max_restreamers > 0 %}<th>Restreamers</th>{% endif %}
+        <th>Runner Notes</th>
     </tr>
     {% for episode in event.episodes %}
     <tr>
         <td><a href="{{ url_for('schedule.schedule_episode', slug=event.event_slug, episode_id=episode.id) }}">{{ episode.id }}</a></td>
         <td>{{ episode.when_countdown }}</td>
+        <td>
+            {% for player in episode.players %}
+                <a href="{{ url_for('user.info', id=player.user.id) }}">{{ player.user.display_name }}</a><br/>
+            {% endfor %}
+        </td>
+        <td><a href="{{ episode.channel.url }}">{{ episode.channel.display_name }}</a></td>
+        {% if event.max_commentators > 0 %}
+        <td>
+            {% for commentator in episode.commentators %}
+                <a href="{{ url_for('user.info', id=commentator.user.id) }}">{{ commentator.user.display_name }}</a><br/>
+            {% endfor %}
+        </td>
+        {% endif %}
+        {% if event.max_trackers > 0 %}
+        <td>
+            {% for tracker in episode.trackers %}
+                <a href="{{ url_for('user.info', id=tracker.user.id) }}">{{ tracker.user.display_name }}</a><br/>
+            {% endfor %}
+        </td>
+        {% endif %}
+        {% if event.max_restreamers > 0 %}
+        <td>
+            {% for restreamer in episode.restreamers %}
+                <a href="{{ url_for('user.info', id=restreamer.user.id) }}">{{ restreamer.user.display_name }}</a><br/>
+            {% endfor %}
+        </td>
+        {% endif %}
+        <td>{{ episode.runner_notes }}</td>
     </tr>
     {% endfor %}
 </table>
-
+</div>
+</div>
+</section>
 {%- endblock content %}

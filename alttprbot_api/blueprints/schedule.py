@@ -21,7 +21,7 @@ async def schedule(slug):
     if event is None:
         return abort(404)
 
-    await event.fetch_related('episodes')
+    await event.fetch_related('episodes', 'episodes__channel', 'episodes__players') # TODO: add filters and pagination
 
     return await render_template('schedule/main.html', logged_in=logged_in, user=user, event=event)
 

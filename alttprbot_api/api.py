@@ -35,6 +35,7 @@ sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_pref
 # not ready for prime time
 if config.DEBUG:
     sahasrahbotapi.register_blueprint(blueprints.schedule_blueprint, url_prefix="/schedule")
+    sahasrahbotapi.register_blueprint(blueprints.user_blueprint, url_prefix="/user")
 
 if config.DEBUG:
     sahasrahbotapi.config['TEMPLATES_AUTO_RELOAD'] = True

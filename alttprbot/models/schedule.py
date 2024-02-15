@@ -37,6 +37,11 @@ class ScheduleEpisode(Model):
     when_countdown = fields.DatetimeField(null=False)
     runner_notes = fields.TextField(null=True) # notes from the runner
     private_notes = fields.TextField(null=True) # notes from the event organizer(s)
+    channel = fields.ForeignKeyField('models.ScheduleBroadcastChannels', related_name='episodes', null=True)
+
+    approved = fields.BooleanField(default=False)
+    approved_at = fields.DatetimeField(null=True)
+    approved_by = fields.ForeignKeyField('models.Users', related_name='schedule_episode_approvals', on_delete="RESTRICT", null=True)
 
     players: fields.ReverseRelation['ScheduleEpisodePlayer']
     commentators: fields.ReverseRelation['ScheduleEpisodeCommentator']
@@ -53,15 +58,25 @@ class ScheduleEpisodeCommentator(Model):
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='commentators')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_commentators', on_delete="RESTRICT")
     approved = fields.BooleanField(default=False)
+    approved_at = fields.DatetimeField(null=True)
+    approved_by = fields.ForeignKeyField('models.Users', related_name='schedule_commentator_approvals', on_delete="RESTRICT", null=True)
     submitted_at = fields.DatetimeField(auto_now_add=True)
     submitter_notes = fields.TextField(null=True)
-    preferred_partner = fields.ForeignKeyField('models.Users', related_name='schedule_commentator_partners', on_delete="RESTRICT", null=True)
+
+    preferred_partner: fields.ReverseRelation['ScheduleEpisodeCommentatorPreferredPartner']
+
+class ScheduleEpisodeCommentatorPreferredPartner(Model):
+    id = fields.IntField(pk=True)
+    episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='preferred_commentator_partners')
+    user = fields.ForeignKeyField('models.Users', related_name='schedule_preferred_commentator_partners', on_delete="RESTRICT")
 
 class ScheduleEpisodeTracker(Model):
     id = fields.IntField(pk=True)
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='trackers')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_trackers', on_delete="RESTRICT")
     approved = fields.BooleanField(default=False)
+    approved_at = fields.DatetimeField(null=True)
+    approved_by = fields.ForeignKeyField('models.Users', related_name='schedule_tracker_approvals', on_delete="RESTRICT", null=True)
     submitted_at = fields.DatetimeField(auto_now_add=True)
     submitter_notes = fields.TextField(null=True)
 
@@ -70,6 +85,8 @@ class ScheduleEpisodeRestreamer(Model):
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='restreamers')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_restreamers', on_delete="RESTRICT")
     approved = fields.BooleanField(default=False)
+    approved_at = fields.DatetimeField(null=True)
+    approved_by = fields.ForeignKeyField('models.Users', related_name='schedule_restreamer_approvals', on_delete="RESTRICT", null=True)
     submitted_at = fields.DatetimeField(auto_now_add=True)
     submitter_notes = fields.TextField(null=True)
 
@@ -81,6 +98,9 @@ class ScheduleBroadcastChannels(Model):
     channel_name = fields.CharField(200)
     display_name = fields.CharField(200)
 
+    @property
+    def url(self):
+        return f"https://twitch.tv/{self.channel_name}"
 
 class ScheduleAudit(Model):
     id = fields.IntField(pk=True)

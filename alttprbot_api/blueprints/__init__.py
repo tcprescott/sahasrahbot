@@ -7,3 +7,4 @@ from .settingsgen import settingsgen_blueprint
 from .tournament import tournament_blueprint
 from .triforcetexts import triforcetexts_blueprint
 from .schedule import schedule_blueprint
+from .user import user_blueprint
