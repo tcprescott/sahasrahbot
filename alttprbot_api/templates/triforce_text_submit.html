@@ -1,15 +1,15 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Triforce Text Submission Done</title>
-{%- endblock head %}
+{% set page_title = "Triforce Text Submission" -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<p>Thank you for your submission!</p>
-</div>
-</div>
+<section id="thanks" class="card">
+    <div class="card-header">
+        <h4>Triforce Text Submission</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>Thank you for your submission!</p>
+        </div>
+    </div>
 </section>
 {%- endblock content %}

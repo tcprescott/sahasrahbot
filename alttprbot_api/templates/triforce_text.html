@@ -1,48 +1,54 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Triforce Text Submission</title>
-{%- endblock head %}
+{% set page_title = "Triforce Text Submission" -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-    <h1>Triforce Text Submission</h1>
-    <p>This is a form for submitting text to the Triforce. All submissions are subject to review and approval by the
-        tournament staff. Submissions that may be rejected include, but are not limited to:</p>
-    <ol>
-        <li>Real-life religion or politics</li>
-        <li>Hate speech</li>
-        <li>Advertising (unless previously approved)</li>
-        <li>References to other community members without their prior consent (will be verified with that person)</li>
-        <li>Harassing or other overtly negative content</li>
-        <li>Text inappropriate for streaming on SpeedGaming, ALTTPRandomizer, or other Twitch channels.</li>
-    </ol>
-    <p>In short, keep it fun and positive!</p>
-    <p>Each submission must be no more than three lines, with a maximum of 19 characters per line.</p>
-    <p>Valid characters include:</p>
-    <ul style="font-family: 'Courier New', Courier, monospace;">
-        <li>A-Z</li>
-        <li>a-z</li>
-        <li>0-9</li>
-        <li>spaces</li>
-        <li>? ! , \ - … . ~ ～ ' ' ↑ ↓ → ←</li>
-        <li>あ い う え お や ゆ よ か き く け こ わ を ん さ し す せ そ が ぎ ぐ た ち つ て と げ ご ざ な に ぬ ね の じ ず ぜ は ひ ふ へ ほ ぞ だ ぢ ま み む め も づ
-            で ど ら り る れ ろ ば び ぶ べ ぼ ぱ ぴ ぷ ぺ ぽ ゃ ゅ ょ っ ぁ ぃ ぅ ぇ ぉ ア イ ウ エ オ ヤ ユ ヨ カ キ ク ケ コ ワ ヲ ン サ シ ス セ ソ ガ ギ グ タ チ ツ テ
-            ト ゲ ゴ ザ ナ ニ ヌ ネ ノ ジ ズ ゼ ハ ヒ フ ヘ ホ ゾ ダ マ ミ ム メ モ ヅ デ ド ラ リ ル レ ロ バ ビ ブ ベ ボ パ ピ プ ペ ポ ャ ュ ョ ッ ァ ィ ゥ ェ ォ </li>
-    </ul>
-<form action="{{ url_for('triforcetexts.submit', pool_name=pool_name) }}" method="post">
-    {% if author_name_field %} Author Name: <input type="text" id="author_name" name="author_name" maxlength="50" title="Your name" /><br /><hr />{% endif %}
-    Line 1: <input type="text" id="first_line" name="first_line" maxlength="19" title="Line one"
-        pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
-    Line 2: <input type="text" id="second_line" name="second_line" maxlength="19" title="Line two"
-        pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
-    Line 3: <input type="text" id="third_line" name="third_line" maxlength="19" title="Line three"
-        pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
-    <input type="submit" value="Submit" />
-</form>
-</div>
-</div>
+<section id="info" class="card">
+    <div class="card-header">
+        <h4>Triforce Text Submission</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>This is a form for submitting text to the Triforce. All submissions are subject to review and approval by the
+                tournament staff. Submissions that may be rejected include, but are not limited to:</p>
+            <ol>
+                <li>Real-life religion or politics</li>
+                <li>Hate speech</li>
+                <li>Advertising (unless previously approved)</li>
+                <li>References to other community members without their prior consent (will be verified with that person)</li>
+                <li>Harassing or other overtly negative content</li>
+                <li>Text inappropriate for streaming on SpeedGaming, ALTTPRandomizer, or other Twitch channels.</li>
+            </ol>
+            <p>In short, keep it fun and positive!</p>
+            <p>Each submission must be no more than three lines, with a maximum of 19 characters per line.</p>
+            <p>Valid characters include:</p>
+            <ul style="font-family: 'Courier New', Courier, monospace;">
+                <li>A-Z</li>
+                <li>a-z</li>
+                <li>0-9</li>
+                <li>spaces</li>
+                <li>? ! , \ - … . ~ ～ ' ' ↑ ↓ → ←</li>
+                <li>あ い う え お や ゆ よ か き く け こ わ を ん さ し す せ そ が ぎ ぐ た ち つ て と げ ご ざ な に ぬ ね の じ ず ぜ は ひ ふ へ ほ ぞ だ ぢ ま み む め も づ
+                    で ど ら り る れ ろ ば び ぶ べ ぼ ぱ ぴ ぷ ぺ ぽ ゃ ゅ ょ っ ぁ ぃ ぅ ぇ ぉ ア イ ウ エ オ ヤ ユ ヨ カ キ ク ケ コ ワ ヲ ン サ シ
+        </div>
+    </div>
+</section>
+<section id="form" class="card">
+    <div class="card-header">
+        <h4>Submission Form</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <form action="{{ url_for('triforcetexts.submit', pool_name=pool_name) }}" method="post">
+            {% if author_name_field %} Author Name: <input class="form-control" type="text" id="author_name" name="author_name" maxlength="50" title="Your name" /><br /><hr />{% endif %}
+            Line 1: <input class="form-control" type="text" id="first_line" name="first_line" maxlength="19" title="Line one"
+                pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
+            Line 2: <input class="form-control" type="text" id="second_line" name="second_line" maxlength="19" title="Line two"
+                pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
+            Line 3: <input class="form-control" type="text" id="third_line" name="third_line" maxlength="19" title="Line three"
+                pattern="[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}" /><br /><br />
+            <input class="btn btn-primary btn-min-width mr-1 mb-1" type="submit" value="Submit"></button>
+        </form>
+        </div>
+    </div>
 </section>
 {%- endblock content %}
