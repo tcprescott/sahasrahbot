@@ -1,31 +1,38 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>{{ election.title }}</title>
-{%- endblock head %}
+{% set page_title = "Ranked Choice Ballot" -%}
+{% set nav_item = 'elections' -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<h1>{{ election.title }}</h1>
-<p>Below is your votes.  If this is not correct, please contact Synack ASAP to have your ballot cleared so you may vote again.</p>
-<p>Your vote is confidential.</p>
-<table border="1">
-    <tr>
-        <th>Candidate</th>
-        <th>Rank</th>
-    </tr>
-    <div class="option">
-        {% for vote in votes %}
-        <tr>
-            <td>{{ vote.candidate.name }}</td>
-            <td>{{ vote.rank }}</td>
-        </tr>
-        {% endfor %}
+<section id="election" class="card">
+    <div class="card-header">
+        <h4>{{ election.title }}</h4>
     </div>
-</table>
-</div>
-</div>
+    <div class="card-content">
+        <div class="card-body">
+            {% if election.description %}
+            <p>{{ election.description }}</p>
+            {% endif %}
+            <p>Below is your votes.  If this is not correct, please contact Synack ASAP to have your ballot cleared so you may vote again.</p>
+            <p>Your vote is confidential.</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Rank</th>
+                    </tr>
+                </thead>
+                <div class="option">
+                    <tbody>
+                        {% for vote in votes %}
+                        <tr>
+                            <td>{{ vote.candidate.name }}</td>
+                            <td>{{ vote.rank }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </div>
+            </table>
+        </div>
+    </div>
 </section>
 {%- endblock content %}

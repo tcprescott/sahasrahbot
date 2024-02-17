@@ -5,30 +5,37 @@
 {%- endblock head %}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<h1>{{ election.title }}</h1>
-<p>Rank each candidate using 1 for the most favorable, up to 999 for the least favorable.  You can leave a field blank to not vote at all for a candidate.</p>
-<p>Your vote is confidential.  Your vote is not final until you click Submit.</p>
-<form action="/ranked_choice/{{ election.id }}" method="post">
-    <table border="1">
-        <tr>
-            <th>Candidate</th>
-            <th>Rank</th>
-        </tr>
-        <div class="option">
-            {% for candidate in election.candidates %}
-            <tr>
-                <td><label for="candidate-name">{{ candidate.name }}</label></td>
-                <td><input type="number" class="candidate-rank" name="candidate_{{ candidate.id }}" id="{{ candidate.id }}"  min="1" max="999"/></td>
-            </tr>
-            {% endfor %}
+<section id="election" class="card">
+    <div class="card-header">
+        <h4>{{ election.title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>{{ election.description }}</p>
+            <p>Rank each candidate using 1 for the most favorable, up to 999 for the least favorable.  You can leave a field blank to not vote at all for a candidate.</p>
+            <p>Your vote is confidential.  Your vote is not final until you click Submit.</p>
+            <form action="{{url_for('ranked_choice.submit_ballot', election_id=election.id)}}" method="post">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Rank</th>
+                        </tr>
+                    </thead>
+                    <div class="option">
+                        {% for candidate in election.candidates %}
+                        <tbody>
+                            <tr>
+                                <td>{{ candidate.name }}</td>
+                                <td><input type="number" class="candidate-rank" name="candidate_{{ candidate.id }}" id="{{ candidate.id }}"  min="1" max="999"/></td>
+                            </tr>
+                        </tbody>
+                        {% endfor %}
+                    </div>
+                </table>
+                <input type="submit" value="Submit"/>
+            </form>
         </div>
-    </table>
-    <input type="submit" value="Submit"/>
-</form>
-</div>
-</div>
+    </div>
 </section>
-{%- endblock content %}  
+{%- endblock content %}
