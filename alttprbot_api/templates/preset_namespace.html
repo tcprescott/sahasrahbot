@@ -1,37 +1,46 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Presets for {{ ns_data.name }}</title>
-{%- endblock head %}
+{% set page_title = "Presets for " ~ ns_data.name -%}
+{% set nav_item = 'presets' -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<h2>{{ ns_data.name }}</h2>
-<a href="{{ url_for('presets.new_preset_submit', namespace=ns_data.name)}}">Create a new preset</a>
-<hr />
-<table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Randomizer</th>
-        <th>Action</th>
-    </tr>
-    {% for preset in presets %}
-    <tr>
-        <td>{{ ns_data.name }}/{{preset.preset_name}}</td>
-        <td><a
-                href="{{ url_for('presets.presets_for_namespace_randomizer', namespace=ns_data.name, randomizer=preset.randomizer)}}">{{preset.randomizer}}</a>
-        </td>
-        <td><a
-                href="{{ url_for('presets.get_preset', namespace=ns_data.name, randomizer=preset.randomizer, preset=preset.preset_name)}}">{%
-                if is_owner
-                ==
-                True %}edit{% else %}view{% endif %}</a></td>
-    </tr>
-    {% endfor %}
-</table>
-</div>
-</div>
+<section id="new" class="card">
+    <div class="card-header">
+        <h4>Create</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <a href="{{ url_for('presets.new_preset', namespace=ns_data.name)}}">Create a new preset</a>
+        </div>
+    </div>
+</section>
+<section id="presets" class="card">
+    <div class="card-header">
+        <h4>{{ ns_data.name }} Presets</h4>
+    </div>
+    <div class="card-content">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Randomizer</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for preset in presets %}
+                <tr>
+                    <td>{{ ns_data.name }}/{{preset.preset_name}}</td>
+                    <td><a href="{{ url_for('presets.presets_for_namespace_randomizer', namespace=ns_data.name, randomizer=preset.randomizer)}}">{{preset.randomizer}}</a>
+                    </td>
+                    <td><a
+                            href="{{ url_for('presets.get_preset', namespace=ns_data.name, randomizer=preset.randomizer, preset=preset.preset_name)}}">{%
+                            if is_owner
+                            ==
+                            True %}edit{% else %}view{% endif %}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
 {%- endblock content %}

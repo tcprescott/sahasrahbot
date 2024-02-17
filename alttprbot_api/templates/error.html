@@ -1,16 +1,18 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>{{ title }}</title>
-{%- endblock head %}
+{% set page_title = "Error" -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-            <h2>{{ title }}</h2>
-<p>{{ message }}</p>
+<section id="error" class="card">
+<div class="card-header">
+    <h4>{{ title }}</h4>
 </div>
+<div class="card-content">
+<div class="card-body">
+<div class="alert alert-danger" role="alert">
+    <div class="alert-body">
+        <i class="ft-alert-triangle"></i>
+        <span>{{ message }}</span>
+    </div>
 </div>
 </section>
 {%- endblock content %}

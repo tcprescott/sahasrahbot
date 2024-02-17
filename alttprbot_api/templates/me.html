@@ -1,17 +1,17 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>About {{ user.name }}</title>
-{%- endblock head %}
+{% set page_title = "My Profile" -%}
 
 {% block content -%}
-<div class="wrapper">
-    <div class="inner">
-        <h3>About {{ user.name }}</h3>
-        <img src='{{ user.avatar_url }}' />
-        <p>
-            In the future, this will have more information we have about you, such as your racetime information.  You can also update your information here in the future.
-        </p>
+<section id="me" class="card">
+    <div class="card-header">
+        <h4>About {{ user.name }}</h4>
     </div>
-</div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>
+                In the future, this will have more information we have about you, such as your racetime information.  You can also update your information here in the future.
+            </p>
+        </div>
+    </div>
+</section>
 {%- endblock content %}

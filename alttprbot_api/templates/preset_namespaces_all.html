@@ -1,24 +1,32 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>All Namespaces</title>
-{%- endblock head %}
+{% set page_title = "All Namespaces" -%}
+{% set nav_item = 'presets' -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-
-<a href="{{ url_for('presets.my_presets') }}">Access your namespace or create a new namespace (requires login).</a>
-
-<h2>All namespaces</h2>
-<ul class="col-6 col-12-medium">
-    {% for namespace in namespaces %}
-    <li><a href="{{ url_for('presets.presets_for_namespace', namespace=namespace.name) }}">{{ namespace.name }}</a></li>
-    {% endfor %}
-</ul>
-    
-            </div>
+<section id="info" class="card">
+    <div class="card-header">
+        <h4>What is a namespace?</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>A namespace is a way for you to share your own presets with others.  You can upload your own presets to a namespace, which others then can roll games with.</p>
+            <p>By default, you can only make changes to presets in your own namespace.  If you want to delegate access to namespace to others, or have a custom name for a namespace, please contact Synack for help.</p>
         </div>
+    </div>
+</section>
+<section id="namespaces" class="card">
+    <div class="card-header">
+        <h4>All Namespaces</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <a href="{{ url_for('presets.my_presets') }}">Access your namespace or create a new namespace (requires login).</a>
+            <ul class="col-6 col-12-medium">
+                {% for namespace in namespaces %}
+                <li><a href="{{ url_for('presets.presets_for_namespace', namespace=namespace.name) }}">{{ namespace.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </section>
 {%- endblock content %}

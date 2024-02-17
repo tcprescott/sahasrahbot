@@ -79,7 +79,8 @@ async def access_denied(e):
     return await render_template(
         'error.html',
         title="Access Denied",
-        message="We were unable to access your Discord account."
+        message="We were unable to access your Discord account.",
+        user=None
     )
 
 
@@ -93,8 +94,17 @@ async def me():
 @sahasrahbotapi.route("/logout/")
 async def logout():
     discord.revoke()
-    return await render_template('logout.html', user=None)
+    return redirect(url_for("index"))
 
+if config.DEBUG:
+    @sahasrahbotapi.route('/throw_error', methods=['GET'])
+    async def throw_error():
+        try:
+            user = await discord.fetch_user()
+        except Unauthorized:
+            user = None
+
+        return await render_template('error.html', user=user, title="Example Error", message="This is just a test.")
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
@@ -156,11 +166,13 @@ async def something_bad_happened(e):
         return await render_template(
             'error.html',
             title="Discord Session Expired",
-            message="Your Discord session has expired.  Please log in again."
+            message="Your Discord session has expired.  Please log in again.",
+            user=None
         )
 
     return await render_template(
         'error.html',
         title="Something Bad Happened",
-        message="Something bad happened.  Please try again later."
+        message="Something bad happened.  Please try again later.",
+        user=None
     )

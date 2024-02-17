@@ -1,29 +1,27 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>New Preset</title>
-{%- endblock head %}
+{% set page_title = "New Preset" -%}
+{% set nav_item = 'presets' -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<h2>New Preset</h2>
-<hr />
-
-<form enctype=multipart/form-data action="{{ url_for('presets.new_preset_submit', namespace=ns_data.name)}}"
-    method="post">
-    <p>Randomizer: <select name="randomizer" id="randomizer">
-            {% for randomizer in randomizers %}
-            <option value="{{ randomizer }}">{{ randomizer }}</option>
-            {% endfor %}
-        </select></p>
-    <p>{{ ns_data.name }}/<input type="text" id="preset_name" name="preset_name" minlength="1" maxlength="20"
-            pattern="^[a-zA-Z0-9_]*$" placeholder="your_preset_name" /></p>
-    <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
-    <p><input type="submit" value="Save" /></p>
-</form>
-</div>
-</div>
+<section id="new" class="card">
+    <div class="card-header">
+        <h4>New Preset</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <form enctype=multipart/form-data action="{{ url_for('presets.new_preset_submit', namespace=ns_data.name)}}"
+                method="post">
+                <p>Randomizer: <select name="randomizer" id="randomizer">
+                        {% for randomizer in randomizers %}
+                        <option value="{{ randomizer }}">{{ randomizer }}</option>
+                        {% endfor %}
+                    </select></p>
+                <p>{{ ns_data.name }}/<input type="text" id="preset_name" name="preset_name" minlength="1" maxlength="20"
+                        pattern="^[a-zA-Z0-9_]*$" placeholder="your_preset_name" /></p>
+                <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
+                <p><input type="submit" value="Save" /></p>
+            </form>
+        </div>
+    </div>
 </section>
 {%- endblock content %}

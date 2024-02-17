@@ -1,33 +1,57 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Preset {{ ns_data.name }}/{{ preset_data.preset_name }} - {{ preset_data.randomizer }} </title>
-{%- endblock head %}
+{% set page_title = "Preset " ~ ns_data.name ~ "/" ~ preset_data.preset_name ~ " - " ~ preset_data.randomizer -%}
+{% set nav_item = 'presets' -%}
 
 {% block content -%}
-<section id="wrapper">
-        <div class="wrapper">
-            <div class="inner">
-                <section>
-<h2>Preset &quot;{{ ns_data.name }}/{{ preset_data.preset_name }}&quot; for {{ preset_data.randomizer}}</h2>
-<p><a href="{{ url_for('presets.presets_for_namespace', namespace=ns_data.name) }}">View presets from {{ ns_data.name
-        }}</a></p>
-<hr />
 {% if is_owner == True %}
-<form enctype=multipart/form-data
-    action="{{ url_for('presets.get_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}"
-    method="post">
-    <p>Upload a new YAML file to replace this preset.</p>
-    <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
-    <p><input id="save" name="save" type="submit" value="Save" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="delete" name="delete" type="submit" value="Delete (cannot be undone)"/></p>
-</form>
-<hr />
-{% endif %}
-<p><a
-        href="{{ url_for('presets.download_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}">download</a>
-</p>
+<section id="upload" class="card">
+        <div class="card-header">
+            <h4>Preset {{ ns_data.name }}/{{ preset_data.preset_name }} - {{ preset_data.randomizer }}</h4>
+        </div>
+        <div class="card-content">
+            <div class="card-body">
+                <p><a href="{{ url_for('presets.presets_for_namespace', namespace=ns_data.name) }}">View presets from {{ ns_data.name }}</a></p>
+                <hr />
+                <form enctype=multipart/form-data
+                    action="{{ url_for('presets.get_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}"
+                    method="post">
+                    <p>Upload a new YAML file to replace this preset.</p>
+                    <p><input type="file" id="presetfile" name="presetfile" accept=".yaml" /></p>
+                    <p><input id="save" name="save" type="submit" value="Save" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="delete" name="delete" type="submit" value="Delete (cannot be undone)"/></p>
+                </form>
+                <hr />
+                <p><a
+                    href="{{ url_for('presets.download_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}">download</a>
+                </p>
+            </div>
+        </div>
 </section>
-<section><pre><code>{{ preset_data.content|e }}</code></pre></section>
+{% else %}
+<section id="info" class="card">
+        <div class="card-header">
+            <h4>Preset {{ ns_data.name }}/{{ preset_data.preset_name }} - {{ preset_data.randomizer }}</h4>
+        </div>
+        <div class="card-content">
+            <div class="card-body">
+                <p><a href="{{ url_for('presets.presets_for_namespace', namespace=ns_data.name) }}">View presets from {{ ns_data.name }}</a></p>
+                <hr />
+                <p><a
+                    href="{{ url_for('presets.download_preset', namespace=ns_data.name, randomizer=preset_data.randomizer, preset=preset_data.preset_name) }}">download</a>
+                </p>
+            </div>
+        </div>
+</section>
+{% endif %}
+<section id="code" class="card">
+        <div class="card-header">
+            <h4>YAML</h4>
+        </div>
+        <div class="card-content">
+            <div class="card-body">
+                <pre><code>{{ preset_data.content|e }}</code></pre>
+            </div>
+        </div>
+</section>
 
 </div>
 </div>
