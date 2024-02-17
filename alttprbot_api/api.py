@@ -76,11 +76,16 @@ async def redirect_unauthorized(e):
 
 @sahasrahbotapi.errorhandler(AccessDenied)
 async def access_denied(e):
+    try:
+        user = await discord.fetch_user()
+    except Unauthorized:
+        user = None
+
     return await render_template(
         'error.html',
         title="Access Denied",
         message="We were unable to access your Discord account.",
-        user=None
+        user=user
     )
 
 
@@ -155,9 +160,18 @@ async def theme_assets(path):
 # def bad_request(e):
 #     return jsonify(success=False, error=repr(e))
 
-# @sahasrahbotapi.errorhandler(404)
-# def not_found(e):
-#     return jsonify(success=False, error=repr(e))
+@sahasrahbotapi.errorhandler(404)
+async def not_found(e):
+    try:
+        user = await discord.fetch_user()
+    except Unauthorized:
+        user = None
+    return await render_template(
+        'error.html',
+        title="Not Found",
+        message="The page you are looking for does not exist.",
+        user=user
+    )
 
 @sahasrahbotapi.errorhandler(500)
 async def something_bad_happened(e):
@@ -170,9 +184,14 @@ async def something_bad_happened(e):
             user=None
         )
 
+    try:
+        user = await discord.fetch_user()
+    except Unauthorized:
+        user = None
+
     return await render_template(
         'error.html',
         title="Something Bad Happened",
         message="Something bad happened.  Please try again later.",
-        user=None
+        user=user
     )
