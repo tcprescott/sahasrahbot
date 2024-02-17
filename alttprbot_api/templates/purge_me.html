@@ -1,13 +1,13 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Purge my info!</title>
-{%- endblock head %}
+{% set page_title = "Purge my info!" -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
 <form action="/purgeme" method="post">
     <p>Purge all of your info from SahasrahBot. This cannot be undone.</p>
     <p>This will delete any data collected by the bot, any presets you have, your namespace, etc.</p>
