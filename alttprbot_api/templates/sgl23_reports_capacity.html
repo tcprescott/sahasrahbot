@@ -1,8 +1,5 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>SGL23 Tournament Room Capacity</title>
-{%- endblock head %}
+{% set page_title = "SGL23 Tournament Room Capacity" -%}
 
 {% block content -%}
 
@@ -20,10 +17,6 @@
         /* padding: 8px; */
     }
 
-    tr:nth-child(even) {
-        background-color: Lightgreen;
-    }
-
     tr.alert {
         background-color: yellow;
     }
@@ -32,43 +25,56 @@
         background-color: lightblue;
     }
 </style>
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<h1>SpeedGaming Live 2023 Tournament Room Capacity Report</h1>
-<p>Note: This data is cached and refreshes every minute.</p>
-<table border="1">
-    <tr>
-        <th>Time</th>
-        <th>Total</th>
-        <th>Starting this 15m</th>
-        <th bgcolor="black">&nbsp;</th>
-        <th>ALTTPR</th>
-        <th>OOTR</th>
-        <th>SMR</th>
-        <th>SMZ3</th>
-        <th>FFR</th>
-        <th>TWWR</th>
-        <th>Z1R</th>
-        <th>SMB3R</th>
-    </tr>
-    {% for interval, data in report.items() %}
-    <tr {% if data['runtime_total'] > alert_threshold %}class="alert"{% endif %}</tr>
-        <td>{{ interval }}</td>
-        <td>{{ data['runtime_total'] }}</td>
-        <td>{{ data['starting_total'] }}</td>
-        <td bgcolor="black">&nbsp;</td>
-        <td>{{ data['runtime']['sgl23alttpr'] }}</td>
-        <td>{{ data['runtime']['sgl23ootr'] }}</td>
-        <td>{{ data['runtime']['sgl23smr'] }}</td>
-        <td>{{ data['runtime']['sgl23smz3'] }}</td>
-        <td>{{ data['runtime']['sgl23ffr'] }}</td>
-        <td>{{ data['runtime']['sgl23twwr'] }}</td>
-        <td>{{ data['runtime']['sgl23z1r'] }}</td>
-        <td>{{ data['runtime']['sgl23smb3r'] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<section id="capacity" class="card">
+    <div class="card-header">
+        <h4>SpeedGaming Live 2023 Tournament Room Capacity Report</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>Note: This data is cached and refreshes every minute.</p>
+        </div>
+    </div>
+</section>
+<section id="reports" class="card">
+    <div class="card-header">
+        <h4>Reports</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th>Time</th>
+                    <th>Total</th>
+                    <th>Starting this 15m</th>
+                    <th>ALTTPR</th>
+                    <th>OOTR</th>
+                    <th>SMR</th>
+                    <th>SMZ3</th>
+                    <th>FFR</th>
+                    <th>TWWR</th>
+                    <th>Z1R</th>
+                    <th>SMB3R</th>
+                </tr>
+                {% for interval, data in report.items() %}
+                <tr {% if data['runtime_total'] > alert_threshold %}class="alert"{% endif %}</tr>
+                    <td>{{ interval }}</td>
+                    <td>{{ data['runtime_total'] }}</td>
+                    <td>{{ data['starting_total'] }}</td>
+                    <td>{{ data['runtime']['sgl23alttpr'] }}</td>
+                    <td>{{ data['runtime']['sgl23ootr'] }}</td>
+                    <td>{{ data['runtime']['sgl23smr'] }}</td>
+                    <td>{{ data['runtime']['sgl23smz3'] }}</td>
+                    <td>{{ data['runtime']['sgl23ffr'] }}</td>
+                    <td>{{ data['runtime']['sgl23twwr'] }}</td>
+                    <td>{{ data['runtime']['sgl23z1r'] }}</td>
+                    <td>{{ data['runtime']['sgl23smb3r'] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</section>
+
 </div>
 </div>
 </section>

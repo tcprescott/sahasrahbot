@@ -28,7 +28,36 @@ async def sgl23_dashboard():
     except Unauthorized:
         user = None
 
-    return await render_template("sgl23_dashboard.html", user=user)
+    games = [
+        {
+            "name": "ALTTPR",
+            "generator_url": "/sgl23/generate/alttpr",
+            "schedule_url": "https://schedule.speedgaming.org/sgl23alttpr",
+            "challonge_url": "https://challonge.com/sgl23alttpr",
+        },
+        {
+            "name": "SMR",
+            "generator_url": "/sgl23/generate/smr",
+            "schedule_url": "https://schedule.speedgaming.org/sgl23smdash",
+            "challonge_url": "https://challonge.com/sgl23smr",
+        },
+        {
+            "name": "OOTR",
+            "generator_url": "/sgl23/generate/ootr",
+            "schedule_url": "https://schedule.speedgaming.org/sgl23ootr",
+            "challonge_url": "https://challonge.com/sgl23ootr",
+        },
+        {
+            "name": "TWWR",
+            "flags": "MS4xMC4wAEEAFwMiAHPowgMMsACCcQ8AAMkHAAAA",
+            "schedule_url": "https://schedule.speedgaming.org/sgl23twwr",
+            "challonge_url": "https://challonge.com/sgl23twwr",
+            "download_url": "https://github.com/LagoLunatic/wwrando/releases/tag/1.10.0",
+            "model_pack_url": "https://github.com/Sage-of-Mirrors/Custom-Wind-Waker-Player-Models/archive/master.zip",
+        },
+    ]
+
+    return await render_template("sgl23_dashboard.html", user=user, games=games)
 
 
 @sgl23_blueprint.route('/sgl23/generate/alttpr', methods=["GET"])  # updated

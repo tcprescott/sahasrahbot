@@ -1,8 +1,5 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>SGL23 Admin "Dashboard"</title>
-{%- endblock head %}
+{% set page_title = "SGL23 Dashboard" -%}
 
 {% block content -%}
 
@@ -11,44 +8,49 @@
         font-size: 12px;
     }
 </style>
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<!-- <h2>Important Links</h2> -->
-<h1>SpeedGaming Live 2023 Dashboard</h1>
-<p><b>ONLY AN ADMIN</b> or an assistant of an admin should use these to generate games.</p>
-
-<h2>Reports</h2>
-<p><a href="/sgl23/reports/capacity" target="_blank">View the capacity report (opens new tab)</a></p>
-
-<h2>ALTTPR <small><a href="https://schedule.speedgaming.org/sgl23alttpr" target="_blank">schedule</a> - <a href="https://speedgaming.challonge.com/sgl23alttpr" target="_blank">challonge</a></small></h2>
-<a href="/sgl23/generate/alttpr" target="_blank">Generate a ALTTPR Seed (opens new tab)</a>
-
-<h2>SMR <small><a href="https://schedule.speedgaming.org/sgl23smr" target="_blank">schedule</a> - <a href="https://speedgaming.challonge.com/sgl23smdash" target="_blank">challonge</a></small></h2>
-<a href="/sgl23/generate/smr" target="_blank">Generate a SM DASH Randomizer Seed (opens new tab)</a>
-
-<h2>OOTR <small><a href="https://schedule.speedgaming.org/sgl23ootr" target="_blank">schedule</a> - <a href="https://challonge.com/sgl23ootr2" target="_blank">challonge</a></small></h2>
-<a href="/sgl23/generate/ootr" target="_blank">Generate a OOTR Seed (opens new tab)</a>
-
-<h2>SMZ3 <small><a href="https://schedule.speedgaming.org/sgl23smz3" target="_blank">schedule</a> - <a href="https://speedgaming.challonge.com/eutm30al" target="_blank">challonge</a></small></h2>
-<p>Generate a <a href="/sgl23/generate/smz3/main" target="_blank">hardfast SMZ3 Seed for main bracket</a> or a <a href="/sgl23/generate/smz3/alt" target="_blank">normal SMZ3 Seed for alt bracket</a> (opens new tab)</a></p>
-
-<h2>FFR <small><a href="https://schedule.speedgaming.org/sgl23ffr" target="_blank">schedule</a> - <a href="https://challonge.com/ffr2023onsite" target="_blank">challonge</a></small></h2>
-<a href="/sgl23/generate/ffr" target="_blank">Generate a FFR Seed (opens new tab)</a>
-
-<h2>TWWR <small><a href="https://schedule.speedgaming.org/sgl23twwr" target="_blank">schedule</a> - <a href="https://speedgaming.challonge.com/sgl23twwr" target="_blank">challonge</a></small></h2>
-<p>Flags: MS4xMC4wAEEAFwMiAHPowgMMsACCcQ8AAMkHAAAA</p>
-<p><a href="https://github.com/LagoLunatic/wwrando/releases/tag/1.10.0" target="_blank">Download randomizer</a></p>
-<p><a href="https://github.com/Sage-of-Mirrors/Custom-Wind-Waker-Player-Models/archive/master.zip" target="_blank">Official Model Pack</a></p>
-
-<h2>Z1R <small><a href="https://schedule.speedgaming.org/sgl23z1r" target="_blank">schedule</a> - <a href="https://speedgaming.challonge.com/sgl23z1r" target="_blank">challonge</a></small></h2>
-<p>Flags: See Z1R admin</p>
-<p><a href="https://tprescott-public-data.s3.amazonaws.com/sgl22/ZeldaRandomizer35.exe">Download randomizer</a></p>
-
-<h2>SMB3R <small><a href="https://schedule.speedgaming.org/sgl23smb3r" target="_blank">schedule</a> - <a href="https://speedgaming.challonge.com/sgl23smb3r" target="_blank">challonge</a></small></h2>
-<p>Flags: 949SL2L0UA4</p>
-<p><a href="https://tprescott-public-data.s3.amazonaws.com/sgl22/smb3RandomizerSetup.exe">Download randomizer</a></p>
-</div>
-</div>
+<section id="reports" class="card">
+    <div class="card-header">
+        <h4>Reports</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p><a href="/sgl23/reports/capacity" target="_blank">View the capacity report (opens new tab)</a></p>
+        </div>
+    </div>
+</section>
+<section id="games">
+	<div class="row match-height">
+        {% for game in games %}
+		<div class="col-lg-4 col-md-12">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title">{{ game['name'] }}</h4>
+                    <h6 class="card-subtitle text-muted">{{ game.get('instructions', '') }}</h6>
+				</div>
+				<div class="card-body">
+                    {% if game.get('generator_url', '') %}
+                    <p class="card-text"><a href="{{ game['generator_url'] }}" class="card-link" target="_blank">Generate Seed</a></p>
+                    {% endif %}
+                    {% if game.get('flags', '') %}
+                    <p class="card-text">Flags: abcdefgh</p>
+                    {% endif %}
+                    <hr/>
+                    {% if game.get('download_url', '') %}
+                    <p class="card-text"><a href="{{ game['download_url'] }}" class="card-link" target="_blank">Download Randomizer</a></p>
+                    {% endif %}
+                    {% if game.get('model_pack_url', '') %}
+                    <p class="card-text"><a href="{{ game['model_pack_url'] }}" class="card-link" target="_blank">Download Model Pack</a></p>
+                    {% endif %}
+                    {% if game.get('schedule_url', '') %}
+                    <p class="card-text"><a href="{{ game['schedule_url'] }}" class="card-link" target="_blank">Schedule</a></p>
+                    {% endif %}
+                    {% if game.get('challonge_url', '') %}
+                    <p class="card-text"><a href="{{ game['challonge_url'] }}" class="card-link" target="_blank">Challonge</a></p>
+                    {% endif %}
+				</div>
+			</div>
+		</div>
+        {% endfor %}
+    </div>
 </section>
 {%- endblock content %}
