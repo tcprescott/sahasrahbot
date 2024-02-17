@@ -1,16 +1,14 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Tournament Leaderboard - {{ tournament.name }} ({{ tournament.id }})</title>
-{%- endblock head %}
+{% set page_title = "Tournament Leaderboard -" ~ tournament.name ~ " (" ~ tournament.id ~ ")" -%}
 
 {% block content -%}
-<h1>Tournament Leaderboard - {{ tournament.name }} ({{ tournament.id }})</h1>
-
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-<table border="1">
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+<table class="table">
     <tr>
         <th>Rank</th>
         <th>Player Name</th>

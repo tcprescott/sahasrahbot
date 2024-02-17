@@ -1,13 +1,13 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Submission Done</title>
-{%- endblock head %}
+{%- set page_title = "Submission Done" -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
 <p>Thank you for your submission for {{ tournament_race.versus }}!</p>
 <p>Check your DMs for details.</p>
 </div>

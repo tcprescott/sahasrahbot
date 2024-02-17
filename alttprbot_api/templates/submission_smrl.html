@@ -1,8 +1,5 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Match Submission</title>
-{%- endblock head %}
+{% set page_title = "SMR League Match Submission" -%}
 
 {% block content -%}
 
@@ -23,9 +20,12 @@
         }
     };
 </script>
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
 <form action="{{ endpoint }}" method="post">
     <label for="episodeid">SpeedGaming Episode ID:</label><input type="number" id="episodeid" name="episodeid"
         value="{{ episode_id }}" required><br><br>

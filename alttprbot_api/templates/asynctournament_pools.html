@@ -1,14 +1,14 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Pools for {{ tournament.name }} ({{ tournament.id }})</title>
-{%- endblock head %}
+{% set page_title = "Pools for " ~ tournament.name ~ " (" ~ tournament.id ~ ")" -%}
 
 {% block content -%}
 
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
 <h1>Pools for {{ tournament.name }} ({{ tournament.id }})</h1>
 
 {% for pool in tournament.permalink_pools %}
