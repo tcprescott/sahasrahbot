@@ -22,7 +22,6 @@ ranked_choice_blueprint = Blueprint('ranked_choice', __name__)
 @requires_authorization
 async def get_ballot(election_id: int):
     user = await discord.fetch_user()
-    logged_in = True
 
     try:
         election = await models.RankedChoiceElection.get(id=election_id)
@@ -51,16 +50,15 @@ async def get_ballot(election_id: int):
     if existing_votes:
         # await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
         return await render_template('ranked_choice_submit.html', election=election, votes=existing_votes,
-                                     logged_in=logged_in, user=user)
+                                     user=user)
 
-    return await render_template('ranked_choice_vote.html', election=election, logged_in=logged_in, user=user)
+    return await render_template('ranked_choice_vote.html', election=election, user=user)
 
 
 @ranked_choice_blueprint.route('/ranked_choice/<int:election_id>', methods=['POST'])
 @requires_authorization
 async def submit_ballot(election_id: int):
     user = await discord.fetch_user()
-    logged_in = True
 
     try:
         election = await models.RankedChoiceElection.get(id=election_id)
@@ -124,8 +122,7 @@ async def submit_ballot(election_id: int):
 
     await rankedchoice.refresh_election_post(election, discordbot)
 
-    return await render_template('ranked_choice_submit.html', election=election, votes=votes, logged_in=logged_in,
-                                 user=user)
+    return await render_template('ranked_choice_submit.html', election=election, votes=votes, user=user)
 
 
 def remove_prefix(text, prefix):

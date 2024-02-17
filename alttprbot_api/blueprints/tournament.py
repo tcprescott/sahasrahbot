@@ -29,7 +29,6 @@ async def submission_form(event):
     if isinstance(form_data, str):
         return await render_template(
             form_data,
-            logged_in=True,
             user=user,
             event=event,
             endpoint=url_for("tournament.submit"),
@@ -38,7 +37,6 @@ async def submission_form(event):
     else:
         return await render_template(
             'submission.html',
-            logged_in=True,
             user=user,
             event=event,
             endpoint=url_for("tournament.submit"),
@@ -57,7 +55,6 @@ async def submit():
         await tournament_race.process_submission_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
         return await render_template(
             "submission_done.html",
-            logged_in=True,
             user=user,
             tournament_race=tournament_race
         )

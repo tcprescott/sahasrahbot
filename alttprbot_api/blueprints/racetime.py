@@ -130,7 +130,7 @@ async def return_racetime_verify():
                                             defaults={'discord_user_id': user.id, 'rtgg_access_token': token,
                                                       'display_name': user.name})
 
-    return await render_template('racetime_verified.html', logged_in=True, user=user,
+    return await render_template('racetime_verified.html', user=user,
                                  racetime_name=userinfo_data['name'])
 
 

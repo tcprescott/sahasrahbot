@@ -45,12 +45,10 @@ if config.DEBUG:
 async def index():
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
-    return await render_template('index.html', logged_in=logged_in, user=user)
+    return await render_template('index.html', user=user)
 
 
 @sahasrahbotapi.route("/login/")
@@ -89,13 +87,13 @@ async def access_denied(e):
 @requires_authorization
 async def me():
     user = await discord.fetch_user()
-    return await render_template('me.html', logged_in=True, user=user)
+    return await render_template('me.html', user=user)
 
 
 @sahasrahbotapi.route("/logout/")
 async def logout():
     discord.revoke()
-    return await render_template('logout.html', logged_in=False)
+    return await render_template('logout.html', user=None)
 
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
@@ -115,7 +113,7 @@ async def healthcheck():
 async def purge_me():
     user = await discord.fetch_user()
 
-    return await render_template('purge_me.html', logged_in=True, user=user)
+    return await render_template('purge_me.html', user=user)
 
 
 @sahasrahbotapi.route('/purgeme', methods=['POST'])

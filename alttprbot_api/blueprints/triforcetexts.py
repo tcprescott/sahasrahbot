@@ -14,10 +14,8 @@ triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
 async def triforcetexts_sgl23():
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
     pool_name = "sgl23"
 
@@ -25,16 +23,16 @@ async def triforcetexts_sgl23():
     triforce_texts_config = await models.TriforceTextsConfig.get_or_none(pool_name=pool_name, key_name='key')
 
     if not triforce_texts_config:
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid key",
+        return await render_template('error.html', user=user, title="Invalid key",
                                      message="This pool does not have a valid key set.")
 
     if key != triforce_texts_config.value:
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid key",
+        return await render_template('error.html', user=user, title="Invalid key",
                                      message="The key supplied is not valid.")
 
     session['sgl23_triforce_text_authorized'] = True
 
-    return await render_template('triforce_text.html', logged_in=logged_in, user=user, pool_name=pool_name,
+    return await render_template('triforce_text.html', user=user, pool_name=pool_name,
                                  author_name_field=True)
 
 
@@ -42,15 +40,13 @@ async def triforcetexts_sgl23():
 async def submit_sgl23():
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
     pool_name = "sgl23"
 
     if not session.get('sgl23_triforce_text_authorized', False):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid key",
+        return await render_template('error.html', user=user, title="Invalid key",
                                      message="The key in your session store is not correct.  This should not have happened.")
 
     payload = await request.form
@@ -59,13 +55,13 @@ async def submit_sgl23():
         r"^[A-Za-z0-9 ?!,-….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ]{0,19}$")
 
     if not regex.match(payload['first_line']):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid input.",
+        return await render_template('error.html', user=user, title="Invalid input.",
                                      message="Invalid text entered for the first line.")
     if not regex.match(payload['second_line']):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid input.",
+        return await render_template('error.html', user=user, title="Invalid input.",
                                      message="Invalid text entered for the second line.")
     if not regex.match(payload['third_line']):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid input.",
+        return await render_template('error.html', user=user, title="Invalid input.",
                                      message="Invalid text entered for the third line.")
 
     text = f"{payload['first_line']}\n{payload['second_line']}\n{payload['third_line']}"
@@ -73,23 +69,21 @@ async def submit_sgl23():
     await models.TriforceTexts.create(pool_name=pool_name, text=text, discord_user_id=None,
                                       author=payload['author_name'])
 
-    return await render_template('triforce_text_submit.html', logged_in=logged_in, user=user)
+    return await render_template('triforce_text_submit.html', user=user)
 
 
 @triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>', methods=['GET'])
 @requires_authorization
 async def triforcetexts(pool_name):
     user = await discord.fetch_user()
-    logged_in = True
 
-    return await render_template('triforce_text.html', logged_in=logged_in, user=user, pool_name=pool_name)
+    return await render_template('triforce_text.html', user=user, pool_name=pool_name)
 
 
 @triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>/submit', methods=['POST'])
 @requires_authorization
 async def submit(pool_name):
     user = await discord.fetch_user()
-    logged_in = True
 
     payload = await request.form
 
@@ -97,13 +91,13 @@ async def submit(pool_name):
         r"^[A-Za-z0-9 ?!,-….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ]{0,19}$")
 
     if not regex.match(payload['first_line']):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid input.",
+        return await render_template('error.html', user=user, title="Invalid input.",
                                      message="Invalid text entered for the first line.")
     if not regex.match(payload['second_line']):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid input.",
+        return await render_template('error.html', user=user, title="Invalid input.",
                                      message="Invalid text entered for the second line.")
     if not regex.match(payload['third_line']):
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Invalid input.",
+        return await render_template('error.html', user=user, title="Invalid input.",
                                      message="Invalid text entered for the third line.")
 
     text = f"{payload['first_line']}\n{payload['second_line']}\n{payload['third_line']}"
@@ -111,21 +105,20 @@ async def submit(pool_name):
     await models.TriforceTexts.create(pool_name=pool_name, text=text, discord_user_id=user.id,
                                       author=f"{user.name}#{user.discriminator}")
 
-    return await render_template('triforce_text_submit.html', logged_in=logged_in, user=user)
+    return await render_template('triforce_text_submit.html', user=user)
 
 
 @triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>/moderation', methods=['GET'])
 @requires_authorization
 async def moderation(pool_name):
     user = await discord.fetch_user()
-    logged_in = True
 
     triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=pool_name, key_name='moderator')
 
     moderators = [int(x.value) for x in triforce_texts_config]
 
     if user.id not in moderators:
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Access Denied",
+        return await render_template('error.html', user=user, title="Access Denied",
                                      message="You do not have permission to access this page.")
 
     filt = {
@@ -142,7 +135,7 @@ async def moderation(pool_name):
 
     texts = await models.TriforceTexts.filter(**filt)
 
-    return await render_template('triforce_text_moderation.html', logged_in=logged_in, user=user, pool_name=pool_name,
+    return await render_template('triforce_text_moderation.html', user=user, pool_name=pool_name,
                                  texts=texts)
 
 
@@ -151,14 +144,13 @@ async def moderation(pool_name):
 @requires_authorization
 async def moderation_action(pool_name, text_id, action):
     user = await discord.fetch_user()
-    logged_in = True
 
     triforce_texts_config = await models.TriforceTextsConfig.filter(pool_name=pool_name, key_name='moderator')
 
     moderators = [int(x.value) for x in triforce_texts_config]
 
     if user.id not in moderators:
-        return await render_template('error.html', logged_in=logged_in, user=user, title="Access Denied",
+        return await render_template('error.html', user=user, title="Access Denied",
                                      message="You do not have permission to access this page.")
 
     text = await models.TriforceTexts.get(id=text_id)

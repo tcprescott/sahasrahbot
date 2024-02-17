@@ -186,7 +186,6 @@ async def async_tournament_queue(tournament_id: int):
 
     return await render_template(
         'asynctournament_race_list.html',
-        logged_in=True,
         user=discord_user,
         tournament=tournament,
         races=races,
@@ -232,7 +231,7 @@ async def async_tournament_review(tournament_id: int, race_id: int):
         race.reviewed_by = user
         await race.save()
 
-    return await render_template('asynctournament_race_view.html', logged_in=True, user=discord_user,
+    return await render_template('asynctournament_race_view.html', user=discord_user,
                                  tournament=tournament, race=race, already_claimed=race.reviewed_by != user,
                                  reviewable=reviewable)
 
@@ -296,7 +295,7 @@ async def async_tournament_leaderboard(tournament_id: int):
     else:
         sort_key = "score"
 
-    return await render_template('asynctournament_leaderboard.html', logged_in=discord_user is not None,
+    return await render_template('asynctournament_leaderboard.html',
                                  user=discord_user, tournament=tournament, leaderboard=leaderboard, estimate=estimate,
                                  sort_key=sort_key)
 
@@ -320,7 +319,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
     races = await models.AsyncTournamentRace.filter(tournament=tournament, user_id=user_id).order_by(
         '-created').prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
 
-    return await render_template('asynctournament_user.html', logged_in=discord_user is not None, user=discord_user,
+    return await render_template('asynctournament_user.html', user=discord_user,
                                  races=races, tournament=tournament, player=player)
 
 
@@ -341,7 +340,7 @@ async def async_tournament_pools(tournament_id: int):
 
     await tournament.fetch_related('permalink_pools', 'permalink_pools__permalinks')
 
-    return await render_template('asynctournament_pools.html', logged_in=discord_user is not None, user=discord_user,
+    return await render_template('asynctournament_pools.html', user=discord_user,
                                  tournament=tournament)
 
 
@@ -366,5 +365,4 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
     races = await permalink.races.filter(status__in=['finished', 'forfeit'], reattempted=False).order_by(
         '-score').prefetch_related('live_race')
 
-    return await render_template('asynctournament_permalink_view.html', logged_in=discord_user is not None,
-                                 user=discord_user, tournament=tournament, permalink=permalink, races=races)
+    return await render_template('asynctournament_permalink_view.html', user=discord_user, tournament=tournament, permalink=permalink, races=races)

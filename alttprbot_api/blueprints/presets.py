@@ -16,14 +16,12 @@ presets_blueprint = Blueprint('presets', __name__)
 async def all_presets():
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
     namespaces = await models.PresetNamespaces.all()
 
-    return await render_template('preset_namespaces_all.html', logged_in=logged_in, user=user, namespaces=namespaces)
+    return await render_template('preset_namespaces_all.html', user=user, namespaces=namespaces)
 
 
 @presets_blueprint.route('/presets/me', methods=['GET'])
@@ -44,10 +42,10 @@ async def new_preset(namespace):
     await ns_data.fetch_related('collaborators')
 
     if not generator.is_namespace_owner(user, ns_data):
-        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized",
+        return await render_template('error.html', user=user, title="Unauthorized",
                                      message="You are not authorized to create presets in this namespace.")
 
-    return await render_template('preset_new.html', logged_in=True, user=user, ns_data=ns_data,
+    return await render_template('preset_new.html', user=user, ns_data=ns_data,
                                  ns_current_user=ns_current_user, randomizers=generator.PRESET_CLASS_MAPPING.keys())
 
 
@@ -61,11 +59,11 @@ async def new_preset_submit(namespace):
     await ns_data.fetch_related('collaborators')
 
     if not generator.is_namespace_owner(user, ns_data):
-        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized",
+        return await render_template('error.html', user=user, title="Unauthorized",
                                      message="You are not authorized to create presets in this namespace.")
 
     if not re.match("^[a-zA-Z0-9_]*$", payload['preset_name']):
-        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized",
+        return await render_template('error.html', user=user, title="Unauthorized",
                                      message="Invalid preset name provided.")
 
     preset_data, _ = await models.Presets.update_or_create(
@@ -90,16 +88,14 @@ async def presets_for_namespace(namespace):
 
     try:
         user = await discord.fetch_user()
-        logged_in = True
         is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
-        logged_in = False
         is_owner = False
 
     presets = await models.Presets.filter(namespace__name=namespace)
 
-    return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner,
+    return await render_template('preset_namespace.html', user=user, is_owner=is_owner,
                                  ns_data=ns_data, presets=presets)
 
 
@@ -111,17 +107,15 @@ async def presets_for_namespace_randomizer(namespace, randomizer):
 
     try:
         user = await discord.fetch_user()
-        logged_in = True
         is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
-        logged_in = False
         is_owner = False
 
     presets = await models.Presets.filter(randomizer=randomizer, namespace__name=namespace).only('id', 'preset_name',
                                                                                                  'randomizer')
 
-    return await render_template('preset_namespace.html', logged_in=logged_in, user=user, is_owner=is_owner,
+    return await render_template('preset_namespace.html', user=user, is_owner=is_owner,
                                  ns_data=ns_data, presets=presets)
 
 
@@ -132,16 +126,14 @@ async def get_preset(namespace, randomizer, preset):
 
     try:
         user = await discord.fetch_user()
-        logged_in = True
         is_owner = generator.is_namespace_owner(user, ns_data)
     except Unauthorized:
         user = None
-        logged_in = False
         is_owner = False
 
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
 
-    return await render_template('preset_view.html', logged_in=logged_in, user=user, is_owner=is_owner, ns_data=ns_data,
+    return await render_template('preset_view.html', user=user, is_owner=is_owner, ns_data=ns_data,
                                  preset_data=preset_data)
 
 
@@ -169,7 +161,7 @@ async def update_preset(namespace, randomizer, preset):
     is_owner = generator.is_namespace_owner(user, ns_data)
 
     if not is_owner:
-        return await render_template('error.html', logged_in=True, user=user, title="Unauthorized",
+        return await render_template('error.html', user=user, title="Unauthorized",
                                      message="You are not the owner of this preset.")
 
     preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
@@ -181,7 +173,7 @@ async def update_preset(namespace, randomizer, preset):
     preset_data.content = request_files['presetfile'].read().decode()
 
     if preset_data.content == '':
-        return await render_template('error.html', logged_in=True, user=user, title="Oops!",
+        return await render_template('error.html', user=user, title="Oops!",
                                      message="Empty or missing preset file provided.")
     await preset_data.save()
 

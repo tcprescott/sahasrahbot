@@ -12,10 +12,8 @@ schedule_blueprint = Blueprint('schedule', __name__)
 async def schedule(slug):
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
     event = await models.ScheduleEvent.get_or_none(event_slug=slug)
     if event is None:
@@ -23,16 +21,14 @@ async def schedule(slug):
 
     await event.fetch_related('episodes', 'episodes__channel', 'episodes__players') # TODO: add filters and pagination
 
-    return await render_template('schedule/main.html', logged_in=logged_in, user=user, event=event)
+    return await render_template('schedule/main.html', user=user, event=event)
 
 @schedule_blueprint.route("/<string:slug>/<int:episode_id>")
 async def schedule_episode(slug, episode_id):
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
     event = await models.ScheduleEvent.get_or_none(event_slug=slug)
     if event is None:
@@ -44,7 +40,7 @@ async def schedule_episode(slug, episode_id):
 
     await episode.fetch_related('players', 'commentators', 'trackers', 'restreamers')
 
-    return await render_template('schedule/episode.html', logged_in=logged_in, user=user, event=event, episode=episode)
+    return await render_template('schedule/episode.html', user=user, event=event, episode=episode)
 
 @schedule_blueprint.route("/<string:slug>/submit")
 @requires_authorization

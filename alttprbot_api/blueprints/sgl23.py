@@ -25,12 +25,10 @@ sgl23_blueprint = Blueprint('sgl23', __name__)
 async def sgl23_dashboard():
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
-    return await render_template("sgl23_dashboard.html", logged_in=logged_in, user=user)
+    return await render_template("sgl23_dashboard.html", user=user)
 
 
 @sgl23_blueprint.route('/sgl23/generate/alttpr', methods=["GET"])  # updated
@@ -348,14 +346,12 @@ async def sgl23_generate_smz3_alt():
 async def sgl23_reports_capacity():
     try:
         user = await discord.fetch_user()
-        logged_in = True
     except Unauthorized:
         user = None
-        logged_in = False
 
     report = await create_capacity_report()
     threshold = 10 if config.DEBUG else 25
-    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=threshold, logged_in=logged_in, user=user)
+    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=threshold, user=user)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def create_capacity_report():
