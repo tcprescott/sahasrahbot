@@ -1,15 +1,15 @@
 {% extends "base/base.html" -%}
-
-{% block head -%}
-<title>Racetime Account Verification</title>
-{%- endblock head %}
+{% set page_title = "Racetime Account Verification" -%}
 
 {% block content -%}
-<section id="wrapper">
-    <div class="wrapper">
-        <div class="inner">
-Thank you {{ racetime_name }}, we have verified you successfully.
-</div>
-</div>
+<section id="verification" class="card">
+    <div class="card-header">
+        <h4>Racetime Account Verification</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <p>Thank you {{ racetime_name }}, we have verified you successfully.</p>
+        </div>
+    </div>
 </section>
 {%- endblock content %}

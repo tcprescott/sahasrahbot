@@ -76,16 +76,11 @@ async def redirect_unauthorized(e):
 
 @sahasrahbotapi.errorhandler(AccessDenied)
 async def access_denied(e):
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-
     return await render_template(
         'error.html',
         title="Access Denied",
         message="We were unable to access your Discord account.",
-        user=user
+        user=None
     )
 
 
