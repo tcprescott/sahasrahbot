@@ -139,9 +139,9 @@ async def robots():
 async def assets(path):
     return await send_from_directory('alttprbot_api/static/assets', path)
 
-@sahasrahbotapi.route('/images/<path:path>', methods=['GET'])
-async def images(path):
-    return await send_from_directory('alttprbot_api/static/images', path)
+@sahasrahbotapi.route('/theme-assets/<path:path>', methods=['GET'])
+async def theme_assets(path):
+    return await send_from_directory('alttprbot_api/static/theme-assets', path)
 
 # @sahasrahbotapi.errorhandler(400)
 # def bad_request(e):
