@@ -3,10 +3,26 @@ from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 
+ALTTPRMINI_TITLE_MAP = {
+    'Casual Boots': 'casualboots',
+    '6/6 Defeat Ganon': 'nightcl4w/6_6_defeat_ganon',
+    'Boss Shuffle': 'nightcl4w/boss_shuffle',
+    'Big Key Shuffle': 'catobat/bkshuffle',
+    'All Dungeons': 'adboots',
+}
 
 class ALTTPRMiniTournament(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed = await ALTTPRPreset("nightcl4w/duality").generate(tournament=True, spoilers="off")
+        try:
+            match_title = self.episode['match1']['title']
+            # we need to strip out anything before the : in the title
+            match_title = match_title.split(':')[-1].strip()
+            preset = ALTTPRMINI_TITLE_MAP[match_title]
+        except KeyError:
+            await self.rtgg_handler.send_message(
+                "Invalid mode chosen, please contact a tournament admin for assistance.")
+            raise
+        self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
 
     async def configuration(self):
         guild = discordbot.get_guild(469300113290821632)
