@@ -29,7 +29,7 @@ class ALTTPRMiniTournament(ALTTPRTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game (assisted)',
+            racetime_goal='Beat the game',
             event_slug="alttprmini",
             audit_channel=discordbot.get_channel(473668481011679234),
             commentary_channel=discordbot.get_channel(469317757331308555),
