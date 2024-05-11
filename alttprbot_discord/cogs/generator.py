@@ -550,26 +550,27 @@ class Generator(commands.Cog):
 
     @app_commands.command()
     @app_commands.describe(
-        mode="The mode you want to generate."
+        preset="The preset you want to generate.",
+        spoiler="Generate a spoiler log? (default no)"
     )
-    @app_commands.choices(mode=[
-        app_commands.Choice(name="SGL23", value="sgl23"),
-        app_commands.Choice(name="recall_mm", value="recall_mm"),
-        app_commands.Choice(name="recall_full", value="recall_full"),
-        app_commands.Choice(name="classic_mm", value="classic_mm"),
-        app_commands.Choice(name="classic_full", value="classic_full"),
-    ])
+    @app_commands.choices(spoiler=YES_NO_CHOICE)
     async def smdash(
             self,
             interaction: discord.Interaction,
-            mode: str
+            preset: str,
+            spoiler: str = "no"
     ):
         """
         Generates a Super Metroid Dash Randomizer game on https://dashrando.net
         """
         await interaction.response.defer()
-        url = await smdash.create_smdash(mode=mode)
+        url = await smdash.create_smdash(mode=preset, spoiler=spoiler == "yes")
         await interaction.followup.send(url)
+    @smdash.autocomplete("preset")
+    async def smdash_preset_autocomplete(self, interaction: discord.Interaction, current: str):
+        presets = await smdash.get_smdash_presets()
+        filtered = sorted([a for a in presets if a.startswith(current.lower())][:25])
+        return [app_commands.Choice(name=preset, value=preset) for preset in filtered]
 
     @app_commands.command()
     @app_commands.describe(

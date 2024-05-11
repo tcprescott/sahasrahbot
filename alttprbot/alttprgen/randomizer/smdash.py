@@ -3,7 +3,9 @@ import aiohttp
 
 
 async def create_smdash(mode="classic_mm", spoiler=False):
-    """Generates a DASH Super Metroid Randomizer seed and returns the URL to download it."""
+    """
+    Generates a DASH Super Metroid Randomizer seed and returns the URL to download it.
+    """
     async with aiohttp.ClientSession() as session:
         route = f'https://www.dashrando.net/generate/{mode}?race=1'
         if spoiler:
@@ -17,7 +19,9 @@ async def create_smdash(mode="classic_mm", spoiler=False):
                 raise Exception(f"Could not generate smdash seed: {msg}")
 
 async def get_smdash_presets():
-    """Returns the available DASH presets as a list of strings."""
+    """
+    Returns the available DASH presets as a list of strings.
+    """
     try:
         async with aiohttp.ClientSession() as session:
             route = f'https://www.dashrando.net/api/presets'
