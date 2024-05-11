@@ -1,8 +1,9 @@
-import aiohttp
 import ssl
+import aiohttp
 
 
 async def create_smdash(mode="classic_mm", spoiler=False):
+    """Generates a DASH Super Metroid Randomizer seed and returns the URL where it can be downloaded."""
     async with aiohttp.ClientSession() as session:
         route = f'https://www.dashrando.net/generate/{mode}?race=1'
         if spoiler:
