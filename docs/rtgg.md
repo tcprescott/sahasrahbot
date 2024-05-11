@@ -118,9 +118,9 @@ Generate a seed using the Super Metroid DASH Randomizer, found at https://dashra
 
 DASH supports many popular features such as boss and area randomization along with unique modes which rebalance existing items and introduce new progression items.
 
-Available presets: `sgl23`, `recall_mm`, `classic_mm`, `classic_full`, `classic_full`
-
-Example `!dashrace recall_mm`
+#### Commands
+`!dash` - List available presets  
+`!dash [--spoiler] <preset>` - Generate a seed using the specified preset (e.g., _classic_, _recall_, _chozo_bozo_, etc.)
 
 ### !multiworld
 Use this command in the RaceTime.gg race room.

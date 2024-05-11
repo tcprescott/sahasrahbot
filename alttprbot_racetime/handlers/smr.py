@@ -177,14 +177,31 @@ class GameHandler(SahasrahBotCoreHandler):
         if await self.is_locked(message):
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-        try:
-            url = await smdash.create_smdash(mode=args[0])
-        except IndexError:
-            await self.send_message(
-                'You must specify a preset!'
+        # No args? Provide list of presets
+        if len(args) < 1 or len(args) > 2:
+            presets = await smdash.get_smdash_presets()
+            await self.send_message('Usage: !dash [--spoiler] <preset>')
+            await self.send_message(f'Available presets: {', '.join(presets)}'
             )
             return
+
+        # Extract options and preset from args
+        spoiler = False
+        preset = args[0]
+        if len(args) == 2:
+            if args[0] != '--spoiler':
+                await self.send_message(
+                    f'Invalid option: {args[0]}  ' +
+                    f'Supported options: --spoiler'
+                )
+                return
+
+            spoiler = True
+            preset = args[1]
+
+        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        try:
+            url = await smdash.create_smdash(mode=preset, spoiler=spoiler)
         except Exception as e:
             await self.send_message(str(e))
             return
@@ -224,4 +241,4 @@ class GameHandler(SahasrahBotCoreHandler):
 
     async def ex_help(self, args, message):
         await self.send_message(
-            "Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash <preset>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")
+            "Available commands:\n\"!total <preset>, !varia <settings> <skills>, !dash [--spoiler] <preset>, !multiworld <preset>\" to generate a seed.  Check out https://sahasrahbot.synack.live/rtgg.html for more info.")

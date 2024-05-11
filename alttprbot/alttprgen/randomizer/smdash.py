@@ -17,7 +17,7 @@ async def create_smdash(mode="classic_mm", spoiler=False):
                 raise Exception(f"Could not generate smdash seed: {msg}")
 
 async def get_smdash_presets():
-    """Returns the available DASH presets in a string"""
+    """Returns the available DASH presets as a list of strings."""
     try:
         async with aiohttp.ClientSession() as session:
             route = f'https://www.dashrando.net/api/presets'
