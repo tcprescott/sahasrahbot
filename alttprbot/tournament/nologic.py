@@ -1,4 +1,4 @@
-from alttprbot.alttprgen import preset
+from alttprbot.alttprgen import generator
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
@@ -6,7 +6,7 @@ from alttprbot_discord.bot import discordbot
 
 class ALTTPRNoLogicRace(ALTTPRTournamentRace):
     async def roll(self):
-        self.seed, self.preset_dict = await preset.get_preset('nologic_rods', allow_quickswap=True)
+        self.seed = await generator.ALTTPRPreset('nologic_rods').generate(allow_quickswap=True, branch='beeta')
 
     async def configuration(self):
         guild = discordbot.get_guild(535946014037901333)
