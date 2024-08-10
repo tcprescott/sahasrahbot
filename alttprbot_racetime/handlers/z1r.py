@@ -9,7 +9,8 @@ PRESETS = {
     'abns_elite8': 'PPcIk!s3aupL9yxEvapydBFdC9X8E2A',
     'consternation': 'ItRtYLs2xToBiCHEvfcY6eRIcxG!VfM',
     '2019brackets': 'ItRtYLs2xC69xBrSRTzj6AW6Ja0fcbv',
-    'rr2024': 'NuJS0dpRgVdyn25HEl8NnSW7WSfLf9v2M'
+    'rr2024': 'NuJS0dpRgVdyn25HEl8NnSW7WSfLf9v2M',
+    'sgl24': '9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2'
 }
 # A note on 2019 brackets. The flag string in Zelda Randomizer is missing
 # Recorder to New Dungeons and Shuffle Overworld Group, which were ON.
@@ -29,8 +30,8 @@ class GameHandler(SahasrahBotCoreHandler):
 
     async def ex_z1rtournament(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
-        await self.send_message(f"Z1R 2024 Tournament - Flags: ItRtYcBhrKWVT6C67oOLsUpgEaHopla Seed: {seed_number}")
-        await self.set_bot_raceinfo(f"Flags: ItRtYcBhrKWVT6C67oOLsUpgEaHopla Seed: {seed_number}")
+        await self.send_message(f"Z1R SGL 2024 Tournament - Flags: 9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2 Seed: {seed_number}")
+        await self.set_bot_raceinfo(f"Flags: 9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2 Seed: {seed_number}")
 
     async def ex_rr2024(self, args, message):
         seed_number = random.randint(0, 9999999999999999)
