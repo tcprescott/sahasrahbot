@@ -101,7 +101,7 @@ class ALTTPRQualifierRace(TournamentRace):
 
         preset = async_tournament_live_race.pool.preset
 
-        self.seed = await triforce_text.generate_with_triforce_text("alttpr2023", preset)
+        self.seed = await triforce_text.generate_with_triforce_text("alttpr2024", preset)
 
         await self.rtgg_handler.set_bot_raceinfo(f"{self.seed.url} - {self.seed_code}")
         await self.rtgg_handler.send_message(f"Seed: {self.seed.url} - {self.seed_code}")

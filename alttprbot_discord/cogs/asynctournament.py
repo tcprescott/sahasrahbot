@@ -835,7 +835,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 else:
                     settings = None
                 seed = await triforce_text.generate_with_triforce_text(
-                    pool_name="alttpr2023",
+                    pool_name="alttpr2024",
                     preset=preset,
                     settings=settings,
                 )

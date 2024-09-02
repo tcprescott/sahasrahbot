@@ -4,7 +4,7 @@ from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
 
 
-class TestTournament(alttpr.ALTTPR2023Race):
+class TestTournament(alttpr.ALTTPR2024Race):
     async def configuration(self):
         guild = discordbot.get_guild(508335685044928540)
         return TournamentConfig(

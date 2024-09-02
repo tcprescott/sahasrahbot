@@ -413,8 +413,8 @@ class Tournament(commands.Cog):
 
     #     await interaction.followup.send(embed=embed)
 
-    # @app_commands.command(description="Generate a randomizer seed for the ALTTPR Main Tournament 2023.")
-    # async def alttpr2023(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member):
+    # @app_commands.command(description="Generate a randomizer seed for the ALTTPR Main Tournament 2024.")
+    # async def 4(self, interaction: discord.Interaction, player1: discord.Member, player2: discord.Member):
     #     await interaction.response.defer()
     #     seed, preset, deck = await alttpr.roll_seed([player1, player2])
 
@@ -495,8 +495,8 @@ class Tournament(commands.Cog):
     @app_commands.guilds(*CC_TOURNAMENT_SERVERS, *MAIN_TOURNAMENT_SERVERS)
     @app_commands.choices(
         event_slug=[
-            app_commands.Choice(name="cc2023", value="cc2023"),
-            app_commands.Choice(name="alttpr2023", value="alttpr2023"),
+            app_commands.Choice(name="cc2024", value="cc2024"),
+            app_commands.Choice(name="alttpr2024", value="alttpr2024"),
         ]
     )
     async def tournament_deck(self, interaction: discord.Interaction, opponent: discord.Member,
@@ -516,7 +516,7 @@ class Tournament(commands.Cog):
             if interaction.guild.id in CC_TOURNAMENT_SERVERS:
                 event_slug = "cc2023"
             elif interaction.guild.id in MAIN_TOURNAMENT_SERVERS:
-                event_slug = "alttpr2023"
+                event_slug = "alttpr2024"
             else:
                 await interaction.response.send_message("You must specify an event slug.", ephemeral=True)
                 return
