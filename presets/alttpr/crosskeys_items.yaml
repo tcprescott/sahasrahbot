@@ -1,6 +1,6 @@
 ---
 goal_name: "normal open keysanity + entrance shuffle"
-description: "Crossworld entrance with keysanity and 100% location accessibility as used for the 2023 Crosskeys Tournament."
+description: "Crossworld entrance with keysanity."
 customizer: false
 settings:
   goal: fast_ganon
@@ -23,6 +23,6 @@ settings:
   spoilers: false
   entrances: crossed
   tournament: true
-  accessibility: locations
+  accessibility: items
   dungeon_items: full
   item_placement: advanced
