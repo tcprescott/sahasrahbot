@@ -181,7 +181,7 @@ class GameHandler(SahasrahBotCoreHandler):
         if len(args) < 1 or len(args) > 2:
             presets = await smdash.get_smdash_presets()
             await self.send_message('Usage: !dash [--spoiler] <preset>')
-            await self.send_message(f'Available presets: {', '.join(presets)}'
+            await self.send_message(f"Available presets: {', '.join(presets)}"
             )
             return
 

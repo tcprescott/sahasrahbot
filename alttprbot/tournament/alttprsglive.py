@@ -23,7 +23,6 @@ class ALTTPRSGLive(ALTTPRTournamentRace):
             racetime_goal='Beat the game',
             event_slug='sgl24alttpr',
             audit_channel=discordbot.get_channel(772351829022474260),
-            stream_delay=0,
             helper_roles=[
                 guild.get_role(590804526114668544),
                 guild.get_role(859868643613474816),
