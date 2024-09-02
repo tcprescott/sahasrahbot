@@ -257,6 +257,7 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
     entrants = race_room_data.get('entrants', [])
 
     eligible_entrants_for_pool = []
+    await async_tournament_live_race.fetch_related('tournament')
 
     # iterate through entrants and create a AsyncTournamentRace record for each one
     for entrant in entrants:
@@ -277,8 +278,8 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
             reattempted=False
         )
 
-        # skip if they've already raced in this pool twice
-        if len(race_history) > 2:
+        # skip if they've already raced in this pool the maximum number of times
+        if len(race_history) > async_tournament_live_race.tournament.runs_per_pool:
             continue
 
         # check if they have an active race already

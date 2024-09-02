@@ -1,4 +1,5 @@
 from datetime import timedelta
+import pytz
 from typing import Optional
 
 import discord.utils
@@ -488,6 +489,7 @@ class AsyncTournament(Model):
     updated = fields.DatetimeField(auto_now=True)
     active = fields.BooleanField(null=False, default=True)
     allowed_reattempts = fields.SmallIntField(null=False, default=0)
+    runs_per_pool = fields.SmallIntField(null=False, default=1)
 
     customization = fields.CharField(45, null=False, default='default')
 
@@ -667,7 +669,14 @@ class AsyncTournamentRace(Model):
         if self.thread_open_time is None:
             return "N/A"
 
-        return self.thread_open_time.strftime('%Y-%m-%d %H:%M:%S')
+        return self.thread_open_time.astimezone(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
+
+    @property
+    def reviewed_at_formatted(self) -> Optional[str]:
+        if self.reviewed_at is None:
+            return ""
+
+        return self.reviewed_at.astimezone(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
 
     @property
     def score_formatted(self) -> Optional[str]:

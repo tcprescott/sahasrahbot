@@ -281,24 +281,25 @@ async def get_leaderboard(tournament: models.AsyncTournament, cache: bool = True
 
         leaderboard: List[LeaderboardEntry] = []
         for user_id in user_id_list:
-            races = []
+            rs = []
             for pool in tournament.permalink_pools:
-                try:
-                    race = await models.AsyncTournamentRace.get_or_none(
-                        user_id=user_id,
-                        tournament=tournament,
-                        permalink__pool=pool,
-                        status__in=["finished", "forfeit", "disqualified"],
-                        reattempted=False
-                    )
-                except MultipleObjectsReturned as e:
-                    raise MultipleObjectsReturned(
-                        f"Recieved multiple results for user id {user_id} in tournament id {tournament.id} permalink pool id {pool.id}") from e
-                races.append(race)
+                races = await models.AsyncTournamentRace.filter(
+                    user_id=user_id,
+                    tournament=tournament,
+                    permalink__pool=pool,
+                    status__in=["finished", "forfeit", "disqualified"],
+                    reattempted=False
+                )
+                for i in range(tournament.runs_per_pool):
+                    try:
+                        race = races[i]
+                    except IndexError:
+                        race = None
+                    rs.append(race)
 
             entry = LeaderboardEntry(
                 player=await models.Users.get(id=user_id),
-                races=races
+                races=rs
             )
             leaderboard.append(entry)
 

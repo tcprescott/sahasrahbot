@@ -14,11 +14,11 @@
         <th>Player Name</th>
         <th>Score</th>
         {% if estimate %}<th>Estimate</th>{% endif %}
-        <th bgcolor="black">&nbsp;</th>
         {% for pool in tournament.permalink_pools %}
-        <th>{{ pool.name }}</th>
+        {% for i in range(tournament.runs_per_pool) %}
+        <th>{{ pool.name }} #{{ i }}</th>
         {% endfor %}
-        <th bgcolor="black">&nbsp;</th>
+        {% endfor %}
         <th>Finished</th>
         <th>Forfeited</th>
         <th>Unplayed</th>
@@ -29,11 +29,9 @@
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=entry.player.id) }}" target="_blank">{{ entry.player.display_name }}</a></td>
         <td>{{ entry.score_formatted }}</td>
         {% if estimate %}<td>{{ entry.estimate_formatted }}</td>{% endif %}
-        <th bgcolor="black">&nbsp;</th>
         {% for race in entry.races %}
         <td>{% if race %}<a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink_id) }}" target="_blank">{{ race.score_formatted }}</a>{% endif %}</td>
         {% endfor %}
-        <td bgcolor="black">&nbsp;</td>
         <td>{{ entry.finished_race_count }}</td>
         <td>{{ entry.forfeited_race_count }}</td>
         <td>{{ entry.unattempted_race_count }}</td>

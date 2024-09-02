@@ -16,7 +16,11 @@
 <table class="table">
     <tr>
         <th>Runner</th>
-        <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
+        <td>{{ race.user.display_name }}</td>
+    </tr>
+    <tr>
+        <th>Date/Time</th>
+        <td>{{ race.thread_open_time_formatted }} ET</td>
     </tr>
     <tr>
         <th>Status</th>
@@ -36,7 +40,7 @@
     </tr>
     <tr>
         <th>Permalink</th>
-        <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
+        <td><a href="{{ race.permalink.url }}" target="_blank">{{ race.permalink.url }}</a></td>
     </tr>
     <tr>
         <th>

@@ -80,7 +80,7 @@ class AsyncTournamentView(discord.ui.View):
                 played_pool_counts[pool] = 1
 
         # get the pools that have not been played twice
-        available_pools = [a for a in async_tournament.permalink_pools if a.name not in played_pool_counts or played_pool_counts[a] < 2]
+        available_pools = [a for a in async_tournament.permalink_pools if a not in played_pool_counts or played_pool_counts[a] < async_tournament.runs_per_pool]
 
         if available_pools is None or len(available_pools) == 0:
             await interaction.response.send_message("You have already played all available pools for this tournament.",
@@ -302,7 +302,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
 
         # check if pool has been played twice already
         num_played = len([a for a in played_seeds if a.pool == pool])
-        if num_played >= 2:
+        if num_played >= async_tournament.runs_per_pool:
             await interaction.response.send_message("You have already played the maximum number of seeds from this pool.", ephemeral=True)
             return
 

@@ -33,6 +33,7 @@
 <table class="table">
     <tr>
         <th>ID</th>
+        <th>Date/Time</th>
         <th>Player Name</th>
         <th>Pool</th>
         <th>VoD</th>
@@ -48,6 +49,7 @@
     {% for race in races %}
     <tr>
         <td>{{ race.id }}</td>
+        <td>{{ race.thread_open_time_formatted }} ET</td>
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
         <td>{{ race.permalink.pool.name }}</td>
         <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% endif %}
@@ -62,7 +64,7 @@
         <td>{{ race.score_formatted }}</td>
         <td>{{ race.status_formatted }}</td>
         <td>{{ race.reviewed_by.display_name }}</td>
-        <td>{{ race.reviewed_at if race.reviewed_at else "" }}</td>
+        <td>{{ race.reviewed_at_formatted }}</td>
         <td>{{ race.review_status_formatted }}</td>
         <td>
             <p><a href="{{ url_for('async.async_tournament_review', tournament_id=tournament.id, race_id=race.id) }}">review</a>
