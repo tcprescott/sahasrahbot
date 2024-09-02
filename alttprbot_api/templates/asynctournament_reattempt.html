@@ -1,0 +1,78 @@
+{% extends "base/base.html" -%}
+{% set page_title = "Confirm reattempt" -%}
+
+{% block content -%}
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+<h1>{{ race.user.display_name }} - {{ race.permalink.pool.name }}</h1>
+
+<p style="background-color: yellow;border-style:solid;border-color: red;">
+    <b>Please review the race below and confirm your reattempt of this race!</b>
+</p>
+<table class="table">
+    <tr>
+        <th>Runner</th>
+        <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>{{ race.status }}</td>
+    </tr>
+    <tr>
+        <th>Finish Time</th>
+        <td>{{ race.elapsed_time_formatted }}</td>
+    </tr>
+    <tr>
+        <th>Score</th>
+        <td>{{ race.score_formatted }}</td>
+    </tr>
+    <tr>
+        <th>Pool</th>
+        <td>{{ race.permalink.pool.name }}</td>
+    </tr>
+    <tr>
+        <th>Permalink</th>
+        <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
+    </tr>
+    <tr>
+        <th>
+            {% if race.live_race %}
+                Racetime URL
+                {% else %}
+                Thread URL
+                {% endif %}
+        </th>
+        <td>
+            {% if race.live_race %}
+                <a href="{{ race.live_race.racetime_url }}" target="_blank">{{ race.live_race.racetime_url }}</a>
+                {% else %}
+                <a href="{{ race.thread_url }}" target="_blank">{{ race.thread_url }}</a>
+                {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th>VoD</th>
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}" target="_blank">{{ race.runner_vod_url|e }}</a>{% else
+            %}NO VOD SUBMITTED{% endif %}</td>
+    </tr>
+</table>
+
+<h2>Reattempt confirmation</h2>
+<p>{{ race.runner_notes_html|safe }}</p>
+<h2>Review</h2>
+<form action="{{ url_for('async.async_tournament_reattempt_submit', tournament_id=tournament.id, race_id=race.id )}}"
+    method="post">
+    <p><label for="reason_notes">Reason (optional)</label>
+    </p>
+    <p><textarea name="reason" id="reason" cols="30" rows="10"></textarea></p>
+    <p><input type="checkbox" id="confirm" value="Yes" required/> I confirm that I wish to re-attempt this race.  I acknowledge this action is permanent and cannot be undone by the tournament administration team!  I acknowlege that I have only one re-attempt and I will be using this re-attempt.</p>
+    <p><input type="submit" value="Confirm" /></p>
+</form>
+</div>
+</div>
+</section>
+{%- endblock content %}

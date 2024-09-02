@@ -1,0 +1,50 @@
+{% extends "base/base.html" -%}
+{% set page_title = "Your results so far! - " ~ tournament.name ~ " (" ~ tournament.id ~ ")" -%}
+
+{% block content -%}
+<section id="main" class="card">
+    <div class="card-header">
+        <h4>{{ page_title }}</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+<h1>History for {{ player.display_name }} - {{ tournament.name }} ({{ tournament.id }})</h1>
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>Date/Time</th>
+        <th>Pool</th>
+        <th>Permalink</th>
+        <th>VoD</th>
+        <th>Thread</th>
+        <th>Finish Time</th>
+        <th>Score</th>
+        <th>Run Status</th>
+        <th>Reattempt</th>
+        <th>Review Status</th>
+    </tr>
+    {% for race in races %}
+    <tr>
+        <td>{{ race.id }}</td>
+        <td>{{ race.thread_open_time_formatted }}</td>
+        <td>{{ race.permalink.pool.name }}</td>
+        <td><a href="{{ url_for('async.async_tournament_permalink', tournament_id=tournament.id, permalink_id=race.permalink.id) }}" target="_blank">{{ race.permalink.url }}</a></td>
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% endif %}</td>
+        <td>{% if race.live_race %}
+            <a href="{{ race.live_race.racetime_url }}" target="_blank">racetime</a>
+            {% else %}
+            <a href="{{ race.thread_url }}" target="_blank">thread</a>
+            {% endif %}
+        </td>
+        <td>{{ race.elapsed_time_formatted }}</td>
+        <td>{{ race.score_formatted }}</td>
+        <td>{{ race.status_formatted }}</td>
+        <td>{% if race.reattempted %}Already reattempted{% elif reattempted %}&nbsp;{% else %}<a href="{{ url_for('async.async_tournament_reattempt', tournament_id=tournament.id, race_id=race.id)}}" color="red">Reattempt this score</a>{% endif %}</td>
+        <td>{{ race.review_status_formatted }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+</div>
+</section>
+{%- endblock content %}

@@ -66,8 +66,22 @@ class AsyncTournamentView(discord.ui.View):
         async_history = await models.AsyncTournamentRace.filter(user=user,
                                                                 tournament=async_tournament).prefetch_related(
             'permalink__pool')
-        played_pools = [a.permalink.pool for a in async_history if a.reattempted is False]
-        available_pools = [a for a in list(async_tournament.permalink_pools) if a not in played_pools]
+        played_seeds = [a.permalink for a in async_history if a.reattempted is False]
+
+        # get the pools of the played seeds
+        played_pools = [a.pool for a in played_seeds]
+
+        # get a count of each pool played
+        played_pool_counts = {}
+        for pool in played_pools:
+            if pool in played_pool_counts:
+                played_pool_counts[pool] += 1
+            else:
+                played_pool_counts[pool] = 1
+
+        # get the pools that have not been played twice
+        available_pools = [a for a in async_tournament.permalink_pools if a.name not in played_pool_counts or played_pool_counts[a] < 2]
+
         if available_pools is None or len(available_pools) == 0:
             await interaction.response.send_message("You have already played all available pools for this tournament.",
                                                     ephemeral=True)
@@ -77,114 +91,114 @@ class AsyncTournamentView(discord.ui.View):
             "You must start your race within 10 minutes of clicking this button.\nFailure to do so will result in a forfeit.\n\n**Please be absolutely certain you're ready to begin.**\n\nThis dialogue box will expire in 60 seconds.  Dismiss this message if you performed this action in error.",
             view=AsyncTournamentRaceViewConfirmNewRace(available_pools=available_pools), ephemeral=True)
 
-    @discord.ui.button(label="Re-attempt", style=discord.ButtonStyle.blurple, emoji="↩️",
-                       custom_id="sahasrahbot:async_reattempt")
-    async def async_reattempt(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
-        await async_tournament.fetch_related('permalink_pools')
+    # @discord.ui.button(label="Re-attempt", style=discord.ButtonStyle.blurple, emoji="↩️",
+    #                    custom_id="sahasrahbot:async_reattempt")
+    # async def async_reattempt(self, interaction: discord.Interaction, button: discord.ui.Button):
+    #     async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+    #     await async_tournament.fetch_related('permalink_pools')
 
-        if async_tournament is None:
-            await interaction.response.send_message("This channel is not configured for async tournaments.",
-                                                    ephemeral=True)
-            return
+    #     if async_tournament is None:
+    #         await interaction.response.send_message("This channel is not configured for async tournaments.",
+    #                                                 ephemeral=True)
+    #         return
 
-        if async_tournament.active is False:
-            await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
-            return
+    #     if async_tournament.active is False:
+    #         await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
+    #         return
 
-        if async_tournament.allowed_reattempts is None or async_tournament.allowed_reattempts == 0:
-            await interaction.response.send_message("This tournament does not allow re-attempts.", ephemeral=True)
-            return
+    #     if async_tournament.allowed_reattempts is None or async_tournament.allowed_reattempts == 0:
+    #         await interaction.response.send_message("This tournament does not allow re-attempts.", ephemeral=True)
+    #         return
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+    #     user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
 
-        async_history = await models.AsyncTournamentRace.filter(user=user,
-                                                                tournament=async_tournament).prefetch_related(
-            'permalink__pool')
-        played_pools = [a.permalink.pool for a in async_history if a.reattempted is False]
-        if played_pools is None or len(played_pools) == 0:
-            await interaction.response.send_message("You have not yet played any pools for this tournament.",
-                                                    ephemeral=True)
-            return
+    #     async_history = await models.AsyncTournamentRace.filter(user=user,
+    #                                                             tournament=async_tournament).prefetch_related(
+    #         'permalink__pool')
+    #     played_seeds = [a.permalink for a in async_history if a.reattempted is False]
+    #     if played_seeds is None or len(played_seeds) == 0:
+    #         await interaction.response.send_message("You have not yet played any seeds for this tournament.",
+    #                                                 ephemeral=True)
+    #         return
 
-        reattempts = [a for a in async_history if a.reattempted is True]
+    #     reattempts = [a for a in async_history if a.reattempted is True]
 
-        available_reattempts = async_tournament.allowed_reattempts - len(reattempts)
+    #     available_reattempts = async_tournament.allowed_reattempts - len(reattempts)
 
-        if available_reattempts < 1:
-            await interaction.response.send_message(
-                f"You have already used all of your re-attempts for this tournament.", ephemeral=True)
-            return
+    #     if available_reattempts < 1:
+    #         await interaction.response.send_message(
+    #             f"You have already used all of your re-attempts for this tournament.", ephemeral=True)
+    #         return
 
-        await interaction.response.send_message(
-            f"Please choose a pool to reattempt.  You have **{available_reattempts}** re-attempts remaining.",
-            view=AsyncTournamentRaceViewConfirmReattempt(played_pools=played_pools), ephemeral=True)
+    #     await interaction.response.send_message(
+    #         f"Please choose a pool to reattempt.  You have **{available_reattempts}** re-attempts remaining.",
+    #         view=AsyncTournamentRaceViewConfirmReattempt(played_pools=played_pools), ephemeral=True)
 
-    @discord.ui.button(label="View your history", style=discord.ButtonStyle.grey, emoji="📜",
-                       custom_id="sahasrahbot:async_history")
-    async def async_history(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.defer()
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+#     @discord.ui.button(label="View your history", style=discord.ButtonStyle.grey, emoji="📜",
+#                        custom_id="sahasrahbot:async_history")
+#     async def async_history(self, interaction: discord.Interaction, button: discord.ui.Button):
+#         await interaction.response.defer()
+#         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
 
-        if async_tournament is None:
-            await interaction.followup.send("This channel is not configured for async tournaments.", ephemeral=True)
-            return
+#         if async_tournament is None:
+#             await interaction.followup.send("This channel is not configured for async tournaments.", ephemeral=True)
+#             return
 
-        pools = await models.AsyncTournamentPermalinkPool.filter(
-            tournament=async_tournament
-        )
-        description = f"""Disclaimer: Score calculation occurs at a fixed interval (hourly).
-If your score for a finished race is \"0\" or \"not calculated\", it may take up to an hour for the score to be calculated and displayed here.
+#         pools = await models.AsyncTournamentPermalinkPool.filter(
+#             tournament=async_tournament
+#         )
+#         description = f"""Disclaimer: Score calculation occurs at a fixed interval (hourly).
+# If your score for a finished race is \"0\" or \"not calculated\", it may take up to an hour for the score to be calculated and displayed here.
 
-This number may also change as more players play the seed, as the score is calculated based on the par time, which is the top 5 runs.  This calculation also occurs hourly.
+# This number may also change as more players play the seed, as the score is calculated based on the par time, which is the top 5 runs.  This calculation also occurs hourly.
 
-Your finish times and scores should be kept private until the end of the qualifier period.
+# Your finish times and scores should be kept private until the end of the qualifier period.
 
-If your run has a review status of "Rejected", this just means your run is undergoing secondary review.  If there's an issue with the run, we will contact you.
-A review status of "Accepted" indicates that all data adjustments have been performed.  "Pending" indicates that your run is still awaiting review.
-"""
-        embed = discord.Embed(
-            title="Async Tournament History",
-            description=description,
-            color=discord.Color.blurple()
-        )
+# If your run has a review status of "Rejected", this just means your run is undergoing secondary review.  If there's an issue with the run, we will contact you.
+# A review status of "Accepted" indicates that all data adjustments have been performed.  "Pending" indicates that your run is still awaiting review.
+# """
+#         embed = discord.Embed(
+#             title="Async Tournament History",
+#             description=description,
+#             color=discord.Color.blurple()
+#         )
 
-        for pool in pools:
-            race = await models.AsyncTournamentRace.get_or_none(
-                user__discord_user_id=interaction.user.id,
-                tournament=async_tournament,
-                permalink__pool=pool,
-                reattempted=False
-            )
-            if race is None:
-                status = "Not yet played"
-                elapsed_time = "N/A"
-                score = "N/A"
-                review_status = "N/A"
-            else:
-                status = race.status_formatted
-                elapsed_time = race.elapsed_time_formatted
-                score = race.score_formatted
-                review_status = race.review_status_formatted
+#         for pool in pools:
+#             race = await models.AsyncTournamentRace.get_or_none(
+#                 user__discord_user_id=interaction.user.id,
+#                 tournament=async_tournament,
+#                 permalink__pool=pool,
+#                 reattempted=False
+#             )
+#             if race is None:
+#                 status = "Not yet played"
+#                 elapsed_time = "N/A"
+#                 score = "N/A"
+#                 review_status = "N/A"
+#             else:
+#                 status = race.status_formatted
+#                 elapsed_time = race.elapsed_time_formatted
+#                 score = race.score_formatted
+#                 review_status = race.review_status_formatted
 
-            embed.add_field(
-                name=pool.name,
-                value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}\n**Score:** {score}\n**Review Status:** {review_status}",
-                inline=False
-            )
+#             embed.add_field(
+#                 name=pool.name,
+#                 value=f"**Status:** {status}\n**Finish Time:** {elapsed_time}\n**Score:** {score}\n**Review Status:** {review_status}",
+#                 inline=False
+#             )
 
-        reattempts = await models.AsyncTournamentRace.filter(
-            user__discord_user_id=interaction.user.id,
-            tournament=async_tournament,
-            reattempted=True
-        ).prefetch_related('permalink__pool')
-        if reattempts:
-            embed.add_field(
-                name="Re-attempted Pools",
-                value="\n".join([f"{r.permalink.pool.name}" for r in reattempts])
-            )
+#         reattempts = await models.AsyncTournamentRace.filter(
+#             user__discord_user_id=interaction.user.id,
+#             tournament=async_tournament,
+#             reattempted=True
+#         ).prefetch_related('permalink__pool')
+#         if reattempts:
+#             embed.add_field(
+#                 name="Re-attempted Pools",
+#                 value="\n".join([f"{r.permalink.pool.name}" for r in reattempts])
+#             )
 
-        await interaction.followup.send(embed=embed, ephemeral=True)
+#         await interaction.followup.send(embed=embed, ephemeral=True)
 
 
 class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
@@ -233,7 +247,6 @@ class SelectPermalinkPool(discord.ui.Select):
             if item.type == discord.ComponentType.button:
                 item.disabled = False
         await interaction.response.edit_message(embed=embed, view=self.view)
-
 
 # This view is ephemeral
 
@@ -285,9 +298,12 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         async_history = await models.AsyncTournamentRace.filter(user__discord_user_id=interaction.user.id,
                                                                 tournament=async_tournament).prefetch_related(
             'permalink__pool')
-        played_pools = [a.permalink.pool for a in async_history if a.reattempted is False]
-        if pool in played_pools:
-            await interaction.response.send_message("You have already played from this pool.", ephemeral=True)
+        played_seeds = [a.permalink for a in async_history if a.reattempted is False]
+
+        # check if pool has been played twice already
+        num_played = len([a for a in played_seeds if a.pool == pool])
+        if num_played >= 2:
+            await interaction.response.send_message("You have already played the maximum number of seeds from this pool.", ephemeral=True)
             return
 
         await pool.fetch_related("permalinks")
@@ -356,67 +372,67 @@ Good luck and have fun!
             view=None, embed=None)
 
 
-class AsyncTournamentRaceViewConfirmReattempt(discord.ui.View):
-    def __init__(self, played_pools):
-        super().__init__(timeout=60)
-        self.pool = None
-        self.add_item(SelectPermalinkPool(pools=played_pools))
+# class AsyncTournamentRaceViewConfirmReattempt(discord.ui.View):
+#     def __init__(self, played_seeds):
+#         super().__init__(timeout=60)
+#         self.pool = None
+#         self.add_item(SelectPermalink(seeds=played_seeds))
 
-    @discord.ui.button(label="I confirm!  I will not be allowed to undo this decision.",
-                       style=discord.ButtonStyle.green, emoji="✅", row=2, disabled=True)
-    async def async_confirm_new_race(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # Send a message to the thread with AsyncTournamentRaceViewReady
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
-        if async_tournament is None:
-            await interaction.response.send_message(
-                "This channel is not configured for async tournaments.  This should not have happened.", ephemeral=True)
-            return
+#     @discord.ui.button(label="I confirm!  I will not be allowed to undo this decision.",
+#                        style=discord.ButtonStyle.green, emoji="✅", row=2, disabled=True)
+#     async def async_confirm_new_race(self, interaction: discord.Interaction, button: discord.ui.Button):
+#         # Send a message to the thread with AsyncTournamentRaceViewReady
+#         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+#         if async_tournament is None:
+#             await interaction.response.send_message(
+#                 "This channel is not configured for async tournaments.  This should not have happened.", ephemeral=True)
+#             return
 
-        if async_tournament.active is False:
-            await interaction.response.send_message(
-                "This tournament is not currently active.  This should not have happened.", ephemeral=True)
-            return
+#         if async_tournament.active is False:
+#             await interaction.response.send_message(
+#                 "This tournament is not currently active.  This should not have happened.", ephemeral=True)
+#             return
 
-        if async_tournament.allowed_reattempts is None or async_tournament.allowed_reattempts == 0:
-            await interaction.response.send_message(
-                "This tournament does not allow re-attempts.  This should not have happened.", ephemeral=True)
-            return
+#         if async_tournament.allowed_reattempts is None or async_tournament.allowed_reattempts == 0:
+#             await interaction.response.send_message(
+#                 "This tournament does not allow re-attempts.  This should not have happened.", ephemeral=True)
+#             return
 
-        if self.pool is None:
-            await interaction.response.send_message("Please choose a pool.", ephemeral=True)
-            return
+#         if self.pool is None:
+#             await interaction.response.send_message("Please choose a pool.", ephemeral=True)
+#             return
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+#         user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
 
-        active_races_for_user = await async_tournament.races.filter(user=user, status__in=["pending", "in_progress"])
-        if active_races_for_user:
-            await interaction.response.send_message(
-                "You already have an active race.  If you believe this is in error, please contact a moderator.",
-                ephemeral=True)
-            return
+#         active_races_for_user = await async_tournament.races.filter(user=user, status__in=["pending", "in_progress"])
+#         if active_races_for_user:
+#             await interaction.response.send_message(
+#                 "You already have an active race.  If you believe this is in error, please contact a moderator.",
+#                 ephemeral=True)
+#             return
 
-        previous_tournament_races_for_pool = await models.AsyncTournamentRace.filter(user=user,
-                                                                                     tournament=async_tournament,
-                                                                                     permalink__pool__name=self.pool).prefetch_related(
-            'permalink__pool')
-        for race in previous_tournament_races_for_pool:
-            await models.AsyncTournamentAuditLog.create(
-                tournament=async_tournament,
-                user=user,
-                action="reattempt",
-                details=f"Marked {race.id} as a re-attempt for pool {self.pool}"
-            )
-            race.reattempted = True
-            await race.save()
+#         previous_tournament_races_for_pool = await models.AsyncTournamentRace.filter(user=user,
+#                                                                                      tournament=async_tournament,
+#                                                                                      permalink__pool__name=self.pool).prefetch_related(
+#             'permalink__pool')
+#         for race in previous_tournament_races_for_pool:
+#             await models.AsyncTournamentAuditLog.create(
+#                 tournament=async_tournament,
+#                 user=user,
+#                 action="reattempt",
+#                 details=f"Marked {race.id} as a re-attempt for pool {self.pool}"
+#             )
+#             race.reattempted = True
+#             await race.save()
 
-        await interaction.response.edit_message(
-            content="Successfully marked your previous race in this pool as a re-attempt.  Please choose a new permalink.",
-            view=None, embed=None)
+#         await interaction.response.edit_message(
+#             content="Successfully marked your previous race in this pool as a re-attempt.  Please choose a new permalink.",
+#             view=None, embed=None)
 
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
-    async def async_cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(
-            content="Successfully cancelled this request.  You have not used a re-attempt.", view=None, embed=None)
+#     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji="❌", row=2)
+#     async def async_cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+#         await interaction.response.edit_message(
+#             content="Successfully cancelled this request.  You have not used a re-attempt.", view=None, embed=None)
 
 
 class AsyncTournamentRaceViewReady(discord.ui.View):
@@ -775,7 +791,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             self.bot.add_view(AsyncTournamentPostRaceView())
             self.persistent_views_added = True
 
-    @app_commands.command(name="create", description="Create an async tournament")
+    @app_commands.command(name="create", description="Create an async tournament.  This command is only available to Synack.")
     async def create(self, interaction: discord.Interaction, name: str, permalinks: discord.Attachment,
                      report_channel: discord.TextChannel = None):
         if not await self.bot.is_owner(interaction.user):
@@ -813,38 +829,21 @@ class AsyncTournament(commands.GroupCog, name="async"):
         content = permalink_attachment.decode('utf-8-sig').splitlines()
         csv_reader = csv.reader(content)
         for row in csv_reader:
-            preset = row[0]
-            pool_name = row[1]
-            num_to_generate = int(row[2])
-            try:
-                oss = int(row[3])
-            except (IndexError, ValueError):
-                oss = None
+            pool_name = row[0]
+            preset = row[1]
+            url = row[2]
 
-            pool = await models.AsyncTournamentPermalinkPool.create(
+            pool, _ = await models.AsyncTournamentPermalinkPool.get_or_create(
                 tournament=async_tournament,
                 name=pool_name,
                 preset=preset,
             )
-
-            for _ in range(num_to_generate):
-                if oss:
-                    settings = {
-                        "override_start_screen": [oss, oss, oss, oss, oss]
-                    }
-                else:
-                    settings = None
-                seed = await triforce_text.generate_with_triforce_text(
-                    pool_name="alttpr2024",
-                    preset=preset,
-                    settings=settings,
-                )
-                await models.AsyncTournamentPermalink.create(
-                    pool=pool,
-                    url=seed.url,
-                    notes='/'.join(seed.code),
-                    live_race=False,
-                )
+            await models.AsyncTournamentPermalink.create(
+                pool=pool,
+                url=url,
+                notes='/'.join(url),
+                live_race=False,
+            )
 
         embed = create_tournament_embed(async_tournament)
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())

@@ -627,6 +627,7 @@ class AsyncTournamentRace(Model):
                               default='pending')  # pending, in_progress, finished, forfeit, disqualified
     live_race = fields.ForeignKeyField('models.AsyncTournamentLiveRace', null=True)  # only set if run was raced live
     reattempted = fields.BooleanField(null=False, default=False)
+    reattempt_reason = fields.TextField(null=True)
     runner_notes = fields.TextField(null=True)
     runner_vod_url = fields.CharField(400, null=True)
     run_collection_rate = fields.CharField(100, null=True)
@@ -660,6 +661,13 @@ class AsyncTournamentRace(Model):
         hours, remainder = divmod(self.elapsed_time.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    @property
+    def thread_open_time_formatted(self) -> Optional[str]:
+        if self.thread_open_time is None:
+            return "N/A"
+
+        return self.thread_open_time.strftime('%Y-%m-%d %H:%M:%S')
 
     @property
     def score_formatted(self) -> Optional[str]:

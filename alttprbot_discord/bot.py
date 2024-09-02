@@ -55,8 +55,8 @@ async def load_extensions():
     if config.DEBUG:
         await discordbot.load_extension("alttprbot_discord.cogs.test")
 
-    if importlib.util.find_spec('jishaku'):
-        await discordbot.load_extension('jishaku')
+    # if importlib.util.find_spec('jishaku'):
+    #     await discordbot.load_extension('jishaku')
 
     # if importlib.util.find_spec('sahasrahbot_private'):
     #     await discordbot.load_extension('sahasrahbot_private.stupid_memes')
@@ -114,10 +114,10 @@ async def on_command_completion(ctx):
 @discordbot.event
 async def on_ready():
     if config.DEBUG:
-        discordbot.tree.copy_global_to(
-            guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
-    else:
-        await discordbot.tree.sync()
+        discordbot.tree.copy_global_to(guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
+        discordbot.tree.clear_commands(guild=None)
+    
+    await discordbot.tree.sync()
 
     for guild in discordbot.guilds:
         cmds = discordbot.tree.get_commands(guild=guild)

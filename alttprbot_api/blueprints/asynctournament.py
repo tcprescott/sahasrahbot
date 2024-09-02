@@ -143,8 +143,73 @@ async def leaderboard_api(tournament_id):
         for idx, e in enumerate(leaderboard)
     ])
 
-
+# public dashboard for the current tournament player
 @asynctournament_blueprint.route('/races/<int:tournament_id>', methods=['GET'])
+@requires_authorization
+async def async_tournament(tournament_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+    races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament).order_by('-created').prefetch_related('permalink', 'permalink__pool')
+
+    reattempted = bool([r for r in races if r.reattempted is True])
+        
+
+    return await render_template('asynctournament_dashboard.html', user=discord_user, player=user, tournament=tournament, races=races, reattempted=reattempted)
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/reattempt', methods=['GET'])
+@requires_authorization
+async def async_tournament_reattempt(tournament_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+    race_id = request.args.get('race_id', None)
+
+    reattempted_races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament, reattempted=True)
+    if reattempted_races:
+        return abort(403, "You have already reattempted a race in this tournament.  Please contact a tournament admin if you believe this is in error.")
+
+    if race_id is None:
+        return abort(400, "You must supply a race_id")
+
+    # verify user of race matches logged in user
+    race = await models.AsyncTournamentRace.get_or_none(id=race_id, user=user, tournament=tournament)
+    if not race:
+        return abort(403, "You must be the player of this race to reattempt it.")
+
+
+    return await render_template('asynctournament_reattempt.html', user=discord_user, player=user, tournament=tournament, race=race)
+
+@asynctournament_blueprint.route('/race/<int:tournament_id>/reattempt', methods=['POST'])
+@requires_authorization
+async def async_tournament_reattempt_submit(tournament_id: int):
+    discord_user = await discord.fetch_user()
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    tournament = await models.AsyncTournament.get(id=tournament_id)
+
+    reattempted_races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament, reattempted=True)
+    if reattempted_races:
+        return abort(403, "You have already reattempted a race in this tournament.  Please contact a tournament admin if you believe this is in error.")
+
+    race_id = request.args.get('race_id', None)
+    if race_id is None:
+        return abort(400, "You must supply a race_id")
+
+    race = await models.AsyncTournamentRace.get_or_none(id=race_id, user=user, tournament=tournament)
+    if not race:
+        return abort(403, "You must be the player of this race to reattempt it.")
+
+    payload = await request.form
+    reason = payload.get('reason', None)
+
+    race.reattempted = True
+    race.reattempt_reason = reason
+
+    await race.save()
+
+    return redirect(url_for('async.async_tournament', tournament_id=tournament_id))
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/queue', methods=['GET'])
 @requires_authorization
 async def async_tournament_queue(tournament_id: int):
     discord_user = await discord.fetch_user()
@@ -280,13 +345,13 @@ async def async_tournament_leaderboard(tournament_id: int):
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    # user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    # authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    # if not authorized:
-    #     return abort(403, "You are not authorized to view this tournament.")
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
 
     leaderboard = await asynctournament.get_leaderboard(tournament)
 
@@ -307,13 +372,13 @@ async def async_tournament_player(tournament_id: int, user_id: int):
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    # user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    # authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    # if not authorized:
-    #     return abort(403, "You are not authorized to view this tournament.")
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
 
     player = await models.Users.get_or_none(id=user_id)
     races = await models.AsyncTournamentRace.filter(tournament=tournament, user_id=user_id).order_by(
@@ -324,19 +389,19 @@ async def async_tournament_player(tournament_id: int, user_id: int):
 
 
 @asynctournament_blueprint.route('/pools/<int:tournament_id>', methods=['GET'])
-# @requires_authorization
+@requires_authorization
 async def async_tournament_pools(tournament_id: int):
     try:
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    # user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    # authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    # if not authorized:
-    #     return abort(403, "You are not authorized to view this tournament.")
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    if not authorized:
+        return abort(403, "You are not authorized to view this tournament.")
 
     await tournament.fetch_related('permalink_pools', 'permalink_pools__permalinks')
 
@@ -345,22 +410,22 @@ async def async_tournament_pools(tournament_id: int):
 
 
 @asynctournament_blueprint.route('/permalink/<int:tournament_id>/<int:permalink_id>', methods=['GET'])
-# @requires_authorization
+@requires_authorization
 async def async_tournament_permalink(tournament_id: int, permalink_id: int):
     try:
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    # user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
     permalink = await models.AsyncTournamentPermalink.get(id=permalink_id, pool__tournament=tournament)
 
     # skip authorization check if this was a live race
-    # if permalink.live_race is False:
-    #     authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    #     if not authorized:
-    #         return abort(403, "You are not authorized to view this tournament.")
+    if permalink.live_race is False:
+        authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+        if not authorized:
+            return abort(403, "You are not authorized to view this tournament.")
 
     races = await permalink.races.filter(status__in=['finished', 'forfeit'], reattempted=False).order_by(
         '-score').prefetch_related('live_race')

@@ -277,8 +277,8 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
             reattempted=False
         )
 
-        # skip if they've already raced in this pool
-        if race_history:
+        # skip if they've already raced in this pool twice
+        if len(race_history) > 2:
             continue
 
         # check if they have an active race already
