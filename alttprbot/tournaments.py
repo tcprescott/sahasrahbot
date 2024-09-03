@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 import config
 from alttprbot import models
-from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttprsglive, alttpr
+from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttprsglive, alttpr_quals
 from alttprbot.util import gsheet
 from alttprbot_racetime import bot as racetimebot
 
@@ -31,7 +31,7 @@ else:
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         'alttprde': alttprde.ALTTPRDETournament,
         'alttprmini': alttprmini.ALTTPRMiniTournament,
-        'alttpr': alttpr.ALTTPR2024Race,
+        # 'alttpr': alttpr_quals.ALTTPRQualifierRace,
         'boots': boots.ALTTPRCASBootsTournamentRace,
         'nologic': nologic.ALTTPRNoLogicRace,
         'smwde': smwde.SMWDETournament,
