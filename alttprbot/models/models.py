@@ -27,6 +27,7 @@ class AuditGeneratedGames(Model):
     timestamp = fields.DatetimeField(auto_now=True, null=True)
     customizer = fields.IntField(null=True)
     doors = fields.BooleanField(default=False, null=False)
+    avianart = fields.BooleanField(default=False, null=False)
 
 
 class AuditMessages(Model):

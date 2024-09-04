@@ -22,6 +22,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util.helpers import generate_random_string
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
+from alttprbot_discord.util.avianart_discord import AVIANARTDiscord
 from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
 
 
@@ -173,6 +174,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
 
         settings = self.preset_data['settings']  # pylint: disable=E1136
         doors = self.preset_data.get('doors', False)
+        avianart = self.preset_data.get('avianart', False)
         if doors:
             branch = self.preset_data.get('branch', branch)  # stable, volatile
             if hints:
@@ -189,6 +191,13 @@ class ALTTPRPreset(SahasrahBotPresetCore):
                 branch=branch
             )
             hash_id = seed.hash
+        elif avianart:
+            preset = settings['preset']
+            seed = await AVIANARTDiscord.create(
+                preset=preset,
+                race=tournament,
+            )
+            hash_id = seed.hash_id
         else:
             branch = self.preset_data.get('branch', branch)  # live, tournament, beeta
             if self.preset_data.get('customizer', False):
@@ -253,7 +262,8 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             gentype='preset',
             genoption=self.preset,
             customizer=1 if self.preset_data.get('customizer', False) else 0,
-            doors=doors
+            doors=doors,
+            avianart=avianart
         )
         return seed
 

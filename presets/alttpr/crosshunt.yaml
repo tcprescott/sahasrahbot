@@ -1,0 +1,5 @@
+goal_name: crosshunt
+avianart: true
+description: "AVIANART Crosshunt"
+settings:
+  preset: crosshunt
