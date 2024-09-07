@@ -366,7 +366,7 @@ async def async_tournament_leaderboard(tournament_id: int):
 
 
 @asynctournament_blueprint.route('/player/<int:tournament_id>/<int:user_id>', methods=['GET'])
-# @requires_authorization
+@requires_authorization
 async def async_tournament_player(tournament_id: int, user_id: int):
     try:
         discord_user = await discord.fetch_user()

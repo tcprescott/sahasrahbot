@@ -16,6 +16,7 @@ import config
 from alttprbot import models
 from alttprbot.util import asynctournament, triforce_text
 from alttprbot_api.util import checks
+from alttprbot.alttprgen import generator
 
 RACETIME_URL = config.RACETIME_URL
 APP_URL = config.APP_URL
@@ -792,7 +793,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             self.persistent_views_added = True
 
     @app_commands.command(name="create", description="Create an async tournament.  This command is only available to Synack.")
-    async def create(self, interaction: discord.Interaction, name: str, permalinks: discord.Attachment,
+    async def create(self, interaction: discord.Interaction, name: str, permalinks: str,
                      report_channel: discord.TextChannel = None):
         if not await self.bot.is_owner(interaction.user):
             await interaction.response.send_message("Only Synack may create an async tournament at this time.",
@@ -825,25 +826,25 @@ class AsyncTournament(commands.GroupCog, name="async"):
             details=f"{name} ({async_tournament.id}) created"
         )
 
-        permalink_attachment = await permalinks.read()
-        content = permalink_attachment.decode('utf-8-sig').splitlines()
-        csv_reader = csv.reader(content)
-        for row in csv_reader:
-            pool_name = row[0]
-            preset = row[1]
-            url = row[2]
-
-            pool, _ = await models.AsyncTournamentPermalinkPool.get_or_create(
+        for row in permalinks.split(';'):
+            pool_name, preset, num = row.split(',')
+            pool = await models.AsyncTournamentPermalinkPool.create(
                 tournament=async_tournament,
                 name=pool_name,
                 preset=preset,
             )
-            await models.AsyncTournamentPermalink.create(
-                pool=pool,
-                url=url,
-                notes='/'.join(url),
-                live_race=False,
-            )
+
+            for _ in range(int(num)):
+                seed = await generator.ALTTPRPreset(preset=preset).generate(
+                    tournament=True,
+                    allow_quickswap=True
+                )
+                await models.AsyncTournamentPermalink.create(
+                    pool=pool,
+                    url=seed.url,
+                    notes='/'.join(seed.code),
+                    live_race=False,
+                )
 
         embed = create_tournament_embed(async_tournament)
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
