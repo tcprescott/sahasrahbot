@@ -22,7 +22,7 @@ RACETIME_CSRF_TOKEN = config.RACETIME_CSRF_TOKEN
 
 if config.DEBUG:
     TOURNAMENT_DATA = {
-        'test': test.TestTournament
+        # 'test': test.TestTournament
     }
 else:
     TOURNAMENT_DATA = {

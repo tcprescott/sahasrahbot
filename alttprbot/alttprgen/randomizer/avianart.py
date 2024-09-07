@@ -19,7 +19,7 @@ class AVIANART():
 
             # check until we get an error or it is finished generating
             attempts = 0
-            while result['response'].get('status', 'finished') == 'generating' and attempts < 24:
+            while result['response'].get('status', 'finished') != 'finished' and attempts < 24:
                 await asyncio.sleep(5)
                 attempts += 1
                 async with session.get(f'https://avianart.games/api.php?action=permlink&hash={hash_id}') as resp:
