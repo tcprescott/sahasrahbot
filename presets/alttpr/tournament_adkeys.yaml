@@ -1,0 +1,28 @@
+---
+goal_name: all dungeons keysanity
+customizer: false
+description: "All dungeon items are shuffled and 100% location accessibility and all dungeons, including Castle Tower, are required."
+settings:
+  goal: dungeons
+  item:
+    pool: normal
+    functionality: normal
+  lang: en
+  mode: open
+  hints: "off"
+  weapons: randomized
+  crystals:
+    ganon: "7"
+    tower: "7"
+  enemizer:
+    boss_shuffle: none
+    enemy_damage: default
+    enemy_health: default
+    enemy_shuffle: none
+  glitches: none
+  spoilers: false
+  entrances: none
+  tournament: true
+  accessibility: locations
+  dungeon_items: full
+  item_placement: advanced
