@@ -849,6 +849,39 @@ class AsyncTournament(commands.GroupCog, name="async"):
         embed = create_tournament_embed(async_tournament)
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
 
+    @app_commands.command(name="addseed", description="Add a seed to an async tournament.  This command is only available to Synack.")
+    async def add_seed(self, interaction: discord.Interaction, pool_name: str, preset: str, num: int=1):
+        if not await self.bot.is_owner(interaction.user):
+            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
+                                                    ephemeral=True)
+            return
+
+        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
+        if async_tournament is None:
+            await interaction.response.send_message(
+                "This channel is not configured for async tournaments.  Please create a new tournament.",
+                ephemeral=True)
+            return
+
+        pool = await models.AsyncTournamentPermalinkPool.get(
+            tournament=async_tournament,
+            name=pool_name,
+        )
+
+        for _ in range(num):
+            seed = await generator.ALTTPRPreset(preset=preset).generate(
+                tournament=True,
+                allow_quickswap=True
+            )
+            await models.AsyncTournamentPermalink.create(
+                pool=pool,
+                url=seed.url,
+                notes='/'.join(seed.code),
+                live_race=False,
+            )
+
+        await interaction.response.send_message(f"Added {num} seeds to pool {pool_name}.")
+
     @app_commands.command(name="extendtimeout", description="Extend the timeout of this tournament run")
     async def extend_timeout(self, interaction: discord.Interaction, minutes: int):
         # TODO: replace this with a lookup on the config table for authorized users
