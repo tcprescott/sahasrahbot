@@ -870,7 +870,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         )
 
         for _ in range(num):
-            seed = await generator.ALTTPRPreset(preset=preset).generate(
+            seed = await generator.ALTTPRPreset(preset=pool.preset).generate(
                 tournament=True,
                 allow_quickswap=True
             )
