@@ -863,6 +863,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 ephemeral=True)
             return
 
+        await interaction.response.defer()
         pool = await models.AsyncTournamentPermalinkPool.get(
             tournament=async_tournament,
             name=pool_name,
@@ -880,7 +881,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 live_race=False,
             )
 
-        await interaction.response.send_message(f"Added {num} seeds to pool {pool_name}.")
+        await interaction.followup.send(f"Added {num} seeds to pool {pool_name}.")
 
     @app_commands.command(name="extendtimeout", description="Extend the timeout of this tournament run")
     async def extend_timeout(self, interaction: discord.Interaction, minutes: int):
