@@ -31,7 +31,7 @@ else:
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         'alttprde': alttprde.ALTTPRDETournament,
         'alttprmini': alttprmini.ALTTPRMiniTournament,
-        # 'alttpr': alttpr_quals.ALTTPRQualifierRace,
+        'alttpr': alttpr_quals.ALTTPRQualifierRace,
         'boots': boots.ALTTPRCASBootsTournamentRace,
         'nologic': nologic.ALTTPRNoLogicRace,
         'smwde': smwde.SMWDETournament,
