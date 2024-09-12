@@ -9,7 +9,8 @@
     <div class="card-content">
         <div class="card-body">
 <h1>History for {{ player.display_name }} - {{ tournament.name }} ({{ tournament.id }})</h1>
-<table class="table">
+<div class="table-responsive">
+<table class="table table-striped">
     <tr>
         <th>ID</th>
         <th>Date/Time</th>
@@ -44,6 +45,7 @@
     </tr>
     {% endfor %}
 </table>
+</div>
 </div>
 </div>
 </section>
