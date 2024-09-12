@@ -30,7 +30,8 @@
         href="{{ url_for('async.async_tournament_queue', tournament_id=tournament.id, live=live, reviewer=reviewer, status=status, review_status=review_status, page=page+1) }}">
         Next page</a>
 </p>
-<table class="table">
+<div class="table-responsive">
+<table class="table table-striped">
     <tr>
         <th>ID</th>
         <th>Date/Time</th>
@@ -73,6 +74,7 @@
     </tr>
     {% endfor %}
 </table>
+</div>
 </div>
 </div>
 </section>
