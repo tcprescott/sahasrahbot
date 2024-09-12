@@ -20,7 +20,7 @@ class ALTTPRSGLive(ALTTPRTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game - Tournament (Solo)',
             event_slug='sgl24alttpr',
             audit_channel=discordbot.get_channel(772351829022474260),
             helper_roles=[
