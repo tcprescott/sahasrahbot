@@ -53,7 +53,7 @@
         <td>{{ race.thread_open_time_formatted }} ET</td>
         <td><a href="{{ url_for('async.async_tournament_player', tournament_id=tournament.id, user_id=race.user.id) }}" target="_blank">{{ race.user.display_name }}</a></td>
         <td>{{ race.permalink.pool.name }}</td>
-        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}">{{ race.runner_vod_url|e }}</a>{% endif %}
+        <td>{% if race.runner_vod_url %}<a href="{{ race.runner_vod_url|e }}" target="_blank">{{ race.runner_vod_url|e }}</a>{% endif %}
         </td>
         <td>{% if race.live_race %}
             <a href="{{ race.live_race.racetime_url }}" target="_blank">racetime</a>
