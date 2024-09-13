@@ -19,7 +19,7 @@ class ALTTPRQualifierRace(TournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game - Tournament (Solo)',
+            racetime_goal='Beat the game',
             event_slug="alttpr",
             audit_channel=discordbot.get_channel(647966639266201620),
             commentary_channel=discordbot.get_channel(947095820673638400),
@@ -279,7 +279,7 @@ async def write_eligible_async_entrants(async_tournament_live_race: models.Async
         )
 
         # skip if they've already raced in this pool the maximum number of times
-        if len(race_history) > async_tournament_live_race.tournament.runs_per_pool:
+        if len(race_history) >= async_tournament_live_race.tournament.runs_per_pool:
             continue
 
         # check if they have an active race already
