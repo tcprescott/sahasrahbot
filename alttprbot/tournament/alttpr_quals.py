@@ -175,7 +175,7 @@ class ALTTPRQualifierRace(TournamentRace):
         if self.broadcast_channels:
             msg += f" on {', '.join(self.broadcast_channels)}"
 
-        msg += " - Seed Distributed {seed_time} - {racetime_url}".format(
+        msg += " - Seed Distributed and Room Lock {seed_time} - {racetime_url}".format(
             seed_time=discord.utils.format_dt(self.seed_time, "R"),
             racetime_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])
         )
@@ -191,7 +191,7 @@ class ALTTPRQualifierRace(TournamentRace):
         if self.broadcast_channels:
             msg += f" on {', '.join(self.broadcast_channels)}"
 
-        msg += " - Seed Distributed at {seed_time} Eastern".format(
+        msg += " - Seed Distributed and Room Locked at {seed_time} Eastern".format(
             seed_time=self.string_time(self.seed_time),
         )
         msg += f" - {self.episodeid}"
