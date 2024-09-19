@@ -718,7 +718,7 @@ class AsyncTournamentRace(Model):
         elif self.review_status == 'accepted':
             return "Accepted"
         elif self.review_status == 'rejected':
-            return "Rejected"
+            return "Pending Second Review"
 
         return "Unknown"
 

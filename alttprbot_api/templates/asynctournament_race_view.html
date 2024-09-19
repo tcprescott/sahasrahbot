@@ -81,7 +81,7 @@
         <select name="review_status" id="review_status" required>
             <option value="pending" {% if race.review_status=="pending" %} selected{% endif %}>Pending</option>
             <option value="accepted" {% if race.review_status=="accepted" %} selected{% endif %}>Accepted</option>
-            <option value="rejected" {% if race.review_status=="rejected" %} selected{% endif %}>Rejected</option>
+            <option value="rejected" {% if race.review_status=="rejected" %} selected{% endif %}>Pending Second Review</option>
         </select>
     </p>
     <p><label for="reviewer_notes">Reviewer Notes</label>
