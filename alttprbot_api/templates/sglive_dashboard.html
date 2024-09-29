@@ -14,7 +14,7 @@
     </div>
     <div class="card-content">
         <div class="card-body">
-            <p><a href="/sgl23/reports/capacity" target="_blank">View the capacity report (opens new tab)</a></p>
+            <p><a href="/sglive/reports/capacity" target="_blank">View the capacity report (opens new tab)</a></p>
         </div>
     </div>
 </section>
@@ -28,11 +28,14 @@
                     <h6 class="card-subtitle text-muted">{{ game.get('instructions', '') }}</h6>
 				</div>
 				<div class="card-body">
+                    {% if game.get('notes', '') %}
+                    <p class="card-text">{{ game.get('notes', '') }}</p>
+                    {% endif %}
                     {% if game.get('generator_url', '') %}
                     <p class="card-text"><a href="{{ game['generator_url'] }}" class="card-link" target="_blank">Generate Seed</a></p>
                     {% endif %}
                     {% if game.get('flags', '') %}
-                    <p class="card-text">Flags: abcdefgh</p>
+                    <p class="card-text">Flags: {{ game.get('flags', '') }}</p>
                     {% endif %}
                     <hr/>
                     {% if game.get('download_url', '') %}

@@ -18,11 +18,12 @@ from alttprbot_api.api import discord
 
 import config
 
-sgl23_blueprint = Blueprint('sgl23', __name__)
+sglive_blueprint = Blueprint('sglive', __name__)
 
 
-@sgl23_blueprint.route('/sgl23', methods=["GET"])
-async def sgl23_dashboard():
+# TODO requires updating
+@sglive_blueprint.route('/', methods=["GET"])
+async def sglive_dashboard():
     try:
         user = await discord.fetch_user()
     except Unauthorized:
@@ -30,43 +31,79 @@ async def sgl23_dashboard():
 
     games = [
         {
-            "name": "ALTTPR",
-            "generator_url": "/sgl23/generate/alttpr",
-            "schedule_url": "https://schedule.speedgaming.org/sgl23alttpr",
-            "challonge_url": "https://challonge.com/sgl23alttpr",
-        },
-        {
-            "name": "SMR",
-            "generator_url": "/sgl23/generate/smr",
-            "schedule_url": "https://schedule.speedgaming.org/sgl23smdash",
-            "challonge_url": "https://challonge.com/sgl23smr",
-        },
-        {
-            "name": "OOTR",
-            "generator_url": "/sgl23/generate/ootr",
-            "schedule_url": "https://schedule.speedgaming.org/sgl23ootr",
-            "challonge_url": "https://challonge.com/sgl23ootr",
+            "name": "ALTTP NMG",
+            "notes": "This is a speedrun, no seeds are generated.",
+            # "schedule_url": "https://schedule.speedgaming.org/alttpnmg",
+            # "challonge_url": "https://challonge.com/alttpnmg",
         },
         {
             "name": "TWWR",
-            "flags": "MS4xMC4wAEEAFwMiAHPowgMMsACCcQ8AAMkHAAAA",
-            "schedule_url": "https://schedule.speedgaming.org/sgl23twwr",
-            "challonge_url": "https://challonge.com/sgl23twwr",
-            "download_url": "https://github.com/LagoLunatic/wwrando/releases/tag/1.10.0",
+            # "schedule_url": "https://schedule.speedgaming.org/twwr",
+            # "challonge_url": "https://challonge.com/twwr",
+            "download_url": "https://github.com/tanjo3/wwrando/releases/tag/s7-v1",
             "model_pack_url": "https://github.com/Sage-of-Mirrors/Custom-Wind-Waker-Player-Models/archive/master.zip",
         },
+        {
+            "name": "OOTR",
+            "generator_url": "/generate/ootr",
+            # "schedule_url": "https://schedule.speedgaming.org/ootr",
+            # "challonge_url": "https://challonge.com/ootr",
+        },
+        {
+            "name": "ALTTPR",
+            "generator_url": "/generate/alttpr",
+            # "schedule_url": "https://schedule.speedgaming.org/alttpr",
+            # "challonge_url": "https://challonge.com/alttpr",
+        },
+        {
+            "name": "Z1R",
+            "generator_url": "/generate/z1r",
+            # "schedule_url": "https://schedule.speedgaming.org/z1r",
+            # "challonge_url": "https://challonge.com/z1r",
+        },
+        {
+            "name": "FFR",
+            "generator_url": "/generate/ffr",
+            # "schedule_url": "https://schedule.speedgaming.org/ffr",
+            # "challonge_url": "https://challonge.com/ffr",
+        },
+        {
+            "name": "MMR",
+            "generator_url": "/generate/mmr",
+            "download_url": "https://github.com/ZoeyZolotova/mm-rando/releases/tag/v1.16.0.12"
+            # "schedule_url": "https://schedule.speedgaming.org/mmr",
+            # "challonge_url": "https://challonge.com/mmr",
+        },
+        {
+            "name": "SMR",
+            "generator_url": "/generate/smr",
+            # "schedule_url": "https://schedule.speedgaming.org/smdash",
+            # "challonge_url": "https://challonge.com/smr",
+        },
+        {
+            "name": "MMX",
+            "notes": "This is a speedrun, no seeds are generated.",
+            # "schedule_url": "https://schedule.speedgaming.org/mmx",
+            # "challonge_url": "https://challonge.com/mmx",
+        },
+        {
+            "name": "SMB3R",
+            # "download_url": "/generate/smb3r",
+            # "schedule_url": "https://schedule.speedgaming.org/smb3r",
+            # "challonge_url": "https://challonge.com/smb3r",
+        }
     ]
 
-    return await render_template("sgl23_dashboard.html", user=user, games=games)
+    return await render_template("sglive_dashboard.html", user=user, games=games)
 
 
-@sgl23_blueprint.route('/sgl23/generate/alttpr', methods=["GET"])  # updated
-async def sgl23_generate_alttpr():
-    preset = "sglive2023"
+# updated for SGL24
+@sglive_blueprint.route('/generate/alttpr', methods=["GET"])  # updated
+async def sglive_generate_alttpr():
+    preset = "sglive2024"
     # seed = await generator.ALTTPRPreset(preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch="tournament")
-    seed = await triforce_text.generate_with_triforce_text(pool_name="sgl23", preset=preset, branch="tournament",
-                                                           balanced=False)
-    logging.info("SGL23 - Generated ALTTPR seed %s", seed.url)
+    seed = await triforce_text.generate_with_triforce_text(pool_name="sgl24", preset=preset, balanced=False)
+    logging.info("sglive - Generated ALTTPR seed %s", seed.url)
     await asyncio.sleep(2)  # workaround for tournament branch seeds not being available immediately
     await models.SGL2023OnsiteHistory.create(
         tournament="alttpr",
@@ -75,9 +112,9 @@ async def sgl23_generate_alttpr():
     )
     return redirect(seed.url)
 
-
-@sgl23_blueprint.route('/sgl23/generate/ootr')  # updated
-async def sgl23_generate_ootr():
+# TODO requires updating
+@sglive_blueprint.route('/generate/ootr')  # updated
+async def sglive_generate_ootr():
     settings = {
         "enable_distribution_file": False,
         "enable_cosmetic_file": False,
@@ -317,7 +354,7 @@ async def sgl23_generate_ootr():
         "cosmetic_file": "",
     }
     seed = await roll_ootr(settings=settings, version='devSGLive22_7.1.143', encrypt=True)
-    logging.info("sgl23 - Generated OOTR seed %s", seed['id'])
+    logging.info("sglive - Generated OOTR seed %s", seed['id'])
     url = f"https://ootrandomizer.com/seed/get?id={seed['id']}"
     await models.SGL2023OnsiteHistory.create(
         tournament="ootr",
@@ -326,10 +363,10 @@ async def sgl23_generate_ootr():
     )
     return redirect(url)
 
-
-@sgl23_blueprint.route("/sgl23/generate/smr")  # updated
-async def sgl23_generate_smr():
-    seed_url = await create_smdash(mode="sgl23")
+# updated for SGL24
+@sglive_blueprint.route("/generate/smr")  # updated
+async def sglive_generate_smr():
+    seed_url = await create_smdash(mode="sglive")
     await models.SGL2023OnsiteHistory.create(
         tournament="smr",
         url=seed_url,
@@ -337,11 +374,11 @@ async def sgl23_generate_smr():
     )
     return redirect(seed_url)
 
-
-@sgl23_blueprint.route("/sgl23/generate/ffr")  # updated
-async def sgl23_generate_ffr():
+# updated for SGL24
+@sglive_blueprint.route("/generate/ffr")  # updated
+async def sglive_generate_ffr():
     _, seed_url = roll_ffr(
-        "https://4-7-2.finalfantasyrandomizer.com/?s=00000000&f=m1-dPYu5-7ZlHqdPgC9BsTva4786C4mX5d0uZn85JzpVARtsVYb4TkKKyi4owT82MQwSww28yiLaHtMBNNzxMGjISw8IWcAfUS7AEkSp52Degtu4wErH3htXn4zENBWaNXWqXL6O-k8R3wZ8h55Gye21Spp4emwbbNwehPD")
+        "https://4-8-4.finalfantasyrandomizer.com/?s=925170C9&f=Oi8sqe8EtEbVp1APHwr9olO0ycGtljkk7F-0SmIM09GoRLzaTydcWAUjAqLlDs3DD8stDlLfhhwd1GwaUi98jg6dZwxFR8I2ylQBWQJWJxQEndIzpq2PUreYxBGv7AFwelXB-OhDufRdb6JnRk3B1Dzw-4o4iYWhY6.6LRNpJ0rUjxD")
     await models.SGL2023OnsiteHistory.create(
         tournament="ffr",
         url=seed_url,
@@ -349,10 +386,10 @@ async def sgl23_generate_ffr():
     )
     return redirect(seed_url)
 
-
-@sgl23_blueprint.route("/sgl23/generate/smz3/main")
-async def sgl23_generate_smz3_main():
-    seed = await generator.SMZ3Preset("hardfast").generate(tournament=True)
+#updated for sgl24
+@sglive_blueprint.route("/generate/smz3/main")
+async def sglive_generate_smz3_main():
+    seed = await generator.SMZ3Preset("mm2nescartridge/sgl2024").generate(tournament=True)
     await models.SGL2023OnsiteHistory.create(
         tournament="smz3_main",
         url=seed.url,
@@ -360,19 +397,8 @@ async def sgl23_generate_smz3_main():
     )
     return redirect(seed.url)
 
-
-@sgl23_blueprint.route("/sgl23/generate/smz3/alt")
-async def sgl23_generate_smz3_alt():
-    seed = await generator.SMZ3Preset("fast").generate(tournament=True)
-    await models.SGL2023OnsiteHistory.create(
-        tournament="smz3_alt",
-        url=seed.url,
-        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
-    )
-    return redirect(seed.url)
-
-@sgl23_blueprint.route("/sgl23/reports/capacity")
-async def sgl23_reports_capacity():
+@sglive_blueprint.route("/reports/capacity")
+async def sglive_reports_capacity():
     try:
         user = await discord.fetch_user()
     except Unauthorized:
@@ -380,19 +406,19 @@ async def sgl23_reports_capacity():
 
     report = await create_capacity_report()
     threshold = 10 if config.DEBUG else 25
-    return await render_template("sgl23_reports_capacity.html", report=report, alert_threshold=threshold, user=user)
+    return await render_template("sglive_reports_capacity.html", report=report, alert_threshold=threshold, user=user)
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def create_capacity_report():
     events = {
-        'sgl23alttpr': timedelta(hours=2),
-        'sgl23ootr': timedelta(hours=3, minutes=30),
-        'sgl23smr': timedelta(hours=2, minutes=30),
-        'sgl23ffr': timedelta(hours=1, minutes=45),
-        'sgl23smz3': timedelta(hours=2, minutes=30),
-        'sgl23twwr': timedelta(hours=2, minutes=30),
-        'sgl23z1r': timedelta(hours=2),
-        'sgl23smb3r': timedelta(hours=2),
+        'sglivealttpr': timedelta(hours=2),
+        'sgliveootr': timedelta(hours=3, minutes=30),
+        'sglivesmr': timedelta(hours=2, minutes=30),
+        'sgliveffr': timedelta(hours=1, minutes=45),
+        'sglivesmz3': timedelta(hours=2, minutes=30),
+        'sglivetwwr': timedelta(hours=2, minutes=30),
+        'sglivez1r': timedelta(hours=2),
+        'sglivesmb3r': timedelta(hours=2),
     }
 
     results = {}
