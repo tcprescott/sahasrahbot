@@ -168,17 +168,28 @@ async def not_found(e):
         user=user
     )
 
+@sahasrahbotapi.errorhandler(InvalidGrantError)
+async def invalid_grant(e):
+    discord.revoke()
+    return await render_template(
+        'error.html',
+        title="Discord Session Expired",
+        message="Your Discord session has expired.  Please log in again.",
+        user=None
+    )
+
+@sahasrahbotapi.errorhandler(TokenExpiredError)
+async def token_expired(e):
+    discord.revoke()
+    return await render_template(
+        'error.html',
+        title="Discord Session Expired",
+        message="Your Discord session has expired.  Please log in again.",
+        user=None
+    )
+
 @sahasrahbotapi.errorhandler(500)
 async def something_bad_happened(e):
-    if isinstance(e, (InvalidGrantError, TokenExpiredError)):
-        discord.revoke()
-        return await render_template(
-            'error.html',
-            title="Discord Session Expired",
-            message="Your Discord session has expired.  Please log in again.",
-            user=None
-        )
-
     try:
         user = await discord.fetch_user()
     except Unauthorized:
