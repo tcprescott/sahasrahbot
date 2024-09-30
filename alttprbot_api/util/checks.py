@@ -8,6 +8,9 @@ async def is_async_tournament_user(user: models.Users, tournament: models.AsyncT
     if 'public' in roles and not tournament.active:
         return True
 
+    if user is None:
+        return False
+
     authorized = await tournament.permissions.filter(user=user, role__in=roles)
     if authorized:
         return True

@@ -345,7 +345,11 @@ async def async_tournament_leaderboard(tournament_id: int):
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    else:
+        user = None
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
@@ -372,7 +376,11 @@ async def async_tournament_player(tournament_id: int, user_id: int):
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    else:
+        user = None
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
@@ -395,7 +403,11 @@ async def async_tournament_pools(tournament_id: int):
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    else:
+        user = None
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
@@ -416,7 +428,11 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
         discord_user = await discord.fetch_user()
     except Unauthorized:
         discord_user = None
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    else:
+        user = None
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
     permalink = await models.AsyncTournamentPermalink.get(id=permalink_id, pool__tournament=tournament)
