@@ -350,7 +350,7 @@ async def async_tournament_leaderboard(tournament_id: int):
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
     authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
-    if not authorized:
+    if not authorized and tournament.active:
         return abort(403, "You are not authorized to view this tournament.")
 
     leaderboard = await asynctournament.get_leaderboard(tournament)
@@ -366,7 +366,7 @@ async def async_tournament_leaderboard(tournament_id: int):
 
 
 @asynctournament_blueprint.route('/player/<int:tournament_id>/<int:user_id>', methods=['GET'])
-@requires_authorization
+# @requires_authorization
 async def async_tournament_player(tournament_id: int, user_id: int):
     try:
         discord_user = await discord.fetch_user()
@@ -377,7 +377,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
     authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    if not authorized:
+    if not authorized and tournament.active:
         return abort(403, "You are not authorized to view this tournament.")
 
     player = await models.Users.get_or_none(id=user_id)
@@ -389,7 +389,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
 
 
 @asynctournament_blueprint.route('/pools/<int:tournament_id>', methods=['GET'])
-@requires_authorization
+# @requires_authorization
 async def async_tournament_pools(tournament_id: int):
     try:
         discord_user = await discord.fetch_user()
@@ -400,7 +400,7 @@ async def async_tournament_pools(tournament_id: int):
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
     authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    if not authorized:
+    if not authorized and tournament.active:
         return abort(403, "You are not authorized to view this tournament.")
 
     await tournament.fetch_related('permalink_pools', 'permalink_pools__permalinks')
@@ -410,7 +410,7 @@ async def async_tournament_pools(tournament_id: int):
 
 
 @asynctournament_blueprint.route('/permalink/<int:tournament_id>/<int:permalink_id>', methods=['GET'])
-@requires_authorization
+# @requires_authorization
 async def async_tournament_permalink(tournament_id: int, permalink_id: int):
     try:
         discord_user = await discord.fetch_user()
@@ -424,7 +424,7 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
     # skip authorization check if this was a live race
     if permalink.live_race is False:
         authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-        if not authorized:
+        if not authorized and tournament.active:
             return abort(403, "You are not authorized to view this tournament.")
 
     races = await permalink.races.filter(status__in=['finished', 'forfeit'], reattempted=False).order_by(
