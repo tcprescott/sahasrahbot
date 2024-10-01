@@ -282,14 +282,17 @@ async def sglive_reports_capacity():
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def create_capacity_report():
     events = {
-        'sglivealttpr': timedelta(hours=2),
-        'sgliveootr': timedelta(hours=3, minutes=30),
-        'sglivesmr': timedelta(hours=2, minutes=30),
-        'sgliveffr': timedelta(hours=1, minutes=45),
-        'sglivesmz3': timedelta(hours=2, minutes=30),
-        'sglivetwwr': timedelta(hours=2, minutes=30),
-        'sglivez1r': timedelta(hours=2),
-        'sglivesmb3r': timedelta(hours=2),
+        'sgl24smb3rx': timedelta(hours=3), # updated
+        'sgl24mmxx': timedelta(hours=1, minutes=0),
+        'sgl24smz3': timedelta(hours=3, minutes=30), # updated
+        'sgl24smrx': timedelta(hours=1, minutes=45),
+        'sgl24mm64r': timedelta(hours=2, minutes=30), # updated
+        'sgl24ffrx': timedelta(hours=1, minutes=30), # updated
+        'sgl24z1rx': timedelta(hours=2), # updated
+        'sgl24ootr': timedelta(hours=3), # updated
+        'sgl24alttprx': timedelta(hours=2), # updated
+        'sgl24wwr': timedelta(hours=2, minutes=30),
+        'sgl24alttpnmg': timedelta(hours=2), # updated
     }
 
     results = {}
