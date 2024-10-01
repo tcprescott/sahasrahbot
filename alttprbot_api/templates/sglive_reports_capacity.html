@@ -41,36 +41,28 @@
     </div>
     <div class="card-content">
         <div class="card-body">
-            <table class="table">
+            <div class="table-responsive">
+            <table class="table table-striped">
                 <tr>
                     <th>Time</th>
                     <th>Total</th>
                     <th>Starting this 15m</th>
-                    <th>ALTTPR</th>
-                    <th>OOTR</th>
-                    <th>SMR</th>
-                    <th>SMZ3</th>
-                    <th>FFR</th>
-                    <th>TWWR</th>
-                    <th>Z1R</th>
-                    <th>SMB3R</th>
+                    {% for event in events %}
+                    <th>{{ event }}</th>
+                    {% endfor %}
                 </tr>
                 {% for interval, data in report.items() %}
                 <tr {% if data['runtime_total'] > alert_threshold %}class="alert"{% endif %}</tr>
                     <td>{{ interval }}</td>
                     <td>{{ data['runtime_total'] }}</td>
                     <td>{{ data['starting_total'] }}</td>
-                    <td>{{ data['runtime']['sgl23alttpr'] }}</td>
-                    <td>{{ data['runtime']['sgl23ootr'] }}</td>
-                    <td>{{ data['runtime']['sgl23smr'] }}</td>
-                    <td>{{ data['runtime']['sgl23smz3'] }}</td>
-                    <td>{{ data['runtime']['sgl23ffr'] }}</td>
-                    <td>{{ data['runtime']['sgl23twwr'] }}</td>
-                    <td>{{ data['runtime']['sgl23z1r'] }}</td>
-                    <td>{{ data['runtime']['sgl23smb3r'] }}</td>
+                    {% for event in events %}
+                    <td>{{ data['runtime'][event] }}</td>
+                    {% endfor %}
                 </tr>
                 {% endfor %}
             </table>
+            </div>
         </div>
     </div>
 </section>

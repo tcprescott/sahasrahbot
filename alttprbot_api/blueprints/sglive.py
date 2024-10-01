@@ -274,13 +274,6 @@ async def sglive_reports_capacity():
     except Unauthorized:
         user = None
 
-    report = await create_capacity_report()
-    threshold = 10 if config.DEBUG else 25
-    return await render_template("sglive_reports_capacity.html", report=report, alert_threshold=threshold, user=user)
-
-# TODO: update for SGL24
-@aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
-async def create_capacity_report():
     events = {
         'sgl24smb3rx': timedelta(hours=3), # updated
         'sgl24mmxx': timedelta(hours=1, minutes=0),
@@ -294,7 +287,13 @@ async def create_capacity_report():
         'sgl24wwr': timedelta(hours=2, minutes=30),
         'sgl24alttpnmg': timedelta(hours=2), # updated
     }
+    report = await create_capacity_report(events)
+    threshold = 10 if config.DEBUG else 25
+    return await render_template("sglive_reports_capacity.html", events=events.keys(), report=report, alert_threshold=threshold, user=user)
 
+# TODO: update for SGL24
+@aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
+async def create_capacity_report(events):
     results = {}
     hours = 48
     tz = timezone('US/Eastern')
