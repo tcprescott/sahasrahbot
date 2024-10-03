@@ -45,38 +45,38 @@ async def sglive_dashboard():
         },
         {
             "name": "OOTR",
-            "generator_url": "/generate/ootr",
+            "generator_url": "/sglive/generate/ootr",
             # "schedule_url": "https://schedule.speedgaming.org/ootr",
             # "challonge_url": "https://challonge.com/ootr",
         },
         {
             "name": "ALTTPR",
-            "generator_url": "/generate/alttpr",
+            "generator_url": "/sglive/generate/alttpr",
             # "schedule_url": "https://schedule.speedgaming.org/alttpr",
             # "challonge_url": "https://challonge.com/alttpr",
         },
         {
             "name": "Z1R",
-            "generator_url": "/generate/z1r",
+            "generator_url": "/sglive/generate/z1r",
             # "schedule_url": "https://schedule.speedgaming.org/z1r",
             # "challonge_url": "https://challonge.com/z1r",
         },
         {
             "name": "FFR",
-            "generator_url": "/generate/ffr",
+            "generator_url": "/sglive/generate/ffr",
             # "schedule_url": "https://schedule.speedgaming.org/ffr",
             # "challonge_url": "https://challonge.com/ffr",
         },
         {
             "name": "MMR",
-            "generator_url": "/generate/mmr",
+            "generator_url": "/sglive/generate/mmr",
             "download_url": "https://github.com/ZoeyZolotova/mm-rando/releases/tag/v1.16.0.12"
             # "schedule_url": "https://schedule.speedgaming.org/mmr",
             # "challonge_url": "https://challonge.com/mmr",
         },
         {
             "name": "SMR",
-            "generator_url": "/generate/smr",
+            "generator_url": "/sglive/generate/smr",
             # "schedule_url": "https://schedule.speedgaming.org/smdash",
             # "challonge_url": "https://challonge.com/smr",
         },
@@ -88,7 +88,7 @@ async def sglive_dashboard():
         },
         {
             "name": "SMB3R",
-            # "download_url": "/generate/smb3r",
+            # "download_url": "/sglive/generate/smb3r",
             # "schedule_url": "https://schedule.speedgaming.org/smb3r",
             # "challonge_url": "https://challonge.com/smb3r",
         }
