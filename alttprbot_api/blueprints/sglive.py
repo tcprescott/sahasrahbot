@@ -236,7 +236,7 @@ async def sglive_generate_ootr():
 # updated for SGL24
 @sglive_blueprint.route("/generate/smr")  # updated
 async def sglive_generate_smr():
-    seed_url = await create_smdash(mode="sglive")
+    seed_url = await create_smdash(mode="sgl24")
     await models.SGL2023OnsiteHistory.create(
         tournament="smr",
         url=seed_url,
