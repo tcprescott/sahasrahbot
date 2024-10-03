@@ -161,7 +161,7 @@ async def sglive_generate_ootr():
         "shuffle_crates": "off",
         "shuffle_cows": False,
         "shuffle_beehives": False,
-        "shuffle_kokiri_sword": true,
+        "shuffle_kokiri_sword": True,
         "shuffle_ocarinas": False,
         "shuffle_gerudo_card": False,
         "shuffle_beans": False,
