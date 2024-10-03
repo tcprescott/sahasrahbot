@@ -30,19 +30,19 @@ async def sglive_dashboard():
         user = None
 
     games = [
-        {
-            "name": "ALTTP NMG",
-            "notes": "This is a speedrun, no seeds are generated.",
-            # "schedule_url": "https://schedule.speedgaming.org/alttpnmg",
-            # "challonge_url": "https://challonge.com/alttpnmg",
-        },
-        {
-            "name": "TWWR",
-            # "schedule_url": "https://schedule.speedgaming.org/twwr",
-            # "challonge_url": "https://challonge.com/twwr",
-            "download_url": "https://github.com/tanjo3/wwrando/releases/tag/s7-v1",
-            "model_pack_url": "https://github.com/Sage-of-Mirrors/Custom-Wind-Waker-Player-Models/archive/master.zip",
-        },
+        # {
+        #     "name": "ALTTP NMG",
+        #     "notes": "This is a speedrun, no seeds are generated.",
+        #     # "schedule_url": "https://schedule.speedgaming.org/alttpnmg",
+        #     # "challonge_url": "https://challonge.com/alttpnmg",
+        # },
+        # {
+        #     "name": "TWWR",
+        #     # "schedule_url": "https://schedule.speedgaming.org/twwr",
+        #     # "challonge_url": "https://challonge.com/twwr",
+        #     "download_url": "https://github.com/tanjo3/wwrando/releases/tag/s7-v1",
+        #     "model_pack_url": "https://github.com/Sage-of-Mirrors/Custom-Wind-Waker-Player-Models/archive/master.zip",
+        # },
         {
             "name": "OOTR",
             "generator_url": "/sglive/generate/ootr",
@@ -55,25 +55,25 @@ async def sglive_dashboard():
             # "schedule_url": "https://schedule.speedgaming.org/alttpr",
             # "challonge_url": "https://challonge.com/alttpr",
         },
-        {
-            "name": "Z1R",
-            "generator_url": "/sglive/generate/z1r",
-            # "schedule_url": "https://schedule.speedgaming.org/z1r",
-            # "challonge_url": "https://challonge.com/z1r",
-        },
+        # {
+        #     "name": "Z1R",
+        #     "generator_url": "/sglive/generate/z1r",
+        #     # "schedule_url": "https://schedule.speedgaming.org/z1r",
+        #     # "challonge_url": "https://challonge.com/z1r",
+        # },
         {
             "name": "FFR",
             "generator_url": "/sglive/generate/ffr",
             # "schedule_url": "https://schedule.speedgaming.org/ffr",
             # "challonge_url": "https://challonge.com/ffr",
         },
-        {
-            "name": "MMR",
-            "generator_url": "/sglive/generate/mmr",
-            "download_url": "https://github.com/ZoeyZolotova/mm-rando/releases/tag/v1.16.0.12"
-            # "schedule_url": "https://schedule.speedgaming.org/mmr",
-            # "challonge_url": "https://challonge.com/mmr",
-        },
+        # {
+        #     "name": "MMR",
+        #     "generator_url": "/sglive/generate/mmr",
+        #     "download_url": "https://github.com/ZoeyZolotova/mm-rando/releases/tag/v1.16.0.12"
+        #     # "schedule_url": "https://schedule.speedgaming.org/mmr",
+        #     # "challonge_url": "https://challonge.com/mmr",
+        # },
         {
             "name": "SMR",
             "generator_url": "/sglive/generate/smr",
@@ -81,17 +81,21 @@ async def sglive_dashboard():
             # "challonge_url": "https://challonge.com/smr",
         },
         {
-            "name": "MMX",
-            "notes": "This is a speedrun, no seeds are generated.",
-            # "schedule_url": "https://schedule.speedgaming.org/mmx",
-            # "challonge_url": "https://challonge.com/mmx",
-        },
-        {
-            "name": "SMB3R",
-            # "download_url": "/sglive/generate/smb3r",
-            # "schedule_url": "https://schedule.speedgaming.org/smb3r",
-            # "challonge_url": "https://challonge.com/smb3r",
+            "name": "SMZ3",
+            "generator_url": "/sglive/generate/smz3",
         }
+        # {
+        #     "name": "MMX",
+        #     "notes": "This is a speedrun, no seeds are generated.",
+        #     # "schedule_url": "https://schedule.speedgaming.org/mmx",
+        #     # "challonge_url": "https://challonge.com/mmx",
+        # },
+        # {
+        #     "name": "SMB3R",
+        #     # "download_url": "/sglive/generate/smb3r",
+        #     # "schedule_url": "https://schedule.speedgaming.org/smb3r",
+        #     # "challonge_url": "https://challonge.com/smb3r",
+        # }
     ]
 
     return await render_template("sglive_dashboard.html", user=user, games=games)
@@ -232,6 +236,16 @@ async def sglive_generate_ootr():
         ip_address=request.headers.get('X-Real-IP', request.remote_addr),
     )
     return redirect(url)
+
+@sglive_blueprint.route('/generate/smz3')  # updated
+async def sglive_generate_smz3():
+    seed = await generator.SMZ3Preset("mm2nescartridge/sgl2024").generate(tournament=True)
+    await models.SGL2023OnsiteHistory.create(
+        tournament="smz3",
+        url=seed.url,
+        ip_address=request.headers.get('X-Real-IP', request.remote_addr),
+    )
+    return redirect(seed.url)
 
 # updated for SGL24
 @sglive_blueprint.route("/generate/smr")  # updated
