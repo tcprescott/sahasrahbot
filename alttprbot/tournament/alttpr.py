@@ -137,7 +137,7 @@ class ALTTPR2024Race(TournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="alttpr",
             audit_channel=discordbot.get_channel(647966639266201620),
             commentary_channel=discordbot.get_channel(947095820673638400),
