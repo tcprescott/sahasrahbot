@@ -131,66 +131,7 @@ class ALTTPRTournamentRace(TournamentRace):
                                                       defaults={'event': self.event_slug, 'submitted': 1})
 
 
-class ALTTPR2024Race(ALTTPRTournamentRace):
-    """
-    ALTTPR2024Race is a class that represents the ALTTPR Main Tournament for the 2023 season.
-    """
-
-    async def roll(self):
-        self.seed, self.preset, self.deck = await roll_seed([p[1] for p in self.player_discords],
-                                                            episode_id=self.episodeid)
-        await self.rtgg_handler.send_message("-----------------")
-        await self.rtgg_handler.send_message(f"Your preset is: {self.preset}")
-        if self.deck:
-            await self.rtgg_handler.send_message("-----------------")
-            await self.rtgg_handler.send_message("Deck used to generate this game.")
-            for preset, cards in self.deck.items():
-                await self.rtgg_handler.send_message(f"{preset}: {cards}")
-        await self.rtgg_handler.send_message("-----------------")
-
-    @property
-    def seed_code(self):
-        return f"{self.preset} - ({'/'.join(self.seed.code)})"
-
-    async def create_embeds(self):
-        if self.rtgg_handler is None:
-            raise SahasrahBotException("No RaceTime.gg handler associated with this tournament game.")
-
-        self.embed = await self.seed.embed(
-            name=self.race_info,
-            notes=self.versus,
-            emojis=discordbot.emojis,
-            include_settings=False
-        )
-
-        self.tournament_embed = await self.seed.tournament_embed(
-            name=self.race_info,
-            notes=self.versus,
-            emojis=discordbot.emojis,
-            include_settings=False
-        )
-
-        self.tournament_embed.insert_field_at(0, name='RaceTime.gg',
-                                              value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']),
-                                              inline=False)
-        self.embed.insert_field_at(0, name='RaceTime.gg',
-                                   value=self.rtgg_handler.bot.http_uri(self.rtgg_handler.data['url']), inline=False)
-
-        if self.broadcast_channels:
-            self.tournament_embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
-                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
-            self.embed.insert_field_at(0, name="Broadcast Channels", value=', '.join(
-                [f"[{a}](https://twitch.tv/{a})" for a in self.broadcast_channels]), inline=False)
-
-        self.embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
-        self.tournament_embed.insert_field_at(0, name="Preset", value=self.preset, inline=False)
-        if self.deck:
-            self.tournament_embed.insert_field_at(1, name="Deck",
-                                                  value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]),
-                                                  inline=False)
-            self.embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in self.deck.items()]),
-                                       inline=False)
-
+class ALTTPR2024Race(TournamentRace):
     async def configuration(self):
         guild = discordbot.get_guild(334795604918272012)
         return TournamentConfig(
@@ -214,49 +155,3 @@ class ALTTPR2024Race(ALTTPRTournamentRace):
                 guild.get_role(334796844750209024)
             ]
         )
-
-
-async def roll_seed(players: List[discord.Member], episode_id: int = None, event_slug="alttpr2024"):
-    """
-    Roll a seed for the given players.
-    """
-    if not episode_id is None:
-        existing_preset_for_episode = await models.TournamentPresetHistory.filter(episode_id=episode_id,
-                                                                                  event_slug=event_slug).first()
-        if existing_preset_for_episode:
-            seed = await generator.ALTTPRPreset(existing_preset_for_episode.preset).generate(allow_quickswap=True,
-                                                                                             tournament=True,
-                                                                                             hints=False,
-                                                                                             spoilers="off")
-            return seed, existing_preset_for_episode.preset, None
-
-    deck = await generate_deck(players, event_slug=event_slug)
-
-    preset = random.choices(list(deck.keys()), weights=list(deck.values()))[0]
-
-    for player in players:
-        await models.TournamentPresetHistory.create(discord_user_id=player.id, preset=preset, episode_id=episode_id,
-                                                    event_slug=event_slug)
-
-    seed = await triforce_text.generate_with_triforce_text("alttpr2024", preset)
-    return seed, preset, deck
-
-
-async def generate_deck(players: List[discord.Member], event_slug="alttpr2024"):
-    deck = {
-        'tournament_hard': 2 * len(players),
-        'standardboots': 2 * len(players),
-        'invrosia': 2 * len(players),
-        'fadkeys_gt': 2 * len(players),
-        'tournament_mcboss': 2 * len(players),
-    }
-    for player in players:
-        history = await models.TournamentPresetHistory.filter(discord_user_id=player.id,
-                                                              event_slug=event_slug).order_by('-timestamp').limit(5)
-        if history:
-            deck[history[0].preset] -= 1 if deck[history[0].preset] > 0 else 0
-
-        for h in history:
-            deck[h.preset] -= 1 if deck[h.preset] > 0 else 0
-
-    return deck
