@@ -332,8 +332,9 @@ async def determine_eligibility(user: models.Users, racer_verification: models.R
 
     race_count = 0
 
-    if racer_verification.use_alttpr_ladder:
-        race_count += await get_ladder_count(user.discord_user_id, days=racer_verification.time_period_days)
+    # TODO: re-implement this, as Dunka changed the API
+    # if racer_verification.use_alttpr_ladder:
+    #     race_count += await get_ladder_count(user.discord_user_id, days=racer_verification.time_period_days)
 
     if race_count < racer_verification.minimum_races:
         race_count += await get_racetime_count(user.rtgg_id, rtgg_categories,
