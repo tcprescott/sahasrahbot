@@ -7,12 +7,6 @@ from alttprbot.exceptions import SahasrahBotException
 
 BINGOSYNC_BASE_URL = 'https://bingosync.com'
 
-jar = aiohttp.CookieJar(unsafe=True)
-try:
-    jar.load('data/bingosync.cookie')
-except FileNotFoundError:
-    logging.warning("No bingosync cookie file found.  Will skip loading...")
-
 
 # WARNING: This is incredibly jank and relies on private endpoints within Bingosync
 # that are not intended for public consumption.
@@ -24,19 +18,30 @@ class BingoSync(object):
         self.nickname = nickname
         self.password = None
         self.room_id = None
+        self.jar = None # must run self.load_cookies() to load the cookie jar or this breaks
 
     @classmethod
     async def generate(cls, nickname="SahasrahBot", base_url=BINGOSYNC_BASE_URL, **kwargs):
         bingo = cls(nickname, base_url)
+        await bingo.load_cookies()
         await bingo.create_bingo_room(**kwargs)
         return bingo
 
     @classmethod
     async def retrieve(cls, room_id, password, nickname="SahasrahBot", base_url=BINGOSYNC_BASE_URL):
         bingo = cls(nickname, base_url)
+        await bingo.load_cookies()
         bingo.room_id = room_id
         bingo.password = password
         return bingo
+
+    async def load_cookies(self):
+        jar = aiohttp.CookieJar(unsafe=True)
+        try:
+            jar.load('data/bingosync.cookie')
+            self.jar = jar
+        except FileNotFoundError:
+            logging.warning("No bingosync cookie file found.  Will skip loading...")
 
     async def create_bingo_room(self, room_name, passphrase, game_type, variant_type=None, lockout_mode='1', seed='',
                                 custom_json='', is_spectator='on', hide_card='on'):

@@ -36,6 +36,7 @@ class SahasrahBotRaceTimeBot(Bot):
         return self.handler_class
 
     async def start(self):
+        self.http = aiohttp.ClientSession(raise_for_status=True)
         self.access_token, self.reauthorize_every = await self.authorize()
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())

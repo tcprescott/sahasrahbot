@@ -1,11 +1,10 @@
 import aiohttp
 from bs4 import BeautifulSoup
 
-jar = aiohttp.CookieJar()
-
 
 async def roll_ctjets(settings: dict, version: str = '3_1_0'):
     version = version.replace('.', '_')
+    jar = aiohttp.CookieJar()
 
     async with aiohttp.ClientSession(cookie_jar=jar) as session:
         async with session.get(url=f'https://ctjot.com/{version}/options/') as resp:

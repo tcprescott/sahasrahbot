@@ -50,13 +50,8 @@ class SMZ3DailyRace(SGDailyRaceCore):
         return msg
 
     async def create_race_room(self):
-        if self.friendly_name.lower().find("spoiler") >= 0:
-            racetime_goal = "Beat the Games(Spoiler Log)"
-        else:
-            racetime_goal = self.data.racetime_goal
-
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal=racetime_goal,
+            goal=self.data.racetime_goal,
             invitational=False,
             unlisted=False,
             info_user=self.race_info,
