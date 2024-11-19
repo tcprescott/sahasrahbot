@@ -233,6 +233,7 @@ class Tournament(commands.Cog):
                                 end_time=end_time,
                                 location=location,
                                 entity_type=discord.EntityType.external,
+                                privacy_level=discord.PrivacyLevel.guild_only
                             )
                     except discord.NotFound:
                         event = await event_data.guild.create_scheduled_event(
@@ -242,6 +243,7 @@ class Tournament(commands.Cog):
                             end_time=end_time,
                             location=location,
                             entity_type=discord.EntityType.external,
+                            privacy_level=discord.PrivacyLevel.guild_only
                         )
                         await models.ScheduledEvents.update_or_create(episode_id=episode_id,
                                                                       defaults={'scheduled_event_id': event.id,
@@ -254,7 +256,8 @@ class Tournament(commands.Cog):
                         start_time=start_time,
                         end_time=end_time,
                         location=location,
-                        entity_type=discord.EntityType.external,
+                        entity_type=discord.EntityType.external,,
+                        privacy_level=discord.PrivacyLevel.guild_only
                     )
                     await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id,
                                                         event_slug=event_slug)
