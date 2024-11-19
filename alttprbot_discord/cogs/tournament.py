@@ -231,7 +231,8 @@ class Tournament(commands.Cog):
                                 description=description,
                                 start_time=start_time,
                                 end_time=end_time,
-                                location=location
+                                location=location,
+                                entity_type=discord.EntityType.external,
                             )
                     except discord.NotFound:
                         event = await event_data.guild.create_scheduled_event(
@@ -239,7 +240,8 @@ class Tournament(commands.Cog):
                             description=description,
                             start_time=start_time,
                             end_time=end_time,
-                            location=location
+                            location=location,
+                            entity_type=discord.EntityType.external,
                         )
                         await models.ScheduledEvents.update_or_create(episode_id=episode_id,
                                                                       defaults={'scheduled_event_id': event.id,
