@@ -253,7 +253,8 @@ class Tournament(commands.Cog):
                         description=description,
                         start_time=start_time,
                         end_time=end_time,
-                        location=location
+                        location=location,
+                        entity_type=discord.EntityType.external,
                     )
                     await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id,
                                                         event_slug=event_slug)
