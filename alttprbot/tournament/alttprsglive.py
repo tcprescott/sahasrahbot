@@ -30,7 +30,7 @@ class ALTTPRSGLive(ALTTPRTournamentRace):
                 guild.get_role(1256518642015932491),
             ],
             create_scheduled_events=True,
-            room_open_time=60,
+            room_open_time=30,
             stream_delay=15,
         )
 
@@ -97,7 +97,7 @@ class ALTTPRSGLive(ALTTPRTournamentRace):
 
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal="Beat the game (assisted)",
+            goal="Beat the game - Tournament (Solo)",
             invitational=not self.qualifier,
             unlisted=False,
             info_user=self.race_info,
