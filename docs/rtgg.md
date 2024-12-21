@@ -77,6 +77,15 @@ Example `!flags VlWlIEwJ1MsKkaOCWhlit2veXNSffs`
 
 Please be aware that the flag string is not validated.
 
+### !race
+Use this command in the RaceTime.gg race room.
+
+This allows you to generate a game using a pre-defined combination of settings.
+
+Example: `!race consternation`
+
+Here is a [list of currently supported presets](presets.md).
+
 ## Zelda 2 Randomizer (Z2R)
 
 ### !flags
