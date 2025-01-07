@@ -228,3 +228,21 @@ title:  Presets
 | [quick](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/quick.yaml) |Normal logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.|   |
 | [random](https://github.com/tcprescott/sahasrahbot/blob/master/presets/smz3/random.yaml) |Normal logic, randomized GT, Ganon, and Tourian requirements.|   |
 
+## Z1R
+
+| Preset | Description | |
+|---|---|---|
+| 2019brackets |Flags for week 5 and brackets of the 2019 tourney.  GDQ Lite with dungeon shuffle, shapes dungeons, and enemy HP shuffle.|   |
+| abns_swiss |Flags for the 2022 Z1R Summer Tournament.  Swordless, red candle guaranteed in white sword cave. Start with 3 triforces.|   |
+| abns_bracket |Flags for the bracket of the 2022 Z1R Swordless Summer Tournament.  Forced overworld block, +/- 4 HP shuffle for most enemies, and no guaranteed red candle.|   |
+| abns_elite8 |Flags for the elite 8 phase of the 2022 Z1R Swordless Summer Tournament.  Mixed-quest overworld, full start shuffle, +/- 4 HP shuffle, and 2nd Quest monsters.  Red bubbles cause slow speed.|   |
+| babysfirsthdn |For Triforce Triple Play - Season 2.  Mixed Quest - 2nd Overworld with dungeon heart shuffle, hidden dungeon numbers, and permanent sword beams.  Start with the book and boomerang.|   |
+| bettypls |For Triforce Triple Play - Season 2.  Mixed Quest - 1st Overworld with dungeon heart shuffle, 2nd Quest monsters, extra bosses and permanent sword beams. Important items are allowed in Level 9. Sword heart requirements are vanilla, and the white sword is in a cave.|   |
+| consternation |1st Quest overworld, Shapes dungeons, mixed hints, +/- 2 HP shuffle, and dungeon heart shuffle.|   |
+| excavator |For Triforce Triple Play - Season 2.  Mixed Quest - 1st Overworld, random hints, with book to understand old men.  OW blocks of the wood sword are allowed, and no extra candles, but you may get a starting red candle.  Dungeon heart shuffle, remove most open stairs.|   |
+| jesscherk |For Triforce Triple Play - Season 2.  Some 2nd Quest elements, but no walk-through walls.  You start with the recorder and 3 triforces for travel to vanilla dungeons.  Dungeon heart shuffle, and important items can be in Level 9.|   |
+| magsrush |For Triforce Triple Play - Season 2.  The Armos have your red candle with OW wood sword blocks allowed.  The magical sword can be picked up at 10 hearts, but white sword item requires 6.  Dungeon heart shuffle, and important items can be in Level 9.|   |
+| rr2024 |Flags for the 2024 Rookie Rumble.  First quest overworld, shapes dungeons, and start with a sword and bombs.  No heart shuffle.  White sword spot is guaranteed to be the recorder at 4 hearts, and magical sword is guaranteed at 10 hearts.|   |
+| sgl24 |Flags for the 2024 SGLive Tournament.  Second quest overworld, shapes dungeons, and no heart shuffle.  13 heart magical sword, and most open stair cases removed!|   |
+| swordlessplus |For Triforce Triple Play - Season 2.  House rule: not allowed to pick up the wood sword until 1-hour mark.  Possible 2nd Quest monsters.  Dungeon heart shuffle, and important items can be in Level 9. Magical sword is available at 11 hearts.|   |
+| walkitin |For Triforce Triple Play - Season 2.  Full start shuffle, blank hints, vanilla HP. Book has no extra function.|   |

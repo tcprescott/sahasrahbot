@@ -10,7 +10,14 @@ PRESETS = {
     'consternation': 'ItRtYLs2xToBiCHEvfcY6eRIcxG!VfM',
     '2019brackets': 'ItRtYLs2xC69xBrSRTzj6AW6Ja0fcbv',
     'rr2024': 'NuJS0dpRgVdyn25HEl8NnSW7WSfLf9v2M',
-    'sgl24': '9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2'
+    'sgl24': '9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2',
+    'bettypls': 'EOYppQG7Q8X5I1tNsFH8R!jOlpTT3x1tx',
+    'excavator': 'voSNknIvGu68ic41GpP4kXSjCqtAN2kNq',
+    'jesscherk': 'ItRtYM3auE3OVFlt6lBQK7khitoHMaU',
+    'magsrush': 'NNxPDPcF9p56THwiFFsHmx7x8Qod2km41',
+    'babysfirsthdn': 'Iv4gW3YU!vlmAtgUOMAM49fslZQS0ed',
+    'walkitin': '6xEziMRCF!vbiyFjZTUYKxi1V80R30fqo',
+    'swordlessplus': 'IVTU8pFHFatE6exqwxuIWuC9GkDFxAAk1'
 }
 # A note on 2019 brackets. The flag string in Zelda Randomizer is missing
 # Recorder to New Dungeons and Shuffle Overworld Group, which were ON.
@@ -29,17 +36,53 @@ class GameHandler(SahasrahBotCoreHandler):
         await self.roll_game(flags, message)
 
     async def ex_z1rtournament(self, args, message):
-        seed_number = random.randint(0, 9999999999999999)
-        await self.send_message(f"Z1R SGL 2024 Tournament - Flags: 9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2 Seed: {seed_number}")
-        await self.set_bot_raceinfo(f"Flags: 9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2 Seed: {seed_number}")
+        await self.ex_race(['sgl24'], message)
 
-    async def ex_rr2024(self, args, message):
-        seed_number = random.randint(0, 9999999999999999)
-        await self.send_message(f"Z1R Rookie Rumble 2024 - Flags: NuJS0dpRgVdyn25HEl8NnSW7WSfLf9v2M Seed: {seed_number}")
-        await self.set_bot_raceinfo(f"Flags: NuJS0dpRgVdyn25HEl8NnSW7WSfLf9v2M Seed: {seed_number}")
+    # Individual commands for these Triforce Triple Play Season 2 flags as requested.
+    async def ex_bettypls(self, args, message):
+        await self.ex_race(['bettypls'], message)
+    
+    async def ex_excavator(self, args, message):
+        await self.ex_race(['excavator'], message)
 
+    async def ex_jesscherk(self, args, message):
+        await self.ex_race(['jesscherk'], message)
+
+    async def ex_magsrush(self, args, message):
+        await self.ex_race(['magsrush'], message)
+
+    async def ex_babysfirsthdn(self, args, message):
+        await self.ex_race(['babysfirsthdn'], message)
+
+    async def ex_walkitin(self, args, message):
+        await self.ex_race(['walkitin'], message)
+
+    async def ex_swordlessplus(self, args, message):
+        await self.ex_race(['swordlessplus'], message)
+
+    async def ex_ttp2(self, args, message):
+        # Choose a Triforce Triple Play Season 2 flag string at random.
+        flag_choice = random.randint(1, 7)
+        
+        if flag_choice == 1:
+            await self.ex_race(['bettypls'], message)
+        elif flag_choice == 2:
+            await self.ex_race(['excavator'], message)
+        elif flag_choice == 3:
+            await self.ex_race(['jesscherk'], message)
+        elif flag_choice == 4:
+            await self.ex_race(['magsrush'], message)
+        elif flag_choice == 5:
+            await self.ex_race(['babysfirsthdn'], message)
+        elif flag_choice == 6:
+            await self.ex_race(['walkitin'], message)
+        else:
+            await self.ex_race(['swordlessplus'], message)
+    
     async def ex_race(self, args, message):
-        seed_number = random.randint(0, 9999999999999999)
+        if await self.is_locked(message):
+            return
+        
         try:
             preset = args[0]
             flags = PRESETS[preset]
@@ -48,9 +91,14 @@ class GameHandler(SahasrahBotCoreHandler):
             return
         except IndexError:
             await self.send_message("No preset specified.")
+            return
 
+        seed_number, flags = roll_z1r(flags)
+        
         await self.send_message(f"{preset} - Flags: {flags} Seed: {seed_number}")
         await self.set_bot_raceinfo(f"Flags: {flags} Seed: {seed_number}")
+        await self.send_message("Seed rolling complete.  See race info for details.")
+        self.seed_rolled = True
 
     async def ex_help(self, args, message):
         await self.send_message(
