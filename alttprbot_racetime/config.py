@@ -50,10 +50,10 @@ else:
             category_slug='sgl',
             handler_class=handlers.sgl.GameHandler,
         ),
-        'sm': RacetimeBotConfig(
-            category_slug='sm',
-            handler_class=handlers.sm.GameHandler,
-        ),
+#        'sm': RacetimeBotConfig(
+#            category_slug='sm',
+#            handler_class=handlers.sm.GameHandler,
+#        ),
         'smb3r': RacetimeBotConfig(
             category_slug='smb3r',
             handler_class=handlers.smb3r.GameHandler,
