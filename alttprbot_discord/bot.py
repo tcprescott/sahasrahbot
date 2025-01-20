@@ -55,8 +55,7 @@ async def load_extensions():
     if config.DEBUG:
         await discordbot.load_extension("alttprbot_discord.cogs.test")
 
-    # if importlib.util.find_spec('jishaku'):
-    #     await discordbot.load_extension('jishaku')
+    await discordbot.load_extension('jishaku')
 
     # if importlib.util.find_spec('sahasrahbot_private'):
     #     await discordbot.load_extension('sahasrahbot_private.stupid_memes')
