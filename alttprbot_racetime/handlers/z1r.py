@@ -17,7 +17,8 @@ PRESETS = {
     'magsrush': 'NNxPDPcF9p56THwiFFsHmx7x8Qod2km41',
     'babysfirsthdn': 'Iv4gW3YU!vlmAtgUOMAM49fslZQS0ed',
     'walkitin': '6xEziMRCF!vbiyFjZTUYKxi1V80R30fqo',
-    'swordlessplus': 'IVTU8pFHFatE6exqwxuIWuC9GkDFxAAk1'
+    'swordlessplus': 'IVTU8pFHFatE6exqwxuIWuC9GkDFxAAk1',
+    'randomforce': 'M16vlklqs4RtcAYYE4Pqo8CAB1a5HWing3'
 }
 # A note on 2019 brackets. The flag string in Zelda Randomizer is missing
 # Recorder to New Dungeons and Shuffle Overworld Group, which were ON.
@@ -35,8 +36,17 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.roll_game(flags, message)
 
-    async def ex_z1rtournament(self, args, message):
-        await self.ex_race(['sgl24'], message)
+    async def ex_randomforce(self, args, message):
+        if await self.is_locked(message):
+            return
+        
+        flags = PRESETS['randomforce']
+        seed_number, flags = roll_z1r(flags)
+
+        await self.send_message(f"2025 Z1R Winter Tournament - Flags: {flags} Seed: {seed_number}")
+        await self.set_bot_raceinfo(f"Flags: {flags} Seed: {seed_number}")
+        await self.send_message("Seed rolling complete.  See race info for details.")
+        self.seed_rolled = True
 
     # Individual commands for these Triforce Triple Play Season 2 flags as requested.
     async def ex_bettypls(self, args, message):
