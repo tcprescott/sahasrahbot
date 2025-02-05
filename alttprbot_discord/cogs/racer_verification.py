@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime
+from datetime import timedelta
 from typing import List
 from io import StringIO
 
@@ -308,21 +309,36 @@ def tz_aware_greater_than(dt1, dt2):
         dt2 = pytz.utc.localize(dt2)
     return dt1 > dt2
 
-
-async def get_ladder_count(discord_id, days=365):
-    now = datetime.datetime.now()
-    delta = datetime.timedelta(days=days)
-    start = (now - delta).strftime('%m%d%Y')
-    end = now.strftime('%m%d%Y')
+async def get_ladder_guid(discord_id):
     async with aiohttp.request(
             method='get',
-            url=f'https://alttprladder.com/api/v1/PublicAPI/GetRacerRaceHistory?discordid={discord_id}&startdt={start}&enddt={end}',
+            url=f'https://alttprladder.com/api/v1/PublicAPI/GetActiveRacers',
             headers={'User-Agent': 'SahasrahBot'},
             raise_for_status=True
     ) as resp:
         data = await resp.json()
 
-    return data['TotalCount']
+    for racer in data:
+        if racer['DiscordName'] == discord_id:
+            return racer['RacerGUID']
+
+async def get_ladder_count(discord_id, days=365):
+    racer_guid = await get_ladder_guid(discord_id)
+    async with aiohttp.request(
+            method='get',
+            url=f'https://alttprladder.com/api/v1/PublicAPI/GetRacerHistory?RacerGUID={racer_guid}&flag_id=0',
+            headers={'User-Agent': 'SahasrahBot'},
+            raise_for_status=True
+    ) as resp:
+        data = await resp.json()
+
+    cutoff = datetime.now() - timedelta(days=days)
+    total = sum(
+       len([race for race in flag['Results'] 
+            if datetime.fromisoformat(race['StartDateTime']) > cutoff])
+       for flag in data
+    )
+    return total
 
 async def determine_eligibility(user: models.Users, racer_verification: models.RacerVerification):
     try:
@@ -332,9 +348,9 @@ async def determine_eligibility(user: models.Users, racer_verification: models.R
 
     race_count = 0
 
-    # TODO: re-implement this, as Dunka changed the API
-    # if racer_verification.use_alttpr_ladder:
-    #     race_count += await get_ladder_count(user.discord_user_id, days=racer_verification.time_period_days)
+    
+    if racer_verification.use_alttpr_ladder:
+         race_count += await get_ladder_count(user.discord_user_id, days=racer_verification.time_period_days)
 
     if race_count < racer_verification.minimum_races:
         race_count += await get_racetime_count(user.rtgg_id, rtgg_categories,
