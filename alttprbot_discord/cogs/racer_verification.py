@@ -41,7 +41,7 @@ class RacerVerificationView(discord.ui.View):
                 ephemeral=True)
             return
 
-        eligible, count = await determine_eligibility(user, racer_verification)
+        eligible, count = await determine_eligibility(interaction.user.name, user, racer_verification)
 
         if eligible:
             racer = await models.VerifiedRacer.get_or_none(
@@ -245,7 +245,7 @@ If you have any questions, please contact a server administrator.
                 continue
             
             # check if they still meet the requirements
-            eligible, count = await determine_eligibility(verified_racer_user, racer_verification)
+            eligible, count = await determine_eligibility(verified_racer_member.name, verified_racer_user, racer_verification)
 
             if eligible:
                 verified_racer.estimated_count = count
@@ -309,21 +309,21 @@ def tz_aware_greater_than(dt1, dt2):
         dt2 = pytz.utc.localize(dt2)
     return dt1 > dt2
 
-async def get_ladder_guid(discord_id):
+async def get_ladder_guid(discord_username):
     async with aiohttp.request(
             method='get',
-            url=f'https://alttprladder.com/api/v1/PublicAPI/GetActiveRacers',
+            url='https://alttprladder.com/api/v1/PublicAPI/GetActiveRacers',
             headers={'User-Agent': 'SahasrahBot'},
             raise_for_status=True
     ) as resp:
         data = await resp.json()
 
     for racer in data:
-        if racer['DiscordName'] == discord_id:
+        if racer['DiscordName'] == discord_username:
             return racer['RacerGUID']
 
-async def get_ladder_count(discord_id, days=365):
-    racer_guid = await get_ladder_guid(discord_id)
+async def get_ladder_count(discord_username, days=365):
+    racer_guid = await get_ladder_guid(discord_username)
     async with aiohttp.request(
             method='get',
             url=f'https://alttprladder.com/api/v1/PublicAPI/GetRacerHistory?RacerGUID={racer_guid}&flag_id=0',
@@ -340,7 +340,23 @@ async def get_ladder_count(discord_id, days=365):
     )
     return total
 
-async def determine_eligibility(user: models.Users, racer_verification: models.RacerVerification):
+# This method will be deprecated in the future once we've had ladder 2.0 for a year.
+async def get_ladder_archive_count(discord_id, days=365):
+    now = datetime.now()
+    delta = timedelta(days=days)
+    start = (now - delta).strftime('%m%d%Y')
+    end = now.strftime('%m%d%Y')
+    async with aiohttp.request(
+            method='get',
+            url=f'https://archive.alttprladder.com/api/v1/PublicAPI/GetRacerRaceHistory?discordid={discord_id}&startdt={start}&enddt={end}',
+            headers={'User-Agent': 'SahasrahBot'},
+            raise_for_status=True
+    ) as resp:
+        data = await resp.json()
+
+    return data['TotalCount']
+
+async def determine_eligibility(username: str, user: models.Users, racer_verification: models.RacerVerification):
     try:
         rtgg_categories = racer_verification.racetime_categories.split(',')
     except AttributeError:
@@ -350,7 +366,8 @@ async def determine_eligibility(user: models.Users, racer_verification: models.R
 
     
     if racer_verification.use_alttpr_ladder:
-         race_count += await get_ladder_count(user.discord_user_id, days=racer_verification.time_period_days)
+         race_count += await get_ladder_count(username, days=racer_verification.time_period_days)
+         race_count += await get_ladder_archive_count(user.discord_user_id, days=racer_verification.time_period_days)
 
     if race_count < racer_verification.minimum_races:
         race_count += await get_racetime_count(user.rtgg_id, rtgg_categories,
