@@ -52,7 +52,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="invleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(1157407211094556703),
@@ -74,9 +74,9 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     await self.send_race_submission_form(warning=True)
         #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
 
+        goal_type = 'Co-op' if self.league_data['coop'] or self.league_data['spoiler'] else 'Solo'
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal="Beat the game (assisted)" if self.league_data['coop'] or self.league_data[
-                'spoiler'] else "Beat the game",
+            goal=f"Beat the game - Tournament ({goal_type})",
             invitational=True,
             unlisted=False,
             info_user=self.race_info,
@@ -187,7 +187,7 @@ class ALTTPROpenLeague(ALTTPRLeague):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="alttprleague",
             audit_channel=discordbot.get_channel(546728638272241674),
             commentary_channel=discordbot.get_channel(1157407211094556703),
