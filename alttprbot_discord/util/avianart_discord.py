@@ -77,15 +77,16 @@ class AVIANARTDiscord(AVIANART):
 
         embed.add_field(
             name='Door Randomizer',
-            value="This game was generated using Aerinon's Door Randomizer.",
+            value="This game was generated using Hi, I'm Cody's AVIANART generator.",
             inline=False)
 
         embed.add_field(name='File Select Code', value=self.build_file_select_code(emojis=emojis), inline=False)
 
-        if self.spoilers:
-            embed.add_field(name='Spoiler Log', value=self.spoiler_url, inline=False)
-            if self.attempts > 1:
-                embed.add_field(name='Generation Attempts', value=self.attempts, inline=False)
+        # No spoiler currently for AVIANART, this causes the game to faile to generate.
+        # if self.spoilers:
+        #     embed.add_field(name='Spoiler Log', value=self.spoiler_url, inline=False)
+        #     if self.attempts > 1:
+        #         embed.add_field(name='Generation Attempts', value=self.attempts, inline=False)
 
         embed.add_field(name="Version", value=self.version)
 
