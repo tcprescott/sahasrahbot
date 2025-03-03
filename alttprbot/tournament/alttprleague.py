@@ -15,14 +15,13 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
     async def roll(self):
         if self.league_data.get('spoiler', False):
-            spoiler = await spoilers.generate_spoiler_game(self.league_data['preset'], branch="tournament")
+            spoiler = await spoilers.generate_spoiler_game(self.league_data['preset'])
             self.seed = spoiler.seed
             await self.rtgg_handler.schedule_spoiler_race(spoiler.spoiler_log_url, 0)
         else:
             self.seed = await generator.ALTTPRPreset(self.league_data['preset']).generate(allow_quickswap=True,
                                                                                           tournament=True, hints=False,
-                                                                                          spoilers="off",
-                                                                                          branch="tournament")
+                                                                                          spoilers="off")
 
         await self.create_embeds()
 
