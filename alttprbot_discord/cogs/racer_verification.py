@@ -240,7 +240,7 @@ If you have any questions, please contact a server administrator.
             verified_racer.fetch_related('user')
 
             # check if they're required to reverify
-            if verified_racer.last_verified is not None and discord.utils.utcnow() - verified_racer.last_verified < datetime.timedelta(days=racer_verification.reverify_period_days):
+            if verified_racer.last_verified is not None and discord.utils.utcnow() - verified_racer.last_verified < timedelta(days=racer_verification.reverify_period_days):
                 # skip this racer as they're not due for reverification
                 continue
             
@@ -289,7 +289,7 @@ async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_cou
                              if x['category']['slug'] in category_slugs
                              and x['status']['value'] == 'finished'
                              and tz_aware_greater_than(isodate.parse_datetime(x['opened_at']),
-                                                       datetime.datetime.utcnow() - datetime.timedelta(days=days))
+                                                       datetime.utcnow() - timedelta(days=days))
                              ]
 
             count += len(filtered_data)
