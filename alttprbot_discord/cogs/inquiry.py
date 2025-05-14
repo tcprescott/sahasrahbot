@@ -60,18 +60,18 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
         self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
 
     async def on_submit(self, interaction: Interaction) -> None:
-        if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
-            await interaction.response.send_message(
-                "Private threads must be available on this server.  Please let the server admin know so this may be fixed.",
-                ephemeral=True)
-            return
+#        if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
+#            await interaction.response.send_message(
+#                "Private threads must be available on this server.  Please let the server admin know so this may be fixed.",
+#                ephemeral=True)
+#            return
 
-        if "SEVEN_DAY_THREAD_ARCHIVE" in interaction.channel.guild.features:
-            duration = 7 * 24 * 60
-        elif "THREE_DAY_THREAD_ARCHIVE" in interaction.channel.guild.features:
-            duration = 3 * 24 * 60
-        else:
-            duration = 24 * 60
+#        if "SEVEN_DAY_THREAD_ARCHIVE" in interaction.channel.guild.features:
+#            duration = 7 * 24 * 60
+#        elif "THREE_DAY_THREAD_ARCHIVE" in interaction.channel.guild.features:
+#            duration = 3 * 24 * 60
+#        else:
+        duration = 24 * 60
 
         msg = await interaction.channel.send("test thread") if config.DEBUG else None
         thread: discord.Thread = await interaction.channel.create_thread(
@@ -123,10 +123,6 @@ class Inquiry(commands.Cog):
                                                     ephemeral=True)
             return
 
-        if "PRIVATE_THREADS" not in interaction.guild.features and not config.DEBUG:
-            await interaction.response.send_message("Private threads must be available on this server.", ephemeral=True)
-            return
-
         if not interaction.channel.permissions_for(interaction.guild.me).create_private_threads:
             await interaction.response.send_message(
                 "This bot needs permission to create private threads in this channel.", ephemeral=True)
@@ -162,9 +158,6 @@ class Inquiry(commands.Cog):
 
 
 def check_private_threads(interaction: discord.Interaction):
-    if "PRIVATE_THREADS" not in interaction.channel.guild.features:
-        return False
-
     return True
 
 
