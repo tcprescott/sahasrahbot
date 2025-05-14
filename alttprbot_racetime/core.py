@@ -37,7 +37,15 @@ class SahasrahBotRaceTimeBot(Bot):
 
     async def start(self):
         self.http = aiohttp.ClientSession(raise_for_status=True)
-        self.access_token, self.reauthorize_every = await self.authorize()
+        try:
+            self.access_token, self.reauthorize_every = await self.authorize()
+        except aiohttp.ClientResponseError as e:
+            if e.status == 401:
+                self.logger.error(f'RaceTime API returned 401 Unauthorized while attempting to create bot for {self.category_slug}. '
+                                 f'Please check your API key and try again.')
+                return
+            else:
+                raise
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
 
