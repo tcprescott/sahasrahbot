@@ -18,11 +18,9 @@ PRESETS = {
     'babysfirsthdn': 'Iv4gW3YU!vlmAtgUOMAM49fslZQS0ed',
     'walkitin': '6xEziMRCF!vbiyFjZTUYKxi1V80R30fqo',
     'swordlessplus': 'IVTU8pFHFatE6exqwxuIWuC9GkDFxAAk1',
-    'randomforce': 'M16vlklqs4RtcAYYE4Pqo8CAB1a5HWing3'
+    'randomforce': 'M16vlklqs4RtcAYYE4Pqo8CAB1a5HWing3',
+    'rr2025': '10i40zbwGIgFO4kghzxmLVbzOk0poTEWClIh'
 }
-# A note on 2019 brackets. The flag string in Zelda Randomizer is missing
-# Recorder to New Dungeons and Shuffle Overworld Group, which were ON.
-# The flag string above turns those on, along with Race ROM.
 
 class GameHandler(SahasrahBotCoreHandler):
     async def ex_flags(self, args, message):
@@ -88,6 +86,9 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.ex_race(['walkitin'], message)
         else:
             await self.ex_race(['swordlessplus'], message)
+
+    async def ex_rr2025(self, args, message):
+        await self.ex_race(['rr2025'], message)
     
     async def ex_race(self, args, message):
         if await self.is_locked(message):
