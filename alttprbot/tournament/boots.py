@@ -13,7 +13,7 @@ class ALTTPRCASBootsTournamentRace(ALTTPRTournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="boots",
             lang='en'
         )
