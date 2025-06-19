@@ -15,7 +15,7 @@ class SGDailyRaceCore(TournamentRace):
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
-            racetime_goal='Beat the game',
+            racetime_goal='Beat the game - Casual',
             event_slug="alttprdaily"
         )
 
