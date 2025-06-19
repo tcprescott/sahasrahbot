@@ -244,6 +244,7 @@ title:  Presets
 | magsrush |For Triforce Triple Play - Season 2.  The Armos have your red candle with OW wood sword blocks allowed.  The magical sword can be picked up at 10 hearts, but white sword item requires 6.  Dungeon heart shuffle, and important items can be in Level 9.|   |
 | randomforce |Flags for the 2025 Randomforce Tournament.  5-8 triforces required to get into 9, helpful hints locked by the book, no heart shuffle, but the floor heart can be in the stair case instead of on the floor!|   |
 | rr2024 |Flags for the 2024 Rookie Rumble.  First quest overworld, shapes dungeons, and start with a sword and bombs.  No heart shuffle.  White sword spot is guaranteed to be the recorder at 4 hearts, and magical sword is guaranteed at 10 hearts.|   |
+| rr2025 |Flags for the 2025 Rookie Rumble.  Start with a sword and bombs, get all 8 triforces and kill Gannon.  Edits to the overworld are included to make the map more friendly for those who have difficulty with screen scrolls.|   |
 | sgl24 |Flags for the 2024 SGLive Tournament.  Second quest overworld, shapes dungeons, and no heart shuffle.  13 heart magical sword, and most open stair cases removed!|   |
 | swordlessplus |For Triforce Triple Play - Season 2.  House rule: not allowed to pick up the wood sword until 1-hour mark.  Possible 2nd Quest monsters.  Dungeon heart shuffle, and important items can be in Level 9. Magical sword is available at 11 hearts.|   |
 | walkitin |For Triforce Triple Play - Season 2.  Full start shuffle, blank hints, vanilla HP. Book has no extra function.|   |
