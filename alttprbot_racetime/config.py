@@ -9,8 +9,8 @@ from alttprbot_racetime.handlers.core import SahasrahBotCoreHandler
 @dataclass
 class RacetimeBotConfig:
     category_slug: str
-    handler_class: SahasrahBotCoreHandler
-    bot_class: SahasrahBotRaceTimeBot = SahasrahBotRaceTimeBot
+    handler_class: type[SahasrahBotCoreHandler]
+    bot_class: type[SahasrahBotRaceTimeBot] = SahasrahBotRaceTimeBot
 
     @property
     def client_id(self):

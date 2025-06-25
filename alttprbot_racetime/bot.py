@@ -14,6 +14,9 @@ logger.addHandler(logger_handler)
 
 
 def start_racetime(loop):
+    """
+    Start all Racetime bots in the given event loop.
+    """
     for bot in racetime_bots.values():
         loop.create_task(bot.start())
 
@@ -21,9 +24,9 @@ def start_racetime(loop):
 racetime_bots = {}
 for slug, category in RACETIME_CATEGORIES.items():
     if not category.client_id:
-        raise ValueError("Racetime category %s has no client id" % slug)
+        raise ValueError(f"Racetime category {slug} has no client id")
     if not category.client_secret:
-        raise ValueError("Racetime category %s has no client secret" % slug)
+        raise ValueError(f"Racetime category {slug} has no client secret")
     racetime_bots[slug] = category.bot_class(
         category_slug=slug,
         client_id=category.client_id,

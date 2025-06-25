@@ -38,7 +38,11 @@ class SahasrahBotRaceTimeBot(Bot):
     async def start(self):
         self.http = aiohttp.ClientSession(raise_for_status=True)
         try:
-            self.access_token, self.reauthorize_every = await self.authorize()
+            result = await self.authorize()
+            if result is None:
+                self.logger.error('Authorization failed: authorize() returned None.')
+                return
+            self.access_token, self.reauthorize_every = result
         except aiohttp.ClientResponseError as e:
             if e.status == 401:
                 self.logger.error(f'RaceTime API returned 401 Unauthorized while attempting to create bot for {self.category_slug}. '
@@ -52,6 +56,7 @@ class SahasrahBotRaceTimeBot(Bot):
         unlisted_rooms = await models.RTGGUnlistedRooms.filter(category=self.category_slug)
         for unlisted_room in unlisted_rooms:
             try:
+                race_data = None
                 async for attempt in AsyncRetrying(
                         stop=stop_after_attempt(5),
                         retry=retry_if_exception_type(aiohttp.ClientResponseError)):
@@ -62,10 +67,13 @@ class SahasrahBotRaceTimeBot(Bot):
                         ) as resp:
                             race_data = await resp.json()
 
-                if race_data['status']['value'] in ['finished', 'cancelled'] or not race_data['unlisted']:
+                if race_data and (race_data['status']['value'] in ['finished', 'cancelled'] or not race_data['unlisted']):
                     await unlisted_room.delete()
-                else:
+                elif race_data:
                     await self.join_race_room(unlisted_room.room_name)
 
             except RetryError as e:
-                raise e.last_attempt._exception from e
+                if e.last_attempt and e.last_attempt._exception:
+                    raise e.last_attempt._exception from e
+                else:
+                    raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
