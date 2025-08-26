@@ -13,7 +13,7 @@ class GameHandler(SahasrahBotCoreHandler):
         """
         Send introduction messages.
         """
-        if not self.state.get('intro_sent') and not self.tournament:
+        if not self.state.get('intro_sent') and not self.tournament and not self._is_room_opened_by_bot():
             await self.send_message(
                 f"Hi!  I'm SahasrahBot, your friendly robotic elder and randomizer seed roller! Use {self.command_prefix}help to see what I can do!   Check out https://sahasrahbot.synack.live/rtgg.html for more info.",
                 actions=[
@@ -63,6 +63,9 @@ class GameHandler(SahasrahBotCoreHandler):
                 ]
             )
             self.state['intro_sent'] = True
+    
+    def _is_room_opened_by_bot(self):
+      return self.data.get("opened_by_bot") is not None        
 
     # deprecated
     async def ex_race(self, args, message):
