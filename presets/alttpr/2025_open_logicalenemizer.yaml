@@ -1,0 +1,5 @@
+goal_name: open_logicalenemizer
+avianart: true
+description: "AVIANART Crosshunt"
+settings:
+  preset: kaesden/open_logicalenemizer

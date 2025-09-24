@@ -1,0 +1,5 @@
+goal_name: cabookey
+avianart: true
+description: "AVIANART Cabookey"
+settings:
+  preset: kaesden/cabookey

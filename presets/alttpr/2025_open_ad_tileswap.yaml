@@ -1,0 +1,5 @@
+goal_name: open_ad_tileswap
+avianart: true
+description: "AVIANART Open AD Tileswap"
+settings:
+  preset: kaesden/open_ad_tileswap

@@ -1,0 +1,5 @@
+goal_name: crosskeys
+avianart: true
+description: "AVIANART Crosskeys"
+settings:
+  preset: crosskeys
