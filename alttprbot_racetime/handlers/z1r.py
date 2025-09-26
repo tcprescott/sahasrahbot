@@ -60,8 +60,11 @@ class GameHandler(SahasrahBotCoreHandler):
         else:
             await self.ex_race(['wisdom'], message)
 
-    async def ex_sgl25(self, args, message):
+    async def ex_sglonline(self, args, message):
         await self.ex_race(['sgl25online'], message)
+
+    async def ex_sglirl(self, args, message):
+        await self.ex_race(['sglirl'], message)
     
     async def ex_race(self, args, message):
         if await self.is_locked(message):
