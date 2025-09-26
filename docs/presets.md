@@ -249,6 +249,7 @@ title:  Presets
 | rr2025 |Flags for the 2025 Rookie Rumble.  Start with a sword and bombs, get all 8 triforces and kill Gannon.  Edits to the overworld are included to make the map more friendly for those who have difficulty with screen scrolls.|   |
 | sgl24 |Flags for the 2024 SGLive Tournament.  Second quest overworld, shapes dungeons, and no heart shuffle.  13 heart magical sword, and most open stair cases removed!|   |
 | sgl25online |Flags for the 2025 SGLive Tournament.  Second quest overworld, UNSORTED shapes dungeons, and full heart shuffle.  12 heart magical sword/5 heart white sword, and most open stair cases removed!|   |
+| sglirl |Flags for the 2025 SGLive in-person tournament.  Second quest overworld, UNSORTED shapes dungeons, no heart shuffle, but the floor heart can be in the stair case instead of on the floor. 12 heart magical sword, and most open stair cases removed!|   |
 | swordlessplus |For Triforce Triple Play - Season 2.  House rule: not allowed to pick up the wood sword until 1-hour mark.  Possible 2nd Quest monsters.  Dungeon heart shuffle, and important items can be in Level 9. Magical sword is available at 11 hearts.|   |
 | walkitin |For Triforce Triple Play - Season 2.  Full start shuffle, blank hints, vanilla HP. Book has no extra function.|   |
 | wisdom |For Triforce Triple Play - Season 3.  Mixed 1st Quest overworld with heart shuffle, Remove Most Open Stairs, and important items allowed in level 9.  Book is forced to White Sword item, and is both atlas and translator for helpful hints.|   |
