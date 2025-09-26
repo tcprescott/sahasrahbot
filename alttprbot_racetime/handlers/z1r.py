@@ -23,7 +23,8 @@ PRESETS = {
     'sgl25online': '5JOfkHFLCIuh7WxM4mIYp7TuCHxRYQdJcty',
     'power': 'D6jolIWI0Br9u!t9aygyjQhVfkvxLb3ya',
     'courage': '1Ni1dDJdXBVB!xrm4SESnEF0jo03UtpBuN',
-    'wisdom': 'ItRtYLs2xZhsICVJJDBZf8Ttf0vZWn3'
+    'wisdom': 'ItRtYLs2xZhsICVJJDBZf8Ttf0vZWn3',
+    'sglirl': '5K!ELDXj35eUlQNR4XAhcL18nJBPgbC4Hpw'
 }
 
 class GameHandler(SahasrahBotCoreHandler):
