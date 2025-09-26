@@ -64,6 +64,7 @@ class AlttprDoor():
                                                    retry=retry_if_exception_type(Exception)):
                     with attempt:
                         attempts += 1
+
                         proc = await asyncio.create_subprocess_exec(
                             'python3',
                             'DungeonRandomizer.py',
@@ -72,7 +73,12 @@ class AlttprDoor():
                             stderr=asyncio.subprocess.PIPE,
                             cwd=self.door_rando_location)
 
-                        stdout, stderr = await proc.communicate()
+                        try:
+                            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=120)
+                        except asyncio.TimeoutError as e:
+                            proc.kill()
+                            await proc.wait()
+                            raise Exception('DungeonRandomizer.py timed out after 2 minutes') from e
                         logging.info(stdout.decode())
                         if proc.returncode > 0:
                             raise Exception(f'Exception while generating game: {stderr.decode()}')
