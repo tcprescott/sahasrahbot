@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 import config
 from alttprbot import models
-from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttprsglive, alttpr
+from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttpr_quals, alttpr
 from alttprbot.util import gsheet
 from alttprbot_racetime import bot as racetimebot
 
@@ -31,17 +31,17 @@ else:
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         # 'alttprde': alttprde.ALTTPRDETournament,
         # 'alttprmini': alttprmini.ALTTPRMiniTournament,
-        'alttpr': alttpr.ALTTPR2024Race,
-        'boots': boots.ALTTPRCASBootsTournamentRace,
-        'nologic': nologic.ALTTPRNoLogicRace,
-        'smwde': smwde.SMWDETournament,
+        'alttpr': alttpr_quals.ALTTPRQualifierRace,
+        # 'boots': boots.ALTTPRCASBootsTournamentRace,
+        # 'nologic': nologic.ALTTPRNoLogicRace,
+        # 'smwde': smwde.SMWDETournament,
         # 'alttprfr': alttprfr.ALTTPRFRTournament,
-        'alttprhmg': alttprhmg.ALTTPRHMGTournament,
+        # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
         # 'alttpres': alttpres.ALTTPRESTournament,
         # 'smz3coop': smz3coop.SMZ3CoopTournament,
         # 'smbingo': smbingo.SMBingoTournament,
-        'smrl': smrl_playoff.SMRLPlayoffs,
-        'sgl24alttpr': alttprsglive.ALTTPRSGLive,
+        # 'smrl': smrl_playoff.SMRLPlayoffs,
+        # 'sgl24alttpr': alttprsglive.ALTTPRSGLive,
 
         # Dailies/Weeklies
         'alttprdaily': dailies.AlttprSGDailyRace,

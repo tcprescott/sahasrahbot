@@ -26,7 +26,7 @@ class ALTTPRQualifierRace(TournamentRace):
             scheduling_needs_channel=discordbot.get_channel(434560353461075969),
             scheduling_needs_tracker=True,
             create_scheduled_events=True,
-            stream_delay=10,
+            stream_delay=0,
             room_open_time=60,
             helper_roles=[
                 guild.get_role(334797023054397450),
@@ -95,9 +95,9 @@ class ALTTPRQualifierRace(TournamentRace):
             return
 
         # lock the room
-        await self.rtgg_handler.set_invitational()
-        await self.rtgg_handler.edit(streaming_required=False)
-        await self.rtgg_handler.send_message("This room is now locked.  Late entries are not permitted.")
+        # await self.rtgg_handler.set_invitational()
+        # await self.rtgg_handler.edit(streaming_required=False)
+        # await self.rtgg_handler.send_message("This room is now locked.  Late entries are not permitted.")
 
         preset = async_tournament_live_race.pool.preset
 
