@@ -95,9 +95,9 @@ class ALTTPRQualifierRace(TournamentRace):
             return
 
         # lock the room
-        # await self.rtgg_handler.set_invitational()
+        await self.rtgg_handler.set_invitational()
         # await self.rtgg_handler.edit(streaming_required=False)
-        # await self.rtgg_handler.send_message("This room is now locked.  Late entries are not permitted.")
+        await self.rtgg_handler.send_message("This room is now locked.  Late entries are not permitted.")
 
         preset = async_tournament_live_race.pool.preset
 
