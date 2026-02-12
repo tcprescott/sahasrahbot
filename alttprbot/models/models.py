@@ -798,3 +798,36 @@ class SGL2023OnsiteHistory(Model):
     tournament = fields.CharField(45, null=False)
     url = fields.CharField(300, null=False)
     ip_address = fields.CharField(200, null=False) # will store X-Forwarded-For header
+
+
+class TelemetryEvent(Model):
+    """
+    Anonymous telemetry event storage.
+    Stores privacy-preserving usage and reliability metrics.
+    
+    Privacy Policy:
+    - No raw user IDs, usernames, or identifiable information
+    - guild_hash is a salted one-way hash (not reversible)
+    - Short retention period (default 30 days)
+    """
+    class Meta:
+        table = "telemetry_events"
+        indexes = [
+            ("day_bucket", "surface", "feature"),
+            ("day_bucket", "event_name"),
+            ("day_bucket", "status"),
+        ]
+
+    id = fields.IntField(pk=True)
+    created_at = fields.DatetimeField(auto_now_add=True, index=True)
+    day_bucket = fields.DateField(index=True)
+    event_name = fields.CharField(100, index=True)
+    surface = fields.CharField(20, index=True)  # discord, racetime, api
+    feature = fields.CharField(50, index=True)  # generator, daily, asynctournament, etc.
+    action = fields.CharField(20)  # invoke, success, failure
+    status = fields.CharField(20, index=True)  # ok, error, timeout, denied
+    provider = fields.CharField(50, null=True)  # optional: randomizer provider/API name
+    guild_hash = fields.CharField(64, index=True, null=True)  # salted hash, not raw ID
+    duration_ms = fields.IntField(null=True)
+    error_type = fields.CharField(50, null=True)  # normalized domain error
+    sample_rate = fields.FloatField(default=1.0)
