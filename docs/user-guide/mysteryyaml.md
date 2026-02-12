@@ -7,11 +7,11 @@ title:  Mystery YAML file documentation
 
 # Mystery YAML file documentation
 
-The mystery weightset yaml file (aka. "weightset"), can be a bit confusing to understand, especially with some of the more advanced features. This document is intended to help you craft your own mystery weights for use with SahasrahBot.
+Mystery weightset YAML files ("weightsets") can be complex, especially when using advanced features. This guide explains the format and helps you build custom mystery weights for SahasrahBot.
 
 # Basics
 
-At the start of each weightset, a `description` should be provided of the weightset.
+Start each weightset with a `description` value.
 
 ```yaml
 description: Example description.
@@ -19,7 +19,7 @@ description: Example description.
 
 For a basic weightset, a value, and its weight, needs to be specified for the following settings: glitches_required, item_placement, dungeon_items, accessibility, goals, tower_open, ganon_open, world_state, entrance_shuffle, boss_shuffle, enemy_shuffle, hints, weapons, item_pool, item_functionality, enemy_damage, enemy_health, pot_shuffle
 
-For each setting that is being rolled, a dictionary consisting of a value for the setting, and its weight, should be specified.  From this point on, I will refer to this as a "weight" within the weightset file.
+For each rolled setting, define a dictionary of possible values and their weights.
 
 ```yaml
 dungeon_items:
@@ -29,9 +29,9 @@ dungeon_items:
   full: 20 # Keysanity
 ```
 
-In the example above, `standard` has a 60% chance, `mc` has a 10% chance, `mcs` has a 20% chance, and `full` has a 20% chance.  The weight values don't need to add up to 100, but generally its considered good practice to do so to help others understand the chances.
+In the example above, `standard` has a 60% chance, `mc` has a 10% chance, `mcs` has a 10% chance, and `full` has a 20% chance. Weight values do not need to total 100, but using percentages that sum to 100 is easier to read.
 
-If you want an setting to always be a specific value, you can just specify it as a string.
+If you want a setting to always use one value, define it as a string.
 
 ```yaml
 glitches_required: "none"
@@ -45,13 +45,13 @@ To allow quickswap:
 allow_quickswap: true
 ```
 
-You can check out the [weighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/weighted.yaml) for a basic example.
+You can use [weighted](https://github.com/tcprescott/sahasrahbot/blob/master/weights/weighted.yaml) as a basic example.
 
 # Customizer
 
-Use of the customizer makes things a bit more complex.  The customizer is very powerful, but it can be overwhelming, especially if you're not familar with the syntax of the customizer.  This section only is used when entrance shuffle is rolled as `none`.
+The customizer section adds flexibility and complexity. Use it when `entrance_shuffle` rolls as `none`.
 
-Customizer is specified as a key on the root of the weightset file called `customizer`.  The customizer section has five sections:
+Define customizer options at the root key `customizer`. The section has five common groups:
 
 ```yaml
 customizer:
@@ -62,7 +62,7 @@ customizer:
     pool: ...
 ```
 
-The [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/weights/chaos.yaml) weightset has a good example of these in action.
+The [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/weights/chaos.yaml) weightset shows these options in practice.
 
 ## "eq" - Equipped gear
 

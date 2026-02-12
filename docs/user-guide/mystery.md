@@ -6,6 +6,13 @@ title:  Mystery Weights
 {: toc}
 # SahasrahBot Mystery Weightsets
 
+This reference lists currently available mystery weightsets.
+
+Notes:
+
+- Weightset names map to YAML filenames without the `.yaml` extension.
+- Labels such as `Customizer`, `Festive-only`, and `Subweights` describe generation behavior.
+
 | Preset | Description | |
 |---|---|---|
 | [aqttp](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/aqttp.yaml) | A Quebecois to the Past S2 |  |

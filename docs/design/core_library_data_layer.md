@@ -1,6 +1,9 @@
 # SahasrahBot Core Library & Data Layer Analysis
 
-> Research document — code analysis only, no modifications.
+> Last updated: 2026-02-12
+> Scope: Core randomizer library, data models, database access patterns, and utility layer
+
+This document describes current core-library and data-layer behavior from code analysis.
 
 ---
 

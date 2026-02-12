@@ -1,7 +1,7 @@
 # SahasrahBot — Discord Bot Domain Analysis
 
-> **Generated:** 2026-02-11  
-> **Scope:** `alttprbot_discord/` (main bot) and `alttprbot_audit/` (audit bot)
+> Last updated: 2026-02-12
+> Scope: `alttprbot_discord/` (main bot) and `alttprbot_audit/` (audit bot)
 
 ---
 

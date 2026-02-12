@@ -1,6 +1,9 @@
 # Tournament System Analysis
 
-> Research-only analysis of the SahasrahBot tournament subsystem, covering architecture, all handlers, SpeedGaming integration, orchestration, data flow, and dailies.
+> Last updated: 2026-02-12
+> Scope: Tournament architecture, handlers, SpeedGaming integration, orchestration, and operational flow
+
+This document describes current tournament subsystem behavior based on repository code analysis.
 
 ---
 

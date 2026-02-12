@@ -4,12 +4,11 @@ title:  SahasrahBot
 ---
 # SahasrahBot
 
-## Race Command Help
-1. [RaceTime.gg Commands](rtgg.md)
+This guide is the entry point for end-user documentation.
 
-## Presets and Mystery Weights
-1. [Preset Lists](presets.md)
-2. [Mystery Weights](mystery.md)
+## Start Here
 
-## Documentation
-1. [Mystery YAML file documentation](mysteryyaml.md)
+- Use [RaceTime.gg Commands](rtgg.md) for race-room command usage.
+- Use [Preset Lists](presets.md) for available preset references.
+- Use [Mystery Weights](mystery.md) for available weightset references.
+- Use [Mystery YAML file documentation](mysteryyaml.md) to build custom mystery files.

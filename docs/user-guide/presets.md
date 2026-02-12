@@ -5,6 +5,14 @@ title:  Presets
 * Table of contents
 {:toc}
 # SahasrahBot Presets
+
+This reference lists currently available presets by randomizer category.
+
+Notes:
+
+- Preset names map to YAML filenames without the `.yaml` extension.
+- Descriptions reflect community-maintained preset intent and may include historical wording.
+
 ## ALTTPR
 
 | Preset | Description | |
