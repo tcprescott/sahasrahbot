@@ -30,6 +30,7 @@ on Guild objects remain functional for non-migrated cogs.
 """
 
 import aiocache
+import discord
 import tortoise.exceptions
 from typing import Any, Optional, List, Dict
 
@@ -184,7 +185,6 @@ class GuildConfigService:
                 # Fallback: resolve channel name to ID
                 channel = None
                 if guild and hasattr(guild, 'text_channels'):
-                    import discord
                     channel = discord.utils.get(guild.text_channels, name=item)
                 
                 if channel:
