@@ -5,10 +5,21 @@ This module provides a dual-path OAuth implementation to support migration
 from Quart-Discord to Authlib. Controlled by USE_AUTHLIB_OAUTH config flag.
 
 Phase 1: Scaffolding only - not yet active by default.
+
+Structured Log Events:
+- auth_flow_started: OAuth login initiated (scope, has_redirect_data)
+- auth_callback_success: OAuth callback completed (token_type, has_access_token)
+- auth_callback_error: OAuth callback received error (error, description)
+- auth_callback_failed: OAuth token exchange failed (error)
+- auth_fetch_user_success: User info fetched successfully (user_id)
+- auth_fetch_user_no_token: User fetch attempted without session token
+- auth_fetch_user_failed: User fetch failed (error)
+- auth_token_revoked: Token cleared from session
+- auth_required_redirect: Authorization required, redirecting to login (original_path)
 """
 
 import logging
-from typing import Optional, Any, Dict
+from typing import Optional, List, Any, Dict
 from functools import wraps
 import secrets
 
@@ -61,7 +72,7 @@ class AuthlibDiscordOAuth:
             token_endpoint=self.TOKEN_URL,
         )
     
-    async def create_session(self, scope: list[str] = None, data: dict = None):
+    async def create_session(self, scope: Optional[List[str]] = None, data: Optional[dict] = None):
         """
         Create OAuth authorization redirect (login flow initiation).
         

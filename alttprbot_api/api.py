@@ -9,6 +9,8 @@ import config
 from alttprbot import models
 from alttprbot_discord.bot import discordbot
 
+logger = logging.getLogger(__name__)
+
 # Initialize Quart app
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")
@@ -37,13 +39,13 @@ if USE_AUTHLIB:
         client_secret=config.DISCORD_CLIENT_SECRET,
         redirect_uri=config.APP_URL + "/callback/discord/"
     )
-    logging.info("OAuth: Using Authlib implementation (USE_AUTHLIB_OAUTH=True)")
+    logger.info("OAuth: Using Authlib implementation (USE_AUTHLIB_OAUTH=True)")
 else:
     # Legacy Quart-Discord path (default)
     from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
                                requires_authorization)
     discord = DiscordOAuth2Session(sahasrahbotapi)
-    logging.info("OAuth: Using Quart-Discord implementation (default)")
+    logger.info("OAuth: Using Quart-Discord implementation (default)")
 
 import alttprbot_api.blueprints as blueprints  # nopep8
 
