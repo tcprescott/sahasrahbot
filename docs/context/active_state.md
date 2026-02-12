@@ -53,13 +53,15 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **WS3: GuildConfigService Pilot Migration** — Created `GuildConfigService` abstraction and migrated `daily.py` cog with backward-compatible channel name→ID resolution helper. Monkey-patch path remains intact for non-migrated cogs. Migration notes in `docs/plans/guild_config_service_migration_notes.md` (2026-02-12).
 
 ## Upcoming Work
 
-1. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
-2. **Create `GuildConfigService`**: Replace monkey-patching pattern (Phase 2).
-3. **Channel ID Migration**: Convert config string names to IDs (Phase 3).
-4. Review and refine generated documentation.
+1. **Monitor GuildConfigService pilot**: Validate daily announcements continue working with pilot migration.
+2. **Incremental cog migration**: Migrate remaining cogs to GuildConfigService (`tournament.py`, `misc.py`, `audit.py`).
+3. **Channel ID Migration**: Develop and execute data migration script for channel names→IDs (Phase 3).
+4. **Refactor `daily.py`**: Add `tenacity` retries and error handling for API resilience.
+5. Review and refine generated documentation.
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
 6. Integrate dependency declaration guard execution (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
