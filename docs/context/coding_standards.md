@@ -1,6 +1,6 @@
 # Coding Standards
 
-> Last updated: 2026-02-11
+> Last updated: 2026-02-12
 > Derived from existing codebase patterns (not prescriptive — descriptive of current state).
 
 ## Python Version
@@ -67,6 +67,7 @@ migrations/             # Aerich database migrations
 - Single event loop drives all 4 subsystems
 - Background tasks use `discord.ext.tasks.loop()` decorator
 - Database queries use either Tortoise ORM awaitable methods or `await orm.select()`/`orm.execute()`
+- Startup currently uses fire-and-forget `loop.create_task(...)` orchestration in entrypoint; this is an observed legacy pattern and should be treated as technical debt unless explicit supervision is added.
 
 ## Discord.py Patterns
 
@@ -115,9 +116,25 @@ await orm.execute("INSERT INTO table (col) VALUES (%s)", [value])
 
 ## Configuration
 
-- All config is in `config.py` as module-level constants (no `.env` file, no environment variable loading)
+- Configuration is provided through `config.py` as module-level constants consumed across the codebase.
 - Per-guild config stored in database via `guild.config_get()`/`guild.config_set()`
 - Config values cached with `aiocache`
+- API startup currently sets `OAUTHLIB_INSECURE_TRANSPORT=1` unconditionally.
+- `APP_SECRET_KEY` currently permits empty default in config model.
+
+### Config Ownership Rules (Needed)
+
+- Avoid new cross-layer imports where low-level data modules depend on Discord-layer utilities.
+- Treat guild config cache key/value shape as a contract; do not mix scalar and row-list payloads under the same key.
+- Prefer ID-based guild channel configuration over name-based configuration.
+
+## Open Intent Questions
+
+- Why should insecure OAuth transport be globally enabled rather than debug-only?
+- Why is an empty app secret considered acceptable for any non-test runtime?
+- Why is startup supervision intentionally best-effort rather than fail-fast?
+- Why is config access still split across raw SQL helpers and ORM-backed guild monkey-patching?
+- Why are seasonal enable/disable toggles maintained as commented registry entries instead of explicit configuration?
 
 ## Testing
 

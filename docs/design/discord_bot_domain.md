@@ -14,6 +14,8 @@ The system runs **two separate Discord bot instances** from a single codebase, s
 1. **Main Bot** (`alttprbot_discord/`) — The primary user-facing bot handling seed generation, tournament management, daily challenges, multiworld coordination, and community tools.
 2. **Audit Bot** (`alttprbot_audit/`) — A separate bot focused on message logging, moderation, and anti-phishing. Runs under a different Discord token (`AUDIT_DISCORD_TOKEN`).
 
+**Author intent (verified):** the audit bot is separate primarily as a **Discord permissions** boundary (it requires privileged intents like message content). It is not intended as a deeper privacy/compliance boundary beyond that.
+
 Both bots share the same database (MySQL via Tortoise ORM), models, and utility libraries. They are started alongside a RaceTime.gg bot and a Quart API server, all in the same event loop.
 
 ### Startup Flow

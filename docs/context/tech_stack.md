@@ -1,6 +1,6 @@
 # Tech Stack
 
-> Last updated: 2026-02-11
+> Last updated: 2026-02-12
 
 ## Runtime
 
@@ -78,6 +78,16 @@
 | `pyrankvote` | `*` | Single Transferable Vote counting |
 | `aiofiles` | `>=0.4.0` | Async file I/O |
 
+## Runtime Import vs Declared Dependency Drift
+
+The following libraries are imported in runtime code but are not currently declared in `pyproject.toml` dependencies:
+
+- `tenacity`
+- `python-dateutil` (`dateutil`)
+- `pytz`
+
+Treat these as environment-coupled dependencies until Poetry declarations are reconciled.
+
 ## Monitoring
 
 | Library | Version | Purpose |
@@ -113,6 +123,15 @@
 | AWS S3 | Spoiler log storage, patch distribution |
 | MySQL | Primary database |
 | Sentry | Error tracking (optional, configured via `SENTRY_URL`) |
+
+## Configuration / Runtime Contracts
+
+- Configuration behavior is defined in `config.py` and consumed as module-level constants across subsystems.
+- API OAuth transport currently sets `OAUTHLIB_INSECURE_TRANSPORT=1` at startup.
+- API session secret uses `APP_SECRET_KEY` (currently defaulting to empty string if unset).
+- RaceTime per-category OAuth credentials are dynamically resolved using category-derived names:
+	- `RACETIME_CLIENT_ID_<CATEGORY_SLUG_UPPER_NO_DASH>`
+	- `RACETIME_CLIENT_SECRET_<CATEGORY_SLUG_UPPER_NO_DASH>`
 
 ## External APIs Consumed
 

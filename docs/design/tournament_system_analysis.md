@@ -17,6 +17,8 @@ The tournament system automates the lifecycle of competitive ALTTPR (and related
 
 The system is built around a **Template Method / Strategy pattern**: a base class (`TournamentRace`) defines the lifecycle, and each tournament/event provides a concrete subclass that overrides configuration, seed rolling, form handling, and room settings.
 
+**Author intent (verified, 2026-02-11):** long-term, the “which events are enabled” switch and substantial per-event configuration (including stable mappings/rules like title→preset maps and seasonal schedules) should move out of commented Python registries and into a config file (e.g., `config/tournaments.yaml`).
+
 ### Key External Dependencies
 
 | System | Role |

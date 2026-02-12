@@ -1,6 +1,6 @@
 # System Patterns
 
-> Last updated: 2026-02-11
+> Last updated: 2026-02-12
 
 ## Architecture Overview
 
@@ -16,6 +16,29 @@ sahasrahbot.py (entry point)
 ```
 
 All four subsystems share the same database connection, models, and utility libraries.
+
+## Startup Sequence & Failure Modes
+
+Current boot order in `sahasrahbot.py`:
+
+1. Initialize Tortoise ORM connection.
+2. Create async tasks for Discord bot, audit bot, and Quart API.
+3. Start RaceTime bots.
+4. Enter `loop.run_forever()`.
+
+Observed failure characteristics:
+
+- Startup is task-based and not centrally supervised; subsystem failures can become runtime errors without coordinated shutdown.
+- Quart API bind host/port is currently hardcoded in entrypoint (`127.0.0.1:5001`).
+- API OAuth transport currently enables insecure mode globally (`OAUTHLIB_INSECURE_TRANSPORT=1`).
+- RaceTime credential resolution is dynamic per category (`RACETIME_CLIENT_ID_<CATEGORY>`, `RACETIME_CLIENT_SECRET_<CATEGORY>`), so missing keys fail per category at runtime.
+
+## Author Intent (Verified)
+
+These intent notes were confirmed directly with the repository author (2026-02-11) to avoid guessing “why” from code structure alone:
+
+- **Single-process / single event loop:** This is intentionally kept together because multiple parts of the system need access to the live in-process `discordbot` object (notably the Quart API and tournament subsystem). Splitting into separate processes would require reworking those call paths (e.g., RPC/queue) rather than being a drop-in deployment tweak.
+- **Audit bot separation:** The audit bot exists as a separate Discord application/token primarily because audit/moderation features require privileged intents (especially message content), while the main bot keeps narrower intents.
 
 ## Core Modules
 
@@ -36,7 +59,7 @@ The tournament system uses `TournamentRace` as a base class defining the match l
 Discord functionality is organized into cogs — self-contained modules loaded as extensions. Each cog handles a specific domain (generation, tournaments, roles, etc.).
 
 ### Handler Pattern (RaceTime Bot)
-Each RaceTime game category has a handler class extending `SahasrahBotCoreHandler`. Handlers define game-specific commands and seed generation logic.
+Each RaceTime game category has a handler class extending `SahasrahBotCoreHandler`. Most handlers define game-specific commands/seed logic, but some are intentionally thin/no-op shells depending on season and category maturity.
 
 ### Blueprint Pattern (Web API)
 The Quart API uses blueprints to organize routes by feature (presets, tournaments, voting, etc.).
@@ -46,6 +69,9 @@ Randomizer seeds are generated via a preset system. `SahasrahBotPresetCore` load
 
 ### Guild Config Monkey-Patching
 `discord.Guild` is monkey-patched with `config_get/set/delete/list` methods backed by database + `aiocache` in-memory caching.
+
+### Seasonal Registry Toggles
+Seasonal enable/disable currently relies on code-level registry edits (including commented entries) in tournament and RaceTime category registries.
 
 ## Data Flow
 
@@ -86,4 +112,10 @@ Admin Creates Tournament → Seeds Added to Pools → Players Start Runs via Dis
 | Google Sheets | REST API | Results recording |
 | AWS S3 | SDK | Spoiler log / patch storage |
 | Discord | Gateway + REST | Bot interactions |
+| Discord Bad Domains Feed | HTTPS JSON | Moderation domain-hash denylist updates |
 | ALTTPR Ladder | REST API | Racer verification |
+
+## Audit & Moderation Data Lifecycle
+
+- Audit bot persists message history and prunes records older than 30 days via scheduled cleanup.
+- DM content may be recorded in audit history tables for moderation/forensics workflows.

@@ -21,8 +21,18 @@ Architectural analysis and domain documentation:
 |------|-------------|
 | [Discord Bot Domain](design/discord_bot_domain.md) | Main bot & audit bot: cogs, commands, listeners, UI views, background tasks |
 | [Tournament System](design/tournament_system_analysis.md) | Tournament framework: base classes, 20+ handlers, SpeedGaming integration, match lifecycle |
-| [RaceTime & Web API](design/racetime_and_web_api.md) | RaceTime.gg bot (12 categories, handlers, race flow) and Quart web API (10 blueprints, auth, templates) |
+| [RaceTime & Web API](design/racetime_and_web_api.md) | RaceTime.gg integration architecture and race lifecycle; links to canonical split Web API/frontend docs |
+| [Web API JSON Endpoints](design/web_api_json_endpoints.md) | Endpoint-level JSON API inventory: auth modes, request/response behavior, async tournament API details |
+| [Web Frontend Route Map](design/web_frontend_routes.md) | HTML-rendered route inventory: OAuth-protected pages, blueprint flows, and DEBUG-only surfaces |
 | [Core Library & Data Layer](design/core_library_data_layer.md) | Randomizer generation, Tortoise ORM models (50+), database layer, utilities, preset system, migrations |
+
+## Plans
+
+Execution plans and implementation checklists:
+
+| File | Description |
+|------|-------------|
+| [Discord Refactor](plans/discord_refactor.md) | Modernization plan for `alttprbot_discord`: remove guild monkey-patching, normalize config, improve resilience |
 
 ## User Guide
 
