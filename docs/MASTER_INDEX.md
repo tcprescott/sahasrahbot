@@ -61,6 +61,7 @@ Execution plans and implementation checklists:
 | [Tournament Registry Config-Driven Rollout](plans/tournament_registry_config_rollout_plan.md) | Rollout plan for YAML-backed seasonal tournament activation with validated dual-path cutover and cleanup |
 | [Modernization Compatibility Gate Validation Runbook](plans/modernization_compatibility_gate_validation_runbook.md) | Executable workflow/evidence checklist for the 8 compatibility-gate baseline flows used in phase and bi-weekly modernization reviews |
 | [Authlib Migration for Discord OAuth](plans/authlib_discord_oauth_migration_plan.md) | Phased migration plan to replace `Quart-Discord` with `Authlib` using compatibility gates, dual-path rollout, and rollback controls |
+| [Modernization Meta Execution Plan (AI-Accelerated)](plans/modernization_meta_execution_plan_ai_accelerated.md) | Multi-phase operating plan that sequences all modernization workstreams with AI-assisted delivery, validation, and governance cadence |
 
 ## User Guide
 
