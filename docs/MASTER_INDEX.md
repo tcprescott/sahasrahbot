@@ -30,6 +30,7 @@ Architectural analysis and domain documentation:
 | [Core Library & Data Layer](design/core_library_data_layer.md) | Randomizer generation, Tortoise ORM models (50+), database layer, utilities, preset system, migrations |
 | [Discord Daily Challenge Audit](design/discord_daily_challenge_audit.md) | Component-scoped audit of Discord `daily.py`: command flow, scheduler behavior, config contract, and resilience risks |
 | [Discord Role Assignment Deprecation Audit](design/discord_role_assignment_deprecation_audit.md) | Component-scoped audit of reaction-role and voice-role systems with confirmed deprecation/removal workflow |
+| [Discord Multiworld Deprecation Audit](design/discord_multiworld_deprecation_audit.md) | Component-scoped audit of Discord multiworld systems (`smmulti`, `doorsmw`, legacy `bontamw`) with confirmed retirement/removal workflow |
 | [Seed Generation Component Audit](design/seed_generation_component_audit.md) | Cross-surface audit of seed generation architecture, provider adapters, reliability/logging risks, and stabilization backlog |
 | [Seed Provider Reliability Contract](design/seed_provider_reliability_contract.md) | Concrete cross-provider contract for timeouts, retries, normalized errors, audit parity, and migration phases |
 
@@ -52,6 +53,7 @@ Execution plans and implementation checklists:
 | File | Description |
 |------|-------------|
 | [Discord Refactor](plans/discord_refactor.md) | Modernization plan for `alttprbot_discord`: remove guild monkey-patching, normalize config, improve resilience |
+| [Anonymous Telemetry & User Stats Plan](plans/anonymous_telemetry_user_stats_plan.md) | Implementation plan for privacy-preserving feature usage telemetry across Discord, RaceTime, and Web/API surfaces |
 
 ## User Guide
 

@@ -41,6 +41,8 @@
 - Completed cross-surface seed generation component audit (`design/seed_generation_component_audit.md`) covering Discord, RaceTime, and API generation paths with owner-confirmed policy intent for spoiler control and standardized provider retries/timeouts (2026-02-12).
 - Drafted concrete shared seed-provider reliability contract (`design/seed_provider_reliability_contract.md`) with owner-confirmed defaults (60s timeout, 3-attempt exponential retry, mandatory audit parity, direct provider error messaging) (2026-02-12).
 - Completed role-assignment component deprecation audit (`design/discord_role_assignment_deprecation_audit.md`) with owner-confirmed scope/timeline/data policy (reaction + voice roles, soft deprecate now, remove next release, archive then drop) (2026-02-12).
+- Completed multiworld Discord component deprecation audit (`design/discord_multiworld_deprecation_audit.md`) with owner-confirmed policy (soft deprecate now, remove next release, drop multiworld tables without archival, no replacement path) (2026-02-12).
+- Drafted anonymous telemetry and feature-usage rollout plan (`plans/anonymous_telemetry_user_stats_plan.md`) covering privacy policy, event taxonomy, storage model, and phased implementation (2026-02-12).
 
 ## Upcoming Work
 
@@ -55,6 +57,8 @@
 9. Define and implement a shared seed-provider reliability contract (timeouts/retries/error taxonomy/audit parity) from `design/seed_generation_component_audit.md`.
 10. Implement provider execution wrapper + adapter migration per `design/seed_provider_reliability_contract.md`.
 11. Implement role-assignment deprecation rollout: admin messaging, listener disablement, and archive/drop migration for `reaction_group`, `reaction_role`, and `voice_role`.
+12. Implement multiworld Discord deprecation rollout: deprecation command responses, extension unload/removal for `smmulti` and `doorsmw`, and schema drops for `multiworld`, `multiworldentrant`, and `smz3_multiworld`.
+13. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
 
 ## Open Why Questions
 
