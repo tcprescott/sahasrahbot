@@ -1,15 +1,15 @@
 import os
+import logging
 
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
 from quart import (Quart, abort, jsonify, redirect, render_template, request,
                    session, url_for, send_from_directory)
-from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
-                           requires_authorization)
 
 import config
 from alttprbot import models
 from alttprbot_discord.bot import discordbot
 
+# Initialize Quart app
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")
 
@@ -19,7 +19,31 @@ sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/disc
 sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = config.DISCORD_TOKEN
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-discord = DiscordOAuth2Session(sahasrahbotapi)
+# Dual-path OAuth client initialization
+# Phase 1: Authlib scaffolding behind disabled feature flag
+USE_AUTHLIB = getattr(config, 'USE_AUTHLIB_OAUTH', False)
+
+if USE_AUTHLIB:
+    # New Authlib-based OAuth path (Phase 1+)
+    from alttprbot_api.oauth_client import (
+        AuthlibDiscordOAuth,
+        Unauthorized,
+        AccessDenied,
+        requires_authorization
+    )
+    discord = AuthlibDiscordOAuth(
+        app=sahasrahbotapi,
+        client_id=config.DISCORD_CLIENT_ID,
+        client_secret=config.DISCORD_CLIENT_SECRET,
+        redirect_uri=config.APP_URL + "/callback/discord/"
+    )
+    logging.info("OAuth: Using Authlib implementation (USE_AUTHLIB_OAUTH=True)")
+else:
+    # Legacy Quart-Discord path (default)
+    from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
+                               requires_authorization)
+    discord = DiscordOAuth2Session(sahasrahbotapi)
+    logging.info("OAuth: Using Quart-Discord implementation (default)")
 
 import alttprbot_api.blueprints as blueprints  # nopep8
 
@@ -187,6 +211,20 @@ async def token_expired(e):
         message="Your Discord session has expired.  Please log in again.",
         user=None
     )
+
+# Handle Authlib OAuth2Error if using Authlib path
+if USE_AUTHLIB:
+    from authlib.oauth2.rfc6749.errors import OAuth2Error
+    
+    @sahasrahbotapi.errorhandler(OAuth2Error)
+    async def oauth2_error(e):
+        discord.revoke()
+        return await render_template(
+            'error.html',
+            title="OAuth Error",
+            message=f"An OAuth error occurred: {e.description}",
+            user=None
+        )
 
 @sahasrahbotapi.errorhandler(500)
 async def something_bad_happened(e):

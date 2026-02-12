@@ -33,6 +33,7 @@ Architectural analysis and domain documentation:
 | [Discord Multiworld Deprecation Audit](design/discord_multiworld_deprecation_audit.md) | Component-scoped audit of Discord multiworld systems (`smmulti`, `doorsmw`, legacy `bontamw`) with confirmed retirement/removal workflow |
 | [Seed Generation Component Audit](design/seed_generation_component_audit.md) | Cross-surface audit of seed generation architecture, provider adapters, reliability/logging risks, and stabilization backlog |
 | [Seed Provider Reliability Contract](design/seed_provider_reliability_contract.md) | Concrete cross-provider contract for timeouts, retries, normalized errors, audit parity, and migration phases |
+| [Discord OAuth Behavior Contract](design/discord_oauth_behavior_contract.md) | Phase 0 behavior parity matrix for Discord OAuth migration from Quart-Discord to Authlib with security/error handling requirements |
 
 ## Guides
 

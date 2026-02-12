@@ -21,7 +21,7 @@
 - **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
 - **Dependency Drift**: runtime imports include `tenacity`, `python-dateutil` (`dateutil`), and `pytz`, but these are not declared in Poetry dependencies.
-- **Auth Stack Modernization Pending**: `Quart-Discord` remains active runtime auth path while phased `Authlib` migration is planned.
+- **Auth Stack Modernization In Progress (Phase 0/1)**: `Quart-Discord` remains active default runtime auth path. `Authlib` migration scaffolding added behind disabled `USE_AUTHLIB_OAUTH` flag (Phase 1 dual-path support). Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
 ## Recent Completions
@@ -53,11 +53,13 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **WS1 Phase 0/1: Authlib Discord OAuth Migration:** Documented behavior contract (`docs/design/discord_oauth_behavior_contract.md`), created Authlib OAuth wrapper module (`alttprbot_api/oauth_client.py`), added dual-path runtime selector behind disabled `USE_AUTHLIB_OAUTH` flag with backward-compatible default (Quart-Discord active), added structured auth telemetry placeholders (2026-02-12).
 
 ## Upcoming Work
 
-1. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
-2. **Create `GuildConfigService`**: Replace monkey-patching pattern (Phase 2).
+1. **WS1 Phase 2: Dual-Path Validation:** Enable Authlib path in controlled environment, validate parity against behavior contract matrix, execute compatibility gate validation per runbook.
+2. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
+3. **Create `GuildConfigService`**: Replace monkey-patching pattern (Phase 2).
 3. **Channel ID Migration**: Convert config string names to IDs (Phase 3).
 4. Review and refine generated documentation.
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
