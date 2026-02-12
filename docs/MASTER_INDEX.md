@@ -45,6 +45,7 @@ Documentation standards and authoring references:
 | [Component Interrogation Checklist](guides/component_interrogation_checklist.md) | Execution checklist for policy/permission/workflow interrogation sessions |
 | [Async Tournament Interrogation Runbook](guides/component_interrogation_runbook_async_tournament.md) | Example runbook showing interrogation workflow against the async tournament module |
 | [Tournament Module (Non-Async) Runbook](guides/tournament_module_runbook.md) | Operator/developer runbook for non-async tournament lifecycle, troubleshooting, and safe change workflow |
+| [Discord Role Assignment Deprecation Runbook](guides/discord_role_assignment_deprecation_runbook.md) | Operator runbook for Phase A/B role-assignment deprecation: feature flags, rollback procedures, and compatibility validation |
 
 ## Plans
 

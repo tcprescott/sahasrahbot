@@ -53,6 +53,7 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **Implemented Phase A/B of Discord role-assignment deprecation (WS4):** Added deprecation messaging to all reaction-role and voice-role command surfaces, implemented runtime disablement flag `DISCORD_ROLE_ASSIGNMENT_ENABLED` (default True for backward compatibility), added conditional extension loading, preserved startup and non-role command behavior. Rollback procedure and compatibility validation documented in `docs/guides/discord_role_assignment_deprecation_runbook.md` (2026-02-12).
 
 ## Upcoming Work
 
