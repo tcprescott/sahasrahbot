@@ -9,7 +9,7 @@
 
 ## Known Issues
 
-- Secrets historically lived in `config.py`; configuration is now environment-driven via `pydantic-settings`, but any previously exposed tokens/keys should be considered compromised and rotated.
+- Secrets historically lived in `config.py`; configuration is environment-driven via `config.py` constants sourced from environment variables, but any previously exposed tokens/keys should be considered compromised and rotated.
 - Legacy database layer (`alttprbot/database/`) coexists with Tortoise ORM models — dual-pattern creates confusion.
 - Cross-layer dependency: `alttprbot/database/config.py` imports `CACHE` from `alttprbot_discord.util.guild_config`.
 - Many tournament handlers in `TOURNAMENT_DATA` registry are commented out between seasons.
@@ -20,7 +20,7 @@
 - **Runtime Security Debt**: `OAUTHLIB_INSECURE_TRANSPORT` is forced on in API startup and `APP_SECRET_KEY` defaults to empty string.
 - **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
-- **Dependency Drift**: runtime imports include `pydantic`, `pydantic-settings`, and `tenacity`, but these are not declared in Poetry dependencies.
+- **Dependency Drift**: runtime imports include `tenacity`, `python-dateutil` (`dateutil`), and `pytz`, but these are not declared in Poetry dependencies.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
 ## Recent Completions
@@ -28,7 +28,7 @@
 - Audit of Discord bot domain completed; technical debt identified.
 - Codebase analysis and documentation generation (2026-02-11).
 - Existing end-user docs relocated from `docs/` root to `docs/user-guide/`.
-- Migrated configuration to env-driven `pydantic-settings` and removed checked-in secrets (2026-02-11).
+- Removed accidental interim configuration abstraction layer and retained env-driven `config.py` settings (2026-02-12).
 - API and web frontend operation documentation completed with separate JSON endpoint and frontend route maps (2026-02-12).
 - Granular parallel codebase audit completed to identify context documentation drift and unresolved intent assumptions (2026-02-12).
 - Reconciled legacy overlapping RaceTime/Web API design doc to RaceTime-only scope with canonical links to split API/frontend docs (2026-02-12).
