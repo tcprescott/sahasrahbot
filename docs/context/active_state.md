@@ -53,6 +53,7 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **Completed Phase 1 of seed provider reliability contract implementation**: implemented shared provider execution wrapper with 60s timeout and 3-attempt retry policy, normalized exception taxonomy, canonical provider response object, and representative SMDash adapter with validation (2026-02-12).
 
 ## Upcoming Work
 
@@ -64,7 +65,7 @@
 6. Integrate dependency declaration guard execution (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
 8. Implement tournament registry loader and `config/tournaments.yaml` rollout per `plans/tournament_registry_config_rollout_plan.md`.
-9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
+9. **Phase 2–4 of seed provider reliability**: Migrate remaining providers to use shared contract, integrate unified audit writer, remove surface-layer duplication per `plans/seed_provider_reliability_implementation_plan.md`.
 10. Implement role-assignment deprecation rollout per `plans/discord_role_assignment_deprecation_removal_plan.md`.
 11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
 12. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
