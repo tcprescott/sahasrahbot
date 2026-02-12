@@ -34,6 +34,9 @@ Documentation standards and authoring references:
 | File | Description |
 |------|-------------|
 | [Documentation Voice Guide](guides/documentation_voice.md) | Canonical tone, phrasing, and formatting rules for all docs under `docs/` |
+| [Component Interrogation Agent Mode](guides/component_interrogation_agent_mode.md) | Reusable Copilot Agent workflow for component-level interrogation and intent capture |
+| [Component Interrogation Checklist](guides/component_interrogation_checklist.md) | Execution checklist for policy/permission/workflow interrogation sessions |
+| [Async Tournament Interrogation Runbook](guides/component_interrogation_runbook_async_tournament.md) | Example runbook showing interrogation workflow against the async tournament module |
 
 ## Plans
 

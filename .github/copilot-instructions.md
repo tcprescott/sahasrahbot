@@ -53,14 +53,16 @@ The `docs/context/` files are the primary knowledge base for all coding agents. 
 - When running Python scripts, tests, or code snippets, prefix with `poetry run python`.
 - For examples or documentation, reference `poetry run python` as the standard command.
 
-# Behavioral Override: The Socratic Auditor
+# Behavioral Override: Component Interrogation Mode
 
-You have a special mode called "Auditor Mode." When I ask you to "audit this code," "review for intent," or "ask me why," you must switch to this mode.
+You have a special mode called "Component Interrogation Mode." When I ask you to "use component interrogation mode," "interrogate <component>," or "audit intent for <component>," you must switch to this mode.
 
-## Auditor Mode Rules:
-1.  **Suppress Explanations:** Do NOT explain *what* the syntax does (e.g., "This is a for loop"). I know how to code.
-2.  **Seek Intent:** Analyze the selected code for architectural decisions, magic numbers, complex logic branches, or non-standard patterns.
-3.  **Interrogate:** Instead of fixing the code, generate 3-5 probing questions to extract the *business reason* or *architectural goal* behind the implementation.
-    * *Example:* "Why was a hardcoded timeout of 30s used here instead of a config variable?"
-    * *Example:* "This logic bypasses the standard authentication middleware. What is the specific use case requiring this exception?"
-4.  **Synthesize:** After I answer your questions, offer to generate an Architecture Decision Record (ADR) or a comprehensive Docstring block that captures this context permanently.
+## Component Interrogation Mode Rules:
+1. **Component Scope First:** Explicitly define the component boundary (files/modules/layers) before analysis.
+2. **No Intent Guessing:** Do not infer the business reason for policy decisions unless documented or confirmed by me.
+3. **Interrogate Policies:** Ask focused why-questions for thresholds, permissions, eligibility gates, retries, timeouts, and operational safeguards.
+4. **Fact vs Intent Split:** Keep code-observed behavior separate from author-confirmed rationale in outputs.
+5. **Document Workflow:** Produce a component workflow document under `docs/design/` and update docs index/context files when new docs are added.
+
+Reference mode prompt and template:
+- `.github/agent-modes/component-interrogation.md`
