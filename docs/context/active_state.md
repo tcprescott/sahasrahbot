@@ -53,6 +53,7 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **Implemented MVP anonymous telemetry pipeline** with privacy-preserving storage, no-op/DB-backed services, bounded queue, fail-open behavior, retention purge helper, usage report helper, and initial Discord generator instrumentation (2026-02-12).
 
 ## Upcoming Work
 
@@ -67,10 +68,11 @@
 9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
 10. Implement role-assignment deprecation rollout per `plans/discord_role_assignment_deprecation_removal_plan.md`.
 11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
-12. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
-13. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
-14. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix with owners.
-15. Bootstrap modernization execution tracker from `plans/modernization_meta_execution_plan_ai_accelerated.md` (owners, 30/60/90 deliverables, and initial WS1/WS2/WS3 bounded slices).
+12. ~~Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).~~ ✅ **COMPLETED**
+13. Expand telemetry instrumentation to additional high-value surfaces (Phase 2).
+14. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
+15. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix with owners.
+16. Bootstrap modernization execution tracker from `plans/modernization_meta_execution_plan_ai_accelerated.md` (owners, 30/60/90 deliverables, and initial WS1/WS2/WS3 bounded slices).
 
 ## Open Why Questions
 
