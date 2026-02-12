@@ -3,6 +3,8 @@
 > Last updated: 2026-02-12  
 > Scope: Replace code-comment seasonal toggles in `alttprbot/tournaments.py` with explicit runtime configuration
 
+Execution sequencing for this design is tracked in [Tournament Registry Config-Driven Rollout Plan](../plans/tournament_registry_config_rollout_plan.md).
+
 ## Problem Statement
 
 Current tournament activation is controlled by editing `TOURNAMENT_DATA` in Python source and commenting handlers in/out by season.

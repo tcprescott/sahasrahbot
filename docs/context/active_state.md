@@ -43,6 +43,8 @@
 - Completed role-assignment component deprecation audit (`design/discord_role_assignment_deprecation_audit.md`) with owner-confirmed scope/timeline/data policy (reaction + voice roles, soft deprecate now, remove next release, archive then drop) (2026-02-12).
 - Completed multiworld Discord component deprecation audit (`design/discord_multiworld_deprecation_audit.md`) with owner-confirmed policy (soft deprecate now, remove next release, drop multiworld tables without archival, no replacement path) (2026-02-12).
 - Drafted anonymous telemetry and feature-usage rollout plan (`plans/anonymous_telemetry_user_stats_plan.md`) covering privacy policy, event taxonomy, storage model, and phased implementation (2026-02-12).
+- Drafted overarching 2026–2027 modernization vision (`plans/application_modernization_vision_2026_2027.md`) to align security, observability, velocity, and risk-first migration sequencing across existing refactor plans (2026-02-12).
+- Reclassified plan-like execution content from design docs into dedicated plan docs for deprecation and migration rollouts (`plans/discord_role_assignment_deprecation_removal_plan.md`, `plans/discord_multiworld_deprecation_removal_plan.md`, `plans/seed_provider_reliability_implementation_plan.md`, `plans/tournament_registry_config_rollout_plan.md`) (2026-02-12).
 
 ## Upcoming Work
 
@@ -53,12 +55,12 @@
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
 6. Reconcile declared dependencies in `pyproject.toml` with actual runtime imports.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
-8. Implement tournament registry loader and `config/tournaments.yaml` rollout from `design/tournament_registry_config_design.md`.
-9. Define and implement a shared seed-provider reliability contract (timeouts/retries/error taxonomy/audit parity) from `design/seed_generation_component_audit.md`.
-10. Implement provider execution wrapper + adapter migration per `design/seed_provider_reliability_contract.md`.
-11. Implement role-assignment deprecation rollout: admin messaging, listener disablement, and archive/drop migration for `reaction_group`, `reaction_role`, and `voice_role`.
-12. Implement multiworld Discord deprecation rollout: deprecation command responses, extension unload/removal for `smmulti` and `doorsmw`, and schema drops for `multiworld`, `multiworldentrant`, and `smz3_multiworld`.
-13. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
+8. Implement tournament registry loader and `config/tournaments.yaml` rollout per `plans/tournament_registry_config_rollout_plan.md`.
+9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
+10. Implement role-assignment deprecation rollout per `plans/discord_role_assignment_deprecation_removal_plan.md`.
+11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
+12. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
+13. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
 
 ## Open Why Questions
 

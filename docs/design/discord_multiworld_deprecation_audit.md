@@ -3,6 +3,8 @@
 > Last updated: 2026-02-12
 > Scope: `alttprbot_discord/cogs/smmulti.py`, `alttprbot_discord/cogs/doorsmw.py`, `alttprbot_discord/cogs/bontamw.py` (disabled), `alttprbot_discord/bot.py`, `alttprbot/models/models.py` (`Multiworld`, `MultiworldEntrant`, `SMZ3Multiworld`), and adjacent shared-generator callers in RaceTime/tournament flows.
 
+Execution sequencing for this deprecation is tracked in [Discord Multiworld Deprecation & Removal Plan](../plans/discord_multiworld_deprecation_removal_plan.md).
+
 ## 1. Component Boundary
 
 This audit covers Discord-hosted multiworld features that are planned for deprecation/removal, plus adjacent dependencies that would be affected by shared code paths.

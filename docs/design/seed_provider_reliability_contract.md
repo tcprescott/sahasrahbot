@@ -3,6 +3,8 @@
 > Last updated: 2026-02-12  
 > Scope: All seed-generation providers used by Discord, RaceTime, and API entrypoints
 
+Execution sequencing for this contract is tracked in [Seed Provider Reliability Contract Implementation Plan](../plans/seed_provider_reliability_implementation_plan.md).
+
 ## Purpose
 
 Define one implementation contract for provider execution behavior so all seed sources have consistent reliability, auditing, and failure semantics.

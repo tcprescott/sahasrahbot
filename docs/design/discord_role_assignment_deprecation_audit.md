@@ -3,6 +3,8 @@
 > Last updated: 2026-02-12
 > Scope: `alttprbot_discord/cogs/role.py`, `alttprbot_discord/cogs/voicerole.py`, `alttprbot/database/role.py`, `alttprbot/database/voicerole.py`, `alttprbot/models/models.py` (`ReactionGroup`, `ReactionRole`, `VoiceRole`)
 
+Execution sequencing for this deprecation is tracked in [Discord Role Assignment Deprecation & Removal Plan](../plans/discord_role_assignment_deprecation_removal_plan.md).
+
 ## 1. Component Boundary
 
 This audit covers the Discord role assignment features that automatically add/remove roles based on:

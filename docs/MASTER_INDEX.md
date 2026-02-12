@@ -52,8 +52,13 @@ Execution plans and implementation checklists:
 
 | File | Description |
 |------|-------------|
+| [Application Modernization Vision (2026–2027)](plans/application_modernization_vision_2026_2027.md) | Umbrella modernization roadmap defining priorities, sequencing, risk gates, and target modular-monolith outcomes |
 | [Discord Refactor](plans/discord_refactor.md) | Modernization plan for `alttprbot_discord`: remove guild monkey-patching, normalize config, improve resilience |
 | [Anonymous Telemetry & User Stats Plan](plans/anonymous_telemetry_user_stats_plan.md) | Implementation plan for privacy-preserving feature usage telemetry across Discord, RaceTime, and Web/API surfaces |
+| [Discord Role Assignment Deprecation & Removal](plans/discord_role_assignment_deprecation_removal_plan.md) | Execution plan to retire reaction-role and voice-role systems with communication, disablement, and archive/drop sequencing |
+| [Discord Multiworld Deprecation & Removal](plans/discord_multiworld_deprecation_removal_plan.md) | Execution plan to retire Discord multiworld command surfaces and clean related models/tables |
+| [Seed Provider Reliability Contract Implementation](plans/seed_provider_reliability_implementation_plan.md) | Phased implementation plan for shared provider timeout/retry/error/audit contract across Discord, RaceTime, and API |
+| [Tournament Registry Config-Driven Rollout](plans/tournament_registry_config_rollout_plan.md) | Rollout plan for YAML-backed seasonal tournament activation with validated dual-path cutover and cleanup |
 
 ## User Guide
 
