@@ -50,7 +50,7 @@ if config.DEBUG:
     }
 else:
     _HARDCODED_TOURNAMENT_DATA = {
-        # REGULAR TOURNEMNTS
+        # REGULAR TOURNAMENTS
 
         # 'alttprcd': alttprcd.ALTTPRCDTournament,
         # 'alttprde': alttprde.ALTTPRDETournament,
