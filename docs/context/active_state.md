@@ -38,6 +38,8 @@
 - Added focused Discord daily challenge component audit documentation (`docs/design/discord_daily_challenge_audit.md`) with owner-confirmed polling/channel/thread policy intent and resilience findings (2026-02-12).
 - Completed non-async tournament module audit and published reliability-first architecture/reporting docs (`design/tournament_module_non_async_audit.md`, `guides/tournament_module_runbook.md`) (2026-02-12).
 - Drafted concrete config-driven seasonal tournament registry migration design (`design/tournament_registry_config_design.md`) to replace code-comment toggles with validated runtime config (2026-02-12).
+- Completed cross-surface seed generation component audit (`design/seed_generation_component_audit.md`) covering Discord, RaceTime, and API generation paths with owner-confirmed policy intent for spoiler control and standardized provider retries/timeouts (2026-02-12).
+- Drafted concrete shared seed-provider reliability contract (`design/seed_provider_reliability_contract.md`) with owner-confirmed defaults (60s timeout, 3-attempt exponential retry, mandatory audit parity, direct provider error messaging) (2026-02-12).
 
 ## Upcoming Work
 
@@ -49,6 +51,8 @@
 6. Reconcile declared dependencies in `pyproject.toml` with actual runtime imports.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
 8. Implement tournament registry loader and `config/tournaments.yaml` rollout from `design/tournament_registry_config_design.md`.
+9. Define and implement a shared seed-provider reliability contract (timeouts/retries/error taxonomy/audit parity) from `design/seed_generation_component_audit.md`.
+10. Implement provider execution wrapper + adapter migration per `design/seed_provider_reliability_contract.md`.
 
 ## Open Why Questions
 
