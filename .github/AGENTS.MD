@@ -6,6 +6,26 @@ Always use your question tool to ask questions of the user.
 
 ---
 
+## 0. Context Loading (MANDATORY)
+
+Before performing any task, you MUST read the following files for context:
+
+1. `docs/context/active_state.md` — Current sprint focus, known issues, upcoming work.
+2. `docs/context/system_patterns.md` — Architecture, data flow, design patterns, module layers.
+3. `docs/context/tech_stack.md` — All dependencies with versions, external APIs.
+4. `docs/context/coding_standards.md` — Naming, async patterns, database patterns, project structure.
+
+See `docs/MASTER_INDEX.md` for the full documentation index.
+
+After completing any significant task, update the relevant context file(s):
+- New dependency → `docs/context/tech_stack.md`
+- Architecture change → `docs/context/system_patterns.md`
+- New coding convention → `docs/context/coding_standards.md`
+- Task completed or new issue → `docs/context/active_state.md`
+- New design/plan doc → `docs/MASTER_INDEX.md`
+
+---
+
 ## 1. The "Interrogation" Protocol (Intent Verification)
 **Trigger:** Before creating or updating any documentation in `docs/` that explains *business logic* or *architecture*.
 
