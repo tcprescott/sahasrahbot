@@ -35,16 +35,16 @@ class Daily(commands.Cog):
             embed = await seed.embed(emojis=self.bot.emojis,
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             
-            # Use GuildConfigService to fetch daily announcer channels
-            daily_announcer_channels = await models.Config.filter(parameter='DailyAnnouncerChannel')
+            # Use GuildConfigService to fetch all guilds with daily announcer channels
+            daily_announcer_channels = await self.config_service.get_all_guilds_with_parameter('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
-                guild = self.bot.get_guild(result.guild_id)
+                guild = self.bot.get_guild(result['guild_id'])
                 if not guild:
                     continue
                 
                 # Get channel IDs with backward compatibility for channel names
                 channel_ids = await self.config_service.get_channel_ids(
-                    result.guild_id,
+                    result['guild_id'],
                     'DailyAnnouncerChannel',
                     guild
                 )

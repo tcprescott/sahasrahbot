@@ -75,12 +75,9 @@ class GuildConfigService:
         try:
             result = await models.Config.get(guild_id=guild_id, parameter=parameter)
             await self.cache.set(cache_key, result.value)
-            # Invalidate the guild-wide cache list
-            await self.cache.delete(f'{guild_id}_guildconfig')
             return result.value
         except tortoise.exceptions.DoesNotExist:
             await self.cache.set(cache_key, default)
-            await self.cache.delete(f'{guild_id}_guildconfig')
             return default
     
     async def set(self, guild_id: int, parameter: str, value: str) -> None:
@@ -130,6 +127,21 @@ class GuildConfigService:
         values = await models.Config.filter(guild_id=guild_id).values()
         await self.cache.set(cache_key, values)
         return values
+    
+    async def get_all_guilds_with_parameter(self, parameter: str) -> List[Dict[str, Any]]:
+        """
+        Get all guilds that have a specific configuration parameter.
+        
+        This is useful for broadcast operations like daily announcements
+        where you need to notify all guilds that have opted into a feature.
+        
+        Args:
+            parameter: Configuration parameter name to search for
+            
+        Returns:
+            List of Config model dictionaries containing guild_id, parameter, and value
+        """
+        return await models.Config.filter(parameter=parameter).values()
     
     async def get_channel_ids(
         self,
