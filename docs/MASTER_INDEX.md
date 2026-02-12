@@ -29,6 +29,7 @@ Architectural analysis and domain documentation:
 | [Web Frontend Route Map](design/web_frontend_routes.md) | HTML-rendered route inventory: OAuth-protected pages, blueprint flows, and DEBUG-only surfaces |
 | [Core Library & Data Layer](design/core_library_data_layer.md) | Randomizer generation, Tortoise ORM models (50+), database layer, utilities, preset system, migrations |
 | [Discord Daily Challenge Audit](design/discord_daily_challenge_audit.md) | Component-scoped audit of Discord `daily.py`: command flow, scheduler behavior, config contract, and resilience risks |
+| [Discord Role Assignment Deprecation Audit](design/discord_role_assignment_deprecation_audit.md) | Component-scoped audit of reaction-role and voice-role systems with confirmed deprecation/removal workflow |
 | [Seed Generation Component Audit](design/seed_generation_component_audit.md) | Cross-surface audit of seed generation architecture, provider adapters, reliability/logging risks, and stabilization backlog |
 | [Seed Provider Reliability Contract](design/seed_provider_reliability_contract.md) | Concrete cross-provider contract for timeouts, retries, normalized errors, audit parity, and migration phases |
 

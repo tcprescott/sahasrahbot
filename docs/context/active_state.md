@@ -40,6 +40,7 @@
 - Drafted concrete config-driven seasonal tournament registry migration design (`design/tournament_registry_config_design.md`) to replace code-comment toggles with validated runtime config (2026-02-12).
 - Completed cross-surface seed generation component audit (`design/seed_generation_component_audit.md`) covering Discord, RaceTime, and API generation paths with owner-confirmed policy intent for spoiler control and standardized provider retries/timeouts (2026-02-12).
 - Drafted concrete shared seed-provider reliability contract (`design/seed_provider_reliability_contract.md`) with owner-confirmed defaults (60s timeout, 3-attempt exponential retry, mandatory audit parity, direct provider error messaging) (2026-02-12).
+- Completed role-assignment component deprecation audit (`design/discord_role_assignment_deprecation_audit.md`) with owner-confirmed scope/timeline/data policy (reaction + voice roles, soft deprecate now, remove next release, archive then drop) (2026-02-12).
 
 ## Upcoming Work
 
@@ -53,6 +54,7 @@
 8. Implement tournament registry loader and `config/tournaments.yaml` rollout from `design/tournament_registry_config_design.md`.
 9. Define and implement a shared seed-provider reliability contract (timeouts/retries/error taxonomy/audit parity) from `design/seed_generation_component_audit.md`.
 10. Implement provider execution wrapper + adapter migration per `design/seed_provider_reliability_contract.md`.
+11. Implement role-assignment deprecation rollout: admin messaging, listener disablement, and archive/drop migration for `reaction_group`, `reaction_role`, and `voice_role`.
 
 ## Open Why Questions
 
