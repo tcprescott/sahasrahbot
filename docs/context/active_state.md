@@ -35,6 +35,9 @@
 - Added async tournament Discord workflow design documentation with owner-verified intent for eligibility, timeout, permissions, and reattempt policy (2026-02-12).
 - Added reusable Component Interrogation Agent mode assets (GitHub mode prompt, checklist, and example runbook) for component-scoped intent-first analysis (2026-02-12).
 - Wired Component Interrogation Mode into `.github/copilot-instructions.md` with trigger phrases and mandatory interrogation rules (2026-02-12).
+- Added focused Discord daily challenge component audit documentation (`docs/design/discord_daily_challenge_audit.md`) with owner-confirmed polling/channel/thread policy intent and resilience findings (2026-02-12).
+- Completed non-async tournament module audit and published reliability-first architecture/reporting docs (`design/tournament_module_non_async_audit.md`, `guides/tournament_module_runbook.md`) (2026-02-12).
+- Drafted concrete config-driven seasonal tournament registry migration design (`design/tournament_registry_config_design.md`) to replace code-comment toggles with validated runtime config (2026-02-12).
 
 ## Upcoming Work
 
@@ -45,6 +48,7 @@
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
 6. Reconcile declared dependencies in `pyproject.toml` with actual runtime imports.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
+8. Implement tournament registry loader and `config/tournaments.yaml` rollout from `design/tournament_registry_config_design.md`.
 
 ## Open Why Questions
 

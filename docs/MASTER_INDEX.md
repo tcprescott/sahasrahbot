@@ -22,10 +22,13 @@ Architectural analysis and domain documentation:
 | [Discord Bot Domain](design/discord_bot_domain.md) | Main bot & audit bot: cogs, commands, listeners, UI views, background tasks |
 | [Async Tournament Discord Workflow](design/async_tournament_discord_workflow.md) | End-to-end async tournament module workflow: Discord lifecycle, scoring, permissions, and web-coupled review flow |
 | [Tournament System](design/tournament_system_analysis.md) | Tournament framework: base classes, 20+ handlers, SpeedGaming integration, match lifecycle |
+| [Tournament Module (Non-Async) Audit](design/tournament_module_non_async_audit.md) | Reliability-first audit of non-async tournament architecture, handler inventory, lifecycle, and risk profile |
+| [Tournament Registry Config-Driven Design](design/tournament_registry_config_design.md) | Concrete migration design for replacing code-comment seasonal toggles with validated runtime config |
 | [RaceTime & Web API](design/racetime_and_web_api.md) | RaceTime.gg integration architecture and race lifecycle; links to canonical split Web API/frontend docs |
 | [Web API JSON Endpoints](design/web_api_json_endpoints.md) | Endpoint-level JSON API inventory: auth modes, request/response behavior, async tournament API details |
 | [Web Frontend Route Map](design/web_frontend_routes.md) | HTML-rendered route inventory: OAuth-protected pages, blueprint flows, and DEBUG-only surfaces |
 | [Core Library & Data Layer](design/core_library_data_layer.md) | Randomizer generation, Tortoise ORM models (50+), database layer, utilities, preset system, migrations |
+| [Discord Daily Challenge Audit](design/discord_daily_challenge_audit.md) | Component-scoped audit of Discord `daily.py`: command flow, scheduler behavior, config contract, and resilience risks |
 
 ## Guides
 
@@ -37,6 +40,7 @@ Documentation standards and authoring references:
 | [Component Interrogation Agent Mode](guides/component_interrogation_agent_mode.md) | Reusable Copilot Agent workflow for component-level interrogation and intent capture |
 | [Component Interrogation Checklist](guides/component_interrogation_checklist.md) | Execution checklist for policy/permission/workflow interrogation sessions |
 | [Async Tournament Interrogation Runbook](guides/component_interrogation_runbook_async_tournament.md) | Example runbook showing interrogation workflow against the async tournament module |
+| [Tournament Module (Non-Async) Runbook](guides/tournament_module_runbook.md) | Operator/developer runbook for non-async tournament lifecycle, troubleshooting, and safe change workflow |
 
 ## Plans
 
