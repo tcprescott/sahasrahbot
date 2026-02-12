@@ -53,11 +53,11 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
-- **WS4 Phase A: Discord Multiworld Deprecation Messaging** — Implemented soft deprecation responses for `smmulti` and `doorsmw` commands with timeline and migration guidance. Commands callable but display retirement notices (2026-02-12).
+- **WS4 Phase A/B: Discord Multiworld Deprecation** — Completed soft deprecation messaging and functional removal for multiworld commands. Phase A added deprecation notices to `smmulti` and `doorsmw` commands. Phase B commented out extension loads in `bot.py` to prevent command registration. Commands no longer callable; non-multiworld flows unaffected (2026-02-12).
 
 ## Upcoming Work
 
-1. **WS4 Phase B: Discord Multiworld Functional Removal** — Remove extension loads for multiworld cogs, validate startup/command sync.
+1. **WS4 Phase C: Discord Multiworld Data Cleanup** — Remove multiworld ORM models and apply schema migrations to drop tables (next release).
 2. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
 2. **Create `GuildConfigService`**: Replace monkey-patching pattern (Phase 2).
 3. **Channel ID Migration**: Convert config string names to IDs (Phase 3).
