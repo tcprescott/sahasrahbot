@@ -64,8 +64,13 @@ class SMDashProvider:
             
             # Construct canonical response
             # Note: smdash returns a URL but no hash/ID in the response
-            # We extract it from the URL if possible
-            hash_or_id = url.split('/')[-1] if '/' in url else url
+            # The URL format from dashrando.net is typically: https://www.dashrando.net/seed/{hash}
+            # We extract the hash from the URL path for the hash_or_id field
+            from urllib.parse import urlparse
+            parsed_url = urlparse(url)
+            # Extract last path component, removing any trailing slashes
+            path_parts = parsed_url.path.rstrip('/').split('/')
+            hash_or_id = path_parts[-1] if path_parts else url
             
             return ProviderResponse(
                 url=url,

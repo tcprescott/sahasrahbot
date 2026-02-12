@@ -40,6 +40,9 @@ T = TypeVar('T')
 # Contract defaults
 PROVIDER_TIMEOUT_SECONDS = 60
 PROVIDER_MAX_ATTEMPTS = 3
+# Note: Backoff configuration produces 1s, 2s wait times (intentionally capped)
+# This provides quick retries for transient failures while respecting the design
+# document's specified backoff sequence of 1s, 2s
 PROVIDER_RETRY_MIN_WAIT = 1  # seconds
 PROVIDER_RETRY_MAX_WAIT = 2  # seconds
 
