@@ -104,6 +104,8 @@ class AuthlibDiscordOAuth:
         })
         
         # Build authorization URL
+        # Note: create_authorization_url returns (url, state) tuple
+        # We manage state separately, so the returned state is unused
         client = self._create_client()
         auth_url, _ = client.create_authorization_url(
             self.AUTHORIZE_URL,
@@ -146,13 +148,19 @@ class AuthlibDiscordOAuth:
         stored_state = session.pop('oauth_state', None)
         
         if not returned_state or returned_state != stored_state:
-            logger.error("auth_callback_state_mismatch")
+            logger.error("auth_callback_state_mismatch", extra={
+                'has_returned_state': bool(returned_state),
+                'has_stored_state': bool(stored_state),
+                'states_match': returned_state == stored_state if returned_state and stored_state else False
+            })
             raise OAuth2Error(description="CSRF state validation failed")
         
         # Get authorization code
         code = request.args.get('code')
         if not code:
-            logger.error("auth_callback_no_code")
+            logger.error("auth_callback_no_code", extra={
+                'query_params': list(request.args.keys())
+            })
             raise OAuth2Error(description="No authorization code received")
         
         try:
