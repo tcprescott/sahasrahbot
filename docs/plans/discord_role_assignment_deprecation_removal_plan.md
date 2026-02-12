@@ -51,6 +51,14 @@ Out of scope:
 3. **Data Gate:** archive completed before schema drop.
 4. **Rollback Gate:** release-level fallback decision documented before destructive migration.
 
+### Compatibility Workflow Coverage
+
+This plan must provide gate evidence for the following modernization compatibility workflows:
+
+- Bot startup and command registration flow
+- Active tournament lifecycle flow (non-role commands unaffected)
+- Discord seed rolling (non-role command groups unaffected)
+
 ## Concrete Checklist
 
 - Confirm removal release and communication period.
@@ -60,6 +68,7 @@ Out of scope:
 - Remove `ReactionGroup`, `ReactionRole`, and `VoiceRole` model classes.
 - Apply migration for table drops after archive export.
 - Validate bot startup and unaffected command groups.
+- Validate that role-removal changes do not affect non-role moderation and generation command surfaces.
 
 ## Success Criteria
 

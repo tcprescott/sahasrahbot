@@ -51,6 +51,14 @@ Out of scope:
 3. **Schema Gate:** table drops sequenced after command/cog retirement.
 4. **Dependency Gate:** shared generator callers outside Discord remain documented and unaffected.
 
+### Compatibility Workflow Coverage
+
+This plan must provide gate evidence for the following modernization compatibility workflows:
+
+- Bot startup and command registration flow
+- Discord seed rolling (non-multiworld command groups unaffected)
+- Active tournament lifecycle flow (unaffected by Discord multiworld removal)
+
 ## Concrete Checklist
 
 - Add deprecation response text to active Discord multiworld commands.
@@ -60,6 +68,7 @@ Out of scope:
 - Drop multiworld-related models/tables via migration.
 - Validate non-multiworld generation and startup behavior.
 - Re-audit RaceTime/tournament multiworld dependency if broader retirement is later planned.
+- Validate command sync after cog removal to confirm retired groups are absent and unrelated groups remain healthy.
 
 ## Success Criteria
 

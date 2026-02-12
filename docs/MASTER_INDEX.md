@@ -59,6 +59,8 @@ Execution plans and implementation checklists:
 | [Discord Multiworld Deprecation & Removal](plans/discord_multiworld_deprecation_removal_plan.md) | Execution plan to retire Discord multiworld command surfaces and clean related models/tables |
 | [Seed Provider Reliability Contract Implementation](plans/seed_provider_reliability_implementation_plan.md) | Phased implementation plan for shared provider timeout/retry/error/audit contract across Discord, RaceTime, and API |
 | [Tournament Registry Config-Driven Rollout](plans/tournament_registry_config_rollout_plan.md) | Rollout plan for YAML-backed seasonal tournament activation with validated dual-path cutover and cleanup |
+| [Modernization Compatibility Gate Validation Runbook](plans/modernization_compatibility_gate_validation_runbook.md) | Executable workflow/evidence checklist for the 8 compatibility-gate baseline flows used in phase and bi-weekly modernization reviews |
+| [Authlib Migration for Discord OAuth](plans/authlib_discord_oauth_migration_plan.md) | Phased migration plan to replace `Quart-Discord` with `Authlib` using compatibility gates, dual-path rollout, and rollback controls |
 
 ## User Guide
 

@@ -13,6 +13,8 @@
 - **Poetry** for dependency management and virtual environments
 - Always use `poetry run python` for execution
 - Dependencies declared in `pyproject.toml`
+- Any third-party module imported directly in user code must have an explicit dependency declaration in `pyproject.toml` (no intentional transitive-only reliance)
+- Use `poetry run python helpers/check_dependency_declarations.py` to validate dependency declarations against imports
 
 ## Project Structure
 

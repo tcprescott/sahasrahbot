@@ -55,6 +55,15 @@ Out of scope:
 3. **Audit Gate:** success parity and failure observability validated across providers.
 4. **Rollback Gate:** staged rollout with reversible adapter switching.
 
+### Compatibility Workflow Coverage
+
+This plan must provide gate evidence for the following modernization compatibility workflows:
+
+- Discord seed rolling
+- RaceTime seed rolling
+- API seed generation endpoint
+- Critical provider failure handling
+
 ## Concrete Checklist
 
 - Implement wrapper + exception classes + canonical response.
@@ -63,6 +72,7 @@ Out of scope:
 - Integrate shared audit success writer and failure logs.
 - Remove duplicated surface retry/error/audit logic.
 - Validate Discord, RaceTime, and API generation flows.
+- Validate timeout/retry/normalized error behavior under provider failure scenarios.
 
 ## Success Criteria
 

@@ -54,6 +54,14 @@ Out of scope:
 3. **Fallback Gate:** hardcoded rollback path remains available until cleanup completes.
 4. **Compatibility Gate:** active tournament loops continue with no lifecycle behavior regressions.
 
+### Compatibility Workflow Coverage
+
+This plan must provide gate evidence for the following modernization compatibility workflows:
+
+- Active tournament lifecycle flow
+- Tournament registry activation flow
+- Bot startup and command registration flow
+
 ## Concrete Checklist
 
 - Add `config/tournaments.yaml` schema and debug/production profiles.
@@ -63,6 +71,7 @@ Out of scope:
 - Update tournament operator runbook for config workflow.
 - Cutover production to config-first path.
 - Remove legacy commented activation blocks after validation window.
+- Validate startup source/profile logs and active handler set against configured profile.
 
 ## Success Criteria
 

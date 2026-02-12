@@ -21,6 +21,7 @@
 - **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
 - **Dependency Drift**: runtime imports include `tenacity`, `python-dateutil` (`dateutil`), and `pytz`, but these are not declared in Poetry dependencies.
+- **Auth Stack Modernization Pending**: `Quart-Discord` remains active runtime auth path while phased `Authlib` migration is planned.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
 ## Recent Completions
@@ -45,6 +46,12 @@
 - Drafted anonymous telemetry and feature-usage rollout plan (`plans/anonymous_telemetry_user_stats_plan.md`) covering privacy policy, event taxonomy, storage model, and phased implementation (2026-02-12).
 - Drafted overarching 2026–2027 modernization vision (`plans/application_modernization_vision_2026_2027.md`) to align security, observability, velocity, and risk-first migration sequencing across existing refactor plans (2026-02-12).
 - Reclassified plan-like execution content from design docs into dedicated plan docs for deprecation and migration rollouts (`plans/discord_role_assignment_deprecation_removal_plan.md`, `plans/discord_multiworld_deprecation_removal_plan.md`, `plans/seed_provider_reliability_implementation_plan.md`, `plans/tournament_registry_config_rollout_plan.md`) (2026-02-12).
+- Scrutinized and strengthened the umbrella modernization roadmap (`plans/application_modernization_vision_2026_2027.md`) with explicit non-goals, workstream dependency mapping, phase exit criteria, gate-evidence requirements, top-risk mitigations, and owner-confirmation decision questions (2026-02-12).
+- Captured owner confirmation decisions for modernization defaults in the umbrella roadmap (degraded startup allowance, 60-day telemetry retention baseline, 8-week deprecation communication window, initial compatibility gate workflows) (2026-02-12).
+- Expanded and wired the concrete modernization compatibility workflow baseline (8 workflows) from umbrella roadmap into dependent rollout plans (seed provider reliability, tournament registry config rollout, role deprecation/removal, multiworld deprecation/removal) (2026-02-12).
+- Added executable compatibility gate validation runbook (`plans/modernization_compatibility_gate_validation_runbook.md`) with per-workflow tasks, evidence packet template, and rollback verification checklist for bi-weekly gate reviews (2026-02-12).
+- Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
+- Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 
 ## Upcoming Work
 
@@ -53,7 +60,7 @@
 3. **Channel ID Migration**: Convert config string names to IDs (Phase 3).
 4. Review and refine generated documentation.
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
-6. Reconcile declared dependencies in `pyproject.toml` with actual runtime imports.
+6. Integrate dependency declaration guard execution (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
 8. Implement tournament registry loader and `config/tournaments.yaml` rollout per `plans/tournament_registry_config_rollout_plan.md`.
 9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
@@ -61,6 +68,7 @@
 11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
 12. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
 13. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
+14. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix with owners.
 
 ## Open Why Questions
 

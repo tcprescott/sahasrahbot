@@ -16,8 +16,9 @@
 | `discord.py` | `*` (latest) | Discord bot framework (v2.x with slash commands) |
 | `quart` | `*` (latest) | Async web framework (Flask-compatible) |
 | `Quart-Discord` | `>=2.1.4` | Discord OAuth2 integration for Quart |
+| `Authlib` | `*` | Target OAuth client framework for phased Discord OAuth migration |
 | `racetime-bot` | pinned commit `48afdd4` | RaceTime.gg bot SDK (custom fork by tcprescott) |
-| `tortoise-orm` | via `aerich` | Async ORM for MySQL |
+| `tortoise-orm` | `*` | Async ORM for MySQL |
 | `aerich` | `>=0.5.5` | Database migration tool for Tortoise ORM |
 
 ## Database
@@ -53,6 +54,7 @@
 | Library | Version | Purpose |
 |---------|---------|---------|
 | `gspread-asyncio` | `*` | Async Google Sheets client |
+| `gspread` | `*` | Direct gspread exception classes and APIs used by tournament integration |
 | `oauth2client` | `*` | Google OAuth2 service account auth |
 | `google-api-python-client` | `*` | Google APIs client library |
 
@@ -62,11 +64,15 @@
 |---------|---------|---------|
 | `PyYAML` | `*` | YAML preset file parsing |
 | `dataclasses-json` | `*` | JSON serialization for dataclasses |
+| `marshmallow` | `*` | Dataclass validation/field mapping used by SpeedGaming client models |
 | `isodate` | `*` | ISO 8601 duration parsing |
 | `html2markdown` | `*` | HTML-to-markdown conversion |
+| `beautifulsoup4` | `*` | HTML parsing utility used by scraping/parsing paths |
 | `html5lib` | `*` | HTML parsing |
 | `markdown` | `^3.4.3` | Markdown rendering |
 | `emoji` | `*` | Emoji handling |
+| `python-dateutil` | `*` | Date parsing/timezone utility (migration target toward stdlib `zoneinfo`) |
+| `pytz` | `*` | Legacy timezone handling (incremental migration target toward stdlib `zoneinfo`) |
 
 ## Utilities
 
@@ -77,29 +83,21 @@
 | `urlextract` | `*` | URL extraction from text (used in moderation) |
 | `pyrankvote` | `*` | Single Transferable Vote counting |
 | `aiofiles` | `>=0.4.0` | Async file I/O |
+| `tenacity` | `*` | Retry policies for provider/external request reliability |
+| `oauthlib` | `*` | OAuth2 error/utility types used by API auth path |
+| `werkzeug` | `*` | MultiDict and request utility types used in tournament form handling |
 
 ## Runtime Import vs Declared Dependency Drift
 
-The following libraries are imported in runtime code but are not currently declared in `pyproject.toml` dependencies:
-
-- `tenacity`
-- `python-dateutil` (`dateutil`)
-- `pytz`
-
-Treat these as environment-coupled dependencies until Poetry declarations are reconciled.
+- Direct-import dependency declarations were reconciled in `pyproject.toml` on 2026-02-12.
+- Guard script added at `helpers/check_dependency_declarations.py` to prevent new drift.
 
 ## Monitoring
 
 | Library | Version | Purpose |
 |---------|---------|---------|
 | `discord-sentry-reporting` | `*` | Sentry integration for discord.py |
-| `sentry_sdk` | (transitive) | Error tracking and reporting |
-
-## Twitch Integration
-
-| Library | Version | Purpose |
-|---------|---------|---------|
-| `twitchapi` | `^3.10.0` | Twitch API client |
+| `sentry-sdk` | `*` | Error tracking and reporting |
 
 ## Discord Extensions
 
