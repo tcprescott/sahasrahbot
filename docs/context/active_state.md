@@ -4,6 +4,7 @@
 
 ## Current Focus
 
+- **Modernization Program Bootstrap (Phase 0)**: Executing program bootstrap per [docs/plans/modernization_meta_execution_plan_ai_accelerated.md](../plans/modernization_meta_execution_plan_ai_accelerated.md) — tracker structure, evidence templates, and flag inventory complete. Next: assign owners and run first compatibility evidence cycle.
 - **Discord Bot Refactor**: Implementing the modernization plan defined in [docs/plans/discord_refactor.md](../plans/discord_refactor.md).
 - **Documentation Sprint**: Generating comprehensive developer documentation from codebase analysis.
 
@@ -53,6 +54,7 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **Phase 0 Bootstrap (Week 0–1) completed:** Created modernization execution tracker (`plans/modernization_execution_tracker.md`) mapping WS1–WS5 workstreams to gate milestones with 30/60/90-day targets; added compatibility evidence packet template (`guides/compatibility_evidence_packet_template.md`) aligned to validation runbook; added feature-flag inventory (`guides/feature_flag_inventory.md`) with owner+sunset enforcement; updated MASTER_INDEX.md and active_state.md (2026-02-12).
 
 ## Upcoming Work
 
@@ -70,7 +72,9 @@
 12. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
 13. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
 14. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix with owners.
-15. Bootstrap modernization execution tracker from `plans/modernization_meta_execution_plan_ai_accelerated.md` (owners, 30/60/90 deliverables, and initial WS1/WS2/WS3 bounded slices).
+15. Define owners for delivery, validation, and rollback per workstream in `plans/modernization_execution_tracker.md`.
+16. Create AI task templates for audits, migrations, and validation packets.
+17. Start Phase 1 with three bounded implementation slices: Authlib scaffolding (no traffic switch), telemetry service/table scaffolding, startup security validation checks.
 
 ## Open Why Questions
 
