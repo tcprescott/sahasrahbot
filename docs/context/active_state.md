@@ -68,6 +68,8 @@
 - Migrated root runtime configuration provider to `pydantic-settings` in `config.py` while preserving module-level `config.<KEY>` compatibility, dynamic uppercase env passthrough, and existing validation helper flow (2026-02-12).
 - Added legacy-config conversion helper `helpers/convert_legacy_config_to_env.py` to transform historical Python constant config files into dotenv format for `pydantic-settings` adoption (2026-02-12).
 - Removed Google Sheets integration from tournament runtime flow (race recording task, sheet credential utility, and Google dependencies/config keys) and retained database-only result tracking (2026-02-12).
+- Drafted implementation-ready migration plan for replacing the forked RaceTime SDK dependency with official upstream package while preserving 1:1 behavior across RaceTime handlers, tournament integrations, API-injected commands, and unlisted-room recovery (`plans/racetime_bot_official_migration_plan.md`) (2026-02-12).
+- Started execution of RaceTime SDK migration: added Phase 0 parity checklist artifact, introduced RaceTime handler compatibility helper, refactored RaceTime bot core toward official-sdk-compatible transport/handler tracking contract, updated API command handler lookup to compatibility helper, and switched `pyproject.toml` dependency to official `racetime-bot` package (2026-02-12).
 
 ## Upcoming Work
 
@@ -85,6 +87,7 @@
 12. Review and refine generated documentation, including `update_docs.py` target alignment with `docs/user-guide/`.
 13. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.
 14. Validate production `.env`/environment completeness against the new `pydantic-settings` config surface before next deployment restart.
+15. Validate RaceTime migration runtime by installing updated dependencies and running targeted startup/smoke checks for RaceTime bot initialization, API command lookup path, and tournament `startrace/get_team` call chains.
 
 ## Open Why Questions
 

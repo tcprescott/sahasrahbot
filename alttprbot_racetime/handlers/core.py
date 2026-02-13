@@ -1,4 +1,5 @@
 import asyncio
+import json
 import math
 from datetime import datetime
 from itertools import groupby
@@ -24,7 +25,8 @@ class SahasrahBotCoreHandler(RaceHandler):
     unlisted = False
     spoiler_race: models.SpoilerRaces = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, bot=None, **kwargs):
+        self.bot = bot
         super().__init__(**kwargs)
         self.seed_rolled = False
 
@@ -202,12 +204,16 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         `user` should be the hashid of the user.
         """
-        await self.ws.send_json({
+        payload = {
             'action': 'override_stream',
             'data': {
                 'user': user
             }
-        })
+        }
+        if hasattr(self.ws, 'send_json'):
+            await self.ws.send_json(payload)
+        else:
+            await self.ws.send(json.dumps(payload))
         self.logger.info('[%(race)s] overrode stream for %(user)s' % {
             'race': self.data.get('name'),
             'user': user

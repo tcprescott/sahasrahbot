@@ -17,7 +17,7 @@
 | `quart` | `*` (latest) | Async web framework (Flask-compatible) |
 | `Authlib` | `*` | Discord OAuth2 client framework for Quart API authentication flows |
 | `pydantic-settings` | `*` | Canonical environment-based runtime configuration provider |
-| `racetime-bot` | pinned commit `48afdd4` | RaceTime.gg bot SDK (custom fork by tcprescott) |
+| `racetime-bot` | `^2.3.0` | RaceTime.gg bot SDK (official upstream package) |
 | `tortoise-orm` | `*` | Async ORM for MySQL |
 | `aerich` | `>=0.5.5` | Database migration tool for Tortoise ORM |
 
@@ -42,6 +42,7 @@
 |---------|---------|---------|
 | `aiohttp` | `*` | Async HTTP client for API calls |
 | `aioboto3` | `>=8.0.5` | Async AWS SDK (S3 operations) |
+| `websockets` | `*` | RaceTime websocket transport compatibility for official SDK integration |
 
 ## Caching
 

@@ -70,6 +70,8 @@ Execution plans and implementation checklists:
 | [Authlib Migration for Discord OAuth](plans/authlib_discord_oauth_migration_plan.md) | Phased migration plan to replace `Quart-Discord` with `Authlib` using compatibility gates, dual-path rollout, and rollback controls |
 | [Modernization Meta Execution Plan (AI-Accelerated)](plans/modernization_meta_execution_plan_ai_accelerated.md) | Multi-phase operating plan that sequences all modernization workstreams with AI-assisted delivery, validation, and governance cadence |
 | [Modernization Execution Tracker](plans/modernization_execution_tracker.md) | Live program status across WS1–WS5 workstreams with gate milestones, owners, phase progress, and 30/60/90-day targets |
+| [RaceTime Bot Official Migration Plan](plans/racetime_bot_official_migration_plan.md) | Implementation-ready migration sequence to replace forked `racetime-bot` with official upstream while preserving 1:1 RaceTime, tournament, API, and recovery behavior |
+| [RaceTime Migration Phase 0 Parity Checklist](plans/racetime_migration_phase0_parity_checklist.md) | Baseline pre-cutover checklist and evidence template for proving post-migration behavior parity |
 
 ## User Guide
 

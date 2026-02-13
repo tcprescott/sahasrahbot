@@ -60,6 +60,12 @@ Discord functionality is organized into cogs — self-contained modules loaded a
 ### Handler Pattern (RaceTime Bot)
 Each RaceTime game category has a handler class extending `SahasrahBotCoreHandler`. Most handlers define game-specific commands/seed logic, but some are intentionally thin/no-op shells depending on season and category maturity.
 
+### RaceTime Compatibility Adapter (Migration In Progress)
+RaceTime integration now includes a compatibility layer to preserve historical SahasrahBot expectations while moving to the official `racetime-bot` package:
+- `alttprbot_racetime/core.py` restores expected bot methods used across app surfaces (`start`, `join_race_room`, `startrace`, `get_team`) and tracks handlers in a task+handler container shape.
+- `alttprbot_racetime/compat.py` provides stable handler lookup (`get_room_handler`) for API/tournament callers.
+- `alttprbot_racetime/handlers/core.py` supports bot-injected context and websocket payload compatibility for `override_stream`.
+
 ### Blueprint Pattern (Web API)
 The Quart API uses blueprints to organize routes by feature (presets, tournaments, voting, etc.).
 

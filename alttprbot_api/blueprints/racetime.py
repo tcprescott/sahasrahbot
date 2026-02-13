@@ -9,6 +9,7 @@ import config
 from alttprbot import models
 from alttprbot_api.api import discord
 from alttprbot_racetime import bot as racetimebot
+from alttprbot_racetime.compat import get_room_handler
 
 racetime_blueprint = Blueprint('racetime', __name__)
 
@@ -36,7 +37,9 @@ async def bot_command():
     if not racetime_bot:
         raise Exception("Invalid game category")
 
-    racetime_handler = racetime_bot.handlers.get(f"{category}/{room}").handler
+    racetime_handler = get_room_handler(racetime_bot, f"{category}/{room}")
+    if racetime_handler is None:
+        return abort(404, "Race room not currently handled")
 
     fake_data = {
         'message': {

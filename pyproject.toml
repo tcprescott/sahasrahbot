@@ -42,7 +42,8 @@ werkzeug = "*"
 "discord.py" = "*"
 jishaku = "*"
 pyrankvote = "*"
-racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/48afdd4691f0f329eebb5dd33b1cbcf42921e980.zip"}
+racetime-bot = "^2.3.0"
+websockets = "*"
 markdown = "^3.4.3"
 pydantic-settings = "*"
 

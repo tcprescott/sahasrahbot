@@ -49,6 +49,7 @@ MODULE_TO_PACKAGE = {
     "tenacity": "tenacity",
     "tortoise": "tortoise-orm",
     "urlextract": "urlextract",
+    "websockets": "websockets",
     "werkzeug": "werkzeug",
     "yaml": "PyYAML",
     "dateutil": "python-dateutil",
