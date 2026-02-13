@@ -53,7 +53,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
     await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
-    await discordbot.load_extension("alttprbot_discord.cogs.doorsmw")
+    # await discordbot.load_extension("alttprbot_discord.cogs.doorsmw")  # Phase B: Multiworld deprecation
     # await discordbot.load_extension("alttprbot_discord.cogs.admin")
     await discordbot.load_extension("alttprbot_discord.cogs.racer_verification")
 
