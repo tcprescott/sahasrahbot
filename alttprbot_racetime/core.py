@@ -5,7 +5,6 @@ from functools import partial
 
 import aiohttp
 from racetime_bot import Bot
-import websockets
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt, wait_exponential)
 
@@ -107,24 +106,12 @@ class SahasrahBotRaceTimeBot(Bot):
             raise e.last_attempt._exception from e
 
     async def create_handler(self, race_data):
-        connect_kwargs = {
-            'additional_headers': {
+        ws_conn = await self.http.ws_connect(
+            self.ws_uri(race_data.get('websocket_bot_url')),
+            headers={
                 'Authorization': 'Bearer ' + self.access_token,
             },
-        }
-
-        try:
-            ws_version = int(websockets.version.version.split('.')[0])
-        except (AttributeError, TypeError, ValueError):
-            ws_version = 14
-        if ws_version < 14:
-            connect_kwargs['extra_headers'] = connect_kwargs.pop('additional_headers')
-
-        if self.ssl_context is not None and self.racetime_secure:
-            connect_kwargs['ssl'] = self.ssl_context
-        ws_conn = websockets.connect(
-            self.ws_uri(race_data.get('websocket_bot_url')),
-            **connect_kwargs,
+            ssl=self.ssl_context if self.ssl_context is not None else self.racetime_secure,
         )
 
         race_name = race_data.get('name')

@@ -27,7 +27,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     def __init__(self, bot=None, **kwargs):
         self.bot = bot
-        super().__init__(**kwargs)
+        super().__init__(bot=bot, **kwargs)
         self.seed_rolled = False
 
     async def begin(self):
