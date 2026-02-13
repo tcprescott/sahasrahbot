@@ -4,6 +4,7 @@
 
 ## Current Focus
 
+- **Modernization Program Bootstrap (Phase 0)**: Executing program bootstrap per [docs/plans/modernization_meta_execution_plan_ai_accelerated.md](../plans/modernization_meta_execution_plan_ai_accelerated.md) — tracker structure, evidence templates, and flag inventory complete. Next: assign owners and run first compatibility evidence cycle.
 - **Discord Bot Refactor**: Implementing the modernization plan defined in [docs/plans/discord_refactor.md](../plans/discord_refactor.md).
 - **Documentation Sprint**: Generating comprehensive developer documentation from codebase analysis.
 
@@ -54,10 +55,15 @@
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
 - **Completed Phase 0/1 of tournament registry config rollout** (`plans/tournament_registry_config_rollout_plan.md`): Added `AVAILABLE_TOURNAMENT_HANDLERS` catalog, `config/tournaments.yaml` schema, `registry_loader.py` with validation, dual-path runtime switch with `TOURNAMENT_CONFIG_ENABLED` flag, startup logging, and validation tooling (`helpers/validate_tournament_config.py`, `docs/guides/tournament_registry_config_guide.md`) (2026-02-12).
+- **Implemented MVP anonymous telemetry pipeline** with privacy-preserving storage, no-op/DB-backed services, bounded queue, fail-open behavior, retention purge helper, usage report helper, and initial Discord generator instrumentation (2026-02-12).
+- **WS4 Phase A/B: Discord Multiworld Deprecation** — Completed soft deprecation messaging and functional removal for multiworld commands. Phase A added deprecation notices to `smmulti` and `doorsmw` commands. Phase B commented out extension loads in `bot.py` to prevent command registration. Commands no longer callable; non-multiworld flows unaffected (2026-02-12).
+- **Implemented Phase A/B of Discord role-assignment deprecation (WS4):** Added deprecation messaging to all reaction-role and voice-role command surfaces, implemented runtime disablement flag `DISCORD_ROLE_ASSIGNMENT_ENABLED` (default True for backward compatibility), added conditional extension loading, preserved startup and non-role command behavior. Rollback procedure and compatibility validation documented in `docs/guides/discord_role_assignment_deprecation_runbook.md` (2026-02-12).
+- **Phase 0 Bootstrap (Week 0–1) completed:** Created modernization execution tracker (`plans/modernization_execution_tracker.md`) mapping WS1–WS5 workstreams to gate milestones with 30/60/90-day targets; added compatibility evidence packet template (`guides/compatibility_evidence_packet_template.md`) aligned to validation runbook; added feature-flag inventory (`guides/feature_flag_inventory.md`) with owner+sunset enforcement; updated MASTER_INDEX.md and active_state.md (2026-02-12).
 
 ## Upcoming Work
 
-1. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
+1. **WS4 Phase C: Discord Multiworld Data Cleanup** — Remove multiworld ORM models and apply schema migrations to drop tables (next release).
+2. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
 2. **Create `GuildConfigService`**: Replace monkey-patching pattern (Phase 2).
 3. **Channel ID Migration**: Convert config string names to IDs (Phase 3).
 4. Review and refine generated documentation.
@@ -68,10 +74,12 @@
 9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
 10. Implement role-assignment deprecation rollout per `plans/discord_role_assignment_deprecation_removal_plan.md`.
 11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
-12. Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).
+12. ~~Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).~~ ✅ **COMPLETED**
 13. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
 14. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix with owners.
-15. Bootstrap modernization execution tracker from `plans/modernization_meta_execution_plan_ai_accelerated.md` (owners, 30/60/90 deliverables, and initial WS1/WS2/WS3 bounded slices).
+15. Define owners for delivery, validation, and rollback per workstream in `plans/modernization_execution_tracker.md`.
+16. Create AI task templates for audits, migrations, and validation packets.
+17. Start Phase 1 with three bounded implementation slices: Authlib scaffolding (no traffic switch), telemetry service/table scaffolding, startup security validation checks.
 
 ## Open Why Questions
 

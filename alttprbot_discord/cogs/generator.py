@@ -1,5 +1,6 @@
 import io
 import json
+import time
 
 import discord
 import pyz3r
@@ -14,6 +15,7 @@ from alttprbot.alttprgen.randomizer import smdash, z2r
 from alttprbot.alttprgen.spoilers import (generate_spoiler_game,
                                           generate_spoiler_game_custom)
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.util.telemetry import record_event
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 # from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
@@ -57,20 +59,78 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             allow_quickswap: str = "yes",
             branch: str = "live",
     ):
+        start_time = time.time()
         await interaction.response.defer()
-        seed = await generator.ALTTPRPreset(preset).generate(
-            hints=hints == "yes",
-            spoilers="off" if race == "yes" else "on",
-            tournament=race == "yes",
-            allow_quickswap=allow_quickswap == "yes",
-            branch=branch,
+        
+        # Record invocation
+        await record_event(
+            event_name="discord.generator.preset.invoke",
+            surface="discord",
+            feature="generator",
+            action="invoke",
+            status="ok",
+            guild_id=interaction.guild_id if interaction.guild else None,
         )
-        if not seed:
-            raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
-        embed = await seed.embed(emojis=self.bot.emojis)
-        embed.insert_field_at(0, name="Preset", value=preset, inline=False)
-
-        await interaction.followup.send(embed=embed)
+        
+        try:
+            seed = await generator.ALTTPRPreset(preset).generate(
+                hints=hints == "yes",
+                spoilers="off" if race == "yes" else "on",
+                tournament=race == "yes",
+                allow_quickswap=allow_quickswap == "yes",
+                branch=branch,
+            )
+            if not seed:
+                raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
+            
+            embed = await seed.embed(emojis=self.bot.emojis)
+            embed.insert_field_at(0, name="Preset", value=preset, inline=False)
+            
+            await interaction.followup.send(embed=embed)
+            
+            # Record success
+            duration_ms = int((time.time() - start_time) * 1000)
+            await record_event(
+                event_name="discord.generator.preset.success",
+                surface="discord",
+                feature="generator",
+                action="success",
+                status="ok",
+                provider="alttpr",
+                guild_id=interaction.guild_id if interaction.guild else None,
+                duration_ms=duration_ms,
+            )
+            
+        except SahasrahBotException as e:
+            # Record failure
+            duration_ms = int((time.time() - start_time) * 1000)
+            await record_event(
+                event_name="discord.generator.preset.failure",
+                surface="discord",
+                feature="generator",
+                action="failure",
+                status="error",
+                provider="alttpr",
+                guild_id=interaction.guild_id if interaction.guild else None,
+                duration_ms=duration_ms,
+                error_type="invalid_preset",
+            )
+            raise
+        except Exception as e:
+            # Record unexpected failure
+            duration_ms = int((time.time() - start_time) * 1000)
+            await record_event(
+                event_name="discord.generator.preset.failure",
+                surface="discord",
+                feature="generator",
+                action="failure",
+                status="error",
+                provider="alttpr",
+                guild_id=interaction.guild_id if interaction.guild else None,
+                duration_ms=duration_ms,
+                error_type="unexpected_error",
+            )
+            raise
 
     @app_commands.command(
         description="Generates an ALTTP Randomizer game on https://alttpr.com using a custom yaml provided by the user")

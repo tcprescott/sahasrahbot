@@ -256,31 +256,35 @@ class SMMulti(commands.Cog):
             self.persistent_views_added = True
 
     @app_commands.command(
-        description="Stub for the old multiworld command.  This command has been replaced by `/smmulti`.")
+        description="[DEPRECATED] Multiworld hosting has been retired.")
     async def multiworld(self, interaction: discord.Interaction):
-        await interaction.response.send_message("This command has been replaced by `/smmulti`.", ephemeral=True)
+        embed = discord.Embed(
+            title="⚠️ Feature Retired",
+            description=(
+                "Discord multiworld hosting has been retired and is no longer available.\n\n"
+                "**Timeline:** This feature will be fully removed in the next bot release.\n\n"
+                "**Alternative:** No in-bot replacement is planned. "
+                "Please use other multiworld hosting solutions outside of Discord.\n\n"
+                "Other bot features like seed generation (`/generate`), tournaments, and community commands remain fully supported."
+            ),
+            color=discord.Color.orange()
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @app_commands.command(description="Creates a multiworld session for SM and SMZ3.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def smmulti(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title='Multiworld Game',
+            title="⚠️ Feature Retired",
             description=(
-                'A new multiworld game has been initiated, click "Join" to join.  Click "Leave" to leave.\n'
-                f'When everyone is ready the game creator, {interaction.user.mention}, can click "Start" to create a session.\n'
-                f'The game creator can click "Cancel" to cancel this game.'
+                "Discord multiworld hosting has been retired and is no longer available.\n\n"
+                "**Timeline:** This feature will be fully removed in the next bot release.\n\n"
+                "**Alternative:** No in-bot replacement is planned. "
+                "Please use other multiworld hosting solutions outside of Discord.\n\n"
+                "Other bot features like seed generation (`/generate`), tournaments, and community commands remain fully supported."
             ),
-            color=discord.Color.dark_blue()
+            color=discord.Color.orange()
         )
-        embed.add_field(name="Owner", value=interaction.user.mention, inline=False)
-        embed.add_field(name="Status", value="👍 Open for entry", inline=False)
-        embed.add_field(name="Randomizer", value="Not yet chosen", inline=False)
-        embed.add_field(name="Preset", value="Not yet chosen", inline=False)
-        embed.add_field(name="Players", value="No players yet.", inline=False)
-
-        await interaction.response.send_message(embed=embed)
-        original_message = await interaction.original_response()
-        await models.Multiworld.create(message_id=original_message.id, owner_id=interaction.user.id, status="STARTED")
-        await original_message.edit(embed=embed, view=MultiworldSignupView())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 def set_embed_field(name: str, value: str, embed: discord.Embed) -> discord.Embed:

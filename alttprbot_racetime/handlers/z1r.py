@@ -4,27 +4,33 @@ from alttprbot.alttprgen.randomizer.z1r import roll_z1r
 from .core import SahasrahBotCoreHandler
 
 PRESETS = {
-    'abns_swiss': 'J780EYa2ywOnCpVR1VGodM1jVyu!o5F',
-    'abns_bracket': 'PPcIk!s3aupL7C41f6AhZ3mi8IwACwv',
-    'abns_elite8': 'PPcIk!s3aupL9yxEvapydBFdC9X8E2A',
-    'consternation': 'ItRtYLs2xToBiCHEvfcY6eRIcxG!VfM',
-    '2019brackets': 'ItRtYLs2xC69xBrSRTzj6AW6Ja0fcbv',
-    'rr2024': 'NuJS0dpRgVdyn25HEl8NnSW7WSfLf9v2M',
-    'sgl24': '9FtgnrOp3JvLxvq1Bf4xtluLDpuXvRQm2',
-    'bettypls': 'EOYppQG7Q8X5I1tNsFH8R!jOlpTT3x1tx',
-    'excavator': 'voSNknIvGu68ic41GpP4kXSjCqtAN2kNq',
-    'jesscherk': 'ItRtYM3auE3OVFlt6lBQK7khitoHMaU',
-    'magsrush': 'NNxPDPcF9p56THwiFFsHmx7x8Qod2km41',
-    'babysfirsthdn': 'Iv4gW3YU!vlmAtgUOMAM49fslZQS0ed',
-    'walkitin': '6xEziMRCF!vbiyFjZTUYKxi1V80R30fqo',
-    'swordlessplus': 'IVTU8pFHFatE6exqwxuIWuC9GkDFxAAk1',
-    'randomforce': 'M16vlklqs4RtcAYYE4Pqo8CAB1a5HWing3',
-    'rr2025': '10i40zbwGIgFO4kghzxmLVbzOk0poTEWClIh',
-    'sgl25online': '5JOfkHFLCIuh7WxM4mIYp7TuCHxRYQdJcty',
-    'power': 'D6jolIWI0Br9u!t9aygyjQhVfkvxLb3ya',
-    'courage': '1Ni1dDJdXBVB!xrm4SESnEF0jo03UtpBuN',
-    'wisdom': 'ItRtYLs2xZhsICVJJDBZf8Ttf0vZWn3',
-    'sglirl': '5K!ELDXj35eUlQNR4XAhcL18nJBPgbC4Hpw'
+    'abns22_swiss': 'oIbnPfPb01HJEAN8LBIMmlBWz!gGeqNjpYphk',
+    'abns22_bracket': '143oNtDD4RQLqGPLpaSfjC2AnRmLOpqFAW5QT4',
+    'abns22_top8': '143oNtDD4RQLrJy5BfGRUWmqGpjvyjX29Xj97o',
+    'consternation': 'oIbnPfPb01Hll3D29Bc2!etrojQOSjJQZUJ3A',
+    '2019brackets': 'oIbnPfPaymqfyH4t7pgvRD4cP1H1I7sPTblX9',
+    'rr2024': 'oIbq2JttN3ae9PzaCJOsVpXedaDD1C2B1yAt8',
+    'sgl24': 'oIbnPfPb01HmodtgCWCvSuAbuHPqZRIVKCvKj',
+    'bettypls': 'q9yBZxHDLh6lovXqLgSNrmEieda2tqJLXZUEo',
+    'excavator': 'hvFx!4yyHzSQ4RIGBlC82EgnMP0hKMULyMo0WP',
+    'jesscherk': 'oIbnPg!o7RsFZtKnEc9AAI8WI7bpnQVS16uNU',
+    'magsrush': 'oIbnPfPb01Hll3F1P2W2uMZOcOJWr!jS05L0A',
+    'babysfirsthdn': 'oVeI512duFh1JQJ6dol1rhfGazsxVWEBeazWF',
+    'walkitin': 'oIbnPfPaymqfyH3OJhgiKHew0nr6Guj6lqHtv',
+    'swordlessplus': 'oIbnPfPb01Hns9ilYf3aXrUwNv7SZU05a56UV',
+    'randomforce': 'oIbnPfPazW!1troLaKovLCWdzL0Ech79PCP7x',
+    'rr2025': 'CKnGZ6u7XaVW!hJ!sGTvkRim82t8PvIW1BEycZo',
+    'sgl25online': '12TDBJOu7zgjkBGTDwHViA9wS3IpdJcvhCVEtu9',
+    'power': '143oNtDD4PAvBt5G8xyCFu5kwp7tS8vUBVpiZY',
+    'courage': 'oIbnQLMCpyScZbUVFbgpGKPLsHFflaoYKIxoA',
+    'wisdom': 'oIbnPfPb0mR7ggY12zwI0QNIY620UnhU8kiC3',
+    'sgl25ip': '12TDBJOu7zgjkBGTDsoDP5Hg7jnJNmTUCh4wT9X',
+    'ttp4rp': '24hJoDaoq92qaumIfio4Qq8LtfU0Xt8tpG3Iafo',
+    'ttp4hopla': 'oIbnRjuMUKqwdnOXzOMO7PuDtwAvU3boJnaXW',
+    'ttp4consternation': 'oIbnPfPb01Hll3D295IGDxxjR4UwfEok8P4MD',
+    'afbns_swiss': '1K9hKZCQamJvAprO0CLKqHgZk0MR1RqiE9bfe9xv',
+    'afbns_bracket': '12V4XiZA!b3mWgwigt9JQcwZSUlpadoHsJNny3J',
+    'afbns_top8': '12V4XiZA!b3mWh!GQFcZr9rUkzjsoaFlYFS64EU'
 }
 
 class GameHandler(SahasrahBotCoreHandler):
@@ -39,33 +45,27 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.roll_game(flags, message)
 
-    # Individual commands for these Triforce Triple Play Season 3 flags as requested.
-    async def ex_power(self, args, message):
-        await self.ex_race(['power'], message)
+    # Individual commands for these Triforce Triple Play Season 4 flags as requested.
+    async def ex_ttp4rp(self, args, message):
+        await self.ex_race(['ttp4rp'], message)
     
-    async def ex_courage(self, args, message):
-        await self.ex_race(['courage'], message)
+    async def ex_ttp4hopla(self, args, message):
+        await self.ex_race(['ttp4hopla'], message)
 
-    async def ex_wisdom(self, args, message):
-        await self.ex_race(['wisdom'], message)
+    async def ex_ttp4consternation(self, args, message):
+        await self.ex_race(['ttp4consternation'], message)
 
-    async def ex_ttp3(self, args, message):
-        # Choose a Triforce Triple Play Season 3 flag string at random.
+    async def ex_ttp4(self, args, message):
+        # Choose a Triforce Triple Play Season 4 flag string at random.
         flag_choice = random.randint(1, 3)
         
         if flag_choice == 1:
-            await self.ex_race(['power'], message)
+            await self.ex_race(['ttp4rp'], message)
         elif flag_choice == 2:
-            await self.ex_race(['courage'], message)
+            await self.ex_race(['ttp4hopla'], message)
         else:
-            await self.ex_race(['wisdom'], message)
+            await self.ex_race(['ttp4consternation'], message)
 
-    async def ex_sglonline(self, args, message):
-        await self.ex_race(['sgl25online'], message)
-
-    async def ex_sglirl(self, args, message):
-        await self.ex_race(['sglirl'], message)
-    
     async def ex_race(self, args, message):
         if await self.is_locked(message):
             return
