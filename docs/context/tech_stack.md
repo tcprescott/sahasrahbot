@@ -16,6 +16,7 @@
 | `discord.py` | `*` (latest) | Discord bot framework (v2.x with slash commands) |
 | `quart` | `*` (latest) | Async web framework (Flask-compatible) |
 | `Authlib` | `*` | Discord OAuth2 client framework for Quart API authentication flows |
+| `pydantic-settings` | `*` | Canonical environment-based runtime configuration provider |
 | `racetime-bot` | pinned commit `48afdd4` | RaceTime.gg bot SDK (custom fork by tcprescott) |
 | `tortoise-orm` | `*` | Async ORM for MySQL |
 | `aerich` | `>=0.5.5` | Database migration tool for Tortoise ORM |
@@ -47,15 +48,6 @@
 | Library | Version | Purpose |
 |---------|---------|---------|
 | `aiocache` | `>=0.11.1` | Async in-memory caching (SimpleMemoryCache) |
-
-## Google Integration
-
-| Library | Version | Purpose |
-|---------|---------|---------|
-| `gspread-asyncio` | `*` | Async Google Sheets client |
-| `gspread` | `*` | Direct gspread exception classes and APIs used by tournament integration |
-| `oauth2client` | `*` | Google OAuth2 service account auth |
-| `google-api-python-client` | `*` | Google APIs client library |
 
 ## Data Processing
 
@@ -122,7 +114,7 @@
 
 ## Configuration / Runtime Contracts
 
-- Configuration behavior is defined in `config.py` and consumed as module-level constants across subsystems.
+- Configuration behavior is defined in `config.py` via `pydantic-settings` and consumed as module-level constants across subsystems.
 - API session secret uses `APP_SECRET_KEY` (currently defaulting to empty string if unset).
 - API Discord OAuth uses Authlib-only runtime wiring (no dual-path selector).
 - RaceTime per-category OAuth credentials are dynamically resolved using category-derived names:
@@ -151,5 +143,4 @@
 | racetime.gg | OAuth2 client credentials | Race room management |
 | alttprleague.com | None | League mode/preset data |
 | alttprladder.com | None | Racer verification |
-| Google Sheets API | Service account | Results recording |
 | Discord API | Bot token + OAuth2 | Bot interactions + web auth |

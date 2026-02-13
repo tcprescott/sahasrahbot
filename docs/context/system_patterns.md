@@ -107,7 +107,7 @@ User Command → Preset Loader (YAML/DB) → Game-Specific Generator → Externa
 
 ### Tournament Match Lifecycle
 ```
-SpeedGaming Schedule → Room Creation (RaceTime.gg) → Player Invites → Seed Roll → Race → Results → Google Sheets
+SpeedGaming Schedule → Room Creation (RaceTime.gg) → Player Invites → Seed Roll → Race → Results persisted in application database
 ```
 
 ### Async Tournament Flow
@@ -134,7 +134,6 @@ Admin Creates Tournament → Seeds Added to Pools → Players Start Runs via Dis
 | SpeedGaming | REST API | Tournament scheduling |
 | RaceTime.gg | WebSocket + REST | Race room management |
 | BingoSync | Web scraping | Bingo room creation |
-| Google Sheets | REST API | Results recording |
 | AWS S3 | SDK | Spoiler log / patch storage |
 | Discord | Gateway + REST | Bot interactions |
 | Discord Bad Domains Feed | HTTPS JSON | Moderation domain-hash denylist updates |

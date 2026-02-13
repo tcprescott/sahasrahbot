@@ -86,19 +86,3 @@ async def update_tournament_race_status(srl_id: int, status="STARTED"):
         'UPDATE tournament_results SET status = %s WHERE srl_id = %s', [
             status, srl_id]
     )
-
-
-async def get_unrecorded_races():
-    results = await orm.select(
-        'SELECT * from tournament_results where `written_to_gsheet` is NULL;'
-    )
-    return results
-
-
-async def mark_as_written(srl_id):
-    key = f'tournament_race_{srl_id}'
-    await orm.execute(
-        'UPDATE tournament_results SET written_to_gsheet=1 where srl_id=%s;',
-        [srl_id]
-    )
-    await CACHE.delete(key)

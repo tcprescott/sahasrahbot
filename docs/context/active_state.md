@@ -65,6 +65,9 @@
 - **Completed Discord OAuth Authlib cutover (WS1):** removed Quart-Discord runtime usage and dual-path selector, migrated all API blueprints/decorators to Authlib helper imports, and removed legacy OAuth dependencies from `pyproject.toml` (2026-02-12).
 - Documented import-backed root config contract in `docs/guides/config_constants_inventory.md`, including 40 statically-read constants and dynamic RaceTime credential key pattern; aligned `config.py.example` placeholders to match static runtime usage (2026-02-12).
 - Added fail-fast startup config contract validation via `alttprbot/util/config_contract.py`, wired in `sahasrahbot.py` before RaceTime bot import, plus standalone checker `helpers/validate_runtime_config.py` for local/CI preflight (2026-02-12).
+- Migrated root runtime configuration provider to `pydantic-settings` in `config.py` while preserving module-level `config.<KEY>` compatibility, dynamic uppercase env passthrough, and existing validation helper flow (2026-02-12).
+- Added legacy-config conversion helper `helpers/convert_legacy_config_to_env.py` to transform historical Python constant config files into dotenv format for `pydantic-settings` adoption (2026-02-12).
+- Removed Google Sheets integration from tournament runtime flow (race recording task, sheet credential utility, and Google dependencies/config keys) and retained database-only result tracking (2026-02-12).
 
 ## Upcoming Work
 
@@ -81,6 +84,7 @@
 11. Rotate/revoke any previously committed secrets and finish operational `.env` hardening.
 12. Review and refine generated documentation, including `update_docs.py` target alignment with `docs/user-guide/`.
 13. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.
+14. Validate production `.env`/environment completeness against the new `pydantic-settings` config surface before next deployment restart.
 
 ## Open Why Questions
 

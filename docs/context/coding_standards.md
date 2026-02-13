@@ -118,7 +118,8 @@ await orm.execute("INSERT INTO table (col) VALUES (%s)", [value])
 
 ## Configuration
 
-- Configuration is provided through `config.py` as module-level constants consumed across the codebase.
+- Configuration is provided through `config.py` backed by `pydantic-settings`, exported as module-level constants consumed across the codebase.
+- Runtime values come from environment variables (and optional `.env`) via the shared `Settings` model in root `config.py`.
 - Per-guild config stored in database via `guild.config_get()`/`guild.config_set()`
 - Config values cached with `aiocache`
 - `APP_SECRET_KEY` currently permits empty default in config model.

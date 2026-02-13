@@ -17,5 +17,4 @@ class SMWDETournament(TournamentRace):
                 guild.get_role(753742980820631562),
             ],
             lang='de',
-            gsheet_id='1BrkmhNPnpjNUSUx5yGrnm09XbfAFhYDsi-7-fHp62qY',
         )

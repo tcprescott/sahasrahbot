@@ -14,9 +14,6 @@ with open('config.py', 'a') as settings_file:
         if key == 'DEBUG':
             value = value == 'true'
 
-        if key == 'gsheet_api_oauth':
-            continue
-
         if key == 'SgApiEndpoint':
             key = 'SG_API_ENDPOINT'
 

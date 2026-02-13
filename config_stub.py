@@ -1,28 +1,19 @@
-"""
-Stub config module for telemetry development.
-In production, config.py is loaded from environment variables.
-"""
-import os
+"""Compatibility shim that re-exports config values from the primary settings module."""
 
-# Database
-DB_HOST = os.getenv('DB_HOST', 'localhost')
-DB_PORT = os.getenv('DB_PORT', '3306')
-DB_NAME = os.getenv('DB_NAME', 'sahasrahbot')
-DB_USER = os.getenv('DB_USER', 'root')
-DB_PASS = os.getenv('DB_PASS', '')
+import config
 
-# Telemetry settings
-TELEMETRY_ENABLED = os.getenv('TELEMETRY_ENABLED', 'false').lower() == 'true'
-TELEMETRY_SAMPLE_RATE = float(os.getenv('TELEMETRY_SAMPLE_RATE', '1.0'))
-TELEMETRY_RETENTION_DAYS = int(os.getenv('TELEMETRY_RETENTION_DAYS', '30'))
-TELEMETRY_HASH_SALT = os.getenv('TELEMETRY_HASH_SALT', '')
-TELEMETRY_QUEUE_SIZE = int(os.getenv('TELEMETRY_QUEUE_SIZE', '1000'))
+DB_HOST = config.DB_HOST
+DB_PORT = config.DB_PORT
+DB_NAME = config.DB_NAME
+DB_USER = config.DB_USER
+DB_PASS = config.DB_PASS
 
-# RaceTime
-RACETIME_URL = os.getenv('RACETIME_URL', 'https://racetime.gg')
+TELEMETRY_ENABLED = config.TELEMETRY_ENABLED
+TELEMETRY_SAMPLE_RATE = config.TELEMETRY_SAMPLE_RATE
+TELEMETRY_RETENTION_DAYS = config.TELEMETRY_RETENTION_DAYS
+TELEMETRY_HASH_SALT = config.TELEMETRY_HASH_SALT
+TELEMETRY_QUEUE_SIZE = config.TELEMETRY_QUEUE_SIZE
 
-# Sentry (optional)
-SENTRY_URL = os.getenv('SENTRY_URL', None)
-
-# Debug
-DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
+RACETIME_URL = config.RACETIME_URL
+SENTRY_URL = config.SENTRY_URL
+DEBUG = config.DEBUG

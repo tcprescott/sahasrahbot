@@ -69,7 +69,6 @@ class Tournament(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.create_races.start()
-        self.record_races.start()
         self.week_races.start()
         self.find_races_with_bad_discord.start()
         self.persistent_views_added = False
@@ -135,23 +134,9 @@ class Tournament(commands.Cog):
             if messages and event_data.audit_channel:
                 await event_data.audit_channel.send("<@185198185990324225>\n\n" + "\n".join(messages))
 
-    @tasks.loop(minutes=0.25 if config.DEBUG else 15, reconnect=True)
-    async def record_races(self):
-        try:
-            logging.info("recording tournament races")
-            await tournaments.race_recording_task()
-            logging.info("done recording")
-        except Exception:
-            logging.exception("error recording")
-
     @create_races.before_loop
     async def before_create_races(self):
         logging.info('tournament create_races loop waiting...')
-        await self.bot.wait_until_ready()
-
-    @record_races.before_loop
-    async def before_record_races(self):
-        logging.info('tournament record_races loop waiting...')
         await self.bot.wait_until_ready()
 
     @week_races.before_loop

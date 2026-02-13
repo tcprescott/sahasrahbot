@@ -27,14 +27,10 @@ sentry-sdk = "*"
 emoji = "*"
 dataclasses-json = "*"
 marshmallow = "*"
-gspread-asyncio = "*"
-gspread = "*"
 PyYAML = "*"
 html2markdown = "*"
 beautifulsoup4 = "*"
 urlextract = "*"
-oauth2client = "*"
-google-api-python-client = "*"
 html5lib = "*"
 shortuuid = "*"
 python-slugify = "*"
@@ -48,6 +44,7 @@ jishaku = "*"
 pyrankvote = "*"
 racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/48afdd4691f0f329eebb5dd33b1cbcf42921e980.zip"}
 markdown = "^3.4.3"
+pydantic-settings = "*"
 
 
 [tool.poetry.group.dev.dependencies]
