@@ -18,7 +18,7 @@
 - The `reverify_racer` background task in the `racer_verification` cog is currently disabled via comment.
 - The `schedule` and `user` blueprints in the web API are DEBUG-only stubs.
 - **Architecture Debt**: `guild_config` monkey-patching and name-based channel config need removal.
-- **Resilience**: `daily` task lacks retries for API failures.
+- **Operational Validation Pending**: Daily challenge retry/thread-failure hardening shipped, but production compatibility evidence capture is still pending.
 - **Runtime Security Debt**: `APP_SECRET_KEY` defaults to empty string.
 - **Startup Reliability Follow-up**: coordinated graceful shutdown is now implemented, but subsystem-level startup policies (strict fail-fast vs degraded mode) still need explicit owner-confirmed criteria.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
@@ -71,6 +71,7 @@
 - Drafted implementation-ready migration plan for replacing the forked RaceTime SDK dependency with official upstream package while preserving 1:1 behavior across RaceTime handlers, tournament integrations, API-injected commands, and unlisted-room recovery (`plans/racetime_bot_official_migration_plan.md`) (2026-02-12).
 - Started execution of RaceTime SDK migration: added Phase 0 parity checklist artifact, introduced RaceTime handler compatibility helper, refactored RaceTime bot core toward official-sdk-compatible transport/handler tracking contract, updated API command handler lookup to compatibility helper, and switched `pyproject.toml` dependency to official `racetime-bot` package (2026-02-12).
 - Implemented centralized signal-aware graceful shutdown for bot runtime: entrypoint now coordinates SIGINT/SIGTERM shutdown, explicitly stops Discord/Audit/RaceTime subsystems, cancels service tasks safely, and closes database connections to reduce termination-time exception noise (2026-02-13).
+- Fixed Discord daily challenge reliability bugs in `alttprbot_discord/cogs/daily.py`: corrected dedupe DB check, added bounded retries for daily hash/seed retrieval, isolated thread creation from send failures, and added safer hash/thread-name handling (2026-02-13).
 
 ## Upcoming Work
 
