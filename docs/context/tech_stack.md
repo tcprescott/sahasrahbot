@@ -130,6 +130,12 @@
 - RaceTime per-category OAuth credentials are dynamically resolved using category-derived names:
 	- `RACETIME_CLIENT_ID_<CATEGORY_SLUG_UPPER_NO_DASH>`
 	- `RACETIME_CLIENT_SECRET_<CATEGORY_SLUG_UPPER_NO_DASH>`
+- **Telemetry configuration** (added 2026-02-12):
+	- `TELEMETRY_ENABLED` (bool, default `false`) — Enable/disable anonymous telemetry
+	- `TELEMETRY_SAMPLE_RATE` (float, default `1.0`) — Sampling rate (0.0 to 1.0)
+	- `TELEMETRY_RETENTION_DAYS` (int, default `30`) — Days to retain telemetry data
+	- `TELEMETRY_HASH_SALT` (string, required if enabled) — Salt for guild ID hashing
+	- `TELEMETRY_QUEUE_SIZE` (int, default `1000`) — Max in-memory queue size
 
 ## External APIs Consumed
 
