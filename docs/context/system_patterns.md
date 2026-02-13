@@ -67,6 +67,23 @@ The Quart API uses blueprints to organize routes by feature (presets, tournament
 ### Preset-Driven Generation
 Randomizer seeds are generated via a preset system. `SahasrahBotPresetCore` loads YAML presets (from disk or database) and delegates to game-specific subclasses (`ALTTPRPreset`, `SMPreset`, `SMZ3Preset`, etc.).
 
+### Provider Reliability Contract (Phase 1 Complete)
+Seed providers now support a shared execution contract for consistent reliability:
+- **Shared wrapper** (`alttprbot/alttprgen/provider_wrapper.py`) enforces:
+  - 60-second timeout per attempt
+  - 3-attempt exponential retry policy (1s, 2s backoff)
+  - Structured logging for observability
+- **Normalized exception taxonomy** (`alttprbot/alttprgen/provider_exceptions.py`):
+  - `SeedProviderTimeoutError` - timeout exceeded
+  - `SeedProviderUnavailableError` - network/5xx errors
+  - `SeedProviderRateLimitError` - HTTP 429 responses
+  - `SeedProviderInvalidRequestError` - 4xx validation errors
+  - `SeedProviderResponseFormatError` - parsing failures
+- **Canonical response object** (`alttprbot/alttprgen/provider_response.py`) standardizes provider outputs with metadata for audit
+- **Provider adapters** (`alttprbot/alttprgen/provider_adapters.py`) wrap legacy helper providers to use the shared contract
+  - SMDashProvider adapter implemented as Phase 1 validation
+  - Legacy compatibility wrappers maintain backward compatibility during rollout
+
 ### Guild Config Monkey-Patching
 `discord.Guild` is monkey-patched with `config_get/set/delete/list` methods backed by database + `aiocache` in-memory caching.
 
