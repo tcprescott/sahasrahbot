@@ -1,0 +1,40 @@
+"""
+SahasrahBot Configuration (Example)
+
+This file shows the expected configuration structure.
+Copy to config.py and populate with real values from environment variables.
+
+DO NOT commit config.py - it contains secrets and is gitignored.
+"""
+
+import os
+
+# Discord Bot Configuration
+DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN', '')
+DISCORD_CLIENT_ID = int(os.environ.get('DISCORD_CLIENT_ID', '0'))
+DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET', '')
+
+# Web API Configuration
+APP_SECRET_KEY = os.environ.get('APP_SECRET_KEY', '')  # Session secret - MUST be set in production
+APP_URL = os.environ.get('APP_URL', 'http://localhost:5001')  # Base URL for OAuth redirects
+
+# Database Configuration
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = int(os.environ.get('DB_PORT', '3306'))
+DB_USER = os.environ.get('DB_USER', 'sahasrahbot')
+DB_PASS = os.environ.get('DB_PASS', '')
+DB_NAME = os.environ.get('DB_NAME', 'sahasrahbot')
+
+# Error Tracking (Optional)
+SENTRY_URL = os.environ.get('SENTRY_URL', '')
+
+# Debug Mode
+DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
+
+# OAuth Implementation Selection (Phase 1: Authlib Migration)
+# When False (default): Use Quart-Discord (legacy)
+# When True: Use Authlib (new implementation, Phase 1+)
+USE_AUTHLIB_OAUTH = os.environ.get('USE_AUTHLIB_OAUTH', 'false').lower() == 'true'
+
+# Additional configuration omitted for brevity
+# See existing code for complete configuration requirements

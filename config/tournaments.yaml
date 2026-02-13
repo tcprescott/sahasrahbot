@@ -1,0 +1,79 @@
+# Tournament Registry Configuration
+# This file controls which tournament handlers are active for each profile.
+# Schema version: 1
+
+version: 1
+
+profiles:
+  # Debug profile - used when config.DEBUG is True
+  debug:
+    events:
+      - event_slug: test
+        handler: test
+        enabled: true
+        notes: "Test tournament handler for development"
+
+  # Production profile - used when config.DEBUG is False
+  production:
+    events:
+      # Active tournaments
+      - event_slug: alttpr
+        handler: alttpr
+        enabled: true
+        notes: "Main ALTTPR qualifier tournament"
+
+      - event_slug: alttprdaily
+        handler: alttprdaily
+        enabled: true
+        notes: "ALTTPR daily race series"
+
+      - event_slug: smz3
+        handler: smz3
+        enabled: true
+        notes: "SMZ3 weekly race"
+
+      - event_slug: invleague
+        handler: invleague
+        enabled: true
+        notes: "ALTTPR Invitational League"
+
+      - event_slug: alttprleague
+        handler: alttprleague
+        enabled: true
+        notes: "ALTTPR Open League"
+
+      # Seasonal tournaments (disabled by default, enable per season)
+      - event_slug: boots
+        handler: boots
+        enabled: false
+        notes: "ALTTPR CAS Boots Tournament - enable per season"
+
+      - event_slug: nologic
+        handler: nologic
+        enabled: false
+        notes: "ALTTPR No Logic Race - enable per season"
+
+      - event_slug: smwde
+        handler: smwde
+        enabled: false
+        notes: "SMW DE Tournament - enable per season"
+
+      - event_slug: alttprhmg
+        handler: alttprhmg
+        enabled: false
+        notes: "ALTTPR HMG Tournament - enable per season"
+
+      - event_slug: alttprmini
+        handler: alttprmini
+        enabled: false
+        notes: "ALTTPR Mini Tournament - enable per season"
+
+      - event_slug: alttprde
+        handler: alttprde
+        enabled: false
+        notes: "ALTTPR DE Tournament - enable per season"
+
+      - event_slug: smrl
+        handler: smrl
+        enabled: false
+        notes: "SMRL Playoffs - enable per season"
