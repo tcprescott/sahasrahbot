@@ -6,7 +6,7 @@
 
 ## Purpose
 
-This tracker provides a live view of modernization program status across all five workstreams (WS1–WS5), linking concrete plan deliverables to gate milestones and owners.
+This tracker provides a live view of modernization program status across all five workstreams (WS1–WS5), linking concrete plan deliverables to gate milestones and single-developer role hats.
 
 ## Workstream Structure
 
@@ -15,11 +15,11 @@ This tracker provides a live view of modernization program status across all fiv
 **Priority:** Critical  
 **Gate alignment:** A-gate (Phase 1 exit)
 
-| Plan/Component | Owner | Status | Gate Milestone | Notes |
-|----------------|-------|--------|----------------|-------|
-| [Authlib Discord OAuth Migration](authlib_discord_oauth_migration_plan.md) | TBD | Not Started | A-gate: Phase 0/1 scaffolding | Auth stack migration scaffolding |
-| Security hardening actions (vision doc) | TBD | Not Started | A-gate: Insecure defaults blocked | Runtime validation checks |
-| Startup validation/supervision strategy | TBD | Not Started | A-gate: Fail-fast policy defined | Subsystem startup supervision |
+| Plan/Component | Single Owner / Role Hat | Status | Gate Milestone | Notes |
+|----------------|---------------------------|--------|----------------|-------|
+| [Authlib Discord OAuth Migration](authlib_discord_oauth_migration_plan.md) | TBD (single developer) | Not Started | A-gate: Phase 0/1 scaffolding | Auth stack migration scaffolding |
+| Security hardening actions (vision doc) | TBD (single developer) | Not Started | A-gate: Insecure defaults blocked | Runtime validation checks |
+| Startup validation/supervision strategy | TBD (single developer) | Not Started | A-gate: Fail-fast policy defined | Subsystem startup supervision |
 
 **Exit criteria:**
 - Security checks block insecure non-local defaults
@@ -32,10 +32,10 @@ This tracker provides a live view of modernization program status across all fiv
 **Priority:** Critical  
 **Gate alignment:** A-gate (Phase 1 exit)
 
-| Plan/Component | Owner | Status | Gate Milestone | Notes |
-|----------------|-------|--------|----------------|-------|
-| [Anonymous Telemetry & User Stats Plan](anonymous_telemetry_user_stats_plan.md) | TBD | Not Started | A-gate: Baseline telemetry active | Telemetry storage/service scaffolding |
-| [Modernization Compatibility Gate Validation Runbook](modernization_compatibility_gate_validation_runbook.md) | TBD | Active | Phase 0: First evidence cycle | Bi-weekly gate review execution |
+| Plan/Component | Single Owner / Role Hat | Status | Gate Milestone | Notes |
+|----------------|---------------------------|--------|----------------|-------|
+| [Anonymous Telemetry & User Stats Plan](anonymous_telemetry_user_stats_plan.md) | TBD (single developer) | Not Started | A-gate: Baseline telemetry active | Telemetry storage/service scaffolding |
+| [Modernization Compatibility Gate Validation Runbook](modernization_compatibility_gate_validation_runbook.md) | TBD (single developer) | Active | Phase 0: First evidence cycle | Bi-weekly gate review execution |
 
 **Exit criteria:**
 - Baseline telemetry emits success/failure for selected critical flows
@@ -48,11 +48,11 @@ This tracker provides a live view of modernization program status across all fiv
 **Priority:** High  
 **Gate alignment:** B-gate partial (Phase 2 exit)
 
-| Plan/Component | Owner | Status | Gate Milestone | Notes |
-|----------------|-------|--------|----------------|-------|
-| [Discord Refactor](discord_refactor.md) | TBD | Not Started | B-gate: GuildConfigService pilot | Phase 2 guild config service migration |
-| [Tournament Registry Config-Driven Rollout](tournament_registry_config_rollout_plan.md) | TBD | Not Started | B-gate: Config loader active | Config-backed tournament registry |
-| [Seed Provider Reliability Contract Implementation](seed_provider_reliability_implementation_plan.md) | TBD | Not Started | B-gate: Provider wrapper active | Shared provider reliability contract |
+| Plan/Component | Single Owner / Role Hat | Status | Gate Milestone | Notes |
+|----------------|---------------------------|--------|----------------|-------|
+| [Discord Refactor](discord_refactor.md) | TBD (single developer) | Not Started | B-gate: GuildConfigService pilot | Phase 2 guild config service migration |
+| [Tournament Registry Config-Driven Rollout](tournament_registry_config_rollout_plan.md) | TBD (single developer) | Not Started | B-gate: Config loader active | Config-backed tournament registry |
+| [Seed Provider Reliability Contract Implementation](seed_provider_reliability_implementation_plan.md) | TBD (single developer) | Not Started | B-gate: Provider wrapper active | Shared provider reliability contract |
 
 **Exit criteria:**
 - Provider reliability contract active on primary generation paths
@@ -66,11 +66,11 @@ This tracker provides a live view of modernization program status across all fiv
 **Priority:** Medium  
 **Gate alignment:** C-gate trajectory (Phase 3 exit)
 
-| Plan/Component | Owner | Status | Gate Milestone | Notes |
-|----------------|-------|--------|----------------|-------|
-| [Discord Role Assignment Deprecation & Removal](discord_role_assignment_deprecation_removal_plan.md) | TBD | Not Started | C-gate: Deprecation disablement | Role-assignment deprecation path |
-| [Discord Multiworld Deprecation & Removal](discord_multiworld_deprecation_removal_plan.md) | TBD | Not Started | C-gate: Runtime removal | Multiworld command deprecation |
-| Channel name-to-ID config migration | TBD | Not Started | C-gate: Compatibility guards active | Config boundary cleanup |
+| Plan/Component | Single Owner / Role Hat | Status | Gate Milestone | Notes |
+|----------------|---------------------------|--------|----------------|-------|
+| [Discord Role Assignment Deprecation & Removal](discord_role_assignment_deprecation_removal_plan.md) | TBD (single developer) | Not Started | C-gate: Deprecation disablement | Role-assignment deprecation path |
+| [Discord Multiworld Deprecation & Removal](discord_multiworld_deprecation_removal_plan.md) | TBD (single developer) | Not Started | C-gate: Runtime removal | Multiworld command deprecation |
+| Channel name-to-ID config migration | TBD (single developer) | Not Started | C-gate: Compatibility guards active | Config boundary cleanup |
 
 **Exit criteria:**
 - Deprecated command surfaces removed from runtime registration
@@ -84,11 +84,11 @@ This tracker provides a live view of modernization program status across all fiv
 **Priority:** Medium  
 **Gate alignment:** Phase 4+ (sustainment mode)
 
-| Plan/Component | Owner | Status | Gate Milestone | Notes |
-|----------------|-------|--------|----------------|-------|
-| Dependency declaration guard + CI integration | TBD | Not Started | Phase 4: CI enforcement active | CI gate enforcement |
-| Modular boundary tightening | TBD | Not Started | Phase 4: Ongoing | Testability improvements |
-| Repeatable bi-weekly compatibility cycle | TBD | In Progress | Phase 0: First evidence cycle | Gate pass rate tracking |
+| Plan/Component | Single Owner / Role Hat | Status | Gate Milestone | Notes |
+|----------------|---------------------------|--------|----------------|-------|
+| Dependency declaration guard + CI integration | TBD (single developer) | Not Started | Phase 4: CI enforcement active | CI gate enforcement |
+| Modular boundary tightening | TBD (single developer) | Not Started | Phase 4: Ongoing | Testability improvements |
+| Repeatable bi-weekly compatibility cycle | TBD (single developer) | In Progress | Phase 0: First evidence cycle | Gate pass rate tracking |
 
 **Exit criteria:**
 - Gate pass rate and rollback readiness become routine release quality metrics
@@ -108,7 +108,7 @@ This tracker provides a live view of modernization program status across all fiv
 - [x] Feature-flag inventory for dual-path migrations
 - [ ] AI task templates for audits, migrations, and validation packets
 - [ ] First checkpoint packet produced for at least 2 baseline workflows
-- [ ] Owners assigned for delivery, validation, and rollback decisions
+- [ ] Single-developer role mapping recorded for delivery, validation, and rollback decisions
 
 ---
 
@@ -201,16 +201,16 @@ This tracker provides a live view of modernization program status across all fiv
 
 ### Baseline Workflow Matrix (8 workflows)
 
-| # | Workflow | Last Result | Last Evidence Date | Owner | Notes |
-|---|----------|-------------|-------------------|-------|-------|
-| 1 | Discord seed rolling | Not Tested | — | TBD | — |
-| 2 | RaceTime seed rolling | Not Tested | — | TBD | — |
-| 3 | API seed generation endpoint | Not Tested | — | TBD | — |
-| 4 | Discord daily challenge flow | Not Tested | — | TBD | — |
-| 5 | Active tournament lifecycle flow | Not Tested | — | TBD | — |
-| 6 | Tournament registry activation flow | Not Tested | — | TBD | — |
-| 7 | Bot startup and command registration flow | Not Tested | — | TBD | — |
-| 8 | Critical provider failure handling flow | Not Tested | — | TBD | — |
+| # | Workflow | Last Result | Last Evidence Date | Single Owner / Role Hat | Notes |
+|---|----------|-------------|-------------------|---------------------------|-------|
+| 1 | Discord seed rolling | Not Tested | — | TBD (single developer) | — |
+| 2 | RaceTime seed rolling | Not Tested | — | TBD (single developer) | — |
+| 3 | API seed generation endpoint | Not Tested | — | TBD (single developer) | — |
+| 4 | Discord daily challenge flow | Not Tested | — | TBD (single developer) | — |
+| 5 | Active tournament lifecycle flow | Not Tested | — | TBD (single developer) | — |
+| 6 | Tournament registry activation flow | Not Tested | — | TBD (single developer) | — |
+| 7 | Bot startup and command registration flow | Not Tested | — | TBD (single developer) | — |
+| 8 | Critical provider failure handling flow | Not Tested | — | TBD (single developer) | — |
 
 ---
 
@@ -234,15 +234,15 @@ _No regressions currently tracked._
 
 ## Program Governance
 
-### Cadence
-- **Daily async check:** Delivery/validation blockers and risk changes
-- **Weekly planning:** Select next small-batch change set by gate readiness
+### Cadence (Single-Developer Model)
+- **Daily async check:** Re-prioritize personal delivery/validation blockers and risk changes
+- **Weekly planning:** Select next small-batch change set by gate readiness and current capacity
 - **Bi-weekly gate review:** Run full compatibility matrix and publish recommendation
 - **Monthly architecture checkpoint:** Verify boundary drift, dual-path debt, and sunset status
 
 ### Required Artifacts per Bi-Weekly Review
 - Workflow pass/fail matrix (8 baseline workflows)
-- Regression list with owner + target date
+- Regression list with single owner + target date
 - Rollback readiness summary per active workstream
 - Sunset ledger for all temporary compatibility paths
 
@@ -255,7 +255,7 @@ _No regressions currently tracked._
 
 ## Immediate Next Actions
 
-1. Define owners for delivery, validation, and rollback per workstream
+1. Record single-developer role mapping for delivery, validation, and rollback per workstream
 2. Run first compatibility evidence cycle using the existing runbook
 3. Create AI task templates for audits, migrations, and validation packets
 4. Start Phase 1 with three bounded implementation slices:

@@ -2,7 +2,7 @@
 
 > **Status:** Phase A/B Complete (Soft Deprecation + Functional Disablement Path)  
 > **Last Updated:** 2026-02-12  
-> **Owner:** Infrastructure Team
+> **Single Owner:** Maintainer
 
 ## Overview
 

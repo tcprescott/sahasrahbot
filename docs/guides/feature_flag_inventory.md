@@ -2,20 +2,20 @@
 
 > **Status:** Active  
 > **Last updated:** 2026-02-12  
-> **Governing principle:** All dual-path feature flags require owner + sunset date  
+> **Governing principle:** All dual-path feature flags require single owner + sunset date  
 > **Related:** [Modernization Meta Execution Plan](../plans/modernization_meta_execution_plan_ai_accelerated.md)
 
 ## Purpose
 
-This inventory tracks all feature flags used for dual-path migrations during modernization. Every flag must have a defined owner and a target sunset date to prevent indefinite technical debt accumulation.
+This inventory tracks all feature flags used for dual-path migrations during modernization. Every flag must have a defined single owner and a target sunset date to prevent indefinite technical debt accumulation.
 
 ## Control Mechanisms
 
 Per the modernization meta execution plan:
 
-- **Two-key release rule:** One delivery owner + one validation owner sign each gate packet
-- **Sunset enforcement:** Every dual-path feature flag includes owner and target removal date
-- **Concurrency limits:** Maximum 2 concurrent high-risk migrations (WS1/WS3/WS4 class) at once
+- **Two-hat gate rule:** One developer records separate delivery and validation checks for each gate packet
+- **Sunset enforcement:** Every dual-path feature flag includes single owner and target removal date
+- **Concurrency limits:** Maximum 1 concurrent high-risk migration (WS1/WS3/WS4 class) at once
 
 ## Flag Status Definitions
 
@@ -29,22 +29,22 @@ Per the modernization meta execution plan:
 
 ## Active Feature Flags
 
-| Flag Name | Component | Owner | Validation Owner | Introduced | Target Sunset | Status | Workstream | Notes |
-|-----------|-----------|-------|------------------|------------|---------------|--------|------------|-------|
-| _No active flags yet_ | — | — | — | — | — | — | — | — |
+| Flag Name | Component | Single Owner | Introduced | Target Sunset | Status | Workstream | Notes |
+|-----------|-----------|--------------|------------|---------------|--------|------------|-------|
+| _No active flags yet_ | — | — | — | — | — | — | — |
 
 ---
 
 ## Proposed Feature Flags
 
-| Flag Name | Component | Owner | Validation Owner | Target Introduction | Target Sunset | Status | Workstream | Notes |
-|-----------|-----------|-------|------------------|---------------------|---------------|--------|------------|-------|
-| `USE_AUTHLIB_OAUTH` | Discord OAuth | TBD | TBD | Phase 1 (Week 1-4) | Phase 2 (Week 8) | Proposed | WS1 | Auth stack migration selector |
-| `USE_CONFIG_TOURNAMENT_REGISTRY` | Tournament Registry | TBD | TBD | Phase 2 (Week 4-8) | Phase 3 (Week 12) | Proposed | WS3 | YAML-backed tournament activation |
-| `USE_PROVIDER_RELIABILITY_WRAPPER` | Seed Generation | TBD | TBD | Phase 2 (Week 4-8) | Phase 3 (Week 12) | Proposed | WS3 | Shared provider timeout/retry/error contract |
-| `USE_GUILD_CONFIG_SERVICE` | Discord Guild Config | TBD | TBD | Phase 2 (Week 4-8) | Phase 4 (Week 16+) | Proposed | WS3 | Replace monkey-patching pattern |
-| `ENABLE_ROLE_ASSIGNMENT_COMMANDS` | Discord Role Assignment | TBD | TBD | Current | Phase 3 (Week 12) | Proposed | WS4 | Deprecation control for reaction/voice roles |
-| `ENABLE_MULTIWORLD_COMMANDS` | Discord Multiworld | TBD | TBD | Current | Phase 3 (Week 12) | Proposed | WS4 | Deprecation control for multiworld commands |
+| Flag Name | Component | Single Owner | Target Introduction | Target Sunset | Status | Workstream | Notes |
+|-----------|-----------|--------------|---------------------|---------------|--------|------------|-------|
+| `USE_AUTHLIB_OAUTH` | Discord OAuth | TBD | Phase 1 (Week 1-4) | Phase 2 (Week 8) | Proposed | WS1 | Auth stack migration selector |
+| `USE_CONFIG_TOURNAMENT_REGISTRY` | Tournament Registry | TBD | Phase 2 (Week 4-8) | Phase 3 (Week 12) | Proposed | WS3 | YAML-backed tournament activation |
+| `USE_PROVIDER_RELIABILITY_WRAPPER` | Seed Generation | TBD | Phase 2 (Week 4-8) | Phase 3 (Week 12) | Proposed | WS3 | Shared provider timeout/retry/error contract |
+| `USE_GUILD_CONFIG_SERVICE` | Discord Guild Config | TBD | Phase 2 (Week 4-8) | Phase 4 (Week 16+) | Proposed | WS3 | Replace monkey-patching pattern |
+| `ENABLE_ROLE_ASSIGNMENT_COMMANDS` | Discord Role Assignment | TBD | Current | Phase 3 (Week 12) | Proposed | WS4 | Deprecation control for reaction/voice roles |
+| `ENABLE_MULTIWORLD_COMMANDS` | Discord Multiworld | TBD | Current | Phase 3 (Week 12) | Proposed | WS4 | Deprecation control for multiworld commands |
 
 ---
 
@@ -52,9 +52,9 @@ Per the modernization meta execution plan:
 
 _Flags in this section have been validated but retained for rollback capability._
 
-| Flag Name | Component | Owner | Validation Owner | Deprecated Date | Target Sunset | Workstream | Notes |
-|-----------|-----------|-------|------------------|-----------------|---------------|------------|-------|
-| _No deprecated flags yet_ | — | — | — | — | — | — | — |
+| Flag Name | Component | Single Owner | Deprecated Date | Target Sunset | Workstream | Notes |
+|-----------|-----------|--------------|-----------------|---------------|------------|-------|
+| _No deprecated flags yet_ | — | — | — | — | — | — |
 
 ---
 
@@ -62,8 +62,8 @@ _Flags in this section have been validated but retained for rollback capability.
 
 _Flags in this section have been fully removed from the codebase._
 
-| Flag Name | Component | Owner | Introduced | Sunset Date | Workstream | Notes |
-|-----------|-----------|-------|------------|-------------|------------|-------|
+| Flag Name | Component | Single Owner | Introduced | Sunset Date | Workstream | Notes |
+|-----------|-----------|--------------|------------|-------------|------------|-------|
 | _No sunset flags yet_ | — | — | — | — | — | — |
 
 ---
@@ -72,8 +72,8 @@ _Flags in this section have been fully removed from the codebase._
 
 _Flags that were planned but never activated, or activated then reverted._
 
-| Flag Name | Component | Owner | Status Date | Workstream | Reason |
-|-----------|-----------|-------|-------------|------------|--------|
+| Flag Name | Component | Single Owner | Status Date | Workstream | Reason |
+|-----------|-----------|--------------|-------------|------------|--------|
 | _No abandoned flags yet_ | — | — | — | — | — |
 
 ---
@@ -83,7 +83,7 @@ _Flags that were planned but never activated, or activated then reverted._
 ### Creating a New Feature Flag
 
 1. **Propose:** Add to "Proposed Feature Flags" section with all required metadata
-2. **Review:** Ensure owner + validation owner assigned and sunset date defined
+2. **Review:** Ensure single owner assigned and sunset date defined
 3. **Implement:** Add flag to codebase with documentation in code and this inventory
 4. **Activate:** Move to "Active Feature Flags" section when dual-path is live
 5. **Update:** Keep status current in bi-weekly gate reviews
@@ -115,7 +115,7 @@ _Flags that were planned but never activated, or activated then reverted._
 ## Flag Audit Requirements
 
 ### Weekly
-- Verify active flags have valid owners assigned
+- Verify active flags have a valid single owner assigned
 - Confirm no flags are blocking concurrent high-risk migrations
 
 ### Bi-Weekly (Gate Review)
@@ -134,9 +134,9 @@ _Flags that were planned but never activated, or activated then reverted._
 
 **High-risk situations that require escalation:**
 
-1. Active flag count exceeds concurrency limits (>2 high-risk WS1/WS3/WS4 flags)
+1. Active flag count exceeds concurrency limits (>1 high-risk WS1/WS3/WS4 flags)
 2. Any flag exceeds 90 days past target sunset date
-3. Flag owner or validation owner becomes unavailable with no successor
+3. Flag single owner becomes unavailable with no successor
 4. Deprecated flag requires rollback activation after 2+ gate review cycles
 5. Multiple flags in same component/subsystem (coupling risk)
 

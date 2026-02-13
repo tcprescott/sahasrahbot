@@ -32,7 +32,7 @@ From owner guidance (2026-02-12):
 2. **Boundary before split:** Enforce module contracts in-process before any service decomposition decision.
 3. **Default secure runtime:** Eliminate insecure defaults and implicit trust assumptions.
 4. **Observe before optimize:** Add shared telemetry/error taxonomy prior to broad refactors.
-5. **Deprecate explicitly:** Every legacy feature gets owner, timeline, and removal criteria.
+5. **Deprecate explicitly:** Every legacy feature gets single-owner accountability, timeline, and removal criteria.
 6. **No dual-path drift:** Temporary compatibility windows must have sunset dates.
 
 ## 4. Target 2027 State (Modular Monolith)
@@ -94,7 +94,7 @@ From owner guidance (2026-02-12):
 - WS2 depends on WS1 startup/config hardening decisions for reliable signal quality.
 - WS3 depends on WS2 error taxonomy and telemetry envelopes for migration safety.
 - WS4 depends on WS3 config boundary hardening to avoid removing paths still carrying hidden coupling.
-- WS5 should begin in parallel, but quality gates become required at Phase B entry.
+- WS5 may start as a lightweight parallel track (docs/tooling), but high-risk migration execution remains WIP-limited for a single-developer workflow; quality gates become required at Phase B entry.
 
 ## 6. Phased Roadmap
 
@@ -191,6 +191,12 @@ Design references informing these plans:
 - **Monthly:** dead-weight review and deprecation scoreboard update.
 - **Quarterly:** architecture checkpoint for modular boundary health and optional topology reassessment.
 
+### 10.1 Single-Developer Operating Constraints
+
+- Keep only one active high-risk migration stream at a time (WS1/WS3/WS4 class).
+- Run supporting low-risk work (WS5 docs/tooling) only when it does not delay gate evidence for the active high-risk stream.
+- Prefer serial phase execution over concurrent cutovers to reduce context-switch and rollback risk.
+
 ## 11. Top Risks and Mitigations
 
 - **Hidden coupling risk:** legacy cross-layer imports and monkey-patching can cause migration regressions.
@@ -198,9 +204,9 @@ Design references informing these plans:
 - **Observability blind spots:** migration changes without normalized telemetry can mask failures.
 	- **Mitigation:** require WS2 instrumentation before broad WS3/WS4 cutovers.
 - **Deprecation drift:** temporary compatibility paths can become permanent.
-	- **Mitigation:** require every deprecation path to include owner + sunset date + removal issue/plan linkage.
+	- **Mitigation:** require every deprecation path to include single owner + sunset date + removal issue/plan linkage.
 - **Operational overload:** modernization work can compete with live operations.
-	- **Mitigation:** cap concurrent high-risk workstreams and preserve rollback rehearsals.
+	- **Mitigation:** enforce single-developer WIP limits, sequence high-risk streams serially, and preserve rollback rehearsals.
 
 ## 12. Owner Confirmation and Decision Record
 

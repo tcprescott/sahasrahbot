@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-Convert the existing modernization strategy and component plans into an execution engine that can run in parallel with AI assistance while preserving migration safety.
+Convert the existing modernization strategy and component plans into an execution engine that can run with AI assistance in a single-developer, WIP-limited model while preserving migration safety.
 
 This plan does not replace subordinate plans. It defines how to run them together, how to stage risk, and how to generate gate evidence continuously.
 
@@ -15,7 +15,7 @@ This plan does not replace subordinate plans. It defines how to run them togethe
 
 ## 2.1 Program Structure
 
-Use three lanes that run concurrently:
+Use three lanes that are executed as role hats by one developer (low-risk overlap allowed; high-risk changes stay serial):
 
 1. **Delivery Lane (code changes):** implements WS1–WS5 scoped tasks.
 2. **Validation Lane (gates/evidence):** executes compatibility workflows and rollback checks on every increment.
@@ -39,8 +39,8 @@ AI is not used as sole authority for:
 ## 2.3 Control Mechanisms
 
 - **Change unit size:** keep each implementation unit small enough to validate against a subset of the 8 baseline workflows.
-- **Two-key release rule:** one delivery owner + one validation owner sign each gate packet.
-- **Sunset enforcement:** every dual-path feature flag includes owner and target removal date.
+- **Two-hat gate rule:** the single developer records separate delivery and validation checks before accepting each gate packet.
+- **Sunset enforcement:** every dual-path feature flag includes single-owner accountability and target removal date.
 
 ## 3. Workstream Composition (Kickoff)
 
@@ -90,7 +90,7 @@ Deliverables:
 Exit criteria:
 
 - First checkpoint packet produced for at least 2 baseline workflows.
-- Owners assigned for delivery, validation, and rollback decisions.
+- Single-developer role mapping recorded for delivery, validation, and rollback decisions.
 
 ## Phase 1 (Week 1–4): Security + Signal Baseline
 
@@ -211,7 +211,7 @@ Exit criteria:
 Required artifacts per bi-weekly review:
 
 - Workflow pass/fail matrix (8 baseline workflows).
-- Regression list with owner + target date.
+- Regression list with single owner + target date.
 - Rollback readiness summary per active workstream.
 - Sunset ledger for all temporary compatibility paths.
 
@@ -226,14 +226,14 @@ Required artifacts per bi-weekly review:
 
 To avoid operational overload:
 
-- Maximum 2 concurrent high-risk migrations (WS1/WS3/WS4 class) at once.
+- Maximum 1 concurrent high-risk migration (WS1/WS3/WS4 class) at once.
 - Maximum 1 destructive schema change window active at a time.
 - No net-new deprecation removal starts during unresolved critical regression windows.
 
 ## 9. Immediate Next Actions (Week 0)
 
 1. Create execution tracker issues from each subordinate plan’s concrete checklist.
-2. Define owners for delivery, validation, and rollback per workstream.
+2. Record single-developer role mapping for delivery, validation, and rollback per workstream.
 3. Run first compatibility evidence cycle using the existing runbook.
 4. Start Phase 1 with three bounded implementation slices:
    - Authlib scaffolding (no traffic switch)

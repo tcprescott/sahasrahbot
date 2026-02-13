@@ -4,9 +4,10 @@
 
 ## Current Focus
 
-- **Modernization Program Bootstrap (Phase 0)**: Executing program bootstrap per [docs/plans/modernization_meta_execution_plan_ai_accelerated.md](../plans/modernization_meta_execution_plan_ai_accelerated.md) — tracker structure, evidence templates, and flag inventory complete. Next: assign owners and run first compatibility evidence cycle.
+- **Modernization Program Bootstrap (Phase 0)**: Executing program bootstrap per [docs/plans/modernization_meta_execution_plan_ai_accelerated.md](../plans/modernization_meta_execution_plan_ai_accelerated.md) — tracker structure, evidence templates, and flag inventory complete. Next: confirm single-owner role mapping (delivery/validation/rollback hats) and run first compatibility evidence cycle.
 - **Discord Bot Refactor**: Implementing the modernization plan defined in [docs/plans/discord_refactor.md](../plans/discord_refactor.md).
 - **Documentation Sprint**: Generating comprehensive developer documentation from codebase analysis.
+- **Single-Developer Workflow Mode**: Plan and execute workstreams serially with explicit priority ordering, minimal parallel WIP, and evidence-first gates to reduce context-switch overhead.
 
 ## Known Issues
 
@@ -21,7 +22,6 @@
 - **Runtime Security Debt**: `OAUTHLIB_INSECURE_TRANSPORT` is forced on in API startup and `APP_SECRET_KEY` defaults to empty string.
 - **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
-- **Dependency Drift**: runtime imports include `tenacity`, `python-dateutil` (`dateutil`), and `pytz`, but these are not declared in Poetry dependencies.
 - **Auth Stack Modernization In Progress (Phase 0/1)**: `Quart-Discord` remains active default runtime auth path. `Authlib` migration scaffolding added behind disabled `USE_AUTHLIB_OAUTH` flag (Phase 1 dual-path support). Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
@@ -60,28 +60,24 @@
 - **Implemented MVP anonymous telemetry pipeline** with privacy-preserving storage, no-op/DB-backed services, bounded queue, fail-open behavior, retention purge helper, usage report helper, and initial Discord generator instrumentation (2026-02-12).
 - **WS4 Phase A/B: Discord Multiworld Deprecation** — Completed soft deprecation messaging and functional removal for multiworld commands. Phase A added deprecation notices to `smmulti` and `doorsmw` commands. Phase B commented out extension loads in `bot.py` to prevent command registration. Commands no longer callable; non-multiworld flows unaffected (2026-02-12).
 - **Implemented Phase A/B of Discord role-assignment deprecation (WS4):** Added deprecation messaging to all reaction-role and voice-role command surfaces, implemented runtime disablement flag `DISCORD_ROLE_ASSIGNMENT_ENABLED` (default True for backward compatibility), added conditional extension loading, preserved startup and non-role command behavior. Rollback procedure and compatibility validation documented in `docs/guides/discord_role_assignment_deprecation_runbook.md` (2026-02-12).
-- **Phase 0 Bootstrap (Week 0–1) completed:** Created modernization execution tracker (`plans/modernization_execution_tracker.md`) mapping WS1–WS5 workstreams to gate milestones with 30/60/90-day targets; added compatibility evidence packet template (`guides/compatibility_evidence_packet_template.md`) aligned to validation runbook; added feature-flag inventory (`guides/feature_flag_inventory.md`) with owner+sunset enforcement; updated MASTER_INDEX.md and active_state.md (2026-02-12).
+- **Phase 0 Bootstrap (Week 0–1) completed:** Created modernization execution tracker (`plans/modernization_execution_tracker.md`) mapping WS1–WS5 workstreams to gate milestones with 30/60/90-day targets; added compatibility evidence packet template (`guides/compatibility_evidence_packet_template.md`) aligned to validation runbook; added feature-flag inventory (`guides/feature_flag_inventory.md`) with single-owner + sunset enforcement; updated MASTER_INDEX.md and active_state.md (2026-02-12).
+- Aligned modernization tracker and umbrella roadmap workflow language to a single-developer operating model (single-owner role hats, serial high-risk execution, explicit WIP limits) (2026-02-12).
 
 ## Upcoming Work
 
-1. **Monitor GuildConfigService pilot**: Validate daily announcements continue working with pilot migration.
-2. **Incremental cog migration**: Migrate remaining cogs to GuildConfigService (`tournament.py`, `misc.py`, `audit.py`).
-3. **Channel ID Migration**: Develop and execute data migration script for channel names→IDs (Phase 3).
-4. **Refactor `daily.py`**: Add `tenacity` retries and error handling for API resilience.
-5. Review and refine generated documentation.
-5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
-6. Integrate dependency declaration guard execution (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
-7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
-8. **Tournament Registry Config Rollout Phase 2**: Enable config-backed registry in production with operational validation over full seasonal cycle per `plans/tournament_registry_config_rollout_plan.md`.
-9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
-10. Implement role-assignment deprecation rollout per `plans/discord_role_assignment_deprecation_removal_plan.md`.
-11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
-12. ~~Implement MVP anonymous telemetry pipeline per `plans/anonymous_telemetry_user_stats_plan.md` (ORM model, buffered telemetry service, Discord/RaceTime/API instrumentation, retention purge).~~ ✅ **COMPLETED**
-13. Sequence modernization backlog against the new umbrella roadmap in `plans/application_modernization_vision_2026_2027.md` and apply decision-gate checks per phase.
-14. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix with owners.
-15. Define owners for delivery, validation, and rollback per workstream in `plans/modernization_execution_tracker.md`.
-16. Create AI task templates for audits, migrations, and validation packets.
-17. Start Phase 1 with three bounded implementation slices: Authlib scaffolding (no traffic switch), telemetry service/table scaffolding, startup security validation checks.
+1. Record single-developer role mapping (same owner across delivery, validation, and rollback) per workstream in `plans/modernization_execution_tracker.md`.
+2. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix for the current single-owner model.
+3. Monitor `GuildConfigService` pilot in `daily.py` and verify announcement reliability in production traffic.
+4. Continue incremental cog migration to `GuildConfigService` (`tournament.py`, `misc.py`, `audit.py`).
+5. Implement channel name→ID data migration script and rollout plan (Phase 3 of guild config modernization).
+6. Integrate dependency declaration guard (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
+7. Define and document explicit startup supervision/failure strategy for multi-subsystem boot.
+8. Complete Tournament Registry Config Rollout Phase 2: enable config-backed registry in production and validate over a full seasonal cycle.
+9. Sequence remaining modernization backlog against `plans/application_modernization_vision_2026_2027.md` and enforce phase gate checks.
+10. Start next bounded Phase 1 slices: Authlib traffic-readiness hardening, telemetry service/table operationalization across surfaces, and startup security validation checks.
+11. Rotate/revoke any previously committed secrets and finish operational `.env` hardening.
+12. Review and refine generated documentation, including `update_docs.py` target alignment with `docs/user-guide/`.
+13. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.
 
 ## Open Why Questions
 

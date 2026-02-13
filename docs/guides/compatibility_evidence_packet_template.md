@@ -84,7 +84,7 @@ If YES, list:
 1. **Regression:** [Brief description]
    - **Severity:** [Critical / High / Medium / Low]
    - **Impact:** [What is broken or degraded]
-   - **Owner:** [Assigned to]
+  - **Single Owner:** [Assigned to]
    - **Target Resolution Date:** [YYYY-MM-DD]
    - **Tracking:** [Issue/ticket number]
 
@@ -112,7 +112,7 @@ If YES, list:
 
 List any action items, tech debt, or clarifications needed:
 
-1. [Action item description] — Owner: [name], Target: [date]
+1. [Action item description] — Single Owner: [name], Target: [date]
 2. [Additional items]
 
 ---
@@ -229,8 +229,8 @@ N/A — This is a baseline validation with no recent changes to roll back.
 
 ### Follow-Up Items
 
-1. Consider reducing timeout threshold for faster failure feedback in non-critical flows — Owner: @dev-team, Target: 2026-03-01
-2. Add provider selection telemetry to track which provider is being used — Owner: @telemetry-owner, Target: 2026-03-15
+1. Consider reducing timeout threshold for faster failure feedback in non-critical flows — Single Owner: @maintainer, Target: 2026-03-01
+2. Add provider selection telemetry to track which provider is being used — Single Owner: @maintainer, Target: 2026-03-15
 
 ---
 
