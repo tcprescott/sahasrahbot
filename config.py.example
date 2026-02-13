@@ -15,8 +15,10 @@ DISCORD_CLIENT_ID = int(os.environ.get('DISCORD_CLIENT_ID', '0'))
 DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET', '')
 
 # Web API Configuration
+# SECURITY: APP_SECRET_KEY must be set to a strong random value in production
+# Generate with: python3 -c 'import secrets; print(secrets.token_hex(32))'
 APP_SECRET_KEY = os.environ.get('APP_SECRET_KEY', '')  # Session secret - MUST be set in production
-APP_URL = os.environ.get('APP_URL', 'http://localhost:5001')  # Base URL for OAuth redirects
+APP_URL = os.environ.get('APP_URL', 'http://localhost:5001')  # Base URL for OAuth redirects (use https:// in production)
 
 # Database Configuration
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
