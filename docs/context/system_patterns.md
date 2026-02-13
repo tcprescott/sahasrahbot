@@ -90,6 +90,15 @@ Seed providers now support a shared execution contract for consistent reliabilit
 ### Seasonal Registry Toggles
 Seasonal enable/disable currently relies on code-level registry edits (including commented entries) in tournament and RaceTime category registries.
 
+### Anonymous Telemetry (Added 2026-02-12)
+Privacy-preserving telemetry for feature usage and reliability tracking:
+- **Service interface:** `TelemetryService` protocol with `NoOpTelemetryService` and `DatabaseTelemetryService` implementations
+- **Fail-open design:** Telemetry failures never impact user-facing flows; all operations wrapped in try/except
+- **Bounded queue:** In-memory queue with configurable size limit to prevent unbounded growth
+- **Privacy-first:** No user IDs, usernames, or identifiable data; guild IDs hashed with salt
+- **Short retention:** Default 30-day retention with automated purge helper
+- **Instrumentation pattern:** `record_event()` convenience function called at command boundaries
+
 ## Data Flow
 
 ### Seed Generation

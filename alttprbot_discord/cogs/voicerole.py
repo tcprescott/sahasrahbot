@@ -1,8 +1,22 @@
 import discord
 from discord.ext import commands
 
+import config
 from alttprbot.database import voicerole  # TODO switch to ORM
 
+
+DEPRECATION_MESSAGE = """
+⚠️ **DEPRECATION NOTICE** ⚠️
+
+The voice-role feature is deprecated and will be removed in a future release.
+
+**Recommended Migration:** Use Discord's native role assignment features:
+• Server Settings → Onboarding (for new member roles)
+• Channel/Server role settings
+• Discord's built-in role management tools
+
+All existing voice-role configurations will be archived before removal.
+"""
 
 class VoiceRole(commands.Cog):
     def __init__(self, bot):
@@ -10,6 +24,10 @@ class VoiceRole(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            return
+        
         vc_roles = await voicerole.get_voice_roles_by_guild(member.guild.id)
 
         if after.channel is not None and before.channel is not None:
