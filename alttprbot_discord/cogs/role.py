@@ -5,6 +5,7 @@ import re
 import discord
 from discord.ext import commands
 
+import config
 from alttprbot.database import role  # TODO switch to ORM
 from alttprbot.exceptions import SahasrahBotException
 from ..util import embed_formatter
@@ -14,12 +15,29 @@ from ..util import embed_formatter
 
 # this is a pile of shit and needs to be refactored
 
+DEPRECATION_MESSAGE = """
+⚠️ **DEPRECATION NOTICE** ⚠️
+
+The reaction-role feature is deprecated and will be removed in a future release.
+
+**Recommended Migration:** Use Discord's native role assignment features:
+• Server Settings → Onboarding (for new member roles)
+• Channel/Server role settings
+• Discord's built-in role management tools
+
+All existing reaction-role configurations will be archived before removal.
+"""
+
 class Role(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            return
+        
         emoji = str(payload.emoji)
         roles = await role.get_role_by_group_emoji(payload.channel_id, payload.message_id, emoji, payload.guild_id)
 
@@ -37,6 +55,10 @@ class Role(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            return
+        
         emoji = str(payload.emoji)
         roles = await role.get_role_by_group_emoji(payload.channel_id, payload.message_id, emoji, payload.guild_id)
 
@@ -55,11 +77,20 @@ class Role(commands.Cog):
     @commands.group(aliases=['rr'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactionrole(self, ctx):
-        pass
+        """Manage reaction roles (DEPRECATED - see help for details)"""
+        if ctx.invoked_subcommand is None:
+            await ctx.reply(DEPRECATION_MESSAGE)
 
     @reactionrole.command(name='create', aliases=['c'])
     async def role_create(self, ctx, group_id: int, role_name: discord.Role, name, description, emoji,
                           protect_mentions: bool = True):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         existing_roles = await role.get_group_roles(group_id, ctx.guild.id)
         if len(existing_roles) >= 20:
             raise SahasrahBotException(
@@ -74,6 +105,13 @@ class Role(commands.Cog):
 
     @reactionrole.command(name='update', aliases=['u'])
     async def role_update(self, ctx, role_id: int, name, description, protect_mentions: bool = False):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         await role.update_role(ctx.guild.id, role_id, name, description, protect_mentions)
         groups = await role.get_role_group(role_id, ctx.guild.id)
         await refresh_bot_message(ctx, groups[0]['id'])
@@ -81,6 +119,13 @@ class Role(commands.Cog):
     # this is a whole pile of trash...
     @reactionrole.command(name='delete', aliases=['del'])
     async def role_delete(self, ctx, role_id: int):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         groups = await role.get_role_group(role_id, ctx.guild.id)
         channel = ctx.guild.get_channel(groups[0]['channel_id'])
         message = await channel.fetch_message(groups[0]['message_id'])
@@ -93,17 +138,29 @@ class Role(commands.Cog):
 
     @reactionrole.command(name='list', aliases=['l'])
     async def role_list(self, ctx, group_id: int):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # List command should work even when disabled (read-only)
         roles = await role.get_group_roles(group_id, ctx.guild.id)
         await ctx.reply(embed=embed_formatter.reaction_role_list(ctx, roles))
 
     @commands.group(aliases=['rg'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactiongroup(self, ctx):
-        pass
+        """Manage reaction groups (DEPRECATED - see help for details)"""
+        if ctx.invoked_subcommand is None:
+            await ctx.reply(DEPRECATION_MESSAGE)
 
     @reactiongroup.command(name='create', aliases=['c'])
     async def group_create(self, ctx, channel: discord.TextChannel, name, description=None, bot_managed: bool = True,
                            message_id: int = None):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         if bot_managed:
             message = await channel.send('temp message')
         else:
@@ -112,19 +169,43 @@ class Role(commands.Cog):
 
     @reactiongroup.command(name='update', aliases=['u'])
     async def group_update(self, ctx, group_id: int, name, description):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         await role.update_group(ctx.guild.id, group_id, name, description)
         await refresh_bot_message(ctx, group_id)
 
     @reactiongroup.command(name='refresh', aliases=['r'])
     async def group_refresh(self, ctx, group_id: int):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         await refresh_bot_message(ctx, group_id)
 
     @reactiongroup.command(name='delete', aliases=['d'])
     async def group_delete(self, ctx, group_id: int):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Check if role assignment is disabled
+        if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+            await ctx.reply("⚠️ Reaction-role functionality is currently disabled.")
+            return
+        
         await role.delete_group(ctx.guild.id, group_id)
 
     @reactiongroup.command(name='list', aliases=['l'])
     async def group_list(self, ctx, group_id: int = None):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # List command should work even when disabled (read-only)
         if group_id is None:
             groups = await role.get_guild_groups(ctx.guild.id)
         else:
@@ -134,6 +215,10 @@ class Role(commands.Cog):
     @commands.command()
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def importroles(self, ctx, mode=None):
+        await ctx.reply(DEPRECATION_MESSAGE)
+        
+        # Import roles functionality still works even when reaction-roles are disabled
+        # This is a utility function not directly tied to reaction-role automation
         if ctx.message.attachments:
             content = await ctx.message.attachments[0].read()
             role_import_list = csv.DictReader(
