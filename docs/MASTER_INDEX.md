@@ -45,6 +45,9 @@ Documentation standards and authoring references:
 | [Component Interrogation Checklist](guides/component_interrogation_checklist.md) | Execution checklist for policy/permission/workflow interrogation sessions |
 | [Async Tournament Interrogation Runbook](guides/component_interrogation_runbook_async_tournament.md) | Example runbook showing interrogation workflow against the async tournament module |
 | [Tournament Module (Non-Async) Runbook](guides/tournament_module_runbook.md) | Operator/developer runbook for non-async tournament lifecycle, troubleshooting, and safe change workflow |
+| [Discord Role Assignment Deprecation Runbook](guides/discord_role_assignment_deprecation_runbook.md) | Operator runbook for Phase A/B role-assignment deprecation: feature flags, rollback procedures, and compatibility validation |
+| [Compatibility Evidence Packet Template](guides/compatibility_evidence_packet_template.md) | Standardized format for capturing compatibility workflow validation evidence per the compatibility gate validation runbook |
+| [Feature Flag Inventory](guides/feature_flag_inventory.md) | Active tracking of dual-path migration feature flags with owners and sunset dates |
 
 ## Plans
 
@@ -62,6 +65,7 @@ Execution plans and implementation checklists:
 | [Modernization Compatibility Gate Validation Runbook](plans/modernization_compatibility_gate_validation_runbook.md) | Executable workflow/evidence checklist for the 8 compatibility-gate baseline flows used in phase and bi-weekly modernization reviews |
 | [Authlib Migration for Discord OAuth](plans/authlib_discord_oauth_migration_plan.md) | Phased migration plan to replace `Quart-Discord` with `Authlib` using compatibility gates, dual-path rollout, and rollback controls |
 | [Modernization Meta Execution Plan (AI-Accelerated)](plans/modernization_meta_execution_plan_ai_accelerated.md) | Multi-phase operating plan that sequences all modernization workstreams with AI-assisted delivery, validation, and governance cadence |
+| [Modernization Execution Tracker](plans/modernization_execution_tracker.md) | Live program status across WS1–WS5 workstreams with gate milestones, owners, phase progress, and 30/60/90-day targets |
 
 ## User Guide
 

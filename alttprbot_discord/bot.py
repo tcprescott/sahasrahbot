@@ -39,11 +39,16 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
     await discordbot.load_extension("alttprbot_discord.cogs.nickname")
     await discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
-    await discordbot.load_extension("alttprbot_discord.cogs.role")
+    
+    # Role assignment extensions - conditionally loaded based on feature flag
+    # Default: True for backward compatibility during Phase A/B deprecation
+    if getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
+        await discordbot.load_extension("alttprbot_discord.cogs.role")
+        await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
+    
     await discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
     await discordbot.load_extension("alttprbot_discord.cogs.tournament")
-    await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
-    # await discordbot.load_extension("alttprbot_discord.cogs.smmulti")  # Phase B: Multiworld deprecation
+    await discordbot.load_extension("alttprbot_discord.cogs.smmulti")
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
     await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
