@@ -1,5 +1,5 @@
 from quart import Blueprint, jsonify, render_template, request, url_for, abort
-from quart_discord import requires_authorization
+from alttprbot_api.oauth_client import requires_authorization
 
 from alttprbot import models
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler

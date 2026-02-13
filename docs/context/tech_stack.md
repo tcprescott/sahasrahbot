@@ -15,8 +15,7 @@
 |---------|---------|---------|
 | `discord.py` | `*` (latest) | Discord bot framework (v2.x with slash commands) |
 | `quart` | `*` (latest) | Async web framework (Flask-compatible) |
-| `Quart-Discord` | `>=2.1.4` | Discord OAuth2 integration for Quart (legacy, active by default) |
-| `Authlib` | `*` | OAuth client framework for phased Discord OAuth migration (Phase 1+ scaffolding, disabled by default via `USE_AUTHLIB_OAUTH=False`) |
+| `Authlib` | `*` | Discord OAuth2 client framework for Quart API authentication flows |
 | `racetime-bot` | pinned commit `48afdd4` | RaceTime.gg bot SDK (custom fork by tcprescott) |
 | `tortoise-orm` | `*` | Async ORM for MySQL |
 | `aerich` | `>=0.5.5` | Database migration tool for Tortoise ORM |
@@ -84,7 +83,6 @@
 | `pyrankvote` | `*` | Single Transferable Vote counting |
 | `aiofiles` | `>=0.4.0` | Async file I/O |
 | `tenacity` | `*` | Retry policies for provider/external request reliability |
-| `oauthlib` | `*` | OAuth2 error/utility types used by API auth path |
 | `werkzeug` | `*` | MultiDict and request utility types used in tournament form handling |
 
 ## Runtime Import vs Declared Dependency Drift
@@ -125,11 +123,8 @@
 ## Configuration / Runtime Contracts
 
 - Configuration behavior is defined in `config.py` and consumed as module-level constants across subsystems.
-- API OAuth transport currently sets `OAUTHLIB_INSECURE_TRANSPORT=1` at startup.
 - API session secret uses `APP_SECRET_KEY` (currently defaulting to empty string if unset).
-- **OAuth Dual-Path Selector:** `USE_AUTHLIB_OAUTH` (bool, default `False`) controls OAuth implementation:
-  - `False` (default): Quart-Discord legacy path active
-  - `True`: Authlib migration path active (Phase 1+ scaffolding)
+- API Discord OAuth uses Authlib-only runtime wiring (no dual-path selector).
 - RaceTime per-category OAuth credentials are dynamically resolved using category-derived names:
 	- `RACETIME_CLIENT_ID_<CATEGORY_SLUG_UPPER_NO_DASH>`
 	- `RACETIME_CLIENT_SECRET_<CATEGORY_SLUG_UPPER_NO_DASH>`

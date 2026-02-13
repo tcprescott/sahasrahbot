@@ -1,7 +1,7 @@
 import re
 
 from quart import Blueprint, render_template, request, url_for, redirect, session, abort
-from quart_discord import requires_authorization, Unauthorized
+from alttprbot_api.oauth_client import requires_authorization, Unauthorized
 
 from alttprbot import models
 from alttprbot_api.api import discord

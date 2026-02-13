@@ -30,7 +30,6 @@ Observed failure characteristics:
 
 - Startup is task-based and not centrally supervised; subsystem failures can become runtime errors without coordinated shutdown.
 - Quart API bind host/port is currently hardcoded in entrypoint (`127.0.0.1:5001`).
-- API OAuth transport currently enables insecure mode globally (`OAUTHLIB_INSECURE_TRANSPORT=1`).
 - RaceTime credential resolution is dynamic per category (`RACETIME_CLIENT_ID_<CATEGORY>`, `RACETIME_CLIENT_SECRET_<CATEGORY>`), so missing keys fail per category at runtime.
 
 ## Author Intent (Verified)

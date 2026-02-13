@@ -2,7 +2,7 @@ import datetime
 
 from quart import (Blueprint, abort, jsonify, redirect,
                    render_template, request, url_for, Response)
-from quart_discord import requires_authorization, Unauthorized
+from alttprbot_api.oauth_client import requires_authorization, Unauthorized
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from alttprbot import models

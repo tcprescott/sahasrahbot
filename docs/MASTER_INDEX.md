@@ -51,6 +51,7 @@ Documentation standards and authoring references:
 | [Discord Role Assignment Deprecation Runbook](guides/discord_role_assignment_deprecation_runbook.md) | Operator runbook for Phase A/B role-assignment deprecation: feature flags, rollback procedures, and compatibility validation |
 | [Compatibility Evidence Packet Template](guides/compatibility_evidence_packet_template.md) | Standardized format for capturing compatibility workflow validation evidence per the compatibility gate validation runbook |
 | [Feature Flag Inventory](guides/feature_flag_inventory.md) | Active tracking of dual-path migration feature flags with owners and sunset dates |
+| [Config Constants Inventory](guides/config_constants_inventory.md) | Import-backed inventory of root `config.py` constants expected by runtime surfaces, including static usage map and dynamic RaceTime key pattern |
 
 ## Plans
 

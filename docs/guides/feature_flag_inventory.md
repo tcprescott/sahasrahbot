@@ -39,7 +39,6 @@ Per the modernization meta execution plan:
 
 | Flag Name | Component | Single Owner | Target Introduction | Target Sunset | Status | Workstream | Notes |
 |-----------|-----------|--------------|---------------------|---------------|--------|------------|-------|
-| `USE_AUTHLIB_OAUTH` | Discord OAuth | TBD | Phase 1 (Week 1-4) | Phase 2 (Week 8) | Proposed | WS1 | Auth stack migration selector |
 | `USE_CONFIG_TOURNAMENT_REGISTRY` | Tournament Registry | TBD | Phase 2 (Week 4-8) | Phase 3 (Week 12) | Proposed | WS3 | YAML-backed tournament activation |
 | `USE_PROVIDER_RELIABILITY_WRAPPER` | Seed Generation | TBD | Phase 2 (Week 4-8) | Phase 3 (Week 12) | Proposed | WS3 | Shared provider timeout/retry/error contract |
 | `USE_GUILD_CONFIG_SERVICE` | Discord Guild Config | TBD | Phase 2 (Week 4-8) | Phase 4 (Week 16+) | Proposed | WS3 | Replace monkey-patching pattern |
@@ -64,7 +63,7 @@ _Flags in this section have been fully removed from the codebase._
 
 | Flag Name | Component | Single Owner | Introduced | Sunset Date | Workstream | Notes |
 |-----------|-----------|--------------|------------|-------------|------------|-------|
-| _No sunset flags yet_ | — | — | — | — | — | — |
+| `USE_AUTHLIB_OAUTH` | Discord OAuth | TBD | Phase 1 (Week 1-4) | 2026-02-12 | WS1 | Authlib cutover completed; selector and legacy path removed |
 
 ---
 

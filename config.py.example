@@ -31,10 +31,5 @@ SENTRY_URL = os.environ.get('SENTRY_URL', '')
 # Debug Mode
 DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
 
-# OAuth Implementation Selection (Phase 1: Authlib Migration)
-# When False (default): Use Quart-Discord (legacy)
-# When True: Use Authlib (new implementation, Phase 1+)
-USE_AUTHLIB_OAUTH = os.environ.get('USE_AUTHLIB_OAUTH', 'false').lower() == 'true'
-
 # Additional configuration omitted for brevity
 # See existing code for complete configuration requirements

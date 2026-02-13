@@ -7,7 +7,7 @@ import logging
 import aiocache
 from pytz import timezone
 from quart import Blueprint, redirect, render_template, request
-from quart_discord import Unauthorized
+from alttprbot_api.oauth_client import Unauthorized
 
 from alttprbot import models
 from alttprbot.alttprgen import generator

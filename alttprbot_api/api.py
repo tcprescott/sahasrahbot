@@ -1,7 +1,6 @@
-import os
 import logging
 
-from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
+from authlib.oauth2.rfc6749.errors import OAuth2Error
 from quart import (Quart, abort, jsonify, redirect, render_template, request,
                    session, url_for, send_from_directory)
 
@@ -19,33 +18,21 @@ sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(config.DISCORD_CLIENT_ID)
 sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
 sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/discord/"
 sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = config.DISCORD_TOKEN
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-# Dual-path OAuth client initialization
-# Phase 1: Authlib scaffolding behind disabled feature flag
-USE_AUTHLIB = getattr(config, 'USE_AUTHLIB_OAUTH', False)
+from alttprbot_api.oauth_client import (
+    AuthlibDiscordOAuth,
+    Unauthorized,
+    AccessDenied,
+    requires_authorization
+)
 
-if USE_AUTHLIB:
-    # New Authlib-based OAuth path (Phase 1+)
-    from alttprbot_api.oauth_client import (
-        AuthlibDiscordOAuth,
-        Unauthorized,
-        AccessDenied,
-        requires_authorization
-    )
-    discord = AuthlibDiscordOAuth(
-        app=sahasrahbotapi,
-        client_id=config.DISCORD_CLIENT_ID,
-        client_secret=config.DISCORD_CLIENT_SECRET,
-        redirect_uri=config.APP_URL + "/callback/discord/"
-    )
-    logger.info("OAuth: Using Authlib implementation (USE_AUTHLIB_OAUTH=True)")
-else:
-    # Legacy Quart-Discord path (default)
-    from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
-                               requires_authorization)
-    discord = DiscordOAuth2Session(sahasrahbotapi)
-    logger.info("OAuth: Using Quart-Discord implementation (default)")
+discord = AuthlibDiscordOAuth(
+    app=sahasrahbotapi,
+    client_id=config.DISCORD_CLIENT_ID,
+    client_secret=config.DISCORD_CLIENT_SECRET,
+    redirect_uri=config.APP_URL + "/callback/discord/"
+)
+logger.info("OAuth: Using Authlib implementation")
 
 import alttprbot_api.blueprints as blueprints  # nopep8
 
@@ -194,39 +181,15 @@ async def not_found(e):
         user=user
     )
 
-@sahasrahbotapi.errorhandler(InvalidGrantError)
-async def invalid_grant(e):
+@sahasrahbotapi.errorhandler(OAuth2Error)
+async def oauth2_error(e):
     discord.revoke()
     return await render_template(
         'error.html',
-        title="Discord Session Expired",
-        message="Your Discord session has expired.  Please log in again.",
+        title="OAuth Error",
+        message=f"An OAuth error occurred: {e.description}",
         user=None
     )
-
-@sahasrahbotapi.errorhandler(TokenExpiredError)
-async def token_expired(e):
-    discord.revoke()
-    return await render_template(
-        'error.html',
-        title="Discord Session Expired",
-        message="Your Discord session has expired.  Please log in again.",
-        user=None
-    )
-
-# Handle Authlib OAuth2Error if using Authlib path
-if USE_AUTHLIB:
-    from authlib.oauth2.rfc6749.errors import OAuth2Error
-    
-    @sahasrahbotapi.errorhandler(OAuth2Error)
-    async def oauth2_error(e):
-        discord.revoke()
-        return await render_template(
-            'error.html',
-            title="OAuth Error",
-            message=f"An OAuth error occurred: {e.description}",
-            user=None
-        )
 
 @sahasrahbotapi.errorhandler(500)
 async def something_bad_happened(e):

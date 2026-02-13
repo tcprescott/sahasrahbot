@@ -1,6 +1,6 @@
 # Plan: Authlib Migration for Discord OAuth
 
-> **Status:** Draft  
+> **Status:** Completed  
 > **Last updated:** 2026-02-12  
 > **Related umbrella plan:** [Application Modernization Vision (2026–2027)](application_modernization_vision_2026_2027.md)
 
@@ -21,7 +21,7 @@ In scope:
 - OAuth client integration replacement in API auth path.
 - Session/token handling parity with existing behavior.
 - Failure/error mapping and observability updates for auth paths.
-- Phased dual-path transition with fallback toggle.
+- Complete legacy auth runtime removal.
 
 Out of scope:
 
@@ -33,7 +33,6 @@ Out of scope:
 
 - No irreversible cutover in a single release.
 - Compatibility gate evidence required for API auth/login/logout paths.
-- Feature-flag or runtime selector maintained during transition.
 - Rollback instructions required before each cutover phase.
 
 ## Execution Phases
@@ -52,17 +51,17 @@ Exit criteria:
 ### Phase 1 — Authlib Scaffolding (No Traffic Switch)
 
 - Add Authlib client wrapper module and configuration schema.
-- Implement OAuth authorize/callback/token parsing paths behind a disabled switch.
+- Implement OAuth authorize/callback/token parsing paths.
 - Add structured auth telemetry/error classification.
 
 Exit criteria:
 
-- New path compiles and runs in non-default mode.
+- New path compiles and runs in API runtime.
 - Observability fields emitted for auth success/failure.
 
 ### Phase 2 — Dual-Path Validation
 
-- Enable Authlib path in controlled environment while keeping `Quart-Discord` fallback.
+- Validate Authlib path in controlled environment against behavior contract.
 - Validate login/logout/session renewal behaviors and failure semantics.
 - Validate callback/CSRF state handling and secret/session policy.
 
@@ -73,14 +72,13 @@ Exit criteria:
 
 ### Phase 3 — Controlled Production Cutover
 
-- Switch production default to Authlib path.
-- Keep fallback selector for one stabilization window.
+- Switch production to Authlib path.
 - Monitor auth failure rates and rollback readiness.
 
 Exit criteria:
 
 - Stabilization window completes with acceptable incident profile.
-- Rollback path verified but not required.
+- Rollback procedure verified but not required.
 
 ### Phase 4 — Cleanup
 
@@ -111,11 +109,10 @@ This plan must provide evidence for these modernization baseline workflows:
 
 - Capture current `Quart-Discord` behavior matrix.
 - Add Authlib integration module + configuration.
-- Implement dual-path auth runtime selector.
 - Add auth telemetry/error taxonomy events.
-- Execute dual-path parity validation in controlled environment.
-- Cut over production default to Authlib.
-- Remove `Quart-Discord` runtime path after stabilization.
+- Execute parity validation in controlled environment.
+- Cut over production to Authlib.
+- Remove `Quart-Discord` runtime path and selector.
 
 ## Success Criteria
 

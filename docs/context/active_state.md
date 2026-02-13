@@ -19,10 +19,10 @@
 - The `schedule` and `user` blueprints in the web API are DEBUG-only stubs.
 - **Architecture Debt**: `guild_config` monkey-patching and name-based channel config need removal.
 - **Resilience**: `daily` task lacks retries for API failures.
-- **Runtime Security Debt**: `OAUTHLIB_INSECURE_TRANSPORT` is forced on in API startup and `APP_SECRET_KEY` defaults to empty string.
+- **Runtime Security Debt**: `APP_SECRET_KEY` defaults to empty string.
 - **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
-- **Auth Stack Modernization In Progress (Phase 0/1)**: `Quart-Discord` remains active default runtime auth path. `Authlib` migration scaffolding added behind disabled `USE_AUTHLIB_OAUTH` flag (Phase 1 dual-path support). Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
+- **Auth Stack Follow-up**: Authlib is now the only API Discord OAuth path; post-cutover hardening and compatibility evidence collection remain open. Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
 ## Recent Completions
@@ -62,6 +62,8 @@
 - **Implemented Phase A/B of Discord role-assignment deprecation (WS4):** Added deprecation messaging to all reaction-role and voice-role command surfaces, implemented runtime disablement flag `DISCORD_ROLE_ASSIGNMENT_ENABLED` (default True for backward compatibility), added conditional extension loading, preserved startup and non-role command behavior. Rollback procedure and compatibility validation documented in `docs/guides/discord_role_assignment_deprecation_runbook.md` (2026-02-12).
 - **Phase 0 Bootstrap (Week 0–1) completed:** Created modernization execution tracker (`plans/modernization_execution_tracker.md`) mapping WS1–WS5 workstreams to gate milestones with 30/60/90-day targets; added compatibility evidence packet template (`guides/compatibility_evidence_packet_template.md`) aligned to validation runbook; added feature-flag inventory (`guides/feature_flag_inventory.md`) with single-owner + sunset enforcement; updated MASTER_INDEX.md and active_state.md (2026-02-12).
 - Aligned modernization tracker and umbrella roadmap workflow language to a single-developer operating model (single-owner role hats, serial high-risk execution, explicit WIP limits) (2026-02-12).
+- **Completed Discord OAuth Authlib cutover (WS1):** removed Quart-Discord runtime usage and dual-path selector, migrated all API blueprints/decorators to Authlib helper imports, and removed legacy OAuth dependencies from `pyproject.toml` (2026-02-12).
+- Documented import-backed root config contract in `docs/guides/config_constants_inventory.md`, including 40 statically-read constants, dynamic RaceTime credential key pattern, and current coverage gap versus `config.py.example` (2026-02-12).
 
 ## Upcoming Work
 
@@ -74,7 +76,7 @@
 7. Define and document explicit startup supervision/failure strategy for multi-subsystem boot.
 8. Complete Tournament Registry Config Rollout Phase 2: enable config-backed registry in production and validate over a full seasonal cycle.
 9. Sequence remaining modernization backlog against `plans/application_modernization_vision_2026_2027.md` and enforce phase gate checks.
-10. Start next bounded Phase 1 slices: Authlib traffic-readiness hardening, telemetry service/table operationalization across surfaces, and startup security validation checks.
+10. Start next bounded Phase 1 slices: telemetry service/table operationalization across surfaces and startup security validation checks.
 11. Rotate/revoke any previously committed secrets and finish operational `.env` hardening.
 12. Review and refine generated documentation, including `update_docs.py` target alignment with `docs/user-guide/`.
 13. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.

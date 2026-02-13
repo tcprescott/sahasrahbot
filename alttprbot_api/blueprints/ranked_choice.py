@@ -3,7 +3,7 @@ import logging
 import tortoise.exceptions
 from discord.errors import NotFound
 from quart import Blueprint, render_template, request, abort
-from quart_discord import requires_authorization
+from alttprbot_api.oauth_client import requires_authorization
 
 from alttprbot import models
 from alttprbot.util import rankedchoice

@@ -121,7 +121,6 @@ await orm.execute("INSERT INTO table (col) VALUES (%s)", [value])
 - Configuration is provided through `config.py` as module-level constants consumed across the codebase.
 - Per-guild config stored in database via `guild.config_get()`/`guild.config_set()`
 - Config values cached with `aiocache`
-- API startup currently sets `OAUTHLIB_INSECURE_TRANSPORT=1` unconditionally.
 - `APP_SECRET_KEY` currently permits empty default in config model.
 
 ### Config Ownership Rules (Needed)

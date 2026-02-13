@@ -1,10 +1,7 @@
 """
 Authlib-based Discord OAuth2 client wrapper.
 
-This module provides a dual-path OAuth implementation to support migration
-from Quart-Discord to Authlib. Controlled by USE_AUTHLIB_OAUTH config flag.
-
-Phase 1: Scaffolding only - not yet active by default.
+This module provides the canonical Discord OAuth implementation for the API.
 
 Structured Log Events:
 - auth_flow_started: OAuth login initiated (scope, has_redirect_data)
@@ -266,19 +263,17 @@ class DiscordUser:
 
 class Unauthorized(Exception):
     """Exception raised when OAuth token is missing or invalid."""
-    pass
 
 
 class AccessDenied(Exception):
     """Exception raised when user denies OAuth authorization."""
-    pass
 
 
 def requires_authorization(func):
     """
     Decorator to require Discord OAuth authorization for route access.
     
-    Compatible replacement for Quart-Discord's @requires_authorization.
+    Require a Discord OAuth session token for route access.
     Redirects to /login/ if no valid session token exists.
     """
     @wraps(func)

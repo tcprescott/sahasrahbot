@@ -3,7 +3,7 @@ from urllib.parse import quote
 
 import aiohttp
 from quart import Blueprint, abort, jsonify, redirect, render_template, request
-from quart_discord import requires_authorization
+from alttprbot_api.oauth_client import requires_authorization
 
 import config
 from alttprbot import models
