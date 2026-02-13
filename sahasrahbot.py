@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import urllib.parse
 
 import sentry_sdk
@@ -7,10 +8,18 @@ from tortoise import Tortoise
 
 import config
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.util.security_validation import run_startup_security_validation
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_audit.bot import start_bot as start_audit_bot
 from alttprbot_discord.bot import start_bot as start_discord_bot
 from alttprbot_racetime.bot import start_racetime
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 if config.SENTRY_URL:
     def before_send(event, hint):
@@ -36,6 +45,16 @@ async def database():
 
 
 if __name__ == '__main__':
+    # Run startup security validation before proceeding
+    try:
+        logger.info("=== Starting SahasrahBot ===")
+        security_results = run_startup_security_validation(config)
+        logger.info(f"Security validation passed: {security_results}")
+    except Exception as e:
+        logger.error(f"FATAL: Security validation failed: {e}")
+        logger.error("Application startup aborted due to security validation failure")
+        exit(1)
+    
     loop = asyncio.get_event_loop()
 
     dbtask = loop.create_task(database())

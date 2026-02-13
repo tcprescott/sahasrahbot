@@ -7,6 +7,7 @@ from quart import (Quart, abort, jsonify, redirect, render_template, request,
 
 import config
 from alttprbot import models
+from alttprbot.util.security_validation import should_allow_insecure_oauth_transport
 from alttprbot_discord.bot import discordbot
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,15 @@ sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(config.DISCORD_CLIENT_ID)
 sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
 sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/discord/"
 sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = config.DISCORD_TOKEN
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+# Security: Only allow insecure OAuth transport in local/dev environments
+if should_allow_insecure_oauth_transport():
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    logger.info("OAuth: Insecure transport enabled (local/development environment)")
+else:
+    # Explicitly unset to ensure secure transport
+    os.environ.pop('OAUTHLIB_INSECURE_TRANSPORT', None)
+    logger.info("OAuth: Secure transport enforced (production environment)")
 
 # Dual-path OAuth client initialization
 # Phase 1: Authlib scaffolding behind disabled feature flag
