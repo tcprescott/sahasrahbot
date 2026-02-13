@@ -1,6 +1,6 @@
 # System Patterns
 
-> Last updated: 2026-02-12
+> Last updated: 2026-02-13
 
 ## Architecture Overview
 
@@ -22,13 +22,14 @@ All four subsystems share the same database connection, models, and utility libr
 Current boot order in `sahasrahbot.py`:
 
 1. Initialize Tortoise ORM connection.
-2. Create async tasks for Discord bot, audit bot, and Quart API.
-3. Start RaceTime bots.
-4. Enter `loop.run_forever()`.
+2. Create async service tasks for Discord bot, audit bot, Quart API (`run_task`), and RaceTime category bots.
+3. Register SIGINT/SIGTERM handlers that trigger a shared shutdown event.
+4. Wait on shutdown event while monitoring service task exits.
+5. On shutdown: stop RaceTime/Discord/Audit subsystems, cancel remaining service tasks, and close DB connections.
 
 Observed failure characteristics:
 
-- Startup is task-based and not centrally supervised; subsystem failures can become runtime errors without coordinated shutdown.
+- Service tasks are now monitored; unexpected service task exits trigger coordinated shutdown.
 - Quart API bind host/port is currently hardcoded in entrypoint (`127.0.0.1:5001`).
 - RaceTime credential resolution is dynamic per category (`RACETIME_CLIENT_ID_<CATEGORY>`, `RACETIME_CLIENT_SECRET_<CATEGORY>`), so missing keys fail per category at runtime.
 

@@ -40,10 +40,18 @@ class SahasrahBotRaceTimeBot(Bot):
         self.http = None
         self.join_lock = asyncio.Lock()
         self.reauthorize_every = 36000
+        self._background_tasks = set()
+        self._stopping = False
 
         self.handler_class = handler_class
         if self.racetime_secure:
             self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+
+    def _create_background_task(self, coro):
+        task = self.loop.create_task(coro)
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
+        return task
 
     def get_handler_kwargs(self, ws_conn, state):
         return {
@@ -132,28 +140,44 @@ class SahasrahBotRaceTimeBot(Bot):
         return handler
 
     async def reauthorize(self):
-        while True:
-            self.logger.info('Get new access token')
-            self.access_token, self.reauthorize_every = await self.authorize()
+        try:
+            while not self._stopping:
+                self.logger.info('Get new access token')
+                self.access_token, self.reauthorize_every = await self.authorize()
 
-            for name in list(self.handlers):
-                room_handler = get_room_handler(self, name)
-                if room_handler is None or getattr(room_handler, 'ws', None) is None:
-                    continue
-                try:
-                    await asyncio.wait_for(room_handler.ws.close(), timeout=30)
-                except asyncio.TimeoutError:
-                    self.logger.exception("Timed out waiting for websocket to close to allow for reconnection.")
+                for name in list(self.handlers):
+                    room_handler = get_room_handler(self, name)
+                    if room_handler is None or getattr(room_handler, 'ws', None) is None:
+                        continue
+                    try:
+                        await asyncio.wait_for(room_handler.ws.close(), timeout=30)
+                    except asyncio.TimeoutError:
+                        self.logger.exception("Timed out waiting for websocket to close to allow for reconnection.")
 
-            delay = self.reauthorize_every
-            if delay > 600:
-                delay -= 600
-            await asyncio.sleep(delay)
+                delay = self.reauthorize_every
+                if delay > 600:
+                    delay -= 600
+                await asyncio.sleep(delay)
+        except asyncio.CancelledError:
+            self.logger.info('Reauthorize loop cancelled for %s.', self.category_slug)
+            raise
 
     def _track_handler_task(self, race_name, handler):
-        def done(task_name, *args):
+        def done(task_name, task):
             if task_name in self.handlers:
                 del self.handlers[task_name]
+
+            if task.cancelled() or self._stopping:
+                return
+
+            exception = task.exception()
+            if exception is not None:
+                self.logger.error(
+                    "Handler task crashed for %s in %s.",
+                    task_name,
+                    self.category_slug,
+                    exc_info=(type(exception), exception, exception.__traceback__),
+                )
 
         task = self.loop.create_task(handler.handle())
         task.add_done_callback(partial(done, race_name))
@@ -182,50 +206,54 @@ class SahasrahBotRaceTimeBot(Bot):
             raise e.last_attempt._exception from e
 
     async def refresh_races(self):
-        while True:
-            self.logger.debug('Refresh races')
-            try:
-                data = await self.get_data()
-            except Exception:
-                self.logger.error('Fatal error when attempting to retrieve race data.', exc_info=True)
-                await asyncio.sleep(self.scan_races_every)
-                continue
+        try:
+            while not self._stopping:
+                self.logger.debug('Refresh races')
+                try:
+                    data = await self.get_data()
+                except Exception:
+                    self.logger.error('Fatal error when attempting to retrieve race data.', exc_info=True)
+                    await asyncio.sleep(self.scan_races_every)
+                    continue
 
-            self.races = {}
-            for race in data.get('current_races', []):
-                self.races[race.get('name')] = race
+                self.races = {}
+                for race in data.get('current_races', []):
+                    self.races[race.get('name')] = race
 
-            for name, summary_data in self.races.items():
-                async with self.join_lock:
-                    if name in self.handlers:
-                        continue
-                    try:
-                        async with self.http.get(
-                                self.http_uri(summary_data.get('data_url')),
-                                ssl=self.ssl_context,
-                        ) as resp:
-                            race_data = await resp.json()
-                    except Exception:
-                        self.logger.error('Fatal error when attempting to retrieve summary data.', exc_info=True)
-                        await asyncio.sleep(self.scan_races_every)
-                        continue
-
-                    if self.should_handle(race_data):
-                        try:
-                            handler = await self.create_handler(race_data)
-                        except Exception:
-                            self.logger.exception("Failed to create handler.")
+                for name, summary_data in self.races.items():
+                    async with self.join_lock:
+                        if name in self.handlers:
                             continue
-                        self._track_handler_task(name, handler)
-                    else:
-                        if name in self.state:
-                            del self.state[name]
-                        self.logger.info(
-                            'Ignoring %(race)s by configuration.'
-                            % {'race': race_data.get('name')}
-                        )
+                        try:
+                            async with self.http.get(
+                                    self.http_uri(summary_data.get('data_url')),
+                                    ssl=self.ssl_context,
+                            ) as resp:
+                                race_data = await resp.json()
+                        except Exception:
+                            self.logger.error('Fatal error when attempting to retrieve summary data.', exc_info=True)
+                            await asyncio.sleep(self.scan_races_every)
+                            continue
 
-            await asyncio.sleep(self.scan_races_every)
+                        if self.should_handle(race_data):
+                            try:
+                                handler = await self.create_handler(race_data)
+                            except Exception:
+                                self.logger.exception("Failed to create handler.")
+                                continue
+                            self._track_handler_task(name, handler)
+                        else:
+                            if name in self.state:
+                                del self.state[name]
+                            self.logger.info(
+                                'Ignoring %(race)s by configuration.'
+                                % {'race': race_data.get('name')}
+                            )
+
+                await asyncio.sleep(self.scan_races_every)
+        except asyncio.CancelledError:
+            self.logger.info('Refresh loop cancelled for %s.', self.category_slug)
+            raise
 
     async def join_race_room(self, race_name, force=False):
         self.logger.info(f'Attempting to join {race_name}')
@@ -310,17 +338,23 @@ class SahasrahBotRaceTimeBot(Bot):
             result = await self.authorize()
             if result is None:
                 self.logger.error('Authorization failed: authorize() returned None.')
+                await self.http.close()
                 return
             self.access_token, self.reauthorize_every = result
         except aiohttp.ClientResponseError as e:
             if e.status == 401:
                 self.logger.error(f'RaceTime API returned 401 Unauthorized while attempting to create bot for {self.category_slug}. '
                                  f'Please check your API key and try again.')
+                await self.http.close()
                 return
             else:
+                await self.http.close()
                 raise
-        self.loop.create_task(self.reauthorize())
-        self.loop.create_task(self.refresh_races())
+        except asyncio.CancelledError:
+            await self.http.close()
+            raise
+        self._create_background_task(self.reauthorize())
+        self._create_background_task(self.refresh_races())
 
         unlisted_rooms = await models.RTGGUnlistedRooms.filter(category=self.category_slug)
         for unlisted_room in unlisted_rooms:
@@ -346,3 +380,36 @@ class SahasrahBotRaceTimeBot(Bot):
                     raise e.last_attempt._exception from e
                 else:
                     raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
+
+    async def stop(self):
+        if self._stopping:
+            return
+
+        self._stopping = True
+
+        handler_tasks = []
+        for entry in list(self.handlers.values()):
+            handler = getattr(entry, 'handler', entry)
+            ws = getattr(handler, 'ws', None)
+            if ws is not None and not ws.closed:
+                try:
+                    await ws.close()
+                except Exception:
+                    self.logger.debug('Failed to close websocket cleanly during shutdown.', exc_info=True)
+
+            task = getattr(entry, 'task', None)
+            if task is not None and not task.done():
+                task.cancel()
+                handler_tasks.append(task)
+
+        background_tasks = [task for task in self._background_tasks if not task.done()]
+        for task in background_tasks:
+            task.cancel()
+
+        if handler_tasks or background_tasks:
+            await asyncio.gather(*handler_tasks, *background_tasks, return_exceptions=True)
+
+        self.handlers.clear()
+
+        if self.http is not None and not self.http.closed:
+            await self.http.close()

@@ -1,5 +1,6 @@
 import importlib
 import logging
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -132,4 +133,14 @@ async def on_ready():
 
 async def start_bot():
     await load_extensions()
-    await discordbot.start(config.DISCORD_TOKEN)
+    try:
+        await discordbot.start(config.DISCORD_TOKEN)
+    except asyncio.CancelledError:
+        if not discordbot.is_closed():
+            await discordbot.close()
+        raise
+
+
+async def stop_bot():
+    if not discordbot.is_closed():
+        await discordbot.close()

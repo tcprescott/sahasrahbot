@@ -1,5 +1,6 @@
 import io
 import logging
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -83,4 +84,14 @@ async def start_bot():
     if config.DEBUG:
         discordbot.tree.copy_global_to(
             guild=discord.Object(id=508335685044928540))  # hard code the discord server id for now
-    await discordbot.start(config.AUDIT_DISCORD_TOKEN)
+    try:
+        await discordbot.start(config.AUDIT_DISCORD_TOKEN)
+    except asyncio.CancelledError:
+        if not discordbot.is_closed():
+            await discordbot.close()
+        raise
+
+
+async def stop_bot():
+    if not discordbot.is_closed():
+        await discordbot.close()

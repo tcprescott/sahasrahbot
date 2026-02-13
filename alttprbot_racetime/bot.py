@@ -1,6 +1,8 @@
 import logging
 import sys
 
+import asyncio
+
 from alttprbot_racetime.config import RACETIME_CATEGORIES
 
 logger = logging.getLogger()
@@ -17,8 +19,18 @@ def start_racetime(loop):
     """
     Start all Racetime bots in the given event loop.
     """
+    tasks = []
     for bot in racetime_bots.values():
-        loop.create_task(bot.start())
+        task = loop.create_task(bot.start())
+        tasks.append(task)
+    return tasks
+
+
+async def stop_racetime():
+    """
+    Stop all Racetime bots gracefully.
+    """
+    await asyncio.gather(*(bot.stop() for bot in racetime_bots.values()), return_exceptions=True)
 
 
 racetime_bots = {}

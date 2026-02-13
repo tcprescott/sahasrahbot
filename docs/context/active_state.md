@@ -1,6 +1,6 @@
 # Active State
 
-> Last updated: 2026-02-12
+> Last updated: 2026-02-13
 
 ## Current Focus
 
@@ -20,7 +20,7 @@
 - **Architecture Debt**: `guild_config` monkey-patching and name-based channel config need removal.
 - **Resilience**: `daily` task lacks retries for API failures.
 - **Runtime Security Debt**: `APP_SECRET_KEY` defaults to empty string.
-- **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
+- **Startup Reliability Follow-up**: coordinated graceful shutdown is now implemented, but subsystem-level startup policies (strict fail-fast vs degraded mode) still need explicit owner-confirmed criteria.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
 - **Auth Stack Follow-up**: Authlib is now the only API Discord OAuth path; post-cutover hardening and compatibility evidence collection remain open. Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
@@ -70,6 +70,7 @@
 - Removed Google Sheets integration from tournament runtime flow (race recording task, sheet credential utility, and Google dependencies/config keys) and retained database-only result tracking (2026-02-12).
 - Drafted implementation-ready migration plan for replacing the forked RaceTime SDK dependency with official upstream package while preserving 1:1 behavior across RaceTime handlers, tournament integrations, API-injected commands, and unlisted-room recovery (`plans/racetime_bot_official_migration_plan.md`) (2026-02-12).
 - Started execution of RaceTime SDK migration: added Phase 0 parity checklist artifact, introduced RaceTime handler compatibility helper, refactored RaceTime bot core toward official-sdk-compatible transport/handler tracking contract, updated API command handler lookup to compatibility helper, and switched `pyproject.toml` dependency to official `racetime-bot` package (2026-02-12).
+- Implemented centralized signal-aware graceful shutdown for bot runtime: entrypoint now coordinates SIGINT/SIGTERM shutdown, explicitly stops Discord/Audit/RaceTime subsystems, cancels service tasks safely, and closes database connections to reduce termination-time exception noise (2026-02-13).
 
 ## Upcoming Work
 
