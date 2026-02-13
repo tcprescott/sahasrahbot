@@ -8,11 +8,13 @@ from discord.ext import commands, tasks
 
 from alttprbot import models
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot_discord.util.guild_config_service import GuildConfigService
 
 
 class Daily(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.config_service = GuildConfigService()
         self.announce_daily.start() # pylint: disable=no-member
 
     @app_commands.command(description='Returns the current daily game from alttpr.com.')
@@ -32,14 +34,34 @@ class Daily(commands.Cog):
             seed = await get_daily_seed(hash_id)
             embed = await seed.embed(emojis=self.bot.emojis,
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
-            daily_announcer_channels = await models.Config.filter(parameter='DailyAnnouncerChannel')
+            
+            # Use GuildConfigService to fetch all guilds with daily announcer channels
+            daily_announcer_channels = await self.config_service.get_all_guilds_with_parameter('DailyAnnouncerChannel')
             for result in daily_announcer_channels:
-                guild = self.bot.get_guild(result.guild_id)
-                for channel_name in result.value.split(","):
-                    channel = discord.utils.get(guild.text_channels, name=channel_name)
-                    message: discord.Message = await channel.send(embed=embed)
-                    await message.create_thread(name=seed.data['spoiler']['meta'].get('name'),
-                                                auto_archive_duration=1440)
+                guild = self.bot.get_guild(result['guild_id'])
+                if not guild:
+                    continue
+                
+                # Get channel IDs with backward compatibility for channel names
+                channel_ids = await self.config_service.get_channel_ids(
+                    result['guild_id'],
+                    'DailyAnnouncerChannel',
+                    guild
+                )
+                
+                for channel_id in channel_ids:
+                    channel = guild.get_channel(channel_id)
+                    if channel and isinstance(channel, discord.TextChannel):
+                        try:
+                            message: discord.Message = await channel.send(embed=embed)
+                            await message.create_thread(
+                                name=seed.data['spoiler']['meta'].get('name'),
+                                auto_archive_duration=1440
+                            )
+                        except discord.errors.Forbidden:
+                            logging.warning(f'Missing permissions to send daily to channel {channel_id} in guild {guild.id}')
+                        except Exception as e:
+                            logging.error(f'Error sending daily to channel {channel_id} in guild {guild.id}: {e}')
 
     @announce_daily.before_loop
     async def before_create_races(self):

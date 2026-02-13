@@ -54,6 +54,7 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **WS3: GuildConfigService Pilot Migration** — Created `GuildConfigService` abstraction and migrated `daily.py` cog with backward-compatible channel name→ID resolution helper. Monkey-patch path remains intact for non-migrated cogs. Migration notes in `docs/plans/guild_config_service_migration_notes.md` (2026-02-12).
 - **Completed Phase 1 of seed provider reliability contract implementation**: implemented shared provider execution wrapper with 60s timeout and 3-attempt retry policy, normalized exception taxonomy, canonical provider response object, and representative SMDash adapter with validation (2026-02-12).
 - **Completed Phase 0/1 of tournament registry config rollout** (`plans/tournament_registry_config_rollout_plan.md`): Added `AVAILABLE_TOURNAMENT_HANDLERS` catalog, `config/tournaments.yaml` schema, `registry_loader.py` with validation, dual-path runtime switch with `TOURNAMENT_CONFIG_ENABLED` flag, startup logging, and validation tooling (`helpers/validate_tournament_config.py`, `docs/guides/tournament_registry_config_guide.md`) (2026-02-12).
 - **Implemented MVP anonymous telemetry pipeline** with privacy-preserving storage, no-op/DB-backed services, bounded queue, fail-open behavior, retention purge helper, usage report helper, and initial Discord generator instrumentation (2026-02-12).
@@ -63,11 +64,11 @@
 
 ## Upcoming Work
 
-1. **WS4 Phase C: Discord Multiworld Data Cleanup** — Remove multiworld ORM models and apply schema migrations to drop tables (next release).
-2. **Refactor `daily.py`**: Add `tenacity` retries and error handling (Phase 1).
-2. **Create `GuildConfigService`**: Replace monkey-patching pattern (Phase 2).
-3. **Channel ID Migration**: Convert config string names to IDs (Phase 3).
-4. Review and refine generated documentation.
+1. **Monitor GuildConfigService pilot**: Validate daily announcements continue working with pilot migration.
+2. **Incremental cog migration**: Migrate remaining cogs to GuildConfigService (`tournament.py`, `misc.py`, `audit.py`).
+3. **Channel ID Migration**: Develop and execute data migration script for channel names→IDs (Phase 3).
+4. **Refactor `daily.py`**: Add `tenacity` retries and error handling for API resilience.
+5. Review and refine generated documentation.
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
 6. Integrate dependency declaration guard execution (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
