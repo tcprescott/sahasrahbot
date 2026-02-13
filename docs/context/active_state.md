@@ -54,6 +54,7 @@
 - Reconciled direct runtime dependency declarations in `pyproject.toml` (added missing direct imports, removed unused `twitchapi`) and added dependency declaration guard script (`helpers/check_dependency_declarations.py`) (2026-02-12).
 - Added phased OAuth modernization plan (`plans/authlib_discord_oauth_migration_plan.md`) and linked it into the umbrella modernization roadmap (2026-02-12).
 - Added AI-accelerated modernization meta execution plan (`plans/modernization_meta_execution_plan_ai_accelerated.md`) to sequence subordinate modernization plans into phased delivery, validation, and governance lanes (2026-02-12).
+- **Completed Phase 0/1 of tournament registry config rollout** (`plans/tournament_registry_config_rollout_plan.md`): Added `AVAILABLE_TOURNAMENT_HANDLERS` catalog, `config/tournaments.yaml` schema, `registry_loader.py` with validation, dual-path runtime switch with `TOURNAMENT_CONFIG_ENABLED` flag, startup logging, and validation tooling (`helpers/validate_tournament_config.py`, `docs/guides/tournament_registry_config_guide.md`) (2026-02-12).
 - **Implemented MVP anonymous telemetry pipeline** with privacy-preserving storage, no-op/DB-backed services, bounded queue, fail-open behavior, retention purge helper, usage report helper, and initial Discord generator instrumentation (2026-02-12).
 - **WS4 Phase A/B: Discord Multiworld Deprecation** — Completed soft deprecation messaging and functional removal for multiworld commands. Phase A added deprecation notices to `smmulti` and `doorsmw` commands. Phase B commented out extension loads in `bot.py` to prevent command registration. Commands no longer callable; non-multiworld flows unaffected (2026-02-12).
 - **Implemented Phase A/B of Discord role-assignment deprecation (WS4):** Added deprecation messaging to all reaction-role and voice-role command surfaces, implemented runtime disablement flag `DISCORD_ROLE_ASSIGNMENT_ENABLED` (default True for backward compatibility), added conditional extension loading, preserved startup and non-role command behavior. Rollback procedure and compatibility validation documented in `docs/guides/discord_role_assignment_deprecation_runbook.md` (2026-02-12).
@@ -69,7 +70,7 @@
 5. Rotate/revoke any previously committed secrets; operationalize `.env`-based configuration.
 6. Integrate dependency declaration guard execution (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
 7. Define and document explicit startup failure/supervision strategy for multi-subsystem boot.
-8. Implement tournament registry loader and `config/tournaments.yaml` rollout per `plans/tournament_registry_config_rollout_plan.md`.
+8. **Tournament Registry Config Rollout Phase 2**: Enable config-backed registry in production with operational validation over full seasonal cycle per `plans/tournament_registry_config_rollout_plan.md`.
 9. Implement shared seed-provider reliability execution wrapper and adapter migration per `plans/seed_provider_reliability_implementation_plan.md`.
 10. Implement role-assignment deprecation rollout per `plans/discord_role_assignment_deprecation_removal_plan.md`.
 11. Implement multiworld Discord deprecation rollout per `plans/discord_multiworld_deprecation_removal_plan.md`.
