@@ -22,7 +22,7 @@
 - **Startup Reliability Debt**: entrypoint startup uses unsupervised `create_task(...)` calls and `run_forever()` without centralized task failure handling.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
 - **Dependency Drift**: runtime imports include `tenacity`, `python-dateutil` (`dateutil`), and `pytz`, but these are not declared in Poetry dependencies.
-- **Auth Stack Modernization Pending**: `Quart-Discord` remains active runtime auth path while phased `Authlib` migration is planned.
+- **Auth Stack Modernization In Progress (Phase 0/1)**: `Quart-Discord` remains active default runtime auth path. `Authlib` migration scaffolding added behind disabled `USE_AUTHLIB_OAUTH` flag (Phase 1 dual-path support). Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
 - **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
 ## Recent Completions
