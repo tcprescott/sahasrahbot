@@ -7,74 +7,52 @@ import config
 from alttprbot.exceptions import SahasrahBotException
 
 
-class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door Randomizer multiworld."):
+def create_deprecation_embed() -> discord.Embed:
+    """Create a standardized deprecation message embed."""
+    return discord.Embed(
+        title="⚠️ Feature Retired",
+        description=(
+            "Discord multiworld hosting has been retired and is no longer available.\n\n"
+            "**Timeline:** This feature will be fully removed in the next bot release.\n\n"
+            "**Alternative:** No in-bot replacement is planned. "
+            "Please use other multiworld hosting solutions outside of Discord.\n\n"
+            "Other bot features like seed generation (`/generate`), tournaments, and community commands remain fully supported."
+        ),
+        color=discord.Color.orange()
+    )
+
+
+class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="[DEPRECATED] Multiworld hosting has been retired."):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    @app_commands.command(description="Create a new multiworld host.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def host(self, interaction: discord.Interaction, multidata: discord.Attachment, race: bool = False):
-        data = {
-            'multidata_url': multidata.url,
-            'admin': interaction.user.id,
-            'racemode': race,
-            'meta': {
-                'channel': interaction.channel.name if interaction.channel.guild else None,
-                'guild': interaction.guild.name if interaction.guild else None,
-                'multidata_url': multidata.url,
-                'name': f'{interaction.user.name}#{interaction.user.discriminator}'
-            }
-        }
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post('http://localhost:5002/game', json=data) as resp:
-                    multiworld = await resp.json()
-        except aiohttp.ClientResponseError as err:
-            raise SahasrahBotException(
-                'Unable to generate host using the provided multidata.  Ensure you\'re using the latest version of the mutiworld (<https://github.com/Bonta0/ALttPEntranceRandomizer/tree/multiworld_31>)!') from err
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
-        if not multiworld.get('success', True):
-            raise SahasrahBotException(
-                f"Unable to generate host using the provided multidata.  {multiworld.get('description', '')}")
-
-        await interaction.response.send_message(embed=make_embed(multiworld))
-
-    @app_commands.command(description="Resume a multiworld that was previously closed.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def resume(self, interaction: discord.Interaction, token: str):
-        data = {
-            'token': token
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:5002/game', json=data) as resp:
-                multiworld = await resp.json()
-        await interaction.response.send_message(embed=make_embed(multiworld))
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
-    @app_commands.command(description="Kick a player from a multiworld game.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def kick(self, interaction: discord.Interaction, token: str, player: str):
-        resp = await send_command(token, interaction, command='kick', name=player)
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
-        await interaction.response.send_message(resp, ephemeral=True)
-
-    @app_commands.command(description="Close a multiworld game.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def close(self, interaction: discord.Interaction, token: str):
-        resp = await send_command(token, interaction, command='close')
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
-        await interaction.response.send_message(resp, ephemeral=True)
-
-    @app_commands.command(description="Forfeit a player in a multiworld game.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def forfeit(self, interaction: discord.Interaction, token: str, player: str):
-        resp = await send_command(token, interaction, command='forfeit', name=player)
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
-        await interaction.response.send_message(resp, ephemeral=True)
-
-    @app_commands.command(description="Send an item to a player.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def send(self, interaction: discord.Interaction, token: str, player: str, item: str):
-        resp = await send_command(token, interaction, command='senditem', player=player, item=item)
-        await interaction.response.send_message(resp, ephemeral=True)
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
-    @app_commands.command(description="Set password for a multiworld game.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def password(self, interaction: discord.Interaction, token: str, password: str):
-        resp = await send_command(token, interaction, command='password', password=password)
-        await interaction.response.send_message(resp, ephemeral=True)
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
     @forfeit.autocomplete("player")
     @send.autocomplete("player")
@@ -114,34 +92,9 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
 
         return [app_commands.Choice(name=client, value=client) for client in result]
 
-    @app_commands.command(description="Send a message to the multiworld server.")
+    @app_commands.command(description="[DEPRECATED] Multiworld hosting has been retired.")
     async def msg(self, interaction: discord.Interaction, token: str, msg: str):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'http://localhost:5002/game/{token}') as multiworld_resp:
-                multiworld = await multiworld_resp.json()
-
-        if not multiworld.get('success', True):
-            raise SahasrahBotException("That game does not exist.")
-
-        if not (multiworld['admin'] == interaction.user.id):
-            raise SahasrahBotException('You must be the creator of the game to send messages to it.')
-
-        data = {
-            'msg': msg
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.put(f'http://localhost:5002/game/{token}/msg', json=data) as msg_response:
-                response = await msg_response.json()
-
-        if response.get('success', True) is False:
-            raise SahasrahBotException(response.get(
-                'error', 'Unknown error occured while processing message.'))
-
-        if 'resp' in response and response['resp'] is not None:
-            await interaction.response.send_message(response['resp'])
-        else:
-            await interaction.response.send_message(
-                "Message sent to multiworld server.  No response received (this may be normal).")
+        await interaction.response.send_message(embed=create_deprecation_embed(), ephemeral=True)
 
 
 async def send_command(token, interaction: discord.Interaction, **data):
