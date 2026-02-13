@@ -7,10 +7,10 @@ from tortoise import Tortoise
 
 import config
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.util.config_contract import ConfigValidationError, validate_config_contract
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_audit.bot import start_bot as start_audit_bot
 from alttprbot_discord.bot import start_bot as start_discord_bot
-from alttprbot_racetime.bot import start_racetime
 
 if config.SENTRY_URL:
     def before_send(event, hint):
@@ -36,6 +36,13 @@ async def database():
 
 
 if __name__ == '__main__':
+    try:
+        validate_config_contract()
+    except ConfigValidationError as error:
+        raise SystemExit(f'Configuration validation failed: {error}')
+
+    from alttprbot_racetime.bot import start_racetime
+
     loop = asyncio.get_event_loop()
 
     dbtask = loop.create_task(database())

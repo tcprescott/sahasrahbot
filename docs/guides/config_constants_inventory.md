@@ -64,39 +64,19 @@ RaceTime category handlers dynamically resolve category-specific client credenti
 
 This means runtime may expect additional constants beyond the 40 statically discovered keys (for each enabled RaceTime category).
 
-## Gap Against `config.py.example`
+## Coverage Against `config.py.example`
 
-`config.py.example` currently defines only a subset of runtime-read constants. The following constants are used by application imports but not present in the example file:
+`config.py.example` has been aligned to include placeholders for all 40 statically-read constants in this inventory.
 
-- `ALTTPR_BASEURL`
-- `ALTTPR_PASSWORD`
-- `ALTTPR_USERNAME`
-- `ALTTP_RANDOMIZER_SERVERS`
-- `ALTTP_ROM`
-- `AUDIT_DISCORD_TOKEN`
-- `AWS_SPOILER_BUCKET_NAME`
-- `BINGO_COLLAB_DISCORD_WEBHOOK`
-- `CC_TOURNAMENT_AUDIT_CHANNELS`
-- `CC_TOURNAMENT_SERVERS`
-- `GSHEET_API_OAUTH`
-- `MAIN_TOURNAMENT_SERVERS`
-- `MULTIWORLDHOSTBASE`
-- `OOTR_API_KEY`
-- `RACETIME_CLIENT_ID_OAUTH`
-- `RACETIME_CLIENT_SECRET_OAUTH`
-- `RACETIME_COMMAND_PREFIX`
-- `RACETIME_CSRF_TOKEN`
-- `RACETIME_HOST`
-- `RACETIME_PORT`
-- `RACETIME_SECURE`
-- `RACETIME_SESSION_TOKEN`
-- `RACETIME_URL`
-- `SAHASRAHBOT_BUCKET`
-- `SG_API_ENDPOINT`
-- `SG_DISCORD_WEBHOOK`
-- `SPOILERLOGURLBASE`
-- `TOURNAMENT_RESULTS_SHEET`
+Remaining caveat: dynamic RaceTime category keys are runtime-dependent and must still be provided per enabled category:
+
+- `RACETIME_CLIENT_ID_<CATEGORY_SLUG_UPPER_NO_DASH>`
+- `RACETIME_CLIENT_SECRET_<CATEGORY_SLUG_UPPER_NO_DASH>`
 
 ## Maintenance
 
 When adding a new `config` constant read in code, update this inventory and `config.py.example` in the same change.
+
+Validate required startup config keys with:
+
+- `poetry run python helpers/validate_runtime_config.py`

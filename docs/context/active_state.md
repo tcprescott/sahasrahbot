@@ -63,7 +63,8 @@
 - **Phase 0 Bootstrap (Week 0–1) completed:** Created modernization execution tracker (`plans/modernization_execution_tracker.md`) mapping WS1–WS5 workstreams to gate milestones with 30/60/90-day targets; added compatibility evidence packet template (`guides/compatibility_evidence_packet_template.md`) aligned to validation runbook; added feature-flag inventory (`guides/feature_flag_inventory.md`) with single-owner + sunset enforcement; updated MASTER_INDEX.md and active_state.md (2026-02-12).
 - Aligned modernization tracker and umbrella roadmap workflow language to a single-developer operating model (single-owner role hats, serial high-risk execution, explicit WIP limits) (2026-02-12).
 - **Completed Discord OAuth Authlib cutover (WS1):** removed Quart-Discord runtime usage and dual-path selector, migrated all API blueprints/decorators to Authlib helper imports, and removed legacy OAuth dependencies from `pyproject.toml` (2026-02-12).
-- Documented import-backed root config contract in `docs/guides/config_constants_inventory.md`, including 40 statically-read constants, dynamic RaceTime credential key pattern, and current coverage gap versus `config.py.example` (2026-02-12).
+- Documented import-backed root config contract in `docs/guides/config_constants_inventory.md`, including 40 statically-read constants and dynamic RaceTime credential key pattern; aligned `config.py.example` placeholders to match static runtime usage (2026-02-12).
+- Added fail-fast startup config contract validation via `alttprbot/util/config_contract.py`, wired in `sahasrahbot.py` before RaceTime bot import, plus standalone checker `helpers/validate_runtime_config.py` for local/CI preflight (2026-02-12).
 
 ## Upcoming Work
 

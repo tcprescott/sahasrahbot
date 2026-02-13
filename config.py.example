@@ -7,6 +7,7 @@ Copy to config.py and populate with real values from environment variables.
 DO NOT commit config.py - it contains secrets and is gitignored.
 """
 
+import json
 import os
 
 # Discord Bot Configuration
@@ -31,5 +32,50 @@ SENTRY_URL = os.environ.get('SENTRY_URL', '')
 # Debug Mode
 DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
 
-# Additional configuration omitted for brevity
-# See existing code for complete configuration requirements
+# ALTTPR / Randomizer Configuration
+ALTTPR_BASEURL = os.environ.get('ALTTPR_BASEURL', 'https://alttpr.com')
+ALTTPR_USERNAME = os.environ.get('ALTTPR_USERNAME', '')
+ALTTPR_PASSWORD = os.environ.get('ALTTPR_PASSWORD', '')
+ALTTP_ROM = os.environ.get('ALTTP_ROM', '/opt/data/alttp_jp10.sfc')
+
+# AWS / Spoiler Storage
+AWS_SPOILER_BUCKET_NAME = os.environ.get('AWS_SPOILER_BUCKET_NAME', '')
+SPOILERLOGURLBASE = os.environ.get('SPOILERLOGURLBASE', '')
+SAHASRAHBOT_BUCKET = os.environ.get('SAHASRAHBOT_BUCKET', '')
+
+# Discord Bot / Server Scope
+AUDIT_DISCORD_TOKEN = os.environ.get('AUDIT_DISCORD_TOKEN', '')
+ALTTP_RANDOMIZER_SERVERS = os.environ.get('ALTTP_RANDOMIZER_SERVERS', '')
+MAIN_TOURNAMENT_SERVERS = os.environ.get('MAIN_TOURNAMENT_SERVERS', '')
+CC_TOURNAMENT_SERVERS = os.environ.get('CC_TOURNAMENT_SERVERS', '')
+CC_TOURNAMENT_AUDIT_CHANNELS = os.environ.get('CC_TOURNAMENT_AUDIT_CHANNELS', '')
+
+# Tournament / Integrations
+TOURNAMENT_RESULTS_SHEET = os.environ.get('TOURNAMENT_RESULTS_SHEET', '')
+SG_API_ENDPOINT = os.environ.get('SG_API_ENDPOINT', 'https://speedgaming.org/api')
+SG_DISCORD_WEBHOOK = os.environ.get('SG_DISCORD_WEBHOOK', '')
+BINGO_COLLAB_DISCORD_WEBHOOK = os.environ.get('BINGO_COLLAB_DISCORD_WEBHOOK', '')
+OOTR_API_KEY = os.environ.get('OOTR_API_KEY', '')
+
+# Multiworld
+MULTIWORLDHOSTBASE = os.environ.get('MULTIWORLDHOSTBASE', 'localhost')
+
+# RaceTime (OAuth + App)
+RACETIME_CLIENT_ID_OAUTH = os.environ.get('RACETIME_CLIENT_ID_OAUTH', '')
+RACETIME_CLIENT_SECRET_OAUTH = os.environ.get('RACETIME_CLIENT_SECRET_OAUTH', '')
+RACETIME_HOST = os.environ.get('RACETIME_HOST', 'localhost')
+RACETIME_PORT = int(os.environ.get('RACETIME_PORT', '8000'))
+RACETIME_SECURE = os.environ.get('RACETIME_SECURE', 'false').lower() == 'true'
+RACETIME_URL = os.environ.get('RACETIME_URL', 'http://localhost:8000')
+RACETIME_COMMAND_PREFIX = os.environ.get('RACETIME_COMMAND_PREFIX', '!')
+RACETIME_SESSION_TOKEN = os.environ.get('RACETIME_SESSION_TOKEN', '')
+RACETIME_CSRF_TOKEN = os.environ.get('RACETIME_CSRF_TOKEN', '')
+
+# RaceTime dynamic category credentials
+# Runtime expects:
+# - RACETIME_CLIENT_ID_<CATEGORY_SLUG_UPPER_NO_DASH>
+# - RACETIME_CLIENT_SECRET_<CATEGORY_SLUG_UPPER_NO_DASH>
+
+# Google API OAuth service account JSON
+# Use a JSON string in env var GSHEET_API_OAUTH.
+GSHEET_API_OAUTH = json.loads(os.environ.get('GSHEET_API_OAUTH', '{}'))
