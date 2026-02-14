@@ -27,7 +27,6 @@ class SahasrahBotRaceTimeBot(Bot):
         self.category_slug = category_slug
         self.ssl_context = ssl_context
 
-        self.loop = asyncio.get_event_loop()
         self.last_scan = None
         self.handlers = {}
         self.races = {}
@@ -48,7 +47,11 @@ class SahasrahBotRaceTimeBot(Bot):
             self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
     def _create_background_task(self, coro):
-        task = self.loop.create_task(coro)
+        if self._stopping:
+            coro.close()
+            return None
+
+        task = asyncio.create_task(coro)
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
         return task
@@ -105,13 +108,15 @@ class SahasrahBotRaceTimeBot(Bot):
                         'client_id': self.client_id,
                         'client_secret': self.client_secret,
                         'grant_type': 'client_credentials',
-                    }, ssl=self.ssl_context) as resp:
+                    }, ssl=self.ssl_context if self.ssl_context is not None else self.racetime_secure) as resp:
                         data = await resp.json()
                         if not data.get('access_token'):
                             raise Exception('Unable to retrieve access token.')
                         return data.get('access_token'), data.get('expires_in', 36000)
         except RetryError as e:
-            raise e.last_attempt._exception from e
+            if e.last_attempt and e.last_attempt.exception():
+                raise e.last_attempt.exception() from e
+            raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
 
     async def create_handler(self, race_data):
         ws_conn = await self.http.ws_connect(
@@ -179,7 +184,7 @@ class SahasrahBotRaceTimeBot(Bot):
                     exc_info=(type(exception), exception, exception.__traceback__),
                 )
 
-        task = self.loop.create_task(handler.handle())
+        task = asyncio.create_task(handler.handle())
         task.add_done_callback(partial(done, race_name))
         self.handlers[race_name] = HandlerTask(task=task, handler=handler)
 
@@ -203,7 +208,9 @@ class SahasrahBotRaceTimeBot(Bot):
                     ) as resp:
                         return await resp.json()
         except RetryError as e:
-            raise e.last_attempt._exception from e
+            if e.last_attempt and e.last_attempt.exception():
+                raise e.last_attempt.exception() from e
+            raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
 
     async def refresh_races(self):
         try:
@@ -211,7 +218,11 @@ class SahasrahBotRaceTimeBot(Bot):
                 self.logger.debug('Refresh races')
                 try:
                     data = await self.get_data()
+                except asyncio.CancelledError:
+                    raise
                 except Exception:
+                    if self._stopping:
+                        break
                     self.logger.error('Fatal error when attempting to retrieve race data.', exc_info=True)
                     await asyncio.sleep(self.scan_races_every)
                     continue
@@ -230,7 +241,11 @@ class SahasrahBotRaceTimeBot(Bot):
                                     ssl=self.ssl_context,
                             ) as resp:
                                 race_data = await resp.json()
+                        except asyncio.CancelledError:
+                            raise
                         except Exception:
+                            if self._stopping:
+                                break
                             self.logger.error('Fatal error when attempting to retrieve summary data.', exc_info=True)
                             await asyncio.sleep(self.scan_races_every)
                             continue
@@ -341,6 +356,12 @@ class SahasrahBotRaceTimeBot(Bot):
                 await self.http.close()
                 return
             self.access_token, self.reauthorize_every = result
+
+            if self._stopping:
+                if not self.http.closed:
+                    await self.http.close()
+                return
+
         except aiohttp.ClientResponseError as e:
             if e.status == 401:
                 self.logger.error(f'RaceTime API returned 401 Unauthorized while attempting to create bot for {self.category_slug}. '
@@ -351,7 +372,11 @@ class SahasrahBotRaceTimeBot(Bot):
                 await self.http.close()
                 raise
         except asyncio.CancelledError:
-            await self.http.close()
+            await self.stop()
+            raise
+        except Exception:
+            if self.http is not None and not self.http.closed:
+                await self.http.close()
             raise
         self._create_background_task(self.reauthorize())
         self._create_background_task(self.refresh_races())
@@ -380,6 +405,9 @@ class SahasrahBotRaceTimeBot(Bot):
                     raise e.last_attempt._exception from e
                 else:
                     raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
+            except asyncio.CancelledError:
+                await self.stop()
+                raise
 
     async def stop(self):
         if self._stopping:

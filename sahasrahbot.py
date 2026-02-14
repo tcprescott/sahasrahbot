@@ -78,15 +78,24 @@ async def _run():
 
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
+
+    def request_shutdown(sig_name):
+        logger.info('Received %s, requesting shutdown.', sig_name)
+        stop_event.set()
+
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        with contextlib.suppress(NotImplementedError):
+            loop.add_signal_handler(sig, request_shutdown, sig.name)
+
     service_tasks = [
         asyncio.create_task(start_discord_bot(), name='discord-bot'),
         asyncio.create_task(start_audit_bot(), name='audit-bot'),
         asyncio.create_task(
-            sahasrahbotapi.run_task(host='127.0.0.1', port=5001),
+            sahasrahbotapi.run_task(host='127.0.0.1', port=5001, shutdown_trigger=stop_event.wait),
             name='quart-api',
         ),
     ]
-    service_tasks.extend(start_racetime(loop))
+    service_tasks.extend(start_racetime())
 
     def on_service_done(task):
         if task.cancelled():
@@ -103,14 +112,6 @@ async def _run():
 
     for task in service_tasks:
         task.add_done_callback(on_service_done)
-
-    def request_shutdown(sig_name):
-        logger.info('Received %s, requesting shutdown.', sig_name)
-        stop_event.set()
-
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        with contextlib.suppress(NotImplementedError):
-            loop.add_signal_handler(sig, request_shutdown, str(sig))
 
     try:
         await stop_event.wait()

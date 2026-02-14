@@ -15,13 +15,13 @@ logger_handler.setFormatter(logging.Formatter(
 logger.addHandler(logger_handler)
 
 
-def start_racetime(loop):
+def start_racetime():
     """
     Start all Racetime bots in the given event loop.
     """
     tasks = []
     for bot in racetime_bots.values():
-        task = loop.create_task(bot.start())
+        task = asyncio.create_task(bot.start())
         tasks.append(task)
     return tasks
 
