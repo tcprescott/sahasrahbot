@@ -139,6 +139,7 @@ class ReactionRole(Model):
     role_id = fields.BigIntField(null=True)
     name = fields.CharField(45, null=True)
     emoji = fields.CharField(200, null=True)
+    description = fields.CharField(1000, null=True)
     protect_mentions = fields.SmallIntField(null=True)
 
 

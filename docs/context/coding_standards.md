@@ -68,7 +68,7 @@ migrations/             # Aerich database migrations
 - All IO operations are async (`aiohttp`, `aioboto3`, `tortoise-orm`, etc.)
 - Single event loop drives all 4 subsystems
 - Background tasks use `discord.ext.tasks.loop()` decorator
-- Database queries use either Tortoise ORM awaitable methods or `await orm.select()`/`orm.execute()`
+- Database queries use Tortoise ORM awaitable methods via model queries and updates
 - Startup currently uses fire-and-forget `loop.create_task(...)` orchestration in entrypoint; this is an observed legacy pattern and should be treated as technical debt unless explicit supervision is added.
 
 ## Discord.py Patterns
@@ -101,12 +101,10 @@ record.field = value
 await record.save()
 ```
 
-### Legacy Raw SQL (existing code in `alttprbot/database/`)
+### Legacy Raw SQL Helper
 ```python
-from alttprbot.util import orm
-
-results = await orm.select("SELECT * FROM table WHERE col=%s", [value])
-await orm.execute("INSERT INTO table (col) VALUES (%s)", [value])
+# Legacy helper `alttprbot/util/orm.py` has been removed.
+# Use model operations for all application data access.
 ```
 
 ## Error Handling

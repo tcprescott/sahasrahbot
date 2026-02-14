@@ -252,35 +252,17 @@ A full event scheduling system:
 
 ## 3. Database Layer
 
-### Dual-Pattern Architecture
+### Database Access Pattern
 
-The codebase has **two coexisting database access patterns**:
+Application database access now uses Tortoise ORM model operations directly (including `alttprbot/database/` helper modules):
 
-#### Legacy Pattern: Raw SQL via `alttprbot/database/`
-
-Each module in `alttprbot/database/` provides async functions that execute raw SQL through `alttprbot/util/orm.py`:
-
-```python
-# orm.py — thin wrapper around Tortoise's raw connection
-async def select(sql, args=None):
-    conn = Tortoise.get_connection("default")
-    return await conn.execute_query_dict(sql, args)
-
-async def execute(sql, args=None):
-    conn = Tortoise.get_connection("default")
-    await conn.execute_query(sql, args)
-```
-
-This returns dictionaries, not model instances. Many modules add `aiocache.SimpleMemoryCache` for caching with manual cache invalidation.
-
-#### Modern Pattern: Tortoise ORM via `alttprbot/models/`
-
-Newer code uses Tortoise ORM models directly:
 ```python
 await models.AuditGeneratedGames.create(...)
 await models.Presets.get_or_none(...)
 await models.AsyncTournamentRace.filter(...)
 ```
+
+Helper modules that previously used raw SQL now call model filters/updates and return dictionary-shaped values where existing call sites expect dict access. Caching behavior remains manual via `aiocache.SimpleMemoryCache` invalidation.
 
 ### Legacy Database Modules
 
@@ -299,8 +281,7 @@ await models.AsyncTournamentRace.filter(...)
 - **`config.py`** imports `CACHE` from `alttprbot_discord.util.guild_config`, creating a cross-layer dependency
 - **`role.py`** has extensive CRUD for reaction-based role assignment with its own cache namespace `"role"`
 - **`tournament_results.py`** tracks races through a lifecycle: `NULL status` → `STARTED` → `RECORDED` → written_to_gsheet
-- **`spoiler_races.py`** uses MySQL-specific `ON DUPLICATE KEY UPDATE` and `TIMESTAMPADD` functions
-- All legacy modules use parameterized queries with `%s` placeholders (MySQL style)
+- **`spoiler_races.py`** preserves the study-time validity window using ORM reads/updates and Python time-window checks
 
 ---
 
@@ -314,7 +295,6 @@ await models.AsyncTournamentRace.filter(...)
 | `helpers.py` | `generate_random_string(length)` — alphanumeric random string generator |
 | `console.py` | Logging wrappers (`debug`, `info`, `warning`, `error`, `critical`) that auto-detect caller module name |
 | `http.py` | Generic async HTTP utilities: `request_generic()`, `request_json_post()`, `request_json_put()` — all use `aiohttp`, support text/json/binary/yaml response types |
-| `orm.py` | Raw SQL execution wrapper over Tortoise's connection (`select()` → dict results, `execute()` → void) |
 | `gsheet.py` | Google Sheets API client setup using `oauth2client` service account credentials from config |
 | `holyimage.py` | Fetches "holy images" from `alttp.mymm1.com` — community images with Discord embed support |
 | `rom.py` | SNES address conversion utilities: `snes_to_pc_lorom()`, `pc_to_snes_lorom()` |
@@ -445,7 +425,7 @@ TORTOISE_ORM = {
     },
     "apps": {
         "models": {
-            "models": ["alttprbot.models", "aerich.models"],
+        "models": ["alttprbot.models", "aerich.models"],
             "default_connection": "default",
         },
     },

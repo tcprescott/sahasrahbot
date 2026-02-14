@@ -12,7 +12,6 @@
 ## Known Issues
 
 - Secrets historically lived in `config.py`; configuration is environment-driven via `config.py` constants sourced from environment variables, but any previously exposed tokens/keys should be considered compromised and rotated.
-- Legacy database layer (`alttprbot/database/`) coexists with Tortoise ORM models — dual-pattern creates confusion.
 - Cross-layer dependency: `alttprbot/database/config.py` imports `CACHE` from `alttprbot_discord.util.guild_config`.
 - Many tournament handlers in `TOURNAMENT_DATA` registry are commented out between seasons.
 - The `reverify_racer` background task in the `racer_verification` cog is currently disabled via comment.
@@ -73,6 +72,7 @@
 - Implemented centralized signal-aware graceful shutdown for bot runtime: entrypoint now coordinates SIGINT/SIGTERM shutdown, explicitly stops Discord/Audit/RaceTime subsystems, cancels service tasks safely, and closes database connections to reduce termination-time exception noise (2026-02-13).
 - Fixed Discord daily challenge reliability bugs in `alttprbot_discord/cogs/daily.py`: corrected dedupe DB check, added bounded retries for daily hash/seed retrieval, isolated thread creation from send failures, and added safer hash/thread-name handling (2026-02-13).
 - Hardened Discord/Audit background task loops against crash-stop behavior: added guarded exception boundaries and loop-level restart handlers in `alttprbot_discord/cogs/tournament.py`, `alttprbot_discord/cogs/daily.py`, `alttprbot_discord/cogs/racer_verification.py`, and `alttprbot_audit/cogs/audit.py` so transient/unhandled exceptions no longer require bot restart (2026-02-13).
+- Eliminated legacy raw-SQL helper usage from application database access modules by migrating `alttprbot/database/*.py` queries/writes to Tortoise model operations with equivalent dict-shaped outputs for existing call sites, and removed obsolete `alttprbot/util/orm.py` (2026-02-13).
 
 ## Upcoming Work
 

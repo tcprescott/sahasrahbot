@@ -119,7 +119,7 @@ poetry run aerich migrate    # Create new migration
 
 ### Database
 - **ORM (preferred):** Tortoise ORM — `await models.Thing.create(...)`, `.get_or_none(...)`, `.filter(...)`
-- **Legacy:** Raw SQL via `alttprbot.util.orm.select()` / `orm.execute()` — avoid for new code
+- **Legacy:** Previous raw SQL helper (`alttprbot/util/orm.py`) has been removed; use model-based ORM operations
 - **Migrations:** Aerich manages schema evolution; migrations in `migrations/models/`
 
 ### Dependencies

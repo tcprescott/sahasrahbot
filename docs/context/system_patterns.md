@@ -126,7 +126,7 @@ Admin Creates Tournament → Seeds Added to Pools → Players Start Runs via Dis
 
 - **ORM**: Tortoise ORM with MySQL backend
 - **Migrations**: Aerich (97 migrations, 2021–2024)
-- **Dual Access Pattern**: Legacy raw SQL modules (`alttprbot/database/`) coexist with Tortoise ORM model usage
+- **Access Pattern**: Application data access modules now use Tortoise model operations (legacy raw SQL helper usage removed from `alttprbot/database/`)
 - **Caching**: `aiocache.SimpleMemoryCache` for guild config and various lookups
 
 ## External Integrations
