@@ -1,6 +1,8 @@
 import csv
 import datetime
 import io
+import logging
+import asyncio
 from contextlib import closing
 
 import discord
@@ -16,8 +18,19 @@ class Audit(commands.Cog):
 
     @tasks.loop(hours=24, reconnect=True)
     async def clean_history(self):
-        thirty_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=30)
-        await models.AuditMessages.filter(message_date__lte=thirty_days_ago).delete()
+        try:
+            thirty_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+            await models.AuditMessages.filter(message_date__lte=thirty_days_ago).delete()
+        except Exception:
+            logging.exception("Error while running audit clean_history loop")
+
+    @clean_history.error
+    async def clean_history_error(self, error: Exception):
+        if isinstance(error, asyncio.CancelledError):
+            return
+        logging.error("Unhandled exception in clean_history loop", exc_info=error)
+        if not self.clean_history.is_being_cancelled() and not self.clean_history.is_running():
+            self.clean_history.restart()
 
     @clean_history.before_loop
     async def before_clean_history(self):

@@ -1,6 +1,7 @@
 import datetime
 import logging
 import random
+import asyncio
 
 import discord
 from discord import app_commands
@@ -126,13 +127,42 @@ class Tournament(commands.Cog):
 
     @tasks.loop(minutes=0.25 if config.DEBUG else 240, reconnect=True)
     async def find_races_with_bad_discord(self):
-        logging.info('scanning for races with bad discord info')
-        for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
-            messages = await self.report_bad_player_discord(event_slug=event_slug)
-            event_data: core.TournamentConfig = await tournament_class.get_config()
+        try:
+            logging.info('scanning for races with bad discord info')
+            for event_slug, tournament_class in tournaments.TOURNAMENT_DATA.items():
+                try:
+                    messages = await self.report_bad_player_discord(event_slug=event_slug)
+                    event_data: core.TournamentConfig = await tournament_class.get_config()
+                except Exception:
+                    logging.exception("Error while checking bad discord data for event %s", event_slug)
+                    continue
 
-            if messages and event_data.audit_channel:
-                await event_data.audit_channel.send("<@185198185990324225>\n\n" + "\n".join(messages))
+                if messages and event_data.audit_channel:
+                    try:
+                        await event_data.audit_channel.send("<@185198185990324225>\n\n" + "\n".join(messages))
+                    except Exception:
+                        logging.exception("Error while sending bad discord alert for event %s", event_slug)
+        except Exception:
+            logging.exception("Encountered a problem while running find_races_with_bad_discord.")
+
+    async def _restart_loop_if_needed(self, loop: tasks.Loop, loop_name: str, error: Exception):
+        if isinstance(error, asyncio.CancelledError):
+            return
+        logging.error("Unhandled exception in %s loop", loop_name, exc_info=error)
+        if not loop.is_being_cancelled() and not loop.is_running():
+            loop.restart()
+
+    @create_races.error
+    async def create_races_error(self, error: Exception):
+        await self._restart_loop_if_needed(self.create_races, "create_races", error)
+
+    @week_races.error
+    async def week_races_error(self, error: Exception):
+        await self._restart_loop_if_needed(self.week_races, "week_races", error)
+
+    @find_races_with_bad_discord.error
+    async def find_races_with_bad_discord_error(self, error: Exception):
+        await self._restart_loop_if_needed(self.find_races_with_bad_discord, "find_races_with_bad_discord", error)
 
     @create_races.before_loop
     async def before_create_races(self):

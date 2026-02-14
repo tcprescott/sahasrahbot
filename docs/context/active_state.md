@@ -72,6 +72,7 @@
 - Started execution of RaceTime SDK migration: added Phase 0 parity checklist artifact, introduced RaceTime handler compatibility helper, refactored RaceTime bot core toward official-sdk-compatible transport/handler tracking contract, updated API command handler lookup to compatibility helper, and switched `pyproject.toml` dependency to official `racetime-bot` package (2026-02-12).
 - Implemented centralized signal-aware graceful shutdown for bot runtime: entrypoint now coordinates SIGINT/SIGTERM shutdown, explicitly stops Discord/Audit/RaceTime subsystems, cancels service tasks safely, and closes database connections to reduce termination-time exception noise (2026-02-13).
 - Fixed Discord daily challenge reliability bugs in `alttprbot_discord/cogs/daily.py`: corrected dedupe DB check, added bounded retries for daily hash/seed retrieval, isolated thread creation from send failures, and added safer hash/thread-name handling (2026-02-13).
+- Hardened Discord/Audit background task loops against crash-stop behavior: added guarded exception boundaries and loop-level restart handlers in `alttprbot_discord/cogs/tournament.py`, `alttprbot_discord/cogs/daily.py`, `alttprbot_discord/cogs/racer_verification.py`, and `alttprbot_audit/cogs/audit.py` so transient/unhandled exceptions no longer require bot restart (2026-02-13).
 
 ## Upcoming Work
 

@@ -1,4 +1,5 @@
 import logging
+import asyncio
 
 import aiocache
 import aiohttp
@@ -56,49 +57,59 @@ class Daily(commands.Cog):
         except (aiohttp.ClientError, ValueError, KeyError, TypeError, RuntimeError) as error:  # noqa: BLE001
             logger.error('Failed daily announcement preparation: %s', error)
             return
-
-        daily_announcer_channels = await self.config_service.get_all_guilds_with_parameter('DailyAnnouncerChannel')
-        for result in daily_announcer_channels:
-            guild_id = result.get('guild_id')
-            guild = self.bot.get_guild(guild_id)
-            if not guild:
-                logger.warning('Guild %s no longer available for daily announcements', guild_id)
-                continue
-
-            channel_ids = await self.config_service.get_channel_ids(
-                guild_id,
-                'DailyAnnouncerChannel',
-                guild
-            )
-
-            for channel_id in channel_ids:
-                channel = guild.get_channel(channel_id)
-                if not channel or not isinstance(channel, discord.TextChannel):
-                    logger.warning('Daily channel %s invalid in guild %s', channel_id, guild.id)
+        try:
+            daily_announcer_channels = await self.config_service.get_all_guilds_with_parameter('DailyAnnouncerChannel')
+            for result in daily_announcer_channels:
+                guild_id = result.get('guild_id')
+                guild = self.bot.get_guild(guild_id)
+                if not guild:
+                    logger.warning('Guild %s no longer available for daily announcements', guild_id)
                     continue
 
-                try:
-                    message: discord.Message = await channel.send(embed=embed)
-                except discord.errors.Forbidden:
-                    logger.warning('Missing permissions to send daily to channel %s in guild %s', channel_id, guild.id)
-                    continue
-                except discord.HTTPException as error:  # noqa: BLE001
-                    logger.error('Error sending daily to channel %s in guild %s: %s', channel_id, guild.id, error)
-                    continue
+                channel_ids = await self.config_service.get_channel_ids(
+                    guild_id,
+                    'DailyAnnouncerChannel',
+                    guild
+                )
 
-                thread_name = _daily_thread_name(seed)
-                if not thread_name:
-                    continue
+                for channel_id in channel_ids:
+                    channel = guild.get_channel(channel_id)
+                    if not channel or not isinstance(channel, discord.TextChannel):
+                        logger.warning('Daily channel %s invalid in guild %s', channel_id, guild.id)
+                        continue
 
-                try:
-                    await message.create_thread(
-                        name=thread_name,
-                        auto_archive_duration=1440
-                    )
-                except discord.errors.Forbidden:
-                    logger.warning('Missing permissions to create daily thread in channel %s (guild %s)', channel_id, guild.id)
-                except discord.HTTPException as error:  # noqa: BLE001
-                    logger.warning('Daily post succeeded but thread creation failed in channel %s (guild %s): %s', channel_id, guild.id, error)
+                    try:
+                        message: discord.Message = await channel.send(embed=embed)
+                    except discord.errors.Forbidden:
+                        logger.warning('Missing permissions to send daily to channel %s in guild %s', channel_id, guild.id)
+                        continue
+                    except discord.HTTPException as error:  # noqa: BLE001
+                        logger.error('Error sending daily to channel %s in guild %s: %s', channel_id, guild.id, error)
+                        continue
+
+                    thread_name = _daily_thread_name(seed)
+                    if not thread_name:
+                        continue
+
+                    try:
+                        await message.create_thread(
+                            name=thread_name,
+                            auto_archive_duration=1440
+                        )
+                    except discord.errors.Forbidden:
+                        logger.warning('Missing permissions to create daily thread in channel %s (guild %s)', channel_id, guild.id)
+                    except discord.HTTPException as error:  # noqa: BLE001
+                        logger.warning('Daily post succeeded but thread creation failed in channel %s (guild %s): %s', channel_id, guild.id, error)
+        except Exception:
+            logger.exception('Unhandled error in announce_daily loop')
+
+    @announce_daily.error
+    async def announce_daily_error(self, error: Exception):
+        if isinstance(error, asyncio.CancelledError):
+            return
+        logger.error('Unhandled exception in announce_daily loop', exc_info=error)
+        if not self.announce_daily.is_being_cancelled() and not self.announce_daily.is_running():
+            self.announce_daily.restart()
 
     @announce_daily.before_loop
     async def before_create_races(self):

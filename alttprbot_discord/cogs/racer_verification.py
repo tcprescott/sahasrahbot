@@ -2,6 +2,8 @@ from datetime import datetime
 from datetime import timedelta
 from typing import List
 from io import StringIO
+import asyncio
+import logging
 
 import aiohttp
 import discord
@@ -77,24 +79,48 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
 
     @tasks.loop(minutes=1 if config.DEBUG else 1440, reconnect=True)
     async def reverify_racer(self):
-        racer_verifications = await models.RacerVerification.all()
-        for racer_verification in racer_verifications:
-            revoked_users = await self.reverify_racer_verification(racer_verification, revoke=racer_verification.revoke_ineligible)
+        try:
+            racer_verifications = await models.RacerVerification.all()
+            for racer_verification in racer_verifications:
+                try:
+                    revoked_users = await self.reverify_racer_verification(
+                        racer_verification,
+                        revoke=racer_verification.revoke_ineligible
+                    )
+                except Exception:
+                    logging.exception("Error while reverifying config %s", racer_verification.id)
+                    continue
 
-            if revoked_users:
-                guild = self.bot.get_guild(racer_verification.guild_id)
-                audit_channel = guild.get_channel(racer_verification.audit_channel_id)
-                if audit_channel is not None:
-                    # attach a list of users who were revoked
-                    revoked_users_list = '\n'.join([x.display_name for x in revoked_users])
-                    if len(revoked_users_list) > 1800:
-                        # attach the list as a file if it's too long
-                        await audit_channel.send(
-                            f"**{len(revoked_users)}** users were revoked from the {guild.get_role(racer_verification.role_id).name} role due to ineligibility.",
-                            file=discord.File(fp=StringIO(revoked_users_list), filename="revoked_users.txt"))
-                    else:
-                        await audit_channel.send(
-                            f"**{len(revoked_users)}** users were revoked from the {guild.get_role(racer_verification.role_id).name} role due to ineligibility.\n\n{revoked_users_list}")
+                if revoked_users:
+                    guild = self.bot.get_guild(racer_verification.guild_id)
+                    if guild is None:
+                        logging.warning("Guild %s missing while reporting revoked users", racer_verification.guild_id)
+                        continue
+
+                    audit_channel = guild.get_channel(racer_verification.audit_channel_id)
+                    if audit_channel is not None:
+                        revoked_users_list = '\n'.join([x.display_name for x in revoked_users])
+                        role = guild.get_role(racer_verification.role_id)
+                        role_name = role.name if role else str(racer_verification.role_id)
+                        if len(revoked_users_list) > 1800:
+                            await audit_channel.send(
+                                f"**{len(revoked_users)}** users were revoked from the {role_name} role due to ineligibility.",
+                                file=discord.File(fp=StringIO(revoked_users_list), filename="revoked_users.txt")
+                            )
+                        else:
+                            await audit_channel.send(
+                                f"**{len(revoked_users)}** users were revoked from the {role_name} role due to ineligibility.\n\n{revoked_users_list}"
+                            )
+        except Exception:
+            logging.exception("Unhandled exception in reverify_racer loop")
+
+    @reverify_racer.error
+    async def reverify_racer_error(self, error: Exception):
+        if isinstance(error, asyncio.CancelledError):
+            return
+        logging.error("Unhandled exception in reverify_racer loop", exc_info=error)
+        if not self.reverify_racer.is_being_cancelled() and not self.reverify_racer.is_running():
+            self.reverify_racer.restart()
 
     @reverify_racer.before_loop
     async def before_create_races(self):
