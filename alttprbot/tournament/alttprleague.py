@@ -73,9 +73,14 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         #     await self.send_race_submission_form(warning=True)
         #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
 
-        goal_type = 'Co-op' if self.league_data['coop'] or self.league_data['spoiler'] else 'Solo'
+        if self.league_data['spoiler']:
+            goal_type = "Spoiler"
+        elif self.league_data['coop']:
+            goal_type = "Tournament (Co-op)"
+        else:
+            goal_type = "Tournament (Solo)"
         self.rtgg_handler = await self.rtgg_bot.startrace(
-            goal=f"Beat the game - Tournament ({goal_type})",
+            goal=f"Beat the game - {goal_type}",
             invitational=True,
             unlisted=False,
             info_user=self.race_info,
@@ -93,6 +98,9 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             require_even_teams=True,
         )
         return self.rtgg_handler
+
+    async def send_room_welcome(self):
+        pass
 
     # async def send_race_submission_form(self, warning=False):
     #     if self.bracket_settings is not None and not warning:
