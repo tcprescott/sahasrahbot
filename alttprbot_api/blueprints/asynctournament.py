@@ -230,19 +230,67 @@ async def async_tournament_leaderboard_json(tournament_id: int):
     ])
 
 
-# public dashboard for the current tournament player
-@asynctournament_blueprint.route('/races/<int:tournament_id>', methods=['GET'])
-@requires_authorization
-async def async_tournament(tournament_id: int):
-    discord_user = await discord.fetch_user()
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/dashboard.json', methods=['GET'])
+async def async_tournament_dashboard_json(tournament_id: int):
+    try:
+        discord_user = await discord.fetch_user()
+    except Unauthorized:
+        return jsonify({'error': 'Authentication required.'}), 401
+
     user = await models.Users.get_or_none(discord_user_id=discord_user.id)
-    tournament = await models.AsyncTournament.get(id=tournament_id)
-    races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament).order_by('-created').prefetch_related('permalink', 'permalink__pool')
+    if user is None:
+        return jsonify({'error': 'Authentication required.'}), 401
 
-    reattempted = bool([r for r in races if r.reattempted is True])
-        
+    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    if tournament is None:
+        return jsonify({'error': 'Tournament not found.'}), 404
 
-    return await render_template('asynctournament_dashboard.html', user=discord_user, player=user, tournament=tournament, races=races, reattempted=reattempted)
+    races = await models.AsyncTournamentRace.filter(
+        user=user, tournament=tournament
+    ).order_by('-created').prefetch_related('permalink', 'permalink__pool')
+
+    reattempted = any(r.reattempted for r in races)
+
+    return jsonify({
+        'tournament': {
+            'id': tournament.id,
+            'name': tournament.name,
+            'active': tournament.active,
+            'allowed_reattempts': tournament.allowed_reattempts,
+            'runs_per_pool': tournament.runs_per_pool,
+        },
+        'player': {
+            'id': user.id,
+            'display_name': user.display_name,
+        },
+        'races': [
+            {
+                'id': race.id,
+                'status': race.status,
+                'review_status': race.review_status,
+                'created': race.created.isoformat() if race.created is not None else None,
+                'start_time': race.start_time.isoformat() if race.start_time is not None else None,
+                'end_time': race.end_time.isoformat() if race.end_time is not None else None,
+                'elapsed_time': race.elapsed_time_formatted,
+                'reattempted': race.reattempted,
+                'reattempt_reason': race.reattempt_reason,
+                'runner_notes': race.runner_notes,
+                'runner_vod_url': race.runner_vod_url,
+                'score': race.score,
+                'score_formatted': race.score_formatted,
+                'reviewer_notes': race.reviewer_notes,
+                'pool_name': race.permalink.pool.name,
+                'permalink_url': race.permalink.url,
+                'permalink_notes': race.permalink.notes,
+                'permalink_live_race': race.permalink.live_race,
+            }
+            for race in races
+        ],
+        'reattempted': reattempted,
+    })
+
+
 
 @asynctournament_blueprint.route('/races/<int:tournament_id>/reattempt', methods=['GET'])
 @requires_authorization
@@ -456,32 +504,6 @@ async def async_tournament_leaderboard(tournament_id: int):
                                  sort_key=sort_key)
 
 
-@asynctournament_blueprint.route('/player/<int:tournament_id>/<int:user_id>', methods=['GET'])
-# @requires_authorization
-async def async_tournament_player(tournament_id: int, user_id: int):
-    try:
-        discord_user = await discord.fetch_user()
-    except Unauthorized:
-        discord_user = None
-    
-    if discord_user:
-        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
-    else:
-        user = None
-
-    tournament = await models.AsyncTournament.get(id=tournament_id)
-
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
-    if not authorized and tournament.active:
-        return abort(403, "You are not authorized to view this tournament.")
-
-    player = await models.Users.get_or_none(id=user_id)
-    races = await models.AsyncTournamentRace.filter(tournament=tournament, user_id=user_id).order_by(
-        '-created').prefetch_related('tournament', 'user', 'permalink', 'permalink__pool')
-
-    return await render_template('asynctournament_user.html', user=discord_user,
-                                 races=races, tournament=tournament, player=player)
-
 
 @asynctournament_blueprint.route('/pools/<int:tournament_id>', methods=['GET'])
 # @requires_authorization
@@ -534,3 +556,63 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
         '-score').prefetch_related('live_race')
 
     return await render_template('asynctournament_permalink_view.html', user=discord_user, tournament=tournament, permalink=permalink, races=races)
+
+
+@asynctournament_blueprint.route('/player/<int:tournament_id>/<int:user_id>/data.json', methods=['GET'])
+async def async_tournament_player_json(tournament_id: int, user_id: int):
+    try:
+        discord_user = await discord.fetch_user()
+    except Unauthorized:
+        discord_user = None
+
+    user = None
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    if tournament is None:
+        return jsonify({'error': 'Tournament not found.'}), 404
+
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    if not authorized and tournament.active:
+        return jsonify({'error': 'Not authorized.'}), 403
+
+    player = await models.Users.get_or_none(id=user_id)
+    if player is None:
+        return jsonify({'error': 'Player not found.'}), 404
+
+    races = await models.AsyncTournamentRace.filter(
+        tournament=tournament, user_id=user_id
+    ).order_by('-created').prefetch_related('permalink', 'permalink__pool')
+
+    return jsonify({
+        'tournament': {
+            'id': tournament.id,
+            'name': tournament.name,
+            'active': tournament.active,
+            'runs_per_pool': tournament.runs_per_pool,
+        },
+        'player': {
+            'id': player.id,
+            'display_name': player.display_name,
+        },
+        'races': [
+            {
+                'id': race.id,
+                'status': race.status,
+                'review_status': race.review_status,
+                'created': race.created.isoformat() if race.created is not None else None,
+                'start_time': race.start_time.isoformat() if race.start_time is not None else None,
+                'end_time': race.end_time.isoformat() if race.end_time is not None else None,
+                'elapsed_time': race.elapsed_time_formatted,
+                'reattempted': race.reattempted,
+                'score': race.score,
+                'score_formatted': race.score_formatted,
+                'pool_name': race.permalink.pool.name,
+                'permalink_url': race.permalink.url,
+                'permalink_notes': race.permalink.notes,
+                'permalink_live_race': race.permalink.live_race,
+            }
+            for race in races
+        ],
+    })

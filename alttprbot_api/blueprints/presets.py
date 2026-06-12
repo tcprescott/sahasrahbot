@@ -223,7 +223,7 @@ async def api_get_preset(randomizer):
             {
                 'preset': preset,
                 'randomizer': randomizer,
-                'data': resp.raw
+                'data': resp.preset_data
             }
         )
     except generator.PresetNotFoundException:

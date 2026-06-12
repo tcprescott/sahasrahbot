@@ -4,15 +4,18 @@ import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { Footer } from './Footer';
 
-/** Reveals `.onscroll` elements as they enter the viewport; re-runs per route. */
+/** Reveals `.onscroll` elements as they enter the viewport; re-runs per route.
+ *  Uses a MutationObserver so elements rendered after an async data fetch
+ *  (e.g. React Query results) are also observed. */
 function useScrollReveal() {
   const location = useLocation();
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>('.onscroll'));
     if (!('IntersectionObserver' in window)) {
-      els.forEach((e) => e.classList.add('in'));
+      document.querySelectorAll<HTMLElement>('.onscroll')
+        .forEach((e) => e.classList.add('in'));
       return;
     }
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -22,10 +25,26 @@ function useScrollReveal() {
           }
         });
       },
-      { threshold: 0.12 },
+      { threshold: 0 },
     );
-    els.forEach((e) => io.observe(e));
-    return () => io.disconnect();
+
+    document.querySelectorAll<HTMLElement>('.onscroll').forEach((e) => io.observe(e));
+
+    const mo = new MutationObserver((mutations) => {
+      for (const mut of mutations) {
+        for (const node of Array.from(mut.addedNodes)) {
+          if (!(node instanceof HTMLElement)) continue;
+          if (node.classList.contains('onscroll')) io.observe(node);
+          node.querySelectorAll<HTMLElement>('.onscroll').forEach((e) => io.observe(e));
+        }
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
   }, [location.pathname]);
 }
 

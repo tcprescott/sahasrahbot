@@ -133,8 +133,7 @@ async def return_racetime_verify():
                                             defaults={'discord_user_id': user.id, 'rtgg_access_token': token,
                                                       'display_name': user.name})
 
-    return await render_template('racetime_verified.html', user=user,
-                                 racetime_name=userinfo_data['name'])
+    return redirect(f"/racetime/verified?name={quote(userinfo_data['name'])}&success=true")
 
 
 async def merge_users(user_to_keep: models.Users, victim: models.Users):

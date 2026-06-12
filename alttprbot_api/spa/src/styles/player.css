@@ -1,0 +1,146 @@
+/* ---- async-player page-specific styles ---- */
+
+/* ---- page head ---- */
+.pl-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  margin: .8rem 0 0;
+  color: var(--ink);
+  text-shadow: 0 0 50px var(--hero-glow-a);
+}
+.pl-meta {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem .8rem;
+  align-items: center;
+}
+
+/* ---- summary stats panel ---- */
+.pl-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+.pl-stat {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+.pl-stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.pl-stat-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.pl-stat-value.teal { color: var(--teal); }
+.pl-stat-value.gold { color: var(--gold); }
+
+/* ---- table wrap ---- */
+.pl-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+/* ---- status / review badges in table ---- */
+.pl-status {
+  font-family: 'Space Mono', monospace;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .18rem .55rem;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+.pl-status.pending   { background: var(--surface-2); color: var(--ink-faint); border: 1px solid var(--border); }
+.pl-status.progress  { background: color-mix(in srgb, var(--teal) 15%, transparent); color: var(--teal); border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent); }
+.pl-status.finished  { background: color-mix(in srgb, var(--teal) 15%, transparent); color: var(--teal); border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent); }
+.pl-status.forfeit   { background: color-mix(in srgb, var(--crimson) 15%, transparent); color: var(--crimson); border: 1px solid color-mix(in srgb, var(--crimson) 35%, transparent); }
+.pl-status.dq        { background: color-mix(in srgb, var(--crimson) 15%, transparent); color: var(--crimson); border: 1px solid color-mix(in srgb, var(--crimson) 35%, transparent); }
+.pl-review.approved  { background: color-mix(in srgb, var(--teal) 15%, transparent); color: var(--teal); border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent); }
+.pl-review.rejected  { background: color-mix(in srgb, var(--crimson) 15%, transparent); color: var(--crimson); border: 1px solid color-mix(in srgb, var(--crimson) 35%, transparent); }
+.pl-review.pending   { background: var(--surface-2); color: var(--ink-faint); border: 1px solid var(--border); }
+
+/* ---- reattempted row ---- */
+tr.reattempted td { opacity: .45; }
+
+/* ---- time / score cells ---- */
+.pl-time, .pl-score {
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+}
+.pl-score.pos { color: var(--teal); }
+
+/* ---- skeleton shimmer ---- */
+@keyframes pl-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+.pl-skel {
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+    var(--bg-2) 25%,
+    var(--bg-3) 50%,
+    var(--bg-2) 75%
+  );
+  background-size: 1200px 100%;
+  animation: pl-shimmer 1.6s infinite linear;
+  display: inline-block;
+}
+
+/* ---- empty / error states ---- */
+.pl-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--ink-faint);
+}
+.pl-state .state-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: .5;
+}
+.pl-state p { font-size: .92rem; max-width: 36ch; }
+
+/* ---- 403 / locked panel ---- */
+.pl-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.pl-locked .lock-icon {
+  font-size: 3rem;
+  line-height: 1;
+  opacity: .4;
+}
+.pl-locked p { font-size: .95rem; max-width: 40ch; }
+
+@media (max-width: 600px) {
+  .pl-stats { grid-template-columns: repeat(2, 1fr); }
+}

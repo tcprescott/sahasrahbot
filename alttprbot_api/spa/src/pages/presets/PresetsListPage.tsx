@@ -18,7 +18,7 @@ interface PresetsListResponse {
 interface PresetDetailResponse {
   preset: string;
   randomizer: string;
-  data: Record<string, unknown>;
+  data: Record<string, unknown> | string;
 }
 
 // ---------------------------------------------------------------------------
@@ -62,8 +62,8 @@ function SkeletonBlock({ w = '100%', h = '1rem' }: { w?: string; h?: string }) {
   return <div className="skel" style={{ width: w, height: h }} />;
 }
 
-/** Lightweight YAML-like renderer from a nested object */
-function YamlPreview({ data }: { data: Record<string, unknown> }) {
+/** Lightweight YAML-like renderer from a nested object or raw YAML string */
+function YamlPreview({ data }: { data: Record<string, unknown> | string }) {
   function renderLines(obj: Record<string, unknown>, indent = 0): string[] {
     const pad = '  '.repeat(indent);
     const lines: string[] = [];
@@ -85,7 +85,10 @@ function YamlPreview({ data }: { data: Record<string, unknown> }) {
     return lines;
   }
 
-  const lines = renderLines(data);
+  const lines = typeof data === 'string'
+    ? data.split('\n').filter((l) => !l.startsWith('---'))
+    : renderLines(data);
+
   return (
     <div className="codeblock">
       <pre><code>
@@ -171,10 +174,10 @@ function PresetDetailPanel({ randomizer, presetName, namespace }: DetailPanelPro
             <p>{error instanceof Error ? error.message : 'Failed to load preset.'}</p>
           </div>
         )}
-        {!isLoading && data && Object.keys(data.data ?? {}).length > 0 && (
+        {!isLoading && data && (typeof data.data === 'string' ? data.data.trim().length > 0 : Object.keys(data.data ?? {}).length > 0) && (
           <YamlPreview data={data.data} />
         )}
-        {!isLoading && data && Object.keys(data.data ?? {}).length === 0 && (
+        {!isLoading && data && (typeof data.data === 'string' ? data.data.trim().length === 0 : Object.keys(data.data ?? {}).length === 0) && (
           <div className="state-box">
             <div className="state-icon">◇</div>
             <p>No detail available for this preset.</p>

@@ -169,7 +169,7 @@ async def populate_test_data(tournament: models.AsyncTournament, participant_cou
     for i in range(1, participant_count + 1):
         # create a fake user, set a test_user flag to true so we can delete them later if needed
         user = await models.Users.create(
-            discord_id=i + offset,
+            discord_user_id=i + offset,
             display_name=f"Test User {i + offset}",
             test_user=True
         )

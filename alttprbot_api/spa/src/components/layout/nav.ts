@@ -10,5 +10,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Presets', to: '/presets' },
   { label: 'Leaderboard', to: '/async/leaderboard/418' },
   { label: 'Submit', to: '/submit/alttprleague' },
+  { label: 'Profile', to: '/me' },
   { label: 'GitHub', to: 'https://github.com/tcprescott/sahasrahbot', external: true },
 ];

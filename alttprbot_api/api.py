@@ -80,7 +80,7 @@ async def login():
 @sahasrahbotapi.route("/callback/discord/")
 async def callback():
     data = await discord.callback()
-    redirect_to = data.get("redirect", "/me/")
+    redirect_to = data.get("redirect", "/me")
     return redirect(redirect_to)
 
 
@@ -99,12 +99,6 @@ async def access_denied(e):
         user=None
     )
 
-
-@sahasrahbotapi.route("/me/")
-@requires_authorization
-async def me():
-    user = await discord.fetch_user()
-    return await render_template('me.html', user=user)
 
 
 @sahasrahbotapi.route("/logout/")
@@ -204,7 +198,8 @@ async def spa_assets(filename):
 _RESERVED_PREFIXES = (
     '/api/',
     '/auth/',
-    '/racetime/',
+    '/racetime/verification/',
+    '/racetime/verify/',
     '/triforcetexts/',
     '/presets/',
     '/sglive/',
@@ -213,7 +208,7 @@ _RESERVED_PREFIXES = (
     '/login/',
     '/logout/',
     '/callback/',
-    '/me/',
+
     '/purgeme',
     '/healthcheck',
     '/robots.txt',
