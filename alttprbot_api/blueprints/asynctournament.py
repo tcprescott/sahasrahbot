@@ -143,6 +143,93 @@ async def leaderboard_api(tournament_id):
         for idx, e in enumerate(leaderboard)
     ])
 
+# ---------------------------------------------------------------------------
+# Public JSON endpoints for the SPA — session auth, same access rules as
+# the Jinja template routes (public when tournament is inactive, admin/mod only
+# when active).
+# ---------------------------------------------------------------------------
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/info', methods=['GET'])
+async def async_tournament_info_json(tournament_id: int):
+    try:
+        discord_user = await discord.fetch_user()
+    except Unauthorized:
+        discord_user = None
+
+    user = None
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    if tournament is None:
+        return jsonify({'error': 'Tournament not found.'}), 404
+
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    if not authorized and tournament.active:
+        return jsonify({'error': 'Not authorized.'}), 403
+
+    return jsonify({
+        'id': tournament.id,
+        'name': tournament.name,
+        'active': tournament.active,
+        'runs_per_pool': tournament.runs_per_pool,
+    })
+
+
+@asynctournament_blueprint.route('/races/<int:tournament_id>/leaderboard.json', methods=['GET'])
+async def async_tournament_leaderboard_json(tournament_id: int):
+    try:
+        discord_user = await discord.fetch_user()
+    except Unauthorized:
+        discord_user = None
+
+    user = None
+    if discord_user:
+        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+
+    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    if tournament is None:
+        return jsonify({'error': 'Tournament not found.'}), 404
+
+    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    if not authorized and tournament.active:
+        return jsonify({'error': 'Not authorized.'}), 403
+
+    leaderboard = await asynctournament.get_leaderboard(tournament)
+
+    return jsonify([
+        {
+            'player': {
+                'id': e.player.id,
+                'display_name': e.player.display_name,
+                'discord_user_id': e.player.discord_user_id,
+                'twitch_name': e.player.twitch_name,
+                'rtgg_id': e.player.rtgg_id,
+            },
+            'score': e.score,
+            'rank': idx + 1,
+            'races': [
+                {
+                    'id': race.id,
+                    'start_time': race.start_time,
+                    'end_time': race.end_time,
+                    'score': race.score,
+                    'permalink_id': race.permalink_id,
+                    'elapsed_time': race.elapsed_time_formatted,
+                    'status': race.status,
+                } if race else None
+                for race in e.races
+            ],
+            'counts': {
+                'finished': e.finished_race_count,
+                'forfeited': e.forfeited_race_count,
+                'unplayed': e.unattempted_race_count,
+            },
+        }
+        for idx, e in enumerate(leaderboard)
+    ])
+
+
 # public dashboard for the current tournament player
 @asynctournament_blueprint.route('/races/<int:tournament_id>', methods=['GET'])
 @requires_authorization

@@ -12,17 +12,6 @@ from alttprbot_api.api import discord
 presets_blueprint = Blueprint('presets', __name__)
 
 
-@presets_blueprint.route('/presets', methods=['GET'])
-async def all_presets():
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-
-    namespaces = await models.PresetNamespaces.all()
-
-    return await render_template('preset_namespaces_all.html', user=user, namespaces=namespaces)
-
 
 @presets_blueprint.route('/presets/me', methods=['GET'])
 @requires_authorization

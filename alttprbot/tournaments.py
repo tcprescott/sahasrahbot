@@ -36,7 +36,7 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
 # Active when TOURNAMENT_CONFIG_ENABLED is false (default).
 if config.DEBUG:
     _HARDCODED_TOURNAMENT_DATA = {
-        'test': test.TestTournament
+        # 'test': test.TestTournament
     }
 else:
     _HARDCODED_TOURNAMENT_DATA = {

@@ -1,0 +1,181 @@
+/* ---- async-leaderboard page-specific styles ---- */
+
+/* ---- page head ---- */
+.lb-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(2.1rem, 6vw, 3.8rem);
+  margin: .8rem 0 0;
+  color: var(--ink);
+  text-shadow: 0 0 50px var(--hero-glow-a);
+}
+.lb-meta {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem .8rem;
+  align-items: center;
+}
+
+/* ---- filter / sort toolbar ---- */
+.lb-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.4rem;
+}
+.lb-search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+}
+.lb-search-ico {
+  position: absolute;
+  left: .9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+.lb-search-input {
+  width: 100%;
+  padding: .7rem 1rem .7rem 2.6rem;
+  font-family: inherit;
+  font-size: .95rem;
+  color: var(--ink);
+  background: var(--bg-3);
+  border: 1px solid var(--line-glow);
+  border-radius: 10px;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.lb-search-input::placeholder { color: var(--ink-faint); }
+.lb-search-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--hero-glow-a);
+}
+.sortgroup {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+}
+.sortgroup .lbl {
+  font-family: 'Space Mono', monospace;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---- medal cells (podium top-3) ---- */
+.medal {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: .82rem;
+}
+tr.podium-1 .medal {
+  background: color-mix(in srgb, var(--gold) 20%, transparent);
+  color: var(--gold);
+}
+tr.podium-2 .medal {
+  background: color-mix(in srgb, #c9d1e0 18%, transparent);
+  color: #c9d1e0;
+}
+tr.podium-3 .medal {
+  background: color-mix(in srgb, #cd7f43 20%, transparent);
+  color: #cd7f43;
+}
+
+/* ---- race time splits ---- */
+.split {
+  font-family: 'Space Mono', monospace;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.split.dnf { color: var(--crimson); }
+.split.none { color: var(--ink-faint); }
+
+/* ---- par score ---- */
+.score-big {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+.score-big.pos { color: var(--teal); }
+.score-big.neg { color: var(--crimson); }
+
+/* ---- finish / forfeit / unplayed tallies ---- */
+.tally {
+  display: inline-flex;
+  gap: .35rem;
+}
+.tally .t {
+  font-family: 'Space Mono', monospace;
+  font-size: .74rem;
+  padding: .1rem .4rem;
+  border-radius: 5px;
+  border: 1px solid var(--line-glow);
+}
+.tally .fin { color: var(--teal); }
+.tally .ff  { color: var(--crimson); }
+.tally .un  { color: var(--ink-faint); }
+
+/* ---- skeleton shimmer (shared with presets.css pattern) ---- */
+@keyframes lb-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+.lb-skel {
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+    var(--bg-2) 25%,
+    var(--bg-3) 50%,
+    var(--bg-2) 75%
+  );
+  background-size: 1200px 100%;
+  animation: lb-shimmer 1.6s infinite linear;
+}
+
+/* ---- empty / error states ---- */
+.lb-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--ink-faint);
+}
+.lb-state .state-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: .5;
+}
+.lb-state p { font-size: .92rem; max-width: 36ch; }
+
+/* ---- footnote ---- */
+.lb-footnote {
+  font-family: 'Space Mono', monospace;
+  font-size: .74rem;
+  color: var(--ink-faint);
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .lb-tools { flex-direction: column; align-items: stretch; }
+  .lb-search { max-width: 100%; }
+}

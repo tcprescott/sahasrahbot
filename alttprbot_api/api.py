@@ -57,11 +57,13 @@ if config.DEBUG:
 
 @sahasrahbotapi.route("/")
 async def index():
+    index_html = os.path.join(_SPA_DIST, 'index.html')
+    if os.path.isfile(index_html):
+        return await send_from_directory(_SPA_DIST, 'index.html')
     try:
         user = await discord.fetch_user()
     except Unauthorized:
         user = None
-
     return await render_template('index.html', user=user)
 
 
@@ -204,10 +206,8 @@ _RESERVED_PREFIXES = (
     '/auth/',
     '/racetime/',
     '/triforcetexts/',
-    '/presets',
-    '/submit',
+    '/presets/',
     '/sglive/',
-    '/async/',
     '/schedule/',
     '/user/',
     '/login/',
@@ -230,6 +230,10 @@ async def spa_catchall(path):
     for prefix in _RESERVED_PREFIXES:
         if full_path.startswith(prefix):
             abort(404)
+    # Serve real files from dist root first (logo, favicon, manifest, etc.)
+    candidate = os.path.join(_SPA_DIST, path)
+    if os.path.isfile(candidate):
+        return await send_from_directory(_SPA_DIST, path)
     index_html = os.path.join(_SPA_DIST, 'index.html')
     if not os.path.isfile(index_html):
         abort(404)
