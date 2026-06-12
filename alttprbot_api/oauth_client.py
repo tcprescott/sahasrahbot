@@ -256,7 +256,17 @@ class DiscordUser:
         if name in self._data:
             return self._data[name]
         raise AttributeError(f"DiscordUser has no attribute '{name}'")
-    
+
+    @property
+    def name(self) -> str:
+        """Quart-Discord parity: the account username."""
+        return self._data.get('username', '')
+
+    @property
+    def display_name(self) -> str:
+        """Quart-Discord parity: global (display) name, falling back to username."""
+        return self._data.get('global_name') or self._data.get('username', '')
+
     def __repr__(self):
         return f"<DiscordUser id={self._data.get('id')} username={self._data.get('username')}>"
 

@@ -1,8 +1,9 @@
 import logging
 import os
+from urllib.parse import urlencode
 
 from authlib.oauth2.rfc6749.errors import OAuth2Error
-from quart import (Quart, abort, jsonify, redirect, render_template, request,
+from quart import (Quart, abort, jsonify, redirect, request,
                    session, url_for, send_from_directory)
 
 import config
@@ -41,30 +42,16 @@ sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.sglive_blueprint, url_prefix="/sglive")
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
-
-# not ready for prime time
-if config.DEBUG:
-    sahasrahbotapi.register_blueprint(blueprints.schedule_blueprint, url_prefix="/schedule")
-    sahasrahbotapi.register_blueprint(blueprints.user_blueprint, url_prefix="/user")
-
-if config.DEBUG:
-    sahasrahbotapi.config['TEMPLATES_AUTO_RELOAD'] = True
-
 
 @sahasrahbotapi.route("/")
 async def index():
     index_html = os.path.join(_SPA_DIST, 'index.html')
     if os.path.isfile(index_html):
         return await send_from_directory(_SPA_DIST, 'index.html')
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-    return await render_template('index.html', user=user)
+    abort(404)
 
 
 @sahasrahbotapi.route("/login/")
@@ -90,15 +77,24 @@ async def redirect_unauthorized(e):
     return redirect(url_for("login"))
 
 
+def _error_response(title, message, code=400):
+    """Return an error to the client without Jinja.
+
+    API callers (``/api/*``) get JSON. Browser users are redirected to the SPA
+    ``/error`` page with the title/message in the query string.
+    """
+    if request.path.startswith('/api/'):
+        return jsonify(error=message, title=title), code
+    return redirect('/error?' + urlencode({'title': title, 'message': message}))
+
+
 @sahasrahbotapi.errorhandler(AccessDenied)
 async def access_denied(e):
-    return await render_template(
-        'error.html',
-        title="Access Denied",
-        message="We were unable to access your Discord account.",
-        user=None
+    return _error_response(
+        "Access Denied",
+        "We were unable to access your Discord account.",
+        403,
     )
-
 
 
 @sahasrahbotapi.route("/logout/")
@@ -106,15 +102,6 @@ async def logout():
     discord.revoke()
     return redirect(url_for("index"))
 
-if config.DEBUG:
-    @sahasrahbotapi.route('/throw_error', methods=['GET'])
-    async def throw_error():
-        try:
-            user = await discord.fetch_user()
-        except Unauthorized:
-            user = None
-
-        return await render_template('error.html', user=user, title="Example Error", message="This is just a test.")
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
@@ -129,24 +116,17 @@ async def healthcheck():
     )
 
 
-@sahasrahbotapi.route('/purgeme', methods=['GET'])
-async def purge_me():
-    user = await discord.fetch_user()
-
-    return await render_template('purge_me.html', user=user)
-
-
 @sahasrahbotapi.route('/purgeme', methods=['POST'])
 async def purge_me_action():
     user = await discord.fetch_user()
-    payload = await request.form
+    payload = await request.get_json(force=True) or {}
 
     if payload.get('confirmpurge', 'no') == 'yes':
         await models.PresetNamespaces.filter(discord_user_id=user.id).delete()
         await models.NickVerification.filter(discord_user_id=user.id).delete()
-        return redirect(url_for('logout'))
+        return jsonify(success=True, redirect='/logout/')
 
-    return redirect(url_for('me'))
+    return jsonify(success=False, redirect='/me')
 
 
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
@@ -200,22 +180,18 @@ _RESERVED_PREFIXES = (
     '/auth/',
     '/racetime/verification/',
     '/racetime/verify/',
-    '/triforcetexts/',
-    '/presets/',
-    '/sglive/',
-    '/schedule/',
-    '/user/',
+    '/presets/api/',
+    '/presets/download/',
+    '/presets/me',
     '/login/',
     '/logout/',
     '/callback/',
 
-    '/purgeme',
     '/healthcheck',
     '/robots.txt',
     '/assets/',
     '/theme-assets/',
     '/spa-assets/',
-    '/throw_error',
 )
 
 
@@ -249,37 +225,29 @@ async def theme_assets(path):
 
 @sahasrahbotapi.errorhandler(404)
 async def not_found(e):
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-    return await render_template(
-        'error.html',
-        title="Not Found",
-        message="The page you are looking for does not exist.",
-        user=user
-    )
+    if request.path.startswith('/api/'):
+        return jsonify(error="The requested resource does not exist."), 404
+    # Hand off to the SPA so its client-side router can render NotFoundPage.
+    index_html = os.path.join(_SPA_DIST, 'index.html')
+    if os.path.isfile(index_html):
+        return await send_from_directory(_SPA_DIST, 'index.html'), 404
+    return jsonify(error="Not found."), 404
+
 
 @sahasrahbotapi.errorhandler(OAuth2Error)
 async def oauth2_error(e):
     discord.revoke()
-    return await render_template(
-        'error.html',
-        title="OAuth Error",
-        message=f"An OAuth error occurred: {e.description}",
-        user=None
+    return _error_response(
+        "OAuth Error",
+        f"An OAuth error occurred: {e.description}",
+        400,
     )
+
 
 @sahasrahbotapi.errorhandler(500)
 async def something_bad_happened(e):
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-
-    return await render_template(
-        'error.html',
-        title="Something Bad Happened",
-        message="Something bad happened.  Please try again later.",
-        user=user
+    return _error_response(
+        "Something Bad Happened",
+        "Something bad happened. Please try again later.",
+        500,
     )

@@ -19,16 +19,26 @@
 | `/me` | `ProfilePage` |
 | `/racetime/verified` | `RaceTimeVerifiedPage` |
 
-### Not yet implemented (this doc)
-- `/async/races/:id/reattempt` — Reattempt page
-- `/async/races/:id/queue` — Admin queue
-- `/async/races/:id/review/:raceId` — Admin review
-- `/async/pools/:id` — Pools view
-- `/async/permalink/:id/:pid` — Permalink view
-- `/triforcetexts/:pool` — Triforce text submission
-- `/triforcetexts/:pool/moderation` — Triforce text moderation
-- `/ranked_choice/:id` — Ranked choice ballot
-- `/sglive` — SG Live dashboard
+### Implemented in this pass (2026-06-11)
+- `/async/races/:id/reattempt` — Reattempt page ✅
+- `/async/races/:id/queue` — Admin queue ✅
+- `/async/races/:id/review/:raceId` — Admin review ✅
+- `/async/pools/:id` — Pools view ✅
+- `/async/permalink/:id/:pid` — Permalink view ✅
+- `/triforcetexts/:pool` — Triforce text submission ✅ (`sgl23` pool still uses the legacy key-based Jinja flow)
+- `/triforcetexts/:pool/moderation` — Triforce text moderation ✅
+- `/ranked_choice/:id` — Ranked choice ballot ✅
+
+### Removed (not implemented)
+- `/sglive` — SG Live dashboard. **The entire SGLive blueprint was deleted** (dead functionality):
+  `alttprbot_api/blueprints/sglive.py`, its registration in `api.py`, the `/sglive/` reserved prefix, and the
+  `sglive_dashboard.html` / `sglive_reports_capacity.html` templates. The `SGL2023OnsiteHistory` model and
+  `triforce_text` util were left intact.
+
+> Colliding legacy Jinja GET routes under `/async`, `/triforcetexts`, and `/ranked_choice` were removed so the SPA
+> catch-all serves the new pages. Their POST/JSON siblings and the orphaned templates were left in place. The legacy
+> Jinja `/async/races/:id/leaderboard` route was already broken before this work (it referenced a non-existent
+> `async_tournament_player` endpoint) and was left untouched.
 
 ---
 

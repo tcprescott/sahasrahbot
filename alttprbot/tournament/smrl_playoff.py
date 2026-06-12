@@ -83,7 +83,30 @@ class SMRLPlayoffs(TournamentRace):
 
     @property
     def submission_form(self):
-        return "submission_smrl.html"
+        return [
+            {
+                'key': 'game',
+                'label': 'Game #',
+                'settings': {
+                    '1': 'Power',
+                    '2': 'Varia',
+                    '3': 'Gravity',
+                    '4': 'Game 4',
+                    '5': 'Game 5',
+                }
+            },
+            {
+                'key': 'preset',
+                'label': 'Preset (games 4 & 5 only)',
+                'settings': {
+                    'RLS4W2': 'Countdown, Full Area, Vanilla Bosses (week 2)',
+                    'RLS4W3': 'Major/Minor, Full Area, Boss Shuffle (week 3)',
+                    'RLS4P1': 'Countdown, Vanilla Area, Boss Shuffle (week 4 equivalent)',
+                    'classic_mm': 'Classic DASH',
+                    'RLS4P2': 'Chozo, Full Area, Vanilla Bosses',
+                }
+            },
+        ]
 
     async def configuration(self):
         guild = discordbot.get_guild(500362417629560881)

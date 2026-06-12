@@ -1,0 +1,102 @@
+/* ---- navbar user menu ---- */
+
+.usermenu {
+  position: relative;
+  flex: none;
+}
+
+.usermenu-signin {
+  white-space: nowrap;
+}
+
+.usermenu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  padding: .35rem .7rem .35rem .4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  transition: all .3s var(--ease);
+}
+.usermenu-trigger:hover {
+  border-color: var(--gold);
+  color: var(--ink);
+  box-shadow: 0 0 0 3px var(--hero-glow-a);
+}
+
+.usermenu-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  object-fit: cover;
+  flex: none;
+}
+
+.usermenu-name {
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usermenu-caret {
+  font-size: .65rem;
+  line-height: 1;
+  color: var(--ink-faint);
+}
+
+.usermenu-dropdown {
+  position: absolute;
+  top: calc(100% + .5rem);
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: .4rem;
+  box-shadow: 0 22px 44px -14px rgba(0, 0, 0, .45);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+
+.usermenu-item {
+  display: block;
+  padding: .55rem .7rem;
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.usermenu-item:hover {
+  background: var(--bg-3);
+  color: var(--ink);
+}
+
+.usermenu-danger {
+  color: var(--crimson, #e0526a);
+}
+.usermenu-danger:hover {
+  color: var(--crimson, #e0526a);
+  background: color-mix(in srgb, var(--crimson, #e0526a) 16%, transparent);
+}
+
+.usermenu-divider {
+  height: 1px;
+  background: var(--line);
+  margin: .25rem .2rem;
+}
+
+/* hide the desktop user menu on mobile (auth lives in the drawer there) */
+@media (max-width: 860px) {
+  .usermenu { display: none; }
+}

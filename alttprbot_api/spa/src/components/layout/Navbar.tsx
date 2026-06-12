@@ -1,6 +1,8 @@
 import { NavLink, Link } from 'react-router-dom';
 import { useTheme } from '../../theme/ThemeProvider';
 import { NAV_ITEMS } from './nav';
+import { UserMenu } from './UserMenu';
+import '../../styles/user-menu.css';
 
 interface NavbarProps {
   onOpenMenu: () => void;
@@ -35,6 +37,8 @@ export function Navbar({ onOpenMenu }: NavbarProps) {
         <span className="ico">{dark ? '☾' : '☀'}</span>
         <span>{dark ? 'DARK' : 'LIGHT'}</span>
       </button>
+
+      <UserMenu />
 
       <button className="burger" onClick={onOpenMenu} aria-label="Open menu">
         <span />

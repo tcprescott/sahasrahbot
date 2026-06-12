@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { NAV_ITEMS } from './nav';
+import { useMe } from '../../hooks/useMe';
 
 interface MobileDrawerProps {
   open: boolean;
@@ -7,6 +8,8 @@ interface MobileDrawerProps {
 }
 
 export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
+  const { data: user, isLoading } = useMe();
+
   return (
     <>
       <div className={open ? 'scrim open' : 'scrim'} onClick={onClose} />
@@ -25,6 +28,17 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             </Link>
           ),
         )}
+
+        {!isLoading &&
+          (user ? (
+            <a href="/logout/" onClick={onClose}>
+              Sign out
+            </a>
+          ) : (
+            <a href="/login/" onClick={onClose}>
+              Sign in
+            </a>
+          ))}
       </aside>
     </>
   );

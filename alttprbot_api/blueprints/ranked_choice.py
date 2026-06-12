@@ -2,7 +2,7 @@ import logging
 
 import tortoise.exceptions
 from discord.errors import NotFound
-from quart import Blueprint, render_template, request, abort
+from quart import Blueprint, request, abort, jsonify
 from alttprbot_api.oauth_client import requires_authorization
 
 from alttprbot import models
@@ -18,18 +18,18 @@ from alttprbot_discord.bot import discordbot
 ranked_choice_blueprint = Blueprint('ranked_choice', __name__)
 
 
-@ranked_choice_blueprint.route('/ranked_choice/<int:election_id>', methods=['GET'])
+@ranked_choice_blueprint.route('/ranked_choice/<int:election_id>/api', methods=['GET'])
 @requires_authorization
-async def get_ballot(election_id: int):
+async def get_ballot_json(election_id: int):
     user = await discord.fetch_user()
 
     try:
         election = await models.RankedChoiceElection.get(id=election_id)
     except tortoise.exceptions.DoesNotExist:
-        return abort(404, "Election not found")
+        return jsonify({'error': 'Election not found.'}), 404
 
     if not election.active:
-        return abort(404, "Election is inactive.")
+        return jsonify({'error': 'Election is inactive.'}), 404
 
     if election.private:
         guild = await discordbot.fetch_guild(election.guild_id)
@@ -38,103 +38,81 @@ async def get_ballot(election_id: int):
             member = await guild.fetch_member(user.id)
         except NotFound:
             logging.exception(f"Unable to find user {user.id} in guild.")
-            return abort(403,
-                         "Unable to find you in the server.  Please contact Synack if you believe this is an error.")
+            return jsonify({'error': 'Unable to find you in the server.'}), 403
 
         if voter_role not in member.roles:
-            return abort(403, "You are not authorized to vote in this election.")
+            return jsonify({'error': 'You are not authorized to vote in this election.'}), 403
 
     await election.fetch_related('candidates')
-
     existing_votes = await election.votes.filter(user_id=user.id)
-    if existing_votes:
-        # await abort(403, "You have already voted in this election.  Please contact Synack if you need to change your vote.")
-        return await render_template('ranked_choice_submit.html', election=election, votes=existing_votes,
-                                     user=user)
 
-    return await render_template('ranked_choice_vote.html', election=election, user=user)
+    return jsonify({
+        'election': {
+            'id': election.id,
+            'name': election.title,
+            'description': election.description,
+            'candidates': [
+                {'id': c.id, 'name': c.name}
+                for c in election.candidates
+            ],
+        },
+        'existing_votes': [
+            {'candidate_id': v.candidate_id, 'rank': v.rank}
+            for v in existing_votes
+        ] if existing_votes else None,
+        'already_voted': bool(existing_votes),
+    })
 
 
-@ranked_choice_blueprint.route('/ranked_choice/<int:election_id>', methods=['POST'])
+@ranked_choice_blueprint.route('/ranked_choice/<int:election_id>/api', methods=['POST'])
 @requires_authorization
-async def submit_ballot(election_id: int):
+async def submit_ballot_json(election_id: int):
     user = await discord.fetch_user()
 
     try:
         election = await models.RankedChoiceElection.get(id=election_id)
     except tortoise.exceptions.DoesNotExist:
-        return abort(404, "Election not found")
+        return jsonify({'error': 'Election not found.'}), 404
 
     if not election.active:
-        return abort(404, "Election is inactive.")
+        return jsonify({'error': 'Election is inactive.'}), 404
 
     if election.private:
         guild = await discordbot.fetch_guild(election.guild_id)
         voter_role = guild.get_role(election.voter_role_id)
-        member = await guild.fetch_member(user.id)
+        try:
+            member = await guild.fetch_member(user.id)
+        except NotFound:
+            return jsonify({'error': 'Unable to find you in the server.'}), 403
         if voter_role not in member.roles:
-            return abort(403, "You are not authorized to vote in this election.")
+            return jsonify({'error': 'You are not authorized to vote in this election.'}), 403
 
     await election.fetch_related('candidates')
-
     existing_votes = await election.votes.filter(user_id=user.id)
     if existing_votes:
-        await abort(403,
-                    "You have already voted in this election.  Please contact Synack if you need to change your vote.")
+        return jsonify({'error': 'You have already voted in this election.'}), 403
 
-    payload = await request.form
+    payload = await request.get_json(force=True) or {}
+    # payload: {"votes": [{"candidate_id": 1, "rank": 1}, ...]}
+    votes_data = payload.get('votes', [])
 
-    if dupcheck([v for v in payload.values() if not v == '']):  # this is broken and we're not sure why
-        return await abort(400, "Each candidate must have a unique rank.")
-
-    if dupcheck(list(payload.keys())):
-        return await abort(400,
-                           "You can only vote for each candidate once.  This should not have happened.  Please contact Synack.")
+    ranks = [v['rank'] for v in votes_data if v.get('rank')]
+    if len(ranks) != len(set(ranks)):
+        return jsonify({'error': 'Each rank must be unique.'}), 400
 
     votes = []
-
-    for key, value in payload.items():
-        if not key.startswith('candidate_'):
+    for vote in votes_data:
+        if not vote.get('rank'):
             continue
-
-        candidate_id = int(remove_prefix(key, 'candidate_'))
-        if value == '':
-            continue
-
-        try:
-            rank = int(value)
-        except ValueError:
-            continue
-
-        candidate = next((c for c in election.candidates if c.id == candidate_id), None)
+        candidate = next((c for c in election.candidates if c.id == vote['candidate_id']), None)
         if not candidate:
-            return abort(400, "Invalid candidate")
-
+            return jsonify({'error': f"Invalid candidate {vote['candidate_id']}"}), 400
         votes.append(models.RankedChoiceVotes(
-            election=election,
-            candidate=candidate,
-            user_id=user.id,
-            rank=rank
+            election=election, candidate=candidate, user_id=user.id, rank=vote['rank']
         ))
 
-    votes.sort(key=sort_rank)
+    votes.sort(key=lambda v: v.rank)
     await models.RankedChoiceVotes.bulk_create(votes)
-
     await rankedchoice.refresh_election_post(election, discordbot)
 
-    return await render_template('ranked_choice_submit.html', election=election, votes=votes, user=user)
-
-
-def remove_prefix(text, prefix):
-    return text[text.startswith(prefix) and len(prefix):]
-
-
-def sort_rank(vote: models.RankedChoiceVotes):
-    return vote.rank
-
-
-def dupcheck(x):
-    for elem in x:
-        if x.count(elem) > 1:
-            return True
-        return False
+    return jsonify({'success': True})

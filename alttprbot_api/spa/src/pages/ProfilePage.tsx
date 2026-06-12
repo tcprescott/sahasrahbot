@@ -1,40 +1,8 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge';
+import { useMe, type MeData } from '../hooks/useMe';
 import '../styles/submit.css';
 import '../styles/profile.css';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface MeData {
-  id: string;
-  name: string;
-  avatar_url: string;
-}
-
-// ---------------------------------------------------------------------------
-// API helpers
-// ---------------------------------------------------------------------------
-
-async function fetchMe(): Promise<MeData | null> {
-  const r = await fetch('/api/me');
-  if (r.status === 401) return null;
-  if (!r.ok) throw new Error(`/api/me returned ${r.status}`);
-  const body = (await r.json()) as { data: MeData };
-  return body.data;
-}
-
-// ---------------------------------------------------------------------------
-// Page states
-// ---------------------------------------------------------------------------
-
-type PageState =
-  | { status: 'loading' }
-  | { status: 'unauthenticated' }
-  | { status: 'error'; message: string }
-  | { status: 'ready'; user: MeData };
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -145,29 +113,7 @@ function ProfileCard({ user }: { user: MeData }) {
 // ---------------------------------------------------------------------------
 
 export function ProfilePage() {
-  const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const me = await fetchMe();
-        if (cancelled) return;
-        if (!me) {
-          setPageState({ status: 'unauthenticated' });
-        } else {
-          setPageState({ status: 'ready', user: me });
-        }
-      } catch (err) {
-        if (cancelled) return;
-        setPageState({
-          status: 'error',
-          message: err instanceof Error ? err.message : 'Failed to load profile.',
-        });
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  const { data: user, isLoading, error } = useMe();
 
   const pageHead = (
     <section className="pagehead">
@@ -184,8 +130,8 @@ export function ProfilePage() {
           className="reveal d3"
           style={{ marginTop: '1rem', display: 'flex', gap: '.6rem', flexWrap: 'wrap' }}
         >
-          {pageState.status === 'ready' && (
-            <Badge tone="gold">{pageState.user.name}</Badge>
+          {user && (
+            <Badge tone="gold">{user.name}</Badge>
           )}
         </div>
       </div>
@@ -199,16 +145,16 @@ export function ProfilePage() {
       <section className="block">
         <div className="wrap">
 
-          {pageState.status === 'loading' && <LoadingSkeleton />}
+          {isLoading && <LoadingSkeleton />}
 
-          {pageState.status === 'unauthenticated' && <UnauthenticatedPanel />}
+          {!isLoading && !error && !user && <UnauthenticatedPanel />}
 
-          {pageState.status === 'error' && (
+          {error && (
             <div className="panel" style={{ maxWidth: 480 }}>
               <div className="panel-body">
                 <div className="alert alert-error" role="alert">
                   <span className="alert-icon">⚠</span>
-                  <p>{pageState.message}</p>
+                  <p>{error instanceof Error ? error.message : 'Failed to load profile.'}</p>
                 </div>
                 <a className="btn btn-ghost btn-sm" href="/login/">
                   Sign in again
@@ -217,7 +163,7 @@ export function ProfilePage() {
             </div>
           )}
 
-          {pageState.status === 'ready' && <ProfileCard user={pageState.user} />}
+          {user && <ProfileCard user={user} />}
 
         </div>
       </section>

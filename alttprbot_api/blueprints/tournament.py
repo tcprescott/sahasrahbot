@@ -1,5 +1,4 @@
-from quart import Blueprint, jsonify, render_template, request, url_for, abort, session
-from alttprbot_api.oauth_client import requires_authorization
+from quart import Blueprint, jsonify, request, session
 
 from alttprbot import models
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
@@ -71,21 +70,3 @@ async def api_submit():
         return jsonify(error=f"Invalid input: {e}"), 400
     except Exception as e:
         return jsonify(error=f"Error processing submission: {e}"), 400
-
-
-
-@tournament_blueprint.route("/submit", methods=['POST'])
-@requires_authorization
-async def submit():
-    user = await discord.fetch_user()
-    payload = await request.form
-    try:
-        tournament_race = await fetch_tournament_handler(payload['event'], int(payload['episodeid']))
-        await tournament_race.process_submission_form(payload, submitted_by=f"{user.name}#{user.discriminator}")
-        return await render_template(
-            "submission_done.html",
-            user=user,
-            tournament_race=tournament_race
-        )
-    except Exception as e:
-        abort(400, description=f"Error processing submission: {e}")
