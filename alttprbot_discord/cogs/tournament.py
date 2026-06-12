@@ -16,9 +16,9 @@ from alttprbot.util import speedgaming
 
 # TODO: use asyncio.semaphore() to limit the number of concurrent tasks
 
-MAIN_TOURNAMENT_SERVERS = list(map(int, config.MAIN_TOURNAMENT_SERVERS.split(',')))
-CC_TOURNAMENT_SERVERS = list(map(int, config.CC_TOURNAMENT_SERVERS.split(',')))
-CC_TOURNAMENT_AUDIT_CHANNELS = int(config.CC_TOURNAMENT_AUDIT_CHANNELS)
+MAIN_TOURNAMENT_SERVERS = list(map(int, filter(None, config.MAIN_TOURNAMENT_SERVERS.split(','))))
+CC_TOURNAMENT_SERVERS = list(map(int, filter(None, config.CC_TOURNAMENT_SERVERS.split(','))))
+CC_TOURNAMENT_AUDIT_CHANNELS = int(config.CC_TOURNAMENT_AUDIT_CHANNELS) if config.CC_TOURNAMENT_AUDIT_CHANNELS else None
 
 MAIN_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if config.DEBUG else 334796844750209024
 CC_TOURNAMENT_ADMIN_ROLE_ID = 523276397679083520 if config.DEBUG else 503724516854202370

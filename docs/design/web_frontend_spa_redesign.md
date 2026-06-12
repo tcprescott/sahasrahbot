@@ -1,7 +1,7 @@
 # Web Frontend SPA Redesign — Architecture & API Contract
 
-> Last updated: 2026-02-13
-> Status: **Design** — awaiting owner confirmation on open questions
+> Last updated: 2026-06-11
+> Status: **Design approved** — visual language locked via prototype (see §11); SPA scaffold in progress. Brand & dark-mode questions resolved (§10).
 
 ## 1. Problem Statement
 
@@ -348,7 +348,54 @@ The `/callback/discord/` handler's redirect target changes from `/me/` to `/me` 
 
 ## 10. Open Questions for Owner
 
-1. **Brand identity**: Should the SPA keep the existing SahasrahBot logo and color palette, or is this an opportunity for a visual refresh?
-2. **Dark mode**: Should the new UI support a dark mode toggle? (Tailwind makes this straightforward with `dark:` variants.)
-3. **SG Live seed generation links**: The current SG Live dashboard has direct `<a>` links to `/sglive/generate/alttpr` etc. that redirect to external seed URLs. Should these remain as server-side redirects, or should the SPA call an API and display the result inline?
-4. **Schedule & User blueprints**: These are currently DEBUG-only stubs. Should they be included in the new SPA scope or deferred?
+1. **Brand identity** — ✅ **Resolved (2026-06-11).** Keep the existing pixel-art SahasrahBot logo, but take a **bold visual refresh** ("Speedrun the Legend" — see §11). The Chameleon palette is dropped.
+2. **Dark mode** — ✅ **Resolved (2026-06-11).** Ship **dark-first** with a light (parchment) theme and a persisted toggle (`localStorage`). Theming is done via `[data-theme]` + CSS variables (not Tailwind's `dark:` variant) so both themes are first-class, not derived.
+3. **SG Live seed generation links**: The current SG Live dashboard has direct `<a>` links to `/sglive/generate/alttpr` etc. that redirect to external seed URLs. Should these remain as server-side redirects, or should the SPA call an API and display the result inline? *(Still open — defer to SG Live page build.)*
+4. **Schedule & User blueprints**: These are currently DEBUG-only stubs. Should they be included in the new SPA scope or deferred? *(Still open — defaulting to deferred.)*
+
+## 11. Visual Language — "Speedrun the Legend"
+
+The aesthetic direction was locked via a standalone HTML prototype set in
+[`docs/design/prototypes/`](../design/prototypes/) (home, leaderboard, presets, submit — verified
+in both themes, desktop + mobile). The concept: the **engraved gravitas of the Zelda mythos** meets the
+**clinical precision of a speedrun split timer**.
+
+### 11.1 Typography
+| Role | Family | Notes |
+|------|--------|-------|
+| Display / brand / headings | **Cinzel Decorative** (700, 900) | Engraved, fantasy-monumental |
+| Body / UI | **Hanken Grotesk** (300–700) | Refined grotesk — deliberately not Inter/Roboto |
+| Numerals / timers / code / labels | **Space Mono** (400, 700) | Monospace race-clock feel; used for stats, table numbers, kickers, badges |
+
+### 11.2 Design tokens (CSS variables — the source of truth)
+Defined in the prototype's [`assets/theme.css`](../design/prototypes/assets/theme.css) under `:root`
+(dark) and `[data-theme="light"]`. These port directly into the SPA as CSS variables, surfaced to
+Tailwind via `theme.extend.colors` referencing `var(--…)`.
+
+| Token | Dark | Light | Use |
+|-------|------|-------|-----|
+| `--bg-0/1/2/3` | `#0a0810` → `#1d1929` | `#ece2c9` → `#fff` | Background depth ramp |
+| `--line` / `--line-glow` | `#2a2438` / `#3a3252` | `#d9cba6` / `#c9b888` | Hairlines / raised edges |
+| `--ink` / `--ink-soft` / `--ink-faint` | `#ede8f5` / `#b6aecb` / `#756e8a` | `#211a12` / `#4f4536` / `#8a7c63` | Text ramp |
+| `--gold` | `#f2c84b` | `#b8860b` | Primary accent (triforce) |
+| `--teal` | `#3fd0c9` | `#0f8b84` | Secondary / links / "ahead" |
+| `--crimson` | `#e5484d` | `#c0392b` | Alert / DNF / "behind" |
+| `--violet` | `#8b6fe8` | `#6a4fc4` | Tertiary accent |
+
+Atmosphere: fixed grain + CRT-scanline overlays, gradient-mesh hero glow, faint blueprint grid,
+floating triforce motifs, dramatic soft shadows. Motion: staggered page-load reveals, scroll reveals,
+a live monospace split-timer, SNES-menu `▶` cursor on hover.
+
+### 11.3 Prototype → component mapping
+The prototype already mirrors the component tree in §6. Port path:
+
+| Prototype (`assets/theme.css` / `app.js`) | SPA component |
+|-------------------------------------------|---------------|
+| injected `.topbar` + `.drawer` + `footer.site` | `AppShell` / `Navbar` / `MobileDrawer` / `Footer` |
+| `applyTheme()` + `localStorage` in `app.js` | `ThemeProvider` / `useTheme()` |
+| `.btn`, `.panel`, `.badge`, `table.data`, `.control`/`.field` | `Button`, `Card`, `Badge`, `Table`, form primitives |
+| `.menu`/`.menu-item` | `MenuList` |
+| home hero / `.splitclock` / `.features` | `HomePage` + `SplitTimer` |
+
+The CSS variables and global overlays move verbatim into `src/styles/tokens.css`; per-page layout is
+re-expressed with Tailwind utilities.

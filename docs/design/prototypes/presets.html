@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presets — SahasrahBot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+.ph-title { font-family: 'Cinzel Decorative', serif; font-weight: 900; line-height: 1; font-size: clamp(2.1rem, 6vw, 3.8rem); margin: .8rem 0 0; color: var(--ink); text-shadow: 0 0 50px var(--hero-glow-a); }
+.ph-sub { margin-top: 1rem; color: var(--ink-soft); max-width: 56ch; }
+
+.ns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+.ns-card {
+  display: flex; align-items: center; gap: .85rem; padding: 1.1rem 1.2rem;
+  background: linear-gradient(165deg, var(--bg-2), var(--bg-1)); border: 1px solid var(--line);
+  border-radius: 13px; transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.ns-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 22px 40px -28px #000; }
+.ns-card.sel { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold), 0 22px 40px -28px #000; }
+.ns-card .glyph { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 9px; background: var(--bg-3); border: 1px solid var(--line-glow); color: var(--gold); font-family: 'Cinzel Decorative', serif; font-weight: 900; font-size: 1.1rem; }
+.ns-card .nm { font-weight: 600; color: var(--ink); }
+.ns-card .ct { font-family: 'Space Mono', monospace; font-size: .7rem; color: var(--ink-faint); }
+
+.split-cols { display: grid; grid-template-columns: 1.05fr 1fr; gap: 1.4rem; align-items: start; }
+.rand-tag { font-family: 'Space Mono', monospace; font-size: .72rem; font-weight: 700; color: var(--teal); }
+.preset-path { color: var(--ink); font-weight: 600; }
+.preset-path .ns { color: var(--ink-faint); }
+.yaml-name { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--gold); font-size: 1.05rem; }
+@media (max-width: 860px) { .split-cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="presets">
+
+<section class="pagehead">
+  <div class="glow"></div><div class="grid"></div>
+  <div class="wrap">
+    <div class="crumb reveal d1"><a href="home.html">Home</a><span class="sep">/</span><span>Presets</span></div>
+    <h1 class="ph-title reveal d2">Preset Namespaces</h1>
+    <p class="ph-sub reveal d3">A namespace lets you publish your own presets for others to roll. Browse the community library below, or sign in to manage your own.</p>
+    <div class="reveal d4" style="margin-top:1.4rem;display:flex;gap:.8rem;flex-wrap:wrap;">
+      <a class="btn btn-primary btn-sm" href="#">＋ New preset</a>
+      <a class="btn btn-ghost btn-sm" href="#">My namespace</a>
+    </div>
+  </div>
+</section>
+
+<main>
+<!-- namespace picker -->
+<section class="block" style="padding-bottom:1.5rem;">
+  <div class="wrap">
+    <div class="sec-head onscroll" style="margin-bottom:1.4rem;">
+      <span class="sec-kicker">Browse</span>
+      <h2 class="sec-title" style="font-size:clamp(1.4rem,3.5vw,2rem);">All namespaces</h2>
+    </div>
+    <div class="ns-grid onscroll">
+      <a class="ns-card sel" href="#"><span class="glyph">S</span><span><span class="nm">synack</span><br><span class="ct">14 presets</span></span></a>
+      <a class="ns-card" href="#"><span class="glyph">A</span><span><span class="nm">alttpr</span><br><span class="ct">31 presets</span></span></a>
+      <a class="ns-card" href="#"><span class="glyph">L</span><span><span class="nm">league</span><br><span class="ct">9 presets</span></span></a>
+      <a class="ns-card" href="#"><span class="glyph">D</span><span><span class="nm">daily</span><br><span class="ct">7 presets</span></span></a>
+      <a class="ns-card" href="#"><span class="glyph">M</span><span><span class="nm">smz3</span><br><span class="ct">12 presets</span></span></a>
+      <a class="ns-card" href="#"><span class="glyph">C</span><span><span class="nm">crosskeys</span><br><span class="ct">4 presets</span></span></a>
+    </div>
+  </div>
+</section>
+
+<!-- selected namespace: table + detail -->
+<section class="block" style="padding-top:1rem;">
+  <div class="wrap">
+    <div class="split-cols">
+
+      <!-- preset list -->
+      <div class="panel onscroll">
+        <div class="panel-head">
+          <h3>synack <span style="color:var(--ink-faint);font-family:'Hanken Grotesk';font-weight:400;font-size:.85rem;">/ presets</span></h3>
+          <a class="btn btn-ghost btn-sm" href="#">＋ Create</a>
+        </div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table class="data" style="min-width:0;">
+            <thead><tr><th>Name</th><th>Randomizer</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td class="preset-path"><span class="ns">synack/</span>casualboots</td><td><a href="#" class="rand-tag">alttpr</a></td><td><a href="#">edit</a></td></tr>
+              <tr><td class="preset-path"><span class="ns">synack/</span>crosskeys</td><td><a href="#" class="rand-tag">alttpr</a></td><td><a href="#">edit</a></td></tr>
+              <tr><td class="preset-path"><span class="ns">synack/</span>open_fast</td><td><a href="#" class="rand-tag">alttpr</a></td><td><a href="#">edit</a></td></tr>
+              <tr><td class="preset-path"><span class="ns">synack/</span>mystery_weighted</td><td><a href="#" class="rand-tag">alttpr</a></td><td><a href="#">edit</a></td></tr>
+              <tr><td class="preset-path"><span class="ns">synack/</span>hard_keys</td><td><a href="#" class="rand-tag">smz3</a></td><td><a href="#">edit</a></td></tr>
+              <tr><td class="preset-path"><span class="ns">synack/</span>retrance</td><td><a href="#" class="rand-tag">alttpr</a></td><td><a href="#">edit</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- preset detail / YAML -->
+      <div class="panel onscroll">
+        <div class="panel-head">
+          <div>
+            <span class="yaml-name">casualboots</span>
+            <div class="rand-tag" style="margin-top:.2rem;">alttpr</div>
+          </div>
+          <div style="display:flex;gap:.5rem;">
+            <a class="btn btn-ghost btn-sm" href="#">⬇ Download</a>
+            <a class="btn btn-primary btn-sm" href="#">Edit</a>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="codeblock">
+<pre><code><span class="c"># synack/casualboots — ALTTPR open preset</span>
+<span class="k">goal</span>: <span class="v">ganon</span>
+<span class="k">mode</span>: <span class="v">open</span>
+<span class="k">weapons</span>: <span class="v">randomized</span>
+<span class="k">item_placement</span>: <span class="v">advanced</span>
+<span class="k">dungeon_items</span>: <span class="v">standard</span>
+<span class="k">accessibility</span>: <span class="v">items</span>
+<span class="k">hints</span>: <span class="v">off</span>
+<span class="k">enemizer</span>:
+  <span class="k">boss_shuffle</span>: <span class="v">none</span>
+  <span class="k">enemy_shuffle</span>: <span class="v">none</span>
+<span class="k">spoilers</span>: <span class="v">off</span>
+<span class="k">tournament</span>: <span class="v">true</span>
+<span class="k">allow_quickswap</span>: <span class="v">true</span></code></pre>
+          </div>
+          <p class="hint" style="margin-top:1rem;color:var(--ink-faint);font-size:.82rem;">
+            Upload a new YAML file to replace this preset. Changes apply the next time someone rolls
+            <code style="font-family:'Space Mono',monospace;color:var(--teal);">/alttpr preset:synack/casualboots</code>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</main>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

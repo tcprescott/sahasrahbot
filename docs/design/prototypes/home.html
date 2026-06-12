@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SahasrahBot — Seeds, Races &amp; Tournaments</title>
+<meta name="description" content="SahasrahBot generates randomized game seeds and organizes community races for the A Link to the Past Randomizer, Super Metroid, SMZ3 and friends.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+/* ---- home-specific: hero, features, editorial ---- */
+.hero { position: relative; padding: clamp(4rem, 11vw, 9rem) clamp(1rem, 4vw, 2.5rem) clamp(3.5rem, 7vw, 6rem); overflow: hidden; isolation: isolate; }
+.hero-glow {
+  position: absolute; inset: -20% -10% auto -10%; height: 120%; z-index: -2;
+  background:
+    radial-gradient(42% 55% at 22% 18%, var(--hero-glow-a) 0%, transparent 60%),
+    radial-gradient(40% 50% at 82% 28%, var(--hero-glow-b) 0%, transparent 62%),
+    radial-gradient(55% 60% at 55% 88%, var(--hero-glow-c) 0%, transparent 65%);
+  filter: blur(8px); animation: drift 22s ease-in-out infinite alternate;
+}
+@keyframes drift { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(-3%,2%,0) scale(1.08); } }
+.hero-grid {
+  position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000 0%, transparent 78%);
+          mask-image: radial-gradient(70% 60% at 50% 40%, #000 0%, transparent 78%);
+  opacity: .5;
+}
+.motif { position: absolute; z-index: -1; opacity: .5; pointer-events: none; }
+.motif.tri-1 { top: 16%; right: 8%; width: 90px; color: var(--gold); animation: float 9s ease-in-out infinite; }
+.motif.tri-2 { bottom: 12%; left: 5%; width: 58px; color: var(--teal); animation: float 12s ease-in-out infinite reverse; }
+.motif.tri-3 { top: 58%; right: 18%; width: 38px; color: var(--violet); animation: float 7s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-18px) rotate(8deg); } }
+.hero-inner { max-width: var(--maxw); margin: 0 auto; position: relative; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-family: 'Space Mono', monospace; font-size: .72rem; font-weight: 700;
+  letter-spacing: .26em; text-transform: uppercase; color: var(--gold);
+  padding: .4rem .9rem; border: 1px solid var(--line-glow); border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-2) 60%, transparent);
+}
+.eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 0 var(--teal); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--teal) 70%, transparent); } 70% { box-shadow: 0 0 0 9px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+.headline {
+  font-family: 'Cinzel Decorative', serif; font-weight: 900; line-height: .92; letter-spacing: .01em;
+  font-size: clamp(2.9rem, 11vw, 7.6rem); margin: 1.4rem 0 0;
+  background: linear-gradient(180deg, var(--ink) 30%, color-mix(in srgb, var(--gold) 65%, var(--ink)) 130%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 60px var(--hero-glow-a);
+}
+.headline .b { display: block; }
+.headline .accent { -webkit-text-fill-color: var(--gold); text-shadow: 0 0 40px var(--hero-glow-a); }
+
+.splitclock {
+  margin-top: 2.4rem; display: inline-flex; flex-direction: column; gap: .55rem; padding: 1.1rem 1.4rem;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: inset 0 1px 0 var(--line-glow), 0 24px 48px -28px #000; position: relative;
+}
+.splitclock::before { content: "● REC"; position: absolute; top: .7rem; right: 1rem; font-family: 'Space Mono', monospace; font-size: .56rem; font-weight: 700; letter-spacing: .22em; color: var(--crimson); }
+.splitclock .label { font-family: 'Space Mono', monospace; font-size: .6rem; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: var(--ink-faint); }
+.splitclock .time { font-family: 'Space Mono', monospace; font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 700; letter-spacing: .02em; color: var(--ink); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: .15em; }
+.splitclock .time .ms { font-size: .5em; color: var(--gold); }
+.splitclock .delta { font-family: 'Space Mono', monospace; font-size: .72rem; font-weight: 700; letter-spacing: .04em; color: var(--teal); }
+
+.cta-row { margin-top: 2.4rem; display: flex; flex-wrap: wrap; gap: 1rem; }
+.cta-row .btn { padding: .95rem 1.7rem; }
+
+.statline { margin-top: 3rem; display: flex; flex-wrap: wrap; gap: clamp(1.4rem, 5vw, 3.4rem); padding-top: 1.6rem; border-top: 1px solid var(--line); }
+.stat .n { font-family: 'Space Mono', monospace; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 700; color: var(--ink); line-height: 1; }
+.stat .n .u { color: var(--gold); }
+.stat .l { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); margin-top: .35rem; font-weight: 600; }
+
+.features { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.2rem; }
+.feat {
+  position: relative; padding: 1.8rem 1.7rem; background: linear-gradient(165deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  transition: transform .4s var(--ease), border-color .4s var(--ease), box-shadow .4s var(--ease);
+}
+.feat::after { content: ""; position: absolute; width: 160px; height: 160px; top: -80px; right: -80px; border-radius: 50%; background: radial-gradient(circle, var(--accent-c, var(--hero-glow-a)) 0%, transparent 70%); opacity: 0; transition: opacity .4s var(--ease); }
+.feat:hover { transform: translateY(-6px); border-color: var(--glow, var(--gold)); box-shadow: 0 30px 50px -32px #000; }
+.feat:hover::after { opacity: 1; }
+.feat .fnum { font-family: 'Space Mono', monospace; font-size: .68rem; font-weight: 700; letter-spacing: .2em; color: var(--ink-faint); }
+.feat .ficon { margin: .4rem 0 1rem; width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid var(--line-glow); border-radius: 12px; background: var(--bg-3); color: var(--glow, var(--gold)); }
+.feat .ficon svg { width: 24px; height: 24px; }
+.feat h3 { font-size: 1.18rem; font-weight: 700; letter-spacing: .005em; margin-bottom: .5rem; color: var(--ink); }
+.feat p { font-size: .92rem; color: var(--ink-soft); }
+.feat.wide { grid-column: span 3; }
+.feat.third { grid-column: span 2; }
+.feat.f1 { --glow: var(--gold); --accent-c: var(--hero-glow-a); }
+.feat.f2 { --glow: var(--teal); --accent-c: var(--hero-glow-b); }
+.feat.f3 { --glow: var(--violet); --accent-c: var(--hero-glow-c); }
+.feat.f4 { --glow: var(--crimson); --accent-c: rgba(229,72,77,.16); }
+
+.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem,5vw,4rem); align-items: start; }
+.why-prose p { color: var(--ink-soft); font-size: 1.05rem; margin-bottom: 1.2rem; max-width: 52ch; }
+.why-prose p:first-child::first-letter { font-family: 'Cinzel Decorative', serif; font-weight: 900; float: left; font-size: 3.4rem; line-height: .8; padding: .1rem .6rem 0 0; color: var(--gold); }
+.why-prose strong { color: var(--ink); }
+.pullquote { align-self: center; border-left: 3px solid var(--gold); padding: .4rem 0 .4rem 1.6rem; }
+.pullquote q { font-family: 'Cinzel Decorative', serif; font-weight: 700; font-size: clamp(1.3rem, 3vw, 1.9rem); line-height: 1.25; color: var(--ink); quotes: none; }
+.pullquote .by { display: block; margin-top: 1rem; font-family: 'Space Mono', monospace; font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+
+@media (max-width: 860px) {
+  .features { grid-template-columns: 1fr; }
+  .feat.wide, .feat.third { grid-column: span 1; }
+  .why-grid { grid-template-columns: 1fr; }
+  .motif { display: none; }
+}
+@media (max-width: 520px) {
+  .menu-item { flex-wrap: wrap; }
+  .menu-item .m-key { min-width: 0; }
+  .splitclock { width: 100%; }
+}
+</style>
+</head>
+<body data-page="home">
+
+<!-- ============ HERO ============ -->
+<main id="top">
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+
+  <svg class="motif tri-1" viewBox="0 0 100 88" fill="currentColor" aria-hidden="true">
+    <path d="M50 0 L62 21 L38 21 Z"/><path d="M26 44 L38 23 L50 44 Z" opacity=".8"/>
+    <path d="M50 44 L62 23 L74 44 Z" opacity=".8"/><path d="M2 88 L26 46 L50 88 Z" opacity=".55"/>
+    <path d="M50 88 L74 46 L98 88 Z" opacity=".55"/>
+  </svg>
+  <svg class="motif tri-2" viewBox="0 0 100 88" fill="currentColor" aria-hidden="true">
+    <path d="M50 0 L62 21 L38 21 Z"/><path d="M26 44 L38 23 L50 44 Z" opacity=".8"/>
+    <path d="M50 44 L62 23 L74 44 Z" opacity=".8"/>
+  </svg>
+  <svg class="motif tri-3" viewBox="0 0 30 27" fill="currentColor" aria-hidden="true">
+    <path d="M15 0 L19 7 L11 7 Z"/><path d="M2 22 L6 15 L10 22 Z" opacity=".7"/><path d="M20 22 L24 15 L28 22 Z" opacity=".7"/>
+  </svg>
+
+  <div class="hero-inner">
+    <span class="eyebrow reveal d1"><span class="dot"></span>Now serving the randomizer multiverse</span>
+
+    <h1 class="headline reveal d2">
+      <span class="b">Speedrun</span>
+      <span class="b accent">the Legend.</span>
+    </h1>
+
+    <div class="splitclock reveal d3" aria-hidden="true">
+      <span class="label">Session uptime · live</span>
+      <span class="time"><span id="clk">00:00:00</span><span class="ms" id="clkms">.00</span></span>
+      <span class="delta" id="delta">▲ −0:00.4 ahead of best</span>
+    </div>
+
+    <div class="cta-row reveal d4">
+      <a class="btn btn-primary"
+         href="https://discord.com/api/oauth2/authorize?client_id=572269659290861578&permissions=0&scope=bot%20applications.commands"
+         target="_blank" rel="noopener">
+        Invite the Bot <span class="arr">→</span>
+      </a>
+      <a class="btn btn-ghost" href="https://sahasrahbot.synack.live/" target="_blank" rel="noopener">
+        Read the Docs <span class="arr">↗</span>
+      </a>
+    </div>
+
+    <div class="statline reveal d5">
+      <div class="stat"><div class="n">12<span class="u">+</span></div><div class="l">Game categories</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">Concurrent subsystems</div></div>
+      <div class="stat"><div class="n">∞<span class="u"></span></div><div class="l">Seeds rolled</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Event loop</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="block" id="features">
+  <div class="wrap">
+    <div class="sec-head onscroll">
+      <span class="sec-kicker">What it does</span>
+      <h2 class="sec-title">From a single slash command to a full tournament night.</h2>
+    </div>
+
+    <div class="features">
+      <article class="feat f1 wide onscroll">
+        <div class="fnum">01 / SEEDS</div>
+        <div class="ficon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+        <h3>Seed Generation</h3>
+        <p>Roll randomized seeds from YAML presets across alttpr.com and a dozen other providers — with a reliability contract of timeouts, retries, and normalized errors so a flaky upstream never ruins race night.</p>
+      </article>
+
+      <article class="feat f2 third onscroll">
+        <div class="fnum">02 / RACETIME</div>
+        <div class="ficon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        </div>
+        <h3>Race Rooms</h3>
+        <p>Auto-opens RaceTime.gg rooms, DMs runners, and manages live races per game category.</p>
+      </article>
+
+      <article class="feat f3 third onscroll">
+        <div class="fnum">03 / ASYNC</div>
+        <div class="ficon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+        </div>
+        <h3>Async Tournaments</h3>
+        <p>Self-serve queues, leaderboards, pools and review tooling for run-when-you-can brackets.</p>
+      </article>
+
+      <article class="feat f4 third onscroll">
+        <div class="fnum">04 / DAILY</div>
+        <div class="ficon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>
+        </div>
+        <h3>Daily Challenges</h3>
+        <p>A fresh seed every day, posted to Discord with its own thread and hash — automatically.</p>
+      </article>
+
+      <article class="feat f1 third onscroll">
+        <div class="fnum">05 / PRESETS</div>
+        <div class="ficon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4H4zM4 10h16v10H4z"/><path d="M8 14h8"/></svg>
+        </div>
+        <h3>Shared Presets</h3>
+        <p>Publish, browse and download community preset namespaces straight from the web.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY ============ -->
+<section class="block" id="why" style="background:var(--bg-0);border-block:1px solid var(--line);">
+  <div class="wrap">
+    <div class="sec-head onscroll">
+      <span class="sec-kicker">Why this exists</span>
+      <h2 class="sec-title">A minimalist console for everything Discord can't do well.</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-prose onscroll">
+        <p>SahasrahBot lives in Discord — but some things, like editing presets, submitting tournament settings, casting ranked-choice votes, or verifying your RaceTime.gg account, just want a real web form. That's what this site is for.</p>
+        <p>It's also an <strong>API surface</strong>: a clean set of endpoints other bots and websites can build on. No bloat, no dashboard theme you didn't ask for — just the operations that matter, wired straight into the live bot.</p>
+      </div>
+      <blockquote class="pullquote onscroll">
+        <q>Maybe someday I'll build a full-featured website. For now, this will more than do.</q>
+        <span class="by">— Synack, maintainer</span>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LINKS MENU ============ -->
+<section class="block" id="links">
+  <div class="wrap">
+    <div class="sec-head onscroll">
+      <span class="sec-kicker">Quick travel</span>
+      <h2 class="sec-title">Important links.</h2>
+    </div>
+
+    <div class="menu onscroll">
+      <a class="menu-item" href="https://sahasrahbot.synack.live/" target="_blank" rel="noopener">
+        <span class="cursor">▶</span>
+        <span class="m-key">Docs</span>
+        <span class="m-main"><b>Documentation</b><span>Setup guides, command reference, tournament hosting.</span></span>
+        <span class="m-go">↗</span>
+      </a>
+      <a class="menu-item" href="https://github.com/tcprescott/sahasrahbot" target="_blank" rel="noopener">
+        <span class="cursor">▶</span>
+        <span class="m-key">Source</span>
+        <span class="m-main"><b>GitHub Repository</b><span>Read the code, file an issue, open a pull request.</span></span>
+        <span class="m-go">↗</span>
+      </a>
+      <a class="menu-item" href="/triforcetexts/alttpr2024">
+        <span class="cursor">▶</span>
+        <span class="m-key">Submit</span>
+        <span class="m-main"><b>Triforce Text Submissions</b><span>ALTTPR Main Tournament 2024 credits-roll messages.</span></span>
+        <span class="m-go">→</span>
+      </a>
+      <a class="menu-item" href="/racetime/verification/initiate">
+        <span class="cursor">▶</span>
+        <span class="m-key">Verify</span>
+        <span class="m-main"><b>Link your RaceTime.gg account</b><span>Tell SahasrahBot who you are on RaceTime.gg.</span></span>
+        <span class="m-go">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<script src="assets/app.js"></script>
+<script>
+/* ---- live split-timer (home only) ---- */
+(function () {
+  const clk = document.getElementById('clk');
+  const ms  = document.getElementById('clkms');
+  const delta = document.getElementById('delta');
+  const start = performance.now();
+  const pad = (n, l = 2) => String(n).padStart(l, '0');
+  function tick(now) {
+    const t = (now - start) / 1000;
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = Math.floor(t % 60);
+    const cs = Math.floor((t * 100) % 100);
+    clk.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+    ms.textContent = '.' + pad(cs);
+    const swing = Math.sin(t * 0.7) * 1.4;
+    const ahead = swing <= 0;
+    delta.textContent = (ahead ? '▲ −' : '▼ +') + '0:0' + Math.abs(swing).toFixed(1) +
+                        (ahead ? ' ahead of best' : ' behind best');
+    delta.style.color = ahead ? 'var(--teal)' : 'var(--crimson)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+/* ---- presets-page-specific styles ---- */
+
+/* ---- page head ---- */
+.ph-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(2.1rem, 6vw, 3.8rem);
+  margin: .8rem 0 0;
+  color: var(--ink);
+  text-shadow: 0 0 50px var(--hero-glow-a);
+}
+.ph-sub {
+  margin-top: 1rem;
+  color: var(--ink-soft);
+  max-width: 56ch;
+}
+
+/* ---- randomizer filter tabs ---- */
+.rand-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1.8rem;
+}
+.rand-tab {
+  font-family: 'Space Mono', monospace;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .45rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--line-glow);
+  background: var(--bg-3);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.rand-tab:hover {
+  border-color: var(--teal);
+  color: var(--ink);
+}
+.rand-tab.active {
+  background: color-mix(in srgb, var(--teal) 18%, transparent);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* ---- search input ---- */
+.search-row {
+  display: flex;
+  gap: .8rem;
+  align-items: center;
+  margin-bottom: 1.4rem;
+  flex-wrap: wrap;
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  font-family: inherit;
+  font-size: .95rem;
+  color: var(--ink);
+  background: var(--bg-3);
+  border: 1px solid var(--line-glow);
+  border-radius: 10px;
+  padding: .7rem 1rem;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.search-input::placeholder { color: var(--ink-faint); }
+.search-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--hero-glow-a);
+}
+
+/* ---- namespace grid ---- */
+.ns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.ns-card {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: 1.1rem 1.2rem;
+  background: linear-gradient(165deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+  text-align: left;
+  width: 100%;
+}
+.ns-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 22px 40px -28px #000;
+}
+.ns-card.active {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold), 0 22px 40px -28px #000;
+}
+.ns-glyph {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--bg-3);
+  border: 1px solid var(--line-glow);
+  color: var(--gold);
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+.ns-name { font-weight: 600; color: var(--ink); font-size: .95rem; }
+.ns-count {
+  font-family: 'Space Mono', monospace;
+  font-size: .7rem;
+  color: var(--ink-faint);
+  margin-top: .1rem;
+}
+
+/* ---- split columns (preset list + detail) ---- */
+.presets-split {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.4rem;
+  align-items: start;
+}
+
+/* ---- preset table ---- */
+.rand-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+.preset-path { color: var(--ink); font-weight: 600; font-size: .9rem; }
+.preset-path .ns-part { color: var(--ink-faint); font-weight: 400; }
+
+/* ---- selected preset row ---- */
+table.data tbody tr.selected td {
+  background: color-mix(in srgb, var(--gold) 9%, transparent);
+}
+
+/* ---- YAML detail ---- */
+.yaml-name {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 1.05rem;
+}
+
+/* ---- skeleton shimmer ---- */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+.skel {
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+    var(--bg-2) 25%,
+    var(--bg-3) 50%,
+    var(--bg-2) 75%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ---- empty / error states ---- */
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--ink-faint);
+}
+.state-box .state-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: .5;
+}
+.state-box p { font-size: .92rem; max-width: 36ch; }
+
+/* ---- click-to-view button cells ---- */
+.preset-view-btn {
+  font-family: 'Space Mono', monospace;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--teal);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color .2s var(--ease);
+}
+.preset-view-btn:hover { color: var(--gold); }
+
+/* ---- global preset special badge ---- */
+.global-section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: .6rem 1.1rem;
+  background: var(--bg-0);
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 860px) {
+  .presets-split { grid-template-columns: 1fr; }
+}

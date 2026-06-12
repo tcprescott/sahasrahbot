@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Submission — SahasrahBot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+.sb-title { font-family: 'Cinzel Decorative', serif; font-weight: 900; line-height: 1; font-size: clamp(2rem, 5.5vw, 3.4rem); margin: .8rem 0 0; color: var(--ink); text-shadow: 0 0 50px var(--hero-glow-a); }
+.form-cols { display: grid; grid-template-columns: 1.3fr .9fr; gap: 1.4rem; align-items: start; }
+.steps { list-style: none; display: flex; flex-direction: column; gap: 1.1rem; }
+.steps li { display: flex; gap: .9rem; }
+.steps .n { flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--bg-3); border: 1px solid var(--line-glow); font-family: 'Space Mono', monospace; font-weight: 700; font-size: .82rem; color: var(--gold); }
+.steps b { color: var(--ink); display: block; font-size: .95rem; }
+.steps span { color: var(--ink-soft); font-size: .86rem; }
+.static-preset { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--gold); background: var(--bg-3); border: 1px dashed var(--line-glow); border-radius: 10px; padding: .8rem 1rem; }
+.matchcard { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.1rem; background: var(--bg-3); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 1.5rem; }
+.matchcard .vs { font-family: 'Cinzel Decorative', serif; font-weight: 700; color: var(--ink-faint); }
+.matchcard .who { color: var(--ink); font-weight: 600; }
+@media (max-width: 860px) { .form-cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="submit">
+
+<section class="pagehead">
+  <div class="glow"></div><div class="grid"></div>
+  <div class="wrap">
+    <div class="crumb reveal d1"><a href="home.html">Home</a><span class="sep">/</span><a href="#">ALTTPR League</a><span class="sep">/</span><span>Submit settings</span></div>
+    <h1 class="sb-title reveal d2">Match Submission</h1>
+    <div class="reveal d3" style="margin-top:1rem;">
+      <span class="badge gold">Event: alttprleague</span>
+      <span class="badge teal"><span class="dot"></span>Signed in as Synack</span>
+    </div>
+  </div>
+</section>
+
+<main>
+<section class="block">
+  <div class="wrap">
+    <div class="form-cols">
+
+      <!-- the form -->
+      <div class="panel onscroll">
+        <div class="panel-head"><h3>Game settings</h3><span class="badge">SpeedGaming</span></div>
+        <div class="panel-body">
+
+          <div class="matchcard">
+            <span class="who">Andy_Mac</span>
+            <span class="vs">vs</span>
+            <span class="who">Daffy_Did_It</span>
+            <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:.74rem;color:var(--ink-faint);">Sat 18:00 ET</span>
+          </div>
+
+          <form onsubmit="return false">
+            <div class="field-grid">
+              <div class="field">
+                <label for="episodeid">SpeedGaming Episode ID <span class="req">*</span></label>
+                <input class="control" type="number" id="episodeid" name="episodeid" value="48217" required>
+              </div>
+              <div class="field">
+                <label for="game">Game #</label>
+                <select class="control" id="game" name="game">
+                  <option value="1">Game 1</option>
+                  <option value="2">Game 2</option>
+                  <option value="3" selected>Game 3</option>
+                  <option value="4">Game 4</option>
+                  <option value="5">Game 5</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field" id="presetField">
+              <label for="preset">Preset</label>
+              <select class="control" id="preset" name="preset">
+                <option value="invrosia">Invrosia</option>
+                <option value="league_swordless">League Swordless</option>
+                <option value="hard_mc">Open Hard MC Shuffle</option>
+                <option value="hard_enemizer">Open Hard Enemizer</option>
+              </select>
+              <p class="hint">Games 3 &amp; 4 are player-picked. Games 1, 2 &amp; 5 use a fixed preset.</p>
+            </div>
+
+            <div class="field" id="staticField" hidden>
+              <label>Preset (fixed for this game)</label>
+              <div class="static-preset" id="staticPreset">casualboots</div>
+            </div>
+
+            <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.5rem;">
+              <button class="btn btn-primary" type="submit">Submit match <span class="arr">→</span></button>
+              <button class="btn btn-ghost" type="reset">Reset</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+      <!-- side help -->
+      <div class="panel onscroll">
+        <div class="panel-head"><h3>How it works</h3></div>
+        <div class="panel-body">
+          <ol class="steps">
+            <li><span class="n">1</span><span><b>Find the episode</b><span>The Episode ID is on the match's SpeedGaming page.</span></span></li>
+            <li><span class="n">2</span><span><b>Pick the game</b><span>Each match is a best-of series; choose which game you're submitting.</span></span></li>
+            <li><span class="n">3</span><span><b>Choose a preset</b><span>Player-picked games let you select; fixed games are locked.</span></span></li>
+            <li><span class="n">4</span><span><b>Submit</b><span>SahasrahBot rolls the seed and posts it to the race room at start time.</span></span></li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</main>
+
+<script src="assets/app.js"></script>
+<script>
+/* game-number → preset behaviour (mirrors the league submission form) */
+(function () {
+  const FIXED = { '1': 'casualboots', '2': 'crosskeys', '5': 'retrance' };
+  const game = document.getElementById('game');
+  const presetField = document.getElementById('presetField');
+  const staticField = document.getElementById('staticField');
+  const staticPreset = document.getElementById('staticPreset');
+  function update() {
+    const fixed = FIXED[game.value];
+    if (fixed) { presetField.hidden = true; staticField.hidden = false; staticPreset.textContent = fixed; }
+    else { presetField.hidden = false; staticField.hidden = true; }
+  }
+  game.addEventListener('change', update);
+  update();
+})();
+</script>
+</body>
+</html>

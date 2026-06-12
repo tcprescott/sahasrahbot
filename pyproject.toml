@@ -46,6 +46,7 @@ racetime-bot = "^2.3.0"
 websockets = "*"
 markdown = "^3.4.3"
 pydantic-settings = "*"
+httpx = "^0.28.1"
 
 
 [tool.poetry.group.dev.dependencies]

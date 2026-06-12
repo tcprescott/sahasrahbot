@@ -1,4 +1,5 @@
 import logging
+import os
 
 from authlib.oauth2.rfc6749.errors import OAuth2Error
 from quart import (Quart, abort, jsonify, redirect, render_template, request,
@@ -155,6 +156,85 @@ async def purge_me_action():
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
 async def robots():
     return 'User-agent: *\nDisallow: /\n'
+
+
+# ---------------------------------------------------------------------------
+# SPA support
+# ---------------------------------------------------------------------------
+
+_SPA_DIST = os.path.join(os.path.dirname(__file__), 'spa', 'dist')
+
+if not os.path.isdir(_SPA_DIST):
+    logger.warning(
+        "SPA dist directory not found at %s — SPA routes will return 404 until the frontend is built.",
+        _SPA_DIST,
+    )
+
+
+@sahasrahbotapi.route('/api/me', methods=['GET'])
+async def api_me():
+    try:
+        user = await discord.fetch_user()
+    except Unauthorized:
+        return jsonify(error="unauthenticated"), 401
+
+    user_id = str(user._data.get('id', ''))
+    avatar_hash = user._data.get('avatar')
+    if avatar_hash:
+        avatar_url = f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.png"
+    else:
+        discriminator = int(user._data.get('discriminator', 0) or 0)
+        avatar_url = f"https://cdn.discordapp.com/embed/avatars/{discriminator % 5}.png"
+
+    name = user._data.get('global_name') or user._data.get('username', '')
+    return jsonify(data=dict(id=user_id, name=name, avatar_url=avatar_url))
+
+
+@sahasrahbotapi.route('/spa-assets/<path:filename>', methods=['GET'])
+async def spa_assets(filename):
+    assets_dir = os.path.join(_SPA_DIST, 'spa-assets')
+    if not os.path.isdir(assets_dir):
+        abort(404)
+    return await send_from_directory(assets_dir, filename)
+
+
+# Prefixes owned by existing blueprints / server routes — never hand off to SPA.
+_RESERVED_PREFIXES = (
+    '/api/',
+    '/auth/',
+    '/racetime/',
+    '/triforcetexts/',
+    '/presets',
+    '/submit',
+    '/sglive/',
+    '/async/',
+    '/schedule/',
+    '/user/',
+    '/login/',
+    '/logout/',
+    '/callback/',
+    '/me/',
+    '/purgeme',
+    '/healthcheck',
+    '/robots.txt',
+    '/assets/',
+    '/theme-assets/',
+    '/spa-assets/',
+    '/throw_error',
+)
+
+
+@sahasrahbotapi.route('/<path:path>', methods=['GET'])
+async def spa_catchall(path):
+    full_path = '/' + path
+    for prefix in _RESERVED_PREFIXES:
+        if full_path.startswith(prefix):
+            abort(404)
+    index_html = os.path.join(_SPA_DIST, 'index.html')
+    if not os.path.isfile(index_html):
+        abort(404)
+    return await send_from_directory(_SPA_DIST, 'index.html')
+
 
 @sahasrahbotapi.route('/assets/<path:path>', methods=['GET'])
 async def assets(path):
