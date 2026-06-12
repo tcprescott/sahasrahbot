@@ -23,7 +23,8 @@ Architectural analysis and domain documentation:
 | [Async Tournament Discord Workflow](design/async_tournament_discord_workflow.md) | End-to-end async tournament module workflow: Discord lifecycle, scoring, permissions, and web-coupled review flow |
 | [Tournament System](design/tournament_system_analysis.md) | Tournament framework: base classes, 20+ handlers, SpeedGaming integration, match lifecycle |
 | [Tournament Module (Non-Async) Audit](design/tournament_module_non_async_audit.md) | Reliability-first audit of non-async tournament architecture, handler inventory, lifecycle, and risk profile |
-| [Tournament Registry Config-Driven Design](design/tournament_registry_config_design.md) | Concrete migration design for replacing code-comment seasonal toggles with validated runtime config |
+| [Tournament Registry Config-Driven Design](design/tournament_registry_config_design.md) | Concrete migration design for replacing code-comment seasonal toggles with validated runtime config (superseded by Self-Service Tournament System) |
+| [Self-Service Tournament System](design/self_service_tournaments.md) | Approved design for DB-backed, web-managed tournament definitions with pluggable seed rollers; supersedes the YAML registry design |
 | [RaceTime & Web API](design/racetime_and_web_api.md) | RaceTime.gg integration architecture and race lifecycle; links to canonical split Web API/frontend docs |
 | [Web API JSON Endpoints](design/web_api_json_endpoints.md) | Endpoint-level JSON API inventory: auth modes, request/response behavior, async tournament API details |
 | [Web Frontend Route Map](design/web_frontend_routes.md) | HTML-rendered route inventory: OAuth-protected pages, blueprint flows, and DEBUG-only surfaces |

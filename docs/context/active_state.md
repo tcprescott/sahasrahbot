@@ -1,8 +1,10 @@
 # Active State
 
-> Last updated: 2026-02-13
+> Last updated: 2026-06-12
 
 ## Current Focus
+
+- **Self-Service Tournament System**: Approved design (`docs/design/self_service_tournaments.md`, 2026-06-12) for DB-backed, web-managed tournament definitions with a pluggable seed-roller registry and a generic `DynamicTournamentRace` handler. Owner decisions: retire the YAML registry path (`config/tournaments.yaml`, `registry_loader.py`, `TOURNAMENT_CONFIG_ENABLED`) once the DB path ships, and use organizer-trust authorization (`Users.tournament_organizer` flag granted by bot owner, no approval queue). This supersedes Tournament Registry Config Rollout Phase 2 (Upcoming Work item below). Implementation not yet started; rollout phases A–D defined in the design doc.
 
 - **Modernization Program Bootstrap (Phase 0)**: Executing program bootstrap per [docs/plans/modernization_meta_execution_plan_ai_accelerated.md](../plans/modernization_meta_execution_plan_ai_accelerated.md) — tracker structure, evidence templates, and flag inventory complete. Next: confirm single-owner role mapping (delivery/validation/rollback hats) and run first compatibility evidence cycle.
 - **Discord Bot Refactor**: Implementing the modernization plan defined in [docs/plans/discord_refactor.md](../plans/discord_refactor.md).
@@ -84,7 +86,7 @@
 5. Implement channel name→ID data migration script and rollout plan (Phase 3 of guild config modernization).
 6. Integrate dependency declaration guard (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
 7. Define and document explicit startup supervision/failure strategy for multi-subsystem boot.
-8. Complete Tournament Registry Config Rollout Phase 2: enable config-backed registry in production and validate over a full seasonal cycle.
+8. ~~Complete Tournament Registry Config Rollout Phase 2~~ — superseded by the Self-Service Tournament System design (`docs/design/self_service_tournaments.md`); next step is implementation Phase A (DB models + async registry).
 9. Sequence remaining modernization backlog against `plans/application_modernization_vision_2026_2027.md` and enforce phase gate checks.
 10. Start next bounded Phase 1 slices: telemetry service/table operationalization across surfaces and startup security validation checks.
 11. Rotate/revoke any previously committed secrets and finish operational `.env` hardening.
