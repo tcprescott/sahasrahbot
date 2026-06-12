@@ -958,6 +958,53 @@ The following files will be edited by multiple pages — **assign one agent per 
 - **Agent B**: §8 (Triforce Submit) + §9 (Triforce Moderation) — same blueprint file
 - **Agent C**: §10 (Ranked Choice) + §11 (SG Live) — separate blueprint files, no conflict
 
+### `_RESERVED_PREFIXES` changes required in `api.py`
+
+The SPA catch-all in `api.py` blocks any path that starts with a reserved prefix and returns 404. When you remove a Jinja GET route from a blueprint, Quart no longer has a handler for that path — it falls through to the catch-all. If the prefix is reserved, the catch-all 404s instead of serving `index.html`.
+
+Current state of relevant entries in `_RESERVED_PREFIXES`:
+
+```python
+'/triforcetexts/',   # blocks /triforcetexts/:pool and /triforcetexts/:pool/moderation
+'/sglive/',          # blocks /sglive (served by Jinja today)
+```
+
+Required changes (apply after all agents finish, before rebuilding):
+
+```python
+# Remove:
+'/triforcetexts/',
+'/sglive/',
+
+# Add:
+'/triforcetexts/<pool>/submit',    # keep POST endpoint server-owned
+'/triforcetexts/<pool>/api',       # keep JSON API endpoints server-owned
+'/sglive/generate/',               # keep generate redirects server-owned
+'/sglive/reports/',                # keep capacity report server-owned
+'/sglive/api',                     # keep JSON endpoint server-owned
+```
+
+Wait — Quart's prefix check is a string `startswith`, not a route match. The cleanest approach:
+
+```python
+# Replace '/triforcetexts/' with nothing — the blueprint's registered POST/API routes
+# take priority over the catch-all anyway (blueprint routes win). The catch-all only
+# runs when no blueprint route matches. So removing '/triforcetexts/' from the list
+# is safe; the POST and API routes will still be handled by the blueprint.
+
+# Replace '/sglive/' with:
+'/sglive/generate/',
+'/sglive/reports/',
+'/sglive/api',
+```
+
+So the net edit to `api.py` `_RESERVED_PREFIXES`:
+- **Remove** `'/triforcetexts/'`
+- **Remove** `'/sglive/'`
+- **Add** `'/sglive/generate/'`, `'/sglive/reports/'`, `'/sglive/api'`
+
+`/ranked_choice/` is NOT currently in `_RESERVED_PREFIXES` — no change needed there.
+
 ### After all agents finish
 
 1. Merge `router.tsx` manually (add all new imports + routes)
