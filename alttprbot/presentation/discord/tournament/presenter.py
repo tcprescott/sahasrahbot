@@ -80,6 +80,7 @@ class TournamentPresenter:
         )
         for player_id in player_ids:
             if player_id is None:
+                logging.info("Could not DM player (unresolved discord member)")
                 continue
             try:
                 await self.gateway.send_dm(player_id, embed=embed)

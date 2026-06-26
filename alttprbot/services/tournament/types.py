@@ -9,7 +9,7 @@ metadata. The Discord presenter turns it into embeds via
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 
 @dataclass
@@ -38,3 +38,31 @@ class SeedResult:
     @property
     def code(self) -> Any:
         return getattr(self.seed, "code", None)
+
+
+@dataclass
+class TournamentPlayer:
+    """A resolved tournament player, decoupled from ``discord.Member``.
+
+    The presentation adapter resolves each SpeedGaming player to this neutral value
+    object (RaceTime id + display name + discord user id) so the orchestrator can
+    invite / DM / list players without holding a live Discord member object.
+    """
+
+    rtgg_id: Optional[str]
+    name: Optional[str]
+    discord_user_id: Optional[int]
+
+
+@dataclass
+class RaceRoom:
+    """A presentation-neutral handle to an opened RaceTime room.
+
+    ``start_race`` produces this; subsequent room operations key off ``name`` through
+    the racetime gateway, so the orchestrator never holds the live race handler.
+    """
+
+    name: str
+    url: str
+    entrant_ids: List[str] = None
+

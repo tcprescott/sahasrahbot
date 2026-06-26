@@ -7,6 +7,8 @@ import config
 from alttprbot import models
 from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttpr_quals
 from alttprbot.tournament import registry_loader
+from alttprbot.tournament.orchestrator_adapter import make_adapter
+from alttprbot.services.tournament.test import TEST_DEFINITION, TestOrchestrator
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -16,7 +18,10 @@ RACETIME_URL = config.RACETIME_URL
 # Active handlers are determined by TOURNAMENT_DATA (hardcoded fallback)
 # or by config/tournaments.yaml when TOURNAMENT_CONFIG_ENABLED is true.
 AVAILABLE_TOURNAMENT_HANDLERS = {
-    'test': test.TestTournament,
+    # 'test' is the first handler migrated to the decomposed orchestrator/presenter
+    # (debug-only; see docs/plans/tournament_decomposition.md). Other slugs keep their
+    # legacy god-object class until migrated one-per-PR.
+    'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
     'alttpr': alttpr_quals.ALTTPRQualifierRace,
     'alttprdaily': dailies.AlttprSGDailyRace,
     'smz3': dailies.SMZ3DailyRace,
