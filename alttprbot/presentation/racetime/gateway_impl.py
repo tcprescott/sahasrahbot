@@ -1,0 +1,80 @@
+"""Concrete RaceTime gateway — the presentation-side implementation of
+``alttprbot.services._notify.racetime_gateway.RaceTimeGateway``.
+
+Wraps the per-category ``racetime_bots`` dict. Category-level calls
+(``start_race`` / ``get_team`` / ``http_uri``) go to the category bot; room-level
+calls resolve the live handler for a room via ``compat.get_room_handler`` (searching
+across categories, since room names are globally unique on RaceTime). Registered
+inward at startup; resolution is lazy.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Optional
+
+from alttprbot.presentation.racetime.compat import get_room_handler
+from alttprbot.services._notify import racetime_gateway
+
+
+class RaceTimeGatewayImpl:
+    def __init__(self, bots: dict) -> None:
+        self.bots = bots
+
+    def _handler(self, room_name: str):
+        for bot in self.bots.values():
+            handler = get_room_handler(bot, room_name)
+            if handler is not None:
+                return handler
+        return None
+
+    # --- room-level ---
+    async def send_message(
+        self, room_name: str, message: str, *, direct_to: Optional[str] = None
+    ) -> None:
+        handler = self._handler(room_name)
+        if handler is None:
+            return
+        if direct_to is not None:
+            await handler.send_message(message, direct_to=direct_to)
+        else:
+            await handler.send_message(message)
+
+    async def set_bot_raceinfo(self, room_name: str, info: str) -> None:
+        handler = self._handler(room_name)
+        if handler is not None:
+            await handler.set_bot_raceinfo(info)
+
+    async def invite_user(self, room_name: str, user_id: str) -> None:
+        handler = self._handler(room_name)
+        if handler is not None:
+            await handler.invite_user(user_id)
+
+    async def set_invitational(self, room_name: str) -> None:
+        handler = self._handler(room_name)
+        if handler is not None:
+            await handler.set_invitational()
+
+    async def edit(self, room_name: str, **kwargs: Any) -> None:
+        handler = self._handler(room_name)
+        if handler is not None:
+            await handler.edit(**kwargs)
+
+    async def schedule_spoiler_race(self, room_name: str, **kwargs: Any) -> Any:
+        handler = self._handler(room_name)
+        if handler is None:
+            return None
+        return await handler.schedule_spoiler_race(**kwargs)
+
+    # --- category-level ---
+    async def start_race(self, category: str, **kwargs: Any) -> Any:
+        return await self.bots[category].startrace(**kwargs)
+
+    async def get_team(self, category: str, team_slug: str) -> Any:
+        return await self.bots[category].get_team(team_slug)
+
+    def http_uri(self, category: str, url: str) -> str:
+        return self.bots[category].http_uri(url)
+
+
+def register(bots: dict) -> None:
+    racetime_gateway.register(RaceTimeGatewayImpl(bots))

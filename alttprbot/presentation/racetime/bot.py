@@ -46,3 +46,9 @@ for slug, category in RACETIME_CATEGORIES.items():
         logger=logger,
         handler_class=category.handler_class
     )
+
+# Register the concrete RaceTime gateway inward so the service tier can reach RaceTime
+# without importing the bot singletons. Resolution is lazy (per-call handler lookup).
+from alttprbot.presentation.racetime import gateway_impl as _gateway_impl  # noqa: E402
+
+_gateway_impl.register(racetime_bots)

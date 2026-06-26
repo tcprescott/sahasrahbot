@@ -144,3 +144,10 @@ async def start_bot():
 async def stop_bot():
     if not discordbot.is_closed():
         await discordbot.close()
+
+
+# Register the concrete Discord gateway inward so the service tier can reach Discord
+# without importing this bot singleton. Resolution is lazy, so import-time is safe.
+from alttprbot.presentation.discord import gateway_impl as _gateway_impl  # noqa: E402
+
+_gateway_impl.register(discordbot)
