@@ -93,3 +93,50 @@ tests/               # pytest + pytest-asyncio
   tournament long tail (one-per-PR); coexistence drift (shared rows, remove old paths
   only after the last caller migrates); gateway registration ordering (enqueue, don't
   call synchronously).
+
+## Status (2026-06-26)
+
+Branch `three-tier-migration`. Each phase below shipped behavior-preserving, with the
+bot importing cleanly and the test suite green (started at 232 characterization tests;
+now **294 passing**). Every migrated vertical follows the same shape: a Tier-3
+repository (pure Tortoise CRUD), a Tier-2 service (validation/orchestration, raising
+`ValueError`/`PermissionError` surfaced per surface), thin presentation, plus a service
+unit test and a repository round-trip test.
+
+**Done:**
+- **Phase 0** — foundation (tier packages, `_notify` queue + gateways, `AuditService`,
+  import-linter contracts (warn-only) + CI + pre-commit, `.claude` hook scripts, pytest).
+- **Phase 1** — the Great Relocation: the four `alttprbot_*` surfaces folded into
+  `alttprbot/presentation/{discord,audit,racetime,api}`, `alttprgen` → `services/seedgen`.
+- **Phase 2** — `daily` (DailyRepository/Service).
+- **Phase 3** — `discord_servers` (DiscordServerRepository/Service); shared `presets`
+  (PresetRepository + PresetNamespaceRepository + PresetService) consumed by the API
+  blueprint and the seed generator.
+- **Phase 4** — canonical GuildConfigRepository + GuildConfigService (UI-free via a
+  resolver callback). The `Guild.config_*` monkey-patch and legacy
+  `alttprbot/database/config.py` remain as coexisting shims (same rows).
+- **Phase 5** — RaceTime handler data access: SpoilerRace / RaceRoom (unlisted rooms +
+  override whitelist) / TournamentResults repositories + services.
+- **Phase 6** — seed-generation audit writes routed through `AuditService`.
+- **Phase 7a** — tournament data-layer foundation: TournamentGamesRepository +
+  TournamentResultsRepository, with the base `tournament/core.py` rewired through them.
+- **Phase 8 (5 of 6 blueprints)** — `tournament` (mass-assignment fixed via a
+  TournamentGamesService allowlist), `triforcetexts`, `ranked_choice`, and `racetime`
+  (UserRepository/Service account link+merge, AuthorizationService) all off direct ORM.
+
+**Remaining (large, incremental-by-design — tackle as focused, reviewed passes):**
+- **asynctournament blueprint (~710 lines) + `util/asynctournament.py` (~310 lines)** —
+  one cohesive subsystem (querysets + pydantic serialization + leaderboard/scoring +
+  `checks.is_async_tournament_user` authz). Extract together into an AsyncTournament
+  repository + service. It is the last presentation file importing `alttprbot.models`.
+- **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
+  IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
+  per PR. These classes are untested and drive live tournaments; do not rush.
+- **Phase 9 util cleanup** — `util/{asynctournament,rankedchoice,triforce_text}.py` mix
+  model navigation, STV/scoring computation, and discord embed rendering; split the
+  discord rendering into presentation and the computation into services (entangled with
+  their cog/blueprint consumers).
+- **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`
+  (after audit/misc/tournament callers migrate), then flip import-linter contracts to
+  blocking and set `SAHASRAHBOT_HOOKS_ENFORCE=1`. Blocked until the above land (the
+  presentation→models and service→presentation contracts still have open items).
