@@ -1,0 +1,13 @@
+# Architecture-boundary checks. Enable with `pre-commit install`.
+# The import-linter hook enforces the three-tier layering (see pyproject.toml
+# [tool.importlinter]). It runs in the Poetry environment so the import graph
+# matches the app's installed dependencies.
+repos:
+  - repo: local
+    hooks:
+      - id: import-linter
+        name: import-linter (three-tier boundaries)
+        entry: poetry run lint-imports
+        language: system
+        pass_filenames: false
+        files: ^alttprbot/.*\.py$

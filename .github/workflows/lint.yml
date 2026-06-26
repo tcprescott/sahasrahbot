@@ -1,0 +1,27 @@
+name: lint
+
+on:
+  push:
+    branches: [master, three-tier-migration]
+  pull_request:
+
+jobs:
+  architecture-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install dependencies
+        run: poetry install --with dev
+      # Architecture boundaries (import-linter). Kept non-blocking ("warn-only")
+      # while the three-tier migration burns down pre-existing violations; flip to
+      # blocking (remove continue-on-error) in the final migration phase.
+      - name: Check import boundaries
+        continue-on-error: true
+        run: poetry run lint-imports
+      - name: Run tests
+        run: poetry run pytest -q

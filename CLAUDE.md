@@ -127,6 +127,21 @@ poetry run aerich migrate    # Create new migration
 - Run `poetry run python helpers/check_dependency_declarations.py` to validate
 - No intentional transitive-only reliance on packages
 
+## Architecture: Three-Tier Layering (migration in progress)
+
+SahasrahBot is migrating to a strict three-tier architecture inside a single `alttprbot/` package. Respect these boundaries — imports may only point downward:
+
+```
+Presentation (alttprbot/presentation/{discord,audit,racetime,api}/)
+  → Service (alttprbot/services/)  → Repository (alttprbot/repositories/)  → Models (alttprbot/models/)
+```
+
+- **Presentation:** thin — calls services, renders results, catches their errors. No business logic; no `alttprbot.repositories`/`alttprbot.models` import.
+- **Service:** business rules/validation/authz/orchestration/audit/notify. Raises `ValueError`/`PermissionError`/`SahasrahBotException`. Never imports `discord`/`racetime_bot`/`quart`/`alttprbot.presentation`; reach surfaces via a `_notify` gateway.
+- **Repository:** pure Tortoise CRUD; returns models. No business logic/notify.
+
+During the migration the four `alttprbot_*` packages are being folded into `alttprbot/presentation/`, and `alttprgen`/`tournament` into `alttprbot/services/`. Enforcement: `poetry run lint-imports` (import-linter, warn-only for now) + edit-time Claude Code hooks. **Full rules and phase plan:** [docs/architecture-layers.md](docs/architecture-layers.md), [docs/plans/three_tier_migration.md](docs/plans/three_tier_migration.md).
+
 ## Architecture Patterns
 
 ### Seed Generation
