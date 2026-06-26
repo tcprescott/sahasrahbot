@@ -15,6 +15,10 @@ class UserRepository:
         return await models.Users.get_or_none(discord_user_id=discord_user_id)
 
     @staticmethod
+    async def get_by_id(user_id: int) -> Optional[models.Users]:
+        return await models.Users.get_or_none(id=user_id)
+
+    @staticmethod
     async def upsert_by_discord_id(discord_user_id: int, defaults: dict) -> Tuple[models.Users, bool]:
         return await models.Users.update_or_create(discord_user_id=discord_user_id, defaults=defaults)
 

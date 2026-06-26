@@ -1,10 +1,7 @@
-import datetime
-
 from quart import (Blueprint, abort, jsonify, request, Response)
 from alttprbot.presentation.api.oauth_client import Unauthorized
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
-from alttprbot import models
+from alttprbot.services import AsyncTournamentService, UserService
 from alttprbot.util import asynctournament
 from alttprbot.presentation.api import auth
 from alttprbot.presentation.api.api import discord
@@ -16,26 +13,22 @@ asynctournament_blueprint = Blueprint('async', __name__)
 @asynctournament_blueprint.route('/api/tournaments', methods=['GET'])
 @auth.authorized_key('asynctournament')
 async def tournaments_api():
-    filter_args = {}
+    active = None
     if request.args.get('active'):
-        filter_args['active'] = request.args.get('active') == 'true'
+        active = request.args.get('active') == 'true'
 
-    qs = models.AsyncTournament.filter(**filter_args)
-    AsyncTournament_Pydantic_List = pydantic_queryset_creator(models.AsyncTournament)
-    res = await AsyncTournament_Pydantic_List.from_queryset(qs)
-    return Response(res.json(), mimetype='application/json')
+    res = await AsyncTournamentService().tournaments_json(active)
+    return Response(res, mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>', methods=['GET'])
 @auth.authorized_key('asynctournament')
 async def tournament_api(tournament_id):
-    result = await models.AsyncTournament.get_or_none(id=tournament_id)
-    if result is None:
+    res = await AsyncTournamentService().tournament_json(tournament_id)
+    if res is None:
         return jsonify({'error': 'Tournament not found.'})
 
-    AsyncTournament_Pydantic = pydantic_model_creator(models.AsyncTournament)
-    res = await AsyncTournament_Pydantic.from_tortoise_orm(result)
-    return Response(res.json(), mimetype='application/json')
+    return Response(res, mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/races', methods=['GET'])
@@ -65,12 +58,8 @@ async def races_api(tournament_id):
     else:
         page_size = 20
 
-    qs = models.AsyncTournamentRace.filter(tournament_id=tournament_id, **filter_args).offset(
-        (page - 1) * page_size).limit(page_size)
-    AsyncTournamentRace_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentRace)
-
-    res = await AsyncTournamentRace_Pydantic_List.from_queryset(qs)
-    return Response(res.json(), mimetype='application/json')
+    res = await AsyncTournamentService().races_json(tournament_id, filter_args, page, page_size)
+    return Response(res, mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/pools', methods=['GET'])
@@ -80,10 +69,8 @@ async def pools_api(tournament_id):
     if request.args.get('id'):
         filter_args['id'] = request.args.get('id')
 
-    qs = models.AsyncTournamentPermalinkPool.filter(tournament_id=tournament_id, **filter_args)
-    AsyncTournamentPermalinkPool_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentPermalinkPool)
-    res = await AsyncTournamentPermalinkPool_Pydantic_List.from_queryset(qs)
-    return Response(res.json(), mimetype='application/json')
+    res = await AsyncTournamentService().pools_json(tournament_id, filter_args)
+    return Response(res, mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/permalinks', methods=['GET'])
@@ -95,16 +82,14 @@ async def permalinks_api(tournament_id):
     if request.args.get('pool_id'):
         filter_args['pool_id'] = request.args.get('pool_id')
 
-    qs = models.AsyncTournamentPermalink.filter(pool__tournament_id=tournament_id, **filter_args)
-    AsyncTournamentPermalink_Pydantic_List = pydantic_queryset_creator(models.AsyncTournamentPermalink)
-    res = await AsyncTournamentPermalink_Pydantic_List.from_queryset(qs)
-    return Response(res.json(), mimetype='application/json')
+    res = await AsyncTournamentService().permalinks_json(tournament_id, filter_args)
+    return Response(res, mimetype='application/json')
 
 
 @asynctournament_blueprint.route('/api/tournaments/<int:tournament_id>/leaderboard', methods=['GET'])
 @auth.authorized_key('asynctournament')
 async def leaderboard_api(tournament_id):
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    tournament = await AsyncTournamentService().get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'})
 
@@ -157,9 +142,9 @@ async def async_tournament_info_json(tournament_id: int):
 
     user = None
     if discord_user:
-        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+        user = await UserService().get_by_discord_id(discord_user.id)
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    tournament = await AsyncTournamentService().get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -184,9 +169,9 @@ async def async_tournament_leaderboard_json(tournament_id: int):
 
     user = None
     if discord_user:
-        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+        user = await UserService().get_by_discord_id(discord_user.id)
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    tournament = await AsyncTournamentService().get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -237,17 +222,16 @@ async def async_tournament_dashboard_json(tournament_id: int):
     except Unauthorized:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await UserService().get_by_discord_id(discord_user.id)
     if user is None:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    races = await models.AsyncTournamentRace.filter(
-        user=user, tournament=tournament
-    ).order_by('-created').prefetch_related('permalink', 'permalink__pool')
+    races = await service.list_user_races(user, tournament)
 
     reattempted = any(r.reattempted for r in races)
 
@@ -298,11 +282,12 @@ async def async_tournament_reattempt_json(tournament_id: int):
     except Unauthorized:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await UserService().get_by_discord_id(discord_user.id)
     if user is None:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -310,15 +295,13 @@ async def async_tournament_reattempt_json(tournament_id: int):
     if race_id is None:
         return jsonify({'error': 'race_id is required.'}), 400
 
-    reattempted_races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament, reattempted=True)
+    reattempted_races = await service.list_reattempted_races(user, tournament)
     if reattempted_races:
         return jsonify({'error': 'You have already reattempted a race in this tournament.'}), 403
 
-    race = await models.AsyncTournamentRace.get_or_none(id=int(race_id), user=user, tournament=tournament)
+    race = await service.get_user_race_with_pool(int(race_id), user, tournament)
     if race is None:
         return jsonify({'error': 'Race not found or you are not the player.'}), 403
-
-    await race.fetch_related('permalink', 'permalink__pool')
 
     return jsonify({
         'tournament': {'id': tournament.id, 'name': tournament.name, 'active': tournament.active},
@@ -339,15 +322,16 @@ async def async_tournament_reattempt_submit_json(tournament_id: int):
     except Unauthorized:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await UserService().get_by_discord_id(discord_user.id)
     if user is None:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    reattempted_races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament, reattempted=True)
+    reattempted_races = await service.list_reattempted_races(user, tournament)
     if reattempted_races:
         return jsonify({'error': 'You have already reattempted a race in this tournament.'}), 403
 
@@ -358,13 +342,11 @@ async def async_tournament_reattempt_submit_json(tournament_id: int):
     if not race_id:
         return jsonify({'error': 'race_id is required.'}), 400
 
-    race = await models.AsyncTournamentRace.get_or_none(id=int(race_id), user=user, tournament=tournament)
+    race = await service.get_user_race(int(race_id), user, tournament)
     if race is None:
         return jsonify({'error': 'Race not found or you are not the player.'}), 403
 
-    race.reattempted = True
-    race.reattempt_reason = reason
-    await race.save()
+    await service.submit_reattempt(race, reason)
 
     return jsonify({'success': True})
 
@@ -376,11 +358,12 @@ async def async_tournament_queue_json(tournament_id: int):
     except Unauthorized:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await UserService().get_by_discord_id(discord_user.id)
     if user is None:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -415,11 +398,7 @@ async def async_tournament_queue_json(tournament_id: int):
     if live != 'all':
         request_filter['thread_id__isnull'] = live == 'true'
 
-    races = await tournament.races.filter(
-        reattempted=False, **request_filter
-    ).offset((page - 1) * page_size).limit(page_size).prefetch_related(
-        'user', 'reviewed_by', 'permalink', 'permalink__pool'
-    )
+    races = await service.list_queue_races(tournament, request_filter, page, page_size)
 
     return jsonify({
         'tournament': {'id': tournament.id, 'name': tournament.name, 'active': tournament.active},
@@ -453,11 +432,12 @@ async def async_tournament_review_json(tournament_id: int, race_id: int):
     except Unauthorized:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await UserService().get_by_discord_id(discord_user.id)
     if user is None:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -465,18 +445,15 @@ async def async_tournament_review_json(tournament_id: int, race_id: int):
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
-    race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
+    race = await service.get_race_for_review(race_id, tournament)
     if race is None:
         return jsonify({'error': 'Race not found.'}), 404
 
     reviewable = race.status == 'finished' and not race.reattempted
 
-    await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool', 'live_race')
-
     # Auto-claim for review (same as the legacy Jinja route)
     if race.reviewed_by is None and reviewable:
-        race.reviewed_by = user
-        await race.save()
+        await service.claim_for_review(race, user)
 
     return jsonify({
         'tournament': {'id': tournament.id, 'name': tournament.name},
@@ -516,11 +493,12 @@ async def async_tournament_review_submit_json(tournament_id: int, race_id: int):
     except Unauthorized:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+    user = await UserService().get_by_discord_id(discord_user.id)
     if user is None:
         return jsonify({'error': 'Authentication required.'}), 401
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -528,7 +506,7 @@ async def async_tournament_review_submit_json(tournament_id: int, race_id: int):
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
-    race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
+    race = await service.get_race(race_id, tournament)
     if race is None:
         return jsonify({'error': 'Race not found.'}), 404
 
@@ -543,11 +521,12 @@ async def async_tournament_review_submit_json(tournament_id: int, race_id: int):
         return jsonify({'error': 'Cannot review your own run.'}), 403
 
     payload = await request.get_json(force=True) or {}
-    race.review_status = payload.get('review_status', 'pending')
-    race.reviewer_notes = payload.get('reviewer_notes', None)
-    race.reviewed_at = datetime.datetime.now()
-    race.reviewed_by = user
-    await race.save()
+    await service.submit_review(
+        race,
+        review_status=payload.get('review_status', 'pending'),
+        reviewer_notes=payload.get('reviewer_notes', None),
+        reviewer=user,
+    )
 
     return jsonify({'success': True})
 
@@ -561,17 +540,15 @@ async def async_tournament_pools_json(tournament_id: int):
 
     user = None
     if discord_user:
-        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+        user = await UserService().get_by_discord_id(discord_user.id)
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    tournament = await AsyncTournamentService().get_tournament_with_pools(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
     authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
-
-    await tournament.fetch_related('permalink_pools', 'permalink_pools__permalinks')
 
     return jsonify({
         'tournament': {'id': tournament.id, 'name': tournament.name, 'active': tournament.active},
@@ -605,15 +582,14 @@ async def async_tournament_permalink_json(tournament_id: int, permalink_id: int)
 
     user = None
     if discord_user:
-        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+        user = await UserService().get_by_discord_id(discord_user.id)
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    permalink = await models.AsyncTournamentPermalink.get_or_none(
-        id=permalink_id, pool__tournament=tournament
-    )
+    permalink = await service.get_permalink(permalink_id, tournament)
     if permalink is None:
         return jsonify({'error': 'Permalink not found.'}), 404
 
@@ -622,10 +598,7 @@ async def async_tournament_permalink_json(tournament_id: int, permalink_id: int)
         if not authorized and tournament.active:
             return jsonify({'error': 'Not authorized.'}), 403
 
-    await permalink.fetch_related('pool')
-    races = await permalink.races.filter(
-        status__in=['finished', 'forfeit'], reattempted=False
-    ).order_by('-score').prefetch_related('live_race')
+    races = await service.list_permalink_races(permalink)
 
     return jsonify({
         'tournament': {'id': tournament.id, 'name': tournament.name, 'active': tournament.active},
@@ -659,9 +632,10 @@ async def async_tournament_player_json(tournament_id: int, user_id: int):
 
     user = None
     if discord_user:
-        user = await models.Users.get_or_none(discord_user_id=discord_user.id)
+        user = await UserService().get_by_discord_id(discord_user.id)
 
-    tournament = await models.AsyncTournament.get_or_none(id=tournament_id)
+    service = AsyncTournamentService()
+    tournament = await service.get_tournament(tournament_id)
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
@@ -669,13 +643,11 @@ async def async_tournament_player_json(tournament_id: int, user_id: int):
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
 
-    player = await models.Users.get_or_none(id=user_id)
+    player = await UserService().get_by_id(user_id)
     if player is None:
         return jsonify({'error': 'Player not found.'}), 404
 
-    races = await models.AsyncTournamentRace.filter(
-        tournament=tournament, user_id=user_id
-    ).order_by('-created').prefetch_related('permalink', 'permalink__pool')
+    races = await service.list_tournament_user_races(tournament, user_id)
 
     return jsonify({
         'tournament': {

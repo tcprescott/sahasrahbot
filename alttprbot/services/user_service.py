@@ -1,11 +1,20 @@
-"""User account service: RaceTime account linking and merges."""
+"""User account service: lookups, RaceTime account linking and merges."""
 
+from typing import Optional
+
+from alttprbot import models
 from alttprbot.repositories import UserRepository
 
 
 class UserService:
     def __init__(self) -> None:
         self.repository = UserRepository()
+
+    async def get_by_discord_id(self, discord_user_id: int) -> Optional[models.Users]:
+        return await self.repository.get_by_discord_id(discord_user_id)
+
+    async def get_by_id(self, user_id: int) -> Optional[models.Users]:
+        return await self.repository.get_by_id(user_id)
 
     async def link_racetime_account(
         self, *, discord_user_id: int, display_name: str, rtgg_id: str, access_token: str
