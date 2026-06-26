@@ -18,6 +18,7 @@ from tortoise.exceptions import DoesNotExist
 import config
 from alttprbot import models
 from alttprbot.repositories import PresetNamespaceRepository, PresetRepository
+from alttprbot.services.audit_service import AuditService
 from alttprbot.services.preset_service import PresetService
 from alttprbot.services.seedgen.randomizer import ctjets, mysterydoors
 from alttprbot.exceptions import SahasrahBotException
@@ -264,7 +265,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             )
             hash_id = seed.hash
 
-        await models.AuditGeneratedGames.create(
+        await AuditService().record_generated_game(
             randomizer=self.randomizer,
             hash_id=hash_id,
             permalink=seed.url,
@@ -312,7 +313,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
                             mystery.settings['allow_quickswap'] = allow_quickswap
                             seed = await ALTTPRDiscord.generate(settings=mystery.settings, endpoint=endpoint)
                     except:
-                        # await models.AuditGeneratedGames.create(
+                        # await AuditService().record_generated_game(
                         #     randomizer='alttpr',
                         #     settings=mystery.settings,
                         #     gentype='mystery failure',
@@ -325,7 +326,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
         except RetryError as e:
             raise e.last_attempt._exception from e
 
-        await models.AuditGeneratedGames.create(
+        await AuditService().record_generated_game(
             randomizer='alttpr',
             hash_id=seed.hash,
             permalink=seed.url,
@@ -372,7 +373,7 @@ class SMPreset(SahasrahBotPresetCore):
             baseurl=self.baseurl
         )
 
-        await models.AuditGeneratedGames.create(
+        await AuditService().record_generated_game(
             randomizer=self.randomizer,
             hash_id=self.hash_id,
             permalink=self.seed.url,
@@ -435,7 +436,7 @@ class CTJetsPreset(SahasrahBotPresetCore):
         settings = self.preset_data['settings']  # pylint: disable=E1136
         seed_uri = await ctjets.roll_ctjets(settings, version=self.preset_data.get('version', '3_1_0'))
 
-        await models.AuditGeneratedGames.create(
+        await AuditService().record_generated_game(
             randomizer=self.randomizer,
             hash_id=None,
             permalink=seed_uri,
