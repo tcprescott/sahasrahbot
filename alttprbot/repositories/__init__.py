@@ -10,8 +10,10 @@ Add new repositories as ``<name>_repository.py`` and export the class here.
 
 from alttprbot.repositories.audit_generated_games_repository import AuditGeneratedGamesRepository
 from alttprbot.repositories.async_tournament_audit_log_repository import AsyncTournamentAuditLogRepository
+from alttprbot.repositories.daily_repository import DailyRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
     "AsyncTournamentAuditLogRepository",
+    "DailyRepository",
 ]

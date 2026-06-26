@@ -8,7 +8,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from alttprbot import models
+from alttprbot.services import DailyService
 from alttprbot.presentation.discord.util.alttpr_discord import ALTTPRDiscord
 from alttprbot.presentation.discord.util.guild_config_service import GuildConfigService
 
@@ -48,7 +48,7 @@ class Daily(commands.Cog):
                 logger.warning('Daily challenge payload missing hash; skipping tick')
                 return
 
-            if not await update_daily(hash_id):
+            if not await DailyService().record_if_new(hash_id):
                 return
 
             seed = await get_daily_seed_with_retry(hash_id)
@@ -118,16 +118,6 @@ class Daily(commands.Cog):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Daily(bot))
-
-
-async def update_daily(hash_id):
-    current_daily_exists = await models.Daily.filter(hash=hash_id).exists()
-    if not current_daily_exists:
-        logger.info('Detected new daily hash %s', hash_id)
-        await models.Daily.create(hash=hash_id)
-        return True
-
-    return False
 
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
