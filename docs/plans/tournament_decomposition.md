@@ -15,11 +15,36 @@
   registered inward at startup. Both satisfy their `runtime_checkable` protocols.
 - **PR 1 (done, `259afaf5`)** — `TournamentPresenter` (gateway-based embeds / audit / commentary /
   player DMs), fully unit-tested with a mock gateway. Not yet wired.
-- **All reusable collaborators now exist** (DTOs, gateways, presenter). What remains is the
-  **orchestrator port + per-handler migration** — see §8. These reimplement live-tournament
-  orchestration and are **gated on DEBUG end-to-end validation against real RaceTime/Discord**
-  (the maintainer runs this; it cannot be verified by unit tests/import alone). Proceed one
-  handler per PR, `test` first, `alttpr_quals` last with an adversarial review.
+- **All reusable collaborators now exist** (DTOs, gateways, presenter).
+- **PR 2 (done, `66758e24`)** — `TournamentOrchestrator` base (pure business; gateways/repos/
+  resolver-callbacks injected; no discord/racetime imports) + `TestOrchestrator` + the
+  `OrchestratorAdapter` (transitional bridge presenting the legacy dispatch interface) +
+  `TOURNAMENT_DATA['test']` wired to it. The **room-creation lifecycle** path is proven
+  end-to-end for the debug-only `test` handler. Verified by a 3-agent adversarial OLD-vs-NEW
+  parity review; folded in its findings (critical: the adapter now resolves the definition into
+  a live `TournamentConfig` so the un-migrated cog's `get_config()` accessors keep working;
+  restored room-name + DM-failure logging; unresolved-member → DM skip parity). 362 tests.
+
+**▶ NEXT — PR 3: the seed-rolling path** (the `ALTTPRTournamentRace.process_tournament_race`
+family → `boots` as the first concrete one). This exercises the orchestrator's *other*
+lifecycle and the `SeedResult`/presenter-embed flow. Couplings already mapped, to port:
+  - `roll()` → returns `SeedResult`; presenter builds the seed embeds (with the RaceTime.gg +
+    broadcast-channel field inserts from the legacy `create_embeds`).
+  - the player-DM-with-fallback (on failure: `@here` audit alert via `discord.AllowedMentions`
+    + a RaceTime chat message) — cross-gateway, orchestrated in the orchestrator.
+  - the pinned "Roll Tournament Seed" `msg_actions` welcome button → a new racetime-gateway
+    primitive (`send_pinned_action`).
+  - `seed_rolled` is RaceTime *handler* state (guards double-rolling) → the adapter sets it
+    after `process_race` (it holds the handler).
+  Needed extensions: `discord_gateway.send_channel_message(mention_everyone=)`,
+  `racetime_gateway.send_pinned_action(...)`, presenter `build_race_embeds` + `send_player_dm`
+  returning success.
+
+**RECOMMENDATION:** validate the `test` handler in DEBUG (confirm a real room opens, players are
+invited + DM'd, audit fires) before building PR 3+ on the pattern — both orchestrator lifecycles
+and every collaborator are now exercised by `test`, so a live pass de-risks the entire remaining
+tail cheaply. After validation the remaining handlers are mechanical applications of the pattern
+(bespoke `roll()` + IDs), `alttpr_quals` last (its AsyncTournament entanglement) with a review.
 
 ## 1. Why this is the last big piece
 
