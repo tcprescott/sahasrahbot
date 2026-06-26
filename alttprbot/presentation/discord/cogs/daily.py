@@ -8,9 +8,8 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from alttprbot.services import DailyService
+from alttprbot.services import DailyService, GuildConfigService
 from alttprbot.presentation.discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot.presentation.discord.util.guild_config_service import GuildConfigService
 
 logger = logging.getLogger(__name__)
 
@@ -66,10 +65,14 @@ class Daily(commands.Cog):
                     logger.warning('Guild %s no longer available for daily announcements', guild_id)
                     continue
 
+                def resolve_channel_id(name, _guild=guild):
+                    channel = discord.utils.get(_guild.text_channels, name=name)
+                    return channel.id if channel else None
+
                 channel_ids = await self.config_service.get_channel_ids(
                     guild_id,
                     'DailyAnnouncerChannel',
-                    guild
+                    resolver=resolve_channel_id
                 )
 
                 for channel_id in channel_ids:

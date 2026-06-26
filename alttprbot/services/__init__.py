@@ -14,6 +14,7 @@ class here.
 from alttprbot.services.audit_service import AuditActions, AuditService
 from alttprbot.services.daily_service import DailyService
 from alttprbot.services.discord_server_service import DiscordServerService
+from alttprbot.services.guild_config_service import GuildConfigService
 from alttprbot.services.preset_service import PresetService
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     "AuditService",
     "DailyService",
     "DiscordServerService",
+    "GuildConfigService",
     "PresetService",
 ]
