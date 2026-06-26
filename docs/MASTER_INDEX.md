@@ -63,6 +63,7 @@ Execution plans and implementation checklists:
 | File | Description |
 |------|-------------|
 | **[Three-Tier Architecture Migration](plans/three_tier_migration.md)** | **Phased plan to fold the four `alttprbot_*` surfaces into one `alttprbot/` package with strict presentation/service/repository/models tiers** |
+| [Tournament Decomposition Plan](plans/tournament_decomposition.md) | PR-by-PR plan to decompose the `alttprbot/tournament/` god-object into orchestrator/presenter/gateway/repository + config (the last large piece of the three-tier migration) |
 | [Application Modernization Vision (2026–2027)](plans/application_modernization_vision_2026_2027.md) | Umbrella modernization roadmap defining priorities, sequencing, risk gates, and target modular-monolith outcomes |
 | [Discord Refactor](plans/discord_refactor.md) | Modernization plan for `alttprbot_discord`: remove guild monkey-patching, normalize config, improve resilience |
 | [Anonymous Telemetry & User Stats Plan](plans/anonymous_telemetry_user_stats_plan.md) | Implementation plan for privacy-preserving feature usage telemetry across Discord, RaceTime, and Web/API surfaces |

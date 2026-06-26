@@ -167,7 +167,9 @@ it does not violate them until its decomposition relocates it into `services/tou
   discord/racetime bot singletons, builds embeds, direct ORM in subclasses). Full
   orchestrator/presenter/gateway/config split, relocate to `services/tournament/`, one
   subclass per PR. Relocating it INTO `services/` is what will surface it under Contracts 1/2,
-  so the decomposition must extract presenters first.
+  so the decomposition must extract presenters first. **Detailed PR-by-PR plan:**
+  [tournament_decomposition.md](tournament_decomposition.md) (collaborator APIs, full subclass
+  catalog + migration order, gateway protocols, repository additions, risks).
 - **Phase 9 util split** (`util/{asynctournament,rankedchoice,triforce_text}.py`).
 - **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
   all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked
