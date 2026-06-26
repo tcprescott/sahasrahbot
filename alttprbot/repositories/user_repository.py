@@ -20,10 +20,11 @@ class UserRepository:
 
     @staticmethod
     async def get_or_create_by_discord_id(
-        discord_user_id: int, *, display_name: str
+        discord_user_id: int, *, display_name: Optional[str] = None
     ) -> Tuple[models.Users, bool]:
+        defaults = {} if display_name is None else {"display_name": display_name}
         return await models.Users.get_or_create(
-            discord_user_id=discord_user_id, defaults={"display_name": display_name}
+            discord_user_id=discord_user_id, defaults=defaults
         )
 
     @staticmethod

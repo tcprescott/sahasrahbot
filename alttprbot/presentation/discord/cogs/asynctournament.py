@@ -13,7 +13,13 @@ from discord.ext import commands, tasks
 from slugify import slugify
 
 import config
-from alttprbot import models
+from alttprbot.services import (
+    AsyncTournamentLiveRaceService,
+    AsyncTournamentPermissionsService,
+    AsyncTournamentService,
+    AuditService,
+    UserService,
+)
 from alttprbot.util import asynctournament, triforce_text
 from alttprbot.presentation.api.util import checks
 from alttprbot.services.seedgen import generator
@@ -34,7 +40,7 @@ class AsyncTournamentView(discord.ui.View):
     @discord.ui.button(label="Start new async run", style=discord.ButtonStyle.green, emoji="🏁",
                        custom_id="sahasrahbot:new_async_race")
     async def new_async_race(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
         await async_tournament.fetch_related('permalink_pools')
 
         if async_tournament is None:
@@ -57,16 +63,14 @@ class AsyncTournamentView(discord.ui.View):
                 return
 
         # this should be configurable in the future
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
         if user.rtgg_id is None:
             await interaction.response.send_message(
                 f"You must link your RaceTime.gg account to SahasrahBot before you can participate in an async tournament.\n\nPlease visit <{APP_URL}/racetime/verification/initiate> to link your RaceTime account.",
                 ephemeral=True)
             return
 
-        async_history = await models.AsyncTournamentRace.filter(user=user,
-                                                                tournament=async_tournament).prefetch_related(
-            'permalink__pool')
+        async_history = await AsyncTournamentService().list_user_races(user, async_tournament)
         played_seeds = [a.permalink for a in async_history if a.reattempted is False]
 
         # get the pools of the played seeds
@@ -95,7 +99,7 @@ class AsyncTournamentView(discord.ui.View):
     # @discord.ui.button(label="Re-attempt", style=discord.ButtonStyle.blurple, emoji="↩️",
     #                    custom_id="sahasrahbot:async_reattempt")
     # async def async_reattempt(self, interaction: discord.Interaction, button: discord.ui.Button):
-    #     async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+    #     async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
     #     await async_tournament.fetch_related('permalink_pools')
 
     #     if async_tournament is None:
@@ -111,7 +115,7 @@ class AsyncTournamentView(discord.ui.View):
     #         await interaction.response.send_message("This tournament does not allow re-attempts.", ephemeral=True)
     #         return
 
-    #     user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+    #     user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
     #     async_history = await models.AsyncTournamentRace.filter(user=user,
     #                                                             tournament=async_tournament).prefetch_related(
@@ -139,7 +143,7 @@ class AsyncTournamentView(discord.ui.View):
 #                        custom_id="sahasrahbot:async_history")
 #     async def async_history(self, interaction: discord.Interaction, button: discord.ui.Button):
 #         await interaction.response.defer()
-#         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+#         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
 
 #         if async_tournament is None:
 #             await interaction.followup.send("This channel is not configured for async tournaments.", ephemeral=True)
@@ -210,7 +214,7 @@ class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
 
     @discord.ui.button(label="Yes, close this tournament", style=discord.ButtonStyle.red, emoji="🔒", row=2)
     async def async_confirm_close_tournament(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
         if async_tournament is None:
             await interaction.response.send_message(
                 "This channel is not configured for async tournaments.  This should not have happened.", ephemeral=True)
@@ -227,7 +231,7 @@ class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
             return
 
         async_tournament.active = False
-        await async_tournament.save()
+        await AsyncTournamentService().save_tournament(async_tournament)
 
         # for item in self.original_view.children:
         #     item.disabled = True
@@ -263,7 +267,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
     async def async_confirm_new_race(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Send a message to the thread with AsyncTournamentRaceViewReady
         # await interaction.response.send_message("NYI", ephemeral=True)
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
         if async_tournament is None:
             await interaction.response.send_message(
                 "This channel is not configured for async tournaments.  This should not have happened.", ephemeral=True)
@@ -296,9 +300,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
             name=self.pool).first()  # TODO: add a unique constraint on this
 
         # Double check that the player hasn't played from this pool already
-        async_history = await models.AsyncTournamentRace.filter(user__discord_user_id=interaction.user.id,
-                                                                tournament=async_tournament).prefetch_related(
-            'permalink__pool')
+        async_history = await AsyncTournamentService().list_user_races_by_discord_id(async_tournament, interaction.user.id)
         played_seeds = [a.permalink for a in async_history if a.reattempted is False]
 
         # check if pool has been played twice already
@@ -309,19 +311,19 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
 
         await pool.fetch_related("permalinks")
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
         permalink = await asynctournament.get_eligible_permalink_from_pool(pool, user)
 
         # Log the action
-        await models.AsyncTournamentAuditLog.create(
-            tournament=async_tournament,
-            user=user,
+        await AuditService().record_async_event(
+            tournament_id=async_tournament.id,
             action="create_thread",
+            actor_id=user.id,
             details=f"Created thread {thread.id} for pool {pool.name}, permalink {permalink.url}"
         )
 
         # Write the race to the database
-        async_tournament_race = await models.AsyncTournamentRace.create(
+        async_tournament_race = await AsyncTournamentService().create_race(
             tournament=async_tournament,
             thread_id=thread.id,
             user=user,
@@ -383,7 +385,7 @@ Good luck and have fun!
 #                        style=discord.ButtonStyle.green, emoji="✅", row=2, disabled=True)
 #     async def async_confirm_new_race(self, interaction: discord.Interaction, button: discord.ui.Button):
 #         # Send a message to the thread with AsyncTournamentRaceViewReady
-#         async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+#         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
 #         if async_tournament is None:
 #             await interaction.response.send_message(
 #                 "This channel is not configured for async tournaments.  This should not have happened.", ephemeral=True)
@@ -403,7 +405,7 @@ Good luck and have fun!
 #             await interaction.response.send_message("Please choose a pool.", ephemeral=True)
 #             return
 
-#         user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+#         user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
 #         active_races_for_user = await async_tournament.races.filter(user=user, status__in=["pending", "in_progress"])
 #         if active_races_for_user:
@@ -424,7 +426,7 @@ Good luck and have fun!
 #                 details=f"Marked {race.id} as a re-attempt for pool {self.pool}"
 #             )
 #             race.reattempted = True
-#             await race.save()
+#             await AsyncTournamentService().save_race(race)
 
 #         await interaction.response.edit_message(
 #             content="Successfully marked your previous race in this pool as a re-attempt.  Please choose a new permalink.",
@@ -443,14 +445,13 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
     @discord.ui.button(label="Ready (start countdown)", style=discord.ButtonStyle.green, emoji="✅",
                        custom_id="sahasrahbot:async_ready")
     async def async_ready(self, interaction: discord.Interaction, button: discord.ui.Button):
-        tournament_race = await models.AsyncTournamentRace.get_or_none(
-            thread_id=interaction.channel.id).prefetch_related('user')
+        tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
         if tournament_race is None:
             await interaction.response.send_message(
                 "This thread is not configured for async tournaments.  This should not have happened.", ephemeral=True)
             return
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
         if tournament_race.user.discord_user_id != interaction.user.id:
             await interaction.response.send_message("Only the runner of this race can start it.", ephemeral=True)
@@ -462,10 +463,10 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
 
         await interaction.response.defer()
 
-        await models.AsyncTournamentAuditLog.create(
+        await AuditService().record_async_event(
             tournament_id=tournament_race.tournament_id,
-            user=user,
             action="race_ready",
+            actor_id=user.id,
             details=f"{tournament_race.id} is marked as ready"
         )
 
@@ -474,12 +475,12 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
         await interaction.followup.edit_message(message_id=interaction.message.id, view=self)
 
         tournament_race.status = "in_progress"
-        await tournament_race.save()
+        await AsyncTournamentService().save_race(tournament_race)
 
-        await models.AsyncTournamentAuditLog.create(
+        await AuditService().record_async_event(
             tournament_id=tournament_race.tournament_id,
-            user=user,
             action="race_countdown",
+            actor_id=user.id,
             details=f"{tournament_race.id} is starting a countdown"
         )
 
@@ -490,20 +491,19 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
         start_time = discord.utils.utcnow()
 
         tournament_race.start_time = start_time
-        await tournament_race.save()
+        await AsyncTournamentService().save_race(tournament_race)
 
-        await models.AsyncTournamentAuditLog.create(
+        await AuditService().record_async_event(
             tournament_id=tournament_race.tournament_id,
-            user=user,
             action="race_started",
+            actor_id=user.id,
             details=f"{tournament_race.id} has started"
         )
 
     @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️",
                        custom_id="sahasrahbot:async_forfeit")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(
-            thread_id=interaction.channel.id).prefetch_related('user')
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
         if async_tournament_race.user.discord_user_id != interaction.user.id:
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
@@ -533,8 +533,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
     @discord.ui.button(label="Forfeit", style=discord.ButtonStyle.red, emoji="🏳️",
                        custom_id="sahasrahbot:async_forfeit2")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(
-            thread_id=interaction.channel.id).prefetch_related('user')
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
         if async_tournament_race.user.discord_user_id != interaction.user.id:
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
@@ -551,7 +550,7 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
     @discord.ui.button(label="Get timer", style=discord.ButtonStyle.gray, emoji="⏱️",
                        custom_id="sahasrahbot:async_get_timer")
     async def async_get_timer(self, interaction: discord.Interaction, button: discord.ui.Button):
-        race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        race = await AsyncTournamentService().get_race_by_thread_id(interaction.channel.id)
         if race.status in ["forfeit", "finished", "disqualified"]:
             await interaction.response.send_message("Race is already finished.", ephemeral=True)
             return
@@ -569,8 +568,7 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
     async def async_confirm_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Write forfeit to database
         # Disable buttons on this view
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(
-            thread_id=interaction.channel.id).prefetch_related('user')
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
         if async_tournament_race is None:
             await interaction.response.send_message("This race does not exist.  Please contact a moderator.",
                                                     ephemeral=True)
@@ -585,17 +583,17 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
                                                     ephemeral=True)
             return
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
-        await models.AsyncTournamentAuditLog.create(
+        await AuditService().record_async_event(
             tournament_id=async_tournament_race.tournament_id,
-            user=user,
             action="runner_forfeit",
+            actor_id=user.id,
             details=f"{async_tournament_race.id} was forfeited by runner"
         )
 
         async_tournament_race.status = "forfeit"
-        await async_tournament_race.save()
+        await AsyncTournamentService().save_race(async_tournament_race)
         await interaction.response.send_message(f"This run has been forfeited by {interaction.user.mention}.")
         for child_item in self.children:
             child_item.disabled = True
@@ -615,8 +613,7 @@ class AsyncTournamentPostRaceView(discord.ui.View):
     @discord.ui.button(label="Submit Run Information", style=discord.ButtonStyle.green, emoji="🗒️",
                        custom_id="sahasrahbot:async_submit_vod")
     async def async_submit_vod(self, interaction: discord.Interaction, button: discord.ui.Button):
-        race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related('user',
-                                                                                                               'tournament')
+        race = await AsyncTournamentService().get_race_by_thread_id_with_user_and_tournament(interaction.channel.id)
         if race is None:
             await interaction.response.send_message(
                 "This is not a race thread.  This should not have happened.  Please contact a moderator.")
@@ -645,7 +642,7 @@ class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
     async def on_submit(self, interaction: discord.Interaction):
         # write vod link and runner notes to database
         # close modal
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id(interaction.channel.id)
         if async_tournament_race is None:
             await interaction.response.send_message(
                 "This race does not exist.  This should not have happened.  Please contact a moderator.")
@@ -653,7 +650,7 @@ class SubmitVODModal(discord.ui.Modal, title="Submit VOD and Notes"):
 
         async_tournament_race.runner_vod_url = self.runner_vod_url.value
         async_tournament_race.runner_notes = self.runner_notes.value
-        await async_tournament_race.save()
+        await AsyncTournamentService().save_race(async_tournament_race)
 
         await interaction.response.send_message(
             f"VOD link and runner notes saved.\n\n**URL:**\n{self.runner_vod_url.value}\n\n**Notes:**\n{self.runner_notes.value}")
@@ -664,7 +661,7 @@ class SubmitCollectIGTModal(discord.ui.Modal, title="Submit Collection Rate and 
     run_igt = discord.ui.TextInput(label="IGT (hh:mm:ss.mm)", placeholder="1:23:45.67", row=1)
 
     async def on_submit(self, interaction: discord.Interaction):
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id(interaction.channel.id)
         if async_tournament_race is None:
             await interaction.response.send_message(
                 "This race does not exist.  This should not have happened.  Please contact a moderator.")
@@ -672,7 +669,7 @@ class SubmitCollectIGTModal(discord.ui.Modal, title="Submit Collection Rate and 
 
         async_tournament_race.run_collection_rate = self.run_collection_rate.value
         async_tournament_race.run_igt = self.run_igt.value
-        await async_tournament_race.save()
+        await AsyncTournamentService().save_race(async_tournament_race)
 
         await interaction.response.send_message(
             f"Collection rate and IGT saved.\n\n**Collection Rate: **\n{self.run_collection_rate.value}\n\n**IGT: **\n{self.run_igt.value}\nThank you for your submission. Now is the time to share a screenshot of your end card with the In Game Time and Collection rate to this bot. If you recorded your run, share that link here as well. We will notify you if any additional information is needed before the tournament starts.\nThank you very much for your interest in participating!")
@@ -689,13 +686,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
     @tasks.loop(seconds=60, reconnect=True)
     async def timeout_warning_task(self):
         try:
-            pending_races = await models.AsyncTournamentRace.filter(status="pending",
-                                                                    thread_id__isnull=False).prefetch_related('user')
+            pending_races = await AsyncTournamentService().list_pending_races()
             for pending_race in pending_races:
                 # make these configurable
                 if pending_race.thread_timeout_time is None:
                     pending_race.thread_timeout_time = pending_race.thread_open_time + datetime.timedelta(minutes=20)
-                    await pending_race.save()
+                    await AsyncTournamentService().save_race(pending_race)
 
                 warning_time = pending_race.thread_timeout_time - datetime.timedelta(minutes=10)
                 forfeit_time = pending_race.thread_timeout_time
@@ -716,11 +712,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
                         f"<@{pending_race.user.discord_user_id}>, the grace period for the start of this run has elapsed.  This run has been forfeit.  Please contact the @Admins if you believe this was in error.",
                         allowed_mentions=discord.AllowedMentions(users=True))
                     pending_race.status = "forfeit"
-                    await pending_race.save()
-                    await models.AsyncTournamentAuditLog.create(
+                    await AsyncTournamentService().save_race(pending_race)
+                    await AuditService().record_async_event(
                         tournament_id=pending_race.tournament_id,
                         action="timeout_forfeit",
-                        details=f"{pending_race.id} was automatically forfeited by System due to timeout",
+                        actor_id=None,
+                        details=f"{pending_race.id} was automatically forfeited by System due to timeout"
                     )
         except Exception:
             logging.exception("Exception in timeout_warning_task")
@@ -728,8 +725,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
     @tasks.loop(seconds=60, reconnect=True)
     async def timeout_in_progress_races_task(self):
         try:
-            races = await models.AsyncTournamentRace.filter(status="in_progress",
-                                                            thread_id__isnull=False).prefetch_related('user')
+            races = await AsyncTournamentService().list_in_progress_races()
             for race in races:
                 if race.start_time is None:
                     continue
@@ -748,11 +744,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
                     f"<@{race.user.discord_user_id}>, this race has exceeded 12 hours.  This run has been forfeit.  Please contact the @Admins if you believe this was in error.",
                     allowed_mentions=discord.AllowedMentions(users=True))
                 race.status = "forfeit"
-                await race.save()
-                await models.AsyncTournamentAuditLog.create(
+                await AsyncTournamentService().save_race(race)
+                await AuditService().record_async_event(
                     tournament_id=race.tournament_id,
                     action="timeout_forfeit",
-                    details=f"in progress race \"{race.id}\" was automatically forfeited by System due to timeout",
+                    actor_id=None,
+                    details=f"in progress race \"{race.id}\" was automatically forfeited by System due to timeout"
                 )
         except Exception:
             logging.exception("Exception in timeout_in_progress_races_task")
@@ -760,7 +757,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
     @tasks.loop(hours=1, reconnect=True)
     async def score_calculation_task(self):
         try:
-            tournaments = await models.AsyncTournament.filter(active=True)
+            tournaments = await AsyncTournamentService().list_active()
             for tournament in tournaments:
                 logging.info("Calculating scores for tournament %s", tournament.id)
                 try:
@@ -803,7 +800,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         await interaction.response.defer()
         embed = discord.Embed(title=name)
         try:
-            async_tournament = await models.AsyncTournament.create(
+            async_tournament = await AsyncTournamentService().create_tournament(
                 name=name,
                 report_channel_id=report_channel.id if report_channel else None,
                 active=True,
@@ -817,18 +814,18 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 ephemeral=True)
             return
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
-        await models.AsyncTournamentAuditLog.create(
-            tournament=async_tournament,
-            user=user,
+        await AuditService().record_async_event(
+            tournament_id=async_tournament.id,
             action="create",
+            actor_id=user.id,
             details=f"{name} ({async_tournament.id}) created"
         )
 
         for row in permalinks.split(';'):
             pool_name, preset, num = row.split(',')
-            pool = await models.AsyncTournamentPermalinkPool.create(
+            pool = await AsyncTournamentService().create_pool(
                 tournament=async_tournament,
                 name=pool_name,
                 preset=preset,
@@ -839,7 +836,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                     tournament=True,
                     allow_quickswap=True
                 )
-                await models.AsyncTournamentPermalink.create(
+                await AsyncTournamentService().create_permalink(
                     pool=pool,
                     url=seed.url,
                     notes='/'.join(seed.code),
@@ -856,7 +853,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                                                     ephemeral=True)
             return
 
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
             await interaction.response.send_message(
                 "This channel is not configured for async tournaments.  Please create a new tournament.",
@@ -864,7 +861,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             return
 
         await interaction.response.defer()
-        pool = await models.AsyncTournamentPermalinkPool.get(
+        pool = await AsyncTournamentService().get_pool_by_name(
             tournament=async_tournament,
             name=pool_name,
         )
@@ -874,7 +871,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 tournament=True,
                 allow_quickswap=True
             )
-            await models.AsyncTournamentPermalink.create(
+            await AsyncTournamentService().create_permalink(
                 pool=pool,
                 url=seed.url,
                 notes='/'.join(seed.code),
@@ -890,7 +887,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         #     await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
         #     return
 
-        async_tournament_race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id)
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id(interaction.channel.id)
         if not async_tournament_race:
             await interaction.response.send_message("This channel is not an async tournament thread.", ephemeral=True)
             return
@@ -901,7 +898,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_tournament_race.fetch_related("tournament")
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, async_tournament_race.tournament, ['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message(
@@ -915,12 +912,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
             thread_timeout_time = async_tournament_race.thread_timeout_time + datetime.timedelta(minutes=minutes)
 
         async_tournament_race.thread_timeout_time = thread_timeout_time
-        await async_tournament_race.save()
+        await AsyncTournamentService().save_race(async_tournament_race)
 
-        await models.AsyncTournamentAuditLog.create(
+        await AuditService().record_async_event(
             tournament_id=async_tournament_race.tournament_id,
-            user=user,
             action="extend_timeout",
+            actor_id=user.id,
             details=f"{async_tournament_race.id} extended by {minutes} minutes"
         )
 
@@ -935,7 +932,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             return
 
         await interaction.response.defer()
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
             await interaction.followup.send(
                 "This channel is not configured for async tournaments.  Please create a new tournament.",
@@ -958,7 +955,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             return
 
         await interaction.response.defer(ephemeral=True)
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel.id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
             await interaction.followup.send(
                 "This channel is not configured for async tournaments.  Please create a new tournament.",
@@ -982,15 +979,14 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 await interaction.guild.chunk()
 
             for member in role.members:
-                dbuser, _ = await models.Users.get_or_create(discord_user_id=member.id,
-                                                             defaults={"display_name": member.name})
-                async_tournament_permission = await models.AsyncTournamentPermissions.get_or_none(
+                dbuser = await UserService().get_or_create_by_discord_id(member.id, display_name=member.name)
+                async_tournament_permission = await AsyncTournamentPermissionsService().get_permission(
                     tournament=async_tournament,
                     user=dbuser,
                     role=permission
                 )
                 if async_tournament_permission is None:
-                    await models.AsyncTournamentPermissions.create(
+                    await AsyncTournamentPermissionsService().create_permission(
                         tournament=async_tournament,
                         user=dbuser,
                         role=permission
@@ -999,14 +995,14 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 f"Users in role {role.name} ({role.id}) has been granted {permission} permissions.", ephemeral=True)
 
         elif user is not None:
-            dbuser, _ = await models.Users.get_or_create(discord_user_id=user.id, defaults={"display_name": user.name})
-            async_tournament_permission = await models.AsyncTournamentPermissions.get_or_none(
+            dbuser = await UserService().get_or_create_by_discord_id(user.id, display_name=user.name)
+            async_tournament_permission = await AsyncTournamentPermissionsService().get_permission(
                 tournament=async_tournament,
                 user=dbuser,
                 role=permission
             )
             if async_tournament_permission is None:
-                await models.AsyncTournamentPermissions.create(
+                await AsyncTournamentPermissionsService().create_permission(
                     tournament=async_tournament,
                     user=dbuser,
                     role=permission
@@ -1018,7 +1014,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
     # TODO: write autocomplete racetime_slug
     @app_commands.command(name="live_race_record", description="Used record the results of a live qualifier race.")
     async def live_race_record(self, interaction: discord.Interaction, racetime_slug: str, force: bool = False):
-        async_live_race = await models.AsyncTournamentLiveRace.get_or_none(racetime_slug=racetime_slug)
+        async_live_race = await AsyncTournamentLiveRaceService().get_by_racetime_slug(racetime_slug)
         if async_live_race is None:
             await interaction.response.send_message("That episode ID is not a async tournament live race.",
                                                     ephemeral=True)
@@ -1030,7 +1026,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_live_race.fetch_related("tournament")
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, async_live_race.tournament, ['admin', 'mod'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
@@ -1057,7 +1053,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             entrant_name = entrant["user"]["name"]
             logging.info(f"Processing entrant {entrant_name} ({entrant_id})...")
 
-            race_user = await models.Users.get_or_none(rtgg_id=entrant_id)
+            race_user = await UserService().get_by_rtgg_id(entrant_id)
 
             if race_user is None:
                 logging.warning(
@@ -1066,10 +1062,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                     f"Entrant {entrant_name} ({entrant_id}) is not in the user table.  This should not have happened.")
                 continue
 
-            race = await models.AsyncTournamentRace.get_or_none(
-                live_race=async_live_race,
-                user=race_user,
-            )
+            race = await AsyncTournamentService().get_race_by_live_race_and_user(async_live_race, race_user)
 
             if race is None:
                 # this runner wasn't eligible, so we're going to skip them
@@ -1088,19 +1081,16 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 warnings.append(
                     f"{entrant['user']['name']} is not finished, forfeited, or disqualified.  THis runner is likely still in progress, and this race will need to be recorded again.")
 
-            await race.save()
+            await AsyncTournamentService().save_race(race)
 
-        races_still_in_progress = await models.AsyncTournamentRace.filter(
-            live_race=async_live_race,
-            status="in_progress"
-        ).count()
+        races_still_in_progress = await AsyncTournamentService().count_in_progress_races_for_live_race(async_live_race)
 
         if races_still_in_progress:
             warnings.append(
                 f"**There are still {races_still_in_progress} still in progress for this live race**, even after recording.  You'll need to record this race again when they finish.")
         else:
             async_live_race.status = "finished"
-            await async_live_race.save(update_fields=["status"])
+            await AsyncTournamentService().save_live_race_fields(async_live_race, ["status"])
 
         if warnings:
             await interaction.followup.send(
@@ -1116,7 +1106,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 await interaction.response.send_message("Only Synack may perform this action.", ephemeral=True)
                 return
 
-            tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+            tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
             if tournament is None:
                 await interaction.response.send_message("This channel is not configured for async tournaments.",
                                                         ephemeral=True)
@@ -1130,7 +1120,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
     @app_commands.command(name="calculate_scores", description="Calculate the scores for a async tournament.")
     async def calculate_scores(self, interaction: discord.Interaction, only_approved: bool = False):
-        tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
         if tournament is None:
             await interaction.response.send_message("This channel is not configured for async tournaments.",
                                                     ephemeral=True)
@@ -1140,7 +1130,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         #     await interaction.response.send_message("This tournament is not active.", ephemeral=True)
         #     return
 
-        user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
         authorized = await checks.is_async_tournament_user(user, tournament, ['admin'])
         if not authorized:
             await interaction.response.send_message("You are not authorized to perform a score recalculation.",
@@ -1155,13 +1145,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
     @live_race_record.autocomplete("racetime_slug")
     async def autocomplete_racetime_slug(self, interaction: discord.Interaction, current: str):
-        result = await models.AsyncTournamentLiveRace.filter(racetime_slug__icontains=current,
-                                                             status="in_progress").values("racetime_slug")
+        result = await AsyncTournamentLiveRaceService().list_in_progress_slugs(current)
         return [app_commands.Choice(name=r["racetime_slug"], value=r["racetime_slug"]) for r in result]
 
     @app_commands.command(name="close", description="Close a async tournament.")
     async def close(self, interaction: discord.Interaction):
-        async_tournament = await models.AsyncTournament.get_or_none(channel_id=interaction.channel_id)
+        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
         if async_tournament is None:
             await interaction.response.send_message("This channel is not configured for async tournaments.",
                                                     ephemeral=True)
@@ -1189,8 +1178,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
     )
     async def update_run(self, interaction: discord.Interaction, status: str = None, elapsed_time: str = None,
                          vod_url: str = None):
-        race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related(
-            "tournament")
+        race = await AsyncTournamentService().get_race_by_thread_id_with_tournament(interaction.channel.id)
         if race is None:
             await interaction.response.send_message("There is no async run in this thread.", ephemeral=True)
             return
@@ -1226,12 +1214,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
         else:
             race.runner_notes = msg
 
-        await race.save(update_fields=["status", "start_time", "end_time", "runner_vod_url", "runner_notes"])
+        await AsyncTournamentService().save_race_fields(race, ["status", "start_time", "end_time", "runner_vod_url", "runner_notes"])
 
         await interaction.response.send_message(msg)
 
 
-def create_tournament_embed(async_tournament: models.AsyncTournament):
+def create_tournament_embed(async_tournament):
     embed = discord.Embed(title=async_tournament.name)
     embed.add_field(name="Owner", value=f"<@{async_tournament.owner_id}>", inline=False)
     embed.set_footer(text=f"ID: {async_tournament.id}")
@@ -1239,8 +1227,7 @@ def create_tournament_embed(async_tournament: models.AsyncTournament):
 
 
 async def finish_race(interaction: discord.Interaction):
-    race = await models.AsyncTournamentRace.get_or_none(thread_id=interaction.channel.id).prefetch_related('user',
-                                                                                                           'tournament')
+    race = await AsyncTournamentService().get_race_by_thread_id_with_user_and_tournament(interaction.channel.id)
     if race is None:
         await interaction.response.send_message("This channel/thread is not an async race room.", ephemeral=True)
         return
@@ -1253,18 +1240,18 @@ async def finish_race(interaction: discord.Interaction):
         await interaction.response.send_message("You may only finish a race that's in progress.", ephemeral=True)
         return
 
-    user, _ = await models.Users.get_or_create(discord_user_id=interaction.user.id)
+    user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
-    await models.AsyncTournamentAuditLog.create(
+    await AuditService().record_async_event(
         tournament_id=race.tournament_id,
-        user=user,
         action="race_finish",
+        actor_id=user.id,
         details=f"{race.id} has finished"
     )
 
     race.end_time = discord.utils.utcnow()
     race.status = "finished"
-    await race.save()
+    await AsyncTournamentService().save_race(race)
 
     if race.tournament.customization == "gmpmt2023":
         await interaction.response.send_message(f"""

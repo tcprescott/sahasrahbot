@@ -124,3 +124,77 @@ class AsyncTournamentService:
             reviewer=reviewer,
             reviewed_at=datetime.datetime.now(),
         )
+
+    # --- discord-cog facade (reads/creates/writes) ---
+
+    async def get_by_channel_id(self, channel_id: int) -> Optional[models.AsyncTournament]:
+        return await self.repository.get_by_channel_id(channel_id)
+
+    async def list_active(self) -> List[models.AsyncTournament]:
+        return await self.repository.list_active()
+
+    async def get_pool_by_name(self, tournament, name: str) -> Optional[models.AsyncTournamentPermalinkPool]:
+        return await self.repository.get_pool_by_name(tournament, name)
+
+    async def list_user_races_by_discord_id(self, tournament, discord_user_id: int) -> List[models.AsyncTournamentRace]:
+        return await self.repository.list_user_races_by_discord_id(tournament, discord_user_id)
+
+    async def list_active_races_for_user(self, tournament, discord_user_id: int, statuses: list) -> List[models.AsyncTournamentRace]:
+        return await self.repository.list_active_races_for_user(tournament, discord_user_id, statuses)
+
+    async def get_race_by_thread_id(self, thread_id: int) -> Optional[models.AsyncTournamentRace]:
+        return await self.repository.get_race_by_thread_id(thread_id)
+
+    async def get_race_by_thread_id_with_user(self, thread_id: int) -> Optional[models.AsyncTournamentRace]:
+        return await self.repository.get_race_by_thread_id_with_user(thread_id)
+
+    async def get_race_by_thread_id_with_user_and_tournament(self, thread_id: int) -> Optional[models.AsyncTournamentRace]:
+        return await self.repository.get_race_by_thread_id_with_user_and_tournament(thread_id)
+
+    async def get_race_by_thread_id_with_tournament(self, thread_id: int) -> Optional[models.AsyncTournamentRace]:
+        return await self.repository.get_race_by_thread_id_with_tournament(thread_id)
+
+    async def get_race_by_live_race_and_user(self, live_race, user) -> Optional[models.AsyncTournamentRace]:
+        return await self.repository.get_race_by_live_race_and_user(live_race, user)
+
+    async def list_pending_races(self) -> List[models.AsyncTournamentRace]:
+        return await self.repository.list_pending_races()
+
+    async def list_in_progress_races(self) -> List[models.AsyncTournamentRace]:
+        return await self.repository.list_in_progress_races()
+
+    async def count_in_progress_races_for_live_race(self, live_race) -> int:
+        return await self.repository.count_in_progress_races_for_live_race(live_race)
+
+    async def create_tournament(
+        self, *, name: str, report_channel_id: Optional[int], active: bool,
+        guild_id: int, channel_id: int, owner_id: int,
+    ) -> models.AsyncTournament:
+        return await self.repository.create_tournament(
+            name=name, report_channel_id=report_channel_id, active=active,
+            guild_id=guild_id, channel_id=channel_id, owner_id=owner_id,
+        )
+
+    async def create_pool(self, *, tournament, name: str, preset: str) -> models.AsyncTournamentPermalinkPool:
+        return await self.repository.create_pool(tournament=tournament, name=name, preset=preset)
+
+    async def create_permalink(self, *, pool, url: str, notes: Optional[str], live_race: bool = False) -> models.AsyncTournamentPermalink:
+        return await self.repository.create_permalink(pool=pool, url=url, notes=notes, live_race=live_race)
+
+    async def create_race(self, *, tournament, user, permalink, thread_id: int, thread_open_time) -> models.AsyncTournamentRace:
+        return await self.repository.create_race(
+            tournament=tournament, user=user, permalink=permalink,
+            thread_id=thread_id, thread_open_time=thread_open_time,
+        )
+
+    async def save_race(self, race: models.AsyncTournamentRace) -> None:
+        await self.repository.save_race(race)
+
+    async def save_race_fields(self, race: models.AsyncTournamentRace, fields: list) -> None:
+        await self.repository.save_race_fields(race, fields)
+
+    async def save_live_race_fields(self, live_race: models.AsyncTournamentLiveRace, fields: list) -> None:
+        await self.repository.save_live_race_fields(live_race, fields)
+
+    async def save_tournament(self, tournament: models.AsyncTournament) -> None:
+        await self.repository.save_tournament(tournament)

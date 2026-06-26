@@ -11,6 +11,8 @@ Add new services as ``<name>_service.py`` (or a domain subpackage) and export th
 class here.
 """
 
+from alttprbot.services.async_tournament_live_race_service import AsyncTournamentLiveRaceService
+from alttprbot.services.async_tournament_permissions_service import AsyncTournamentPermissionsService
 from alttprbot.services.async_tournament_service import AsyncTournamentService
 from alttprbot.services.audit_messages_service import AuditMessagesService
 from alttprbot.services.audit_service import AuditActions, AuditService
@@ -34,6 +36,8 @@ from alttprbot.services.user_service import UserService
 from alttprbot.services.verified_racer_service import VerifiedRacerService
 
 __all__ = [
+    "AsyncTournamentLiveRaceService",
+    "AsyncTournamentPermissionsService",
     "AsyncTournamentService",
     "AuditActions",
     "AuditMessagesService",

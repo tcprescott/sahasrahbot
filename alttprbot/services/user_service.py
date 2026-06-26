@@ -16,8 +16,11 @@ class UserService:
     async def get_by_id(self, user_id: int) -> Optional[models.Users]:
         return await self.repository.get_by_id(user_id)
 
+    async def get_by_rtgg_id(self, rtgg_id: str) -> Optional[models.Users]:
+        return await self.repository.get_by_rtgg_id(rtgg_id)
+
     async def get_or_create_by_discord_id(
-        self, discord_user_id: int, *, display_name: str
+        self, discord_user_id: int, *, display_name: Optional[str] = None
     ) -> models.Users:
         user, _ = await self.repository.get_or_create_by_discord_id(
             discord_user_id, display_name=display_name

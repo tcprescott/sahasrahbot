@@ -11,6 +11,8 @@ Add new repositories as ``<name>_repository.py`` and export the class here.
 from alttprbot.repositories.audit_generated_games_repository import AuditGeneratedGamesRepository
 from alttprbot.repositories.audit_messages_repository import AuditMessagesRepository
 from alttprbot.repositories.async_tournament_audit_log_repository import AsyncTournamentAuditLogRepository
+from alttprbot.repositories.async_tournament_live_race_repository import AsyncTournamentLiveRaceRepository
+from alttprbot.repositories.async_tournament_permissions_repository import AsyncTournamentPermissionsRepository
 from alttprbot.repositories.async_tournament_repository import AsyncTournamentRepository
 from alttprbot.repositories.authorization_key_repository import AuthorizationKeyRepository
 from alttprbot.repositories.daily_repository import DailyRepository
@@ -37,6 +39,8 @@ __all__ = [
     "AuditGeneratedGamesRepository",
     "AuditMessagesRepository",
     "AsyncTournamentAuditLogRepository",
+    "AsyncTournamentLiveRaceRepository",
+    "AsyncTournamentPermissionsRepository",
     "AsyncTournamentRepository",
     "AuthorizationKeyRepository",
     "DailyRepository",

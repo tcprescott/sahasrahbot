@@ -182,3 +182,167 @@ class AsyncTournamentRepository:
         race.reviewed_at = reviewed_at
         race.reviewed_by = reviewer
         await race.save()
+
+    # --- discord-cog reads ---
+
+    @staticmethod
+    async def get_by_channel_id(channel_id: int) -> Optional[models.AsyncTournament]:
+        return await models.AsyncTournament.get_or_none(channel_id=channel_id)
+
+    @staticmethod
+    async def list_active() -> List[models.AsyncTournament]:
+        return await models.AsyncTournament.filter(active=True)
+
+    @staticmethod
+    async def get_pool_by_name(
+        tournament: models.AsyncTournament, name: str
+    ) -> Optional[models.AsyncTournamentPermalinkPool]:
+        return await models.AsyncTournamentPermalinkPool.get_or_none(tournament=tournament, name=name)
+
+    @staticmethod
+    async def list_user_races_by_discord_id(
+        tournament: models.AsyncTournament, discord_user_id: int
+    ) -> List[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.filter(
+            user__discord_user_id=discord_user_id, tournament=tournament
+        ).prefetch_related("permalink__pool")
+
+    @staticmethod
+    async def list_active_races_for_user(
+        tournament: models.AsyncTournament, discord_user_id: int, statuses: list
+    ) -> List[models.AsyncTournamentRace]:
+        return await tournament.races.filter(
+            user__discord_user_id=discord_user_id, status__in=statuses
+        )
+
+    @staticmethod
+    async def get_race_by_thread_id(thread_id: int) -> Optional[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.get_or_none(thread_id=thread_id)
+
+    @staticmethod
+    async def get_race_by_thread_id_with_user(
+        thread_id: int,
+    ) -> Optional[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.get_or_none(
+            thread_id=thread_id
+        ).prefetch_related("user")
+
+    @staticmethod
+    async def get_race_by_thread_id_with_user_and_tournament(
+        thread_id: int,
+    ) -> Optional[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.get_or_none(
+            thread_id=thread_id
+        ).prefetch_related("user", "tournament")
+
+    @staticmethod
+    async def get_race_by_thread_id_with_tournament(
+        thread_id: int,
+    ) -> Optional[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.get_or_none(
+            thread_id=thread_id
+        ).prefetch_related("tournament")
+
+    @staticmethod
+    async def get_race_by_live_race_and_user(
+        live_race: models.AsyncTournamentLiveRace, user: models.Users
+    ) -> Optional[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.get_or_none(live_race=live_race, user=user)
+
+    @staticmethod
+    async def list_pending_races() -> List[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.filter(
+            status="pending", thread_id__isnull=False
+        ).prefetch_related("user")
+
+    @staticmethod
+    async def list_in_progress_races() -> List[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.filter(
+            status="in_progress", thread_id__isnull=False
+        ).prefetch_related("user")
+
+    @staticmethod
+    async def count_in_progress_races_for_live_race(
+        live_race: models.AsyncTournamentLiveRace,
+    ) -> int:
+        return await models.AsyncTournamentRace.filter(
+            live_race=live_race, status="in_progress"
+        ).count()
+
+    # --- discord-cog creates ---
+
+    @staticmethod
+    async def create_tournament(
+        *,
+        name: str,
+        report_channel_id: Optional[int],
+        active: bool,
+        guild_id: int,
+        channel_id: int,
+        owner_id: int,
+    ) -> models.AsyncTournament:
+        return await models.AsyncTournament.create(
+            name=name,
+            report_channel_id=report_channel_id,
+            active=active,
+            guild_id=guild_id,
+            channel_id=channel_id,
+            owner_id=owner_id,
+        )
+
+    @staticmethod
+    async def create_pool(
+        *, tournament: models.AsyncTournament, name: str, preset: str
+    ) -> models.AsyncTournamentPermalinkPool:
+        return await models.AsyncTournamentPermalinkPool.create(
+            tournament=tournament, name=name, preset=preset
+        )
+
+    @staticmethod
+    async def create_permalink(
+        *,
+        pool: models.AsyncTournamentPermalinkPool,
+        url: str,
+        notes: Optional[str],
+        live_race: bool = False,
+    ) -> models.AsyncTournamentPermalink:
+        return await models.AsyncTournamentPermalink.create(
+            pool=pool, url=url, notes=notes, live_race=live_race
+        )
+
+    @staticmethod
+    async def create_race(
+        *,
+        tournament: models.AsyncTournament,
+        user: models.Users,
+        permalink: models.AsyncTournamentPermalink,
+        thread_id: int,
+        thread_open_time: datetime,
+    ) -> models.AsyncTournamentRace:
+        return await models.AsyncTournamentRace.create(
+            tournament=tournament,
+            thread_id=thread_id,
+            user=user,
+            thread_open_time=thread_open_time,
+            permalink=permalink,
+        )
+
+    # --- discord-cog writes (the cog builds the new state; persistence is owned here) ---
+
+    @staticmethod
+    async def save_race(race: models.AsyncTournamentRace) -> None:
+        await race.save()
+
+    @staticmethod
+    async def save_race_fields(race: models.AsyncTournamentRace, fields: list) -> None:
+        await race.save(update_fields=fields)
+
+    @staticmethod
+    async def save_live_race_fields(
+        live_race: models.AsyncTournamentLiveRace, fields: list
+    ) -> None:
+        await live_race.save(update_fields=fields)
+
+    @staticmethod
+    async def save_tournament(tournament: models.AsyncTournament) -> None:
+        await tournament.save()
