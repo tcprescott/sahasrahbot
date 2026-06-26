@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.interactions import Interaction
 
 import config
-from alttprbot import models
+from alttprbot.services import InquiryMessageConfigService
 
 
 # TODO: make work with discord.py 2.0
@@ -23,7 +23,7 @@ class ConfirmInquiryThread(discord.ui.View):
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬",
                        custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):
-        inquiry_message_config = await models.InquiryMessageConfig.get(message_id=interaction.message.id)
+        inquiry_message_config = await InquiryMessageConfigService().get_for_message(interaction.message.id)
         role = interaction.guild.get_role(inquiry_message_config.role_id)
         view = OpenInquiryThread(inquiry_message_config)
 
@@ -39,7 +39,7 @@ class ConfirmInquiryThread(discord.ui.View):
 class OpenInquiryThread(discord.ui.View):
     def __init__(self, inquiry_message_config):
         super().__init__(timeout=60)
-        self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
+        self.inquiry_message_config = inquiry_message_config
 
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
     async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -57,7 +57,7 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
 
     def __init__(self, inquiry_message_config):
         super().__init__()
-        self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
+        self.inquiry_message_config = inquiry_message_config
 
     async def on_submit(self, interaction: Interaction) -> None:
 #        if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
@@ -154,7 +154,7 @@ class Inquiry(commands.Cog):
             allowed_mentions=discord.AllowedMentions(roles=False)
         )
         original_message = await interaction.original_response()
-        await models.InquiryMessageConfig.create(message_id=original_message.id, role_id=role.id)
+        await InquiryMessageConfigService().register(message_id=original_message.id, role_id=role.id)
 
 
 def check_private_threads(interaction: discord.Interaction):

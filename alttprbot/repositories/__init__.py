@@ -15,13 +15,16 @@ from alttprbot.repositories.authorization_key_repository import AuthorizationKey
 from alttprbot.repositories.daily_repository import DailyRepository
 from alttprbot.repositories.discord_server_repository import DiscordServerRepository
 from alttprbot.repositories.guild_config_repository import GuildConfigRepository
+from alttprbot.repositories.inquiry_message_config_repository import InquiryMessageConfigRepository
 from alttprbot.repositories.nick_verification_repository import NickVerificationRepository
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
 from alttprbot.repositories.race_room_repository import RaceRoomRepository
 from alttprbot.repositories.ranked_choice_repository import RankedChoiceRepository
+from alttprbot.repositories.scheduled_events_repository import ScheduledEventsRepository
 from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
 from alttprbot.repositories.tournament_games_repository import TournamentGamesRepository
+from alttprbot.repositories.tournament_preset_history_repository import TournamentPresetHistoryRepository
 from alttprbot.repositories.tournament_results_repository import TournamentResultsRepository
 from alttprbot.repositories.triforce_text_repository import TriforceTextRepository
 from alttprbot.repositories.user_repository import UserRepository
@@ -34,13 +37,16 @@ __all__ = [
     "DailyRepository",
     "DiscordServerRepository",
     "GuildConfigRepository",
+    "InquiryMessageConfigRepository",
     "NickVerificationRepository",
     "PresetNamespaceRepository",
     "PresetRepository",
     "RaceRoomRepository",
     "RankedChoiceRepository",
+    "ScheduledEventsRepository",
     "SpoilerRaceRepository",
     "TournamentGamesRepository",
+    "TournamentPresetHistoryRepository",
     "TournamentResultsRepository",
     "TriforceTextRepository",
     "UserRepository",

@@ -24,3 +24,11 @@ class RaceRoomService:
     ) -> Optional[models.RTGGOverrideWhitelist]:
         """Return the stream-override whitelist row (with ``expires``), or ``None``."""
         return await self.repository.get_override_whitelist(racetime_id, category)
+
+    async def list_watchlisted_players(
+        self, entrant_ids: list, category: str
+    ) -> List[models.RTGGWatcherPlayer]:
+        return await self.repository.list_watchlisted_players(entrant_ids, category)
+
+    async def list_watchers(self, category: str) -> List[models.RTGGWatcher]:
+        return await self.repository.list_watchers(category)

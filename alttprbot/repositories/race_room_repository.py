@@ -31,3 +31,17 @@ class RaceRoomRepository:
         return await models.RTGGOverrideWhitelist.get_or_none(
             racetime_id=racetime_id, category=category
         )
+
+    # --- watchlist ---
+
+    @staticmethod
+    async def list_watchlisted_players(
+        entrant_ids: list, category: str
+    ) -> List[models.RTGGWatcherPlayer]:
+        return await models.RTGGWatcherPlayer.filter(
+            racetime_id__in=entrant_ids, rtgg_watcher__category=category
+        ).prefetch_related("rtgg_watcher")
+
+    @staticmethod
+    async def list_watchers(category: str) -> List[models.RTGGWatcher]:
+        return await models.RTGGWatcher.filter(category=category)

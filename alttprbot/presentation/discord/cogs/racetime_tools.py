@@ -4,7 +4,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from alttprbot import models
+from alttprbot.services import RaceRoomService
 
 
 # TODO: make work with discord.py 2.0
@@ -37,9 +37,8 @@ class RacetimeTools(commands.Cog):
 
     async def watchlisted_players(self, handler):
         entrant_ids = [a['user']['id'] for a in handler.data['entrants']]
-        watchlisted_players = await models.RTGGWatcherPlayer.filter(racetime_id__in=entrant_ids,
-                                                                    rtgg_watcher__category=handler.bot.category_slug).prefetch_related(
-            "rtgg_watcher")
+        watchlisted_players = await RaceRoomService().list_watchlisted_players(
+            entrant_ids, handler.bot.category_slug)
         for watchlisted_player in watchlisted_players:
             channel = self.bot.get_channel(watchlisted_player.rtgg_watcher.channel_id)
             player_data_uri = handler.bot.http_uri(f"/user/{watchlisted_player.racetime_id}/data")
@@ -59,7 +58,7 @@ class RacetimeTools(commands.Cog):
 
     async def new_players(self, handler):
         entrant_ids = [a['user']['id'] for a in handler.data['entrants']]
-        watchers = await models.RTGGWatcher.filter(category=handler.bot.category_slug)
+        watchers = await RaceRoomService().list_watchers(handler.bot.category_slug)
         for watcher in watchers:
             channel = self.bot.get_channel(watcher.channel_id)
             if not watcher.notify_on_new_player:

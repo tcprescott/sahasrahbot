@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 
 import config
 # from alttprbot.presentation.discord.util import alttpr_discord
-from alttprbot import models
+from alttprbot.services import TournamentSchedulingService
 from alttprbot import tournaments
 from alttprbot.tournament import core, alttpr
 from alttprbot.util import speedgaming
@@ -53,10 +53,7 @@ class ChallengeCupDeleteHistoryConfirmationView(discord.ui.View):
     async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
         message_id = self.message.id
 
-        await models.TournamentPresetHistory.filter(
-            episode_id=message_id,
-            event_slug='cc2023'
-        ).delete()
+        await TournamentSchedulingService().delete_preset_history(message_id, 'cc2023')
         await self.message.add_reaction('🗑️')
 
         # disable buttons
@@ -191,8 +188,9 @@ class Tournament(commands.Cog):
     async def update_scheduled_event(self, event_data: core.TournamentRace, event_slug: str, episodes: dict):
 
         # remove dead events
-        dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes],
-                                                          event_slug=event_slug)
+        scheduling_service = TournamentSchedulingService()
+        dead_events = await scheduling_service.list_dead_scheduled_events(
+            [e['id'] for e in episodes], event_slug)
         for dead_event in dead_events:
             try:
                 event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(
@@ -202,12 +200,12 @@ class Tournament(commands.Cog):
                     await event.delete()
             except discord.NotFound:
                 continue
-            await dead_event.delete()
+            await scheduling_service.delete_scheduled_event(dead_event)
 
         for episode in episodes:
             start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
             episode_id = int(episode['id'])
-            scheduled_event = await models.ScheduledEvents.get_or_none(episode_id=episode_id)
+            scheduled_event = await scheduling_service.get_scheduled_event(episode_id)
 
             try:
                 tournament_race = await tournaments.fetch_tournament_handler_v2(event_slug, episode)
@@ -260,9 +258,8 @@ class Tournament(commands.Cog):
                             entity_type=discord.EntityType.external,
                             privacy_level=discord.PrivacyLevel.guild_only
                         )
-                        await models.ScheduledEvents.update_or_create(episode_id=episode_id,
-                                                                      defaults={'scheduled_event_id': event.id,
-                                                                                'event_slug': event_slug})
+                        await scheduling_service.upsert_scheduled_event(
+                            episode_id, scheduled_event_id=event.id, event_slug=event_slug)
                 else:
                     # create an event
                     event = await event_data.guild.create_scheduled_event(
@@ -274,8 +271,8 @@ class Tournament(commands.Cog):
                         entity_type=discord.EntityType.external,
                         privacy_level=discord.PrivacyLevel.guild_only
                     )
-                    await models.ScheduledEvents.create(scheduled_event_id=event.id, episode_id=episode_id,
-                                                        event_slug=event_slug)
+                    await scheduling_service.create_scheduled_event(
+                        scheduled_event_id=event.id, episode_id=episode_id, event_slug=event_slug)
             except Exception:
                 logging.exception("Unable to create guild event.")
 
