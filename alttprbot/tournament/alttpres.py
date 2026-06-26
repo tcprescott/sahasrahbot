@@ -7,7 +7,7 @@ from alttprbot.services.seedgen import preset
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot.presentation.discord.bot import discordbot
-from alttprbot.presentation.discord.util import alttpr_discord
+from alttprbot.services.seedgen.seedclasses import ALTTPRSeed
 
 
 class ALTTPRESTournament(ALTTPRTournamentRace):
@@ -16,7 +16,7 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
             raise Exception('Missing bracket settings.  Please submit!')
 
         self.preset_dict = None
-        self.seed = await alttpr_discord.ALTTPRDiscord.generate(
+        self.seed = await ALTTPRSeed.generate(
             settings=self.bracket_settings,
             endpoint='/api/customizer' if 'eq' in self.bracket_settings else '/api/randomizer',
         )

@@ -8,7 +8,7 @@ from alttprbot.services.seedgen import smz3multi
 from alttprbot.services.seedgen.randomizer import smdash
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.presentation.discord.bot import discordbot
-from alttprbot.presentation.discord.util.smvaria_discord import SuperMetroidVariaDiscord
+from pyz3r.smvaria import SuperMetroidVaria
 
 # tournament schedule
 # 1. Multiworld with major/minor split https: // sm.samus.link/
@@ -91,7 +91,7 @@ class SMRandoLeague(TournamentRace):
             tournamentresults.permalink = self.seed
 
         elif WEEKS[WEEK].get('randomizer') == 'smvaria':
-            self.seed = await SuperMetroidVariaDiscord.create(
+            self.seed = await SuperMetroidVaria.create(
                 settings_preset=WEEKS[WEEK].get('preset'),
                 skills_preset="Season_Races",
                 race=True

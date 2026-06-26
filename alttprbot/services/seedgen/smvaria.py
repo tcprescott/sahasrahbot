@@ -1,8 +1,8 @@
-from alttprbot.presentation.discord.util.smvaria_discord import SuperMetroidVariaDiscord
+from pyz3r.smvaria import SuperMetroidVaria
 
 
 async def generate_preset(settings, skills, race=False):
-    seed = await SuperMetroidVariaDiscord.create(
+    seed = await SuperMetroidVaria.create(
         skills_preset=skills,
         settings_preset=settings,
         race=race
@@ -119,7 +119,7 @@ async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morp
     }
 
     await ctx.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
-    seed = await SuperMetroidVariaDiscord.create(
+    seed = await SuperMetroidVaria.create(
         settings_preset="Season_Races",
         skills_preset="newbie" if difficulty == "BasicDifficulty" else "Season_Races",
         race=race,
@@ -167,7 +167,7 @@ async def generate_league_playoff(majors, area, bosses):
             'Mama Turtle'
         ]
 
-    seed = await SuperMetroidVariaDiscord.create(
+    seed = await SuperMetroidVaria.create(
         settings_preset="Season_Races",
         skills_preset="Season_Races",
         settings_dict=settings,

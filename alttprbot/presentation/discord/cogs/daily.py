@@ -9,7 +9,8 @@ from discord.ext import commands, tasks
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from alttprbot.services import DailyService, GuildConfigService
-from alttprbot.presentation.discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot.services.seedgen.seedclasses import ALTTPRSeed
+from alttprbot.presentation.discord.util.seed_embeds import seed_embed
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class Daily(commands.Cog):
             if not hash_id:
                 raise ValueError('Daily challenge payload missing hash')
             seed = await get_daily_seed_with_retry(hash_id)
-            embed = await seed.embed(emojis=self.bot.emojis,
+            embed = await seed_embed(seed, emojis=self.bot.emojis,
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             await interaction.response.send_message(embed=embed)
         except (aiohttp.ClientError, ValueError, KeyError, TypeError, RuntimeError) as error:  # noqa: BLE001
@@ -51,7 +52,7 @@ class Daily(commands.Cog):
                 return
 
             seed = await get_daily_seed_with_retry(hash_id)
-            embed = await seed.embed(emojis=self.bot.emojis,
+            embed = await seed_embed(seed, emojis=self.bot.emojis,
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         except (aiohttp.ClientError, ValueError, KeyError, TypeError, RuntimeError) as error:  # noqa: BLE001
             logger.error('Failed daily announcement preparation: %s', error)
@@ -125,7 +126,7 @@ async def setup(bot: commands.Bot):
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash_id):
-    return await ALTTPRDiscord.retrieve(hash_id=hash_id)
+    return await ALTTPRSeed.retrieve(hash_id=hash_id)
 
 
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)

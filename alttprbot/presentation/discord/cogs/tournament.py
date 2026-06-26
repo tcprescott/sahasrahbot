@@ -11,6 +11,7 @@ import config
 # from alttprbot.presentation.discord.util import alttpr_discord
 from alttprbot.services import TournamentSchedulingService
 from alttprbot import tournaments
+from alttprbot.presentation.discord.util.seed_embeds import seed_embed
 from alttprbot.tournament import core, alttpr
 from alttprbot.util import speedgaming
 
@@ -491,7 +492,7 @@ class Tournament(commands.Cog):
 
         seed, preset, deck = await alttpr.roll_seed(players, event_slug="cc2023", episode_id=msg_id)
 
-        embed = await seed.embed(emojis=self.bot.emojis, include_settings=False)
+        embed = await seed_embed(seed, emojis=self.bot.emojis, include_settings=False)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         if deck:
             embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]),

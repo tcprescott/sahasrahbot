@@ -11,6 +11,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import triforce_text
 from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.discord.util.seed_embeds import seed_embed, seed_tournament_embed
 
 
 class ALTTPRTournamentRace(TournamentRace):
@@ -79,13 +80,13 @@ class ALTTPRTournamentRace(TournamentRace):
         if self.rtgg_handler is None:
             raise SahasrahBotException("No RaceTime.gg handler associated with this tournament game.")
 
-        self.embed = await self.seed.embed(
+        self.embed = await seed_embed(self.seed, 
             name=self.race_info,
             notes=self.versus,
             emojis=discordbot.emojis
         )
 
-        self.tournament_embed = await self.seed.tournament_embed(
+        self.tournament_embed = await seed_tournament_embed(self.seed, 
             name=self.race_info,
             notes=self.versus,
             emojis=discordbot.emojis

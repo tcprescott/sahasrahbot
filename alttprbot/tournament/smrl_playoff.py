@@ -8,7 +8,7 @@ from alttprbot import models
 from alttprbot.services.seedgen.randomizer import smdash
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.presentation.discord.bot import discordbot
-from alttprbot.presentation.discord.util.smvaria_discord import SuperMetroidVariaDiscord
+from pyz3r.smvaria import SuperMetroidVaria
 
 
 # game schedule
@@ -42,7 +42,7 @@ class SMRLPlayoffs(TournamentRace):
         preset = self.tournament_game.settings['preset']
 
         if randomizer == 'smvaria':
-            self.seed = await SuperMetroidVariaDiscord.create(
+            self.seed = await SuperMetroidVaria.create(
                 settings_preset=preset,
                 skills_preset="Season_Races",
                 race=True

@@ -9,14 +9,14 @@ import aioboto3
 import config
 from alttprbot.services.seedgen.ext.progression_spoiler import create_progression_spoiler
 from alttprbot.services.seedgen.generator import ALTTPRPreset, PresetData
-from alttprbot.presentation.discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot.services.seedgen.seedclasses import ALTTPRSeed
 
 
 @dataclass
 class ALTTPRSpoilerGame:
     preset: PresetData
     spoiler_log_url: str
-    seed: ALTTPRDiscord
+    seed: ALTTPRSeed
 
 
 async def generate_spoiler_game(preset, spoiler_type='spoiler', festive=False, branch=None, allow_quickswap=True):
