@@ -8,7 +8,7 @@ from contextlib import closing
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot import models
+from alttprbot.services import AuditMessagesService
 
 
 class Audit(commands.Cog):
@@ -19,8 +19,7 @@ class Audit(commands.Cog):
     @tasks.loop(hours=24, reconnect=True)
     async def clean_history(self):
         try:
-            thirty_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=30)
-            await models.AuditMessages.filter(message_date__lte=thirty_days_ago).delete()
+            await AuditMessagesService().clean_old_messages(days=30)
         except Exception:
             logging.exception("Error while running audit clean_history loop")
 
@@ -39,7 +38,7 @@ class Audit(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def messagehistory(self, ctx, member: discord.Member, limit=500):
-        messages = await models.AuditMessages.filter(guild_id=ctx.guild.id, user_id=member.id).limit(limit).values()
+        messages = await AuditMessagesService().list_user_history(ctx.guild.id, member.id, limit)
 
         fields = ['message_date', 'content', 'attachment', 'deleted']
         with closing(io.StringIO()) as sio:
@@ -54,8 +53,7 @@ class Audit(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def deletedhistory(self, ctx, member: discord.Member, limit=500):
-        messages = await models.AuditMessages.filter(guild_id=ctx.guild.id, user_id=member.id, deleted=1).limit(
-            limit).values()
+        messages = await AuditMessagesService().list_deleted_user_history(ctx.guild.id, member.id, limit)
 
         fields = ['message_date', 'content', 'attachment', 'deleted']
         with closing(io.StringIO()) as sio:
@@ -98,11 +96,7 @@ class Audit(commands.Cog):
 
             await audit_channel.send(embed=embed)
 
-            cached_messages = await models.AuditMessages.filter(message_id=payload.message_id)
-            if cached_messages:
-                for msg in cached_messages:
-                    msg.deleted = 1
-                    await msg.save(update_fields=['deleted'])
+            await AuditMessagesService().mark_deleted(payload.message_id)
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload):
@@ -125,9 +119,7 @@ class Audit(commands.Cog):
             embed = await audit_embed_delete(guild, channel, message_id)
 
             await audit_channel.send(embed=embed)
-            cached_message = await models.AuditMessages.get(message_id=message_id)
-            cached_message.deleted = 1
-            await cached_message.save()
+            await AuditMessagesService().mark_deleted(message_id)
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
@@ -143,7 +135,7 @@ class Audit(commands.Cog):
         if message.author.bot:
             return
 
-        old_message = await models.AuditMessages.filter(message_id=message.id).order_by('id').values()
+        old_message = await AuditMessagesService().get_message_history(message.id)
         if old_message and old_message[-1]['content'] == message.content:
             return
         audit_channel_id = await message.guild.config_get('AuditLogChannel')
@@ -331,7 +323,7 @@ async def audit_embed_edit(old_message, message):
 
 
 async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=False):
-    old_message = await models.AuditMessages.filter(message_id=message_id).order_by('id').values()
+    old_message = await AuditMessagesService().get_message_history(message_id)
     if old_message is None:
         author = None
         old_content = '*unknown*'
@@ -367,7 +359,7 @@ async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=Fal
 
 
 async def record_message(message):
-    await models.AuditMessages.create(
+    await AuditMessagesService().record_message(
         guild_id=message.guild.id if message.guild else 0,
         message_id=message.id,
         user_id=message.author.id,

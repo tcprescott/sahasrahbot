@@ -13,7 +13,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 import config
-from alttprbot import models
+from alttprbot.services import RacerVerificationService, UserService, VerifiedRacerService
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -27,8 +27,8 @@ class RacerVerificationView(discord.ui.View):
                        style=discord.ButtonStyle.primary)
     async def verify_status(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
-        racer_verification = await models.RacerVerification.get_or_none(message_id=interaction.message.id,
-                                                                        guild_id=interaction.guild.id)
+        racer_verification = await RacerVerificationService().get_by_message_and_guild(
+            interaction.message.id, interaction.guild.id)
 
         if racer_verification is None:
             await interaction.followup.send(
@@ -36,7 +36,7 @@ class RacerVerificationView(discord.ui.View):
                 ephemeral=True)
             return
 
-        user = await models.Users.get_or_none(discord_user_id=interaction.user.id)
+        user = await UserService().get_by_discord_id(interaction.user.id)
         if user is None or user.rtgg_id is None:
             await interaction.followup.send(
                 "Please visit https://sahasrahbotapi.synack.live/racetime/verification/initiate to link your RaceTime.gg ID!\n\nAfter that, click the button again!",
@@ -46,21 +46,7 @@ class RacerVerificationView(discord.ui.View):
         eligible, count = await determine_eligibility(interaction.user.name, user, racer_verification)
 
         if eligible:
-            racer = await models.VerifiedRacer.get_or_none(
-                user=user,
-                racer_verification=racer_verification
-            )
-            if racer is None:
-                racer = await models.VerifiedRacer.create(
-                    user=user,
-                    racer_verification=racer_verification,
-                    last_verified=discord.utils.utcnow(),
-                    estimated_count=count
-                )
-            else:
-                racer.last_verified = discord.utils.utcnow()
-                racer.estimated_count = count
-                await racer.save()
+            await VerifiedRacerService().record_verification(user, racer_verification, count)
 
             role = interaction.guild.get_role(racer_verification.role_id)
             await interaction.user.add_roles(role, reason="Racer Verification")
@@ -80,7 +66,7 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
     @tasks.loop(minutes=1 if config.DEBUG else 1440, reconnect=True)
     async def reverify_racer(self):
         try:
-            racer_verifications = await models.RacerVerification.all()
+            racer_verifications = await RacerVerificationService().list_all()
             for racer_verification in racer_verifications:
                 try:
                     revoked_users = await self.reverify_racer_verification(
@@ -140,7 +126,7 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
 
         await interaction.response.defer(ephemeral=True)
 
-        racer_verifications = await models.RacerVerification.filter(guild_id=interaction.guild.id)
+        racer_verifications = await RacerVerificationService().list_by_guild(interaction.guild.id)
         for racer_verification in racer_verifications:
             revoked_users = await self.reverify_racer_verification(racer_verification, revoke=revoke)
             racer_verification_role = interaction.guild.get_role(racer_verification.role_id)
@@ -192,7 +178,7 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
             await interaction.response.send_message("You are authorized to use this command.", ephemeral=True)
             return
 
-        racer_verification, _ = await models.RacerVerification.update_or_create(
+        racer_verification = await RacerVerificationService().configure(
             role_id=role.id,
             guild_id=interaction.guild.id,
             defaults={
@@ -229,11 +215,10 @@ If you have any questions, please contact a server administrator.
             view=RacerVerificationView(self.bot)
         )
         message = await interaction.original_response()
-        racer_verification.message_id = message.id
-        racer_verification.channel_id = message.channel.id
-        await racer_verification.save()
+        await RacerVerificationService().set_message(
+            racer_verification, message_id=message.id, channel_id=message.channel.id)
 
-    async def reverify_racer_verification(self, racer_verification: models.RacerVerification, revoke=False):
+    async def reverify_racer_verification(self, racer_verification, revoke=False):
         if racer_verification.reverify_period_days is None:
             # skip this as this racer verification is not set to reverify
             return False
@@ -247,22 +232,14 @@ If you have any questions, please contact a server administrator.
 
         verified_racer_role = guild.get_role(racer_verification.role_id)
 
-        revoked_users: List[models.VerifiedRacer] = []
+        revoked_users = []
 
         for verified_racer_member in verified_racer_role.members:
             # create database records if they don't already exist
-            verified_racer_user, _ = await models.Users.get_or_create(
-                discord_user_id=verified_racer_member.id,
-                defaults={
-                    'display_name': verified_racer_member.name,
-                }
-            )
-            verified_racer, _ = await models.VerifiedRacer.get_or_create(
-                user=verified_racer_user,
-                defaults={
-                    'racer_verification': racer_verification,
-                }
-            )
+            verified_racer_user = await UserService().get_or_create_by_discord_id(
+                verified_racer_member.id, display_name=verified_racer_member.name)
+            verified_racer, _ = await VerifiedRacerService().get_or_create_for_user(
+                verified_racer_user, racer_verification)
             verified_racer.fetch_related('user')
 
             # check if they're required to reverify
@@ -274,16 +251,14 @@ If you have any questions, please contact a server administrator.
             eligible, count = await determine_eligibility(verified_racer_member.name, verified_racer_user, racer_verification)
 
             if eligible:
-                verified_racer.estimated_count = count
-                verified_racer.last_verified = discord.utils.utcnow()
-                await verified_racer.save()
+                await VerifiedRacerService().mark_verified(verified_racer, count)
             else:
                 revoked_users.append(verified_racer_user)
                 if revoke:
                     # remove the role
                     await verified_racer_member.remove_roles(verified_racer_role, reason="Racer Verification")
                     # delete the database record
-                    await verified_racer.delete()
+                    await VerifiedRacerService().revoke(verified_racer)
                     # send a message to the user
                     await verified_racer_member.send(
                         f"Your verification for __{verified_racer_role.name}__ has expired.  Please re-verify by clicking the button in the message in the {guild.name} server.\n\nIf you believe this is in error, please contact a server administrator for assistance."
@@ -382,7 +357,7 @@ async def get_ladder_archive_count(discord_id, days=365):
 
     return data['TotalCount']
 
-async def determine_eligibility(username: str, user: models.Users, racer_verification: models.RacerVerification):
+async def determine_eligibility(username: str, user, racer_verification):
     try:
         rtgg_categories = racer_verification.racetime_categories.split(',')
     except AttributeError:

@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 import config
-from alttprbot import models
+from alttprbot.services import RankedChoiceService
 from alttprbot.util import rankedchoice
 
 APP_URL = config.APP_URL
@@ -23,7 +23,7 @@ class RankedChoiceMessageView(discord.ui.View):
     async def end_election(self, interaction: discord.Interaction, button: discord.ui.Button):
         # await interaction.response.send_message("Ending the election is not yet implemented.", ephemeral=True)
         await interaction.response.defer()
-        election = await models.RankedChoiceElection.get(message_id=interaction.message.id)
+        election = await RankedChoiceService().get_election_by_message_id(interaction.message.id)
 
         if election.owner_id != interaction.user.id:
             await interaction.followup.send("You are not the owner of this election.", ephemeral=True)
@@ -39,8 +39,7 @@ class RankedChoiceMessageView(discord.ui.View):
 
         await rankedchoice.calculate_results(election)
 
-        election.active = False
-        await election.save()
+        await RankedChoiceService().close_election(election)
 
         await rankedchoice.refresh_election_post(election, self.bot)
 
@@ -74,7 +73,8 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
             await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
             return
 
-        election = await models.RankedChoiceElection.create(
+        service = RankedChoiceService()
+        election = await service.create_election(
             title=title,
             description=description,
             private=authorized_voters_role is not None,
@@ -91,9 +91,7 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         if interaction.guild.chunked is False:
             await interaction.guild.chunk(cache=True)
 
-        await models.RankedChoiceCandidate.bulk_create(
-            [models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in
-             candidates.split(',')])
+        await service.add_candidates(election, [candidate.strip() for candidate in candidates.split(',')])
         # if authorized_voters_role:
         #     await models.RankedChoiceAuthorizedVoters.bulk_create([models.RankedChoiceAuthorizedVoters(election=election, user_id=user_id) for user_id in [member.id for member in authorized_voters_role.members]])
 
@@ -104,8 +102,7 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         await interaction.response.send_message(embed=rankedchoice.create_embed(election),
                                                 view=RankedChoiceMessageView(self.bot))
         message = await interaction.original_response()
-        election.message_id = message.id
-        await election.save()
+        await service.set_election_message_id(election, message.id)
 
     # @app_commands.command(description="Refresh the .")
     # @app_commands.describe(election_id="The ID of the election.")

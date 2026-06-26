@@ -9,6 +9,7 @@ Add new repositories as ``<name>_repository.py`` and export the class here.
 """
 
 from alttprbot.repositories.audit_generated_games_repository import AuditGeneratedGamesRepository
+from alttprbot.repositories.audit_messages_repository import AuditMessagesRepository
 from alttprbot.repositories.async_tournament_audit_log_repository import AsyncTournamentAuditLogRepository
 from alttprbot.repositories.async_tournament_repository import AsyncTournamentRepository
 from alttprbot.repositories.authorization_key_repository import AuthorizationKeyRepository
@@ -20,6 +21,7 @@ from alttprbot.repositories.nick_verification_repository import NickVerification
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
 from alttprbot.repositories.race_room_repository import RaceRoomRepository
+from alttprbot.repositories.racer_verification_repository import RacerVerificationRepository
 from alttprbot.repositories.ranked_choice_repository import RankedChoiceRepository
 from alttprbot.repositories.scheduled_events_repository import ScheduledEventsRepository
 from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
@@ -28,9 +30,11 @@ from alttprbot.repositories.tournament_preset_history_repository import Tourname
 from alttprbot.repositories.tournament_results_repository import TournamentResultsRepository
 from alttprbot.repositories.triforce_text_repository import TriforceTextRepository
 from alttprbot.repositories.user_repository import UserRepository
+from alttprbot.repositories.verified_racer_repository import VerifiedRacerRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
+    "AuditMessagesRepository",
     "AsyncTournamentAuditLogRepository",
     "AsyncTournamentRepository",
     "AuthorizationKeyRepository",
@@ -42,6 +46,7 @@ __all__ = [
     "PresetNamespaceRepository",
     "PresetRepository",
     "RaceRoomRepository",
+    "RacerVerificationRepository",
     "RankedChoiceRepository",
     "ScheduledEventsRepository",
     "SpoilerRaceRepository",
@@ -50,4 +55,5 @@ __all__ = [
     "TournamentResultsRepository",
     "TriforceTextRepository",
     "UserRepository",
+    "VerifiedRacerRepository",
 ]

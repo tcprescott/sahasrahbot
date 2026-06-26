@@ -19,6 +19,27 @@ class RankedChoiceService:
     ) -> Optional[models.RankedChoiceElection]:
         return await self.repository.get_election_with_candidates(election_id)
 
+    async def get_election_by_message_id(
+        self, message_id: int
+    ) -> Optional[models.RankedChoiceElection]:
+        return await self.repository.get_election_by_message_id(message_id)
+
+    async def create_election(self, **fields) -> models.RankedChoiceElection:
+        return await self.repository.create_election(**fields)
+
+    async def add_candidates(
+        self, election: models.RankedChoiceElection, names: List[str]
+    ) -> None:
+        await self.repository.bulk_create_candidates(election, names)
+
+    async def set_election_message_id(
+        self, election: models.RankedChoiceElection, message_id: int
+    ) -> None:
+        await self.repository.set_message_id(election, message_id)
+
+    async def close_election(self, election: models.RankedChoiceElection) -> None:
+        await self.repository.close(election)
+
     async def get_user_votes(
         self, election: models.RankedChoiceElection, user_id: int
     ) -> List[models.RankedChoiceVotes]:
