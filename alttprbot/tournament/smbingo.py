@@ -6,9 +6,9 @@ import discord
 
 import config
 from alttprbot import models
-from alttprbot.alttprgen.randomizer.bingosync import BingoSync
+from alttprbot.services.seedgen.randomizer.bingosync import BingoSync
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 BINGO_COLLAB_DISCORD_WEBHOOK = config.BINGO_COLLAB_DISCORD_WEBHOOK
 

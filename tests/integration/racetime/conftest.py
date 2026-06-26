@@ -1,8 +1,8 @@
 """Import-order shim for racetime handler tests.
 
-Importing ``alttprbot_racetime.handlers.core`` cold triggers a circular import
-(handlers.core -> alttprbot.tournaments -> ... -> alttprbot_racetime.config ->
-handlers.core). Importing ``alttprbot_racetime.bot`` first walks the chain in
+Importing ``alttprbot.presentation.racetime.handlers.core`` cold triggers a circular import
+(handlers.core -> alttprbot.tournaments -> ... -> alttprbot.presentation.racetime.config ->
+handlers.core). Importing ``alttprbot.presentation.racetime.bot`` first walks the chain in
 the order the running app uses, so the handler modules import cleanly afterward.
 """
 
@@ -18,4 +18,4 @@ for _key, _value in {
     if not getattr(config, _key, None):
         setattr(config, _key, _value)
 
-import alttprbot_racetime.bot  # noqa: E402,F401  (establishes module import order)
+import alttprbot.presentation.racetime.bot  # noqa: E402,F401  (establishes module import order)

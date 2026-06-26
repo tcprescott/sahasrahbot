@@ -12,9 +12,9 @@ import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.services._notify import queue as notify_queue
 from alttprbot.util.config_contract import ConfigValidationError, validate_config_contract
-from alttprbot_api.api import sahasrahbotapi
-from alttprbot_audit.bot import start_bot as start_audit_bot, stop_bot as stop_audit_bot
-from alttprbot_discord.bot import start_bot as start_discord_bot, stop_bot as stop_discord_bot
+from alttprbot.presentation.api.api import sahasrahbotapi
+from alttprbot.presentation.audit.bot import start_bot as start_audit_bot, stop_bot as stop_audit_bot
+from alttprbot.presentation.discord.bot import start_bot as start_discord_bot, stop_bot as stop_discord_bot
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ async def _cancel_tasks(tasks):
 async def _graceful_shutdown(service_tasks):
     logger.info('Graceful shutdown started.')
 
-    from alttprbot_racetime.bot import stop_racetime
+    from alttprbot.presentation.racetime.bot import stop_racetime
 
     with contextlib.suppress(Exception):
         await notify_queue.stop()
@@ -76,7 +76,7 @@ async def _graceful_shutdown(service_tasks):
 
 
 async def _run():
-    from alttprbot_racetime.bot import start_racetime
+    from alttprbot.presentation.racetime.bot import start_racetime
 
     await database()
 

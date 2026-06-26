@@ -5,10 +5,10 @@ from racetime_bot import msg_actions
 from werkzeug.datastructures import MultiDict
 
 from alttprbot import models
-from alttprbot.alttprgen.randomizer import smdash
+from alttprbot.services.seedgen.randomizer import smdash
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
-from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
+from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.discord.util.smvaria_discord import SuperMetroidVariaDiscord
 
 
 # game schedule

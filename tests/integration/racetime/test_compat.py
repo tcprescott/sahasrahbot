@@ -1,11 +1,11 @@
 """Tests for the racetime room-handler lookup helper.
 
-See alttprbot_racetime/compat.py.
+See alttprbot/presentation/racetime/compat.py.
 """
 
 from types import SimpleNamespace
 
-from alttprbot_racetime.compat import HandlerTask, get_room_handler
+from alttprbot.presentation.racetime.compat import HandlerTask, get_room_handler
 
 
 def test_handler_task_holds_fields():

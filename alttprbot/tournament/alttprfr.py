@@ -5,8 +5,8 @@ import discord
 from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util import alttpr_discord
+from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.discord.util import alttpr_discord
 
 
 class ALTTPRFRTournament(ALTTPRTournamentRace):

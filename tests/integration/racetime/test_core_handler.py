@@ -7,12 +7,12 @@ methods under test touch and mock ``send_message``/``set_bot_raceinfo``.
 ``can_monitor(message)`` is ``message.get('is_monitor', False)``, so monitor
 status is controlled by that key.
 
-See alttprbot_racetime/handlers/core.py.
+See alttprbot/presentation/racetime/handlers/core.py.
 """
 
 from unittest.mock import AsyncMock, MagicMock
 
-from alttprbot_racetime.handlers.core import SahasrahBotCoreHandler
+from alttprbot.presentation.racetime.handlers.core import SahasrahBotCoreHandler
 
 MONITOR_MSG = {"is_monitor": True, "user": {"id": "mod", "name": "Mod"}}
 PLAIN_MSG = {"is_monitor": False, "user": {"id": "runner", "name": "Runner"}}

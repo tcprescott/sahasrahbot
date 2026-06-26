@@ -5,8 +5,8 @@ import discord
 from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import speedgaming
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
+from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.racetime import bot as racetime
 
 
 class SGDailyRaceCore(TournamentRace):

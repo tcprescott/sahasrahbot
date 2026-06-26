@@ -1,5 +1,5 @@
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 
 class SMWDETournament(TournamentRace):

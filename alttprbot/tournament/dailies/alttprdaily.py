@@ -3,7 +3,7 @@ import discord
 
 import config
 from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 SG_DISCORD_WEBHOOK = config.SG_DISCORD_WEBHOOK
 

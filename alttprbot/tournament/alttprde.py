@@ -7,10 +7,10 @@
 # from werkzeug.datastructures import MultiDict
 
 # from alttprbot import models
-from alttprbot.alttprgen.generator import ALTTPRPreset
+from alttprbot.services.seedgen.generator import ALTTPRPreset
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 ALTTPRDE_TITLE_MAP = {
     'Open': 'open',

@@ -7,7 +7,7 @@ import config
 from alttprbot import models
 from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttpr_quals
 from alttprbot.tournament import registry_loader
-from alttprbot_racetime import bot as racetimebot
+from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
 

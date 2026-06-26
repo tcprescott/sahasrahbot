@@ -9,11 +9,15 @@ SahasrahBot is a **monolithic async Python application** that generates randomiz
 ```
 sahasrahbot.py (entry point)
 ├── Tortoise ORM init (MySQL)
-├── alttprbot_discord  → Main Discord bot (discord.py v2)
-├── alttprbot_audit    → Audit/moderation Discord bot (separate token)
-├── alttprbot_racetime → RaceTime.gg race bot (racetime-bot SDK)
-└── alttprbot_api      → Web API (Quart)
+├── alttprbot.presentation.discord   → Main Discord bot (discord.py v2)
+├── alttprbot.presentation.audit     → Audit/moderation Discord bot (separate token)
+├── alttprbot.presentation.racetime  → RaceTime.gg race bot (racetime-bot SDK)
+└── alttprbot.presentation.api       → Web API (Quart)
 ```
+
+> The four surfaces were folded into a single `alttprbot/` package under
+> `alttprbot/presentation/` during the three-tier migration (Phase 1). See the
+> Project Structure below and [docs/architecture-layers.md](docs/architecture-layers.md).
 
 All subsystems share the same database connection, ORM models, and utility libraries. They run in a single process intentionally — the Quart API and tournament system need direct access to the live `discordbot` object.
 
@@ -27,7 +31,7 @@ All subsystems share the same database connection, ORM models, and utility libra
 | Migrations | Aerich (`aerich migrate` / `aerich upgrade`) |
 | Entry point | `python sahasrahbot.py` |
 | Config | `config.py` — pydantic-settings, env vars / `.env` file |
-| Tests | No formal test suite; debug mode enables test fixtures |
+| Tests | `pytest` + `pytest-asyncio` (`poetry run pytest`); debug mode also enables test fixtures |
 | Linting | `pycodestyle`, `pylint`, `autopep8` (dev deps) |
 
 ## Project Structure
@@ -35,33 +39,27 @@ All subsystems share the same database connection, ORM models, and utility libra
 ```
 sahasrahbot.py              # Entry point — starts all 4 subsystems
 config.py                   # Runtime config (pydantic-settings, env-backed)
-alttprbot/                  # Core shared library
-  alttprgen/                # Seed generation (presets, providers, reliability)
-  database/                 # Legacy raw SQL modules
-  models/                   # Tortoise ORM models (50+ entities)
-  tournament/               # Tournament handler classes
+alttprbot/                  # Single package — top-level directories ARE the tiers
+  presentation/             # Tier 1 — thin adapters (folded-in surfaces, Phase 1)
+    discord/                #   Main Discord bot (bot.py, cogs/, util/)
+    audit/                  #   Audit Discord bot (separate token, privileged intents)
+    racetime/               #   RaceTime.gg integration (bot.py, core.py, handlers/)
+    api/                    #   Quart web API (api.py, blueprints/, static/, spa/)
+  services/                 # Tier 2 — business logic
+    seedgen/                #   Seed generation, was alttprgen/ (presets, providers)
+    _notify/                #   Fire-and-forget notification queue + presentation gateways
+    audit_service.py        #   AuditService + AuditActions
+  repositories/             # Tier 3 — pure Tortoise CRUD (returns models)
+  models/                   # Tier 4 — Tortoise ORM models (50+ entities, unchanged)
+  database/                 # Legacy raw SQL modules (being retired)
+  tournament/               # Tournament handler classes (moves to services/ in Phase 7)
   util/                     # Shared utilities (telemetry, config contract, etc.)
   exceptions.py             # Custom exception hierarchy
-alttprbot_discord/          # Main Discord bot
-  bot.py                    # Bot startup/shutdown
-  cogs/                     # 20+ command groups (generator, tournament, daily, admin...)
-  util/                     # Discord-specific utilities
-alttprbot_audit/            # Audit Discord bot (separate token, privileged intents)
-  bot.py                    # Audit bot startup
-  cogs/                     # Audit + moderation cogs
-alttprbot_racetime/         # RaceTime.gg integration
-  bot.py                    # RaceTime bot startup
-  core.py                   # Compatibility adapter for official SDK
-  handlers/                 # Per-game-category race handlers (12+)
-alttprbot_api/              # Quart web API
-  api.py                    # App factory
-  blueprints/               # Route groups (presets, tournament, racetime, etc.)
-  templates/                # Jinja2 templates
-  static/                   # Static assets
 presets/                    # YAML preset files for randomizer generation
 config/                     # Tournament YAML config
-migrations/                 # Aerich database migrations (98 files)
+migrations/                 # Aerich database migrations
 helpers/                    # Standalone utility scripts (validation, conversion)
+tests/                      # pytest + pytest-asyncio (unit/, integration/)
 docs/                       # All documentation (context, design, guides, plans, user-guide)
 ```
 

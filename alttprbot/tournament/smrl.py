@@ -4,11 +4,11 @@ import discord
 from racetime_bot import msg_actions
 
 from alttprbot import models
-from alttprbot.alttprgen import smz3multi
-from alttprbot.alttprgen.randomizer import smdash
+from alttprbot.services.seedgen import smz3multi
+from alttprbot.services.seedgen.randomizer import smdash
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
-from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util.smvaria_discord import SuperMetroidVariaDiscord
+from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.discord.util.smvaria_discord import SuperMetroidVariaDiscord
 
 # tournament schedule
 # 1. Multiworld with major/minor split https: // sm.samus.link/

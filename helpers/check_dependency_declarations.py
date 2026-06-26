@@ -11,10 +11,6 @@ PYPROJECT = ROOT / "pyproject.toml"
 
 SOURCE_DIRS = [
     ROOT / "alttprbot",
-    ROOT / "alttprbot_api",
-    ROOT / "alttprbot_audit",
-    ROOT / "alttprbot_discord",
-    ROOT / "alttprbot_racetime",
     ROOT / "helpers",
 ]
 
@@ -58,10 +54,6 @@ MODULE_TO_PACKAGE = {
 IGNORED_MODULES = {
     "config",
     "alttprbot",
-    "alttprbot_api",
-    "alttprbot_audit",
-    "alttprbot_discord",
-    "alttprbot_racetime",
     "migrations",
     "helpers",
     "util",

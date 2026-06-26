@@ -4,7 +4,7 @@ We feed fake message/arg structures to ``ex2_newrace`` and mock the seed
 generator so no real seed is rolled. ``set_bot_raceinfo``/``send_message`` are
 mocked to capture output.
 
-See alttprbot_racetime/handlers/alttpr.py.
+See alttprbot/presentation/racetime/handlers/alttpr.py.
 """
 
 from types import SimpleNamespace
@@ -12,9 +12,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from alttprbot.alttprgen import preset
-from alttprbot_racetime.handlers import alttpr as alttpr_handler
-from alttprbot_racetime.handlers.alttpr import GameHandler
+from alttprbot.services.seedgen import preset
+from alttprbot.presentation.racetime.handlers import alttpr as alttpr_handler
+from alttprbot.presentation.racetime.handlers.alttpr import GameHandler
 
 PLAIN_MSG = {"is_monitor": False, "user": {"id": "runner", "name": "Runner"}}
 

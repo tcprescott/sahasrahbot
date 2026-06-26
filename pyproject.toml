@@ -68,7 +68,7 @@ pythonpath = ["."]
 addopts = "--import-mode=importlib"
 
 [tool.coverage.run]
-source = ["alttprbot", "alttprbot_api", "alttprbot_racetime"]
+source = ["alttprbot"]
 omit = [
     "*/migrations/*",
     "*/tests/*",

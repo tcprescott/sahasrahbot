@@ -1,13 +1,13 @@
 """Route tests for the racetime command-injection endpoint.
 
-See alttprbot_api/blueprints/racetime.py (/api/racetime/cmd).
+See alttprbot/presentation/api/blueprints/racetime.py (/api/racetime/cmd).
 """
 
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
-from alttprbot_api.blueprints import racetime as rt_bp
-from alttprbot_racetime.compat import HandlerTask
+from alttprbot.presentation.api.blueprints import racetime as rt_bp
+from alttprbot.presentation.racetime.compat import HandlerTask
 
 
 def grant_auth(monkeypatch, access=SimpleNamespace(id=1)):

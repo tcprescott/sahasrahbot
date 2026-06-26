@@ -1,7 +1,7 @@
-from alttprbot.alttprgen import generator
+from alttprbot.services.seedgen import generator
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 
 class ALTTPRNoLogicRace(ALTTPRTournamentRace):

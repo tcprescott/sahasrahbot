@@ -1,7 +1,7 @@
 import discord
 
 from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 
 class SMZ3DailyRace(SGDailyRaceCore):

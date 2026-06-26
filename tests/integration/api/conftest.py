@@ -1,6 +1,6 @@
 """Fixtures for Quart API route tests.
 
-``alttprbot_api.api`` builds the Quart app at import time and reads config
+``alttprbot.presentation.api.api`` builds the Quart app at import time and reads config
 (``int(config.DISCORD_CLIENT_ID)``, ``APP_SECRET_KEY``...), so we seed
 placeholder values before importing it. The test client does not trigger
 ``before_serving`` hooks, so no real database connection is opened; every route
@@ -19,7 +19,7 @@ for _key, _value in {
         setattr(config, _key, _value)
 
 import pytest_asyncio  # noqa: E402
-from alttprbot_api.api import sahasrahbotapi  # noqa: E402
+from alttprbot.presentation.api.api import sahasrahbotapi  # noqa: E402
 
 
 @pytest_asyncio.fixture

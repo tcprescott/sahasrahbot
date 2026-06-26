@@ -1,7 +1,7 @@
 from alttprbot.tournament import alttpr
 from alttprbot.tournament.core import TournamentConfig
 # from alttprbot.tournament import alttprleague
-from alttprbot_discord.bot import discordbot
+from alttprbot.presentation.discord.bot import discordbot
 
 
 class TestTournament(alttpr.ALTTPR2024Race):

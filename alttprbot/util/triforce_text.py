@@ -1,7 +1,7 @@
 import random
 
 from alttprbot import models
-from alttprbot.alttprgen import generator
+from alttprbot.services.seedgen import generator
 
 
 async def get_triforce_text_balanced(pool_name: str):

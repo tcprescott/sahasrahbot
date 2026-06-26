@@ -7,10 +7,10 @@ import pytz
 from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot.util import speedgaming, triforce_text
-from alttprbot_api.util import checks
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
-from alttprbot_racetime.core import SahasrahBotRaceTimeBot
+from alttprbot.presentation.api.util import checks
+from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.racetime import bot as racetime
+from alttprbot.presentation.racetime.core import SahasrahBotRaceTimeBot
 
 
 class ALTTPRQualifierRace(TournamentRace):

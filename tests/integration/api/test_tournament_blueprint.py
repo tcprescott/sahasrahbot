@@ -1,12 +1,12 @@
 """Route tests for the tournament blueprint.
 
-See alttprbot_api/blueprints/tournament.py.
+See alttprbot/presentation/api/blueprints/tournament.py.
 """
 
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
-from alttprbot_api.blueprints import tournament as t_bp
+from alttprbot.presentation.api.blueprints import tournament as t_bp
 
 
 def fake_event(submission_form):
