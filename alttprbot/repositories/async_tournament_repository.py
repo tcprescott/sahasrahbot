@@ -25,6 +25,22 @@ class AsyncTournamentRepository:
             await tournament.fetch_related("permalink_pools", "permalink_pools__permalinks")
         return tournament
 
+    # --- permission checks ---
+
+    @staticmethod
+    async def user_has_permission(
+        tournament: models.AsyncTournament, user: models.Users, roles: list
+    ) -> bool:
+        return await tournament.permissions.filter(user=user, role__in=roles).exists()
+
+    @staticmethod
+    async def role_has_permission(
+        tournament: models.AsyncTournament, discord_role_ids: list, roles: list
+    ) -> bool:
+        return await tournament.permissions.filter(
+            discord_role_id__in=discord_role_ids, role__in=roles
+        ).exists()
+
     @staticmethod
     async def get_permalink(
         permalink_id: int, tournament: models.AsyncTournament

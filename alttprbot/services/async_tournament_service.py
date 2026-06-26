@@ -49,6 +49,18 @@ class AsyncTournamentService:
         pydantic = pydantic_queryset_creator(models.AsyncTournamentPermalink)
         return (await pydantic.from_queryset(qs)).json()
 
+    # --- permission checks (the discord guild/member resolution stays in presentation) ---
+
+    async def user_has_permission(
+        self, tournament: models.AsyncTournament, user: models.Users, roles: list
+    ) -> bool:
+        return await self.repository.user_has_permission(tournament, user, roles)
+
+    async def role_has_permission(
+        self, tournament: models.AsyncTournament, discord_role_ids: list, roles: list
+    ) -> bool:
+        return await self.repository.role_has_permission(tournament, discord_role_ids, roles)
+
     # --- data facade (session-auth endpoints shape the JSON themselves) ---
 
     async def get_tournament(self, tournament_id: int) -> Optional[models.AsyncTournament]:
