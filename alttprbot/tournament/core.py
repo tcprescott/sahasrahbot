@@ -7,6 +7,7 @@ import pytz
 
 import config
 from alttprbot import models
+from alttprbot.repositories import TournamentGamesRepository, TournamentResultsRepository
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import speedgaming
 from alttprbot.presentation.discord.bot import discordbot
@@ -152,9 +153,10 @@ class TournamentRace(object):
         tournament_race.rtgg_handler = handler
 
         logging.info(handler.data.get('name'))
-        await models.TournamentResults.update_or_create(srl_id=handler.data.get('name'),
-                                                        defaults={'episode_id': tournament_race.episodeid,
-                                                                  'event': tournament_race.event_slug, 'spoiler': None})
+        await TournamentResultsRepository.upsert_by_srl_id(
+            srl_id=handler.data.get('name'),
+            defaults={'episode_id': tournament_race.episodeid,
+                      'event': tournament_race.event_slug, 'spoiler': None})
 
         for rtggid in tournament_race.player_racetime_ids:
             await handler.invite_user(rtggid)
@@ -238,7 +240,7 @@ class TournamentRace(object):
         if update_episode:
             self.episode = await speedgaming.get_episode(self.episodeid)
 
-        self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
+        self.tournament_game = await TournamentGamesRepository.get_by_episode_id(self.episodeid)
 
         self.rtgg_bot: SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
@@ -455,5 +457,6 @@ class TournamentRace(object):
             logging.info("Sending tournament submit reminder to %s.", name)
             await player.send(msg)
 
-        await models.TournamentGames.update_or_create(episode_id=self.episodeid,
-                                                      defaults={'event': self.event_slug, 'submitted': 1})
+        await TournamentGamesRepository.upsert_by_episode_id(
+            episode_id=self.episodeid,
+            defaults={'event': self.event_slug, 'submitted': 1})

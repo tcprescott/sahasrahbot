@@ -9,6 +9,7 @@ from alttprbot import models
 from alttprbot.repositories import (
     RaceRoomRepository,
     SpoilerRaceRepository,
+    TournamentGamesRepository,
     TournamentResultsRepository,
 )
 
@@ -63,3 +64,29 @@ async def test_tournament_results_get_by_srl_id(tortoise_db):
     await models.TournamentResults.create(srl_id="room-1", event="test")
     found = await TournamentResultsRepository.get_by_srl_id("room-1")
     assert found is not None and found.event == "test"
+
+
+async def test_tournament_results_upsert_by_srl_id(tortoise_db):
+    row, created = await TournamentResultsRepository.upsert_by_srl_id(
+        "room-1", {"episode_id": "42", "event": "alttpr", "spoiler": None}
+    )
+    assert created is True and row.event == "alttpr"
+
+    row2, created2 = await TournamentResultsRepository.upsert_by_srl_id(
+        "room-1", {"event": "smz3"}
+    )
+    assert created2 is False and row2.id == row.id
+    refetched = await TournamentResultsRepository.get_by_srl_id("room-1")
+    assert refetched.event == "smz3" and refetched.episode_id == "42"
+
+
+async def test_tournament_games_get_and_upsert(tortoise_db):
+    assert await TournamentGamesRepository.get_by_episode_id("99") is None
+
+    row, created = await TournamentGamesRepository.upsert_by_episode_id(
+        "99", {"event": "alttpr", "submitted": 1}
+    )
+    assert created is True and row.submitted == 1
+
+    fetched = await TournamentGamesRepository.get_by_episode_id("99")
+    assert fetched is not None and fetched.event == "alttpr"

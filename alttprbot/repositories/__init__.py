@@ -17,6 +17,7 @@ from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRe
 from alttprbot.repositories.preset_repository import PresetRepository
 from alttprbot.repositories.race_room_repository import RaceRoomRepository
 from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
+from alttprbot.repositories.tournament_games_repository import TournamentGamesRepository
 from alttprbot.repositories.tournament_results_repository import TournamentResultsRepository
 
 __all__ = [
@@ -29,5 +30,6 @@ __all__ = [
     "PresetRepository",
     "RaceRoomRepository",
     "SpoilerRaceRepository",
+    "TournamentGamesRepository",
     "TournamentResultsRepository",
 ]
