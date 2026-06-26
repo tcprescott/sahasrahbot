@@ -128,12 +128,24 @@ unit test and a repository round-trip test.
   authz and `util.get_leaderboard` left in place). **No `api/blueprints/*` imports
   `alttprbot.models` — the blueprint burn-down is complete.**
 
+- **Cog burn-down (all active, non-deprecated cogs)** — nickname, generator, inquiry,
+  racetime_tools, tournament, audit, rankedchoice, racer_verification, the api
+  app-factory/auth, the shared `checks.is_async_tournament_user` (permission ORM via
+  service; discord guild/member resolution stays), the `Guild.config_*` monkey-patch
+  (now delegates to GuildConfigService), and `racetime/misc/konot.py` are all off direct
+  ORM. Driven by a parallel analysis workflow (one agent per file) and verified by a
+  parallel adversarial behavior-preservation review (one fix landed: KONOT.resume must
+  re-raise DoesNotExist for the non-KONOT-room control-flow path).
+
 **Remaining (large, incremental-by-design — tackle as focused, reviewed passes):**
-- **Discord cogs + api app-factory/auth/checks** — still on the presentation→models
-  contract: the many discord command cogs (admin, asynctournament, generator, tournament,
-  rankedchoice, …), `presentation/api/{api,auth}.py`, `presentation/api/util/checks.py`
-  (the discord-coupled, shared `is_async_tournament_user`), and `racetime/misc/konot.py`.
-  Each cog is its own vertical (repo + service + rewire), like the blueprints were.
+- **asynctournament discord cog (~1289 lines, 8 models)** — the discord side of the async
+  tournament system (UI Views/Modals, thread creation, tournament/permission/live-race
+  creation). High effort; needs new AsyncTournamentPermissions/LiveRace repos + service
+  methods and careful Views→service boundaries. The only non-deprecated file still on the
+  presentation→models contract.
+- **Deprecated cogs** — `admin` (disabled in bot startup), `smmulti` (multiworld
+  retirement), `voicerole` (behind the role-assignment flag): slated for removal by their
+  own deprecation plans; migrate only if kept.
 - **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
   IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
   per PR. These classes are untested and drive live tournaments; do not rush.
