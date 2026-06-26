@@ -22,6 +22,7 @@ from alttprbot.services.discord_server_service import DiscordServerService
 from alttprbot.services.guild_config_service import GuildConfigService
 from alttprbot.services.inquiry_message_config_service import InquiryMessageConfigService
 from alttprbot.services.konot_service import KONOTService
+from alttprbot.services.multiworld_service import MultiworldService
 from alttprbot.services.nick_verification_service import NickVerificationService
 from alttprbot.services.preset_service import PresetService
 from alttprbot.services.race_room_service import RaceRoomService
@@ -34,6 +35,7 @@ from alttprbot.services.tournament_scheduling_service import TournamentSchedulin
 from alttprbot.services.triforce_text_service import TriforceTextService
 from alttprbot.services.user_service import UserService
 from alttprbot.services.verified_racer_service import VerifiedRacerService
+from alttprbot.services.voice_role_service import VoiceRoleService
 
 __all__ = [
     "AsyncTournamentLiveRaceService",
@@ -48,6 +50,7 @@ __all__ = [
     "GuildConfigService",
     "InquiryMessageConfigService",
     "KONOTService",
+    "MultiworldService",
     "NickVerificationService",
     "PresetService",
     "RaceRoomService",
@@ -60,4 +63,5 @@ __all__ = [
     "TriforceTextService",
     "UserService",
     "VerifiedRacerService",
+    "VoiceRoleService",
 ]

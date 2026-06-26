@@ -19,6 +19,12 @@ class UserService:
     async def get_by_rtgg_id(self, rtgg_id: str) -> Optional[models.Users]:
         return await self.repository.get_by_rtgg_id(rtgg_id)
 
+    async def list_users_without_display_name(self) -> "list[models.Users]":
+        return await self.repository.list_without_display_name()
+
+    async def update_display_name(self, user: models.Users, display_name: str) -> None:
+        await self.repository.set_display_name(user, display_name)
+
     async def get_or_create_by_discord_id(
         self, discord_user_id: int, *, display_name: Optional[str] = None
     ) -> models.Users:

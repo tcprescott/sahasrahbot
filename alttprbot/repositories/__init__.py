@@ -20,6 +20,7 @@ from alttprbot.repositories.discord_server_repository import DiscordServerReposi
 from alttprbot.repositories.guild_config_repository import GuildConfigRepository
 from alttprbot.repositories.inquiry_message_config_repository import InquiryMessageConfigRepository
 from alttprbot.repositories.konot_repository import KONOTRepository
+from alttprbot.repositories.multiworld_repository import MultiworldRepository
 from alttprbot.repositories.nick_verification_repository import NickVerificationRepository
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
@@ -34,6 +35,7 @@ from alttprbot.repositories.tournament_results_repository import TournamentResul
 from alttprbot.repositories.triforce_text_repository import TriforceTextRepository
 from alttprbot.repositories.user_repository import UserRepository
 from alttprbot.repositories.verified_racer_repository import VerifiedRacerRepository
+from alttprbot.repositories.voice_role_repository import VoiceRoleRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
@@ -48,6 +50,7 @@ __all__ = [
     "GuildConfigRepository",
     "InquiryMessageConfigRepository",
     "KONOTRepository",
+    "MultiworldRepository",
     "NickVerificationRepository",
     "PresetNamespaceRepository",
     "PresetRepository",
@@ -62,4 +65,5 @@ __all__ = [
     "TriforceTextRepository",
     "UserRepository",
     "VerifiedRacerRepository",
+    "VoiceRoleRepository",
 ]

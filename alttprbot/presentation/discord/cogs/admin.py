@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot import models
+from alttprbot.services import UserService
 
 
 class Admin(commands.GroupCog, name="admin"):
@@ -16,7 +16,7 @@ class Admin(commands.GroupCog, name="admin"):
             return
 
         await interaction.response.defer(ephemeral=True)
-        users = await models.Users.filter(discord_user_id__isnull=False, display_name__isnull=True)
+        users = await UserService().list_users_without_display_name()
 
         updated = 0
 
@@ -26,8 +26,7 @@ class Admin(commands.GroupCog, name="admin"):
             except discord.NotFound:
                 continue
 
-            user.display_name = member.display_name
-            await user.save()
+            await UserService().update_display_name(user, member.display_name)
             updated += 1
 
         await interaction.followup.send(f"Done. Performed {updated} changes.", ephemeral=True)

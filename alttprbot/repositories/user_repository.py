@@ -19,6 +19,15 @@ class UserRepository:
         return await models.Users.get_or_none(id=user_id)
 
     @staticmethod
+    async def list_without_display_name() -> "list[models.Users]":
+        return await models.Users.filter(discord_user_id__isnull=False, display_name__isnull=True)
+
+    @staticmethod
+    async def set_display_name(user: models.Users, display_name: str) -> None:
+        user.display_name = display_name
+        await user.save()
+
+    @staticmethod
     async def get_or_create_by_discord_id(
         discord_user_id: int, *, display_name: Optional[str] = None
     ) -> Tuple[models.Users, bool]:

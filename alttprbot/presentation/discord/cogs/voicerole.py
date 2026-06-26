@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 import config
-from alttprbot.models.models import VoiceRole as VoiceRoleModel
+from alttprbot.services import VoiceRoleService
 
 
 DEPRECATION_MESSAGE = """
@@ -28,7 +28,7 @@ class VoiceRole(commands.Cog):
         if not getattr(config, 'DISCORD_ROLE_ASSIGNMENT_ENABLED', True):
             return
         
-        vc_roles = await VoiceRoleModel.filter(guild_id=member.guild.id)
+        vc_roles = await VoiceRoleService().list_for_guild(member.guild.id)
 
         if after.channel is not None and before.channel is not None:
             if after.channel.id == before.channel.id:
