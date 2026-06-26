@@ -19,6 +19,7 @@ from alttprbot.services.daily_service import DailyService
 from alttprbot.services.discord_server_service import DiscordServerService
 from alttprbot.services.guild_config_service import GuildConfigService
 from alttprbot.services.inquiry_message_config_service import InquiryMessageConfigService
+from alttprbot.services.konot_service import KONOTService
 from alttprbot.services.nick_verification_service import NickVerificationService
 from alttprbot.services.preset_service import PresetService
 from alttprbot.services.race_room_service import RaceRoomService
@@ -42,6 +43,7 @@ __all__ = [
     "DiscordServerService",
     "GuildConfigService",
     "InquiryMessageConfigService",
+    "KONOTService",
     "NickVerificationService",
     "PresetService",
     "RaceRoomService",

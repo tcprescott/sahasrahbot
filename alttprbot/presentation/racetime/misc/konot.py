@@ -1,17 +1,18 @@
-from alttprbot import models
+from alttprbot.services import KONOTService
 
 
 class KONOT(object):
     def __init__(self, rtgg_handler):
         self.rtgg_handler = rtgg_handler
-        self.game: models.RacetimeKONOTGame = None
-        self.segment: models.RaceTimeKONOTSegment = None
+        self.game = None
+        self.segment = None
 
     @classmethod
     async def create_new(cls, category, rtgg_handler):
         konot = cls(rtgg_handler)
-        konot.game = await models.RacetimeKONOTGame.create(category_slug=category)
-        konot.segment = await models.RaceTimeKONOTSegment.create(
+        service = KONOTService()
+        konot.game = await service.create_game(category)
+        konot.segment = await service.create_segment(
             racetime_room=rtgg_handler.data.get('name'),
             game_id=konot.game.id,
             segment_number=1
@@ -21,15 +22,16 @@ class KONOT(object):
     @classmethod
     async def resume(cls, rtgg_handler):
         konot = cls(rtgg_handler)
-        konot.segment = await models.RaceTimeKONOTSegment.get(racetime_room=rtgg_handler.data.get('name'))
-        konot.game = await models.RacetimeKONOTGame.get(id=konot.segment.game_id)
+        service = KONOTService()
+        konot.segment = await service.get_segment_by_room(rtgg_handler.data.get('name'))
+        konot.game = await service.get_game(konot.segment.game_id)
         return konot
 
     @classmethod
-    async def next_segment(cls, rtgg_handler, game: models.RacetimeKONOTGame, segment_number):
+    async def next_segment(cls, rtgg_handler, game, segment_number):
         konot = cls(rtgg_handler)
         konot.game = game
-        konot.segment = await models.RaceTimeKONOTSegment.create(
+        konot.segment = await KONOTService().create_segment(
             racetime_room=rtgg_handler.data.get('name'),
             game_id=konot.game.id,
             segment_number=segment_number

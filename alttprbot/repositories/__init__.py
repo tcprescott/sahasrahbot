@@ -17,6 +17,7 @@ from alttprbot.repositories.daily_repository import DailyRepository
 from alttprbot.repositories.discord_server_repository import DiscordServerRepository
 from alttprbot.repositories.guild_config_repository import GuildConfigRepository
 from alttprbot.repositories.inquiry_message_config_repository import InquiryMessageConfigRepository
+from alttprbot.repositories.konot_repository import KONOTRepository
 from alttprbot.repositories.nick_verification_repository import NickVerificationRepository
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
@@ -42,6 +43,7 @@ __all__ = [
     "DiscordServerRepository",
     "GuildConfigRepository",
     "InquiryMessageConfigRepository",
+    "KONOTRepository",
     "NickVerificationRepository",
     "PresetNamespaceRepository",
     "PresetRepository",
