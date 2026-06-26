@@ -145,10 +145,23 @@ unit test and a repository round-trip test.
   forced a fix to a scripted-transform regex over-match). **No non-deprecated presentation
   file imports `alttprbot.models` — the active cog burn-down is complete.**
 
-**Remaining (large, incremental-by-design — tackle as focused, reviewed passes):**
-- **Deprecated cogs** — `admin` (disabled in bot startup), `smmulti` (multiworld
-  retirement), `voicerole` (behind the role-assignment flag): still import models but are
-  slated for removal by their own deprecation plans; migrate only if kept.
+- **Deprecated cogs (admin / smmulti / voicerole)** — migrated anyway (kept indefinitely):
+  UserRepository extensions, new VoiceRoleRepository/Service and MultiworldRepository/Service.
+
+**MILESTONE — the `presentation → models` contract (Contract 3) is KEPT.** Across the whole
+tree, NO presentation file imports `alttprbot.models`; every surface goes through a service.
+
+**Remaining (the other two contracts — service-tier couplings):**
+- **Contract 1 (three-tier layering) + Contract 2 (core must not import UI)** are still
+  BROKEN, driven by: (a) `services/seedgen/generator.py` importing the discord embed utils
+  (`presentation/discord/util/*_discord.py`) — the seed-embed coupling (extract a neutral
+  SeedResult; only the discord layer builds embeds); (b) the **tournament god-object**
+  (`alttprbot/tournament/`) importing the discord/racetime bot singletons + building embeds
+  — the full orchestrator/presenter/gateway/config decomposition (relocate to
+  `services/tournament/`, one subclass per PR).
+- **Phase 9 util split**, then **Phase 10**: retire the guild-config monkey-patch + legacy
+  `database/config.py`, flip all import-linter contracts to blocking + set
+  `SAHASRAHBOT_HOOKS_ENFORCE=1`.
 - **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
   IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
   per PR. These classes are untested and drive live tournaments; do not rush.
