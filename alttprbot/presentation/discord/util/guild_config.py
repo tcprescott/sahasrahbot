@@ -1,48 +1,36 @@
-import aiocache
-import tortoise.exceptions
+"""Legacy ``Guild.config_*`` monkey-patch — now a thin shim over GuildConfigService.
+
+The four methods are still attached to ``discord.Guild`` for the many existing
+callers, but all storage now flows through the canonical GuildConfigService
+(Tier 2) + GuildConfigRepository (Tier 3). Slated for removal once the remaining
+callers (audit/misc/tournament) call the service directly (Phase 10).
+
+``CACHE`` is re-exported as the service's shared cache so the legacy
+``alttprbot.database.config`` module stays cache-coherent with the service.
+"""
+
 from discord.guild import Guild
 
-from alttprbot import models
+from alttprbot.services import GuildConfigService
+from alttprbot.services.guild_config_service import GUILD_CONFIG_CACHE
 
-CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
+CACHE = GUILD_CONFIG_CACHE
 
 
 async def config_set(self, parameter, value):
-    await models.Config.update_or_create(guild_id=self.id, parameter=parameter, defaults={'value': value})
-    await CACHE.delete(f'{parameter}_{self.id}_config')
-    await CACHE.delete(f'{self.id}_guildconfig')
+    await GuildConfigService().set(self.id, parameter, value)
 
 
 async def config_get(self, parameter, default=None):
-    if await CACHE.exists(f'{parameter}_{self.id}_config'):
-        value = await CACHE.get(f'{parameter}_{self.id}_config')
-        return value
-
-    try:
-        result = await models.Config.get(guild_id=self.id, parameter=parameter)
-        await CACHE.set(f'{parameter}_{self.id}_config', result.value)
-        await CACHE.delete(f'{self.id}_guildconfig')
-        return result.value
-    except tortoise.exceptions.DoesNotExist:
-        await CACHE.set(f'{parameter}_{self.id}_config', default)
-        await CACHE.delete(f'{self.id}_guildconfig')
-        return default
+    return await GuildConfigService().get(self.id, parameter, default)
 
 
 async def config_delete(self, parameter):
-    await models.Config.filter(guild_id=self.id, parameter=parameter).delete()
-    await CACHE.delete(f'{parameter}_{self.id}_config')
-    await CACHE.delete(f'{self.id}_guildconfig')
+    await GuildConfigService().delete(self.id, parameter)
 
 
 async def config_list(self):
-    if await CACHE.exists(f'{self.id}_guildconfig'):
-        values = await CACHE.get(f'{self.id}_guildconfig')
-        return values
-
-    values = await models.Config.filter(guild_id=self.id).values()
-    await CACHE.set(f'{self.id}_guildconfig', values)
-    return values
+    return await GuildConfigService().list(self.id)
 
 
 def init():

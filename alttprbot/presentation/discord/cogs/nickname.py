@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 import config
-from alttprbot import models
+from alttprbot.services import UserService
 
 APP_URL = config.APP_URL
 
@@ -29,7 +29,7 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
             await interaction.guild.chunk(cache=True)
 
         for member in role.members:
-            result = await models.Users.get_or_none(discord_user_id=member.id)
+            result = await UserService().get_by_discord_id(member.id)
             if result is None or result.rtgg_id is None:
                 try:
                     await member.send(
@@ -64,7 +64,7 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
             await interaction.guild.chunk(cache=True)
 
         for member in role.members:
-            result = await models.Users.get_or_none(discord_user_id=member.id)
+            result = await UserService().get_by_discord_id(member.id)
             if result is None or result.rtgg_id is None:
                 msg.append(f"{member.name}#{member.discriminator}")
 
