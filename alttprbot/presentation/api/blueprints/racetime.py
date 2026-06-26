@@ -6,7 +6,7 @@ from quart import Blueprint, abort, jsonify, redirect, request
 from alttprbot.presentation.api.oauth_client import requires_authorization
 
 import config
-from alttprbot import models
+from alttprbot.services import AuthorizationService, UserService
 from alttprbot.presentation.api.api import discord
 from alttprbot.presentation.racetime import bot as racetimebot
 from alttprbot.presentation.racetime.compat import get_room_handler
@@ -28,9 +28,7 @@ async def bot_command():
     cmd = data['cmd']
     auth_key = request.args['auth_key']
 
-    access = await models.AuthorizationKeyPermissions.get_or_none(auth_key__key=auth_key, type='racetimecmd',
-                                                                  subtype=category)
-    if access is None:
+    if not await AuthorizationService().is_racetime_cmd_authorized(auth_key, category):
         return abort(403)
 
     racetime_bot = racetimebot.racetime_bots.get(category)
@@ -116,41 +114,11 @@ async def return_racetime_verify():
 
     rtgg_id = userinfo_data['id']
 
-    # we need to test if the user has a rtgg_id but no discord_user_id and handle that case
-    # this is really ugly and needs to be refactored
-    rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
-    discord_user = await models.Users.get_or_none(discord_user_id=user.id)
-    if not rtgg_user == discord_user and rtgg_user is not None and discord_user is not None:
-        kept_user = await merge_users(rtgg_user, discord_user)
-        kept_user.display_name = user.name
-        await kept_user.save()
-    elif rtgg_user is None:
-        await models.Users.update_or_create(discord_user_id=user.id,
-                                            defaults={'rtgg_id': userinfo_data['id'], 'rtgg_access_token': token,
-                                                      'display_name': user.name})
-    else:
-        await models.Users.update_or_create(rtgg_id=rtgg_id,
-                                            defaults={'discord_user_id': user.id, 'rtgg_access_token': token,
-                                                      'display_name': user.name})
+    await UserService().link_racetime_account(
+        discord_user_id=user.id,
+        display_name=user.name,
+        rtgg_id=rtgg_id,
+        access_token=token,
+    )
 
     return redirect(f"/racetime/verified?name={quote(userinfo_data['name'])}&success=true")
-
-
-async def merge_users(user_to_keep: models.Users, victim: models.Users):
-    if victim.discord_user_id:
-        user_to_keep.discord_user_id = victim.discord_user_id
-    if victim.rtgg_id:
-        user_to_keep.rtgg_id = victim.rtgg_id
-
-    # update everything to the new user
-    # we should be figuring this out dynamically by looking at the models
-    await models.AsyncTournamentAuditLog.filter(user=victim).update(user=user_to_keep)
-    await models.AsyncTournamentPermissions.filter(user=victim).update(user=user_to_keep)
-    await models.AsyncTournamentRace.filter(user=victim).update(user=user_to_keep)
-    await models.AsyncTournamentRace.filter(reviewed_by=victim).update(reviewed_by=user_to_keep)
-    await models.AsyncTournamentReviewNotes.filter(author=victim).update(author=user_to_keep)
-
-    await victim.delete()
-    await user_to_keep.save()
-
-    return user_to_keep

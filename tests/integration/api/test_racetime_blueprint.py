@@ -8,17 +8,18 @@ from unittest.mock import AsyncMock
 
 from alttprbot.presentation.api.blueprints import racetime as rt_bp
 from alttprbot.presentation.racetime.compat import HandlerTask
+from alttprbot.repositories import AuthorizationKeyRepository
 
 
 def grant_auth(monkeypatch, access=SimpleNamespace(id=1)):
     mock = AsyncMock(return_value=access)
-    monkeypatch.setattr(rt_bp.models.AuthorizationKeyPermissions, "get_or_none", mock)
+    monkeypatch.setattr(AuthorizationKeyRepository, "get_permission", mock)
     return mock
 
 
 async def test_invalid_auth_key_returns_403(client, monkeypatch):
     auth_mock = AsyncMock(return_value=None)
-    monkeypatch.setattr(rt_bp.models.AuthorizationKeyPermissions, "get_or_none", auth_mock)
+    monkeypatch.setattr(AuthorizationKeyRepository, "get_permission", auth_mock)
     resp = await client.post(
         "/api/racetime/cmd?auth_key=bad",
         json={"category": "alttpr", "room": "r1", "cmd": "!help"},
@@ -26,7 +27,7 @@ async def test_invalid_auth_key_returns_403(client, monkeypatch):
     assert resp.status_code == 403
     # Authorization is scoped per category/type: pin the exact lookup so a
     # broadening regression (dropping subtype, swapping type) would fail.
-    auth_mock.assert_awaited_once_with(auth_key__key="bad", type="racetimecmd", subtype="alttpr")
+    auth_mock.assert_awaited_once_with("bad", "racetimecmd", "alttpr")
 
 
 async def test_unhandled_room_returns_404(client, monkeypatch):

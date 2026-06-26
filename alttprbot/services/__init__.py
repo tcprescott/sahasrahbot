@@ -12,6 +12,7 @@ class here.
 """
 
 from alttprbot.services.audit_service import AuditActions, AuditService
+from alttprbot.services.authorization_service import AuthorizationService
 from alttprbot.services.daily_service import DailyService
 from alttprbot.services.discord_server_service import DiscordServerService
 from alttprbot.services.guild_config_service import GuildConfigService
@@ -22,10 +23,12 @@ from alttprbot.services.spoiler_race_service import SpoilerRaceService
 from alttprbot.services.tournament_games_service import TournamentGamesService
 from alttprbot.services.tournament_results_service import TournamentResultsService
 from alttprbot.services.triforce_text_service import TriforceTextService
+from alttprbot.services.user_service import UserService
 
 __all__ = [
     "AuditActions",
     "AuditService",
+    "AuthorizationService",
     "DailyService",
     "DiscordServerService",
     "GuildConfigService",
@@ -36,4 +39,5 @@ __all__ = [
     "TournamentGamesService",
     "TournamentResultsService",
     "TriforceTextService",
+    "UserService",
 ]

@@ -10,6 +10,7 @@ Add new repositories as ``<name>_repository.py`` and export the class here.
 
 from alttprbot.repositories.audit_generated_games_repository import AuditGeneratedGamesRepository
 from alttprbot.repositories.async_tournament_audit_log_repository import AsyncTournamentAuditLogRepository
+from alttprbot.repositories.authorization_key_repository import AuthorizationKeyRepository
 from alttprbot.repositories.daily_repository import DailyRepository
 from alttprbot.repositories.discord_server_repository import DiscordServerRepository
 from alttprbot.repositories.guild_config_repository import GuildConfigRepository
@@ -21,10 +22,12 @@ from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
 from alttprbot.repositories.tournament_games_repository import TournamentGamesRepository
 from alttprbot.repositories.tournament_results_repository import TournamentResultsRepository
 from alttprbot.repositories.triforce_text_repository import TriforceTextRepository
+from alttprbot.repositories.user_repository import UserRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
     "AsyncTournamentAuditLogRepository",
+    "AuthorizationKeyRepository",
     "DailyRepository",
     "DiscordServerRepository",
     "GuildConfigRepository",
@@ -36,4 +39,5 @@ __all__ = [
     "TournamentGamesRepository",
     "TournamentResultsRepository",
     "TriforceTextRepository",
+    "UserRepository",
 ]
