@@ -53,3 +53,13 @@ async def test_record_async_event_maps_actor_to_user_id():
         user_id=42,
         details="finished in 1:23:45",
     )
+
+
+def test_audit_action_constants_are_stable():
+    # Pin the verb.object action strings; a typo/swap here would silently
+    # mislabel audit-log rows.
+    assert AuditActions.GAME_GENERATED == "game.generated"
+    assert AuditActions.ASYNC_RACE_STARTED == "async.race_started"
+    assert AuditActions.ASYNC_RACE_FINISHED == "async.race_finished"
+    assert AuditActions.ASYNC_RACE_FORFEITED == "async.race_forfeited"
+    assert AuditActions.ASYNC_RACE_REVIEWED == "async.race_reviewed"

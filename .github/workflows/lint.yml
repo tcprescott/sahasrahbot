@@ -24,4 +24,4 @@ jobs:
         continue-on-error: true
         run: poetry run lint-imports
       - name: Run tests
-        run: poetry run pytest -q
+        run: poetry run pytest -q --cov --cov-report=term-missing

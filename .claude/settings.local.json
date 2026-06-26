@@ -1,18 +1,4 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      { "matcher": "Write|Edit", "hooks": [
-        { "type": "command", "command": "python3 .claude/scripts/enforce_architecture.py", "timeout": 10 } ] }
-    ],
-    "PostToolUse": [
-      { "matcher": "Write|Edit", "hooks": [
-        { "type": "command", "command": "python3 .claude/scripts/enforce_no_orm_writes.py", "timeout": 10 },
-        { "type": "command", "command": "python3 .claude/scripts/check_layer_exports.py", "timeout": 10 } ] }
-    ],
-    "SessionStart": [
-      { "hooks": [ { "type": "command", "command": ".claude/hooks/session-start.sh", "timeout": 10 } ] }
-    ]
-  },
   "permissions": {
     "allow": [
       "mcp__chrome-devtools__take_screenshot",
@@ -28,7 +14,54 @@
       "Bash(pnpm -v)",
       "Bash(echo \"pnpm: $\\(pnpm -v 2>/dev/null || echo MISSING\\)\")",
       "Bash(yarn -v)",
-      "Bash(docker compose exec -T racetime.web python manage.py shell -c ' *)"
+      "Bash(docker compose exec -T racetime.web python manage.py shell -c ' *)",
+      "Bash(poetry run *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "sentry"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/scripts/enforce_architecture.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/scripts/enforce_no_orm_writes.py",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/scripts/check_layer_exports.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-start.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

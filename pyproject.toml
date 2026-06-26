@@ -56,12 +56,24 @@ autopep8 = "^2.0.1"
 ipython = "^8.10.0"
 pytest = "*"
 pytest-asyncio = "*"
+pytest-cov = "*"
 import-linter = "*"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["."]
+# importlib mode lets nested test packages share basenames (e.g. several
+# test_core.py) without colliding and without needing __init__.py files.
+addopts = "--import-mode=importlib"
+
+[tool.coverage.run]
+source = ["alttprbot", "alttprbot_api", "alttprbot_racetime"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "helpers/*",
+]
 
 [tool.importlinter]
 root_package = "alttprbot"
