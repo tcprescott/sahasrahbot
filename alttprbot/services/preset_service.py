@@ -108,3 +108,7 @@ class PresetService:
 
     async def list_namespaces_with_presets(self, randomizer: str) -> List[models.PresetNamespaces]:
         return await self.namespaces.list_all_with_presets_for_randomizer(randomizer)
+
+    async def delete_namespaces_for_user(self, discord_user_id: int) -> int:
+        """Delete all of a user's preset namespaces (account-data purge)."""
+        return await self.namespaces.delete_by_discord_id(discord_user_id)

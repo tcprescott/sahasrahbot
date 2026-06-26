@@ -15,6 +15,7 @@ from alttprbot.repositories.authorization_key_repository import AuthorizationKey
 from alttprbot.repositories.daily_repository import DailyRepository
 from alttprbot.repositories.discord_server_repository import DiscordServerRepository
 from alttprbot.repositories.guild_config_repository import GuildConfigRepository
+from alttprbot.repositories.nick_verification_repository import NickVerificationRepository
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
 from alttprbot.repositories.race_room_repository import RaceRoomRepository
@@ -33,6 +34,7 @@ __all__ = [
     "DailyRepository",
     "DiscordServerRepository",
     "GuildConfigRepository",
+    "NickVerificationRepository",
     "PresetNamespaceRepository",
     "PresetRepository",
     "RaceRoomRepository",

@@ -7,6 +7,10 @@ from alttprbot import models
 
 class AuditGeneratedGamesRepository:
     @staticmethod
+    async def get_by_hash_id(hash_id: str) -> Optional[models.AuditGeneratedGames]:
+        return await models.AuditGeneratedGames.get_or_none(hash_id=hash_id)
+
+    @staticmethod
     async def record(
         *,
         randomizer: Optional[str],

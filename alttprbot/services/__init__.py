@@ -17,6 +17,7 @@ from alttprbot.services.authorization_service import AuthorizationService
 from alttprbot.services.daily_service import DailyService
 from alttprbot.services.discord_server_service import DiscordServerService
 from alttprbot.services.guild_config_service import GuildConfigService
+from alttprbot.services.nick_verification_service import NickVerificationService
 from alttprbot.services.preset_service import PresetService
 from alttprbot.services.race_room_service import RaceRoomService
 from alttprbot.services.ranked_choice_service import RankedChoiceService
@@ -34,6 +35,7 @@ __all__ = [
     "DailyService",
     "DiscordServerService",
     "GuildConfigService",
+    "NickVerificationService",
     "PresetService",
     "RaceRoomService",
     "RankedChoiceService",

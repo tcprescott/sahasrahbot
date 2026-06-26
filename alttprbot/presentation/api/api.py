@@ -7,7 +7,7 @@ from quart import (Quart, abort, jsonify, redirect, request,
                    session, url_for, send_from_directory)
 
 import config
-from alttprbot import models
+from alttprbot.services import NickVerificationService, PresetService
 from alttprbot.presentation.discord.bot import discordbot
 
 logger = logging.getLogger(__name__)
@@ -122,8 +122,8 @@ async def purge_me_action():
     payload = await request.get_json(force=True) or {}
 
     if payload.get('confirmpurge', 'no') == 'yes':
-        await models.PresetNamespaces.filter(discord_user_id=user.id).delete()
-        await models.NickVerification.filter(discord_user_id=user.id).delete()
+        await PresetService().delete_namespaces_for_user(user.id)
+        await NickVerificationService().delete_for_user(user.id)
         return jsonify(success=True, redirect='/logout/')
 
     return jsonify(success=False, redirect='/me')

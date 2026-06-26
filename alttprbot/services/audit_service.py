@@ -33,6 +33,10 @@ class AuditService:
         self.generated_games_repository = AuditGeneratedGamesRepository()
         self.async_log_repository = AsyncTournamentAuditLogRepository()
 
+    async def get_generated_game_by_hash_id(self, hash_id: str):
+        """Look up a previously generated game by its hash (for verification)."""
+        return await self.generated_games_repository.get_by_hash_id(hash_id)
+
     async def record_generated_game(
         self,
         *,

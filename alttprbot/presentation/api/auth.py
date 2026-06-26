@@ -6,7 +6,7 @@ from functools import wraps
 from quart import request
 from quart.wrappers import Response
 
-from alttprbot import models
+from alttprbot.services import AuthorizationService
 
 
 def authorized_key(auth_key_type):
@@ -17,8 +17,7 @@ def authorized_key(auth_key_type):
             if auth_key is None:
                 return Response(status=401)
 
-            access = await models.AuthorizationKeyPermissions.get_or_none(auth_key__key=auth_key, type=auth_key_type)
-            if access is None:
+            if not await AuthorizationService().is_api_authorized(auth_key, auth_key_type):
                 return Response(status=401)
 
             return await func(*args, **kwargs)

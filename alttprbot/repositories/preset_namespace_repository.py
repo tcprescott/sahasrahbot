@@ -20,6 +20,10 @@ class PresetNamespaceRepository:
         return namespace
 
     @staticmethod
+    async def delete_by_discord_id(discord_user_id: int) -> int:
+        return await models.PresetNamespaces.filter(discord_user_id=discord_user_id).delete()
+
+    @staticmethod
     async def get_or_create_by_user(
         *, discord_user_id: int, name: str
     ) -> Tuple[models.PresetNamespaces, bool]:
