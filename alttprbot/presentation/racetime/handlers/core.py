@@ -8,8 +8,12 @@ import discord.utils
 import tortoise.exceptions
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
-from alttprbot import models
 from alttprbot import tournaments
+from alttprbot.services import (
+    RaceRoomService,
+    SpoilerRaceService,
+    TournamentResultsService,
+)
 from alttprbot.presentation.discord.bot import discordbot
 from alttprbot.presentation.racetime.misc.konot import KONOT
 
@@ -23,7 +27,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     konot: KONOT = None
     status = None
     unlisted = False
-    spoiler_race: models.SpoilerRaces = None
+    spoiler_race = None
 
     def __init__(self, bot=None, **kwargs):
         self.bot = bot
@@ -41,9 +45,7 @@ class SahasrahBotCoreHandler(RaceHandler):
         await self.setup_spoiler_race()
 
     async def setup_spoiler_race(self):
-        self.spoiler_race = await models.SpoilerRaces.get_or_none(
-            srl_id=self.data.get('name')
-        )
+        self.spoiler_race = await SpoilerRaceService().get_for_room(self.data.get('name'))
 
         if self.spoiler_race is None:
             return
@@ -67,8 +69,7 @@ class SahasrahBotCoreHandler(RaceHandler):
         if self.spoiler_race is None:
             return
 
-        self.spoiler_race.started = datetime.utcnow()
-        await self.spoiler_race.save(update_fields=['started'])
+        await SpoilerRaceService().mark_started(self.spoiler_race)
         await self.send_message('Sending spoiler log...')
         await self.send_message('---------------')
         await self.send_message(f"This race\'s spoiler log: {self.spoiler_race.spoiler_url}")
@@ -110,25 +111,23 @@ class SahasrahBotCoreHandler(RaceHandler):
             await asyncio.sleep(.1 if timeleft <= 10 else 1)
 
     async def schedule_spoiler_race(self, spoiler_url: str, studytime: int):
-        self.spoiler_race, _ = await models.SpoilerRaces.update_or_create(
+        self.spoiler_race = await SpoilerRaceService().schedule(
             srl_id=self.data.get('name'),
-            defaults={
-                'spoiler_url': spoiler_url,
-                'studytime': studytime,
-            }
+            spoiler_url=spoiler_url,
+            studytime=studytime,
         )
         return self.spoiler_race
 
     async def delete_spoiler_race(self):
         if self.spoiler_race:
-            await self.spoiler_race.delete()
+            await SpoilerRaceService().delete(self.spoiler_race)
         self.spoiler_race = None
 
     async def setup_tournament(self):
         if self.tournament:
             return
 
-        race = await models.TournamentResults.get_or_none(srl_id=self.data.get('name'))
+        race = await TournamentResultsService().get_by_srl_id(self.data.get('name'))
         if not race:
             return
 
@@ -191,10 +190,9 @@ class SahasrahBotCoreHandler(RaceHandler):
         unlisted = self.data.get('unlisted', False)
         if unlisted != self.unlisted:
             if unlisted:
-                await models.RTGGUnlistedRooms.update_or_create(room_name=self.data.get('name'),
-                                                                defaults={'category': self.bot.category_slug})
+                await RaceRoomService().set_unlisted(self.data.get('name'), self.bot.category_slug)
             else:
-                await models.RTGGUnlistedRooms.filter(room_name=self.data.get('name')).delete()
+                await RaceRoomService().clear_unlisted(self.data.get('name'))
         self.unlisted = unlisted
 
     # TODO: this should be implemented in the base class
@@ -355,7 +353,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     async def ex_override(self, args, message):
         racetime_id = message.get('user', {}).get('id', None)
         racetime_category = self.data['category']['slug']
-        whitelisted_user = await models.RTGGOverrideWhitelist.get_or_none(racetime_id=racetime_id, category=racetime_category)
+        whitelisted_user = await RaceRoomService().get_override_whitelist(racetime_id, racetime_category)
 
         if whitelisted_user is None:
             await self.send_message("You do not have permission to override the stream requirement for this category.  Please contact a category owner if you need this to be changed.")

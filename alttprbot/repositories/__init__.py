@@ -15,6 +15,9 @@ from alttprbot.repositories.discord_server_repository import DiscordServerReposi
 from alttprbot.repositories.guild_config_repository import GuildConfigRepository
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
+from alttprbot.repositories.race_room_repository import RaceRoomRepository
+from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
+from alttprbot.repositories.tournament_results_repository import TournamentResultsRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
@@ -24,4 +27,7 @@ __all__ = [
     "GuildConfigRepository",
     "PresetNamespaceRepository",
     "PresetRepository",
+    "RaceRoomRepository",
+    "SpoilerRaceRepository",
+    "TournamentResultsRepository",
 ]

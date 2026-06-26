@@ -9,7 +9,7 @@ from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt, wait_exponential)
 
 import config
-from alttprbot import models
+from alttprbot.services import RaceRoomService
 from alttprbot.presentation.racetime.compat import HandlerTask, get_room_handler
 
 RACETIME_HOST = config.RACETIME_HOST
@@ -381,7 +381,7 @@ class SahasrahBotRaceTimeBot(Bot):
         self._create_background_task(self.reauthorize())
         self._create_background_task(self.refresh_races())
 
-        unlisted_rooms = await models.RTGGUnlistedRooms.filter(category=self.category_slug)
+        unlisted_rooms = await RaceRoomService().list_unlisted_for_category(self.category_slug)
         for unlisted_room in unlisted_rooms:
             try:
                 race_data = None
