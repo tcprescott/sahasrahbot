@@ -18,4 +18,3 @@ utils/enemizer/ubuntu*
 # Config stub for development
 config_stub.py
 config.backup.py
-.claude/worktrees/
