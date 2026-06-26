@@ -148,20 +148,31 @@ unit test and a repository round-trip test.
 - **Deprecated cogs (admin / smmulti / voicerole)** — migrated anyway (kept indefinitely):
   UserRepository extensions, new VoiceRoleRepository/Service and MultiworldRepository/Service.
 
-**MILESTONE — the `presentation → models` contract (Contract 3) is KEPT.** Across the whole
-tree, NO presentation file imports `alttprbot.models`; every surface goes through a service.
+- **Seed-embed extraction (Phase 6 completion)** — done: the `*Discord` seed-wrapper classes
+  split into `services/seedgen/seedclasses.py` (`*Seed` = client + `__init__` + `generated_goal`,
+  no discord) and `presentation/discord/util/seed_embeds.py` (embed bodies as functions +
+  `seed_embed`/`seed_tournament_embed` isinstance dispatchers replacing the old `seed.embed()`
+  method polymorphism). 15 consumers rewired; 5 old `*_discord.py` deleted. All 9 embed bodies
+  confirmed byte-identical by mechanical diff; a 3-agent adversarial review caught one real
+  runtime bug (`kisspriest` called the moved `build_file_select_code`).
 
-**Remaining (the other two contracts — service-tier couplings):**
-- **Contract 1 (three-tier layering) + Contract 2 (core must not import UI)** are still
-  BROKEN, driven by: (a) `services/seedgen/generator.py` importing the discord embed utils
-  (`presentation/discord/util/*_discord.py`) — the seed-embed coupling (extract a neutral
-  SeedResult; only the discord layer builds embeds); (b) the **tournament god-object**
-  (`alttprbot/tournament/`) importing the discord/racetime bot singletons + building embeds
-  — the full orchestrator/presenter/gateway/config decomposition (relocate to
-  `services/tournament/`, one subclass per PR).
-- **Phase 9 util split**, then **Phase 10**: retire the guild-config monkey-patch + legacy
-  `database/config.py`, flip all import-linter contracts to blocking + set
-  `SAHASRAHBOT_HOOKS_ENFORCE=1`.
+**★ MILESTONE — import-linter reports 3 kept, 0 broken: the entire enforced contract suite is
+green.** Presentation imports no models; services/repositories import no UI; layering holds.
+(The tournament god-object at `alttprbot/tournament/` still imports presentation, but it is
+**untiered** — outside the `services`/`presentation` path prefixes the contracts govern — so
+it does not violate them until its decomposition relocates it into `services/tournament/`.)
+
+**Remaining (no longer contract violations — architectural debt + final enforcement):**
+- **Tournament decomposition** — the `alttprbot/tournament/` god-object (imports the
+  discord/racetime bot singletons, builds embeds, direct ORM in subclasses). Full
+  orchestrator/presenter/gateway/config split, relocate to `services/tournament/`, one
+  subclass per PR. Relocating it INTO `services/` is what will surface it under Contracts 1/2,
+  so the decomposition must extract presenters first.
+- **Phase 9 util split** (`util/{asynctournament,rankedchoice,triforce_text}.py`).
+- **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
+  all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked
+  on the contract side** (all three are green); gated only on not regressing while tournament/
+  util land.
 - **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
   IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
   per PR. These classes are untested and drive live tournaments; do not rush.
