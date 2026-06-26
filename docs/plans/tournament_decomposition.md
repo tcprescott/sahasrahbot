@@ -7,6 +7,20 @@
 > Grounded in a five-dimension analysis of the package (base anatomy, subclass catalog,
 > discord coupling, data/racetime I/O, registry/config path).
 
+## 0. Progress
+
+- **PR 0 (done, `0832bf36`)** — scaffolding: `SeedResult`, `TournamentDefinition`, and the
+  discord/racetime gateway protocol extensions. Pure additive; tested.
+- **PR 0.5 (done, `27cc7003`)** — concrete `DiscordGatewayImpl` + `RaceTimeGatewayImpl`,
+  registered inward at startup. Both satisfy their `runtime_checkable` protocols.
+- **PR 1 (done, `259afaf5`)** — `TournamentPresenter` (gateway-based embeds / audit / commentary /
+  player DMs), fully unit-tested with a mock gateway. Not yet wired.
+- **All reusable collaborators now exist** (DTOs, gateways, presenter). What remains is the
+  **orchestrator port + per-handler migration** — see §8. These reimplement live-tournament
+  orchestration and are **gated on DEBUG end-to-end validation against real RaceTime/Discord**
+  (the maintainer runs this; it cannot be verified by unit tests/import alone). Proceed one
+  handler per PR, `test` first, `alttpr_quals` last with an adversarial review.
+
 ## 1. Why this is the last big piece
 
 Every import-linter contract is currently **KEPT** — but only because `alttprbot/tournament/`
