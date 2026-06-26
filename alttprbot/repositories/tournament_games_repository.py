@@ -5,7 +5,7 @@ class routes its TournamentGames access here; subclasses migrate one per PR duri
 the orchestrator/presenter decomposition.
 """
 
-from typing import Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from alttprbot import models
 
@@ -14,6 +14,11 @@ class TournamentGamesRepository:
     @staticmethod
     async def get_by_episode_id(episode_id) -> Optional[models.TournamentGames]:
         return await models.TournamentGames.get_or_none(episode_id=episode_id)
+
+    @staticmethod
+    async def search(filters: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Return ``.values()`` rows matching ``filters`` (already validated/allowlisted)."""
+        return await models.TournamentGames.filter(**filters).values()
 
     @staticmethod
     async def upsert_by_episode_id(

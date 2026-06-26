@@ -1,6 +1,6 @@
 from quart import Blueprint, jsonify, request, session
 
-from alttprbot import models
+from alttprbot.services import TournamentGamesService
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 from alttprbot.presentation.api.api import discord
 
@@ -9,8 +9,9 @@ tournament_blueprint = Blueprint('tournament', __name__)
 
 @tournament_blueprint.route('/api/tournament/games', methods=['GET'])
 async def get_tournament_games():
-    terms = request.args
-    data = await models.TournamentGames.filter(**terms).values()
+    # Only known columns may be filtered on; unknown query params are ignored
+    # (previously any param was forwarded straight into the ORM filter).
+    data = await TournamentGamesService().search(dict(request.args))
     return jsonify(data)
 
 

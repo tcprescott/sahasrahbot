@@ -1,11 +1,10 @@
 import logging
 
-import tortoise.exceptions
 from discord.errors import NotFound
-from quart import Blueprint, request, abort, jsonify
+from quart import Blueprint, request, jsonify
 from alttprbot.presentation.api.oauth_client import requires_authorization
 
-from alttprbot import models
+from alttprbot.services import RankedChoiceService
 from alttprbot.util import rankedchoice
 from alttprbot.presentation.api.api import discord
 from alttprbot.presentation.discord.bot import discordbot
@@ -18,33 +17,44 @@ from alttprbot.presentation.discord.bot import discordbot
 ranked_choice_blueprint = Blueprint('ranked_choice', __name__)
 
 
+async def _voter_role_denial(election, user_id):
+    """Return an error response tuple if the user may not vote, else None.
+
+    Discord membership/role resolution stays in the presentation layer.
+    """
+    if not election.private:
+        return None
+
+    guild = await discordbot.fetch_guild(election.guild_id)
+    voter_role = guild.get_role(election.voter_role_id)
+    try:
+        member = await guild.fetch_member(user_id)
+    except NotFound:
+        logging.exception(f"Unable to find user {user_id} in guild.")
+        return jsonify({'error': 'Unable to find you in the server.'}), 403
+
+    if voter_role not in member.roles:
+        return jsonify({'error': 'You are not authorized to vote in this election.'}), 403
+    return None
+
+
 @ranked_choice_blueprint.route('/ranked_choice/<int:election_id>/api', methods=['GET'])
 @requires_authorization
 async def get_ballot_json(election_id: int):
     user = await discord.fetch_user()
+    service = RankedChoiceService()
 
-    try:
-        election = await models.RankedChoiceElection.get(id=election_id)
-    except tortoise.exceptions.DoesNotExist:
+    election = await service.get_election_with_candidates(election_id)
+    if election is None:
         return jsonify({'error': 'Election not found.'}), 404
-
     if not election.active:
         return jsonify({'error': 'Election is inactive.'}), 404
 
-    if election.private:
-        guild = await discordbot.fetch_guild(election.guild_id)
-        voter_role = guild.get_role(election.voter_role_id)
-        try:
-            member = await guild.fetch_member(user.id)
-        except NotFound:
-            logging.exception(f"Unable to find user {user.id} in guild.")
-            return jsonify({'error': 'Unable to find you in the server.'}), 403
+    denial = await _voter_role_denial(election, user.id)
+    if denial is not None:
+        return denial
 
-        if voter_role not in member.roles:
-            return jsonify({'error': 'You are not authorized to vote in this election.'}), 403
-
-    await election.fetch_related('candidates')
-    existing_votes = await election.votes.filter(user_id=user.id)
+    existing_votes = await service.get_user_votes(election, user.id)
 
     return jsonify({
         'election': {
@@ -68,51 +78,30 @@ async def get_ballot_json(election_id: int):
 @requires_authorization
 async def submit_ballot_json(election_id: int):
     user = await discord.fetch_user()
+    service = RankedChoiceService()
 
-    try:
-        election = await models.RankedChoiceElection.get(id=election_id)
-    except tortoise.exceptions.DoesNotExist:
+    election = await service.get_election_with_candidates(election_id)
+    if election is None:
         return jsonify({'error': 'Election not found.'}), 404
-
     if not election.active:
         return jsonify({'error': 'Election is inactive.'}), 404
 
-    if election.private:
-        guild = await discordbot.fetch_guild(election.guild_id)
-        voter_role = guild.get_role(election.voter_role_id)
-        try:
-            member = await guild.fetch_member(user.id)
-        except NotFound:
-            return jsonify({'error': 'Unable to find you in the server.'}), 403
-        if voter_role not in member.roles:
-            return jsonify({'error': 'You are not authorized to vote in this election.'}), 403
+    denial = await _voter_role_denial(election, user.id)
+    if denial is not None:
+        return denial
 
-    await election.fetch_related('candidates')
-    existing_votes = await election.votes.filter(user_id=user.id)
-    if existing_votes:
+    if await service.get_user_votes(election, user.id):
         return jsonify({'error': 'You have already voted in this election.'}), 403
 
     payload = await request.get_json(force=True) or {}
     # payload: {"votes": [{"candidate_id": 1, "rank": 1}, ...]}
     votes_data = payload.get('votes', [])
 
-    ranks = [v['rank'] for v in votes_data if v.get('rank')]
-    if len(ranks) != len(set(ranks)):
-        return jsonify({'error': 'Each rank must be unique.'}), 400
+    try:
+        await service.submit_ballot(election, user.id, votes_data)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
 
-    votes = []
-    for vote in votes_data:
-        if not vote.get('rank'):
-            continue
-        candidate = next((c for c in election.candidates if c.id == vote['candidate_id']), None)
-        if not candidate:
-            return jsonify({'error': f"Invalid candidate {vote['candidate_id']}"}), 400
-        votes.append(models.RankedChoiceVotes(
-            election=election, candidate=candidate, user_id=user.id, rank=vote['rank']
-        ))
-
-    votes.sort(key=lambda v: v.rank)
-    await models.RankedChoiceVotes.bulk_create(votes)
     await rankedchoice.refresh_election_post(election, discordbot)
 
     return jsonify({'success': True})

@@ -46,15 +46,18 @@ async def test_form_config_returns_settings(client, monkeypatch):
     assert (await resp.get_json())["settings"] == form
 
 
-async def test_games_forwards_query_params_to_filter(client, monkeypatch):
-    queryset = MagicMock()
-    queryset.values = AsyncMock(return_value=[{"episode_id": 42, "event": "alttprleague"}])
-    mock_filter = MagicMock(return_value=queryset)
-    monkeypatch.setattr(t_bp.models.TournamentGames, "filter", mock_filter)
+async def test_games_forwards_allowlisted_params_to_service(client, monkeypatch):
+    captured = {}
+
+    async def fake_search(self, raw_filters):
+        captured.update(raw_filters)
+        return [{"episode_id": 42, "event": "alttprleague"}]
+
+    monkeypatch.setattr(t_bp.TournamentGamesService, "search", fake_search)
 
     resp = await client.get("/api/tournament/games?event=alttprleague&episode_id=42")
 
     assert resp.status_code == 200
     assert await resp.get_json() == [{"episode_id": 42, "event": "alttprleague"}]
-    # Query params are forwarded verbatim as filter kwargs (values are strings).
-    mock_filter.assert_called_once_with(event="alttprleague", episode_id="42")
+    # Query params reach the service, which applies the field allowlist.
+    assert captured == {"event": "alttprleague", "episode_id": "42"}

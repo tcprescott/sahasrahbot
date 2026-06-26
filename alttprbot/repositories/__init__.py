@@ -16,9 +16,11 @@ from alttprbot.repositories.guild_config_repository import GuildConfigRepository
 from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
 from alttprbot.repositories.preset_repository import PresetRepository
 from alttprbot.repositories.race_room_repository import RaceRoomRepository
+from alttprbot.repositories.ranked_choice_repository import RankedChoiceRepository
 from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
 from alttprbot.repositories.tournament_games_repository import TournamentGamesRepository
 from alttprbot.repositories.tournament_results_repository import TournamentResultsRepository
+from alttprbot.repositories.triforce_text_repository import TriforceTextRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
@@ -29,7 +31,9 @@ __all__ = [
     "PresetNamespaceRepository",
     "PresetRepository",
     "RaceRoomRepository",
+    "RankedChoiceRepository",
     "SpoilerRaceRepository",
     "TournamentGamesRepository",
     "TournamentResultsRepository",
+    "TriforceTextRepository",
 ]
