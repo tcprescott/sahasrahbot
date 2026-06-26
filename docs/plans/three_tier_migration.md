@@ -137,15 +137,18 @@ unit test and a repository round-trip test.
   parallel adversarial behavior-preservation review (one fix landed: KONOT.resume must
   re-raise DoesNotExist for the non-KONOT-room control-flow path).
 
+- **asynctournament discord cog (~1289 lines, 8 models, ~60 ops)** — done: new
+  AsyncTournamentPermissions/LiveRace repos+services, AsyncTournamentRepository/Service
+  extended (channel/thread lookups, create flows, persistence wrappers), all 11 audit
+  writes via `AuditService.record_async_event`; UI Views/threads/embeds stay in the cog.
+  Driven by a per-model spec workflow + an adversarial review workflow (which caught and
+  forced a fix to a scripted-transform regex over-match). **No non-deprecated presentation
+  file imports `alttprbot.models` — the active cog burn-down is complete.**
+
 **Remaining (large, incremental-by-design — tackle as focused, reviewed passes):**
-- **asynctournament discord cog (~1289 lines, 8 models)** — the discord side of the async
-  tournament system (UI Views/Modals, thread creation, tournament/permission/live-race
-  creation). High effort; needs new AsyncTournamentPermissions/LiveRace repos + service
-  methods and careful Views→service boundaries. The only non-deprecated file still on the
-  presentation→models contract.
 - **Deprecated cogs** — `admin` (disabled in bot startup), `smmulti` (multiworld
-  retirement), `voicerole` (behind the role-assignment flag): slated for removal by their
-  own deprecation plans; migrate only if kept.
+  retirement), `voicerole` (behind the role-assignment flag): still import models but are
+  slated for removal by their own deprecation plans; migrate only if kept.
 - **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
   IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
   per PR. These classes are untested and drive live tournaments; do not rush.
