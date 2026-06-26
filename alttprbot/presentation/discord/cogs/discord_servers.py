@@ -1,10 +1,8 @@
-from typing import List
-
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from alttprbot import models
+from alttprbot.services import DiscordServerService
 
 
 class DiscordServers(commands.GroupCog, name="discordservers", description="Manage catagories."):
@@ -20,12 +18,12 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
                            category_description: str = None,
                            order: int = 0
                            ):
-        await models.DiscordServerCategories.create(
-            order=order,
+        await DiscordServerService().add_category(
             guild_id=interaction.guild.id,
             channel_id=channel.id,
             category_title=category_title,
-            category_description=category_description
+            category_description=category_description,
+            order=order,
         )
         await interaction.response.send_message(f"Added category {category_title} to {channel.mention}", ephemeral=True)
 
@@ -33,7 +31,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def list_category(self, interaction: discord.Interaction):
-        results = await models.DiscordServerCategories.filter(guild_id=interaction.guild.id).all()
+        results = await DiscordServerService().list_categories(interaction.guild.id)
         if results:
             embed = discord.Embed(
                 title="List of categories",
@@ -54,7 +52,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def remove_category(self, interaction: discord.Interaction, category_id: int):
-        await models.DiscordServerCategories.filter(id=category_id).delete()
+        await DiscordServerService().remove_category(category_id)
         await interaction.response.send_message(f"Removed category {category_id}", ephemeral=True)
 
     @app_commands.command()
@@ -62,10 +60,11 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.checks.has_permissions(administrator=True)
     async def update_category(self, interaction: discord.Interaction, category_id: int, category_title: str,
                               category_description: str, order: int = 0):
-        await models.DiscordServerCategories.filter(id=category_id).update(
-            order=order,
+        await DiscordServerService().update_category(
+            category_id,
             category_title=category_title,
-            category_description=category_description
+            category_description=category_description,
+            order=order,
         )
         await interaction.response.send_message(f"Updated category {category_id}", ephemeral=True)
 
@@ -78,11 +77,10 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         Add a server to a category.
         """
         invite = await self.bot.fetch_invite(invite_url)
-        await models.DiscordServerLists.create(
-            guild_id=interaction.guild.id,
+        await DiscordServerService().add_server(
             invite_id=invite.id,
             category_id=category_id,
-            server_description=server_description
+            server_description=server_description,
         )
         await interaction.response.send_message(f"Added server {invite.guild.name} to category {category_id}",
                                                 ephemeral=True)
@@ -94,7 +92,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         """
         List all servers in a category.
         """
-        results = await models.DiscordServerLists.filter(category_id=category_id)
+        results = await DiscordServerService().list_servers(category_id)
 
         if results:
             embed = discord.Embed(
@@ -118,7 +116,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         """
         Remove a server from the discord server list.
         """
-        await models.DiscordServerLists.filter(id=server_id).delete()
+        await DiscordServerService().remove_server(server_id)
         await interaction.response.send_message(f"Removed server {server_id}", ephemeral=True)
 
     @app_commands.command()
@@ -130,10 +128,11 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         Update a server in the discord server list.
         """
         invite = await self.bot.fetch_invite(invite_url)
-        await models.DiscordServerLists.filter(id=server_id).update(
+        await DiscordServerService().update_server(
+            server_id,
             invite_id=invite.id,
             category_id=category_id,
-            server_description=server_description
+            server_description=server_description,
         )
         await interaction.response.send_message(f"Updated server {server_id}", ephemeral=True)
 
@@ -149,8 +148,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         def is_me(m):
             return m.author == self.bot.user
 
-        categories = await models.DiscordServerCategories.filter(guild_id=interaction.guild.id).prefetch_related(
-            'server_list')
+        categories = await DiscordServerService().list_categories_with_servers(interaction.guild.id)
         channels_to_update = list(set([c.channel_id for c in categories]))
 
         for c in channels_to_update:
@@ -158,7 +156,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
             await channel.purge(limit=100, check=is_me)
 
         for category in categories:
-            server_list: List[models.DiscordServerLists] = category.server_list
+            server_list = category.server_list
             channel = discord.utils.get(
                 interaction.guild.channels, id=category.channel_id)
 
