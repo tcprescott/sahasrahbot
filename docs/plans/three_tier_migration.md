@@ -120,15 +120,20 @@ unit test and a repository round-trip test.
 - **Phase 6** — seed-generation audit writes routed through `AuditService`.
 - **Phase 7a** — tournament data-layer foundation: TournamentGamesRepository +
   TournamentResultsRepository, with the base `tournament/core.py` rewired through them.
-- **Phase 8 (5 of 6 blueprints)** — `tournament` (mass-assignment fixed via a
-  TournamentGamesService allowlist), `triforcetexts`, `ranked_choice`, and `racetime`
-  (UserRepository/Service account link+merge, AuthorizationService) all off direct ORM.
+- **Phase 8 — all 6 blueprints off direct ORM.** `tournament` (mass-assignment fixed
+  via a TournamentGamesService allowlist), `triforcetexts`, `ranked_choice`, `racetime`
+  (UserRepository/Service account link+merge, AuthorizationService), and
+  **asynctournament** (~710 lines → AsyncTournamentRepository + AsyncTournamentService;
+  pydantic serialization + race review/reattempt writes; `checks.is_async_tournament_user`
+  authz and `util.get_leaderboard` left in place). **No `api/blueprints/*` imports
+  `alttprbot.models` — the blueprint burn-down is complete.**
 
 **Remaining (large, incremental-by-design — tackle as focused, reviewed passes):**
-- **asynctournament blueprint (~710 lines) + `util/asynctournament.py` (~310 lines)** —
-  one cohesive subsystem (querysets + pydantic serialization + leaderboard/scoring +
-  `checks.is_async_tournament_user` authz). Extract together into an AsyncTournament
-  repository + service. It is the last presentation file importing `alttprbot.models`.
+- **Discord cogs + api app-factory/auth/checks** — still on the presentation→models
+  contract: the many discord command cogs (admin, asynctournament, generator, tournament,
+  rankedchoice, …), `presentation/api/{api,auth}.py`, `presentation/api/util/checks.py`
+  (the discord-coupled, shared `is_async_tournament_user`), and `racetime/misc/konot.py`.
+  Each cog is its own vertical (repo + service + rewire), like the blueprints were.
 - **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
   IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
   per PR. These classes are untested and drive live tournaments; do not rush.
