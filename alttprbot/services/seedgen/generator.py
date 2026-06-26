@@ -17,6 +17,8 @@ from tortoise.exceptions import DoesNotExist
 
 import config
 from alttprbot import models
+from alttprbot.repositories import PresetNamespaceRepository, PresetRepository
+from alttprbot.services.preset_service import PresetService
 from alttprbot.services.seedgen.randomizer import ctjets, mysterydoors
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util.helpers import generate_random_string
@@ -105,12 +107,13 @@ class SahasrahBotPresetCore():
         if namespace is None:
             return await get_global_preset_list(self.global_preset_path)
 
-        namespace_data = await models.PresetNamespaces.get_or_none(name=namespace)
+        namespace_data = await PresetNamespaceRepository.get_by_name(namespace)
         if namespace_data is None:
             raise NamespaceNotFound(f"Could not find namespace {namespace}.")
 
-        presets = await models.Presets.filter(namespace__name=namespace_data.name, randomizer=self.randomizer)
-        return [preset.preset_name for preset in presets]
+        return await PresetRepository.list_preset_names(
+            namespace_name=namespace_data.name, randomizer=self.randomizer
+        )
 
     async def fetch(self) -> PresetData:
         if self.preset is None:
@@ -136,10 +139,16 @@ class SahasrahBotPresetCore():
             raise AttemptToSaveGlobalPreset("You cannot save a global preset.")
 
         self.raw = yaml.dump(self.preset_data)
-        namespace_data = await models.PresetNamespaces.get(name=self.namespace)
+        namespace_data = await PresetNamespaceRepository.get_by_name(self.namespace)
+        if namespace_data is None:
+            raise NamespaceNotFound(f"Could not find namespace {self.namespace}.")
 
-        await models.Presets.update_or_create(randomizer=self.randomizer, preset_name=self.preset,
-                                              namespace=namespace_data, defaults={'content': self.raw})
+        await PresetRepository.upsert(
+            namespace=namespace_data,
+            randomizer=self.randomizer,
+            preset_name=self.preset,
+            content=self.raw,
+        )
 
     async def _fetch_global(self):
         basename = os.path.basename(f'{self.preset}.yaml')
@@ -152,8 +161,9 @@ class SahasrahBotPresetCore():
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
 
     async def _fetch_namespaced(self):
-        data = await models.Presets.get_or_none(preset_name=self.preset, randomizer=self.randomizer,
-                                                namespace__name=self.namespace)
+        data = await PresetRepository.get(
+            namespace_name=self.namespace, randomizer=self.randomizer, preset_name=self.preset
+        )
 
         if data is None:
             raise PresetNotFoundException(f'Could not find preset {self.preset} in namespace {self.namespace}.')
@@ -468,29 +478,15 @@ async def mystery_generate(weights, spoilers="mystery"):
 
 
 async def create_or_retrieve_namespace(discord_user_id, discord_user_name):
-    tempnamespaceslug = slugify(discord_user_name, max_length=20)
-    try:
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id,
-                                                                   defaults={'name': tempnamespaceslug})
-    except DoesNotExist:
-        tempnamespaceslug = tempnamespaceslug + str(random.randint(0, 99))
-        namespace, _ = await models.PresetNamespaces.get_or_create(discord_user_id=discord_user_id,
-                                                                   defaults={'name': tempnamespaceslug})
-
-    await namespace.fetch_related('collaborators')
-    return namespace
+    # Thin shim preserved for existing callers; the canonical logic lives in
+    # PresetService (Tier 2). The Discord generator cog migrates off this later.
+    return await PresetService().create_or_retrieve_namespace(discord_user_id, discord_user_name)
 
 
 def is_namespace_owner(user, namespace: models.PresetNamespaces):
-    if namespace.discord_user_id == user.id:
-        return True
-
-    # collaborators needs to be fetched by the caller first
-    if user.id in [x.discord_user_id for x in namespace.collaborators]:
-        return True
-
-    if user.id == 185198185990324225:
-        return True
+    # Thin shim over PresetService.is_namespace_owner (collaborators must be
+    # fetched by the caller first).
+    return PresetService.is_namespace_owner(user.id, namespace)
 
     return False
 

@@ -1,11 +1,9 @@
-import re
 from io import BytesIO
 
 from quart import Blueprint, redirect, request, send_file, jsonify
 from alttprbot.presentation.api.oauth_client import Unauthorized, requires_authorization
-from tortoise.query_utils import Prefetch
 
-from alttprbot import models
+from alttprbot.services import PresetService
 from alttprbot.services.seedgen import generator
 from alttprbot.presentation.api.api import discord
 
@@ -16,7 +14,7 @@ presets_blueprint = Blueprint('presets', __name__)
 @requires_authorization
 async def my_presets():
     user = await discord.fetch_user()
-    ns_current_user = await generator.create_or_retrieve_namespace(user.id, user.name)
+    ns_current_user = await PresetService().create_or_retrieve_namespace(user.id, user.name)
 
     return redirect(f"/presets/manage/{ns_current_user.name}")
 
@@ -27,26 +25,27 @@ async def new_preset_submit(namespace):
     user = await discord.fetch_user()
     payload = await request.form
     request_files = await request.files
-    ns_data = await models.PresetNamespaces.get(name=namespace)
-    await ns_data.fetch_related('collaborators')
 
-    if not generator.is_namespace_owner(user, ns_data):
+    service = PresetService()
+    ns_data = await service.get_namespace(namespace)
+    if ns_data is None:
+        return jsonify({'error': 'Namespace not found.'}), 404
+
+    if not PresetService.is_namespace_owner(user.id, ns_data):
         return jsonify({'error': 'You are not authorized to create presets in this namespace.'}), 403
 
     preset_name = payload.get('preset_name', '')
-    if not re.match("^[a-zA-Z0-9_]*$", preset_name):
+    if not PresetService.is_valid_preset_name(preset_name):
         return jsonify({'error': 'Invalid preset name provided.'}), 400
 
     if 'presetfile' not in request_files:
         return jsonify({'error': 'A preset file is required.'}), 400
 
-    preset_data, _ = await models.Presets.update_or_create(
-        preset_name=preset_name,
-        randomizer=payload['randomizer'],
+    preset_data = await service.save_preset(
         namespace=ns_data,
-        defaults={
-            'content': request_files['presetfile'].read().decode()
-        }
+        randomizer=payload['randomizer'],
+        preset_name=preset_name,
+        content=request_files['presetfile'].read().decode(),
     )
 
     return jsonify({
@@ -57,22 +56,19 @@ async def new_preset_submit(namespace):
 
 @presets_blueprint.route('/presets/manage/<string:namespace>/data.json', methods=['GET'])
 async def presets_for_namespace_json(namespace):
-    ns_data = await models.PresetNamespaces.get_or_none(name=namespace)
+    service = PresetService()
+    ns_data = await service.get_namespace(namespace)
     if ns_data is None:
         return jsonify({'error': 'Namespace not found.'}), 404
-    await ns_data.fetch_related('collaborators')
 
     try:
         user = await discord.fetch_user()
-        is_owner = generator.is_namespace_owner(user, ns_data)
+        is_owner = PresetService.is_namespace_owner(user.id, ns_data)
     except Unauthorized:
         is_owner = False
 
     randomizer = request.args.get('randomizer')
-    query = models.Presets.filter(namespace__name=namespace)
-    if randomizer:
-        query = query.filter(randomizer=randomizer)
-    presets = await query.only('id', 'preset_name', 'randomizer')
+    presets = await service.list_presets(namespace, randomizer=randomizer)
 
     return jsonify({
         'namespace': ns_data.name,
@@ -89,19 +85,18 @@ async def presets_for_namespace_json(namespace):
 @presets_blueprint.route('/presets/manage/<string:namespace>/<string:randomizer>/<string:preset>/data.json',
                          methods=['GET'])
 async def get_preset_json(namespace, randomizer, preset):
-    ns_data = await models.PresetNamespaces.get_or_none(name=namespace)
+    service = PresetService()
+    ns_data = await service.get_namespace(namespace)
     if ns_data is None:
         return jsonify({'error': 'Namespace not found.'}), 404
-    await ns_data.fetch_related('collaborators')
 
     try:
         user = await discord.fetch_user()
-        is_owner = generator.is_namespace_owner(user, ns_data)
+        is_owner = PresetService.is_namespace_owner(user.id, ns_data)
     except Unauthorized:
         is_owner = False
 
-    preset_data = await models.Presets.get_or_none(
-        preset_name=preset, randomizer=randomizer, namespace__name=namespace)
+    preset_data = await service.get_preset(namespace, randomizer, preset)
     if preset_data is None:
         return jsonify({'error': 'Preset not found.'}), 404
 
@@ -119,7 +114,9 @@ async def get_preset_json(namespace, randomizer, preset):
 
 @presets_blueprint.route('/presets/download/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
 async def download_preset(namespace, randomizer, preset):
-    preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
+    preset_data = await PresetService().get_preset(namespace, randomizer, preset)
+    if preset_data is None:
+        return jsonify({'error': 'Preset not found.'}), 404
 
     return await send_file(
         BytesIO(preset_data.content.encode()),
@@ -135,16 +132,21 @@ async def update_preset(namespace, randomizer, preset):
     user = await discord.fetch_user()
     payload = await request.form
     request_files = await request.files
-    ns_data = await models.PresetNamespaces.get(name=namespace)
-    await ns_data.fetch_related('collaborators')
 
-    if not generator.is_namespace_owner(user, ns_data):
+    service = PresetService()
+    ns_data = await service.get_namespace(namespace)
+    if ns_data is None:
+        return jsonify({'error': 'Namespace not found.'}), 404
+
+    if not PresetService.is_namespace_owner(user.id, ns_data):
         return jsonify({'error': 'You are not the owner of this preset.'}), 403
 
-    preset_data = await models.Presets.get(preset_name=preset, randomizer=randomizer, namespace__name=namespace)
+    preset_data = await service.get_preset(namespace, randomizer, preset)
+    if preset_data is None:
+        return jsonify({'error': 'Preset not found.'}), 404
 
     if 'delete' in payload:
-        await preset_data.delete()
+        await service.delete_preset(preset_data)
         return jsonify({'success': True, 'redirect': f"/presets/manage/{namespace}"})
 
     if 'presetfile' not in request_files:
@@ -154,8 +156,12 @@ async def update_preset(namespace, randomizer, preset):
     if content == '':
         return jsonify({'error': 'Empty or missing preset file provided.'}), 400
 
-    preset_data.content = content
-    await preset_data.save()
+    await service.save_preset(
+        namespace=ns_data,
+        randomizer=randomizer,
+        preset_name=preset,
+        content=content,
+    )
 
     return jsonify({
         'success': True,
@@ -174,8 +180,7 @@ async def api_get_presets(randomizer):
         'ctjets': generator.CTJetsPreset
     }
     global_presets = await generators[randomizer]().get_presets(namespace=None)
-    namespaces = await models.PresetNamespaces.all().prefetch_related(
-        Prefetch('presets', queryset=models.Presets.filter(randomizer=randomizer)))
+    namespaces = await PresetService().list_namespaces_with_presets(randomizer)
 
     output = {
         'global': global_presets,

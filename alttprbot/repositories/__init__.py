@@ -12,10 +12,14 @@ from alttprbot.repositories.audit_generated_games_repository import AuditGenerat
 from alttprbot.repositories.async_tournament_audit_log_repository import AsyncTournamentAuditLogRepository
 from alttprbot.repositories.daily_repository import DailyRepository
 from alttprbot.repositories.discord_server_repository import DiscordServerRepository
+from alttprbot.repositories.preset_namespace_repository import PresetNamespaceRepository
+from alttprbot.repositories.preset_repository import PresetRepository
 
 __all__ = [
     "AuditGeneratedGamesRepository",
     "AsyncTournamentAuditLogRepository",
     "DailyRepository",
     "DiscordServerRepository",
+    "PresetNamespaceRepository",
+    "PresetRepository",
 ]
