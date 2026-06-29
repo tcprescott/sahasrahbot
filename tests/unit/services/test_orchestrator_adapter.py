@@ -6,6 +6,10 @@ exposes the legacy property surface. Here we drive _build_config + the propertie
 fake discordbot.
 """
 
+from unittest.mock import AsyncMock
+
+import pytest
+
 import alttprbot.tournament.orchestrator_adapter as adapter_mod
 from alttprbot.services.tournament import TournamentDefinition
 from alttprbot.tournament.orchestrator_adapter import make_adapter
@@ -90,3 +94,50 @@ def test_player_racetime_ids_safe_without_orchestrator(monkeypatch):
     AdapterCls = make_adapter(object, DEFN)
     adapter = AdapterCls()
     assert adapter.player_racetime_ids == []  # orchestrator not built yet
+
+
+def _fake_handler(seed_rolled=False):
+    handler = type("H", (), {})()
+    handler.data = {"url": "/r", "name": "test/clever-cat", "entrants": [{"user": {"id": "e1"}}]}
+    handler.seed_rolled = seed_rolled
+    return handler
+
+
+def _adapter_with_orch(monkeypatch, process_race):
+    _patch_bot(monkeypatch)
+    fake_gw = type("GW", (), {"http_uri": lambda self, cat, url: f"http://rt{url}"})()
+    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+
+    AdapterCls = make_adapter(object, DEFN)
+    adapter = AdapterCls()
+    adapter.rtgg_handler = _fake_handler()
+    orch = AsyncMock()
+    orch.process_race = process_race
+    adapter.orchestrator = orch
+    return adapter, orch
+
+
+async def test_process_tournament_race_refreshes_room_and_sets_seed_rolled(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock(return_value=True))
+
+    await adapter.process_tournament_race(None, None)
+
+    # room refreshed from the live handler (fresh entrants/url) before delegating
+    assert orch.room.name == "test/clever-cat"
+    assert orch.room.entrant_ids == ["e1"]
+    assert orch.room.url == "http://rt/r"
+    orch.process_race.assert_awaited_once()
+    assert adapter.rtgg_handler.seed_rolled is True
+
+
+async def test_process_tournament_race_no_seed_rolled_when_handler_does_not_roll(monkeypatch):
+    adapter, _ = _adapter_with_orch(monkeypatch, AsyncMock(return_value=False))
+    await adapter.process_tournament_race(None, None)
+    assert adapter.rtgg_handler.seed_rolled is False  # falsy return -> guard untouched
+
+
+async def test_process_tournament_race_leaves_room_rerollable_on_error(monkeypatch):
+    adapter, _ = _adapter_with_orch(monkeypatch, AsyncMock(side_effect=RuntimeError("boom")))
+    with pytest.raises(RuntimeError):
+        await adapter.process_tournament_race(None, None)
+    assert adapter.rtgg_handler.seed_rolled is False  # exception -> not set

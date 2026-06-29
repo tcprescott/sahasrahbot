@@ -22,12 +22,21 @@ class DiscordGatewayImpl:
 
     # --- sends ---
     async def send_channel_message(
-        self, channel_id: int, content: Optional[str] = None, *, embed: Any = None
+        self,
+        channel_id: int,
+        content: Optional[str] = None,
+        *,
+        embed: Any = None,
+        mention_everyone: bool = False,
     ) -> None:
         channel = self.bot.get_channel(channel_id)
         if channel is None:
             return
-        await channel.send(content=content, embed=embed)
+        # ``mention_everyone`` mirrors the legacy ``@here`` audit alerts which passed
+        # ``allowed_mentions=discord.AllowedMentions(everyone=True)``; ``None`` falls back
+        # to the client default (the legacy plain-send behavior).
+        allowed_mentions = discord.AllowedMentions(everyone=True) if mention_everyone else None
+        await channel.send(content=content, embed=embed, allowed_mentions=allowed_mentions)
 
     async def send_dm(
         self, user_id: int, content: Optional[str] = None, *, embed: Any = None

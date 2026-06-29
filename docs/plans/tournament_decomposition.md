@@ -25,26 +25,36 @@
   a live `TournamentConfig` so the un-migrated cog's `get_config()` accessors keep working;
   restored room-name + DM-failure logging; unresolved-member → DM skip parity). 362 tests.
 
-**▶ NEXT — PR 3: the seed-rolling path** (the `ALTTPRTournamentRace.process_tournament_race`
-family → `boots` as the first concrete one). This exercises the orchestrator's *other*
-lifecycle and the `SeedResult`/presenter-embed flow. Couplings already mapped, to port:
-  - `roll()` → returns `SeedResult`; presenter builds the seed embeds (with the RaceTime.gg +
-    broadcast-channel field inserts from the legacy `create_embeds`).
-  - the player-DM-with-fallback (on failure: `@here` audit alert via `discord.AllowedMentions`
-    + a RaceTime chat message) — cross-gateway, orchestrated in the orchestrator.
-  - the pinned "Roll Tournament Seed" `msg_actions` welcome button → a new racetime-gateway
-    primitive (`send_pinned_action`).
-  - `seed_rolled` is RaceTime *handler* state (guards double-rolling) → the adapter sets it
-    after `process_race` (it holds the handler).
-  Needed extensions: `discord_gateway.send_channel_message(mention_everyone=)`,
-  `racetime_gateway.send_pinned_action(...)`, presenter `build_race_embeds` + `send_player_dm`
-  returning success.
+- **PR 3 (done)** — the seed-rolling path, with `boots` as the first concrete handler. Added the
+  shared `ALTTPRTournamentOrchestrator` (`services/tournament/alttpr.py`) — a behavior-preserving
+  port of the legacy `ALTTPRTournamentRace`: `process_race` (the `!tournamentrace` flow),
+  `send_room_welcome` (welcome + pinned "Roll Tournament Seed" action), `_seed_code`. `BootsOrchestrator`
+  overrides only `roll()` (the `casualboots` preset → `SeedResult`). Collaborator extensions:
+  `TournamentResultsRepository.create_or_update_with_permalink`,
+  `discord_gateway.send_channel_message(mention_everyone=)`, `racetime_gateway.send_pinned_action(...)`
+  + `get_entrant_ids(...)`, presenter `build_race_embeds` / `send_player_seed_dm` (→bool) /
+  `send_audit_alert`. `process_race` returns whether a seed was rolled; the adapter sets the handler's
+  `seed_rolled` guard only on success and refreshes the room (name/url) before delegating. Registry
+  repoints `boots` → `make_adapter(BootsOrchestrator, BOOTS_DEFINITION)`. 18 new tests; 380 passing;
+  import-linter still 3-kept. Verified by a 5-lens adversarial OLD-vs-NEW parity workflow (23 findings,
+  every one independently re-verified): **1 real divergence found and fixed** — the per-entrant seed-URL
+  RaceTime whisper must read the entrant list *post-roll/live* (legacy read `handler.data['entrants']` at
+  the loop, after the seconds-long seed gen), so it now reads fresh via `racetime_gateway.get_entrant_ids`
+  instead of the pre-roll room snapshot. All other findings refuted as parity/known-safe.
 
-**RECOMMENDATION:** validate the `test` handler in DEBUG (confirm a real room opens, players are
-invited + DM'd, audit fires) before building PR 3+ on the pattern — both orchestrator lifecycles
-and every collaborator are now exercised by `test`, so a live pass de-risks the entire remaining
-tail cheaply. After validation the remaining handlers are mechanical applications of the pattern
-(bespoke `roll()` + IDs), `alttpr_quals` last (its AsyncTournament entanglement) with a review.
+**▶ NEXT — PR 4: the trivial/low ALTTPR handlers** (`smwde`, `nologic`, `alttprhmg`, then
+`alttprde`/`alttprmini` which share a title→preset map). Each is now a mechanical application of the
+PR-3 pattern: a `services/tournament/<event>.py` orchestrator overriding only `roll()` (+ its title
+parse where applicable), a `<EVENT>_DEFINITION` lifting the hardcoded IDs out of `configuration()`,
+and a registry repoint to `make_adapter(...)`. `smwde` is pure-config (SM, no ALTTPR roll) so it
+extends the base orchestrator, not the ALTTPR one. Then the moderate handlers
+(`alttprleague`/`smrl_playoff` — external API / submission form, solo PRs), the dailies, and
+**`alttpr_quals` last** (AsyncTournament entanglement; solo + adversarial review).
+
+**RECOMMENDATION:** validate `test` (room lifecycle) and now `boots` (full seed-roll) in DEBUG —
+confirm a real room opens, the seed rolls, embeds/DMs/audit/permalink all fire — before batching the
+PR-4 handlers. Both orchestrator lifecycles and every collaborator are now exercised end-to-end, so a
+single live boots pass de-risks the entire remaining ALTTPR tail.
 
 ## 1. Why this is the last big piece
 

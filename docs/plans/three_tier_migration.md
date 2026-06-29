@@ -170,6 +170,13 @@ it does not violate them until its decomposition relocates it into `services/tou
   so the decomposition must extract presenters first. **Detailed PR-by-PR plan:**
   [tournament_decomposition.md](tournament_decomposition.md) (collaborator APIs, full subclass
   catalog + migration order, gateway protocols, repository additions, risks).
+  **Progress:** PRs 0–2 landed the collaborators (DTOs, gateways, presenter,
+  `TournamentOrchestrator` base + dispatch adapter) and the debug `test` handler;
+  **PR 3 migrated `boots`** — the first seed-rolling handler — porting the shared
+  `ALTTPRTournamentOrchestrator` (`process_race`/`send_room_welcome`) + presenter seed embeds,
+  adversarially parity-reviewed (one real entrant-snapshot timing bug found and fixed). NEXT is the
+  trivial/low ALTTPR tail (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`), then the moderate
+  handlers + dailies, with `alttpr_quals` last.
 - **Phase 9 util split** (`util/{asynctournament,rankedchoice,triforce_text}.py`).
 - **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
   all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked

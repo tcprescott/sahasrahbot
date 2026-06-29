@@ -9,6 +9,7 @@ from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nolo
 from alttprbot.tournament import registry_loader
 from alttprbot.tournament.orchestrator_adapter import make_adapter
 from alttprbot.services.tournament.test import TEST_DEFINITION, TestOrchestrator
+from alttprbot.services.tournament.boots import BOOTS_DEFINITION, BootsOrchestrator
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -18,16 +19,16 @@ RACETIME_URL = config.RACETIME_URL
 # Active handlers are determined by TOURNAMENT_DATA (hardcoded fallback)
 # or by config/tournaments.yaml when TOURNAMENT_CONFIG_ENABLED is true.
 AVAILABLE_TOURNAMENT_HANDLERS = {
-    # 'test' is the first handler migrated to the decomposed orchestrator/presenter
-    # (debug-only; see docs/plans/tournament_decomposition.md). Other slugs keep their
-    # legacy god-object class until migrated one-per-PR.
+    # 'test' and 'boots' are migrated to the decomposed orchestrator/presenter (see
+    # docs/plans/tournament_decomposition.md); 'boots' is the first seed-rolling handler.
+    # Other slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
     'alttpr': alttpr_quals.ALTTPRQualifierRace,
     'alttprdaily': dailies.AlttprSGDailyRace,
     'smz3': dailies.SMZ3DailyRace,
     'invleague': alttprleague.ALTTPRLeague,
     'alttprleague': alttprleague.ALTTPROpenLeague,
-    'boots': boots.ALTTPRCASBootsTournamentRace,
+    'boots': make_adapter(BootsOrchestrator, BOOTS_DEFINITION),
     'nologic': nologic.ALTTPRNoLogicRace,
     'smwde': smwde.SMWDETournament,
     'alttprhmg': alttprhmg.ALTTPRHMGTournament,

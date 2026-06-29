@@ -165,8 +165,15 @@ class TournamentOrchestrator:
     async def on_race_pending(self):
         pass
 
-    async def process_race(self, args, message):
-        pass
+    async def process_race(self, args, message) -> bool:
+        """Handle the ``!tournamentrace`` seed-roll for this room.
+
+        Returns ``True`` when a seed was rolled (the dispatch adapter then sets the
+        RaceTime handler's ``seed_rolled`` guard). The no-op base returns falsy, so a
+        handler that does not roll (e.g. the debug ``test`` event) never trips the guard
+        — matching the legacy base ``process_tournament_race`` which did nothing.
+        """
+        return False
 
     # --- pure, presentation-neutral properties (ported verbatim) ---
     @property

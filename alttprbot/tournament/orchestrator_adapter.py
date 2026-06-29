@@ -123,7 +123,19 @@ class OrchestratorAdapter:
 
     # --- legacy instance interface (delegated to the orchestrator) ---
     async def process_tournament_race(self, args, message):
-        await self.orchestrator.process_race(args, message)
+        # Refresh the room (name / URL) from the live handler before delegating. The
+        # entrant list for the post-roll seed-URL whisper is read fresh from the racetime
+        # gateway inside process_race (matching the legacy live read), so this snapshot is
+        # only used for the room name/URL the orchestrator needs while rolling.
+        if self.rtgg_handler is not None:
+            self.orchestrator.room = self._room_from_handler(self.rtgg_handler)
+        rolled = await self.orchestrator.process_race(args, message)
+        # seed_rolled is RaceTime *handler* state guarding double-rolling. The legacy
+        # subclasses set it as the last line of a successful process_tournament_race; the
+        # orchestrator (no handler) reports the roll and the adapter (holds the handler)
+        # sets the flag. Only set on success so an exception leaves the room re-rollable.
+        if rolled and self.rtgg_handler is not None:
+            self.rtgg_handler.seed_rolled = True
 
     async def on_race_start(self):
         await self.orchestrator.on_race_start()

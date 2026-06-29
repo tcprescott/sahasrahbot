@@ -17,8 +17,8 @@ class FakeGateway:
     def get_emojis(self):
         return ["emoji"]
 
-    async def send_channel_message(self, channel_id, content=None, *, embed=None):
-        self.channel_messages.append((channel_id, content, embed))
+    async def send_channel_message(self, channel_id, content=None, *, embed=None, mention_everyone=False):
+        self.channel_messages.append((channel_id, content, embed, mention_everyone))
 
     async def send_dm(self, user_id, content=None, *, embed=None):
         if self.dm_should_raise:
@@ -38,7 +38,7 @@ async def test_audit_message_sends_to_audit_channel():
     gw = FakeGateway()
     p = TournamentPresenter(_definition(audit_channel_id=999), gateway=gw)
     await p.send_audit_message("hello")
-    assert gw.channel_messages == [(999, "hello", None)]
+    assert gw.channel_messages == [(999, "hello", None, False)]
 
 
 async def test_audit_message_noop_without_channel():
@@ -55,7 +55,7 @@ async def test_commentary_requires_broadcasts_and_channel():
     await p.send_commentary_message(e, has_broadcasts=False)
     assert gw.channel_messages == []  # no broadcasts -> skipped
     await p.send_commentary_message(e, has_broadcasts=True)
-    assert gw.channel_messages == [(42, None, e)]
+    assert gw.channel_messages == [(42, None, e, False)]
 
 
 async def test_send_player_room_info_dms_each_player_and_survives_failures():
@@ -92,3 +92,88 @@ async def test_build_seed_embeds_uses_gateway_emojis(monkeypatch):
     assert embed.title == "public" and tournament_embed.title == "restream"
     assert calls["embed"]["emojis"] == ["emoji"]
     assert calls["embed"]["name"] == "Race" and calls["embed"]["notes"] == "A vs B"
+
+
+async def test_build_race_embeds_inserts_racetime_and_broadcast_fields(monkeypatch):
+    async def fake_seed_embed(seed, **kw):
+        return discord.Embed(title="public")
+
+    async def fake_tournament_embed(seed, **kw):
+        return discord.Embed(title="restream")
+
+    monkeypatch.setattr(presenter_mod, "seed_embed", fake_seed_embed)
+    monkeypatch.setattr(presenter_mod, "seed_tournament_embed", fake_tournament_embed)
+
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    embed, tournament_embed = await p.build_race_embeds(
+        SeedResult(seed=object()),
+        race_info="Race",
+        versus="A vs B",
+        room_url="http://rt/room",
+        broadcast_channels=["restreamA", "restreamB"],
+    )
+
+    # final field order per embed: [Broadcast Channels, RaceTime.gg, ...] (both embeds)
+    for e in (embed, tournament_embed):
+        assert e.fields[0].name == "Broadcast Channels"
+        assert e.fields[0].value == "[restreamA](https://twitch.tv/restreamA), [restreamB](https://twitch.tv/restreamB)"
+        assert e.fields[1].name == "RaceTime.gg"
+        assert e.fields[1].value == "http://rt/room"
+
+
+async def test_build_race_embeds_without_broadcasts_only_inserts_racetime(monkeypatch):
+    async def fake_seed_embed(seed, **kw):
+        return discord.Embed(title="public")
+
+    async def fake_tournament_embed(seed, **kw):
+        return discord.Embed(title="restream")
+
+    monkeypatch.setattr(presenter_mod, "seed_embed", fake_seed_embed)
+    monkeypatch.setattr(presenter_mod, "seed_tournament_embed", fake_tournament_embed)
+
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    embed, tournament_embed = await p.build_race_embeds(
+        SeedResult(seed=object()), race_info="Race", versus="A vs B",
+        room_url="http://rt/room", broadcast_channels=[],
+    )
+    for e in (embed, tournament_embed):
+        assert e.fields[0].name == "RaceTime.gg"
+        assert all(f.name != "Broadcast Channels" for f in e.fields)
+
+
+async def test_send_player_seed_dm_returns_true_on_success():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    embed = discord.Embed(title="seed")
+    assert await p.send_player_seed_dm(123, embed=embed) is True
+    assert gw.dms == [(123, None, embed)]
+
+
+async def test_send_player_seed_dm_returns_false_for_unresolved_member():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    assert await p.send_player_seed_dm(None, embed=discord.Embed(title="seed")) is False
+    assert gw.dms == []  # no send attempted
+
+
+async def test_send_player_seed_dm_returns_false_on_http_exception():
+    gw = FakeGateway()
+    gw.dm_should_raise = True
+    p = TournamentPresenter(_definition(), gateway=gw)
+    assert await p.send_player_seed_dm(123, embed=discord.Embed(title="seed")) is False
+
+
+async def test_send_audit_alert_mentions_everyone():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(audit_channel_id=999), gateway=gw)
+    await p.send_audit_alert("@here could not send DM to A")
+    assert gw.channel_messages == [(999, "@here could not send DM to A", None, True)]
+
+
+async def test_send_audit_alert_noop_without_channel():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    await p.send_audit_alert("@here could not send DM to A")
+    assert gw.channel_messages == []

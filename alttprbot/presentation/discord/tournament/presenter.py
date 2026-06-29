@@ -57,10 +57,52 @@ class TournamentPresenter:
         )
         return embed, tournament_embed
 
+    async def build_race_embeds(
+        self,
+        result: SeedResult,
+        *,
+        race_info: Any,
+        versus: Any,
+        room_url: str,
+        broadcast_channels: Iterable[str],
+    ) -> Tuple[discord.Embed, discord.Embed]:
+        """Build the seed embeds for a rolled tournament race, with the live-room inserts.
+
+        Mirrors the legacy ``ALTTPRTournamentRace.create_embeds``: the standard pair
+        plus a ``RaceTime.gg`` field (the room URL) inserted at the top of each, and a
+        ``Broadcast Channels`` field inserted above that when there are restreams.
+        ``insert_field_at(0, ...)`` is order-sensitive, so the RaceTime.gg field is
+        inserted first and the broadcast field second — leaving the final order
+        ``[Broadcast Channels?, RaceTime.gg, ...settings]`` exactly as before.
+        """
+        embed, tournament_embed = await self.build_seed_embeds(
+            result, race_info=race_info, versus=versus
+        )
+        for e in (tournament_embed, embed):
+            e.insert_field_at(0, name="RaceTime.gg", value=room_url, inline=False)
+        channels = list(broadcast_channels)
+        if channels:
+            links = ", ".join(f"[{a}](https://twitch.tv/{a})" for a in channels)
+            for e in (tournament_embed, embed):
+                e.insert_field_at(0, name="Broadcast Channels", value=links, inline=False)
+        return embed, tournament_embed
+
     # --- channel sends ---
     async def send_audit_message(self, content: Optional[str] = None, embed: discord.Embed = None) -> None:
         if self.definition.audit_channel_id:
             await self.gateway.send_channel_message(self.definition.audit_channel_id, content, embed=embed)
+
+    async def send_audit_alert(self, content: str) -> None:
+        """Post an ``@here`` audit alert (legacy DM-failure notice).
+
+        No-ops when no audit channel is configured. The legacy code unconditionally
+        sent to ``self.audit_channel`` here and would crash if it was ``None``; guarding
+        on the configured id is strictly safer and consistent with ``send_audit_message``.
+        """
+        if self.definition.audit_channel_id:
+            await self.gateway.send_channel_message(
+                self.definition.audit_channel_id, content, mention_everyone=True
+            )
 
     async def send_commentary_message(self, embed: discord.Embed, *, has_broadcasts: bool) -> None:
         if self.definition.commentary_channel_id and has_broadcasts:
@@ -89,3 +131,19 @@ class TournamentPresenter:
 
     async def send_player_dm(self, user_id: int, *, content: Optional[str] = None, embed: discord.Embed = None) -> None:
         await self.gateway.send_dm(user_id, content, embed=embed)
+
+    async def send_player_seed_dm(self, user_id: Optional[int], *, embed: discord.Embed) -> bool:
+        """DM a player their seed embed, returning whether delivery succeeded.
+
+        Mirrors the legacy ``send_player_message`` delivery half: an unresolved member
+        (``user_id is None``) or a ``discord.HTTPException`` is a failed delivery. The
+        orchestrator owns the cross-gateway failure handling (audit ``@here`` alert +
+        RaceTime chat notice), so this only reports success/failure.
+        """
+        if user_id is None:
+            return False
+        try:
+            await self.gateway.send_dm(user_id, embed=embed)
+            return True
+        except discord.HTTPException:
+            return False

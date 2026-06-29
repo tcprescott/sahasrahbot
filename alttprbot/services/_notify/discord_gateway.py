@@ -20,7 +20,12 @@ from typing import Any, Optional, Protocol, runtime_checkable
 @runtime_checkable
 class DiscordGateway(Protocol):
     async def send_channel_message(
-        self, channel_id: int, content: Optional[str] = None, *, embed: Any = None
+        self,
+        channel_id: int,
+        content: Optional[str] = None,
+        *,
+        embed: Any = None,
+        mention_everyone: bool = False,
     ) -> None: ...
 
     async def send_dm(
