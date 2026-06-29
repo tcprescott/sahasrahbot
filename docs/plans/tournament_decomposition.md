@@ -81,15 +81,33 @@
   static-parity-clean but not yet live-validated. Migrating a future handler in the catalog now
   propagates to both paths automatically (no second registry edit).
 
-**▶ NEXT — PR 6: `smrl_playoff`** (the Super Metroid Random League playoffs — `smrl`). Heavier than
-league: a fully custom `process_race` (SM seeds via `SuperMetroidVaria` / `smdash`, race-info set to the
-seed URL, no ALTTPR embeds), a web-API-consumed `submission_form` (list-of-dicts) + `process_submission_form`
-(builds an embed, persists `TournamentGames.settings`, DMs players), and a `create_race_room` that gates on
-submitted settings. Solo PR with its own adversarial review. Then the **dailies**
-(`AlttprSGDailyRace`/`SMZ3DailyRace`, the cron entry path) and finally **`alttpr_quals`** (the only active
-non-daily handler; AsyncTournament entanglement — solo, reviewed). After the tail lands, the **Final PR**
-relocates `alttprbot/tournament/` → `services/tournament/`, removes the racetime-bot import from
-`tournaments.py`, and confirms import-linter still 3-kept with the code now actively under the contracts.
+- **PR 6 (done)** — `smrl_playoff` (the Super Metroid Random League playoffs — `smrl`). The heaviest
+  handler so far. `SMRLPlayoffsOrchestrator` (`services/tournament/smrl.py`) extends the **base**
+  orchestrator (no ALTTPR embeds) and overrides: `process_race` (SM seeds via `SuperMetroidVaria` /
+  `smdash`, whisper the seed URL + set race-info, persist the permalink), `send_room_welcome` (a single
+  pinned welcome message carrying the action), `before_room_creation` (gate room creation on submitted
+  settings), and `process_submission_form` (map game# → randomizer/preset, persist, confirm). New shared
+  infrastructure: base `before_room_creation` gate + adapter honoring it; base `send_race_submission_form`
+  (reminders via presenter + `submitted` upsert) + base `process_submission_form` no-op; presenter
+  `send_player_reminders` + `send_submission_confirmation` (+ `_submission_dm_failed`); adapter
+  `process_submission_form` / `send_race_submission_form` / `versus` delegation; `TournamentDefinition.submission_form`
+  widened to `Any` so it can carry the SMRL form schema (`SMRL_SUBMISSION_FORM`). Registry repoints `smrl`
+  (seasonal — stays dormant in the production hardcoded set). 24 new tests; 431 passing; import-linter
+  3-kept. Verified by a 5-surface adversarial parity workflow (13 findings, **0 confirmed real**); the one
+  "uncertain" was a doc nit — the submission gate cleanly drops a *latent legacy crash* (legacy returned
+  `None` from `create_race_room`, which the un-null-checked base dereferenced → `AttributeError` + a
+  spurious audit error). Docstrings corrected to describe this as an intentional cleanup, not a mirror.
+
+**▶ NEXT — PR 7: the dailies** (`AlttprSGDailyRace` / `SMZ3DailyRace`). Open casual races (not invitational,
+no player invites/DMs, no bot seed roll), so they extend the **base** orchestrator and override room kwargs
+(`invitational=False`, `team_race` from a "co-op" title match), a custom `race_info`, and — instead of the
+player room-info DM — an **announcement** posted to a channel (with role mentions; `alttprdaily` also posts a
+webhook). The announce message uses discord timestamps, so it moves to the presenter. Then **`alttpr_quals`**
+(the only active non-daily handler; deep AsyncTournament entanglement — live-race lookup, permission checks,
+permalink + eligible-entrant records, `on_race_start` processing — solo, reviewed). After the tail lands, the
+**Final PR** removes the now-unused legacy god-object handler classes + the racetime-bot import from
+`tournaments.py`, leaving `alttprbot/tournament/` as just the dispatch adapter (+ `TournamentConfig` shim),
+and confirms import-linter still 3-kept with the orchestrators now actively under the layering contracts.
 
 **RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
 confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title

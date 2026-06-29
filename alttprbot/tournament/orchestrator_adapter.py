@@ -52,6 +52,14 @@ class OrchestratorAdapter:
         adapter.orchestrator = orch
         await orch.update_data()
 
+        # Submission gate (e.g. smrl): if the event refuses room creation it has already
+        # handled the abort (sent a reminder); skip opening a room. This cleanly drops a
+        # latent legacy crash — legacy create_race_room returned None here, which the
+        # un-null-checked base construct_race_room dereferenced (AttributeError + a spurious
+        # "error creating a race room" audit message). Warning DMs + the upsert are unchanged.
+        if not await orch.before_room_creation():
+            return None
+
         handler = await racetime_gateway.get().start_race(
             cls._definition.racetime_category, **orch.room_creation_kwargs
         )
@@ -151,6 +159,17 @@ class OrchestratorAdapter:
 
     async def can_gatekeep(self, rtgg_id):
         return await self.orchestrator.can_gatekeep(rtgg_id)
+
+    # --- submission flow (web API + the discord cog's reminder task) ---
+    async def process_submission_form(self, payload, submitted_by):
+        return await self.orchestrator.process_submission_form(payload, submitted_by)
+
+    async def send_race_submission_form(self, warning=False):
+        return await self.orchestrator.send_race_submission_form(warning=warning)
+
+    @property
+    def versus(self):
+        return self.orchestrator.versus if self.orchestrator else None
 
     @property
     def player_racetime_ids(self):

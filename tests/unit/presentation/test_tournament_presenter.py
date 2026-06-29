@@ -177,3 +177,49 @@ async def test_send_audit_alert_noop_without_channel():
     p = TournamentPresenter(_definition(), gateway=gw)
     await p.send_audit_alert("@here could not send DM to A")
     assert gw.channel_messages == []
+
+
+# --- submission flow (PR6) ---
+
+async def test_send_player_reminders_dms_resolved_players_and_propagates():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    await p.send_player_reminders([1, None, 2], "please submit")
+    assert gw.dms == [(1, "please submit", None), (2, "please submit", None)]  # None skipped
+
+    gw.dm_should_raise = True  # reminders do NOT swallow failures (cog wraps the call)
+    with pytest.raises(discord.HTTPException):
+        await p.send_player_reminders([3], "please submit")
+
+
+async def test_send_submission_confirmation_posts_audit_and_dms():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(audit_channel_id=77), gateway=gw)
+    await p.send_submission_confirmation(
+        versus="A vs B", episode_id=100, event="smrl", game_number=2,
+        randomizer="smdash", preset="recall_mm", submitted_by="user",
+        players=[("A", 1), ("B", 2)],
+    )
+    # audit embed first, then a DM per player
+    assert gw.channel_messages[0][0] == 77 and gw.channel_messages[0][3] is False
+    audit_embed = gw.channel_messages[0][2]
+    assert audit_embed.title == "SMRL - A vs B"
+    field_names = [f.name for f in audit_embed.fields]
+    assert field_names == ["Episode ID", "Event", "Game #", "Randomizer", "Preset", "Submitted by"]
+    assert [d[0] for d in gw.dms] == [1, 2]
+
+
+async def test_send_submission_confirmation_alerts_on_unresolved_and_failed_dm():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(audit_channel_id=77), gateway=gw)
+    gw.dm_should_raise = True  # both DMs fail -> @here alerts (carrying the embed)
+    await p.send_submission_confirmation(
+        versus="A vs B", episode_id=100, event="smrl", game_number=1,
+        randomizer="smvaria", preset="RLS4W5", submitted_by="user",
+        players=[("A", None), ("B", 2)],
+    )
+    # 1 audit embed + 2 @here alerts (one for unresolved A, one for failed-DM B)
+    alerts = [m for m in gw.channel_messages if m[3] is True]
+    assert len(alerts) == 2
+    assert all(a[2] is not None for a in alerts)  # each alert carries the embed
+    assert {a[1] for a in alerts} == {"@here could not send DM to A", "@here could not send DM to B"}

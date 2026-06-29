@@ -20,6 +20,7 @@ from alttprbot.services.tournament.alttprleague import (
     OPEN_LEAGUE_DEFINITION,
     ALTTPRLeagueOrchestrator,
 )
+from alttprbot.services.tournament.smrl import SMRL_DEFINITION, SMRLPlayoffsOrchestrator
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -31,8 +32,9 @@ RACETIME_URL = config.RACETIME_URL
 AVAILABLE_TOURNAMENT_HANDLERS = {
     # Migrated to the decomposed orchestrator/presenter (see
     # docs/plans/tournament_decomposition.md): 'test' (debug), 'boots' (first seed-rolling),
-    # the trivial/low ALTTPR tail 'smwde'/'nologic'/'alttprhmg'/'alttprde'/'alttprmini', and
-    # the moderate league handlers 'invleague'/'alttprleague' (one orchestrator, two configs).
+    # the trivial/low ALTTPR tail 'smwde'/'nologic'/'alttprhmg'/'alttprde'/'alttprmini', the
+    # moderate league handlers 'invleague'/'alttprleague' (one orchestrator, two configs), and
+    # 'smrl' (SM playoffs — custom SM seed flow + settings-submission form).
     # Remaining slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
     'alttpr': alttpr_quals.ALTTPRQualifierRace,
@@ -46,7 +48,7 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
     'alttprhmg': make_adapter(ALTTPRHMGOrchestrator, ALTTPRHMG_DEFINITION),
     'alttprmini': make_adapter(ALTTPRMiniOrchestrator, ALTTPRMINI_DEFINITION),
     'alttprde': make_adapter(ALTTPRDEOrchestrator, ALTTPRDE_DEFINITION),
-    'smrl': smrl_playoff.SMRLPlayoffs,
+    'smrl': make_adapter(SMRLPlayoffsOrchestrator, SMRL_DEFINITION),
 }
 
 # Hardcoded registry fallback (active when TOURNAMENT_CONFIG_ENABLED is false — the

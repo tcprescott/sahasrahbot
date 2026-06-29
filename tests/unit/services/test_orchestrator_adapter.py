@@ -39,6 +39,9 @@ class _FakeBot:
     def get_channel(self, cid):
         return self._channels.get(cid)
 
+    async def wait_until_ready(self):
+        return None
+
 
 DEFN = TournamentDefinition(
     event_slug="test", racetime_category="test", racetime_goal="Beat the game",
@@ -141,3 +144,57 @@ async def test_process_tournament_race_leaves_room_rerollable_on_error(monkeypat
     with pytest.raises(RuntimeError):
         await adapter.process_tournament_race(None, None)
     assert adapter.rtgg_handler.seed_rolled is False  # exception -> not set
+
+
+# --- submission-flow delegation (PR6) ---
+
+async def test_adapter_delegates_process_submission_form(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+    orch.process_submission_form = AsyncMock(return_value=None)
+    await adapter.process_submission_form({"game": "1"}, submitted_by="u")
+    orch.process_submission_form.assert_awaited_once_with({"game": "1"}, "u")
+
+
+async def test_adapter_delegates_send_race_submission_form(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+    orch.send_race_submission_form = AsyncMock()
+    await adapter.send_race_submission_form(warning=True)
+    orch.send_race_submission_form.assert_awaited_once_with(warning=True)
+
+
+async def test_adapter_versus_delegates_to_orchestrator(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+    orch.versus = "A vs. B"
+    assert adapter.versus == "A vs. B"
+
+
+def test_adapter_versus_safe_without_orchestrator(monkeypatch):
+    _patch_bot(monkeypatch)
+    adapter = make_adapter(object, DEFN)()
+    assert adapter.versus is None
+
+
+class _GatedOrchestrator:
+    """Minimal orchestrator that refuses room creation (mirrors smrl's no-settings gate)."""
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    async def update_data(self):
+        return None
+
+    async def before_room_creation(self):
+        return False
+
+
+async def test_construct_race_room_aborts_when_gated(monkeypatch):
+    _patch_bot(monkeypatch)
+    started = AsyncMock()
+    fake_gw = type("GW", (), {"start_race": started})()
+    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+
+    AdapterCls = make_adapter(_GatedOrchestrator, DEFN)
+    handler = await AdapterCls.construct_race_room(123)
+
+    assert handler is None  # gated -> no room
+    started.assert_not_awaited()  # start_race never reached

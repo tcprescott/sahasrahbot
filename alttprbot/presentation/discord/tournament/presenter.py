@@ -132,6 +132,75 @@ class TournamentPresenter:
     async def send_player_dm(self, user_id: int, *, content: Optional[str] = None, embed: discord.Embed = None) -> None:
         await self.gateway.send_dm(user_id, content, embed=embed)
 
+    async def send_player_reminders(self, player_ids: Iterable[Optional[int]], message: str) -> None:
+        """DM each resolved player a plain-text reminder (legacy ``send_race_submission_form``).
+
+        Unresolved members (``None``) are skipped. Delivery failures are NOT caught — they
+        propagate, exactly as the legacy ``await player.send(msg)`` did (the discord cog's
+        ``send_race_form`` is the surrounding try/except that logs + audits).
+        """
+        for player_id in player_ids:
+            if player_id is None:
+                continue
+            logging.info("Sending tournament submit reminder to %s.", player_id)
+            await self.gateway.send_dm(player_id, message)
+
+    async def send_submission_confirmation(
+        self,
+        *,
+        versus: str,
+        episode_id: Any,
+        event: str,
+        game_number: Any,
+        randomizer: str,
+        preset: str,
+        submitted_by: str,
+        players: Iterable[Tuple[Optional[str], Optional[int]]],
+    ) -> None:
+        """Build + broadcast the SMRL settings-submission confirmation embed.
+
+        Mirrors the legacy ``SMRLPlayoffs.process_submission_form`` presentation half:
+        post the summary embed to the audit channel and DM it to each player, with an
+        ``@here`` audit alert (carrying the embed) when a player can't be DMed.
+        """
+        embed = discord.Embed(
+            title=f"SMRL - {versus}",
+            description=(
+                "Thank you for submitting your settings for this race!  Below is what will be "
+                "played.\nIf this is incorrect, please contact a tournament admin."
+            ),
+            color=discord.Colour.blue(),
+        )
+        embed.add_field(name="Episode ID", value=episode_id, inline=False)
+        embed.add_field(name="Event", value=event, inline=False)
+        embed.add_field(name="Game #", value=game_number, inline=False)
+        embed.add_field(name="Randomizer", value=randomizer, inline=False)
+        embed.add_field(name="Preset", value=preset, inline=False)
+        embed.add_field(name="Submitted by", value=submitted_by, inline=False)
+
+        if self.definition.audit_channel_id:
+            await self.gateway.send_channel_message(self.definition.audit_channel_id, embed=embed)
+
+        for name, user_id in players:
+            if user_id is None:
+                logging.error("Could not send DM to %s", name)
+                await self._submission_dm_failed(name, embed)
+                continue
+            try:
+                await self.gateway.send_dm(user_id, embed=embed)
+            except discord.HTTPException:
+                logging.exception("Could not send DM to %s", name)
+                await self._submission_dm_failed(name, embed)
+
+    async def _submission_dm_failed(self, name: Optional[str], embed: discord.Embed) -> None:
+        if self.definition.audit_channel_id:
+            await self.gateway.send_channel_message(
+                self.definition.audit_channel_id,
+                f"@here could not send DM to {name}",
+                embed=embed,
+                mention_everyone=True,
+            )
+
     async def send_player_seed_dm(self, user_id: Optional[int], *, embed: discord.Embed) -> bool:
         """DM a player their seed embed, returning whether delivery succeeded.
 
