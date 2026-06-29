@@ -45,6 +45,15 @@ class UserRepository:
         return await models.Users.update_or_create(rtgg_id=rtgg_id, defaults=defaults)
 
     @staticmethod
+    async def get_or_create_by_rtgg_id(rtgg_id: str, defaults: dict) -> Tuple[models.Users, bool]:
+        return await models.Users.get_or_create(rtgg_id=rtgg_id, defaults=defaults)
+
+    @staticmethod
+    async def set_twitch_name(user: models.Users, twitch_name: Optional[str]) -> None:
+        user.twitch_name = twitch_name
+        await user.save()
+
+    @staticmethod
     async def merge(user_to_keep: models.Users, victim: models.Users) -> models.Users:
         """Fold ``victim`` into ``user_to_keep``: adopt ids, reassign owned rows, delete victim.
 

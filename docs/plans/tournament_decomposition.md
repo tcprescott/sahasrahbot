@@ -111,18 +111,32 @@
   comment, fixed). **Production runs the hardcoded path, so the dailies go live on the next deploy — smoke-test in
   DEBUG first.**
 
-**▶ NEXT — PR 8: `alttpr_quals`** (the ALTTPR main-tournament live qualifier, slug `alttpr`). The last and
-riskiest active handler — deeply entangled with the AsyncTournament system: `process_race` does live-race lookup
-+ a stack of guard conditions, a mod/admin permission check, room-lock, seed roll via `triforce_text`, permalink
-persistence, and writes an `AsyncTournamentRace` record per eligible entrant; `on_race_start` flips pending
-entrants to in-progress and prunes no-shows; `construct_race_room` silently skips when no live race exists. Needs
-new AsyncTournament repository methods (live-race-by-episode + save, permalink create, eligible-entrant + start
-processing), an adapter-supplied authz callback (the existing `checks.is_async_tournament_user` mixes a DB check
-with a `discordbot` guild-role check), and an `on_race_start` lifecycle hook on the adapter. Solo PR, full
-adversarial review. After it lands, the **Final PR** removes the now-unused legacy god-object handler classes + the
-racetime-bot import from `tournaments.py`, leaving `alttprbot/tournament/` as just the dispatch adapter (+
-`TournamentConfig` shim), and confirms import-linter still 3-kept with the orchestrators now actively under the
-layering contracts.
+- **PR 8 (done)** — `alttpr_quals` (the ALTTPR main-tournament live qualifier, slug `alttpr`): the last and
+  most entangled active handler. `ALTTPRQualifierOrchestrator` (`services/tournament/alttpr_quals.py`) extends the
+  base orchestrator with the full live-race ↔ AsyncTournament flow: `before_update_data` (live-race gate, runs
+  *before* any I/O), `process_race` (guard ladder, mod/admin authz, room-lock, `triforce_text` seed, permalink
+  persistence, eligible-entrant writes), `on_race_start` (promote present entrants, prune no-shows, announce), plus
+  the open-race `update_data`/`race_info`/announce. New repo methods on `AsyncTournamentLiveRaceRepository`
+  (`get_by_episode_id[_with_relations]`, `set_permalink_and_slug`, `process_race_start`), `AsyncTournamentRepository`
+  (`create_live_permalink`, `count_completed_pool_races`, `user_has_active_race`, `create_pending_live_entry`), and
+  `UserRepository` (`get_or_create_by_rtgg_id`, `set_twitch_name`); gateway `get_entrants`/`get_started_at`; presenter
+  `seed_label`; an adapter-supplied async-authz callback (wraps `checks.is_async_tournament_user`) + a new
+  `before_update_data` pre-I/O gate hook. 18 unit + 4 repo round-trip tests; 462 passing; import-linter 3-kept.
+  Verified by a 5-surface adversarial parity workflow (16 findings, **1 confirmed (low)** — the live-race gate ran
+  *after* `update_data`; fixed by the pre-I/O `before_update_data` hook so a no-live-race episode short-circuits
+  before any SpeedGaming/RaceTime call, matching legacy). **Active production handler — smoke-test in DEBUG before deploy.**
+
+**★ MILESTONE — every active tournament handler is now a decomposed orchestrator.** All slugs in the production
+registry (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) and every seasonal slug dispatch through
+`services/tournament/` orchestrators + the presenter + gateways; no legacy god-object class is active.
+
+**▶ NEXT — PR 9 (final cleanup):** delete the now-unused legacy handler subclass files under
+`alttprbot/tournament/` (boots/smwde/smrl_playoff/alttprleague/nologic/alttprhmg/alttprde/alttprmini/alttpr_quals/
+dailies/test + the long-dead ones), drop the unused legacy-handler imports from `tournaments.py`, and route
+`create_tournament_race_room`'s lone `racetime_bots` use through the racetime gateway so the racetime-bot import can
+go. Keep `core.py` (the `TournamentConfig` + `UnableToLookupUserException` shim) and `alttpr.py` — the discord cog
+still imports them (for type hints + the pre-existing-broken cc2023 `roll_seed`/`generate_deck` commands, which are
+out of scope). Confirm import-linter still 3-kept.
 
 **RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
 confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title

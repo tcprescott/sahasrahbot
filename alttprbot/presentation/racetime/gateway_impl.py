@@ -81,6 +81,31 @@ class RaceTimeGatewayImpl:
             return []
         return [e["user"]["id"] for e in handler.data.get("entrants", [])]
 
+    async def get_entrants(self, room_name: str) -> list:
+        """Neutral entrant records (id / name / twitch_name) for a room, read at call time.
+
+        Mirrors the legacy ``race_room_data['entrants']`` iteration in
+        ``write_eligible_async_entrants`` — flattened to the fields the service tier needs
+        so it never touches the raw RaceTime entrant shape.
+        """
+        handler = self._handler(room_name)
+        if handler is None:
+            return []
+        return [
+            {
+                "id": e["user"]["id"],
+                "name": e["user"]["name"],
+                "twitch_name": e["user"].get("twitch_name", None),
+            }
+            for e in handler.data.get("entrants", [])
+        ]
+
+    async def get_started_at(self, room_name: str):
+        handler = self._handler(room_name)
+        if handler is None:
+            return None
+        return handler.data.get("started_at")
+
     async def set_invitational(self, room_name: str) -> None:
         handler = self._handler(room_name)
         if handler is not None:

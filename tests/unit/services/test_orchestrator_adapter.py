@@ -175,16 +175,31 @@ def test_adapter_versus_safe_without_orchestrator(monkeypatch):
 
 
 class _GatedOrchestrator:
-    """Minimal orchestrator that refuses room creation (mirrors smrl's no-settings gate)."""
+    """Minimal orchestrator that refuses room creation after update_data (smrl-style gate)."""
 
     def __init__(self, *args, **kwargs):
-        pass
+        self.updated = False
+
+    async def before_update_data(self):
+        return True
 
     async def update_data(self):
-        return None
+        self.updated = True
 
     async def before_room_creation(self):
         return False
+
+
+class _PreGatedOrchestrator(_GatedOrchestrator):
+    """Refuses room creation BEFORE update_data (alttpr_quals live-race-style gate)."""
+
+    update_data_calls = 0
+
+    async def before_update_data(self):
+        return False
+
+    async def update_data(self):
+        type(self).update_data_calls += 1
 
 
 async def test_construct_race_room_aborts_when_gated(monkeypatch):
@@ -198,3 +213,19 @@ async def test_construct_race_room_aborts_when_gated(monkeypatch):
 
     assert handler is None  # gated -> no room
     started.assert_not_awaited()  # start_race never reached
+
+
+async def test_construct_race_room_pre_io_gate_skips_update_data(monkeypatch):
+    _patch_bot(monkeypatch)
+    started = AsyncMock()
+    fake_gw = type("GW", (), {"start_race": started})()
+    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+
+    _PreGatedOrchestrator.update_data_calls = 0
+    AdapterCls = make_adapter(_PreGatedOrchestrator, DEFN)
+    handler = await AdapterCls.construct_race_room(123)
+
+    assert handler is None
+    started.assert_not_awaited()
+    # the pre-I/O gate short-circuits before update_data runs any SpeedGaming/RaceTime I/O
+    assert _PreGatedOrchestrator.update_data_calls == 0

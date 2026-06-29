@@ -34,12 +34,8 @@ def test_league_slugs_are_decomposed_in_catalog():
         assert _is_migrated_adapter(tournaments.AVAILABLE_TOURNAMENT_HANDLERS[slug])
 
 
-def test_current_migration_state_of_active_production_handlers():
-    # Documents (and guards) which active production handlers are decomposed vs still legacy.
-    # When alttpr (the qualifier) is migrated, flip it here.
-    catalog = tournaments.AVAILABLE_TOURNAMENT_HANDLERS
-    assert _is_migrated_adapter(catalog["invleague"])
-    assert _is_migrated_adapter(catalog["alttprleague"])
-    assert _is_migrated_adapter(catalog["alttprdaily"])  # daily — decomposed (PR7)
-    assert _is_migrated_adapter(catalog["smz3"])         # weekly — decomposed (PR7)
-    assert not _is_migrated_adapter(catalog["alttpr"])   # qualifier — still legacy
+def test_all_active_production_handlers_are_decomposed():
+    # Every slug active in the production hardcoded fallback now dispatches to a decomposed
+    # orchestrator adapter — no legacy god-object class remains active.
+    for slug, handler in tournaments._HARDCODED_TOURNAMENT_DATA.items():
+        assert _is_migrated_adapter(handler), f"{slug} is not a decomposed orchestrator"

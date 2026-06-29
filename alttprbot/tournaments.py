@@ -27,6 +27,7 @@ from alttprbot.services.tournament.dailies import (
     AlttprSGDailyOrchestrator,
     SMZ3DailyOrchestrator,
 )
+from alttprbot.services.tournament.alttpr_quals import QUALIFIER_DEFINITION, ALTTPRQualifierOrchestrator
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -43,7 +44,7 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
     # 'smrl' (SM playoffs — custom SM seed flow + settings-submission form).
     # Remaining slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
-    'alttpr': alttpr_quals.ALTTPRQualifierRace,
+    'alttpr': make_adapter(ALTTPRQualifierOrchestrator, QUALIFIER_DEFINITION),
     'alttprdaily': make_adapter(AlttprSGDailyOrchestrator, ALTTPR_DAILY_DEFINITION),
     'smz3': make_adapter(SMZ3DailyOrchestrator, SMZ3_DAILY_DEFINITION),
     'invleague': make_adapter(ALTTPRLeagueOrchestrator, INVITATIONAL_LEAGUE_DEFINITION),
@@ -66,13 +67,13 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
 # Seasonal handlers are decomposed in the catalog but left inactive here; add a slug to the
 # production list to enable it for a season:
 #   boots, nologic, smwde, alttprhmg, alttprmini, alttprde, smrl
-# Still-legacy (not yet decomposed) active handlers: alttpr.
+# All active handlers are now decomposed orchestrators (no legacy god-objects remain active).
 if config.DEBUG:
     # Debug: no auto-active tournaments (enable 'test' here manually when needed).
     _HARDCODED_ACTIVE_SLUGS = []
 else:
     _HARDCODED_ACTIVE_SLUGS = [
-        'alttpr',         # ALTTPR qualifier (legacy handler — not yet decomposed)
+        'alttpr',         # ALTTPR main-tournament live qualifier (decomposed orchestrator)
         'alttprdaily',    # ALTTPR daily series (decomposed orchestrator)
         'smz3',           # SMZ3 weekly (decomposed orchestrator)
         'invleague',      # ALTTPR Invitational League (decomposed orchestrator)

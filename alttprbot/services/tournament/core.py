@@ -52,6 +52,7 @@ class TournamentOrchestrator:
         player_resolver: PlayerResolver,
         gatekeep_checker: GatekeepChecker,
         racetime=None,
+        async_authz_checker=None,
     ) -> None:
         try:
             self.episodeid = int(episodeid)
@@ -63,6 +64,9 @@ class TournamentOrchestrator:
         self._racetime = racetime
         self._player_resolver = player_resolver
         self._gatekeep_checker = gatekeep_checker
+        # adapter-supplied async-tournament authz check (DB + discord guild role); only the
+        # alttpr_quals orchestrator uses it (wraps presentation/api/util/checks).
+        self._async_authz_checker = async_authz_checker
 
         # runtime state
         self.episode: Optional[dict] = None
@@ -143,7 +147,19 @@ class TournamentOrchestrator:
 
         return await self._gatekeep_checker(user.discord_user_id, self.definition.helper_role_ids)
 
-    # --- room-creation gate (overridden per event; default allows creation) ---
+    # --- room-creation gates (overridden per event; default allows creation) ---
+    async def before_update_data(self) -> bool:
+        """Pre-I/O room-creation gate, run *before* ``update_data``.
+
+        The dispatch adapter calls this right after building the orchestrator, before any
+        SpeedGaming / RaceTime I/O. Use it for cheap checks that should short-circuit room
+        creation without doing that work (e.g. the alttpr_quals live-race lookup, which the
+        legacy ``construct_race_room`` did first and returned ``None`` from silently). The
+        default allows creation. Gates that need ``update_data`` to have run (e.g. the smrl
+        submitted-settings check) belong in :meth:`before_room_creation` instead.
+        """
+        return True
+
     async def before_room_creation(self) -> bool:
         """Return ``False`` to abort room creation (handling the abort itself).
 

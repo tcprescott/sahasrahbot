@@ -50,6 +50,13 @@ class OrchestratorAdapter:
         adapter.data = adapter._build_config()
         orch = adapter._build_orchestrator(episodeid)
         adapter.orchestrator = orch
+
+        # Pre-I/O gate (e.g. alttpr_quals live-race lookup): short-circuit before any
+        # SpeedGaming / RaceTime calls, matching the legacy construct_race_room which did
+        # its cheap gate first and returned None silently.
+        if not await orch.before_update_data():
+            return None
+
         await orch.update_data()
 
         # Submission gate (e.g. smrl): if the event refuses room creation it has already
@@ -146,6 +153,8 @@ class OrchestratorAdapter:
             self.rtgg_handler.seed_rolled = True
 
     async def on_race_start(self):
+        if self.rtgg_handler is not None:
+            self.orchestrator.room = self._room_from_handler(self.rtgg_handler)
         await self.orchestrator.on_race_start()
 
     async def on_race_pending(self):
@@ -224,7 +233,17 @@ class OrchestratorAdapter:
             presenter=presenter,
             player_resolver=self._resolve_player,
             gatekeep_checker=self._check_gatekeep,
+            async_authz_checker=self._check_async_authz,
         )
+
+    async def _check_async_authz(self, user, tournament, roles):
+        """Async-tournament mod/admin check (DB + discord guild roles).
+
+        Wraps the existing ``checks.is_async_tournament_user`` (which touches ``discordbot``);
+        imported lazily to keep this off the module import path. Used by the alttpr_quals roll.
+        """
+        from alttprbot.presentation.api.util import checks
+        return await checks.is_async_tournament_user(user, tournament, roles)
 
     def _room_from_handler(self, handler) -> RaceRoom:
         category = self._definition.racetime_category

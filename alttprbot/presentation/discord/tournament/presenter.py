@@ -103,16 +103,18 @@ class TournamentPresenter:
         broadcast_channels: Iterable[str],
         room_url: str,
         seed_time: Any = None,
+        seed_label: str = "Seed Distributed",
         webhook_url: Optional[str] = None,
         webhook_role_mention: Optional[str] = None,
     ) -> None:
-        """Post the open-race announcement (legacy daily ``send_player_room_info`` / ``announce_message``).
+        """Post the open-race announcement (legacy daily/qualifier ``announce_message``).
 
         Builds the message with Discord relative/absolute timestamps and posts it to the
         announce channel (allowing role mentions). When ``seed_time`` is given the message
-        includes the "Seed Distributed" line + permalink (alttprdaily); otherwise just the
-        room link (smz3). When ``webhook_url`` is given (alttprdaily) the same message,
-        prefixed with the webhook role mention, is also posted to the SG webhook.
+        includes the ``seed_label`` line + permalink (alttprdaily "Seed Distributed", the
+        qualifier "Seed Distributed and Room Lock"); otherwise just the room link (smz3).
+        When ``webhook_url`` is given (alttprdaily) the same message, prefixed with the
+        webhook role mention, is also posted to the SG webhook.
         """
         msg = (
             f"{prefix}{series} - {title} - "
@@ -122,7 +124,7 @@ class TournamentPresenter:
         if channels:
             msg += f" on {', '.join(channels)}"
         if seed_time is not None:
-            msg += f" - Seed Distributed {discord.utils.format_dt(seed_time, 'R')} - {room_url}"
+            msg += f" - {seed_label} {discord.utils.format_dt(seed_time, 'R')} - {room_url}"
         else:
             msg += f" - {room_url}"
 
