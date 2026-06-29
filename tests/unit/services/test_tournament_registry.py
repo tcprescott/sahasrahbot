@@ -36,10 +36,10 @@ def test_league_slugs_are_decomposed_in_catalog():
 
 def test_current_migration_state_of_active_production_handlers():
     # Documents (and guards) which active production handlers are decomposed vs still legacy.
-    # When alttpr / dailies are migrated, flip them here.
+    # When alttpr (the qualifier) is migrated, flip it here.
     catalog = tournaments.AVAILABLE_TOURNAMENT_HANDLERS
     assert _is_migrated_adapter(catalog["invleague"])
     assert _is_migrated_adapter(catalog["alttprleague"])
-    assert not _is_migrated_adapter(catalog["alttpr"])       # qualifier — still legacy
-    assert not _is_migrated_adapter(catalog["alttprdaily"])  # daily — still legacy
-    assert not _is_migrated_adapter(catalog["smz3"])         # weekly — still legacy
+    assert _is_migrated_adapter(catalog["alttprdaily"])  # daily — decomposed (PR7)
+    assert _is_migrated_adapter(catalog["smz3"])         # weekly — decomposed (PR7)
+    assert not _is_migrated_adapter(catalog["alttpr"])   # qualifier — still legacy

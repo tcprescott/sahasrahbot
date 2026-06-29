@@ -12,13 +12,16 @@ class FakeGateway:
     def __init__(self):
         self.channel_messages = []
         self.dms = []
+        self.webhooks = []
         self.dm_should_raise = False
 
     def get_emojis(self):
         return ["emoji"]
 
-    async def send_channel_message(self, channel_id, content=None, *, embed=None, mention_everyone=False):
-        self.channel_messages.append((channel_id, content, embed, mention_everyone))
+    async def send_channel_message(
+        self, channel_id, content=None, *, embed=None, mention_everyone=False, mention_roles=False
+    ):
+        self.channel_messages.append((channel_id, content, embed, mention_everyone, mention_roles))
 
     async def send_dm(self, user_id, content=None, *, embed=None):
         if self.dm_should_raise:
@@ -26,6 +29,9 @@ class FakeGateway:
                 response=type("R", (), {"status": 403, "reason": "Forbidden"})(), message="blocked"
             )
         self.dms.append((user_id, content, embed))
+
+    async def send_webhook(self, url, *, content=None, embed=None, username=None):
+        self.webhooks.append((url, content, embed, username))
 
 
 def _definition(**kw):
@@ -38,7 +44,7 @@ async def test_audit_message_sends_to_audit_channel():
     gw = FakeGateway()
     p = TournamentPresenter(_definition(audit_channel_id=999), gateway=gw)
     await p.send_audit_message("hello")
-    assert gw.channel_messages == [(999, "hello", None, False)]
+    assert gw.channel_messages == [(999, "hello", None, False, False)]
 
 
 async def test_audit_message_noop_without_channel():
@@ -55,7 +61,7 @@ async def test_commentary_requires_broadcasts_and_channel():
     await p.send_commentary_message(e, has_broadcasts=False)
     assert gw.channel_messages == []  # no broadcasts -> skipped
     await p.send_commentary_message(e, has_broadcasts=True)
-    assert gw.channel_messages == [(42, None, e, False)]
+    assert gw.channel_messages == [(42, None, e, False, False)]
 
 
 async def test_send_player_room_info_dms_each_player_and_survives_failures():
@@ -169,7 +175,7 @@ async def test_send_audit_alert_mentions_everyone():
     gw = FakeGateway()
     p = TournamentPresenter(_definition(audit_channel_id=999), gateway=gw)
     await p.send_audit_alert("@here could not send DM to A")
-    assert gw.channel_messages == [(999, "@here could not send DM to A", None, True)]
+    assert gw.channel_messages == [(999, "@here could not send DM to A", None, True, False)]
 
 
 async def test_send_audit_alert_noop_without_channel():
@@ -223,3 +229,60 @@ async def test_send_submission_confirmation_alerts_on_unresolved_and_failed_dm()
     assert len(alerts) == 2
     assert all(a[2] is not None for a in alerts)  # each alert carries the embed
     assert {a[1] for a in alerts} == {"@here could not send DM to A", "@here could not send DM to B"}
+
+
+# --- open-race announcement (PR7) ---
+
+import datetime  # noqa: E402
+
+_START = datetime.datetime(2026, 6, 26, 18, 0, tzinfo=datetime.timezone.utc)
+_SEED = _START - datetime.timedelta(minutes=10)
+
+
+async def test_send_race_announcement_alttpr_daily_with_seed_and_webhook():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    await p.send_race_announcement(
+        555,
+        prefix="",
+        series="SpeedGaming Daily Race Series",
+        title="Daily 1",
+        race_start_time=_START,
+        broadcast_channels=["restreamA"],
+        room_url="http://rt/room",
+        seed_time=_SEED,
+        webhook_url="http://hook",
+        webhook_role_mention="<@&399038388964950016>",
+    )
+    cid, content, embed, m_everyone, m_roles = gw.channel_messages[0]
+    assert cid == 555 and m_roles is True and m_everyone is False
+    assert content.startswith("SpeedGaming Daily Race Series - Daily 1 - ")
+    assert " on restreamA" in content
+    assert "Seed Distributed " in content and content.endswith(" - http://rt/room")
+    # webhook gets the same message prefixed with the role mention + the SahasrahBot username
+    assert len(gw.webhooks) == 1
+    url, wh_content, _, username = gw.webhooks[0]
+    assert url == "http://hook" and username == "SahasrahBot"
+    assert wh_content == f"<@&399038388964950016> {content}"
+
+
+async def test_send_race_announcement_smz3_prefix_no_seed_no_webhook():
+    gw = FakeGateway()
+    p = TournamentPresenter(_definition(), gateway=gw)
+    await p.send_race_announcement(
+        777,
+        prefix="<@&449260882501959700> ",
+        series="SMZ3 Weekly Race",
+        title="Weekly 1",
+        race_start_time=_START,
+        broadcast_channels=[],
+        room_url="http://rt/smz3",
+        seed_time=None,
+    )
+    cid, content, _, _, m_roles = gw.channel_messages[0]
+    assert cid == 777 and m_roles is True
+    assert content.startswith("<@&449260882501959700> SMZ3 Weekly Race - Weekly 1 - ")
+    assert "Seed Distributed" not in content
+    assert content.endswith(" - http://rt/smz3")
+    assert " on " not in content  # no broadcast channels
+    assert gw.webhooks == []  # no webhook for smz3

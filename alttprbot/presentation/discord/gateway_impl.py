@@ -28,14 +28,20 @@ class DiscordGatewayImpl:
         *,
         embed: Any = None,
         mention_everyone: bool = False,
+        mention_roles: bool = False,
     ) -> None:
         channel = self.bot.get_channel(channel_id)
         if channel is None:
             return
-        # ``mention_everyone`` mirrors the legacy ``@here`` audit alerts which passed
-        # ``allowed_mentions=discord.AllowedMentions(everyone=True)``; ``None`` falls back
-        # to the client default (the legacy plain-send behavior).
-        allowed_mentions = discord.AllowedMentions(everyone=True) if mention_everyone else None
+        # ``mention_everyone`` mirrors the legacy ``@here`` audit alerts
+        # (``AllowedMentions(everyone=True)``); ``mention_roles`` mirrors the daily-announce
+        # ``AllowedMentions(roles=True)``. ``None`` falls back to the client default.
+        if mention_everyone:
+            allowed_mentions = discord.AllowedMentions(everyone=True)
+        elif mention_roles:
+            allowed_mentions = discord.AllowedMentions(roles=True)
+        else:
+            allowed_mentions = None
         await channel.send(content=content, embed=embed, allowed_mentions=allowed_mentions)
 
     async def send_dm(
@@ -48,10 +54,13 @@ class DiscordGatewayImpl:
             return
         await user.send(content=content, embed=embed)
 
-    async def send_webhook(self, url: str, *, content: Optional[str] = None, embed: Any = None) -> None:
+    async def send_webhook(
+        self, url: str, *, content: Optional[str] = None, embed: Any = None, username: Optional[str] = None
+    ) -> None:
         async with aiohttp.ClientSession() as session:
             webhook = discord.Webhook.from_url(url, session=session)
-            await webhook.send(content=content, embed=embed)
+            extra = {"username": username} if username is not None else {}
+            await webhook.send(content=content, embed=embed, **extra)
 
     # --- resolvers ---
     def get_emojis(self) -> list:

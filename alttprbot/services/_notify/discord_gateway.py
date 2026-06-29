@@ -26,13 +26,16 @@ class DiscordGateway(Protocol):
         *,
         embed: Any = None,
         mention_everyone: bool = False,
+        mention_roles: bool = False,
     ) -> None: ...
 
     async def send_dm(
         self, user_id: int, content: Optional[str] = None, *, embed: Any = None
     ) -> None: ...
 
-    async def send_webhook(self, url: str, *, content: Optional[str] = None, embed: Any = None) -> None: ...
+    async def send_webhook(
+        self, url: str, *, content: Optional[str] = None, embed: Any = None, username: Optional[str] = None
+    ) -> None: ...
 
     def get_emojis(self) -> list: ...
 

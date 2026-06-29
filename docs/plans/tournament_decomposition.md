@@ -98,16 +98,31 @@
   `None` from `create_race_room`, which the un-null-checked base dereferenced → `AttributeError` + a
   spurious audit error). Docstrings corrected to describe this as an intentional cleanup, not a mirror.
 
-**▶ NEXT — PR 7: the dailies** (`AlttprSGDailyRace` / `SMZ3DailyRace`). Open casual races (not invitational,
-no player invites/DMs, no bot seed roll), so they extend the **base** orchestrator and override room kwargs
-(`invitational=False`, `team_race` from a "co-op" title match), a custom `race_info`, and — instead of the
-player room-info DM — an **announcement** posted to a channel (with role mentions; `alttprdaily` also posts a
-webhook). The announce message uses discord timestamps, so it moves to the presenter. Then **`alttpr_quals`**
-(the only active non-daily handler; deep AsyncTournament entanglement — live-race lookup, permission checks,
-permalink + eligible-entrant records, `on_race_start` processing — solo, reviewed). After the tail lands, the
-**Final PR** removes the now-unused legacy god-object handler classes + the racetime-bot import from
-`tournaments.py`, leaving `alttprbot/tournament/` as just the dispatch adapter (+ `TournamentConfig` shim),
-and confirms import-linter still 3-kept with the orchestrators now actively under the layering contracts.
+- **PR 7 (done)** — the SG dailies (`alttprdaily` + `smz3`), the first **active production** handlers to
+  migrate. Open casual races: `SGDailyOrchestrator` (`services/tournament/dailies.py`) extends the **base**
+  orchestrator and overrides `room_creation_kwargs` (`invitational=False`, `team_race` from a "co-op" title
+  match), `update_data` (fetch episode/game/team, resolve **no** players — open race), `race_info` / `seed_time`,
+  and `send_player_room_info` → a channel **announcement** (`alttprdaily` also posts the SG webhook) instead of
+  player DMs. Two thin subclasses set the per-event presentation (series label, seed-time inclusion, role-mention
+  prefix, webhook). New collaborators: presenter `send_race_announcement` (discord timestamps + role mentions +
+  optional webhook), gateway `send_channel_message(mention_roles=)` + `send_webhook(username=)`. 12 new tests; 443
+  passing; import-linter 3-kept. Verified by a 4-surface adversarial parity workflow (15 findings, **0 behavior
+  divergences** — every announce/race-info string confirmed byte-for-byte; the one "confirmed" was a stale registry
+  comment, fixed). **Production runs the hardcoded path, so the dailies go live on the next deploy — smoke-test in
+  DEBUG first.**
+
+**▶ NEXT — PR 8: `alttpr_quals`** (the ALTTPR main-tournament live qualifier, slug `alttpr`). The last and
+riskiest active handler — deeply entangled with the AsyncTournament system: `process_race` does live-race lookup
++ a stack of guard conditions, a mod/admin permission check, room-lock, seed roll via `triforce_text`, permalink
+persistence, and writes an `AsyncTournamentRace` record per eligible entrant; `on_race_start` flips pending
+entrants to in-progress and prunes no-shows; `construct_race_room` silently skips when no live race exists. Needs
+new AsyncTournament repository methods (live-race-by-episode + save, permalink create, eligible-entrant + start
+processing), an adapter-supplied authz callback (the existing `checks.is_async_tournament_user` mixes a DB check
+with a `discordbot` guild-role check), and an `on_race_start` lifecycle hook on the adapter. Solo PR, full
+adversarial review. After it lands, the **Final PR** removes the now-unused legacy god-object handler classes + the
+racetime-bot import from `tournaments.py`, leaving `alttprbot/tournament/` as just the dispatch adapter (+
+`TournamentConfig` shim), and confirms import-linter still 3-kept with the orchestrators now actively under the
+layering contracts.
 
 **RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
 confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title

@@ -21,6 +21,12 @@ from alttprbot.services.tournament.alttprleague import (
     ALTTPRLeagueOrchestrator,
 )
 from alttprbot.services.tournament.smrl import SMRL_DEFINITION, SMRLPlayoffsOrchestrator
+from alttprbot.services.tournament.dailies import (
+    ALTTPR_DAILY_DEFINITION,
+    SMZ3_DAILY_DEFINITION,
+    AlttprSGDailyOrchestrator,
+    SMZ3DailyOrchestrator,
+)
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -38,8 +44,8 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
     # Remaining slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
     'alttpr': alttpr_quals.ALTTPRQualifierRace,
-    'alttprdaily': dailies.AlttprSGDailyRace,
-    'smz3': dailies.SMZ3DailyRace,
+    'alttprdaily': make_adapter(AlttprSGDailyOrchestrator, ALTTPR_DAILY_DEFINITION),
+    'smz3': make_adapter(SMZ3DailyOrchestrator, SMZ3_DAILY_DEFINITION),
     'invleague': make_adapter(ALTTPRLeagueOrchestrator, INVITATIONAL_LEAGUE_DEFINITION),
     'alttprleague': make_adapter(ALTTPRLeagueOrchestrator, OPEN_LEAGUE_DEFINITION),
     'boots': make_adapter(BootsOrchestrator, BOOTS_DEFINITION),
@@ -60,15 +66,15 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
 # Seasonal handlers are decomposed in the catalog but left inactive here; add a slug to the
 # production list to enable it for a season:
 #   boots, nologic, smwde, alttprhmg, alttprmini, alttprde, smrl
-# Still-legacy (not yet decomposed) active handlers: alttpr, alttprdaily, smz3.
+# Still-legacy (not yet decomposed) active handlers: alttpr.
 if config.DEBUG:
     # Debug: no auto-active tournaments (enable 'test' here manually when needed).
     _HARDCODED_ACTIVE_SLUGS = []
 else:
     _HARDCODED_ACTIVE_SLUGS = [
         'alttpr',         # ALTTPR qualifier (legacy handler — not yet decomposed)
-        'alttprdaily',    # ALTTPR daily series (legacy handler)
-        'smz3',           # SMZ3 weekly (legacy handler)
+        'alttprdaily',    # ALTTPR daily series (decomposed orchestrator)
+        'smz3',           # SMZ3 weekly (decomposed orchestrator)
         'invleague',      # ALTTPR Invitational League (decomposed orchestrator)
         'alttprleague',   # ALTTPR Open League (decomposed orchestrator)
     ]

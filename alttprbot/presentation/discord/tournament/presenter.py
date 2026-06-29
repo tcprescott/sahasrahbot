@@ -92,6 +92,48 @@ class TournamentPresenter:
         if self.definition.audit_channel_id:
             await self.gateway.send_channel_message(self.definition.audit_channel_id, content, embed=embed)
 
+    async def send_race_announcement(
+        self,
+        channel_id: Optional[int],
+        *,
+        prefix: str,
+        series: str,
+        title: str,
+        race_start_time: Any,
+        broadcast_channels: Iterable[str],
+        room_url: str,
+        seed_time: Any = None,
+        webhook_url: Optional[str] = None,
+        webhook_role_mention: Optional[str] = None,
+    ) -> None:
+        """Post the open-race announcement (legacy daily ``send_player_room_info`` / ``announce_message``).
+
+        Builds the message with Discord relative/absolute timestamps and posts it to the
+        announce channel (allowing role mentions). When ``seed_time`` is given the message
+        includes the "Seed Distributed" line + permalink (alttprdaily); otherwise just the
+        room link (smz3). When ``webhook_url`` is given (alttprdaily) the same message,
+        prefixed with the webhook role mention, is also posted to the SG webhook.
+        """
+        msg = (
+            f"{prefix}{series} - {title} - "
+            f"{discord.utils.format_dt(race_start_time)} ({discord.utils.format_dt(race_start_time, 'R')})"
+        )
+        channels = list(broadcast_channels)
+        if channels:
+            msg += f" on {', '.join(channels)}"
+        if seed_time is not None:
+            msg += f" - Seed Distributed {discord.utils.format_dt(seed_time, 'R')} - {room_url}"
+        else:
+            msg += f" - {room_url}"
+
+        if channel_id:
+            await self.gateway.send_channel_message(channel_id, msg, mention_roles=True)
+
+        if webhook_url:
+            await self.gateway.send_webhook(
+                webhook_url, content=f"{webhook_role_mention} {msg}", username="SahasrahBot"
+            )
+
     async def send_audit_alert(self, content: str) -> None:
         """Post an ``@here`` audit alert (legacy DM-failure notice).
 
