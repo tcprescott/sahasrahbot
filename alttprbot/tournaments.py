@@ -49,40 +49,31 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
     'smrl': smrl_playoff.SMRLPlayoffs,
 }
 
-# Phase 1: Hardcoded registry fallback (preserved for rollback safety)
-# This is the original registry logic, kept as emergency fallback.
-# Active when TOURNAMENT_CONFIG_ENABLED is false (default).
+# Hardcoded registry fallback (active when TOURNAMENT_CONFIG_ENABLED is false — the
+# production default). Single source of truth: the *handler* for every slug always comes
+# from AVAILABLE_TOURNAMENT_HANDLERS, so this fallback can never drift from the catalog (or
+# the config/tournaments.yaml path) — migrating a handler in the catalog propagates to both
+# paths automatically. These lists declare only *which* slugs are active per profile.
+#
+# Seasonal handlers are decomposed in the catalog but left inactive here; add a slug to the
+# production list to enable it for a season:
+#   boots, nologic, smwde, alttprhmg, alttprmini, alttprde, smrl
+# Still-legacy (not yet decomposed) active handlers: alttpr, alttprdaily, smz3.
 if config.DEBUG:
-    _HARDCODED_TOURNAMENT_DATA = {
-        # 'test': test.TestTournament
-    }
+    # Debug: no auto-active tournaments (enable 'test' here manually when needed).
+    _HARDCODED_ACTIVE_SLUGS = []
 else:
-    _HARDCODED_TOURNAMENT_DATA = {
-        # REGULAR TOURNAMENTS
+    _HARDCODED_ACTIVE_SLUGS = [
+        'alttpr',         # ALTTPR qualifier (legacy handler — not yet decomposed)
+        'alttprdaily',    # ALTTPR daily series (legacy handler)
+        'smz3',           # SMZ3 weekly (legacy handler)
+        'invleague',      # ALTTPR Invitational League (decomposed orchestrator)
+        'alttprleague',   # ALTTPR Open League (decomposed orchestrator)
+    ]
 
-        # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        # 'alttprde': alttprde.ALTTPRDETournament,
-        # 'alttprmini': alttprmini.ALTTPRMiniTournament,
-        'alttpr': alttpr_quals.ALTTPRQualifierRace,
-        # 'boots': boots.ALTTPRCASBootsTournamentRace,
-        # 'nologic': nologic.ALTTPRNoLogicRace,
-        # 'smwde': smwde.SMWDETournament,
-        # 'alttprfr': alttprfr.ALTTPRFRTournament,
-        # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
-        # 'alttpres': alttpres.ALTTPRESTournament,
-        # 'smz3coop': smz3coop.SMZ3CoopTournament,
-        # 'smbingo': smbingo.SMBingoTournament,
-        # 'smrl': smrl_playoff.SMRLPlayoffs,
-        # 'sgl24alttpr': alttprsglive.ALTTPRSGLive,
-
-        # Dailies/Weeklies
-        'alttprdaily': dailies.AlttprSGDailyRace,
-        'smz3': dailies.SMZ3DailyRace,
-
-        # ALTTPR League
-        'invleague': alttprleague.ALTTPRLeague,
-        'alttprleague': alttprleague.ALTTPROpenLeague,
-    }
+_HARDCODED_TOURNAMENT_DATA = {
+    slug: AVAILABLE_TOURNAMENT_HANDLERS[slug] for slug in _HARDCODED_ACTIVE_SLUGS
+}
 
 
 # Phase 1: Dual-path runtime switch

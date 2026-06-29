@@ -67,10 +67,19 @@
   embeds once in `process_race`. 9 new tests (mode fetch + error path, room kwargs solo/co-op/spoiler,
   preset vs spoiler roll, no-op welcome, both definitions); 403 passing; import-linter 3-kept. Two
   adversarial parity reviewers (overrides + ID/wiring): **clean — no divergences, IDs match digit-for-digit.**
-  **Rollout caveat:** like every prior PR this repoints the `AVAILABLE_TOURNAMENT_HANDLERS` capability
-  catalog (the config-driven path), but `_HARDCODED_TOURNAMENT_DATA` still maps `invleague`/`alttprleague`
-  to the legacy classes (the default-flag fallback for rollback safety). The new orchestrators only go
-  live when `TOURNAMENT_CONFIG_ENABLED=true` (or at the final-PR cutover).
+- **Registry unification (done, post-PR5)** — the dual-source drift is eliminated.
+  `_HARDCODED_TOURNAMENT_DATA` (the fallback used when `TOURNAMENT_CONFIG_ENABLED` is false — the
+  **production default**) is now *derived* from `AVAILABLE_TOURNAMENT_HANDLERS`:
+  `{slug: AVAILABLE_TOURNAMENT_HANDLERS[slug] for slug in _HARDCODED_ACTIVE_SLUGS}`. The fallback lists
+  declare only *which slugs* are active per profile; the *handler class* always comes from the catalog,
+  so the hardcoded path, the `config/tournaments.yaml` path, and the catalog can never disagree. The
+  production active set is unchanged (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) — the
+  one behavioral effect is that `invleague`/`alttprleague` now dispatch to the migrated (parity-reviewed)
+  orchestrator under the default path too, matching the config path. A no-drift regression test pins the
+  invariant (`tests/unit/services/test_tournament_registry.py`). **Because production runs the hardcoded
+  path, do a DEBUG/staging smoke test of the league rooms before the next deploy** — the new code is
+  static-parity-clean but not yet live-validated. Migrating a future handler in the catalog now
+  propagates to both paths automatically (no second registry edit).
 
 **▶ NEXT — PR 6: `smrl_playoff`** (the Super Metroid Random League playoffs — `smrl`). Heavier than
 league: a fully custom `process_race` (SM seeds via `SuperMetroidVaria` / `smdash`, race-info set to the
