@@ -21,6 +21,7 @@ This module imports no ``discord`` / ``racetime_bot`` / ``alttprbot.presentation
 from __future__ import annotations
 
 from alttprbot.repositories import TournamentResultsRepository
+from alttprbot.services.seedgen import generator
 from alttprbot.services.tournament.core import TournamentOrchestrator
 from alttprbot.services.tournament.types import SeedResult
 
@@ -36,6 +37,27 @@ class ALTTPRTournamentOrchestrator(TournamentOrchestrator):
         persistence layer consume.
         """
         raise NotImplementedError("ALTTPR tournament events must override roll().")
+
+    async def _roll_from_title_map(self, title_map: dict, **generate_kwargs) -> SeedResult:
+        """Resolve the preset from the match title and roll it.
+
+        Mirrors the title-parse ``roll`` shared by the legacy ``ALTTPRDETournament`` /
+        ``ALTTPRMiniTournament``: take the match title, keep the part after the last
+        ``:``, strip it, and look it up in ``title_map``. On an unknown title, post the
+        legacy "Invalid mode chosen" notice to the race room and re-raise the ``KeyError``
+        (which aborts the roll exactly as before — no seed, ``seed_rolled`` stays false).
+        """
+        try:
+            match_title = self.friendly_name.split(":")[-1].strip()
+            preset = title_map[match_title]
+        except KeyError:
+            await self.racetime.send_message(
+                self.room.name,
+                "Invalid mode chosen, please contact a tournament admin for assistance.",
+            )
+            raise
+        seed = await generator.ALTTPRPreset(preset).generate(**generate_kwargs)
+        return SeedResult(seed=seed)
 
     @staticmethod
     def _seed_code(result: SeedResult) -> str:

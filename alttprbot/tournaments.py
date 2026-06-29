@@ -10,6 +10,11 @@ from alttprbot.tournament import registry_loader
 from alttprbot.tournament.orchestrator_adapter import make_adapter
 from alttprbot.services.tournament.test import TEST_DEFINITION, TestOrchestrator
 from alttprbot.services.tournament.boots import BOOTS_DEFINITION, BootsOrchestrator
+from alttprbot.services.tournament.smwde import SMWDE_DEFINITION, SMWDEOrchestrator
+from alttprbot.services.tournament.nologic import NOLOGIC_DEFINITION, NoLogicOrchestrator
+from alttprbot.services.tournament.alttprhmg import ALTTPRHMG_DEFINITION, ALTTPRHMGOrchestrator
+from alttprbot.services.tournament.alttprde import ALTTPRDE_DEFINITION, ALTTPRDEOrchestrator
+from alttprbot.services.tournament.alttprmini import ALTTPRMINI_DEFINITION, ALTTPRMiniOrchestrator
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -19,9 +24,10 @@ RACETIME_URL = config.RACETIME_URL
 # Active handlers are determined by TOURNAMENT_DATA (hardcoded fallback)
 # or by config/tournaments.yaml when TOURNAMENT_CONFIG_ENABLED is true.
 AVAILABLE_TOURNAMENT_HANDLERS = {
-    # 'test' and 'boots' are migrated to the decomposed orchestrator/presenter (see
-    # docs/plans/tournament_decomposition.md); 'boots' is the first seed-rolling handler.
-    # Other slugs keep their legacy god-object class until migrated one-per-PR.
+    # Migrated to the decomposed orchestrator/presenter (see
+    # docs/plans/tournament_decomposition.md): 'test' (debug), 'boots' (first seed-rolling),
+    # and the trivial/low ALTTPR tail 'smwde'/'nologic'/'alttprhmg'/'alttprde'/'alttprmini'.
+    # Remaining slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
     'alttpr': alttpr_quals.ALTTPRQualifierRace,
     'alttprdaily': dailies.AlttprSGDailyRace,
@@ -29,11 +35,11 @@ AVAILABLE_TOURNAMENT_HANDLERS = {
     'invleague': alttprleague.ALTTPRLeague,
     'alttprleague': alttprleague.ALTTPROpenLeague,
     'boots': make_adapter(BootsOrchestrator, BOOTS_DEFINITION),
-    'nologic': nologic.ALTTPRNoLogicRace,
-    'smwde': smwde.SMWDETournament,
-    'alttprhmg': alttprhmg.ALTTPRHMGTournament,
-    'alttprmini': alttprmini.ALTTPRMiniTournament,
-    'alttprde': alttprde.ALTTPRDETournament,
+    'nologic': make_adapter(NoLogicOrchestrator, NOLOGIC_DEFINITION),
+    'smwde': make_adapter(SMWDEOrchestrator, SMWDE_DEFINITION),
+    'alttprhmg': make_adapter(ALTTPRHMGOrchestrator, ALTTPRHMG_DEFINITION),
+    'alttprmini': make_adapter(ALTTPRMiniOrchestrator, ALTTPRMINI_DEFINITION),
+    'alttprde': make_adapter(ALTTPRDEOrchestrator, ALTTPRDE_DEFINITION),
     'smrl': smrl_playoff.SMRLPlayoffs,
 }
 

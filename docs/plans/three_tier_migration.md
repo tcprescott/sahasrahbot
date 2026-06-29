@@ -174,9 +174,12 @@ it does not violate them until its decomposition relocates it into `services/tou
   `TournamentOrchestrator` base + dispatch adapter) and the debug `test` handler;
   **PR 3 migrated `boots`** — the first seed-rolling handler — porting the shared
   `ALTTPRTournamentOrchestrator` (`process_race`/`send_room_welcome`) + presenter seed embeds,
-  adversarially parity-reviewed (one real entrant-snapshot timing bug found and fixed). NEXT is the
-  trivial/low ALTTPR tail (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`), then the moderate
-  handlers + dailies, with `alttpr_quals` last.
+  adversarially parity-reviewed (one real entrant-snapshot timing bug found and fixed);
+  **PR 4 migrated the trivial/low ALTTPR tail** (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`),
+  each a small `roll()`-only orchestrator + ID-only definition (`smwde` on the base orchestrator;
+  de/mini sharing a `_roll_from_title_map` helper), per-handler parity-reviewed clean (0 findings).
+  NEXT are the moderate handlers (`alttprleague`/`smrl_playoff`) + dailies, with `alttpr_quals` last,
+  then the final relocation into `services/tournament/`.
 - **Phase 9 util split** (`util/{asynctournament,rankedchoice,triforce_text}.py`).
 - **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
   all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked

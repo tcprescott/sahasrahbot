@@ -42,19 +42,32 @@
   the loop, after the seconds-long seed gen), so it now reads fresh via `racetime_gateway.get_entrant_ids`
   instead of the pre-roll room snapshot. All other findings refuted as parity/known-safe.
 
-**▶ NEXT — PR 4: the trivial/low ALTTPR handlers** (`smwde`, `nologic`, `alttprhmg`, then
-`alttprde`/`alttprmini` which share a title→preset map). Each is now a mechanical application of the
-PR-3 pattern: a `services/tournament/<event>.py` orchestrator overriding only `roll()` (+ its title
-parse where applicable), a `<EVENT>_DEFINITION` lifting the hardcoded IDs out of `configuration()`,
-and a registry repoint to `make_adapter(...)`. `smwde` is pure-config (SM, no ALTTPR roll) so it
-extends the base orchestrator, not the ALTTPR one. Then the moderate handlers
-(`alttprleague`/`smrl_playoff` — external API / submission form, solo PRs), the dailies, and
-**`alttpr_quals` last** (AsyncTournament entanglement; solo + adversarial review).
+- **PR 4 (done)** — the trivial/low ALTTPR tail, batched (the PR-3 pattern is now mechanical):
+  `services/tournament/{smwde,nologic,alttprhmg,alttprde,alttprmini}.py`, each a small orchestrator
+  overriding only `roll()` + a `<EVENT>_DEFINITION` lifting the hardcoded IDs out of the legacy
+  `configuration()`; registry repointed to `make_adapter(...)`. `smwde` is pure-config (SM hacks, no
+  seed roll) so it extends the **base** `TournamentOrchestrator` (no-op `process_race`, no welcome) —
+  matching the legacy `SMWDETournament` on the base `TournamentRace`. `nologic`/`alttprhmg` are
+  fixed-preset rolls; `alttprde`/`alttprmini` share a new `ALTTPRTournamentOrchestrator._roll_from_title_map`
+  helper (split title on the last `:`, strip, map lookup; unknown title → "Invalid mode chosen" race
+  message + re-raise) differing only in their title→preset map. 14 new tests (title-map success +
+  KeyError path, fixed-preset kwargs, every definition's IDs); 394 passing; import-linter 3-kept.
+  Verified by a per-handler adversarial parity workflow (5 reviewers reading legacy-vs-new digit/entry
+  by entry): **0 findings — clean parity across all five.**
 
-**RECOMMENDATION:** validate `test` (room lifecycle) and now `boots` (full seed-roll) in DEBUG —
-confirm a real room opens, the seed rolls, embeds/DMs/audit/permalink all fire — before batching the
-PR-4 handlers. Both orchestrator lifecycles and every collaborator are now exercised end-to-end, so a
-single live boots pass de-risks the entire remaining ALTTPR tail.
+**▶ NEXT — PR 5: the moderate handlers** (`alttprleague`/`ALTTPROpenLeague` — injects the
+`alttprleague.com/api/episode` external lookup; and `smrl_playoff` — submission-form + permalink
+writes). These have real overrides beyond `roll()` (external API, `process_race`/submission handling,
+extra repo writes), so each is a solo PR. Then the **dailies** (`AlttprSGDailyRace`/`SMZ3DailyRace`,
+the cron entry path) and finally **`alttpr_quals`** (the only active non-daily handler; AsyncTournament
+entanglement — solo, with its own adversarial review). After the tail lands, the **Final PR** relocates
+`alttprbot/tournament/` → `services/tournament/`, removes the racetime-bot import from `tournaments.py`,
+and confirms import-linter still 3-kept with the code now actively under the layering contracts.
+
+**RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
+confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title
+posts "Invalid mode chosen" — before tackling the moderate handlers. The whole ALTTPR tail now shares
+the exact same exercised collaborators, so a single live pass de-risks it.
 
 ## 1. Why this is the last big piece
 
