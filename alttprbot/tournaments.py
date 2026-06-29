@@ -5,9 +5,9 @@ import aiohttp
 
 import config
 from alttprbot import models
-from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttpr_quals
 from alttprbot.tournament import registry_loader
 from alttprbot.tournament.orchestrator_adapter import make_adapter
+from alttprbot.services._notify import racetime_gateway
 from alttprbot.services.tournament.test import TEST_DEFINITION, TestOrchestrator
 from alttprbot.services.tournament.boots import BOOTS_DEFINITION, BootsOrchestrator
 from alttprbot.services.tournament.smwde import SMWDE_DEFINITION, SMWDEOrchestrator
@@ -28,7 +28,6 @@ from alttprbot.services.tournament.dailies import (
     SMZ3DailyOrchestrator,
 )
 from alttprbot.services.tournament.alttpr_quals import QUALIFIER_DEFINITION, ALTTPRQualifierOrchestrator
-from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -163,11 +162,11 @@ async def fetch_tournament_handler_v2(event, episode: dict, rtgg_handler=None):
 
 async def create_tournament_race_room(event, episodeid):
     event_data = await TOURNAMENT_DATA[event].get_config()
-    rtgg_bot = racetimebot.racetime_bots[event_data.data.racetime_category]
+    category = event_data.data.racetime_category
     race = await models.TournamentResults.get_or_none(episode_id=episodeid)
     if race:
-        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"),
-                                   raise_for_status=True) as resp:
+        data_url = racetime_gateway.get().http_uri(category, f"/{race.srl_id}/data")
+        async with aiohttp.request(method='get', url=data_url, raise_for_status=True) as resp:
             race_data = json.loads(await resp.read())
         status = race_data.get('status', {}).get('value')
         if not status == 'cancelled':

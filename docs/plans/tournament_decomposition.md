@@ -130,13 +130,34 @@
 registry (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) and every seasonal slug dispatch through
 `services/tournament/` orchestrators + the presenter + gateways; no legacy god-object class is active.
 
-**▶ NEXT — PR 9 (final cleanup):** delete the now-unused legacy handler subclass files under
-`alttprbot/tournament/` (boots/smwde/smrl_playoff/alttprleague/nologic/alttprhmg/alttprde/alttprmini/alttpr_quals/
-dailies/test + the long-dead ones), drop the unused legacy-handler imports from `tournaments.py`, and route
-`create_tournament_race_room`'s lone `racetime_bots` use through the racetime gateway so the racetime-bot import can
-go. Keep `core.py` (the `TournamentConfig` + `UnableToLookupUserException` shim) and `alttpr.py` — the discord cog
-still imports them (for type hints + the pre-existing-broken cc2023 `roll_seed`/`generate_deck` commands, which are
-out of scope). Confirm import-linter still 3-kept.
+- **PR 9 (done) — final cleanup.** Deleted the 18 now-unused legacy handler subclass files under
+  `alttprbot/tournament/` (`boots`/`smwde`/`smrl_playoff`/`alttprleague`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`/
+  `alttpr_quals`/`test` + the `dailies/` package + the long-dead `alttpres`/`alttprfr`/`smz3coop`/`smbingo`/`smrl`/
+  `alttprsglive`/`alttprcd`), dropped the unused legacy-handler imports from `tournaments.py`, and routed
+  `create_tournament_race_room`'s lone `racetime_bots` lookup through the racetime gateway so the racetime-bot import
+  is gone. The `alttprbot/tournament/` package is now just the dispatch infra: `orchestrator_adapter.py` (the untiered
+  bridge), `registry_loader.py` (the YAML config path), and the `core.py` (`TournamentConfig` +
+  `UnableToLookupUserException`) / `alttpr.py` shims the discord cog still imports (type hints + the pre-existing-broken
+  cc2023 `roll_seed`/`generate_deck` commands — out of scope). 462 passing; import-linter 3-kept.
+
+## ★ Decomposition complete
+
+Every tournament handler is decomposed: the business orchestrators live in `alttprbot/services/tournament/`
+(actively under the import-linter layering + bot-singleton contracts), Discord rendering in
+`alttprbot/presentation/discord/tournament/presenter.py`, all RaceTime/Discord I/O behind the `_notify` gateways, and
+all ORM behind repositories. The `OrchestratorAdapter` is the one remaining transitional piece — an intentionally
+**untiered** bridge (in `alttprbot/tournament/`) that still touches `discordbot` for player/authz resolution and holds
+the live RaceTime handler, presenting the legacy dispatch interface to the un-migrated discord cog + racetime handler.
+
+**Follow-ups (beyond the handler decomposition):**
+- Retire the `OrchestratorAdapter` by rewiring the discord cog (`cogs/tournament.py`) and racetime handler
+  (`handlers/core.py`) to drive `(orchestrator, presenter)` directly — then `alttprbot/tournament/` can be deleted
+  entirely and the package relocated semantics finished. This is a dispatch-surface refactor, not a handler change.
+- Each migrated handler is static-parity-clean but **not yet live-validated**; smoke-test the active ones
+  (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) in DEBUG/staging before the next production deploy
+  (production runs the hardcoded path, so they go live on deploy).
+- Phase 10: flip the import-linter contracts to blocking + `SAHASRAHBOT_HOOKS_ENFORCE=1` once the guild-config
+  monkey-patch + legacy `database/config.py` also land.
 
 **RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
 confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title
