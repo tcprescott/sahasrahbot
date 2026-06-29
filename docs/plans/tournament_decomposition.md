@@ -55,14 +55,32 @@
   Verified by a per-handler adversarial parity workflow (5 reviewers reading legacy-vs-new digit/entry
   by entry): **0 findings — clean parity across all five.**
 
-**▶ NEXT — PR 5: the moderate handlers** (`alttprleague`/`ALTTPROpenLeague` — injects the
-`alttprleague.com/api/episode` external lookup; and `smrl_playoff` — submission-form + permalink
-writes). These have real overrides beyond `roll()` (external API, `process_race`/submission handling,
-extra repo writes), so each is a solo PR. Then the **dailies** (`AlttprSGDailyRace`/`SMZ3DailyRace`,
-the cron entry path) and finally **`alttpr_quals`** (the only active non-daily handler; AsyncTournament
-entanglement — solo, with its own adversarial review). After the tail lands, the **Final PR** relocates
-`alttprbot/tournament/` → `services/tournament/`, removes the racetime-bot import from `tournaments.py`,
-and confirms import-linter still 3-kept with the code now actively under the layering contracts.
+- **PR 5 (done)** — the ALTTPR **league** handlers (`invleague` + `alttprleague`). The legacy
+  `ALTTPRLeague`/`ALTTPROpenLeague` differed only in `event_slug`, so both collapse into one
+  `ALTTPRLeagueOrchestrator` (`services/tournament/alttprleague.py`) parameterised by
+  `INVITATIONAL_LEAGUE_DEFINITION` / `OPEN_LEAGUE_DEFINITION`. League-specific overrides on the shared
+  ALTTPR seed-roll lifecycle: `update_data` also fetches the external `alttprleague.com/api/episode`
+  "mode" (preset + spoiler/co-op flags); `room_creation_kwargs` derives the dynamic goal /
+  `team_race` / `require_even_teams`; `roll` rolls the league preset or a spoiler game (scheduling the
+  spoiler race via the gateway); `send_room_welcome` is a no-op (league suppressed it). The legacy
+  in-`roll` `create_embeds` (built twice, only the second used) is dropped — the presenter builds the
+  embeds once in `process_race`. 9 new tests (mode fetch + error path, room kwargs solo/co-op/spoiler,
+  preset vs spoiler roll, no-op welcome, both definitions); 403 passing; import-linter 3-kept. Two
+  adversarial parity reviewers (overrides + ID/wiring): **clean — no divergences, IDs match digit-for-digit.**
+  **Rollout caveat:** like every prior PR this repoints the `AVAILABLE_TOURNAMENT_HANDLERS` capability
+  catalog (the config-driven path), but `_HARDCODED_TOURNAMENT_DATA` still maps `invleague`/`alttprleague`
+  to the legacy classes (the default-flag fallback for rollback safety). The new orchestrators only go
+  live when `TOURNAMENT_CONFIG_ENABLED=true` (or at the final-PR cutover).
+
+**▶ NEXT — PR 6: `smrl_playoff`** (the Super Metroid Random League playoffs — `smrl`). Heavier than
+league: a fully custom `process_race` (SM seeds via `SuperMetroidVaria` / `smdash`, race-info set to the
+seed URL, no ALTTPR embeds), a web-API-consumed `submission_form` (list-of-dicts) + `process_submission_form`
+(builds an embed, persists `TournamentGames.settings`, DMs players), and a `create_race_room` that gates on
+submitted settings. Solo PR with its own adversarial review. Then the **dailies**
+(`AlttprSGDailyRace`/`SMZ3DailyRace`, the cron entry path) and finally **`alttpr_quals`** (the only active
+non-daily handler; AsyncTournament entanglement — solo, reviewed). After the tail lands, the **Final PR**
+relocates `alttprbot/tournament/` → `services/tournament/`, removes the racetime-bot import from
+`tournaments.py`, and confirms import-linter still 3-kept with the code now actively under the contracts.
 
 **RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
 confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title

@@ -177,9 +177,14 @@ it does not violate them until its decomposition relocates it into `services/tou
   adversarially parity-reviewed (one real entrant-snapshot timing bug found and fixed);
   **PR 4 migrated the trivial/low ALTTPR tail** (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`),
   each a small `roll()`-only orchestrator + ID-only definition (`smwde` on the base orchestrator;
-  de/mini sharing a `_roll_from_title_map` helper), per-handler parity-reviewed clean (0 findings).
-  NEXT are the moderate handlers (`alttprleague`/`smrl_playoff`) + dailies, with `alttpr_quals` last,
-  then the final relocation into `services/tournament/`.
+  de/mini sharing a `_roll_from_title_map` helper), per-handler parity-reviewed clean (0 findings);
+  **PR 5 migrated the ALTTPR league handlers** (`invleague`/`alttprleague`) into one
+  `ALTTPRLeagueOrchestrator` + two definitions (external `alttprleague.com/api` mode fetch, dynamic
+  room kwargs, spoiler-game roll, no-op welcome), two adversarial reviewers clean. NEXT is
+  `smrl_playoff` (custom SM process + web submission form) + dailies, with `alttpr_quals` last, then the
+  final relocation into `services/tournament/`. (Migrated handlers are repointed in the
+  `AVAILABLE_TOURNAMENT_HANDLERS` catalog; the hardcoded fallback stays on the legacy classes until the
+  `TOURNAMENT_CONFIG_ENABLED` cutover.)
 - **Phase 9 util split** (`util/{asynctournament,rankedchoice,triforce_text}.py`).
 - **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
   all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked

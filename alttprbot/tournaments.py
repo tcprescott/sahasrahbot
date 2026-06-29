@@ -15,6 +15,11 @@ from alttprbot.services.tournament.nologic import NOLOGIC_DEFINITION, NoLogicOrc
 from alttprbot.services.tournament.alttprhmg import ALTTPRHMG_DEFINITION, ALTTPRHMGOrchestrator
 from alttprbot.services.tournament.alttprde import ALTTPRDE_DEFINITION, ALTTPRDEOrchestrator
 from alttprbot.services.tournament.alttprmini import ALTTPRMINI_DEFINITION, ALTTPRMiniOrchestrator
+from alttprbot.services.tournament.alttprleague import (
+    INVITATIONAL_LEAGUE_DEFINITION,
+    OPEN_LEAGUE_DEFINITION,
+    ALTTPRLeagueOrchestrator,
+)
 from alttprbot.presentation.racetime import bot as racetimebot
 
 RACETIME_URL = config.RACETIME_URL
@@ -26,14 +31,15 @@ RACETIME_URL = config.RACETIME_URL
 AVAILABLE_TOURNAMENT_HANDLERS = {
     # Migrated to the decomposed orchestrator/presenter (see
     # docs/plans/tournament_decomposition.md): 'test' (debug), 'boots' (first seed-rolling),
-    # and the trivial/low ALTTPR tail 'smwde'/'nologic'/'alttprhmg'/'alttprde'/'alttprmini'.
+    # the trivial/low ALTTPR tail 'smwde'/'nologic'/'alttprhmg'/'alttprde'/'alttprmini', and
+    # the moderate league handlers 'invleague'/'alttprleague' (one orchestrator, two configs).
     # Remaining slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
     'alttpr': alttpr_quals.ALTTPRQualifierRace,
     'alttprdaily': dailies.AlttprSGDailyRace,
     'smz3': dailies.SMZ3DailyRace,
-    'invleague': alttprleague.ALTTPRLeague,
-    'alttprleague': alttprleague.ALTTPROpenLeague,
+    'invleague': make_adapter(ALTTPRLeagueOrchestrator, INVITATIONAL_LEAGUE_DEFINITION),
+    'alttprleague': make_adapter(ALTTPRLeagueOrchestrator, OPEN_LEAGUE_DEFINITION),
     'boots': make_adapter(BootsOrchestrator, BOOTS_DEFINITION),
     'nologic': make_adapter(NoLogicOrchestrator, NOLOGIC_DEFINITION),
     'smwde': make_adapter(SMWDEOrchestrator, SMWDE_DEFINITION),
