@@ -28,6 +28,42 @@
 
 ## Recent Completions
 
+- **Authorization centralized into a single PDP (`AuthorizationService`).** Domain
+  authorization decisions — previously scattered across cogs (inline `bot.is_owner` /
+  `guild_permissions.administrator` blocks, hardcoded role-ID literals, owner-id and
+  `race.user.discord_user_id` self-comparisons), the API, and the RaceTime handlers,
+  with the one cross-cutting helper (`is_async_tournament_user`) living *in the
+  presentation layer* (`api/util/checks.py`) yet imported by Discord cogs and the
+  tournament coordinator — now resolve through one service. Shape is the XACML
+  PDP/PEP/PIP/PAP split forced by the import-linter rule (services may not import
+  `discord`/`quart`/`racetime_bot`): `authorization_service.py` was promoted to a
+  package `services/authorization/` (`service.py` = PDP, `subject.py` = the normalized
+  `AuthSubject` principal, `__init__` re-exporting both). Each surface builds an
+  `AuthSubject` from platform facts via a per-surface PIP builder
+  (`presentation/discord/util/authz.py`, `presentation/api/util/subject.py`,
+  `presentation/racetime/util/authz.py`) so the service never touches a platform
+  object. **Platform/cosmetic authz stays native** in presentation (consolidated, not
+  relocated): shared `requires_bot_owner` / `requires_admin_or_owner`
+  `app_commands.check` predicates raising `AuthzCheckFailure`, rendered centrally by
+  the `errors` cog alongside new `PermissionError` arms. Convention: `require_*` raises
+  `PermissionError(message)` (slash path, central render), `is_*`/`can_*` returns bool
+  (View/modal callbacks, inline — the `on_view_error` listener is dead in discord.py).
+  `api/util/checks.py` shim and the old `authorization_service.py` module deleted; the
+  presentation→presentation edge is gone. **Authentication left where it correctly
+  lives** (Discord OAuth/session, RaceTime per-category OAuth, bot tokens, `UserService`
+  identity linking) — moving it would violate the layering rule. Shipped as risk-ordered
+  phases (5a–5e decomposed the dense `asynctournament.py` site — bot-owner cmds →
+  tournament-owner → role grants → race self-ownership in persistent views → the join
+  gate). **Three latent auth bugs fixed in passing:** an un-awaited
+  `self.bot.is_owner(...)` coroutine (always falsy → the admin-or-owner deny branch
+  never fired, leaving `reverify`/`create_or_update`/rankedchoice `create` effectively
+  unprotected); a missing `return` after the VoD-owner denial in `async_submit_vod`
+  (non-owner fell through to `send_modal`); and a "You are authorized" → "not
+  authorized" message typo. 494 tests green, import-linter 3 kept / 0 broken throughout;
+  an adversarial OLD-vs-NEW parity review of the full diff returned zero regressions.
+  Plan: `docs/plans` / plan-mode record. **Note:** `subject_from_session` and
+  `is_tournament_admin`/`require_tournament_admin` are scaffolded but not yet wired to a
+  call site (harmless dead code, ready for future use).
 - **Final structural debt cleared (three-tier migration).** The last untiered seams are gone.
   (1) `alttprbot/tournaments.py` decomposed: the registry moved to `alttprbot/services/tournament/registry.py`
   (slug → `TournamentEntry(orchestrator_cls, definition)`, pure service data — no presentation import); the
