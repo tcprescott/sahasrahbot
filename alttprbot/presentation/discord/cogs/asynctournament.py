@@ -19,6 +19,7 @@ from alttprbot.services import (
     AsyncTournamentScoringService,
     AsyncTournamentService,
     AuditService,
+    AuthorizationService,
     UserService,
 )
 from alttprbot.presentation.api.util import checks
@@ -226,7 +227,8 @@ class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
                 "This tournament is not currently active.  This should not have happened.", ephemeral=True)
             return
 
-        if interaction.user.id != async_tournament.owner_id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_tournament_owner(subject, async_tournament):
             await interaction.response.send_message(
                 "You are not the owner of this tournament.  This should not have happened.", ephemeral=True)
             return
@@ -1142,7 +1144,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
             return
 
-        if interaction.user.id != async_tournament.owner_id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_tournament_owner(subject, async_tournament):
             await interaction.response.send_message("You are not the owner of this tournament.", ephemeral=True)
             return
 
@@ -1165,7 +1168,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("There is no async run in this thread.", ephemeral=True)
             return
 
-        if not race.tournament.owner_id == interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_tournament_owner(subject, race.tournament):
             await interaction.response.send_message("Only the owner of this tournament may update runs.",
                                                     ephemeral=True)
             return
