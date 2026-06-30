@@ -1,10 +1,10 @@
 from quart import (Blueprint, abort, jsonify, request, Response)
 from alttprbot.presentation.api.oauth_client import Unauthorized
 
-from alttprbot.services import AsyncTournamentScoringService, AsyncTournamentService, UserService
+from alttprbot.services import AsyncTournamentScoringService, AsyncTournamentService, AuthorizationService, UserService
 from alttprbot.presentation.api import auth
 from alttprbot.presentation.api.api import discord
-from alttprbot.presentation.api.util import checks
+from alttprbot.presentation.api.util.subject import subject_with_guild_roles
 
 asynctournament_blueprint = Blueprint('async', __name__)
 
@@ -147,7 +147,7 @@ async def async_tournament_info_json(tournament_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod'])
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
 
@@ -174,7 +174,7 @@ async def async_tournament_leaderboard_json(tournament_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod'])
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
 
@@ -366,7 +366,7 @@ async def async_tournament_queue_json(tournament_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod'])
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
@@ -440,7 +440,7 @@ async def async_tournament_review_json(tournament_id: int, race_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod'])
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
@@ -501,7 +501,7 @@ async def async_tournament_review_submit_json(tournament_id: int, race_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod'])
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
@@ -545,7 +545,7 @@ async def async_tournament_pools_json(tournament_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod', 'public'])
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
 
@@ -593,7 +593,7 @@ async def async_tournament_permalink_json(tournament_id: int, permalink_id: int)
         return jsonify({'error': 'Permalink not found.'}), 404
 
     if not permalink.live_race:
-        authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+        authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod', 'public'])
         if not authorized and tournament.active:
             return jsonify({'error': 'Not authorized.'}), 403
 
@@ -638,7 +638,7 @@ async def async_tournament_player_json(tournament_id: int, user_id: int):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'}), 404
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    authorized = await AuthorizationService().is_async_tournament_user(await subject_with_guild_roles(user, tournament.guild_id), tournament, ['admin', 'mod', 'public'])
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
 
