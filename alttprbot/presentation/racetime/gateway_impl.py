@@ -10,8 +10,10 @@ inward at startup; resolution is lazy.
 
 from __future__ import annotations
 
+import json
 from typing import Any, Optional
 
+import aiohttp
 from racetime_bot import msg_actions
 
 from alttprbot.presentation.racetime.compat import get_room_handler
@@ -128,6 +130,17 @@ class RaceTimeGatewayImpl:
 
     async def get_team(self, category: str, team_slug: str) -> Any:
         return await self.bots[category].get_team(team_slug)
+
+    async def get_race_status(self, category: str, srl_id: str) -> Optional[str]:
+        """Fetch the RaceTime room status value (e.g. ``'cancelled'``) for a room.
+
+        Mirrors the legacy ``tournaments.create_tournament_race_room`` existence check:
+        GET ``/{srl_id}/data`` and read ``status.value``.
+        """
+        data_url = self.http_uri(category, f"/{srl_id}/data")
+        async with aiohttp.request(method='get', url=data_url, raise_for_status=True) as resp:
+            race_data = json.loads(await resp.read())
+        return race_data.get('status', {}).get('value')
 
     def http_uri(self, category: str, url: str) -> str:
         return self.bots[category].http_uri(url)

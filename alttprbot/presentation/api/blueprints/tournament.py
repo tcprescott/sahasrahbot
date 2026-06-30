@@ -1,7 +1,8 @@
 from quart import Blueprint, jsonify, request, session
 
 from alttprbot.services import TournamentGamesService
-from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
+from alttprbot.services.tournament import registry as tournament_registry
+from alttprbot.presentation.discord.tournament import dispatch as tournament_dispatch
 from alttprbot.presentation.api.api import discord
 
 tournament_blueprint = Blueprint('tournament', __name__)
@@ -17,10 +18,10 @@ async def get_tournament_games():
 
 @tournament_blueprint.route('/api/tournament/form-config/<string:event>', methods=['GET'])
 async def get_form_config(event):
-    if event not in TOURNAMENT_DATA:
+    if event not in tournament_registry.TOURNAMENT_DATA:
         return jsonify(error=f"Unknown event: {event}"), 404
 
-    event_config = await TOURNAMENT_DATA[event].get_config()
+    event_config = await tournament_dispatch.get_config(event)
     form_data = event_config.submission_form
 
     if form_data is None:
@@ -63,7 +64,7 @@ async def api_submit():
         from werkzeug.datastructures import ImmutableMultiDict
         flat_payload = ImmutableMultiDict(list(payload.items()))
 
-        tournament_race = await fetch_tournament_handler(event, episode_id)
+        tournament_race = await tournament_dispatch.fetch_tournament_handler(event, episode_id)
         submitted_by = getattr(user, 'name', str(user)) or "unknown"
         await tournament_race.process_submission_form(flat_payload, submitted_by=submitted_by)
         return jsonify(success=True, versus=tournament_race.versus)

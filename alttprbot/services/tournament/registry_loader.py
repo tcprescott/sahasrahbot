@@ -297,22 +297,22 @@ def build_active_registry(
         profile_name: Profile to use ('debug' or 'production')
         
     Returns:
-        Dictionary mapping event slug to handler class (only enabled events)
-        
+        Dictionary mapping event slug to its registry entry (only enabled events)
+
     Raises:
         TournamentConfigError: If profile not found
     """
     profile = registry.get_profile(profile_name)
     if profile is None:
         raise TournamentConfigError(f"Profile not found: '{profile_name}'")
-    
+
     active_registry = {}
     enabled_events = profile.get_enabled_events()
-    
+
     for event in enabled_events:
-        handler_class = available_handlers[event.handler]
-        active_registry[event.event_slug] = handler_class
-    
+        entry = available_handlers[event.handler]
+        active_registry[event.event_slug] = entry
+
     return active_registry
 
 

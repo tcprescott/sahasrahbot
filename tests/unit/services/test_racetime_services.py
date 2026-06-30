@@ -1,8 +1,9 @@
 """Unit tests for the RaceTime-surface services (repositories mocked)."""
 
-from unittest.mock import AsyncMock, sentinel
+from unittest.mock import AsyncMock, Mock, sentinel
 
 from alttprbot.services import RaceRoomService, SpoilerRaceService, TournamentResultsService
+from alttprbot.services._notify import racetime_gateway
 
 
 # --- SpoilerRaceService ---
@@ -78,3 +79,44 @@ async def test_tournament_results_get_by_srl_id_delegates():
 
     assert await service.get_by_srl_id("room-1") is sentinel.tr
     service.repository.get_by_srl_id.assert_awaited_once_with("room-1")
+
+
+def _gateway_returning(status, monkeypatch):
+    gw = AsyncMock()
+    gw.get_race_status.return_value = status
+    monkeypatch.setattr(racetime_gateway, "get", lambda: gw)
+    return gw
+
+
+async def test_handle_existing_room_no_row_proceeds(monkeypatch):
+    service = TournamentResultsService()
+    service.repository = AsyncMock()
+    service.repository.get_by_episode_id.return_value = None
+    gw = _gateway_returning("open", monkeypatch)
+
+    assert await service.handle_existing_room_for_episode(42, "alttpr") is True
+    gw.get_race_status.assert_not_awaited()  # no row -> never queries racetime
+    service.repository.delete.assert_not_awaited()
+
+
+async def test_handle_existing_room_live_refuses(monkeypatch):
+    race = Mock(srl_id="room-42")
+    service = TournamentResultsService()
+    service.repository = AsyncMock()
+    service.repository.get_by_episode_id.return_value = race
+    gw = _gateway_returning("in_progress", monkeypatch)
+
+    assert await service.handle_existing_room_for_episode(42, "alttpr") is False
+    gw.get_race_status.assert_awaited_once_with("alttpr", "room-42")
+    service.repository.delete.assert_not_awaited()  # live room left intact
+
+
+async def test_handle_existing_room_cancelled_deletes_and_proceeds(monkeypatch):
+    race = Mock(srl_id="room-42")
+    service = TournamentResultsService()
+    service.repository = AsyncMock()
+    service.repository.get_by_episode_id.return_value = race
+    _gateway_returning("cancelled", monkeypatch)
+
+    assert await service.handle_existing_room_for_episode(42, "alttpr") is True
+    service.repository.delete.assert_awaited_once_with(race)

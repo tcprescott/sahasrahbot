@@ -1,21 +1,21 @@
-"""Transitional adapter bridging the legacy dispatch to the decomposed orchestrator.
+"""Presentation-tier coordinator that drives a decomposed tournament event.
 
-The discord cog, RaceTime handler, and ``tournaments.py`` dispatch all drive a
-``TournamentRace``-shaped object (``construct_race_room`` / ``construct`` /
-``construct_with_episode_data`` / ``get_config`` classmethods + ``process_tournament_race``
-/ ``on_*`` / ``can_gatekeep`` / ``player_racetime_ids``). This adapter presents that exact
-interface but delegates business to a ``TournamentOrchestrator`` (service tier) and
-rendering/sends to a ``TournamentPresenter`` (discord presentation).
+Composes a service-tier ``TournamentOrchestrator`` (business) with a Discord
+``TournamentPresenter`` (rendering), supplies the Discord-specific resolution the
+orchestrator pushes out (player lookup, gatekeeper / async-tournament role checks), and
+holds the live RaceTime handler. The discord cog, the RaceTime handler, and the dispatch
+module drive a single coordinator object (``construct_race_room`` / ``construct`` /
+``construct_with_episode_data`` / ``get_config`` + ``process_tournament_race`` / ``on_*`` /
+``can_gatekeep`` / ``player_racetime_ids``).
 
-It lives in the Discord presentation tier (``presentation/discord/tournament/``) because it
-touches ``discordbot`` for the Discord-specific resolution the orchestrator pushes out
-(player lookup, gatekeeper role checks) and holds the live RaceTime handler. ``tournaments.py``
-builds the per-event registry by binding each orchestrator class to this adapter via
-:func:`make_adapter`; every active event slug now resolves to a decomposed
-``(orchestrator, presenter)`` pair behind this interface.
+A coordinator is built from a service-tier ``TournamentEntry`` (orchestrator class +
+definition); ``dispatch.py`` resolves the entry from the registry and hands it here. This
+replaces the transitional ``OrchestratorAdapter`` + ``make_adapter`` metaprogramming with a
+plain presentation-tier class.
 """
 
 import logging
+from typing import TYPE_CHECKING
 
 from alttprbot.presentation.discord.bot import discordbot
 from alttprbot.presentation.discord.tournament.presenter import TournamentPresenter
@@ -25,33 +25,35 @@ from alttprbot.services import UserService
 from alttprbot.services.tournament.types import RaceRoom, TournamentPlayer
 from alttprbot.exceptions import UnableToLookupUserException
 
+if TYPE_CHECKING:
+    from alttprbot.services.tournament.registry import TournamentEntry
 
-class OrchestratorAdapter:
-    # set by make_adapter() on each per-event subclass
-    _orchestrator_cls = None
-    _definition = None
 
-    def __init__(self, episodeid=None, rtgg_handler=None):
+class TournamentCoordinator:
+    def __init__(self, entry: "TournamentEntry", episodeid=None, rtgg_handler=None):
+        self._entry = entry
+        self._orchestrator_cls = entry.orchestrator_cls
+        self._definition = entry.definition
         try:
             self.episodeid = int(episodeid)
         except TypeError:
             self.episodeid = episodeid
         self.rtgg_handler = rtgg_handler
         self.orchestrator = None
-        # `.data` is a live TournamentConfig (resolved from the definition) for backward
-        # compatibility with the un-migrated discord cog, which reads live discord objects
-        # off the dispatched object (.guild / .audit_channel / .data.scheduling_needs_channel).
-        # Built after discordbot is ready (see the construct* / get_config classmethods).
+        # `.data` is a live TournamentConfig (resolved from the definition) for the discord
+        # cog, which reads live discord objects off the dispatched object (.guild /
+        # .audit_channel / .data.scheduling_needs_channel). Built after discordbot is ready
+        # (see the construct* / get_config classmethods).
         self.data = None
 
     # --- construction / dispatch entry points ---
     @classmethod
-    async def construct_race_room(cls, episodeid):
-        adapter = cls(episodeid=episodeid, rtgg_handler=None)
+    async def construct_race_room(cls, entry, episodeid):
+        coord = cls(entry, episodeid=episodeid, rtgg_handler=None)
         await discordbot.wait_until_ready()
-        adapter.data = adapter._build_config()
-        orch = adapter._build_orchestrator(episodeid)
-        adapter.orchestrator = orch
+        coord.data = coord._build_config()
+        orch = coord._build_orchestrator(episodeid)
+        coord.orchestrator = orch
 
         # Pre-I/O gate (e.g. alttpr_quals live-race lookup): short-circuit before any
         # SpeedGaming / RaceTime calls, matching the legacy construct_race_room which did
@@ -62,58 +64,54 @@ class OrchestratorAdapter:
         await orch.update_data()
 
         # Submission gate (e.g. smrl): if the event refuses room creation it has already
-        # handled the abort (sent a reminder); skip opening a room. This cleanly drops a
-        # latent legacy crash — legacy create_race_room returned None here, which the
-        # un-null-checked base construct_race_room dereferenced (AttributeError + a spurious
-        # "error creating a race room" audit message). Warning DMs + the upsert are unchanged.
+        # handled the abort (sent a reminder); skip opening a room.
         if not await orch.before_room_creation():
             return None
 
         handler = await racetime_gateway.get().start_race(
-            cls._definition.racetime_category, **orch.room_creation_kwargs
+            entry.definition.racetime_category, **orch.room_creation_kwargs
         )
-        handler.tournament = adapter
-        adapter.rtgg_handler = handler
+        handler.tournament = coord
+        coord.rtgg_handler = handler
 
         logging.info(handler.data.get("name"))
-        room = adapter._room_from_handler(handler)
+        room = coord._room_from_handler(handler)
         await orch.on_room_created(room)
         return handler.data
 
     @classmethod
-    async def construct(cls, episodeid, rtgg_handler):
-        adapter = cls(episodeid=episodeid, rtgg_handler=rtgg_handler)
+    async def construct(cls, entry, episodeid, rtgg_handler):
+        coord = cls(entry, episodeid=episodeid, rtgg_handler=rtgg_handler)
         await discordbot.wait_until_ready()
-        adapter.data = adapter._build_config()
-        orch = adapter._build_orchestrator(episodeid)
-        adapter.orchestrator = orch
+        coord.data = coord._build_config()
+        orch = coord._build_orchestrator(episodeid)
+        coord.orchestrator = orch
         await orch.update_data()
         if rtgg_handler is not None:
-            orch.room = adapter._room_from_handler(rtgg_handler)
-        return adapter
+            orch.room = coord._room_from_handler(rtgg_handler)
+        return coord
 
     @classmethod
-    async def construct_with_episode_data(cls, episode, rtgg_handler):
-        adapter = cls(episodeid=episode["id"], rtgg_handler=rtgg_handler)
+    async def construct_with_episode_data(cls, entry, episode, rtgg_handler):
+        coord = cls(entry, episodeid=episode["id"], rtgg_handler=rtgg_handler)
         await discordbot.wait_until_ready()
-        adapter.data = adapter._build_config()
-        orch = adapter._build_orchestrator(episode["id"])
+        coord.data = coord._build_config()
+        orch = coord._build_orchestrator(episode["id"])
         orch.episode = episode
-        adapter.orchestrator = orch
+        coord.orchestrator = orch
         await orch.update_data(update_episode=False)
         if rtgg_handler is not None:
-            orch.room = adapter._room_from_handler(rtgg_handler)
-        return adapter
+            orch.room = coord._room_from_handler(rtgg_handler)
+        return coord
 
     @classmethod
-    async def get_config(cls):
-        adapter = cls(episodeid=None, rtgg_handler=None)
+    async def get_config(cls, entry):
+        coord = cls(entry, episodeid=None, rtgg_handler=None)
         await discordbot.wait_until_ready()
-        adapter.data = adapter._build_config()
-        return adapter
+        coord.data = coord._build_config()
+        return coord
 
-    # --- backward-compat surface for the un-migrated discord cog ---
-    # The cog reads these live objects off the dispatched object (post get_config).
+    # --- cog-facing surface (the cog reads these live objects off the dispatched object) ---
     @property
     def guild(self):
         return self.data.guild if self.data else None
@@ -138,7 +136,7 @@ class OrchestratorAdapter:
     def hours_before_room_open(self):
         return (self._definition.stream_delay + self._definition.room_open_time) / 60
 
-    # --- legacy instance interface (delegated to the orchestrator) ---
+    # --- lifecycle interface (delegated to the orchestrator) ---
     async def process_tournament_race(self, args, message):
         # Refresh the room (name / URL) from the live handler before delegating. The
         # entrant list for the post-roll seed-URL whisper is read fresh from the racetime
@@ -147,10 +145,9 @@ class OrchestratorAdapter:
         if self.rtgg_handler is not None:
             self.orchestrator.room = self._room_from_handler(self.rtgg_handler)
         rolled = await self.orchestrator.process_race(args, message)
-        # seed_rolled is RaceTime *handler* state guarding double-rolling. The legacy
-        # subclasses set it as the last line of a successful process_tournament_race; the
-        # orchestrator (no handler) reports the roll and the adapter (holds the handler)
-        # sets the flag. Only set on success so an exception leaves the room re-rollable.
+        # seed_rolled is RaceTime *handler* state guarding double-rolling. The orchestrator
+        # (no handler) reports the roll and the coordinator (holds the handler) sets the
+        # flag. Only set on success so an exception leaves the room re-rollable.
         if rolled and self.rtgg_handler is not None:
             self.rtgg_handler.seed_rolled = True
 
@@ -190,8 +187,8 @@ class OrchestratorAdapter:
     def _build_config(self) -> TournamentConfig:
         """Resolve the TournamentDefinition (IDs) into a live TournamentConfig.
 
-        This is the backward-compat bridge for the un-migrated cog. The orchestrator
-        itself never uses this — it works off the definition.
+        This is the bridge for the discord cog. The orchestrator itself never uses this —
+        it works off the definition.
         """
         d = self._definition
         guild = discordbot.get_guild(d.guild_id) if d.guild_id else None
@@ -311,12 +308,3 @@ class OrchestratorAdapter:
             return False
         member_role_ids = {r.id for r in member.roles}
         return any(rid in member_role_ids for rid in (helper_role_ids or []))
-
-
-def make_adapter(orchestrator_cls, definition):
-    """Build a per-event adapter class bound to an orchestrator class + definition."""
-    return type(
-        f"{orchestrator_cls.__name__}Adapter",
-        (OrchestratorAdapter,),
-        {"_orchestrator_cls": orchestrator_cls, "_definition": definition},
-    )

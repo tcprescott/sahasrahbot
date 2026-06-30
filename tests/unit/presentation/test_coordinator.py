@@ -1,18 +1,20 @@
-"""Tests for the OrchestratorAdapter's backward-compat surface (cog-facing).
+"""Tests for the TournamentCoordinator (cog-facing surface + lifecycle delegation).
 
-The un-migrated discord cog reads live discord objects + scalar props off the dispatched
-object; the adapter resolves the TournamentDefinition into a live TournamentConfig and
-exposes the legacy property surface. Here we drive _build_config + the properties with a
-fake discordbot.
+The discord cog reads live discord objects + scalar props off the dispatched coordinator;
+the coordinator resolves the TournamentDefinition into a live TournamentConfig and exposes
+the legacy property surface. The RaceTime handler drives the lifecycle methods. Here we
+drive _build_config, the properties, the room-refresh/seed_rolled logic, and the
+construction gates with a fake discordbot. (Replaces the old OrchestratorAdapter tests.)
 """
 
 from unittest.mock import AsyncMock
 
 import pytest
 
-import alttprbot.presentation.discord.tournament.orchestrator_adapter as adapter_mod
+import alttprbot.presentation.discord.tournament.coordinator as coord_mod
+from alttprbot.presentation.discord.tournament.coordinator import TournamentCoordinator
 from alttprbot.services.tournament import TournamentDefinition
-from alttprbot.presentation.discord.tournament.orchestrator_adapter import make_adapter
+from alttprbot.services.tournament.registry import TournamentEntry
 
 
 class _Role:
@@ -52,18 +54,21 @@ DEFN = TournamentDefinition(
 )
 
 
+def _entry(orchestrator_cls):
+    return TournamentEntry(orchestrator_cls, DEFN)
+
+
 def _patch_bot(monkeypatch):
     guild = _Guild(roles=[7, 8])  # 999 is not a real role -> dropped
     bot = _FakeBot(guild, channels={10: "AUDIT", 11: "COMMENTARY"})
-    monkeypatch.setattr(adapter_mod, "discordbot", bot)
+    monkeypatch.setattr(coord_mod, "discordbot", bot)
     return guild
 
 
 def test_build_config_resolves_ids_to_live_objects(monkeypatch):
     guild = _patch_bot(monkeypatch)
-    AdapterCls = make_adapter(object, DEFN)
-    adapter = AdapterCls()
-    cfg = adapter._build_config()
+    coord = TournamentCoordinator(_entry(object))
+    cfg = coord._build_config()
 
     assert cfg.guild is guild
     assert cfg.audit_channel == "AUDIT"
@@ -77,26 +82,24 @@ def test_build_config_resolves_ids_to_live_objects(monkeypatch):
 
 def test_cog_facing_properties(monkeypatch):
     _patch_bot(monkeypatch)
-    AdapterCls = make_adapter(object, DEFN)
-    adapter = AdapterCls()
-    adapter.data = adapter._build_config()
+    coord = TournamentCoordinator(_entry(object))
+    coord.data = coord._build_config()
 
-    assert adapter.guild is not None
-    assert adapter.audit_channel == "AUDIT"
-    assert adapter.commentary_channel == "COMMENTARY"
-    assert adapter.lang == "en"
-    assert adapter.submission_form == "myform"
-    assert adapter.hours_before_room_open == (10 + 35) / 60
+    assert coord.guild is not None
+    assert coord.audit_channel == "AUDIT"
+    assert coord.commentary_channel == "COMMENTARY"
+    assert coord.lang == "en"
+    assert coord.submission_form == "myform"
+    assert coord.hours_before_room_open == (10 + 35) / 60
     # the cog reads .data.racetime_category / .data.scheduling_needs_channel
-    assert adapter.data.racetime_category == "test"
-    assert adapter.data.scheduling_needs_channel is None
+    assert coord.data.racetime_category == "test"
+    assert coord.data.scheduling_needs_channel is None
 
 
 def test_player_racetime_ids_safe_without_orchestrator(monkeypatch):
     _patch_bot(monkeypatch)
-    AdapterCls = make_adapter(object, DEFN)
-    adapter = AdapterCls()
-    assert adapter.player_racetime_ids == []  # orchestrator not built yet
+    coord = TournamentCoordinator(_entry(object))
+    assert coord.player_racetime_ids == []  # orchestrator not built yet
 
 
 def _fake_handler(seed_rolled=False):
@@ -106,72 +109,71 @@ def _fake_handler(seed_rolled=False):
     return handler
 
 
-def _adapter_with_orch(monkeypatch, process_race):
+def _coord_with_orch(monkeypatch, process_race):
     _patch_bot(monkeypatch)
     fake_gw = type("GW", (), {"http_uri": lambda self, cat, url: f"http://rt{url}"})()
-    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+    monkeypatch.setattr(coord_mod.racetime_gateway, "get", lambda: fake_gw)
 
-    AdapterCls = make_adapter(object, DEFN)
-    adapter = AdapterCls()
-    adapter.rtgg_handler = _fake_handler()
+    coord = TournamentCoordinator(_entry(object))
+    coord.rtgg_handler = _fake_handler()
     orch = AsyncMock()
     orch.process_race = process_race
-    adapter.orchestrator = orch
-    return adapter, orch
+    coord.orchestrator = orch
+    return coord, orch
 
 
 async def test_process_tournament_race_refreshes_room_and_sets_seed_rolled(monkeypatch):
-    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock(return_value=True))
+    coord, orch = _coord_with_orch(monkeypatch, AsyncMock(return_value=True))
 
-    await adapter.process_tournament_race(None, None)
+    await coord.process_tournament_race(None, None)
 
     # room refreshed from the live handler (fresh entrants/url) before delegating
     assert orch.room.name == "test/clever-cat"
     assert orch.room.entrant_ids == ["e1"]
     assert orch.room.url == "http://rt/r"
     orch.process_race.assert_awaited_once()
-    assert adapter.rtgg_handler.seed_rolled is True
+    assert coord.rtgg_handler.seed_rolled is True
 
 
 async def test_process_tournament_race_no_seed_rolled_when_handler_does_not_roll(monkeypatch):
-    adapter, _ = _adapter_with_orch(monkeypatch, AsyncMock(return_value=False))
-    await adapter.process_tournament_race(None, None)
-    assert adapter.rtgg_handler.seed_rolled is False  # falsy return -> guard untouched
+    coord, _ = _coord_with_orch(monkeypatch, AsyncMock(return_value=False))
+    await coord.process_tournament_race(None, None)
+    assert coord.rtgg_handler.seed_rolled is False  # falsy return -> guard untouched
 
 
 async def test_process_tournament_race_leaves_room_rerollable_on_error(monkeypatch):
-    adapter, _ = _adapter_with_orch(monkeypatch, AsyncMock(side_effect=RuntimeError("boom")))
+    coord, _ = _coord_with_orch(monkeypatch, AsyncMock(side_effect=RuntimeError("boom")))
     with pytest.raises(RuntimeError):
-        await adapter.process_tournament_race(None, None)
-    assert adapter.rtgg_handler.seed_rolled is False  # exception -> not set
+        await coord.process_tournament_race(None, None)
+    assert coord.rtgg_handler.seed_rolled is False  # exception -> not set
 
 
-# --- submission-flow delegation (PR6) ---
+# --- submission-flow delegation ---
 
-async def test_adapter_delegates_process_submission_form(monkeypatch):
-    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+async def test_coordinator_delegates_process_submission_form(monkeypatch):
+    coord, orch = _coord_with_orch(monkeypatch, AsyncMock())
     orch.process_submission_form = AsyncMock(return_value=None)
-    await adapter.process_submission_form({"game": "1"}, submitted_by="u")
+    await coord.process_submission_form({"game": "1"}, submitted_by="u")
     orch.process_submission_form.assert_awaited_once_with({"game": "1"}, "u")
 
 
-async def test_adapter_delegates_send_race_submission_form(monkeypatch):
-    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+async def test_coordinator_delegates_send_race_submission_form(monkeypatch):
+    coord, orch = _coord_with_orch(monkeypatch, AsyncMock())
     orch.send_race_submission_form = AsyncMock()
-    await adapter.send_race_submission_form(warning=True)
+    await coord.send_race_submission_form(warning=True)
     orch.send_race_submission_form.assert_awaited_once_with(warning=True)
 
 
-async def test_adapter_versus_delegates_to_orchestrator(monkeypatch):
-    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+async def test_coordinator_versus_delegates_to_orchestrator(monkeypatch):
+    coord, orch = _coord_with_orch(monkeypatch, AsyncMock())
     orch.versus = "A vs. B"
-    assert adapter.versus == "A vs. B"
+    assert coord.versus == "A vs. B"
 
 
-def test_adapter_versus_safe_without_orchestrator(monkeypatch):
+def test_coordinator_versus_safe_without_orchestrator(monkeypatch):
     _patch_bot(monkeypatch)
-    adapter = make_adapter(object, DEFN)()
-    assert adapter.versus is None
+    coord = TournamentCoordinator(_entry(object))
+    assert coord.versus is None
 
 
 class _GatedOrchestrator:
@@ -206,10 +208,9 @@ async def test_construct_race_room_aborts_when_gated(monkeypatch):
     _patch_bot(monkeypatch)
     started = AsyncMock()
     fake_gw = type("GW", (), {"start_race": started})()
-    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+    monkeypatch.setattr(coord_mod.racetime_gateway, "get", lambda: fake_gw)
 
-    AdapterCls = make_adapter(_GatedOrchestrator, DEFN)
-    handler = await AdapterCls.construct_race_room(123)
+    handler = await TournamentCoordinator.construct_race_room(_entry(_GatedOrchestrator), 123)
 
     assert handler is None  # gated -> no room
     started.assert_not_awaited()  # start_race never reached
@@ -219,11 +220,10 @@ async def test_construct_race_room_pre_io_gate_skips_update_data(monkeypatch):
     _patch_bot(monkeypatch)
     started = AsyncMock()
     fake_gw = type("GW", (), {"start_race": started})()
-    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+    monkeypatch.setattr(coord_mod.racetime_gateway, "get", lambda: fake_gw)
 
     _PreGatedOrchestrator.update_data_calls = 0
-    AdapterCls = make_adapter(_PreGatedOrchestrator, DEFN)
-    handler = await AdapterCls.construct_race_room(123)
+    handler = await TournamentCoordinator.construct_race_room(_entry(_PreGatedOrchestrator), 123)
 
     assert handler is None
     started.assert_not_awaited()

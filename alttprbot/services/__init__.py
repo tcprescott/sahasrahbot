@@ -21,6 +21,7 @@ from alttprbot.services.authorization_service import AuthorizationService
 from alttprbot.services.daily_service import DailyService
 from alttprbot.services.discord_server_service import DiscordServerService
 from alttprbot.services.guild_config_service import GuildConfigService
+from alttprbot.services.holy_image_service import HolyImageService
 from alttprbot.services.inquiry_message_config_service import InquiryMessageConfigService
 from alttprbot.services.konot_service import KONOTService
 from alttprbot.services.nick_verification_service import NickVerificationService
@@ -50,6 +51,7 @@ __all__ = [
     "DailyService",
     "DiscordServerService",
     "GuildConfigService",
+    "HolyImageService",
     "InquiryMessageConfigService",
     "KONOTService",
     "NickVerificationService",
