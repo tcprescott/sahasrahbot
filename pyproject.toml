@@ -54,6 +54,73 @@ pycodestyle = "*"
 pylint = "*"
 autopep8 = "^2.0.1"
 ipython = "^8.10.0"
+pytest = "*"
+pytest-asyncio = "*"
+pytest-cov = "*"
+import-linter = "*"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+# importlib mode lets nested test packages share basenames (e.g. several
+# test_core.py) without colliding and without needing __init__.py files.
+addopts = "--import-mode=importlib"
+
+[tool.coverage.run]
+source = ["alttprbot"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "helpers/*",
+]
+
+[tool.importlinter]
+root_package = "alttprbot"
+include_external_packages = "true"
+
+# Contract 1 — the three-tier spine. Imports may only point downward.
+[[tool.importlinter.contracts]]
+name = "Three-tier layering"
+type = "layers"
+layers = [
+    "alttprbot.presentation",
+    "alttprbot.services",
+    "alttprbot.repositories",
+    "alttprbot.models",
+]
+
+# Contract 2 — the service and repository tiers must stay free of UI/transport
+# libraries and of the presentation tier.
+[[tool.importlinter.contracts]]
+name = "Core tiers must not import UI or presentation"
+type = "forbidden"
+source_modules = [
+    "alttprbot.services",
+    "alttprbot.repositories",
+]
+forbidden_modules = [
+    "discord",
+    "racetime_bot",
+    "quart",
+    "alttprbot.presentation",
+]
+allow_indirect_imports = "true"
+
+# Contract 3 — the presentation tier must reach data only through services.
+# Enforced (blocking in CI) as of the final migration phase: the direct-model
+# import burn-down is complete.
+[[tool.importlinter.contracts]]
+name = "Presentation must not import models directly"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation",
+]
+forbidden_modules = [
+    "alttprbot.models",
+]
+allow_indirect_imports = "true"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

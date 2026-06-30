@@ -9,11 +9,15 @@ SahasrahBot is a **monolithic async Python application** that generates randomiz
 ```
 sahasrahbot.py (entry point)
 ├── Tortoise ORM init (MySQL)
-├── alttprbot_discord  → Main Discord bot (discord.py v2)
-├── alttprbot_audit    → Audit/moderation Discord bot (separate token)
-├── alttprbot_racetime → RaceTime.gg race bot (racetime-bot SDK)
-└── alttprbot_api      → Web API (Quart)
+├── alttprbot.presentation.discord   → Main Discord bot (discord.py v2)
+├── alttprbot.presentation.audit     → Audit/moderation Discord bot (separate token)
+├── alttprbot.presentation.racetime  → RaceTime.gg race bot (racetime-bot SDK)
+└── alttprbot.presentation.api       → Web API (Quart)
 ```
+
+> The four surfaces were folded into a single `alttprbot/` package under
+> `alttprbot/presentation/` during the three-tier migration (Phase 1). See the
+> Project Structure below and [docs/architecture-layers.md](docs/architecture-layers.md).
 
 All subsystems share the same database connection, ORM models, and utility libraries. They run in a single process intentionally — the Quart API and tournament system need direct access to the live `discordbot` object.
 
@@ -27,7 +31,7 @@ All subsystems share the same database connection, ORM models, and utility libra
 | Migrations | Aerich (`aerich migrate` / `aerich upgrade`) |
 | Entry point | `python sahasrahbot.py` |
 | Config | `config.py` — pydantic-settings, env vars / `.env` file |
-| Tests | No formal test suite; debug mode enables test fixtures |
+| Tests | `pytest` + `pytest-asyncio` (`poetry run pytest`); debug mode also enables test fixtures |
 | Linting | `pycodestyle`, `pylint`, `autopep8` (dev deps) |
 
 ## Project Structure
@@ -35,33 +39,27 @@ All subsystems share the same database connection, ORM models, and utility libra
 ```
 sahasrahbot.py              # Entry point — starts all 4 subsystems
 config.py                   # Runtime config (pydantic-settings, env-backed)
-alttprbot/                  # Core shared library
-  alttprgen/                # Seed generation (presets, providers, reliability)
-  database/                 # Legacy raw SQL modules
-  models/                   # Tortoise ORM models (50+ entities)
-  tournament/               # Tournament handler classes
+alttprbot/                  # Single package — top-level directories ARE the tiers
+  presentation/             # Tier 1 — thin adapters (folded-in surfaces, Phase 1)
+    discord/                #   Main Discord bot (bot.py, cogs/, util/)
+    audit/                  #   Audit Discord bot (separate token, privileged intents)
+    racetime/               #   RaceTime.gg integration (bot.py, core.py, handlers/)
+    api/                    #   Quart web API (api.py, blueprints/, static/, spa/)
+  services/                 # Tier 2 — business logic
+    seedgen/                #   Seed generation, was alttprgen/ (presets, providers)
+    _notify/                #   Fire-and-forget notification queue + presentation gateways
+    audit_service.py        #   AuditService + AuditActions
+  repositories/             # Tier 3 — pure Tortoise CRUD (returns models)
+  models/                   # Tier 4 — Tortoise ORM models (50+ entities, unchanged)
+  database/                 # Legacy raw SQL modules (being retired)
+  tournament/               # Tournament handler classes (moves to services/ in Phase 7)
   util/                     # Shared utilities (telemetry, config contract, etc.)
   exceptions.py             # Custom exception hierarchy
-alttprbot_discord/          # Main Discord bot
-  bot.py                    # Bot startup/shutdown
-  cogs/                     # 20+ command groups (generator, tournament, daily, admin...)
-  util/                     # Discord-specific utilities
-alttprbot_audit/            # Audit Discord bot (separate token, privileged intents)
-  bot.py                    # Audit bot startup
-  cogs/                     # Audit + moderation cogs
-alttprbot_racetime/         # RaceTime.gg integration
-  bot.py                    # RaceTime bot startup
-  core.py                   # Compatibility adapter for official SDK
-  handlers/                 # Per-game-category race handlers (12+)
-alttprbot_api/              # Quart web API
-  api.py                    # App factory
-  blueprints/               # Route groups (presets, tournament, racetime, etc.)
-  templates/                # Jinja2 templates
-  static/                   # Static assets
 presets/                    # YAML preset files for randomizer generation
 config/                     # Tournament YAML config
-migrations/                 # Aerich database migrations (98 files)
+migrations/                 # Aerich database migrations
 helpers/                    # Standalone utility scripts (validation, conversion)
+tests/                      # pytest + pytest-asyncio (unit/, integration/)
 docs/                       # All documentation (context, design, guides, plans, user-guide)
 ```
 
@@ -126,6 +124,21 @@ poetry run aerich migrate    # Create new migration
 - All direct imports must have explicit declarations in `pyproject.toml`
 - Run `poetry run python helpers/check_dependency_declarations.py` to validate
 - No intentional transitive-only reliance on packages
+
+## Architecture: Three-Tier Layering (migration in progress)
+
+SahasrahBot is migrating to a strict three-tier architecture inside a single `alttprbot/` package. Respect these boundaries — imports may only point downward:
+
+```
+Presentation (alttprbot/presentation/{discord,audit,racetime,api}/)
+  → Service (alttprbot/services/)  → Repository (alttprbot/repositories/)  → Models (alttprbot/models/)
+```
+
+- **Presentation:** thin — calls services, renders results, catches their errors. No business logic; no `alttprbot.repositories`/`alttprbot.models` import.
+- **Service:** business rules/validation/authz/orchestration/audit/notify. Raises `ValueError`/`PermissionError`/`SahasrahBotException`. Never imports `discord`/`racetime_bot`/`quart`/`alttprbot.presentation`; reach surfaces via a `_notify` gateway.
+- **Repository:** pure Tortoise CRUD; returns models. No business logic/notify.
+
+During the migration the four `alttprbot_*` packages are being folded into `alttprbot/presentation/`, and `alttprgen`/`tournament` into `alttprbot/services/`. Enforcement: `poetry run lint-imports` (import-linter, warn-only for now) + edit-time Claude Code hooks. **Full rules and phase plan:** [docs/architecture-layers.md](docs/architecture-layers.md), [docs/plans/three_tier_migration.md](docs/plans/three_tier_migration.md).
 
 ## Architecture Patterns
 

@@ -1,0 +1,26 @@
+name: lint
+
+on:
+  push:
+    branches: [master, three-tier-migration]
+  pull_request:
+
+jobs:
+  architecture-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install dependencies
+        run: poetry install --with dev
+      # Architecture boundaries (import-linter). Blocking as of the final migration
+      # phase: the three-tier contracts are green (3 kept / 0 broken), so any new
+      # boundary violation now fails the build.
+      - name: Check import boundaries
+        run: poetry run lint-imports
+      - name: Run tests
+        run: poetry run pytest -q --cov --cov-report=term-missing
