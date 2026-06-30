@@ -319,5 +319,8 @@ class TournamentCoordinator:
         member = guild.get_member(discord_user_id)
         if not member:
             return False
-        member_role_ids = {r.id for r in member.roles}
-        return any(rid in member_role_ids for rid in (helper_role_ids or []))
+        subject = AuthSubject(
+            discord_user_id=discord_user_id,
+            discord_role_ids=frozenset(r.id for r in member.roles),
+        )
+        return AuthorizationService().can_gatekeep(subject, helper_role_ids)
