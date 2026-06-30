@@ -4,7 +4,7 @@ from discord.errors import NotFound
 from quart import Blueprint, request, jsonify
 from alttprbot.presentation.api.oauth_client import requires_authorization
 
-from alttprbot.services import RankedChoiceService
+from alttprbot.services import AuthorizationService, AuthSubject, RankedChoiceService
 from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
 from alttprbot.presentation.api.api import discord
 from alttprbot.presentation.discord.bot import discordbot
@@ -20,20 +20,24 @@ ranked_choice_blueprint = Blueprint('ranked_choice', __name__)
 async def _voter_role_denial(election, user_id):
     """Return an error response tuple if the user may not vote, else None.
 
-    Discord membership/role resolution stays in the presentation layer.
+    Discord membership/role resolution stays in the presentation layer; the
+    voter-role decision is made by AuthorizationService.
     """
     if not election.private:
         return None
 
     guild = await discordbot.fetch_guild(election.guild_id)
-    voter_role = guild.get_role(election.voter_role_id)
     try:
         member = await guild.fetch_member(user_id)
     except NotFound:
         logging.exception(f"Unable to find user {user_id} in guild.")
         return jsonify({'error': 'Unable to find you in the server.'}), 403
 
-    if voter_role not in member.roles:
+    subject = AuthSubject(
+        discord_user_id=user_id,
+        discord_role_ids=frozenset(role.id for role in member.roles),
+    )
+    if not AuthorizationService().can_vote_ranked_choice(subject, election):
         return jsonify({'error': 'You are not authorized to vote in this election.'}), 403
     return None
 
