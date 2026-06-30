@@ -1,13 +1,19 @@
 # Web Frontend Route Map
 
-> Last updated: 2026-02-12
-> Scope: HTML-rendered routes in `alttprbot_api/`
+> Last updated: 2026-06-30
+> Scope: routes serving the SPA / browser sessions, now in `alttprbot/presentation/web/`
+> (split out from the REST surface, which moved to `alttprbot/presentation/api/`).
+> Note: the Jinja2 templates this doc originally described have been fully replaced by
+> the React SPA (`alttprbot/presentation/web/spa/`) — this doc needs a broader refresh
+> beyond the API/web split; treat the routing stack section below as stale.
 
 ## Rendering Stack
 
-- Framework: Quart (`alttprbot_api/api.py`)
-- Templates: Jinja2 files under `alttprbot_api/templates/`
-- Auth for human sessions: Discord OAuth via `quart_discord` (`@requires_authorization`)
+- Framework: Quart (`alttprbot/presentation/web/web.py`)
+- SPA: React app under `alttprbot/presentation/web/spa/`, built to `spa/dist/` and
+  served by `web.py`'s catch-all route (no Jinja2 templates remain)
+- Auth for human sessions: Discord OAuth via `alttprbot/presentation/web/oauth_client.py`
+  (Authlib-based `AuthlibDiscordOAuth`, `@requires_authorization`)
 
 ## Intent Notes (confirmed 2026-02-12)
 

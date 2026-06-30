@@ -12,7 +12,7 @@ sahasrahbot.py (entry point)
 ├── alttprbot.presentation.discord   → Main Discord bot (discord.py v2)
 ├── alttprbot.presentation.audit     → Audit/moderation Discord bot (separate token)
 ├── alttprbot.presentation.racetime  → RaceTime.gg race bot (racetime-bot SDK)
-└── alttprbot.presentation.api       → Web API (Quart)
+└── alttprbot.presentation.{api,web} → Web (Quart): REST API (api) + OAuth/SPA backend (web), one app/port
 ```
 
 > The four surfaces were folded into a single `alttprbot/` package under
@@ -44,7 +44,8 @@ alttprbot/                  # Single package — top-level directories ARE the t
     discord/                #   Main Discord bot (bot.py, cogs/, util/)
     audit/                  #   Audit Discord bot (separate token, privileged intents)
     racetime/               #   RaceTime.gg integration (bot.py, core.py, handlers/)
-    api/                    #   Quart web API (api.py, blueprints/, static/, spa/)
+    api/                    #   REST API — no session/OAuth (auth.py, blueprints/)
+    web/                    #   Web BFF — Quart app, OAuth, SPA (web.py, oauth_client.py, blueprints/, spa/)
   services/                 # Tier 2 — business logic
     seedgen/                #   Seed generation, was alttprgen/ (presets, providers)
     _notify/                #   Fire-and-forget notification queue + presentation gateways
@@ -129,11 +130,11 @@ poetry run aerich migrate    # Create new migration
 SahasrahBot is migrating to a strict three-tier architecture inside a single `alttprbot/` package. Respect these boundaries — imports may only point downward:
 
 ```
-Presentation (alttprbot/presentation/{discord,audit,racetime,api}/)
+Presentation (alttprbot/presentation/{discord,audit,racetime,api,web}/)
   → Service (alttprbot/services/)  → Repository (alttprbot/repositories/)  → Models (alttprbot/models/)
 ```
 
-- **Presentation:** thin — calls services, renders results, catches their errors. No business logic; no `alttprbot.repositories`/`alttprbot.models` import.
+- **Presentation:** thin — calls services, renders results, catches their errors. No business logic; no `alttprbot.repositories`/`alttprbot.models` import. `api/` (REST, no session/OAuth) and `web/` (Quart app owner, OAuth, SPA) share one process/port but never import each other — enforced by import-linter; `sahasrahbot.py` is the only place that wires them together.
 - **Service:** business rules/validation/authz/orchestration/audit/notify. Raises `ValueError`/`PermissionError`/`SahasrahBotException`. Never imports `discord`/`racetime_bot`/`quart`/`alttprbot.presentation`; reach surfaces via a `_notify` gateway.
 - **Repository:** pure Tortoise CRUD; returns models. No business logic/notify.
 

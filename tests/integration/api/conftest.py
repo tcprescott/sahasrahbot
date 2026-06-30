@@ -1,28 +1,21 @@
-"""Fixtures for Quart API route tests.
+"""Fixtures for REST API route tests.
 
-``alttprbot.presentation.api.api`` builds the Quart app at import time and reads config
-(``int(config.DISCORD_CLIENT_ID)``, ``APP_SECRET_KEY``...), so we seed
-placeholder values before importing it. The test client does not trigger
-``before_serving`` hooks, so no real database connection is opened; every route
-under test has its model/bot access mocked.
+``alttprbot.presentation.api.blueprints`` has no dependency on Discord OAuth or
+the session cookie — it is pure REST (public or API-key-gated via
+``auth.authorized_key()``). This conftest builds a throwaway Quart app and
+registers only the REST blueprints, so no OAuth config seeding is needed.
 """
 
-import config
+import pytest_asyncio
+from quart import Quart
 
-for _key, _value in {
-    "DISCORD_CLIENT_ID": "123456",
-    "DISCORD_CLIENT_SECRET": "test-secret",
-    "APP_SECRET_KEY": "test-app-secret",
-    "APP_URL": "http://localhost:5001",
-}.items():
-    if not getattr(config, _key, None):
-        setattr(config, _key, _value)
-
-import pytest_asyncio  # noqa: E402
-from alttprbot.presentation.api.api import sahasrahbotapi  # noqa: E402
+from alttprbot.presentation.api.blueprints import REST_BLUEPRINTS
 
 
 @pytest_asyncio.fixture
 async def client():
-    async with sahasrahbotapi.test_client() as test_client:
+    app = Quart(__name__)
+    for blueprint, kwargs in REST_BLUEPRINTS:
+        app.register_blueprint(blueprint, **kwargs)
+    async with app.test_client() as test_client:
         yield test_client

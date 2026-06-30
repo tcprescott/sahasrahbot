@@ -16,12 +16,6 @@ def patch_form_config(monkeypatch, submission_form):
     monkeypatch.setattr(t_bp.tournament_dispatch, "get_config", AsyncMock(return_value=cfg))
 
 
-async def test_submit_without_session_is_unauthenticated(client):
-    resp = await client.post("/api/tournament/submit", json={"event": "x", "episodeid": 1})
-    assert resp.status_code == 401
-    assert (await resp.get_json())["error"] == "unauthenticated"
-
-
 async def test_form_config_unknown_event_returns_404(client):
     resp = await client.get("/api/tournament/form-config/definitely-not-an-event")
     assert resp.status_code == 404

@@ -12,7 +12,8 @@ sahasrahbot.py (entry point)
 ├── alttprbot_discord  → Discord bot (discord.py)
 ├── alttprbot_audit    → Audit Discord bot (separate token)
 ├── alttprbot_racetime → RaceTime.gg bot (racetime-bot)
-└── alttprbot_api      → Web API (Quart)
+├── alttprbot/presentation/api → REST API (no session/OAuth)
+└── alttprbot/presentation/web → Web BFF for the SPA (Quart app, Discord OAuth)
 ```
 
 All four subsystems share the same database connection, models, and utility libraries.
@@ -48,7 +49,8 @@ These intent notes were confirmed directly with the repository author (2026-02-1
 | `alttprbot_discord/` | Main Discord bot with 17+ cogs |
 | `alttprbot_audit/` | Audit/moderation Discord bot (2 cogs) |
 | `alttprbot_racetime/` | RaceTime.gg integration (12+ game categories) |
-| `alttprbot_api/` | Quart web API (10 blueprints) |
+| `alttprbot/presentation/api/` | REST API surface — public/API-key JSON, no session (5 blueprints) |
+| `alttprbot/presentation/web/` | Web BFF — Quart app, Discord OAuth, SPA static serving, session-authenticated JSON for the SPA (6 blueprints) |
 
 ## Design Patterns
 

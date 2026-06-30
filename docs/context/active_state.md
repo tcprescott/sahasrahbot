@@ -28,6 +28,21 @@
 
 ## Recent Completions
 
+- **REST API separated from the web UI.** `alttprbot/presentation/api/` previously mixed
+  a session/OAuth-free REST surface (public or `auth.authorized_key()`-gated, for
+  external/machine consumers) with a Discord-OAuth-session BFF for the React SPA. Split
+  by auth method — not URL naming, since several SPA-facing JSON routes were named
+  `/api/...` — into two independent presentation surfaces sharing one Quart
+  app/process/port (127.0.0.1:5001, unchanged): `alttprbot/presentation/api/` (REST only,
+  no Quart app, no session) and `alttprbot/presentation/web/` (owns the Quart app,
+  `oauth_client.py`, the SPA under `web/spa/`, and every session-authenticated JSON
+  endpoint). Four blueprint files (`racetime`, `asynctournament`, `presets`, `tournament`)
+  split into REST/web halves with disambiguated blueprint names to avoid registration
+  collisions; three moved wholesale (`settingsgen` → `api/`, `triforcetexts`/
+  `ranked_choice` → `web/`). `sahasrahbot.py` is now the sole composition root, importing
+  both and registering `api/`'s `REST_BLUEPRINTS` onto the `web`-owned app. Two new
+  import-linter contracts forbid `presentation.api` ↔ `presentation.web` cross-imports in
+  either direction (5 contracts kept, 0 broken). Zero URL/route changes. 494 tests green.
 - **Authorization centralized into a single PDP (`AuthorizationService`).** Domain
   authorization decisions — previously scattered across cogs (inline `bot.is_owner` /
   `guild_permissions.administrator` blocks, hardcoded role-ID literals, owner-id and
@@ -40,7 +55,8 @@
   package `services/authorization/` (`service.py` = PDP, `subject.py` = the normalized
   `AuthSubject` principal, `__init__` re-exporting both). Each surface builds an
   `AuthSubject` from platform facts via a per-surface PIP builder
-  (`presentation/discord/util/authz.py`, `presentation/api/util/subject.py`,
+  (`presentation/discord/util/authz.py`, `presentation/web/util/subject.py` (moved from
+  `presentation/api/util/subject.py` in the REST/web split below),
   `presentation/racetime/util/authz.py`) so the service never touches a platform
   object. **Platform/cosmetic authz stays native** in presentation (consolidated, not
   relocated): shared `requires_bot_owner` / `requires_admin_or_owner`

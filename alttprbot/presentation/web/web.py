@@ -32,7 +32,7 @@ sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
 sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/discord/"
 sahasrahbotapi.config["DISCORD_BOT_TOKEN"] = config.DISCORD_TOKEN
 
-from alttprbot.presentation.api.oauth_client import (
+from alttprbot.presentation.web.oauth_client import (
     AuthlibDiscordOAuth,
     Unauthorized,
     AccessDenied,
@@ -47,12 +47,11 @@ discord = AuthlibDiscordOAuth(
 )
 logger.info("OAuth: Using Authlib implementation")
 
-import alttprbot.presentation.api.blueprints as blueprints  # nopep8
+import alttprbot.presentation.web.blueprints as blueprints  # nopep8
 
 sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")

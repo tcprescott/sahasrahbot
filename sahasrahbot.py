@@ -12,11 +12,18 @@ import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.services._notify import queue as notify_queue
 from alttprbot.util.config_contract import ConfigValidationError, validate_config_contract
-from alttprbot.presentation.api.api import sahasrahbotapi
+from alttprbot.presentation.web.web import sahasrahbotapi
+from alttprbot.presentation.api.blueprints import REST_BLUEPRINTS
 from alttprbot.presentation.audit.bot import start_bot as start_audit_bot, stop_bot as stop_audit_bot
 from alttprbot.presentation.discord.bot import start_bot as start_discord_bot, stop_bot as stop_discord_bot
 
 logger = logging.getLogger(__name__)
+
+# Compose the REST API surface onto the web-owned Quart app. ``presentation.api``
+# and ``presentation.web`` never import each other (enforced by import-linter);
+# this is the one place that wires them onto a single app/port/process.
+for _rest_blueprint, _rest_kwargs in REST_BLUEPRINTS:
+    sahasrahbotapi.register_blueprint(_rest_blueprint, **_rest_kwargs)
 
 if config.SENTRY_URL:
     def before_send(event, hint):
