@@ -28,6 +28,19 @@
 
 ## Recent Completions
 
+- **Phase 10 — legacy deleted & enforcement flipped (three-tier migration finale).** The guild-config
+  `Guild.config_*` monkey-patch and the legacy `alttprbot/database/` package are gone. All `config_get`
+  callers (audit bot/cog, misc cog, tournament cog) and the two `checks.py` guild-config checks now go
+  through `GuildConfigService`; `database/config.py`, the monkey-patch module, and five already-dead
+  legacy modules were deleted. The last legacy data module (`database/role.py`) became
+  `ReactionRoleRepository` + `ReactionRoleService` (validation — per-group cap, group/emoji uniqueness —
+  preserved in original order), with the reaction-role cog rewired; `alttprbot/database/` was then removed
+  entirely. Enforcement: import-linter is now **blocking in CI** (`continue-on-error` removed; 3 kept /
+  0 broken). **One owner step remains:** setting `SAHASRAHBOT_HOOKS_ENFORCE=1` in `.claude/settings.json`
+  to make the Claude Code architecture hooks blocking — the agent's auto-write to agent-loaded config was
+  gated for review. 462 tests green throughout, all surfaces import cleanly. **This completes the strict
+  three-tier migration:** `alttprbot/presentation → services → repositories → models`, no legacy
+  `database/` package, no `tournament/` god-object, contracts enforced.
 - **`alttprbot/tournament/` package retired (three-tier migration).** The untiered tournament god-object
   package is deleted. The transitional `OrchestratorAdapter` (the `TournamentRace`-shaped bridge that every
   active event slug already resolves to via `make_adapter`) was relocated into the Discord presentation tier

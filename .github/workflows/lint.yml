@@ -17,11 +17,10 @@ jobs:
         run: pipx install poetry
       - name: Install dependencies
         run: poetry install --with dev
-      # Architecture boundaries (import-linter). Kept non-blocking ("warn-only")
-      # while the three-tier migration burns down pre-existing violations; flip to
-      # blocking (remove continue-on-error) in the final migration phase.
+      # Architecture boundaries (import-linter). Blocking as of the final migration
+      # phase: the three-tier contracts are green (3 kept / 0 broken), so any new
+      # boundary violation now fails the build.
       - name: Check import boundaries
-        continue-on-error: true
         run: poetry run lint-imports
       - name: Run tests
         run: poetry run pytest -q --cov --cov-report=term-missing

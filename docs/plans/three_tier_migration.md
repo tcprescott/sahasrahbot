@@ -197,10 +197,17 @@ it does not violate them until its decomposition relocates it into `services/tou
   tier no longer imports discord. All cog/blueprint/service consumers rewired; the scoring characterization
   test moved to the services tier. Behavior-preserving (462 tests green, import-linter 3 kept/0 broken) and
   adversarially OLD-vs-NEW parity-reviewed (per-slice reviewers + finding verifiers off the git-HEAD originals).
-- **Phase 10 — the last remaining phase.** Retire the guild-config monkey-patch + legacy
-  `database/config.py` (after the audit/misc callers migrate), then flip all import-linter
-  contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked on every prior
-  dependency:** the tournament decomposition and the `alttprbot/tournament/` package retirement
-  are done, Phase 9's util split is done, and all three contracts are green. What's left is the
-  guild-config monkey-patch removal and the enforcement flip itself. The migrated active tournament
-  handlers are static-parity-clean but not yet live-validated — smoke-test in DEBUG before deploy.
+- **Phase 10 — ✅ essentially DONE (the legacy is gone; enforcement is on).**
+  - **10a — guild-config monkey-patch + `database/config.py` retired.** Every `Guild.config_*`
+    caller (audit bot/cog, misc cog, tournament cog) and the two `checks.py` config checks now go
+    through `GuildConfigService`; the monkey-patch module + its `init()` calls and `database/config.py`
+    are deleted, along with five already-dead legacy `database/` modules.
+  - **10b — `alttprbot/database/` deleted.** The last legacy module (`database/role.py`) became
+    `ReactionRoleRepository` + `ReactionRoleService`; the reaction-role cog calls the service. The
+    untiered `alttprbot/database/` package no longer exists.
+  - **10c — enforcement flipped.** import-linter is **blocking in CI** (the `continue-on-error` was
+    removed; contracts are 3 kept / 0 broken). The Claude Code architecture hooks flip to blocking via
+    `SAHASRAHBOT_HOOKS_ENFORCE=1` in `.claude/settings.json` — **the one remaining manual step** (writing
+    agent-loaded config is gated for owner review).
+  - **Residual:** the migrated active tournament handlers are static-parity-clean but not yet
+    live-validated — smoke-test in DEBUG before deploy.
