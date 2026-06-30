@@ -3,7 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 
 import config
-from alttprbot.services import RankedChoiceService
+from alttprbot.services import AuthorizationService, RankedChoiceService
+from alttprbot.presentation.discord.util import authz
 from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
 
 APP_URL = config.APP_URL
@@ -25,7 +26,8 @@ class RankedChoiceMessageView(discord.ui.View):
         await interaction.response.defer()
         election = await RankedChoiceService().get_election_by_message_id(interaction.message.id)
 
-        if election.owner_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_election_owner(subject, election):
             await interaction.followup.send("You are not the owner of this election.", ephemeral=True)
             return
 
@@ -65,13 +67,10 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
     @app_commands.describe(
         authorized_voters_role="The role that is authorized to vote in the election.  If not specified, anyone can vote.")
     @app_commands.describe(show_vote_count="Whether or not to show who has voted in this election.")
+    @authz.requires_admin_or_owner("You are not authorized to use this command.")
     async def create(self, interaction: discord.Interaction, title: str, candidates: str, seats: int = 1,
                      description: str = None, authorized_voters_role: discord.Role = None,
                      show_vote_count: bool = True):
-
-        if interaction.user.guild_permissions.administrator is False and self.bot.is_owner(interaction.user) is False:
-            await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
-            return
 
         service = RankedChoiceService()
         election = await service.create_election(
