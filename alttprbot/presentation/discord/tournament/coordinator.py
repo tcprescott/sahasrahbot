@@ -21,7 +21,7 @@ from alttprbot.presentation.discord.bot import discordbot
 from alttprbot.presentation.discord.tournament.presenter import TournamentPresenter
 from alttprbot.presentation.discord.tournament.config import TournamentConfig
 from alttprbot.services._notify import racetime_gateway
-from alttprbot.services import UserService
+from alttprbot.services import AuthorizationService, AuthSubject, UserService
 from alttprbot.services.tournament.types import RaceRoom, TournamentPlayer
 from alttprbot.exceptions import UnableToLookupUserException
 
@@ -236,13 +236,26 @@ class TournamentCoordinator:
         )
 
     async def _check_async_authz(self, user, tournament, roles):
-        """Async-tournament mod/admin check (DB + discord guild roles).
+        """Async-tournament mod/admin check (DB grants + live discord guild roles).
 
-        Wraps the existing ``checks.is_async_tournament_user`` (which touches ``discordbot``);
-        imported lazily to keep this off the module import path. Used by the alttpr_quals roll.
+        Resolves the user's roles in the tournament guild here (presentation) and
+        delegates the decision to ``AuthorizationService``. Used by the alttpr_quals roll.
         """
-        from alttprbot.presentation.api.util import checks
-        return await checks.is_async_tournament_user(user, tournament, roles)
+        role_ids = frozenset()
+        if user is not None:
+            guild = discordbot.get_guild(tournament.guild_id)
+            if guild is not None:
+                if guild.chunked is False:
+                    await guild.chunk(cache=True)
+                member = guild.get_member(user.discord_user_id)
+                if member is not None:
+                    role_ids = frozenset(r.id for r in member.roles)
+        subject = AuthSubject(
+            discord_user_id=user.discord_user_id if user else None,
+            discord_role_ids=role_ids,
+            user=user,
+        )
+        return await AuthorizationService().is_async_tournament_user(subject, tournament, roles)
 
     def _room_from_handler(self, handler) -> RaceRoom:
         category = self._definition.racetime_category
