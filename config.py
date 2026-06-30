@@ -43,9 +43,6 @@ class Settings(BaseSettings):
     SG_DISCORD_WEBHOOK: str = ''
     BINGO_COLLAB_DISCORD_WEBHOOK: str = ''
 
-    MULTIWORLDROMBASE: str = 'http://localhost'
-    MULTIWORLDHOSTBASE: str = 'localhost'
-
     RACETIME_GAMES: str = ''
     RACETIME_HOST: str = 'localhost'
     RACETIME_PORT: int = 8000
