@@ -27,6 +27,7 @@ from alttprbot.repositories.preset_repository import PresetRepository
 from alttprbot.repositories.race_room_repository import RaceRoomRepository
 from alttprbot.repositories.racer_verification_repository import RacerVerificationRepository
 from alttprbot.repositories.ranked_choice_repository import RankedChoiceRepository
+from alttprbot.repositories.reaction_role_repository import ReactionRoleRepository
 from alttprbot.repositories.scheduled_events_repository import ScheduledEventsRepository
 from alttprbot.repositories.spoiler_race_repository import SpoilerRaceRepository
 from alttprbot.repositories.tournament_games_repository import TournamentGamesRepository
@@ -57,6 +58,7 @@ __all__ = [
     "RaceRoomRepository",
     "RacerVerificationRepository",
     "RankedChoiceRepository",
+    "ReactionRoleRepository",
     "ScheduledEventsRepository",
     "SpoilerRaceRepository",
     "TournamentGamesRepository",
