@@ -23,7 +23,15 @@ npm run build         # type-check + Vite build → dist/
 npm run preview       # serve the production build locally
 ```
 
-Quart will serve the built `dist/` via a catch-all route (backend phase — not wired yet).
+Quart serves the built `dist/` via the SPA catch-all route in
+`alttprbot/presentation/api/api.py`; hashed assets land under `/spa-assets/`
+(`assetsDir` in `vite.config.ts`).
+
+> **Frontend assets are built, not vendored.** The legacy
+> `static/theme-assets/` and `static/assets/` trees (a 42 MB Chameleon/jQuery
+> bundle, including `jquery-1.12.3` with known XSS CVEs) were removed once the
+> Jinja templates were retired. Run `npm install && npm run build` to produce
+> the frontend; do not re-vendor third-party JS/CSS into the repo.
 
 ## Design system
 - `src/styles/tokens.css` — design tokens (CSS variables, dark + light) + element base +

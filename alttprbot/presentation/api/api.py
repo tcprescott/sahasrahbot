@@ -17,6 +17,16 @@ logger = logging.getLogger(__name__)
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")
 
+# Harden the session cookie. ``HttpOnly`` is on by default in Quart, but we set it
+# explicitly alongside ``SameSite=Lax`` (blocks cross-site POST forgery while still
+# allowing the top-level GET redirect back from Discord OAuth) and ``Secure`` in
+# production. ``Secure`` is relaxed under DEBUG so local HTTP development still works.
+sahasrahbotapi.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=not config.DEBUG,
+)
+
 sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(config.DISCORD_CLIENT_ID)
 sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
 sahasrahbotapi.config["DISCORD_REDIRECT_URI"] = config.APP_URL + "/callback/discord/"
@@ -61,14 +71,25 @@ async def login():
         scope=[
             'identify',
         ],
-        data=dict(redirect=session.get("login_original_path", "/me"))
+        data=dict(redirect=_safe_redirect_target(session.get("login_original_path", "/me")))
     )
+
+
+def _safe_redirect_target(target, fallback="/me"):
+    """Return ``target`` only if it is a same-site relative path.
+
+    Rejects absolute URLs and protocol-relative paths (``//evil.com``), which the
+    browser would treat as off-site, preventing an open-redirect after login.
+    """
+    if isinstance(target, str) and target.startswith("/") and not target.startswith("//"):
+        return target
+    return fallback
 
 
 @sahasrahbotapi.route("/callback/discord/")
 async def callback():
     data = await discord.callback()
-    redirect_to = data.get("redirect", "/me")
+    redirect_to = _safe_redirect_target(data.get("redirect", "/me"))
     return redirect(redirect_to)
 
 
@@ -190,8 +211,6 @@ _RESERVED_PREFIXES = (
 
     '/healthcheck',
     '/robots.txt',
-    '/assets/',
-    '/theme-assets/',
     '/spa-assets/',
 )
 
@@ -212,14 +231,6 @@ async def spa_catchall(path):
         abort(404)
     return await send_from_directory(_SPA_DIST, 'index.html')
 
-
-@sahasrahbotapi.route('/assets/<path:path>', methods=['GET'])
-async def assets(path):
-    return await send_from_directory('alttprbot/presentation/api/static/assets', path)
-
-@sahasrahbotapi.route('/theme-assets/<path:path>', methods=['GET'])
-async def theme_assets(path):
-    return await send_from_directory('alttprbot/presentation/api/static/theme-assets', path)
 
 # @sahasrahbotapi.errorhandler(400)
 # def bad_request(e):
