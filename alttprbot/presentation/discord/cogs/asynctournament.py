@@ -53,23 +53,24 @@ class AsyncTournamentView(discord.ui.View):
             await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
             return
 
-        # check discord account age, this should also be configurable in the future
-        # the age of the account must be at least 7 days older than the tournament start date
-        if interaction.user.created_at > (async_tournament.created - datetime.timedelta(days=7)):
-            await async_tournament.fetch_related('whitelist', 'whitelist__user')
-            if interaction.user.id not in [w.user.discord_user_id for w in async_tournament.whitelist]:
-                await interaction.response.send_message(
-                    "Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for manual verification and whitelisting.",
-                    ephemeral=True)
-                return
-
-        # this should be configurable in the future
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        if user.rtgg_id is None:
-            await interaction.response.send_message(
-                f"You must link your RaceTime.gg account to SahasrahBot before you can participate in an async tournament.\n\nPlease visit <{APP_URL}/racetime/verification/initiate> to link your RaceTime account.",
-                ephemeral=True)
+        # Account-age (7-day) + whitelist gate and the RaceTime-link requirement are
+        # owned by the service; presentation only renders the denial message.
+        subject = await authz.subject_from_interaction(interaction, with_user=True)
+        try:
+            await AuthorizationService().require_can_join_async(
+                subject,
+                async_tournament,
+                message="Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for manual verification and whitelisting.",
+            )
+            AuthorizationService().require_racetime_linked(
+                subject,
+                message=f"You must link your RaceTime.gg account to SahasrahBot before you can participate in an async tournament.\n\nPlease visit <{APP_URL}/racetime/verification/initiate> to link your RaceTime account.",
+            )
+        except PermissionError as denial:
+            await interaction.response.send_message(str(denial), ephemeral=True)
             return
+
+        user = subject.user
 
         async_history = await AsyncTournamentService().list_user_races(user, async_tournament)
         played_seeds = [a.permalink for a in async_history if a.reattempted is False]
