@@ -1,6 +1,6 @@
 # Active State
 
-> Last updated: 2026-06-12
+> Last updated: 2026-06-30
 
 ## Current Focus
 
@@ -28,6 +28,21 @@
 
 ## Recent Completions
 
+- **Final structural debt cleared (three-tier migration).** The last untiered seams are gone.
+  (1) `alttprbot/tournaments.py` decomposed: the registry moved to `alttprbot/services/tournament/registry.py`
+  (slug → `TournamentEntry(orchestrator_cls, definition)`, pure service data — no presentation import); the
+  dispatch/driving moved to `alttprbot/presentation/discord/tournament/dispatch.py`; the cancelled-room ORM
+  pre-check moved to `TournamentResultsRepository.get_by_episode_id`/`delete` +
+  `TournamentResultsService.handle_existing_room_for_episode` + a new `racetime_gateway.get_race_status`.
+  (2) The transitional `OrchestratorAdapter` + `make_adapter` metaprogramming retired in favor of a plain
+  `presentation/discord/tournament/coordinator.py` `TournamentCoordinator` (built from a `TournamentEntry`;
+  config resolution, discord callbacks, room-refresh, `seed_rolled` guard, cog-facing props preserved verbatim).
+  All three consumers (discord cog, API blueprint, racetime handler) rewired; `tournaments.py` +
+  `orchestrator_adapter.py` deleted. (3) `util/holyimage.py` (the last tier-mixing util) split into
+  `HolyImageService` + `presentation/discord/util/holy_image.py` `create_holy_image_embed`, with
+  `HolyImageNotFound` moved to `exceptions.py`. Sequenced as small behavior-preserving commits; 472 tests green,
+  import-linter 3 kept / 0 broken; `util/` no longer imports discord. **Pending:** live DEBUG smoke-test of the
+  active tournament handlers before deploy (production runs the hardcoded path, so they go live on deploy).
 - **Phase 10 — legacy deleted & enforcement flipped (three-tier migration finale).** The guild-config
   `Guild.config_*` monkey-patch and the legacy `alttprbot/database/` package are gone. All `config_get`
   callers (audit bot/cog, misc cog, tournament cog) and the two `checks.py` guild-config checks now go
@@ -69,7 +84,7 @@
   services tier, and the `LeaderboardEntry` dataclass relocated with the scoring service. Behavior-preserving:
   462 tests green, import-linter 3 kept/0 broken, and a 3-slice adversarial OLD-vs-NEW parity review (per-slice
   reviewers + finding verifiers comparing against the git-HEAD originals) returned **zero findings**.
-- **Tournament decomposition complete (three-tier migration, Phase 7).** Every tournament handler is decomposed out of the `alttprbot/tournament/` god-object into `alttprbot/services/tournament/` orchestrators (business) + `presentation/discord/tournament/presenter.py` (Discord rendering) + the `_notify` discord/racetime gateways (all I/O) + repositories (all ORM). Migrated, behavior-preserving and per-handler adversarially parity-reviewed: `test`, `boots`, the trivial/low ALTTPR tail (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`), the league handlers (`invleague`/`alttprleague`), `smrl_playoff` (custom SM flow + web submission form), the SG dailies (`alttprdaily`/`smz3`), and `alttpr_quals` (the AsyncTournament-entangled live qualifier). The tournament registry is now single-source (the hardcoded production fallback derives from `AVAILABLE_TOURNAMENT_HANDLERS`, so it can't drift from the YAML/catalog). The 18 legacy handler files + the racetime-bot import were deleted; `alttprbot/tournament/` is now just the dispatch infra (the untiered `OrchestratorAdapter` bridge, `registry_loader`, and the `core`/`alttpr` shims the discord cog still imports). 462 tests passing; import-linter 3 kept / 0 broken. **Pending: smoke-test the active handlers in DEBUG before deploy (production runs the hardcoded path, so they go live on deploy); retire the `OrchestratorAdapter` by rewiring the cog + racetime handler to drive (orchestrator, presenter) directly.** Full record: `docs/plans/tournament_decomposition.md`.
+- **Tournament decomposition complete (three-tier migration, Phase 7).** Every tournament handler is decomposed out of the `alttprbot/tournament/` god-object into `alttprbot/services/tournament/` orchestrators (business) + `presentation/discord/tournament/presenter.py` (Discord rendering) + the `_notify` discord/racetime gateways (all I/O) + repositories (all ORM). Migrated, behavior-preserving and per-handler adversarially parity-reviewed: `test`, `boots`, the trivial/low ALTTPR tail (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`), the league handlers (`invleague`/`alttprleague`), `smrl_playoff` (custom SM flow + web submission form), the SG dailies (`alttprdaily`/`smz3`), and `alttpr_quals` (the AsyncTournament-entangled live qualifier). The tournament registry is now single-source (the hardcoded production fallback derives from `AVAILABLE_TOURNAMENT_HANDLERS`, so it can't drift from the YAML/catalog). The 18 legacy handler files + the racetime-bot import were deleted. 462 tests passing; import-linter 3 kept / 0 broken. **Pending: smoke-test the active handlers in DEBUG before deploy (production runs the hardcoded path, so they go live on deploy).** (The `OrchestratorAdapter` has since been retired in favor of a `TournamentCoordinator` — see the "Final structural debt cleared" entry above.) Full record: `docs/plans/tournament_decomposition.md`.
 - Audit of Discord bot domain completed; technical debt identified.
 - Codebase analysis and documentation generation (2026-02-11).
 - Existing end-user docs relocated from `docs/` root to `docs/user-guide/`.

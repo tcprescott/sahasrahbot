@@ -184,8 +184,20 @@ it does not violate them until its decomposition relocates it into `services/tou
   `UnableToLookupUserException` to `alttprbot/exceptions.py`. The dead `core.py` `TournamentRace`/`TournamentPlayer`
   base and the entire `alttpr.py` (legacy `ALTTPRTournamentRace`/`ALTTPR2024Race`, never instantiated) were
   deleted, and the two pre-existing-broken cog commands (`cc2023`/`tournament_deck`, which called
-  never-defined `alttpr.roll_seed`/`generate_deck`) removed. `tournaments.py` remains as thin untiered dispatch
-  glue. Behavior-preserving (462 tests green, import-linter 3 kept/0 broken) and adversarially reviewed.
+  never-defined `alttpr.roll_seed`/`generate_deck`) removed. Behavior-preserving (462 tests green,
+  import-linter 3 kept/0 broken) and adversarially reviewed.
+- **`tournaments.py` decomposed + `OrchestratorAdapter` retired — ✅ DONE.** The last untiered top-level
+  module is gone. Its three jobs split by tier: the registry → `services/tournament/registry.py` (slug →
+  `TournamentEntry(orchestrator_cls, definition)`, pure service data); the dispatch/driving →
+  `presentation/discord/tournament/dispatch.py`; the cancelled-room ORM pre-check →
+  `TournamentResultsRepository.get_by_episode_id`/`delete` + `TournamentResultsService.handle_existing_room_for_episode`
+  + a new `racetime_gateway.get_race_status`. The transitional `OrchestratorAdapter` + `make_adapter`
+  metaprogramming was replaced by a plain `presentation/discord/tournament/coordinator.py` `TournamentCoordinator`
+  built from a `TournamentEntry` (config resolution, discord callbacks, room-refresh, `seed_rolled` guard, and
+  cog-facing props preserved verbatim). All three consumers (discord cog, API blueprint, racetime handler)
+  rewired; `tournaments.py` + `orchestrator_adapter.py` deleted. Sequenced as 5 behavior-preserving commits
+  (registry→services proven by lint-imports in isolation, then coordinator+dispatch alongside the adapter, then
+  the consumer cut-over, then deletion). 472 tests green, import-linter 3 kept/0 broken.
   Migrated active handlers are static-parity-clean but not yet live-validated — smoke-test in DEBUG before deploy.
 - **Phase 9 util split — ✅ DONE.** The three tier-mixing util modules are gone: `triforce_text` →
   `TriforceTextService` (balanced/random selection + `generate_with_triforce_text`) over new
@@ -197,6 +209,10 @@ it does not violate them until its decomposition relocates it into `services/tou
   tier no longer imports discord. All cog/blueprint/service consumers rewired; the scoring characterization
   test moved to the services tier. Behavior-preserving (462 tests green, import-linter 3 kept/0 broken) and
   adversarially OLD-vs-NEW parity-reviewed (per-slice reviewers + finding verifiers off the git-HEAD originals).
+  **Follow-up — ✅ DONE:** the last tier-mixing util, `util/holyimage.py` (imported `discord` + built an embed),
+  split into `HolyImageService` (external-catalog fetch + slug lookup, no discord) +
+  `presentation/discord/util/holy_image.py` (`create_holy_image_embed`); `HolyImageNotFound` moved to
+  `exceptions.py`; the misc cog's duplicate fetch removed. `util/` no longer imports discord.
 - **Phase 10 — ✅ essentially DONE (the legacy is gone; enforcement is on).**
   - **10a — guild-config monkey-patch + `database/config.py` retired.** Every `Guild.config_*`
     caller (audit bot/cog, misc cog, tournament cog) and the two `checks.py` config checks now go
