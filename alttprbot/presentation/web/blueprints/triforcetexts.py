@@ -1,8 +1,8 @@
 from quart import Blueprint, request, jsonify
-from alttprbot.presentation.api.oauth_client import requires_authorization
+from alttprbot.presentation.web.oauth_client import requires_authorization
 
 from alttprbot.services import AuthorizationService, AuthSubject, TriforceTextService
-from alttprbot.presentation.api.api import discord
+from alttprbot.presentation.web.web import discord
 
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
 

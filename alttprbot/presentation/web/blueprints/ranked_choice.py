@@ -2,11 +2,11 @@ import logging
 
 from discord.errors import NotFound
 from quart import Blueprint, request, jsonify
-from alttprbot.presentation.api.oauth_client import requires_authorization
+from alttprbot.presentation.web.oauth_client import requires_authorization
 
 from alttprbot.services import AuthorizationService, AuthSubject, RankedChoiceService
 from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
-from alttprbot.presentation.api.api import discord
+from alttprbot.presentation.web.web import discord
 from alttprbot.presentation.discord.bot import discordbot
 
 # TODO: add a way to resubmit votes (low priority)

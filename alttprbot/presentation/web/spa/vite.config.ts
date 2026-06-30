@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// SPA build output is served by Quart from `alttprbot_api/spa/dist/`.
+// SPA build output is served by Quart from `alttprbot/presentation/web/spa/dist/`.
 // assetsDir is 'spa-assets' (not the default 'assets') to avoid colliding with
-// Quart's existing /assets/ route that serves alttprbot_api/static/assets/.
+// Quart's existing /assets/ route that serves alttprbot/presentation/web/static/assets/.
 export default defineConfig({
   plugins: [react()],
   server: {

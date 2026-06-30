@@ -8,7 +8,7 @@
 ## The tiers
 
 ```
-Presentation   alttprbot/presentation/{discord,audit,racetime,api}/
+Presentation   alttprbot/presentation/{discord,audit,racetime,api,web}/
                         │  calls services, renders results, catches their errors
                         ▼
 Service        alttprbot/services/        business rules, validation, authorization,
@@ -24,14 +24,37 @@ Imports may only point **downward**. A file's tier is its directory.
 ## Layer responsibilities
 
 ### Presentation — `alttprbot/presentation/`
-The four surfaces: `discord/` (main bot), `audit/` (audit bot), `racetime/`
-(RaceTime.gg bot), `api/` (Quart web API).
+The five surfaces: `discord/` (main bot), `audit/` (audit bot), `racetime/`
+(RaceTime.gg bot), `api/` (REST API), `web/` (Quart app: Discord OAuth session,
+SPA static serving, and session-authenticated JSON for the SPA — a
+backend-for-frontend).
 
 - **Does:** parse input, call a service, render the result, catch service errors
   and present them idiomatically per surface (ephemeral Discord reply / error
   embed, RaceTime chat message, Quart JSON + status code), build Discord embeds.
 - **Does not:** contain business logic, import `alttprbot.repositories`, or import
   `alttprbot.models`. Data access goes through a service.
+
+#### `api/` vs `web/`
+
+`api/` and `web/` share one Quart app/process/port (127.0.0.1:5001) but are
+independent code surfaces, split by auth method rather than URL naming (some
+`web/` routes are named `/api/...` for historical/SPA-compatibility reasons):
+
+- **`api/` (REST):** no dependency on the Discord OAuth session — either fully
+  public or gated by `api/auth.py`'s `authorized_key()` (an `Authorization`
+  header checked against `AuthorizationService`). Meant for external/machine
+  consumers (RaceTime tooling, async-tournament integrations). Owns no Quart
+  `app` object — just `Blueprint`s, exported as `api/blueprints.REST_BLUEPRINTS`.
+- **`web/` (BFF):** owns the single Quart `app` (`web/web.py`), the Discord OAuth
+  client (`web/oauth_client.py`), the SPA static files (`web/spa/`), and every
+  JSON endpoint the SPA itself calls via the browser session cookie
+  (`discord.fetch_user()` / `session[...]` / `@requires_authorization`).
+
+An import-linter contract (`pyproject.toml`) forbids `alttprbot.presentation.api`
+and `alttprbot.presentation.web` from importing each other in either direction.
+`sahasrahbot.py` is the only place that imports both — it registers `api/`'s
+`REST_BLUEPRINTS` onto the Quart app exported by `web/web.py` before serving.
 
 ### Service — `alttprbot/services/`
 One module per domain (`<name>_service.py`), or a subpackage for larger domains
@@ -65,7 +88,8 @@ Services raise; each surface catches centrally and renders:
 |---|---|
 | `presentation/discord`, `presentation/audit` | ephemeral reply / error embed (via the `errors` cog) |
 | `presentation/racetime` | `await self.send_message(str(e))` to race chat |
-| `presentation/api` | `jsonify({'error': str(e)})` with 400/422 (`ValueError`), 403 (`PermissionError`) |
+| `presentation/api` | each handler returns `jsonify({'error': str(e)})` inline with 400/422 (`ValueError`), 403 (`PermissionError`); `api/` registers no app-level error handlers (`auth.authorized_key()` returns a plain `401` rather than raising) |
+| `presentation/web` | same per-handler JSON pattern, plus app-level handlers in `web/web.py` (`Unauthorized` → redirect to `/login/`, `AccessDenied`/`OAuth2Error`/404/500 → JSON for `/api/*` paths, SPA `/error` redirect otherwise) — these apply process-wide since `web/` owns the one Quart app |
 
 ## Notifications
 

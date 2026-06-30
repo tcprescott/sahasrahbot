@@ -2,6 +2,10 @@
 
 > Last updated: 2026-06-11
 > Status: **Design approved** — visual language locked via prototype (see §11); SPA scaffold in progress. Brand & dark-mode questions resolved (§10).
+> Note (2026-06-30): this is a historical design record predating the REST-API/web-UI
+> split. `alttprbot_api/` paths below refer to what is now `alttprbot/presentation/web/`
+> (the SPA, OAuth, and session-authenticated JSON moved there; pure REST endpoints moved
+> to `alttprbot/presentation/api/`) — see [architecture-layers.md](../architecture-layers.md).
 
 ## 1. Problem Statement
 
@@ -66,7 +70,7 @@ The current web frontend (`alttprbot_api/`) is a server-rendered Jinja2 applicat
 
 Quart already has static file serving via `send_from_directory`. The new approach:
 
-1. Vite builds the SPA into `alttprbot_api/spa/dist/`.
+1. Vite builds the SPA into `alttprbot/presentation/web/spa/dist/`.
 2. A new Quart catch-all route serves `index.html` for any non-API, non-auth path (client-side routing).
 3. Vite-hashed asset files (`/assets/js/*, /assets/css/*`) are served from the same dist directory.
 4. The existing `/api/*` routes remain unchanged and return JSON.
@@ -290,9 +294,9 @@ alttprbot_api/static/assets/js/    # Custom JS (replaced by React)
 Retained:
 - `alttprbot_api/static/assets/images/sahasrahbot_transparent.png` → moved into SPA `public/` directory.
 - All blueprint Python files (refactored to return JSON instead of `render_template`).
-- `alttprbot_api/api.py` (refactored: template routes become API routes, catch-all added for SPA).
-- `alttprbot_api/auth.py` (unchanged).
-- `alttprbot_api/oauth_client.py` (unchanged).
+- `alttprbot/presentation/web/web.py` (refactored: template routes become API routes, catch-all added for SPA; later split from the REST surface — see architecture-layers.md).
+- `alttprbot/presentation/api/auth.py` (REST API-key decorator; lives in the REST surface, not alongside the OAuth client).
+- `alttprbot/presentation/web/oauth_client.py` (unchanged; lives in the web surface alongside `web.py`).
 
 ## 9. Backend Changes Required
 

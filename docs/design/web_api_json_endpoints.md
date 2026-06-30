@@ -1,17 +1,23 @@
 # Web API JSON Endpoints
 
-> Last updated: 2026-02-12
-> Scope: JSON-producing endpoints under `alttprbot_api/`
+> Last updated: 2026-06-30
+> Scope: JSON-producing endpoints under `alttprbot/presentation/{api,web}/`
 
 ## Runtime Registration
 
-The Quart app is created in `alttprbot_api/api.py` and registers JSON routes from multiple blueprints:
+The single Quart app is created in `alttprbot/presentation/web/web.py`; JSON endpoints
+are split across two independent presentation surfaces (see
+[architecture-layers.md](../architecture-layers.md)):
 
-- `settingsgen` (no URL prefix)
-- `tournament` (no URL prefix)
-- `presets` (no URL prefix)
-- `racetime` (no URL prefix)
-- `asynctournament` (registered with `/async` prefix)
+- **`alttprbot/presentation/api/`** — REST, no session/OAuth dependency.
+  `sahasrahbot.py` registers its `REST_BLUEPRINTS` onto the `web`-owned app:
+  `settingsgen`, `tournament` (games/form-config only), `presets` (download/list/get
+  only), `racetime` (`/api/racetime/cmd` only), `asynctournament` (the `/async/api/*`
+  routes, registered with the `/async` prefix).
+- **`alttprbot/presentation/web/`** — session-authenticated BFF for the SPA, registered
+  directly in `web/web.py`: `tournament` (submit only), `presets` (the rest),
+  `racetime` (verification flow), `asynctournament` (the `/async/races|pools|...`
+  routes, also `/async`-prefixed), `triforcetexts`, `ranked_choice`.
 
 ## Authentication Modes
 

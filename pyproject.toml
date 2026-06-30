@@ -123,6 +123,32 @@ forbidden_modules = [
 # but must not import alttprbot.models itself.
 allow_indirect_imports = "true"
 
+# Contract 4/5 — the REST API and the web BFF are independent presentation
+# surfaces. Neither may import the other; sahasrahbot.py is the only place
+# that wires them together (it imports both and registers the REST
+# blueprints onto the web-owned Quart app).
+[[tool.importlinter.contracts]]
+name = "API presentation surface must not import the web surface"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.api",
+]
+forbidden_modules = [
+    "alttprbot.presentation.web",
+]
+allow_indirect_imports = "false"
+
+[[tool.importlinter.contracts]]
+name = "Web presentation surface must not import the API surface"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.web",
+]
+forbidden_modules = [
+    "alttprbot.presentation.api",
+]
+allow_indirect_imports = "false"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
