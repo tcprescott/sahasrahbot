@@ -1,8 +1,26 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '../components/ui/Badge';
-import { useMe, type MeData } from '../hooks/useMe';
+import { useMe, meQueryKey, type MeData } from '../hooks/useMe';
 import '../styles/submit.css';
 import '../styles/profile.css';
+
+// ---------------------------------------------------------------------------
+// Shared POST helper for the mutations below — keeps fetch/parse/error
+// handling in one place instead of duplicated per section.
+// ---------------------------------------------------------------------------
+
+async function postJson<T extends { error?: string } = { error?: string }>(url: string, body?: unknown): Promise<T> {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = (await r.json().catch(() => ({}))) as T;
+  if (!r.ok || data.error) throw new Error(data.error ?? `Request failed (${r.status}).`);
+  return data;
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -46,7 +64,151 @@ function UnauthenticatedPanel() {
   );
 }
 
-function ProfileCard({ user }: { user: MeData }) {
+function DisplayNameSection({ user, onChanged }: { user: MeData; onChanged: () => void }) {
+  const [value, setValue] = useState(user.display_name ?? '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const dirty = value.trim() !== (user.display_name ?? '');
+
+  async function handleSave() {
+    setError(null);
+    setSuccess(false);
+    setSaving(true);
+    try {
+      const body = await postJson<{ display_name?: string; error?: string }>('/api/me/display-name', { display_name: value });
+      // Resync to the server's (trimmed/validated) value rather than leaving
+      // the raw input text, so the field can't drift from what was persisted.
+      if (body.display_name !== undefined) setValue(body.display_name);
+      setSuccess(true);
+      onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="profile-section">
+      <p className="profile-section-title">Display Name</p>
+      <p className="profile-section-desc">
+        Shown across tournaments and leaderboards instead of your Discord name.
+      </p>
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <span className="alert-icon">⚠</span>
+          <p>{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="alert alert-success" role="status">
+          <span className="alert-icon">✓</span>
+          <p>Display name updated.</p>
+        </div>
+      )}
+      <div className="field" style={{ display: 'flex', gap: '.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <input
+          className="control"
+          value={value}
+          onChange={(e) => { setValue(e.target.value); setSuccess(false); }}
+          maxLength={32}
+          placeholder="Not set"
+          disabled={saving}
+          aria-label="Display name"
+        />
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={() => void handleSave()}
+          disabled={saving || !dirty || value.trim().length === 0}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function LinkedAccountsSection({ user, onChanged }: { user: MeData; onChanged: () => void }) {
+  const [unlinking, setUnlinking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { discord, racetime, twitch } = user.linked_accounts;
+
+  async function handleUnlinkRacetime() {
+    const confirmed = window.confirm(
+      'Unlink your RaceTime.gg account? This may affect verified-racer roles, tournament ' +
+      'eligibility, or race entries that depend on it. You can link it again at any time.'
+    );
+    if (!confirmed) return;
+
+    setError(null);
+    setUnlinking(true);
+    try {
+      await postJson('/api/me/racetime/unlink');
+      onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
+      setUnlinking(false);
+    }
+  }
+
+  return (
+    <div className="profile-section">
+      <p className="profile-section-title">Linked Accounts</p>
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <span className="alert-icon">⚠</span>
+          <p>{error}</p>
+        </div>
+      )}
+
+      <div className="profile-linked-row">
+        <div className="profile-linked-label">
+          <Badge tone="teal" dot>Discord</Badge>
+          <span className="profile-linked-value">{discord.username}</span>
+        </div>
+      </div>
+
+      <div className="profile-linked-row">
+        <div className="profile-linked-label">
+          <Badge tone={racetime.linked ? 'teal' : 'default'} dot={racetime.linked}>RaceTime.gg</Badge>
+          {racetime.linked ? (
+            <a className="profile-linked-value" href={racetime.url ?? undefined} target="_blank" rel="noreferrer">
+              {racetime.id}
+            </a>
+          ) : (
+            <span className="profile-linked-value muted">Not linked</span>
+          )}
+        </div>
+        {racetime.linked ? (
+          <button className="btn btn-ghost btn-sm" onClick={() => void handleUnlinkRacetime()} disabled={unlinking}>
+            {unlinking ? 'Unlinking…' : 'Unlink'}
+          </button>
+        ) : (
+          <a className="btn btn-ghost btn-sm" href="/racetime/verification/initiate">
+            Link account <span className="arr">→</span>
+          </a>
+        )}
+      </div>
+
+      <div className="profile-linked-row">
+        <div className="profile-linked-label">
+          <Badge tone={twitch.linked ? 'teal' : 'default'} dot={twitch.linked}>Twitch</Badge>
+          {twitch.linked ? (
+            <span className="profile-linked-value">{twitch.name}</span>
+          ) : (
+            <span className="profile-linked-value muted">Not linked</span>
+          )}
+        </div>
+        <span className="profile-linked-hint">Synced automatically from tournament registration</span>
+      </div>
+    </div>
+  );
+}
+
+function ProfileCard({ user, onChanged }: { user: MeData; onChanged: () => void }) {
   return (
     <div className="panel" style={{ maxWidth: 680 }}>
       <div className="panel-head">
@@ -70,16 +232,9 @@ function ProfileCard({ user }: { user: MeData }) {
           </div>
         </div>
 
-        {/* RaceTime Verification */}
-        <div className="profile-section">
-          <p className="profile-section-title">RaceTime Verification</p>
-          <p className="profile-section-desc">
-            Link your RaceTime.gg account to participate in bot-managed races.
-          </p>
-          <a className="btn btn-ghost btn-sm" href="/racetime/verification/initiate">
-            Verify RaceTime Account <span className="arr">→</span>
-          </a>
-        </div>
+        <DisplayNameSection user={user} onChanged={onChanged} />
+
+        <LinkedAccountsSection user={user} onChanged={onChanged} />
 
         {/* Manage Presets */}
         <div className="profile-section">
@@ -114,6 +269,8 @@ function ProfileCard({ user }: { user: MeData }) {
 
 export function ProfilePage() {
   const { data: user, isLoading, error } = useMe();
+  const queryClient = useQueryClient();
+  const handleChanged = () => { void queryClient.invalidateQueries({ queryKey: meQueryKey }); };
 
   const pageHead = (
     <section className="pagehead">
@@ -163,7 +320,7 @@ export function ProfilePage() {
             </div>
           )}
 
-          {user && <ProfileCard user={user} />}
+          {user && <ProfileCard user={user} onChanged={handleChanged} />}
 
         </div>
       </section>

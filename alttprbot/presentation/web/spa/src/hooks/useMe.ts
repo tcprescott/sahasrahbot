@@ -8,10 +8,18 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 // throws on any other non-OK response.
 // ---------------------------------------------------------------------------
 
+export interface LinkedAccounts {
+  discord: { linked: true; username: string };
+  racetime: { linked: boolean; id: string | null; url: string | null };
+  twitch: { linked: boolean; name: string | null };
+}
+
 export interface MeData {
   id: string;
   name: string;
   avatar_url: string;
+  display_name: string | null;
+  linked_accounts: LinkedAccounts;
 }
 
 async function fetchMe(): Promise<MeData | null> {
@@ -22,6 +30,8 @@ async function fetchMe(): Promise<MeData | null> {
   return body.data;
 }
 
+export const meQueryKey = ['me'] as const;
+
 export function useMe(): UseQueryResult<MeData | null> {
-  return useQuery({ queryKey: ['me'], queryFn: fetchMe });
+  return useQuery({ queryKey: meQueryKey, queryFn: fetchMe });
 }

@@ -8,7 +8,7 @@ from quart import (Quart, abort, jsonify, redirect, request,
 from werkzeug.utils import safe_join
 
 import config
-from alttprbot.services import NickVerificationService, PresetService
+from alttprbot.services import NickVerificationService, PresetService, UserService
 from alttprbot.presentation.discord.bot import discordbot
 
 logger = logging.getLogger(__name__)
@@ -50,6 +50,7 @@ logger.info("OAuth: Using Authlib implementation")
 import alttprbot.presentation.web.blueprints as blueprints  # nopep8
 
 sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
+sahasrahbotapi.register_blueprint(blueprints.profile_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
@@ -184,7 +185,21 @@ async def api_me():
         avatar_url = f"https://cdn.discordapp.com/embed/avatars/{discriminator % 5}.png"
 
     name = user._data.get('global_name') or user._data.get('username', '')
-    return jsonify(data=dict(id=user_id, name=name, avatar_url=avatar_url))
+    username = user._data.get('username', '')
+
+    summary = await UserService().get_account_summary(int(user_id))
+
+    return jsonify(data=dict(
+        id=user_id,
+        name=name,
+        avatar_url=avatar_url,
+        display_name=summary["display_name"],
+        linked_accounts=dict(
+            discord=dict(linked=True, username=username),
+            racetime=summary["racetime"],
+            twitch=summary["twitch"],
+        ),
+    ))
 
 
 @sahasrahbotapi.route('/spa-assets/<path:filename>', methods=['GET'])

@@ -54,6 +54,12 @@ class UserRepository:
         await user.save()
 
     @staticmethod
+    async def clear_racetime_link(user: models.Users) -> None:
+        user.rtgg_id = None
+        user.rtgg_access_token = None
+        await user.save()
+
+    @staticmethod
     async def merge(user_to_keep: models.Users, victim: models.Users) -> models.Users:
         """Fold ``victim`` into ``user_to_keep``: adopt ids, reassign owned rows, delete victim.
 
