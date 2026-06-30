@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import random
 
-import aiohttp
 import discord
 import pytz
 from aiocache import cached, Cache
@@ -11,8 +10,8 @@ from discord.ext import commands
 from pytz import UnknownTimeZoneError
 
 import config
-from alttprbot.services import GuildConfigService
-from alttprbot.util.holyimage import HolyImage
+from alttprbot.services import GuildConfigService, HolyImageService
+from alttprbot.presentation.discord.util.holy_image import create_holy_image_embed
 
 # TODO: make work with discord.py 2.0
 
@@ -51,13 +50,6 @@ WELCOME_MESSAGES = {
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
     return await GuildConfigService().get(guild.id, "HolyImageDefaultGame", "z3r")
-
-
-@cached(ttl=300, cache=Cache.MEMORY, key="holyimages")
-async def get_holy_images() -> dict:
-    async with aiohttp.ClientSession() as session:
-        async with session.get('http://alttp.mymm1.com/holyimage/holyimages.json') as resp:
-            return await resp.json()
 
 
 class Misc(commands.Cog):
@@ -107,19 +99,19 @@ class Misc(commands.Cog):
             else:
                 game = await GuildConfigService().get(interaction.guild.id, "HolyImageDefaultGame", "z3r")
 
-        holyimage = await HolyImage.construct(slug=slug, game=game)
+        image, link = await HolyImageService().get_image(slug=slug, game=game)
 
-        await interaction.response.send_message(embed=holyimage.embed)
+        await interaction.response.send_message(embed=create_holy_image_embed(image, link))
 
     @holyimage.autocomplete("game")
     async def holy_game_autocomplete(self, interaction: discord.Interaction, current: str):
-        data = await get_holy_images()
+        data = await HolyImageService().get_all_images()
         keys = sorted([val for val in data.keys() if val.startswith(current)][:25])
         return [app_commands.Choice(name=key, value=key) for key in keys]
 
     @holyimage.autocomplete("slug")
     async def holy_slug_autocomplete(self, interaction: discord.Interaction, current: str):
-        data = await get_holy_images()
+        data = await HolyImageService().get_all_images()
         value: str = current
 
         game = interaction.namespace.game
