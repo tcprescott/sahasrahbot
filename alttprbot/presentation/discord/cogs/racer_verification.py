@@ -14,6 +14,7 @@ from discord.ext import commands, tasks
 
 import config
 from alttprbot.services import RacerVerificationService, UserService, VerifiedRacerService
+from alttprbot.presentation.discord.util import authz
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -119,11 +120,8 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
             self.persistent_views_added = True
 
     @app_commands.command(description="Reverify all racers in this server.")
+    @authz.requires_admin_or_owner("You are not authorized to use this command.")
     async def reverify(self, interaction: discord.Interaction, revoke: bool=False):
-        if interaction.user.guild_permissions.administrator is False and self.bot.is_owner(interaction.user) is False:
-            await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
-            return
-
         await interaction.response.defer(ephemeral=True)
 
         racer_verifications = await RacerVerificationService().list_by_guild(interaction.guild.id)
@@ -162,6 +160,7 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
     @app_commands.describe(reverify_period_days="How often should the racer be required to reverify.  Leave blank to disable reverification.")
     @app_commands.describe(revoke_ineligible="Set to true to revoke the role from ineligible racers.")
     @app_commands.describe(audit_channel="Set to a channel to send a message to when a racer is revoked.")
+    @authz.requires_admin_or_owner("You are not authorized to use this command.")
     async def create_or_update(
         self,
         interaction: discord.Interaction,
@@ -174,10 +173,6 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
         revoke_ineligible: bool = False,
         audit_channel: discord.TextChannel = None,
     ):
-        if interaction.user.guild_permissions.administrator is False and self.bot.is_owner(interaction.user) is False:
-            await interaction.response.send_message("You are authorized to use this command.", ephemeral=True)
-            return
-
         racer_verification = await RacerVerificationService().configure(
             role_id=role.id,
             guild_id=interaction.guild.id,

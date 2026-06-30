@@ -2,9 +2,10 @@
 
 Owns the pydantic serialization for the API-key ``/api/*`` endpoints (which need
 model access) and the race review/reattempt writes, and provides a thin data
-facade over the repository for the session-auth endpoints. Authorization
-(``is_async_tournament_user``) and leaderboard scoring remain in their existing
-shared helpers; this service does not duplicate them.
+facade over the repository for the session-auth endpoints. The authorization
+decision (``is_async_tournament_user``) now lives in ``AuthorizationService``,
+which composes the ``user_has_permission`` / ``role_has_permission`` grant lookups
+this service exposes; leaderboard scoring lives in its own service.
 """
 
 import datetime
@@ -60,6 +61,11 @@ class AsyncTournamentService:
         self, tournament: models.AsyncTournament, discord_role_ids: list, roles: list
     ) -> bool:
         return await self.repository.role_has_permission(tournament, discord_role_ids, roles)
+
+    async def is_user_whitelisted(
+        self, tournament: models.AsyncTournament, discord_user_id: int
+    ) -> bool:
+        return await self.repository.is_user_whitelisted(tournament, discord_user_id)
 
     # --- data facade (session-auth endpoints shape the JSON themselves) ---
 

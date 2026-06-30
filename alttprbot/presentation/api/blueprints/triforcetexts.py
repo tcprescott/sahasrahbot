@@ -1,7 +1,7 @@
 from quart import Blueprint, request, jsonify
 from alttprbot.presentation.api.oauth_client import requires_authorization
 
-from alttprbot.services import TriforceTextService
+from alttprbot.services import AuthorizationService, AuthSubject, TriforceTextService
 from alttprbot.presentation.api.api import discord
 
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
@@ -39,7 +39,7 @@ async def submit_json(pool_name):
 async def moderation_json(pool_name):
     user = await discord.fetch_user()
     service = TriforceTextService()
-    if not await service.is_moderator(user.id, pool_name):
+    if not await AuthorizationService().is_triforce_moderator(AuthSubject(discord_user_id=user.id), pool_name):
         return jsonify({'error': 'Access denied.'}), 403
 
     approved_filter = request.args.get('approved', 'pending')
@@ -59,7 +59,7 @@ async def moderation_json(pool_name):
 async def moderation_action_json(pool_name, text_id):
     user = await discord.fetch_user()
     service = TriforceTextService()
-    if not await service.is_moderator(user.id, pool_name):
+    if not await AuthorizationService().is_triforce_moderator(AuthSubject(discord_user_id=user.id), pool_name):
         return jsonify({'error': 'Access denied.'}), 403
 
     payload = await request.get_json(force=True) or {}

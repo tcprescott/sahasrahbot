@@ -19,9 +19,10 @@ from alttprbot.services import (
     AsyncTournamentScoringService,
     AsyncTournamentService,
     AuditService,
+    AuthorizationService,
     UserService,
 )
-from alttprbot.presentation.api.util import checks
+from alttprbot.presentation.discord.util import authz
 from alttprbot.services.seedgen import generator
 
 RACETIME_URL = config.RACETIME_URL
@@ -52,23 +53,24 @@ class AsyncTournamentView(discord.ui.View):
             await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
             return
 
-        # check discord account age, this should also be configurable in the future
-        # the age of the account must be at least 7 days older than the tournament start date
-        if interaction.user.created_at > (async_tournament.created - datetime.timedelta(days=7)):
-            await async_tournament.fetch_related('whitelist', 'whitelist__user')
-            if interaction.user.id not in [w.user.discord_user_id for w in async_tournament.whitelist]:
-                await interaction.response.send_message(
-                    "Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for manual verification and whitelisting.",
-                    ephemeral=True)
-                return
-
-        # this should be configurable in the future
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        if user.rtgg_id is None:
-            await interaction.response.send_message(
-                f"You must link your RaceTime.gg account to SahasrahBot before you can participate in an async tournament.\n\nPlease visit <{APP_URL}/racetime/verification/initiate> to link your RaceTime account.",
-                ephemeral=True)
+        # Account-age (7-day) + whitelist gate and the RaceTime-link requirement are
+        # owned by the service; presentation only renders the denial message.
+        subject = await authz.subject_from_interaction(interaction, with_user=True)
+        try:
+            await AuthorizationService().require_can_join_async(
+                subject,
+                async_tournament,
+                message="Your Discord account is too new to participate in this tournament.  Please contact a tournament administrator for manual verification and whitelisting.",
+            )
+            AuthorizationService().require_racetime_linked(
+                subject,
+                message=f"You must link your RaceTime.gg account to SahasrahBot before you can participate in an async tournament.\n\nPlease visit <{APP_URL}/racetime/verification/initiate> to link your RaceTime account.",
+            )
+        except PermissionError as denial:
+            await interaction.response.send_message(str(denial), ephemeral=True)
             return
+
+        user = subject.user
 
         async_history = await AsyncTournamentService().list_user_races(user, async_tournament)
         played_seeds = [a.permalink for a in async_history if a.reattempted is False]
@@ -225,7 +227,8 @@ class AsyncTournamentViewConfirmCloseTournament(discord.ui.View):
                 "This tournament is not currently active.  This should not have happened.", ephemeral=True)
             return
 
-        if interaction.user.id != async_tournament.owner_id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_tournament_owner(subject, async_tournament):
             await interaction.response.send_message(
                 "You are not the owner of this tournament.  This should not have happened.", ephemeral=True)
             return
@@ -453,7 +456,8 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
 
         user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
-        if tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, tournament_race):
             await interaction.response.send_message("Only the runner of this race can start it.", ephemeral=True)
             return
 
@@ -504,7 +508,8 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
                        custom_id="sahasrahbot:async_forfeit")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, async_tournament_race):
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
 
@@ -534,7 +539,8 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
                        custom_id="sahasrahbot:async_forfeit2")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, async_tournament_race):
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
 
@@ -574,7 +580,8 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
                                                     ephemeral=True)
             return
 
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, async_tournament_race):
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
 
@@ -619,8 +626,10 @@ class AsyncTournamentPostRaceView(discord.ui.View):
                 "This is not a race thread.  This should not have happened.  Please contact a moderator.")
             return
 
-        if race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, race):
             await interaction.response.send_message("Only the player may submit a VoD.", ephemeral=True)
+            return
 
         if race.tournament.customization == "gmpmt2023":
             await interaction.response.send_modal(SubmitCollectIGTModal())
@@ -790,13 +799,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
             self.persistent_views_added = True
 
     @app_commands.command(name="create", description="Create an async tournament.  This command is only available to Synack.")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def create(self, interaction: discord.Interaction, name: str, permalinks: str,
                      report_channel: discord.TextChannel = None):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         await interaction.response.defer()
         embed = discord.Embed(title=name)
         try:
@@ -847,12 +852,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
 
     @app_commands.command(name="addseed", description="Add a seed to an async tournament.  This command is only available to Synack.")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def add_seed(self, interaction: discord.Interaction, pool_name: str, preset: str, num: int=1):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
             await interaction.response.send_message(
@@ -898,9 +899,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_tournament_race.fetch_related("tournament")
 
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        authorized = await checks.is_async_tournament_user(user, async_tournament_race.tournament, ['admin', 'mod'])
-        if not authorized:
+        subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
+        user = subject.user
+        if not await AuthorizationService().is_async_tournament_user(subject, async_tournament_race.tournament, ['admin', 'mod']):
             await interaction.response.send_message(
                 "You are not authorized to extend the timeout for this tournament race.", ephemeral=True)
             return
@@ -925,12 +926,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             f"Timeout extended to {discord.utils.format_dt(thread_timeout_time, 'f')} ({discord.utils.format_dt(thread_timeout_time, 'R')}).")
 
     @app_commands.command(name="repost", description="Repost the tournament embed")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def repost(self, interaction: discord.Interaction):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         await interaction.response.defer()
         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
@@ -947,13 +944,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
         await finish_race(interaction)
 
     @app_commands.command(name="permissions", description="Configure permissions for this tournament")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def permissions(self, interaction: discord.Interaction, permission: str, role: discord.Role = None,
                           user: discord.User = None):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         await interaction.response.defer(ephemeral=True)
         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
@@ -1026,9 +1019,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_live_race.fetch_related("tournament")
 
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        authorized = await checks.is_async_tournament_user(user, async_live_race.tournament, ['admin', 'mod'])
-        if not authorized:
+        subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
+        if not await AuthorizationService().is_async_tournament_user(subject, async_live_race.tournament, ['admin', 'mod']):
             await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
             return
 
@@ -1101,11 +1093,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
     if config.DEBUG:
         @app_commands.command(name="test", description="Populate tournament with dummy data.")
+        @authz.requires_bot_owner("Only Synack may perform this action.")
         async def test(self, interaction: discord.Interaction, participant_count: int = 1):
-            if not await self.bot.is_owner(interaction.user):
-                await interaction.response.send_message("Only Synack may perform this action.", ephemeral=True)
-                return
-
             tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
             if tournament is None:
                 await interaction.response.send_message("This channel is not configured for async tournaments.",
@@ -1130,9 +1119,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
         #     await interaction.response.send_message("This tournament is not active.", ephemeral=True)
         #     return
 
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        authorized = await checks.is_async_tournament_user(user, tournament, ['admin'])
-        if not authorized:
+        subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
+        if not await AuthorizationService().is_async_tournament_user(subject, tournament, ['admin']):
             await interaction.response.send_message("You are not authorized to perform a score recalculation.",
                                                     ephemeral=True)
             return
@@ -1160,7 +1148,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("This tournament is not currently active.", ephemeral=True)
             return
 
-        if interaction.user.id != async_tournament.owner_id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_tournament_owner(subject, async_tournament):
             await interaction.response.send_message("You are not the owner of this tournament.", ephemeral=True)
             return
 
@@ -1183,7 +1172,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             await interaction.response.send_message("There is no async run in this thread.", ephemeral=True)
             return
 
-        if not race.tournament.owner_id == interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_tournament_owner(subject, race.tournament):
             await interaction.response.send_message("Only the owner of this tournament may update runs.",
                                                     ephemeral=True)
             return
@@ -1232,7 +1222,8 @@ async def finish_race(interaction: discord.Interaction):
         await interaction.response.send_message("This channel/thread is not an async race room.", ephemeral=True)
         return
 
-    if race.user.discord_user_id != interaction.user.id:
+    subject = await authz.subject_from_interaction(interaction)
+    if not AuthorizationService().is_async_race_owner(subject, race):
         await interaction.response.send_message("Only the player of this race may finish it.", ephemeral=True)
         return
 

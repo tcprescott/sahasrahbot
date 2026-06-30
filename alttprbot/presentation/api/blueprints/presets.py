@@ -3,7 +3,7 @@ from io import BytesIO
 from quart import Blueprint, redirect, request, send_file, jsonify
 from alttprbot.presentation.api.oauth_client import Unauthorized, requires_authorization
 
-from alttprbot.services import PresetService
+from alttprbot.services import AuthorizationService, AuthSubject, PresetService
 from alttprbot.services.seedgen import generator
 from alttprbot.presentation.api.api import discord
 
@@ -31,7 +31,7 @@ async def new_preset_submit(namespace):
     if ns_data is None:
         return jsonify({'error': 'Namespace not found.'}), 404
 
-    if not PresetService.is_namespace_owner(user.id, ns_data):
+    if not AuthorizationService().is_namespace_owner(AuthSubject(discord_user_id=user.id), ns_data):
         return jsonify({'error': 'You are not authorized to create presets in this namespace.'}), 403
 
     preset_name = payload.get('preset_name', '')
@@ -63,7 +63,7 @@ async def presets_for_namespace_json(namespace):
 
     try:
         user = await discord.fetch_user()
-        is_owner = PresetService.is_namespace_owner(user.id, ns_data)
+        is_owner = AuthorizationService().is_namespace_owner(AuthSubject(discord_user_id=user.id), ns_data)
     except Unauthorized:
         is_owner = False
 
@@ -92,7 +92,7 @@ async def get_preset_json(namespace, randomizer, preset):
 
     try:
         user = await discord.fetch_user()
-        is_owner = PresetService.is_namespace_owner(user.id, ns_data)
+        is_owner = AuthorizationService().is_namespace_owner(AuthSubject(discord_user_id=user.id), ns_data)
     except Unauthorized:
         is_owner = False
 
@@ -138,7 +138,7 @@ async def update_preset(namespace, randomizer, preset):
     if ns_data is None:
         return jsonify({'error': 'Namespace not found.'}), 404
 
-    if not PresetService.is_namespace_owner(user.id, ns_data):
+    if not AuthorizationService().is_namespace_owner(AuthSubject(discord_user_id=user.id), ns_data):
         return jsonify({'error': 'You are not the owner of this preset.'}), 403
 
     preset_data = await service.get_preset(namespace, randomizer, preset)

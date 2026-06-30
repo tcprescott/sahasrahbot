@@ -4,6 +4,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from alttprbot.presentation.discord.util.authz import AuthzCheckFailure
+
 
 class Errors(commands.Cog, name="errors"):
     """Errors handler."""
@@ -127,6 +129,10 @@ class Errors(commands.Cog, name="errors"):
         # HybridCommandError
         except commands.HybridCommandError as d_error:
             await self.get_app_command_error(ctx.interaction, error)
+        # Authorization failure raised by a service/check (renders the message)
+        except PermissionError as d_error:
+            if edit is not None:
+                await edit(content=f"{riplink} {d_error}")
         except Exception as e:
             self.trace_error("get_command_error", e)
 
@@ -146,7 +152,12 @@ class Errors(commands.Cog, name="errors"):
 
             raise error
         except app_commands.CommandInvokeError as d_error:
-            if isinstance(d_error.original, discord.errors.InteractionResponded):
+            if isinstance(d_error.original, PermissionError):
+                # Authorization failure raised by a service require_* call in a
+                # command body — render just the message.
+                if edit is not None:
+                    await edit(content=f"{riplink} {d_error.original}")
+            elif isinstance(d_error.original, discord.errors.InteractionResponded):
                 if edit is not None:
                     await edit(content=f"{riplink} {d_error.original}")
                 self.bot.logger.exception("Error during interaction")
@@ -158,6 +169,10 @@ class Errors(commands.Cog, name="errors"):
                 if edit is not None:
                     await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
                 self.bot.logger.exception("Error during interaction")
+        # Authorization failure from a platform predicate (renders the message)
+        except AuthzCheckFailure as d_error:
+            if edit is not None:
+                await edit(content=f"{riplink} {d_error}")
         except app_commands.CheckFailure as d_error:
             if isinstance(d_error, app_commands.errors.CommandOnCooldown):
                 if edit is not None:

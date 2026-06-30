@@ -9,6 +9,7 @@ import tortoise.exceptions
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
 from alttprbot.services import (
+    AuthorizationService,
     RaceRoomService,
     SpoilerRaceService,
     TournamentResultsService,
@@ -16,6 +17,7 @@ from alttprbot.services import (
 from alttprbot.presentation.discord.bot import discordbot
 from alttprbot.presentation.discord.tournament import dispatch as tournament_dispatch
 from alttprbot.presentation.racetime.misc.konot import KONOT
+from alttprbot.presentation.racetime.util.authz import subject_from_message
 
 
 class SahasrahBotCoreHandler(RaceHandler):
@@ -284,10 +286,8 @@ class SahasrahBotCoreHandler(RaceHandler):
         if await self.is_locked(message):
             return
 
-        entrant_ids = [e['user']['id'] for e in self.data['entrants'] if e['status']['value'] in ['ready', 'not_ready', 'in_progress', 'done', 'dnf', 'dq'] ]
-        user_id = message.get('user', {}).get('id', None)
         # only entrants or race monitors can roll seeds
-        if user_id not in entrant_ids and not can_monitor(message):
+        if not AuthorizationService().can_roll_tournament_seed(subject_from_message(self, message)):
             await self.send_message(
                 'Only entrants or race monitors may roll a tournament seed.'
             )
