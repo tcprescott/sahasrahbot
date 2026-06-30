@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from authlib.oauth2.rfc6749.errors import OAuth2Error
 from quart import (Quart, abort, jsonify, redirect, request,
                    session, url_for, send_from_directory)
+from werkzeug.utils import safe_join
 
 import config
 from alttprbot.services import NickVerificationService, PresetService
@@ -201,9 +202,10 @@ async def spa_catchall(path):
     for prefix in _RESERVED_PREFIXES:
         if full_path.startswith(prefix):
             abort(404)
-    # Serve real files from dist root first (logo, favicon, manifest, etc.)
-    candidate = os.path.join(_SPA_DIST, path)
-    if os.path.isfile(candidate):
+    # Serve real files from dist root first (logo, favicon, manifest, etc.).
+    # safe_join returns None if the user path escapes _SPA_DIST (traversal).
+    candidate = safe_join(_SPA_DIST, path)
+    if candidate and os.path.isfile(candidate):
         return await send_from_directory(_SPA_DIST, path)
     index_html = os.path.join(_SPA_DIST, 'index.html')
     if not os.path.isfile(index_html):

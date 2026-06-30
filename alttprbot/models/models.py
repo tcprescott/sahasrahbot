@@ -1,8 +1,7 @@
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 import pytz
 from typing import Optional
 
-import discord.utils
 import markdown
 from bs4 import BeautifulSoup
 from tortoise import fields
@@ -653,7 +652,7 @@ class AsyncTournamentRace(Model):
         if self.status == 'finished':
             return self.end_time - self.start_time
         elif self.status == 'in_progress':
-            return discord.utils.utcnow() - self.start_time
+            return datetime.now(timezone.utc) - self.start_time
 
         return None
 

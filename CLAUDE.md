@@ -51,7 +51,6 @@ alttprbot/                  # Single package — top-level directories ARE the t
     audit_service.py        #   AuditService + AuditActions
   repositories/             # Tier 3 — pure Tortoise CRUD (returns models)
   models/                   # Tier 4 — Tortoise ORM models (50+ entities, unchanged)
-  database/                 # Legacy raw SQL modules (being retired)
   tournament/               # Tournament handler classes (moves to services/ in Phase 7)
   util/                     # Shared utilities (telemetry, config contract, etc.)
   exceptions.py             # Custom exception hierarchy
@@ -90,7 +89,7 @@ poetry run aerich migrate    # Create new migration
 - **PascalCase** for classes: `TournamentRace`, `ALTTPRPreset`, `SahasrahBotCoreHandler`
 - **SCREAMING_SNAKE_CASE** for config constants: `DISCORD_TOKEN`, `SG_API_ENDPOINT`
 - All IO operations are async (`async def` / `await`)
-- Use Tortoise ORM for new database code (not legacy raw SQL in `alttprbot/database/`)
+- Use Tortoise ORM for new database code (the legacy raw SQL `alttprbot/database/` layer has been removed)
 
 ### Async Patterns
 - Single event loop drives all 4 subsystems — never use `asyncio.run()` inside the app
@@ -138,7 +137,7 @@ Presentation (alttprbot/presentation/{discord,audit,racetime,api}/)
 - **Service:** business rules/validation/authz/orchestration/audit/notify. Raises `ValueError`/`PermissionError`/`SahasrahBotException`. Never imports `discord`/`racetime_bot`/`quart`/`alttprbot.presentation`; reach surfaces via a `_notify` gateway.
 - **Repository:** pure Tortoise CRUD; returns models. No business logic/notify.
 
-During the migration the four `alttprbot_*` packages are being folded into `alttprbot/presentation/`, and `alttprgen`/`tournament` into `alttprbot/services/`. Enforcement: `poetry run lint-imports` (import-linter, warn-only for now) + edit-time Claude Code hooks. **Full rules and phase plan:** [docs/architecture-layers.md](docs/architecture-layers.md), [docs/plans/three_tier_migration.md](docs/plans/three_tier_migration.md).
+The four `alttprbot_*` packages have been folded into `alttprbot/presentation/`, and `alttprgen`/`tournament` into `alttprbot/services/`. Enforcement: `poetry run lint-imports` (import-linter, **blocking in CI** — see [.github/workflows/lint.yml](.github/workflows/lint.yml) and `.pre-commit-config.yaml`; all three contracts are green) + edit-time Claude Code hooks. **Full rules and phase plan:** [docs/architecture-layers.md](docs/architecture-layers.md), [docs/plans/three_tier_migration.md](docs/plans/three_tier_migration.md).
 
 ## Architecture Patterns
 
