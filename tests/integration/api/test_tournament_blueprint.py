@@ -9,9 +9,11 @@ from unittest.mock import AsyncMock, MagicMock
 from alttprbot.presentation.api.blueprints import tournament as t_bp
 
 
-def fake_event(submission_form):
+def patch_form_config(monkeypatch, submission_form):
+    """Make ``fakeevent`` a known event whose dispatched config has ``submission_form``."""
+    monkeypatch.setattr(t_bp.tournament_registry, "TOURNAMENT_DATA", {"fakeevent": object()})
     cfg = SimpleNamespace(submission_form=submission_form)
-    return SimpleNamespace(get_config=AsyncMock(return_value=cfg))
+    monkeypatch.setattr(t_bp.tournament_dispatch, "get_config", AsyncMock(return_value=cfg))
 
 
 async def test_submit_without_session_is_unauthenticated(client):
@@ -26,21 +28,21 @@ async def test_form_config_unknown_event_returns_404(client):
 
 
 async def test_form_config_no_submission_form_returns_422(client, monkeypatch):
-    monkeypatch.setattr(t_bp, "TOURNAMENT_DATA", {"fakeevent": fake_event(None)})
+    patch_form_config(monkeypatch, None)
     resp = await client.get("/api/tournament/form-config/fakeevent")
     assert resp.status_code == 422
 
 
 async def test_form_config_custom_template_returns_422(client, monkeypatch):
     # A string submission_form is a server-rendered template name, unsupported by the JSON API.
-    monkeypatch.setattr(t_bp, "TOURNAMENT_DATA", {"fakeevent": fake_event("custom_form.html")})
+    patch_form_config(monkeypatch, "custom_form.html")
     resp = await client.get("/api/tournament/form-config/fakeevent")
     assert resp.status_code == 422
 
 
 async def test_form_config_returns_settings(client, monkeypatch):
     form = [{"name": "vod", "type": "text"}]
-    monkeypatch.setattr(t_bp, "TOURNAMENT_DATA", {"fakeevent": fake_event(form)})
+    patch_form_config(monkeypatch, form)
     resp = await client.get("/api/tournament/form-config/fakeevent")
     assert resp.status_code == 200
     assert (await resp.get_json())["settings"] == form

@@ -1,9 +1,10 @@
 """Import-order shim for racetime handler tests.
 
-Importing ``alttprbot.presentation.racetime.handlers.core`` cold triggers a circular import
-(handlers.core -> alttprbot.tournaments -> ... -> alttprbot.presentation.racetime.config ->
-handlers.core). Importing ``alttprbot.presentation.racetime.bot`` first walks the chain in
-the order the running app uses, so the handler modules import cleanly afterward.
+Importing ``alttprbot.presentation.racetime.handlers.core`` cold can trigger a circular
+import (handlers.core -> presentation.discord.tournament.dispatch -> ... ->
+alttprbot.presentation.racetime.config -> handlers.core). Importing
+``alttprbot.presentation.racetime.bot`` first walks the chain in the order the running app
+uses, so the handler modules import cleanly afterward.
 """
 
 import config

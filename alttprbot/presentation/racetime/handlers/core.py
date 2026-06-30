@@ -8,13 +8,13 @@ import discord.utils
 import tortoise.exceptions
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
-from alttprbot import tournaments
 from alttprbot.services import (
     RaceRoomService,
     SpoilerRaceService,
     TournamentResultsService,
 )
 from alttprbot.presentation.discord.bot import discordbot
+from alttprbot.presentation.discord.tournament import dispatch as tournament_dispatch
 from alttprbot.presentation.racetime.misc.konot import KONOT
 
 
@@ -132,7 +132,7 @@ class SahasrahBotCoreHandler(RaceHandler):
             return
 
         try:
-            self.tournament = await tournaments.fetch_tournament_handler(
+            self.tournament = await tournament_dispatch.fetch_tournament_handler(
                 event=race.event,
                 episodeid=race.episode_id,
                 rtgg_handler=self
