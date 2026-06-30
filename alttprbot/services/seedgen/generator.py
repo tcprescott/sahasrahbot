@@ -1,4 +1,5 @@
 import base64
+import binascii
 import logging
 import os
 import random
@@ -232,9 +233,15 @@ class ALTTPRPreset(SahasrahBotPresetCore):
                                 except ValueError:
                                     continue
                             else:
+                                # ``location`` comes from user-supplied preset data; a
+                                # non-base64 value must not crash generation in a log call.
+                                try:
+                                    location_label = base64.b64decode(location).decode("utf8")
+                                except (binascii.Error, ValueError, UnicodeDecodeError):
+                                    location_label = str(location)
                                 logging.info(
                                     "Skipping \"%s\" because it is already populated with \"%s\" and override is true.",
-                                    base64.b64decode(location).decode("utf8"), settings['l'][location])
+                                    location_label, settings['l'][location])
 
             if hints:
                 settings['hints'] = 'on'

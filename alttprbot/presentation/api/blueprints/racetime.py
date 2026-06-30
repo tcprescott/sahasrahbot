@@ -1,8 +1,10 @@
 import datetime
+import logging
+import secrets
 from urllib.parse import quote
 
 import aiohttp
-from quart import Blueprint, abort, jsonify, redirect, request
+from quart import Blueprint, abort, jsonify, redirect, request, session
 from alttprbot.presentation.api.oauth_client import requires_authorization
 
 import config
@@ -11,7 +13,32 @@ from alttprbot.presentation.api.api import discord
 from alttprbot.presentation.racetime import bot as racetimebot
 from alttprbot.presentation.racetime.compat import get_room_handler
 
+logger = logging.getLogger(__name__)
+
 racetime_blueprint = Blueprint('racetime', __name__)
+
+
+def _extract_auth_key(req):
+    """Resolve the API key from the ``Authorization`` header, falling back to the
+    legacy ``?auth_key=`` query parameter.
+
+    The query-string form leaks the key into access logs and proxies, so it is
+    deprecated: callers should send ``Authorization: <key>`` (or ``Bearer <key>``).
+    Both forms work for now; the query form logs a deprecation warning.
+    """
+    header = req.headers.get('Authorization')
+    if header:
+        if header.lower().startswith('bearer '):
+            return header[7:].strip()
+        return header.strip()
+
+    auth_key = req.args.get('auth_key')
+    if auth_key:
+        logger.warning(
+            "racetime_cmd_auth_key_query_deprecated",
+            extra={'path': req.path},
+        )
+    return auth_key
 
 RACETIME_CLIENT_ID_OAUTH = config.RACETIME_CLIENT_ID_OAUTH
 RACETIME_CLIENT_SECRET_OAUTH = config.RACETIME_CLIENT_SECRET_OAUTH
@@ -26,7 +53,9 @@ async def bot_command():
     category = data['category']
     room = data['room']
     cmd = data['cmd']
-    auth_key = request.args['auth_key']
+    auth_key = _extract_auth_key(request)
+    if not auth_key:
+        return abort(401)
 
     if not await AuthorizationService().is_racetime_cmd_authorized(auth_key, category):
         return abort(403)
@@ -79,8 +108,13 @@ async def bot_command():
 @requires_authorization
 async def racetime_init_verification():
     redirect_uri = quote(f"{APP_URL}/racetime/verify/return")
+    # CSRF state: bind this authorization request to the user's session so an
+    # attacker can't trick a logged-in victim into linking the attacker's
+    # RaceTime account via a forged callback.
+    state = secrets.token_urlsafe(32)
+    session['racetime_oauth_state'] = state
     return redirect(
-        f"{RACETIME_URL}/o/authorize?client_id={RACETIME_CLIENT_ID_OAUTH}&response_type=code&scope=read&redirect_uri={redirect_uri}",
+        f"{RACETIME_URL}/o/authorize?client_id={RACETIME_CLIENT_ID_OAUTH}&response_type=code&scope=read&redirect_uri={redirect_uri}&state={quote(state)}",
     )
 
 
@@ -88,6 +122,12 @@ async def racetime_init_verification():
 @requires_authorization
 async def return_racetime_verify():
     user = await discord.fetch_user()
+
+    returned_state = request.args.get("state")
+    stored_state = session.pop('racetime_oauth_state', None)
+    if not stored_state or not returned_state or not secrets.compare_digest(returned_state, stored_state):
+        return abort(400, "Invalid or missing OAuth state.")
+
     code = request.args.get("code")
     if code is None:
         return abort(400, "code is missing")

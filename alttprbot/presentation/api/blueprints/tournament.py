@@ -1,9 +1,13 @@
+import logging
+
 from quart import Blueprint, jsonify, request, session
 
 from alttprbot.services import TournamentGamesService
 from alttprbot.services.tournament import registry as tournament_registry
 from alttprbot.presentation.discord.tournament import dispatch as tournament_dispatch
 from alttprbot.presentation.api.api import discord
+
+logger = logging.getLogger(__name__)
 
 tournament_blueprint = Blueprint('tournament', __name__)
 
@@ -68,7 +72,10 @@ async def api_submit():
         submitted_by = getattr(user, 'name', str(user)) or "unknown"
         await tournament_race.process_submission_form(flat_payload, submitted_by=submitted_by)
         return jsonify(success=True, versus=tournament_race.versus)
-    except (ValueError, TypeError) as e:
-        return jsonify(error=f"Invalid input: {e}"), 400
-    except Exception as e:
-        return jsonify(error=f"Error processing submission: {e}"), 400
+    except (ValueError, TypeError):
+        # Log the detail server-side; don't reflect exception internals to the client.
+        logger.warning("tournament_submit_invalid_input", exc_info=True)
+        return jsonify(error="Invalid submission data provided."), 400
+    except Exception:
+        logger.exception("tournament_submit_failed")
+        return jsonify(error="An error occurred while processing your submission."), 400

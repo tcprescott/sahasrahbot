@@ -47,6 +47,8 @@ async def races_api(tournament_id):
 
     if request.args.get('page'):
         page = int(request.args.get('page'))
+        if page < 1 or page > 100000:
+            return abort(400, 'page must be between 1 and 100000.')
     else:
         page = 1
 
@@ -370,7 +372,7 @@ async def async_tournament_queue_json(tournament_id: int):
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
-    page = int(request.args.get('page', 1))
+    page = max(1, min(int(request.args.get('page', 1)), 100000))
     page_size = 20
     request_filter = {}
 
