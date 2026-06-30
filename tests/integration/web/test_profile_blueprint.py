@@ -34,8 +34,12 @@ async def test_api_me_unauthenticated_returns_401(client):
 async def test_api_me_includes_linked_account_state(client, monkeypatch):
     await sign_in(client)
     monkeypatch.setattr(web_module.discord, "fetch_user", AsyncMock(return_value=DISCORD_USER))
-    profile = AsyncMock(return_value=None)
-    monkeypatch.setattr(UserService, "get_by_discord_id", profile)
+    summary = AsyncMock(return_value={
+        "display_name": None,
+        "racetime": {"linked": False, "id": None, "url": None},
+        "twitch": {"linked": False, "name": None},
+    })
+    monkeypatch.setattr(UserService, "get_account_summary", summary)
 
     resp = await client.get("/api/me")
     assert resp.status_code == 200
@@ -44,6 +48,7 @@ async def test_api_me_includes_linked_account_state(client, monkeypatch):
     assert data["linked_accounts"]["discord"] == {"linked": True, "username": "tester"}
     assert data["linked_accounts"]["racetime"] == {"linked": False, "id": None, "url": None}
     assert data["linked_accounts"]["twitch"] == {"linked": False, "name": None}
+    summary.assert_awaited_once_with(123)
 
 
 async def test_display_name_update_requires_auth(client):
@@ -55,11 +60,20 @@ async def test_display_name_update_requires_auth(client):
 
 
 async def test_display_name_update_rejects_invalid_name(client, monkeypatch):
+    # Validation happens before any repository access, so no DB-layer mocking is needed.
     await sign_in(client)
     monkeypatch.setattr(web_module.discord, "fetch_user", AsyncMock(return_value=DISCORD_USER))
-    monkeypatch.setattr(UserService, "get_or_create_by_discord_id", AsyncMock(return_value=AsyncMock()))
 
     resp = await client.post("/api/me/display-name", json={"display_name": "   "})
+    assert resp.status_code == 400
+    assert "error" in (await resp.get_json())
+
+
+async def test_display_name_update_rejects_non_string(client, monkeypatch):
+    await sign_in(client)
+    monkeypatch.setattr(web_module.discord, "fetch_user", AsyncMock(return_value=DISCORD_USER))
+
+    resp = await client.post("/api/me/display-name", json={"display_name": 123})
     assert resp.status_code == 400
     assert "error" in (await resp.get_json())
 
@@ -67,18 +81,15 @@ async def test_display_name_update_rejects_invalid_name(client, monkeypatch):
 async def test_display_name_update_succeeds(client, monkeypatch):
     await sign_in(client)
     monkeypatch.setattr(web_module.discord, "fetch_user", AsyncMock(return_value=DISCORD_USER))
-
-    record = AsyncMock()
-    record.display_name = "Alice"
-    monkeypatch.setattr(UserService, "get_or_create_by_discord_id", AsyncMock(return_value=record))
-    update_mock = AsyncMock()
-    monkeypatch.setattr(UserService, "update_display_name", update_mock)
+    set_name_mock = AsyncMock(return_value="Alice")
+    monkeypatch.setattr(UserService, "set_own_display_name", set_name_mock)
 
     resp = await client.post("/api/me/display-name", json={"display_name": "Alice"})
     assert resp.status_code == 200
     body = await resp.get_json()
     assert body["success"] is True
-    update_mock.assert_awaited_once_with(record, "Alice")
+    assert body["display_name"] == "Alice"
+    set_name_mock.assert_awaited_once_with(123, "Alice")
 
 
 async def test_racetime_unlink_requires_auth(client):

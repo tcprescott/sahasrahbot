@@ -187,24 +187,17 @@ async def api_me():
     name = user._data.get('global_name') or user._data.get('username', '')
     username = user._data.get('username', '')
 
-    profile = await UserService().get_by_discord_id(int(user_id))
+    summary = await UserService().get_account_summary(int(user_id))
 
     return jsonify(data=dict(
         id=user_id,
         name=name,
         avatar_url=avatar_url,
-        display_name=profile.display_name if profile else None,
+        display_name=summary["display_name"],
         linked_accounts=dict(
             discord=dict(linked=True, username=username),
-            racetime=dict(
-                linked=bool(profile and profile.rtgg_id),
-                id=profile.rtgg_id if profile else None,
-                url=profile.racetime_profile if profile else None,
-            ),
-            twitch=dict(
-                linked=bool(profile and profile.twitch_name),
-                name=profile.twitch_name if profile else None,
-            ),
+            racetime=summary["racetime"],
+            twitch=summary["twitch"],
         ),
     ))
 

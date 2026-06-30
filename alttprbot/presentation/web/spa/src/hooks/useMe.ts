@@ -30,6 +30,8 @@ async function fetchMe(): Promise<MeData | null> {
   return body.data;
 }
 
+export const meQueryKey = ['me'] as const;
+
 export function useMe(): UseQueryResult<MeData | null> {
-  return useQuery({ queryKey: ['me'], queryFn: fetchMe });
+  return useQuery({ queryKey: meQueryKey, queryFn: fetchMe });
 }

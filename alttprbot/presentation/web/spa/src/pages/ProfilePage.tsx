@@ -2,9 +2,25 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '../components/ui/Badge';
-import { useMe, type MeData } from '../hooks/useMe';
+import { useMe, meQueryKey, type MeData } from '../hooks/useMe';
 import '../styles/submit.css';
 import '../styles/profile.css';
+
+// ---------------------------------------------------------------------------
+// Shared POST helper for the mutations below — keeps fetch/parse/error
+// handling in one place instead of duplicated per section.
+// ---------------------------------------------------------------------------
+
+async function postJson<T extends { error?: string } = { error?: string }>(url: string, body?: unknown): Promise<T> {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = (await r.json().catch(() => ({}))) as T;
+  if (!r.ok || data.error) throw new Error(data.error ?? `Request failed (${r.status}).`);
+  return data;
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -61,13 +77,10 @@ function DisplayNameSection({ user, onChanged }: { user: MeData; onChanged: () =
     setSuccess(false);
     setSaving(true);
     try {
-      const r = await fetch('/api/me/display-name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ display_name: value }),
-      });
-      const body = (await r.json().catch(() => ({}))) as { success?: boolean; display_name?: string; error?: string };
-      if (!r.ok || body.error) { setError(body.error ?? `Save failed (${r.status}).`); return; }
+      const body = await postJson<{ display_name?: string; error?: string }>('/api/me/display-name', { display_name: value });
+      // Resync to the server's (trimmed/validated) value rather than leaving
+      // the raw input text, so the field can't drift from what was persisted.
+      if (body.display_name !== undefined) setValue(body.display_name);
       setSuccess(true);
       onChanged();
     } catch (err) {
@@ -123,12 +136,16 @@ function LinkedAccountsSection({ user, onChanged }: { user: MeData; onChanged: (
   const { discord, racetime, twitch } = user.linked_accounts;
 
   async function handleUnlinkRacetime() {
+    const confirmed = window.confirm(
+      'Unlink your RaceTime.gg account? This may affect verified-racer roles, tournament ' +
+      'eligibility, or race entries that depend on it. You can link it again at any time.'
+    );
+    if (!confirmed) return;
+
     setError(null);
     setUnlinking(true);
     try {
-      const r = await fetch('/api/me/racetime/unlink', { method: 'POST' });
-      const body = (await r.json().catch(() => ({}))) as { success?: boolean; error?: string };
-      if (!r.ok || body.error) { setError(body.error ?? `Unlink failed (${r.status}).`); return; }
+      await postJson('/api/me/racetime/unlink');
       onChanged();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
@@ -253,7 +270,7 @@ function ProfileCard({ user, onChanged }: { user: MeData; onChanged: () => void 
 export function ProfilePage() {
   const { data: user, isLoading, error } = useMe();
   const queryClient = useQueryClient();
-  const handleChanged = () => { void queryClient.invalidateQueries({ queryKey: ['me'] }); };
+  const handleChanged = () => { void queryClient.invalidateQueries({ queryKey: meQueryKey }); };
 
   const pageHead = (
     <section className="pagehead">
