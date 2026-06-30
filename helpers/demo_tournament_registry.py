@@ -58,7 +58,7 @@ def demo_hardcoded_path():
     MockConfig.TOURNAMENT_CONFIG_ENABLED = False
     
     # Import the module (this triggers initialization)
-    from alttprbot.tournament import registry_loader
+    from alttprbot.services.tournament import registry_loader
     
     # Mock handlers
     mock_handlers = {
@@ -95,7 +95,7 @@ def demo_config_path():
     
     MockConfig.TOURNAMENT_CONFIG_ENABLED = True
     
-    from alttprbot.tournament import registry_loader
+    from alttprbot.services.tournament import registry_loader
     
     # Mock handlers
     mock_handlers = {

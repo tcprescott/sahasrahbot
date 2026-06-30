@@ -5,7 +5,7 @@ from quart import Blueprint, request, jsonify
 from alttprbot.presentation.api.oauth_client import requires_authorization
 
 from alttprbot.services import RankedChoiceService
-from alttprbot.util import rankedchoice
+from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
 from alttprbot.presentation.api.api import discord
 from alttprbot.presentation.discord.bot import discordbot
 
@@ -102,6 +102,6 @@ async def submit_ballot_json(election_id: int):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
-    await rankedchoice.refresh_election_post(election, discordbot)
+    await ranked_choice_embeds.refresh_election_post(election, discordbot)
 
     return jsonify({'success': True})

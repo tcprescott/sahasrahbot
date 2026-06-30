@@ -28,6 +28,47 @@
 
 ## Recent Completions
 
+- **Phase 10 — legacy deleted & enforcement flipped (three-tier migration finale).** The guild-config
+  `Guild.config_*` monkey-patch and the legacy `alttprbot/database/` package are gone. All `config_get`
+  callers (audit bot/cog, misc cog, tournament cog) and the two `checks.py` guild-config checks now go
+  through `GuildConfigService`; `database/config.py`, the monkey-patch module, and five already-dead
+  legacy modules were deleted. The last legacy data module (`database/role.py`) became
+  `ReactionRoleRepository` + `ReactionRoleService` (validation — per-group cap, group/emoji uniqueness —
+  preserved in original order), with the reaction-role cog rewired; `alttprbot/database/` was then removed
+  entirely. Enforcement: import-linter is now **blocking in CI** (`continue-on-error` removed; 3 kept /
+  0 broken). **One owner step remains:** setting `SAHASRAHBOT_HOOKS_ENFORCE=1` in `.claude/settings.json`
+  to make the Claude Code architecture hooks blocking — the agent's auto-write to agent-loaded config was
+  gated for review. 462 tests green throughout, all surfaces import cleanly. **This completes the strict
+  three-tier migration:** `alttprbot/presentation → services → repositories → models`, no legacy
+  `database/` package, no `tournament/` god-object, contracts enforced.
+- **`alttprbot/tournament/` package retired (three-tier migration).** The untiered tournament god-object
+  package is deleted. The transitional `OrchestratorAdapter` (the `TournamentRace`-shaped bridge that every
+  active event slug already resolves to via `make_adapter`) was relocated into the Discord presentation tier
+  (`presentation/discord/tournament/orchestrator_adapter.py`), with its player lookup routed through
+  `UserService` instead of `UserRepository`. `registry_loader.py` moved to `services/tournament/`; the live
+  `TournamentConfig` dataclass moved to `presentation/discord/tournament/config.py` and
+  `UnableToLookupUserException` to `alttprbot/exceptions.py`. The dead `core.py` `TournamentRace`/`TournamentPlayer`
+  base classes and the entire `alttpr.py` (`ALTTPRTournamentRace`/`ALTTPR2024Race`, never instantiated) were
+  deleted. Two **pre-existing-broken** cog commands — `cc2023` and `tournament_deck`, which called
+  `alttpr.roll_seed`/`alttpr.generate_deck` (functions that never existed in any branch, including master) —
+  were removed per owner decision, along with their stale commented experimental blocks and now-unused imports.
+  `tournaments.py` remains as thin untiered dispatch glue. Behavior-preserving: 462 tests green, import-linter
+  3 kept/0 broken, all surfaces import cleanly, and an adversarial 3-reviewer + verifier workflow checked the
+  dead-code-deletion safety, the cog removal, and the relocation parity. This was the last blocker before
+  Phase 10 (retire the guild-config monkey-patch, then flip the import-linter contracts to blocking).
+- **Phase 9 util split complete (three-tier migration).** The three tier-mixing modules under
+  `alttprbot/util/` are deleted, their concerns split across the proper tiers: `triforce_text` →
+  `TriforceTextService` (balanced/random text selection + `generate_with_triforce_text`) backed by new
+  `TriforceTextRepository` queries; `rankedchoice` → `RankedChoiceService.calculate_results` (STV
+  tabulation + winner/results persistence via repo) with the Discord embed + post-refresh moved to
+  `presentation/discord/util/ranked_choice.py`; `asynctournament` → new `AsyncTournamentScoringService`
+  (par/qualifier scoring, leaderboard, balanced permalink eligibility, DEBUG-only test data) backed by 15
+  new `AsyncTournamentRepository` methods, with `discord.utils.utcnow()` replaced by stdlib UTC so the
+  service tier no longer imports `discord`. All cog/blueprint/service consumers were rewired (incl. the
+  `alttpr_quals` qualifier orchestrator and its test), the scoring characterization test moved to the
+  services tier, and the `LeaderboardEntry` dataclass relocated with the scoring service. Behavior-preserving:
+  462 tests green, import-linter 3 kept/0 broken, and a 3-slice adversarial OLD-vs-NEW parity review (per-slice
+  reviewers + finding verifiers comparing against the git-HEAD originals) returned **zero findings**.
 - **Tournament decomposition complete (three-tier migration, Phase 7).** Every tournament handler is decomposed out of the `alttprbot/tournament/` god-object into `alttprbot/services/tournament/` orchestrators (business) + `presentation/discord/tournament/presenter.py` (Discord rendering) + the `_notify` discord/racetime gateways (all I/O) + repositories (all ORM). Migrated, behavior-preserving and per-handler adversarially parity-reviewed: `test`, `boots`, the trivial/low ALTTPR tail (`smwde`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`), the league handlers (`invleague`/`alttprleague`), `smrl_playoff` (custom SM flow + web submission form), the SG dailies (`alttprdaily`/`smz3`), and `alttpr_quals` (the AsyncTournament-entangled live qualifier). The tournament registry is now single-source (the hardcoded production fallback derives from `AVAILABLE_TOURNAMENT_HANDLERS`, so it can't drift from the YAML/catalog). The 18 legacy handler files + the racetime-bot import were deleted; `alttprbot/tournament/` is now just the dispatch infra (the untiered `OrchestratorAdapter` bridge, `registry_loader`, and the `core`/`alttpr` shims the discord cog still imports). 462 tests passing; import-linter 3 kept / 0 broken. **Pending: smoke-test the active handlers in DEBUG before deploy (production runs the hardcoded path, so they go live on deploy); retire the `OrchestratorAdapter` by rewiring the cog + racetime handler to drive (orchestrator, presenter) directly.** Full record: `docs/plans/tournament_decomposition.md`.
 - Audit of Discord bot domain completed; technical debt identified.
 - Codebase analysis and documentation generation (2026-02-11).

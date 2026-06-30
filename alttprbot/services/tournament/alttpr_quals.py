@@ -31,7 +31,8 @@ from alttprbot.repositories import (
 )
 from alttprbot.services.tournament.core import TournamentOrchestrator
 from alttprbot.services.tournament.definition import TournamentDefinition
-from alttprbot.util import speedgaming, triforce_text
+from alttprbot.services.triforce_text_service import TriforceTextService
+from alttprbot.util import speedgaming
 
 QUALIFIER_DEFINITION = TournamentDefinition(
     event_slug="alttpr",
@@ -159,7 +160,7 @@ class ALTTPRQualifierOrchestrator(TournamentOrchestrator):
         await self.racetime.set_invitational(room)
         await self.racetime.send_message(room, "This room is now locked.  Late entries are not permitted.")
 
-        seed = await triforce_text.generate_with_triforce_text("alttpr2024", live_race.pool.preset)
+        seed = await TriforceTextService().generate_with_triforce_text("alttpr2024", live_race.pool.preset)
         seed_code = f"({'/'.join(seed.code)})"
 
         await self.racetime.set_bot_raceinfo(room, f"{seed.url} - {seed_code}")

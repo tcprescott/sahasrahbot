@@ -5,8 +5,8 @@ import aiohttp
 
 import config
 from alttprbot import models
-from alttprbot.tournament import registry_loader
-from alttprbot.tournament.orchestrator_adapter import make_adapter
+from alttprbot.services.tournament import registry_loader
+from alttprbot.presentation.discord.tournament.orchestrator_adapter import make_adapter
 from alttprbot.services._notify import racetime_gateway
 from alttprbot.services.tournament.test import TEST_DEFINITION, TestOrchestrator
 from alttprbot.services.tournament.boots import BOOTS_DEFINITION, BootsOrchestrator

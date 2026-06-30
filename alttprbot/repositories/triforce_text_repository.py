@@ -34,3 +34,21 @@ class TriforceTextRepository:
     async def list_config_values(pool_name: str, key_name: str) -> List[str]:
         entries = await models.TriforceTextsConfig.filter(pool_name=pool_name, key_name=key_name)
         return [entry.value for entry in entries]
+
+    @staticmethod
+    async def list_approved_discord_user_ids(pool_name: str) -> List[int]:
+        return await models.TriforceTexts.filter(
+            pool_name=pool_name, approved=True
+        ).distinct().values_list("discord_user_id", flat=True)
+
+    @staticmethod
+    async def list_approved_for_user(
+        pool_name: str, discord_user_id: int
+    ) -> List[models.TriforceTexts]:
+        return await models.TriforceTexts.filter(
+            approved=True, pool_name=pool_name, discord_user_id=discord_user_id
+        )
+
+    @staticmethod
+    async def list_approved(pool_name: str) -> List[models.TriforceTexts]:
+        return await models.TriforceTexts.filter(approved=True, pool_name=pool_name)

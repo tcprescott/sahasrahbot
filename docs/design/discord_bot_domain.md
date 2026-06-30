@@ -405,7 +405,7 @@ This file registers **4 cog classes:**
 **UI Views (Persistent):**
 - `RankedChoiceMessageView` — "End Election" button (owner-only). Calculates results using ranked-choice algorithm and updates the post.
 
-**Dependencies:** `alttprbot.util.rankedchoice` (election logic, result calculation), `RankedChoiceElection`, `RankedChoiceCandidate`, `RankedChoiceVote` models, `APP_URL` config.
+**Dependencies:** `RankedChoiceService` (STV tabulation + persistence), `alttprbot.presentation.discord.util.ranked_choice` (embed + post refresh), `RankedChoiceElection`, `RankedChoiceCandidate`, `RankedChoiceVote` models, `APP_URL` config.
 
 ---
 
@@ -446,7 +446,7 @@ This file registers **4 cog classes:**
 - `SubmitVODModal` — VOD link + runner notes.
 - `SubmitCollectIGTModal` — Collection rate + IGT (for GMPMT2023 customization).
 
-**Dependencies:** `alttprbot.util.asynctournament` (scoring, test data), `alttprbot.util.triforce_text`, `alttprbot_api.util.checks`, `alttprbot.alttprgen.generator`, `aiohttp` (RaceTime.gg data API), `isodate`, `pytz`, `slugify`, extensive model usage (`AsyncTournament`, `AsyncTournamentRace`, `AsyncTournamentPermalinkPool`, `AsyncTournamentPermalink`, `AsyncTournamentLiveRace`, `AsyncTournamentAuditLog`, `AsyncTournamentPermissions`, `Users`).
+**Dependencies:** `AsyncTournamentScoringService` (scoring, leaderboard, eligibility, test data), `TriforceTextService` (triforce-text seed generation), `alttprbot.presentation.api.util.checks`, `alttprbot.services.seedgen.generator`, `aiohttp` (RaceTime.gg data API), `isodate`, `pytz`, `slugify`, extensive model usage (`AsyncTournament`, `AsyncTournamentRace`, `AsyncTournamentPermalinkPool`, `AsyncTournamentPermalink`, `AsyncTournamentLiveRace`, `AsyncTournamentAuditLog`, `AsyncTournamentPermissions`, `Users`).
 
 ---
 

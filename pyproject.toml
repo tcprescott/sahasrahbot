@@ -108,7 +108,8 @@ forbidden_modules = [
 allow_indirect_imports = "true"
 
 # Contract 3 — the presentation tier must reach data only through services.
-# Warn-only until the migration burns down the existing direct-model imports.
+# Enforced (blocking in CI) as of the final migration phase: the direct-model
+# import burn-down is complete.
 [[tool.importlinter.contracts]]
 name = "Presentation must not import models directly"
 type = "forbidden"

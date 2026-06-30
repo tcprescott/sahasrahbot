@@ -1,9 +1,9 @@
 """Guild configuration service.
 
 Per-guild key/value settings (the ``config`` table) with an in-memory cache.
-This is the canonical replacement for the ``Guild.config_*`` monkey-patch and the
-legacy ``alttprbot.database.config`` module (both kept alive as coexisting shims
-over the same rows until their remaining callers migrate).
+This is the canonical owner of guild config: it replaced the former
+``Guild.config_*`` monkey-patch and the legacy ``alttprbot.database.config``
+module, both of which have been removed (Phase 10).
 
 UI-free: channel-name -> id resolution is delegated to a caller-supplied
 ``resolver`` so the service never imports discord.

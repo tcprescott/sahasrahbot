@@ -13,6 +13,7 @@ class here.
 
 from alttprbot.services.async_tournament_live_race_service import AsyncTournamentLiveRaceService
 from alttprbot.services.async_tournament_permissions_service import AsyncTournamentPermissionsService
+from alttprbot.services.async_tournament_scoring_service import AsyncTournamentScoringService
 from alttprbot.services.async_tournament_service import AsyncTournamentService
 from alttprbot.services.audit_messages_service import AuditMessagesService
 from alttprbot.services.audit_service import AuditActions, AuditService
@@ -28,6 +29,7 @@ from alttprbot.services.preset_service import PresetService
 from alttprbot.services.race_room_service import RaceRoomService
 from alttprbot.services.racer_verification_service import RacerVerificationService
 from alttprbot.services.ranked_choice_service import RankedChoiceService
+from alttprbot.services.reaction_role_service import ReactionRoleService
 from alttprbot.services.spoiler_race_service import SpoilerRaceService
 from alttprbot.services.tournament_games_service import TournamentGamesService
 from alttprbot.services.tournament_results_service import TournamentResultsService
@@ -40,6 +42,7 @@ from alttprbot.services.voice_role_service import VoiceRoleService
 __all__ = [
     "AsyncTournamentLiveRaceService",
     "AsyncTournamentPermissionsService",
+    "AsyncTournamentScoringService",
     "AsyncTournamentService",
     "AuditActions",
     "AuditMessagesService",
@@ -56,6 +59,7 @@ __all__ = [
     "RaceRoomService",
     "RacerVerificationService",
     "RankedChoiceService",
+    "ReactionRoleService",
     "SpoilerRaceService",
     "TournamentGamesService",
     "TournamentResultsService",

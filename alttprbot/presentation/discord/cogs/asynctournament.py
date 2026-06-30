@@ -16,11 +16,11 @@ import config
 from alttprbot.services import (
     AsyncTournamentLiveRaceService,
     AsyncTournamentPermissionsService,
+    AsyncTournamentScoringService,
     AsyncTournamentService,
     AuditService,
     UserService,
 )
-from alttprbot.util import asynctournament, triforce_text
 from alttprbot.presentation.api.util import checks
 from alttprbot.services.seedgen import generator
 
@@ -312,7 +312,7 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         await pool.fetch_related("permalinks")
 
         user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        permalink = await asynctournament.get_eligible_permalink_from_pool(pool, user)
+        permalink = await AsyncTournamentScoringService().get_eligible_permalink_from_pool(pool, user)
 
         # Log the action
         await AuditService().record_async_event(
@@ -761,7 +761,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
             for tournament in tournaments:
                 logging.info("Calculating scores for tournament %s", tournament.id)
                 try:
-                    await asynctournament.calculate_async_tournament(tournament)
+                    await AsyncTournamentScoringService().calculate_async_tournament(tournament)
                 except Exception:
                     logging.exception("Exception in score_calculation_task for tournament %s", tournament.id)
                 logging.info("Finished calculating scores for tournament %s", tournament.id)
@@ -1114,7 +1114,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
             await interaction.response.defer(ephemeral=True)
 
-            await asynctournament.populate_test_data(tournament=tournament, participant_count=participant_count)
+            await AsyncTournamentScoringService().populate_test_data(tournament=tournament, participant_count=participant_count)
 
             await interaction.followup.send("Done!", ephemeral=True)
 
@@ -1139,7 +1139,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await interaction.response.defer(ephemeral=True)
 
-        await asynctournament.calculate_async_tournament(tournament, only_approved=only_approved)
+        await AsyncTournamentScoringService().calculate_async_tournament(tournament, only_approved=only_approved)
 
         await interaction.followup.send("Done!", ephemeral=True)
 

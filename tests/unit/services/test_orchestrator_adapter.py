@@ -10,9 +10,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-import alttprbot.tournament.orchestrator_adapter as adapter_mod
+import alttprbot.presentation.discord.tournament.orchestrator_adapter as adapter_mod
 from alttprbot.services.tournament import TournamentDefinition
-from alttprbot.tournament.orchestrator_adapter import make_adapter
+from alttprbot.presentation.discord.tournament.orchestrator_adapter import make_adapter
 
 
 class _Role:
