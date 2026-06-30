@@ -14,7 +14,7 @@ hardcoded IDs in each ``configuration()`` move here during the decomposition).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -46,7 +46,9 @@ class TournamentDefinition:
     webhook_urls: Dict[str, str] = field(default_factory=dict)
 
     # --- scheduling / room behavior ---
-    submission_form: Optional[str] = None
+    # Either a server-rendered template name (str) or a list of field-definition dicts
+    # consumed by the JSON submission API (e.g. the SMRL game/preset form).
+    submission_form: Any = None
     create_scheduled_events: bool = False
     scheduling_needs_tracker: bool = False
     stream_delay: int = 0

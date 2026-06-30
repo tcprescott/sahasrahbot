@@ -25,3 +25,20 @@ class TournamentResultsRepository:
         callers keep their existing field semantics while the ORM call is owned here.
         """
         return await models.TournamentResults.update_or_create(srl_id=srl_id, defaults=defaults)
+
+    @staticmethod
+    async def create_or_update_with_permalink(
+        srl_id: str, defaults: dict, permalink: str
+    ) -> models.TournamentResults:
+        """Update-or-create a result row, then stamp its ``permalink`` and save.
+
+        Mirrors the legacy seed-rolling write in
+        ``ALTTPRTournamentRace.process_tournament_race`` (``update_or_create`` keyed on
+        ``srl_id`` with ``defaults``, then ``result.permalink = seed.url`` + ``save()``).
+        ``permalink`` is set explicitly rather than via ``defaults`` so the field set is
+        an allowlist, never mass-assigned from caller input.
+        """
+        result, _ = await models.TournamentResults.update_or_create(srl_id=srl_id, defaults=defaults)
+        result.permalink = permalink
+        await result.save()
+        return result

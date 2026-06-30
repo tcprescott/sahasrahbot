@@ -50,7 +50,22 @@ class OrchestratorAdapter:
         adapter.data = adapter._build_config()
         orch = adapter._build_orchestrator(episodeid)
         adapter.orchestrator = orch
+
+        # Pre-I/O gate (e.g. alttpr_quals live-race lookup): short-circuit before any
+        # SpeedGaming / RaceTime calls, matching the legacy construct_race_room which did
+        # its cheap gate first and returned None silently.
+        if not await orch.before_update_data():
+            return None
+
         await orch.update_data()
+
+        # Submission gate (e.g. smrl): if the event refuses room creation it has already
+        # handled the abort (sent a reminder); skip opening a room. This cleanly drops a
+        # latent legacy crash — legacy create_race_room returned None here, which the
+        # un-null-checked base construct_race_room dereferenced (AttributeError + a spurious
+        # "error creating a race room" audit message). Warning DMs + the upsert are unchanged.
+        if not await orch.before_room_creation():
+            return None
 
         handler = await racetime_gateway.get().start_race(
             cls._definition.racetime_category, **orch.room_creation_kwargs
@@ -123,9 +138,23 @@ class OrchestratorAdapter:
 
     # --- legacy instance interface (delegated to the orchestrator) ---
     async def process_tournament_race(self, args, message):
-        await self.orchestrator.process_race(args, message)
+        # Refresh the room (name / URL) from the live handler before delegating. The
+        # entrant list for the post-roll seed-URL whisper is read fresh from the racetime
+        # gateway inside process_race (matching the legacy live read), so this snapshot is
+        # only used for the room name/URL the orchestrator needs while rolling.
+        if self.rtgg_handler is not None:
+            self.orchestrator.room = self._room_from_handler(self.rtgg_handler)
+        rolled = await self.orchestrator.process_race(args, message)
+        # seed_rolled is RaceTime *handler* state guarding double-rolling. The legacy
+        # subclasses set it as the last line of a successful process_tournament_race; the
+        # orchestrator (no handler) reports the roll and the adapter (holds the handler)
+        # sets the flag. Only set on success so an exception leaves the room re-rollable.
+        if rolled and self.rtgg_handler is not None:
+            self.rtgg_handler.seed_rolled = True
 
     async def on_race_start(self):
+        if self.rtgg_handler is not None:
+            self.orchestrator.room = self._room_from_handler(self.rtgg_handler)
         await self.orchestrator.on_race_start()
 
     async def on_race_pending(self):
@@ -139,6 +168,17 @@ class OrchestratorAdapter:
 
     async def can_gatekeep(self, rtgg_id):
         return await self.orchestrator.can_gatekeep(rtgg_id)
+
+    # --- submission flow (web API + the discord cog's reminder task) ---
+    async def process_submission_form(self, payload, submitted_by):
+        return await self.orchestrator.process_submission_form(payload, submitted_by)
+
+    async def send_race_submission_form(self, warning=False):
+        return await self.orchestrator.send_race_submission_form(warning=warning)
+
+    @property
+    def versus(self):
+        return self.orchestrator.versus if self.orchestrator else None
 
     @property
     def player_racetime_ids(self):
@@ -193,7 +233,17 @@ class OrchestratorAdapter:
             presenter=presenter,
             player_resolver=self._resolve_player,
             gatekeep_checker=self._check_gatekeep,
+            async_authz_checker=self._check_async_authz,
         )
+
+    async def _check_async_authz(self, user, tournament, roles):
+        """Async-tournament mod/admin check (DB + discord guild roles).
+
+        Wraps the existing ``checks.is_async_tournament_user`` (which touches ``discordbot``);
+        imported lazily to keep this off the module import path. Used by the alttpr_quals roll.
+        """
+        from alttprbot.presentation.api.util import checks
+        return await checks.is_async_tournament_user(user, tournament, roles)
 
     def _room_from_handler(self, handler) -> RaceRoom:
         category = self._definition.racetime_category

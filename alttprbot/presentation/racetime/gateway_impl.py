@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from racetime_bot import msg_actions
+
 from alttprbot.presentation.racetime.compat import get_room_handler
 from alttprbot.services._notify import racetime_gateway
 
@@ -44,10 +46,65 @@ class RaceTimeGatewayImpl:
         if handler is not None:
             await handler.set_bot_raceinfo(info)
 
+    async def send_pinned_action(
+        self, room_name: str, content: str, *, label: str, help_text: str, message: str
+    ) -> None:
+        """Post a pinned chat message carrying a single action button.
+
+        Mirrors the legacy ``send_room_welcome`` "Tournament Controls:" pinned
+        ``msg_actions.Action`` (the "Roll Tournament Seed" button).
+        """
+        handler = self._handler(room_name)
+        if handler is None:
+            return
+        await handler.send_message(
+            content,
+            actions=[msg_actions.Action(label=label, help_text=help_text, message=message)],
+            pinned=True,
+        )
+
     async def invite_user(self, room_name: str, user_id: str) -> None:
         handler = self._handler(room_name)
         if handler is not None:
             await handler.invite_user(user_id)
+
+    async def get_entrant_ids(self, room_name: str) -> list:
+        """The live entrant user-ids for a room (full list, no status filter).
+
+        Mirrors the legacy ``self.rtgg_handler.data['entrants']`` read: the handler's
+        ``data`` dict is reassigned on every ``race.data`` websocket frame, so this
+        returns the entrant set as it exists *at call time* (used for the post-roll
+        seed-URL whisper, which must see late joiners / dropped entrants).
+        """
+        handler = self._handler(room_name)
+        if handler is None:
+            return []
+        return [e["user"]["id"] for e in handler.data.get("entrants", [])]
+
+    async def get_entrants(self, room_name: str) -> list:
+        """Neutral entrant records (id / name / twitch_name) for a room, read at call time.
+
+        Mirrors the legacy ``race_room_data['entrants']`` iteration in
+        ``write_eligible_async_entrants`` — flattened to the fields the service tier needs
+        so it never touches the raw RaceTime entrant shape.
+        """
+        handler = self._handler(room_name)
+        if handler is None:
+            return []
+        return [
+            {
+                "id": e["user"]["id"],
+                "name": e["user"]["name"],
+                "twitch_name": e["user"].get("twitch_name", None),
+            }
+            for e in handler.data.get("entrants", [])
+        ]
+
+    async def get_started_at(self, room_name: str):
+        handler = self._handler(room_name)
+        if handler is None:
+            return None
+        return handler.data.get("started_at")
 
     async def set_invitational(self, room_name: str) -> None:
         handler = self._handler(room_name)

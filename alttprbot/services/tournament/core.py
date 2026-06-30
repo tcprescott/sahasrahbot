@@ -19,7 +19,7 @@ the business hooks (``roll`` / ``process_race`` / the ``on_*`` lifecycle hooks).
 from __future__ import annotations
 
 import logging
-from typing import Awaitable, Callable, List, Optional
+from typing import Any, Awaitable, Callable, List, Optional
 
 import dateutil.parser
 import pytz
@@ -52,6 +52,7 @@ class TournamentOrchestrator:
         player_resolver: PlayerResolver,
         gatekeep_checker: GatekeepChecker,
         racetime=None,
+        async_authz_checker=None,
     ) -> None:
         try:
             self.episodeid = int(episodeid)
@@ -63,6 +64,9 @@ class TournamentOrchestrator:
         self._racetime = racetime
         self._player_resolver = player_resolver
         self._gatekeep_checker = gatekeep_checker
+        # adapter-supplied async-tournament authz check (DB + discord guild role); only the
+        # alttpr_quals orchestrator uses it (wraps presentation/api/util/checks).
+        self._async_authz_checker = async_authz_checker
 
         # runtime state
         self.episode: Optional[dict] = None
@@ -143,6 +147,35 @@ class TournamentOrchestrator:
 
         return await self._gatekeep_checker(user.discord_user_id, self.definition.helper_role_ids)
 
+    # --- room-creation gates (overridden per event; default allows creation) ---
+    async def before_update_data(self) -> bool:
+        """Pre-I/O room-creation gate, run *before* ``update_data``.
+
+        The dispatch adapter calls this right after building the orchestrator, before any
+        SpeedGaming / RaceTime I/O. Use it for cheap checks that should short-circuit room
+        creation without doing that work (e.g. the alttpr_quals live-race lookup, which the
+        legacy ``construct_race_room`` did first and returned ``None`` from silently). The
+        default allows creation. Gates that need ``update_data`` to have run (e.g. the smrl
+        submitted-settings check) belong in :meth:`before_room_creation` instead.
+        """
+        return True
+
+    async def before_room_creation(self) -> bool:
+        """Return ``False`` to abort room creation (handling the abort itself).
+
+        The dispatch adapter calls this after ``update_data`` and before opening the
+        RaceTime room. The default allows creation. Events that require submitted settings
+        (e.g. ``smrl``) override this to send a submission reminder and return ``False``.
+
+        Note this is an intentional *cleanup* of a latent legacy bug, not a faithful mirror:
+        legacy ``create_race_room`` returned ``None`` in this case, which the un-null-checked
+        base ``construct_race_room`` then dereferenced (``handler.tournament = ...``) — raising
+        ``AttributeError`` and posting a spurious "error creating a race room" audit message.
+        The clean early-return drops that crash + spurious message; the warning DMs and the
+        ``submitted`` upsert are identical to before.
+        """
+        return True
+
     # --- business hooks (overridden per event; no-op base) ---
     async def roll(self):
         pass
@@ -165,8 +198,43 @@ class TournamentOrchestrator:
     async def on_race_pending(self):
         pass
 
-    async def process_race(self, args, message):
+    async def process_race(self, args, message) -> bool:
+        """Handle the ``!tournamentrace`` seed-roll for this room.
+
+        Returns ``True`` when a seed was rolled (the dispatch adapter then sets the
+        RaceTime handler's ``seed_rolled`` guard). The no-op base returns falsy, so a
+        handler that does not roll (e.g. the debug ``test`` event) never trips the guard
+        — matching the legacy base ``process_tournament_race`` which did nothing.
+        """
+        return False
+
+    async def process_submission_form(self, payload, submitted_by):
+        """Handle a settings-submission POST. No-op base (legacy ``process_submission_form``)."""
         pass
+
+    # --- submission reminders (mirrors TournamentRace.send_race_submission_form) ---
+    async def send_race_submission_form(self, warning: bool = False) -> None:
+        if self.submission_form is None:
+            return
+        if self.tournament_game and self.tournament_game.submitted and not warning:
+            return
+
+        if warning:
+            msg = (
+                f"Your upcoming race room cannot be created because settings have not submitted: `{self.versus}`!\n\n"
+                f"For your convenience, please visit {self.submit_link} to submit the settings.\n\n"
+            )
+        else:
+            msg = (
+                f"Greetings!  Do not forget to submit settings for your upcoming race: `{self.versus}`!\n\n"
+                f"For your convenience, please visit {self.submit_link} to submit the settings.\n\n"
+            )
+
+        await self.presenter.send_player_reminders(self.player_discord_ids, msg)
+        await TournamentGamesRepository.upsert_by_episode_id(
+            episode_id=self.episodeid,
+            defaults={"event": self.event_slug, "submitted": 1},
+        )
 
     # --- pure, presentation-neutral properties (ported verbatim) ---
     @property
@@ -174,7 +242,7 @@ class TournamentOrchestrator:
         return self.definition.lang
 
     @property
-    def submission_form(self) -> Optional[str]:
+    def submission_form(self) -> Any:
         return self.definition.submission_form
 
     @property

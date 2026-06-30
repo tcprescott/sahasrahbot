@@ -6,6 +6,10 @@ exposes the legacy property surface. Here we drive _build_config + the propertie
 fake discordbot.
 """
 
+from unittest.mock import AsyncMock
+
+import pytest
+
 import alttprbot.tournament.orchestrator_adapter as adapter_mod
 from alttprbot.services.tournament import TournamentDefinition
 from alttprbot.tournament.orchestrator_adapter import make_adapter
@@ -34,6 +38,9 @@ class _FakeBot:
 
     def get_channel(self, cid):
         return self._channels.get(cid)
+
+    async def wait_until_ready(self):
+        return None
 
 
 DEFN = TournamentDefinition(
@@ -90,3 +97,135 @@ def test_player_racetime_ids_safe_without_orchestrator(monkeypatch):
     AdapterCls = make_adapter(object, DEFN)
     adapter = AdapterCls()
     assert adapter.player_racetime_ids == []  # orchestrator not built yet
+
+
+def _fake_handler(seed_rolled=False):
+    handler = type("H", (), {})()
+    handler.data = {"url": "/r", "name": "test/clever-cat", "entrants": [{"user": {"id": "e1"}}]}
+    handler.seed_rolled = seed_rolled
+    return handler
+
+
+def _adapter_with_orch(monkeypatch, process_race):
+    _patch_bot(monkeypatch)
+    fake_gw = type("GW", (), {"http_uri": lambda self, cat, url: f"http://rt{url}"})()
+    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+
+    AdapterCls = make_adapter(object, DEFN)
+    adapter = AdapterCls()
+    adapter.rtgg_handler = _fake_handler()
+    orch = AsyncMock()
+    orch.process_race = process_race
+    adapter.orchestrator = orch
+    return adapter, orch
+
+
+async def test_process_tournament_race_refreshes_room_and_sets_seed_rolled(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock(return_value=True))
+
+    await adapter.process_tournament_race(None, None)
+
+    # room refreshed from the live handler (fresh entrants/url) before delegating
+    assert orch.room.name == "test/clever-cat"
+    assert orch.room.entrant_ids == ["e1"]
+    assert orch.room.url == "http://rt/r"
+    orch.process_race.assert_awaited_once()
+    assert adapter.rtgg_handler.seed_rolled is True
+
+
+async def test_process_tournament_race_no_seed_rolled_when_handler_does_not_roll(monkeypatch):
+    adapter, _ = _adapter_with_orch(monkeypatch, AsyncMock(return_value=False))
+    await adapter.process_tournament_race(None, None)
+    assert adapter.rtgg_handler.seed_rolled is False  # falsy return -> guard untouched
+
+
+async def test_process_tournament_race_leaves_room_rerollable_on_error(monkeypatch):
+    adapter, _ = _adapter_with_orch(monkeypatch, AsyncMock(side_effect=RuntimeError("boom")))
+    with pytest.raises(RuntimeError):
+        await adapter.process_tournament_race(None, None)
+    assert adapter.rtgg_handler.seed_rolled is False  # exception -> not set
+
+
+# --- submission-flow delegation (PR6) ---
+
+async def test_adapter_delegates_process_submission_form(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+    orch.process_submission_form = AsyncMock(return_value=None)
+    await adapter.process_submission_form({"game": "1"}, submitted_by="u")
+    orch.process_submission_form.assert_awaited_once_with({"game": "1"}, "u")
+
+
+async def test_adapter_delegates_send_race_submission_form(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+    orch.send_race_submission_form = AsyncMock()
+    await adapter.send_race_submission_form(warning=True)
+    orch.send_race_submission_form.assert_awaited_once_with(warning=True)
+
+
+async def test_adapter_versus_delegates_to_orchestrator(monkeypatch):
+    adapter, orch = _adapter_with_orch(monkeypatch, AsyncMock())
+    orch.versus = "A vs. B"
+    assert adapter.versus == "A vs. B"
+
+
+def test_adapter_versus_safe_without_orchestrator(monkeypatch):
+    _patch_bot(monkeypatch)
+    adapter = make_adapter(object, DEFN)()
+    assert adapter.versus is None
+
+
+class _GatedOrchestrator:
+    """Minimal orchestrator that refuses room creation after update_data (smrl-style gate)."""
+
+    def __init__(self, *args, **kwargs):
+        self.updated = False
+
+    async def before_update_data(self):
+        return True
+
+    async def update_data(self):
+        self.updated = True
+
+    async def before_room_creation(self):
+        return False
+
+
+class _PreGatedOrchestrator(_GatedOrchestrator):
+    """Refuses room creation BEFORE update_data (alttpr_quals live-race-style gate)."""
+
+    update_data_calls = 0
+
+    async def before_update_data(self):
+        return False
+
+    async def update_data(self):
+        type(self).update_data_calls += 1
+
+
+async def test_construct_race_room_aborts_when_gated(monkeypatch):
+    _patch_bot(monkeypatch)
+    started = AsyncMock()
+    fake_gw = type("GW", (), {"start_race": started})()
+    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+
+    AdapterCls = make_adapter(_GatedOrchestrator, DEFN)
+    handler = await AdapterCls.construct_race_room(123)
+
+    assert handler is None  # gated -> no room
+    started.assert_not_awaited()  # start_race never reached
+
+
+async def test_construct_race_room_pre_io_gate_skips_update_data(monkeypatch):
+    _patch_bot(monkeypatch)
+    started = AsyncMock()
+    fake_gw = type("GW", (), {"start_race": started})()
+    monkeypatch.setattr(adapter_mod.racetime_gateway, "get", lambda: fake_gw)
+
+    _PreGatedOrchestrator.update_data_calls = 0
+    AdapterCls = make_adapter(_PreGatedOrchestrator, DEFN)
+    handler = await AdapterCls.construct_race_room(123)
+
+    assert handler is None
+    started.assert_not_awaited()
+    # the pre-I/O gate short-circuits before update_data runs any SpeedGaming/RaceTime I/O
+    assert _PreGatedOrchestrator.update_data_calls == 0

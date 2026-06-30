@@ -52,6 +52,49 @@ class AsyncTournamentRepository:
             await permalink.fetch_related("pool")
         return permalink
 
+    # --- live-qualifier writes (used by the alttpr_quals roll) ---
+
+    @staticmethod
+    async def create_live_permalink(
+        url: str, pool: models.AsyncTournamentPermalinkPool, notes: str
+    ) -> models.AsyncTournamentPermalink:
+        return await models.AsyncTournamentPermalink.create(
+            url=url, pool=pool, notes=notes, live_race=True
+        )
+
+    @staticmethod
+    async def count_completed_pool_races(
+        tournament: models.AsyncTournament, user: models.Users, pool: models.AsyncTournamentPermalinkPool
+    ) -> int:
+        """Non-reattempted races this user has already run from this pool (run-limit check)."""
+        return await models.AsyncTournamentRace.filter(
+            tournament=tournament, user=user, permalink__pool=pool, reattempted=False
+        ).count()
+
+    @staticmethod
+    async def user_has_active_race(
+        tournament: models.AsyncTournament, user: models.Users
+    ) -> bool:
+        return await models.AsyncTournamentRace.filter(
+            tournament=tournament, user=user, status__in=["pending", "in_progress"]
+        ).exists()
+
+    @staticmethod
+    async def create_pending_live_entry(
+        tournament: models.AsyncTournament,
+        permalink: models.AsyncTournamentPermalink,
+        user: models.Users,
+        live_race: models.AsyncTournamentLiveRace,
+    ) -> models.AsyncTournamentRace:
+        return await models.AsyncTournamentRace.create(
+            tournament=tournament,
+            permalink=permalink,
+            user=user,
+            thread_id=None,
+            status="pending",
+            live_race=live_race,
+        )
+
     # --- querysets for the pydantic /api/* endpoints (serialized in the service) ---
 
     @staticmethod

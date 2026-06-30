@@ -80,6 +80,32 @@ async def test_tournament_results_upsert_by_srl_id(tortoise_db):
     assert refetched.event == "smz3" and refetched.episode_id == "42"
 
 
+async def test_tournament_results_create_or_update_with_permalink(tortoise_db):
+    # creates the row, then stamps the permalink
+    row = await TournamentResultsRepository.create_or_update_with_permalink(
+        srl_id="room-9",
+        defaults={"episode_id": "7", "event": "boots", "spoiler": None},
+        permalink="http://alttpr/permalink1",
+    )
+    assert row.event == "boots"
+    assert row.permalink == "http://alttpr/permalink1"
+
+    refetched = await TournamentResultsRepository.get_by_srl_id("room-9")
+    assert refetched.permalink == "http://alttpr/permalink1"
+    assert refetched.episode_id == "7"
+
+    # second call updates in place (no duplicate) and re-stamps the permalink
+    row2 = await TournamentResultsRepository.create_or_update_with_permalink(
+        srl_id="room-9",
+        defaults={"event": "boots", "spoiler": None},
+        permalink="http://alttpr/permalink2",
+    )
+    assert row2.id == row.id
+    refetched2 = await TournamentResultsRepository.get_by_srl_id("room-9")
+    assert refetched2.permalink == "http://alttpr/permalink2"
+    assert refetched2.episode_id == "7"  # untouched default preserved
+
+
 async def test_tournament_games_get_and_upsert(tortoise_db):
     assert await TournamentGamesRepository.get_by_episode_id("99") is None
 

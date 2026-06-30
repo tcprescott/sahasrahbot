@@ -163,13 +163,22 @@ green.** Presentation imports no models; services/repositories import no UI; lay
 it does not violate them until its decomposition relocates it into `services/tournament/`.)
 
 **Remaining (no longer contract violations — architectural debt + final enforcement):**
-- **Tournament decomposition** — the `alttprbot/tournament/` god-object (imports the
-  discord/racetime bot singletons, builds embeds, direct ORM in subclasses). Full
-  orchestrator/presenter/gateway/config split, relocate to `services/tournament/`, one
-  subclass per PR. Relocating it INTO `services/` is what will surface it under Contracts 1/2,
-  so the decomposition must extract presenters first. **Detailed PR-by-PR plan:**
-  [tournament_decomposition.md](tournament_decomposition.md) (collaborator APIs, full subclass
-  catalog + migration order, gateway protocols, repository additions, risks).
+- **Tournament decomposition — ✅ DONE (handlers).** Every tournament handler is decomposed into
+  `alttprbot/services/tournament/` orchestrators (business, actively under the layering + bot-singleton
+  contracts) + `presentation/discord/tournament/presenter.py` (Discord rendering) + the `_notify` gateways
+  (all RaceTime/Discord I/O) + repositories (all ORM). **Full PR-by-PR record + collaborator APIs:**
+  [tournament_decomposition.md](tournament_decomposition.md). Sequence: PRs 0–2 (collaborators + `test`),
+  PR 3 (`boots`, the seed-roll path; entrant-snapshot timing bug found+fixed), PR 4 (the trivial/low ALTTPR
+  tail via `_roll_from_title_map`), PR 5 (the league handlers), PR 6 (`smrl_playoff` — custom SM flow + web
+  submission form), PR 7 (the SG dailies — first active production handlers), PR 8 (`alttpr_quals` — the
+  AsyncTournament-entangled live qualifier; one live-race-gate ordering bug found+fixed), PR 9 (deleted the 18
+  legacy handler files + the racetime-bot import). Every handler was adversarially OLD-vs-NEW parity-reviewed
+  (a workflow of per-surface reviewers + independent verifiers). The registry is **single-source**: the
+  hardcoded fallback (the production default) derives handler classes from `AVAILABLE_TOURNAMENT_HANDLERS`, so
+  the YAML and hardcoded paths can't drift. **Remaining tournament follow-up (a dispatch-surface refactor, not
+  a handler change):** retire the untiered `OrchestratorAdapter` by rewiring the discord cog + racetime handler
+  to drive `(orchestrator, presenter)` directly, after which `alttprbot/tournament/` can be deleted outright.
+  Migrated active handlers are static-parity-clean but not yet live-validated — smoke-test in DEBUG before deploy.
 - **Phase 9 util split** (`util/{asynctournament,rankedchoice,triforce_text}.py`).
 - **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
   all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked

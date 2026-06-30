@@ -25,26 +25,144 @@
   a live `TournamentConfig` so the un-migrated cog's `get_config()` accessors keep working;
   restored room-name + DM-failure logging; unresolved-member → DM skip parity). 362 tests.
 
-**▶ NEXT — PR 3: the seed-rolling path** (the `ALTTPRTournamentRace.process_tournament_race`
-family → `boots` as the first concrete one). This exercises the orchestrator's *other*
-lifecycle and the `SeedResult`/presenter-embed flow. Couplings already mapped, to port:
-  - `roll()` → returns `SeedResult`; presenter builds the seed embeds (with the RaceTime.gg +
-    broadcast-channel field inserts from the legacy `create_embeds`).
-  - the player-DM-with-fallback (on failure: `@here` audit alert via `discord.AllowedMentions`
-    + a RaceTime chat message) — cross-gateway, orchestrated in the orchestrator.
-  - the pinned "Roll Tournament Seed" `msg_actions` welcome button → a new racetime-gateway
-    primitive (`send_pinned_action`).
-  - `seed_rolled` is RaceTime *handler* state (guards double-rolling) → the adapter sets it
-    after `process_race` (it holds the handler).
-  Needed extensions: `discord_gateway.send_channel_message(mention_everyone=)`,
-  `racetime_gateway.send_pinned_action(...)`, presenter `build_race_embeds` + `send_player_dm`
-  returning success.
+- **PR 3 (done)** — the seed-rolling path, with `boots` as the first concrete handler. Added the
+  shared `ALTTPRTournamentOrchestrator` (`services/tournament/alttpr.py`) — a behavior-preserving
+  port of the legacy `ALTTPRTournamentRace`: `process_race` (the `!tournamentrace` flow),
+  `send_room_welcome` (welcome + pinned "Roll Tournament Seed" action), `_seed_code`. `BootsOrchestrator`
+  overrides only `roll()` (the `casualboots` preset → `SeedResult`). Collaborator extensions:
+  `TournamentResultsRepository.create_or_update_with_permalink`,
+  `discord_gateway.send_channel_message(mention_everyone=)`, `racetime_gateway.send_pinned_action(...)`
+  + `get_entrant_ids(...)`, presenter `build_race_embeds` / `send_player_seed_dm` (→bool) /
+  `send_audit_alert`. `process_race` returns whether a seed was rolled; the adapter sets the handler's
+  `seed_rolled` guard only on success and refreshes the room (name/url) before delegating. Registry
+  repoints `boots` → `make_adapter(BootsOrchestrator, BOOTS_DEFINITION)`. 18 new tests; 380 passing;
+  import-linter still 3-kept. Verified by a 5-lens adversarial OLD-vs-NEW parity workflow (23 findings,
+  every one independently re-verified): **1 real divergence found and fixed** — the per-entrant seed-URL
+  RaceTime whisper must read the entrant list *post-roll/live* (legacy read `handler.data['entrants']` at
+  the loop, after the seconds-long seed gen), so it now reads fresh via `racetime_gateway.get_entrant_ids`
+  instead of the pre-roll room snapshot. All other findings refuted as parity/known-safe.
 
-**RECOMMENDATION:** validate the `test` handler in DEBUG (confirm a real room opens, players are
-invited + DM'd, audit fires) before building PR 3+ on the pattern — both orchestrator lifecycles
-and every collaborator are now exercised by `test`, so a live pass de-risks the entire remaining
-tail cheaply. After validation the remaining handlers are mechanical applications of the pattern
-(bespoke `roll()` + IDs), `alttpr_quals` last (its AsyncTournament entanglement) with a review.
+- **PR 4 (done)** — the trivial/low ALTTPR tail, batched (the PR-3 pattern is now mechanical):
+  `services/tournament/{smwde,nologic,alttprhmg,alttprde,alttprmini}.py`, each a small orchestrator
+  overriding only `roll()` + a `<EVENT>_DEFINITION` lifting the hardcoded IDs out of the legacy
+  `configuration()`; registry repointed to `make_adapter(...)`. `smwde` is pure-config (SM hacks, no
+  seed roll) so it extends the **base** `TournamentOrchestrator` (no-op `process_race`, no welcome) —
+  matching the legacy `SMWDETournament` on the base `TournamentRace`. `nologic`/`alttprhmg` are
+  fixed-preset rolls; `alttprde`/`alttprmini` share a new `ALTTPRTournamentOrchestrator._roll_from_title_map`
+  helper (split title on the last `:`, strip, map lookup; unknown title → "Invalid mode chosen" race
+  message + re-raise) differing only in their title→preset map. 14 new tests (title-map success +
+  KeyError path, fixed-preset kwargs, every definition's IDs); 394 passing; import-linter 3-kept.
+  Verified by a per-handler adversarial parity workflow (5 reviewers reading legacy-vs-new digit/entry
+  by entry): **0 findings — clean parity across all five.**
+
+- **PR 5 (done)** — the ALTTPR **league** handlers (`invleague` + `alttprleague`). The legacy
+  `ALTTPRLeague`/`ALTTPROpenLeague` differed only in `event_slug`, so both collapse into one
+  `ALTTPRLeagueOrchestrator` (`services/tournament/alttprleague.py`) parameterised by
+  `INVITATIONAL_LEAGUE_DEFINITION` / `OPEN_LEAGUE_DEFINITION`. League-specific overrides on the shared
+  ALTTPR seed-roll lifecycle: `update_data` also fetches the external `alttprleague.com/api/episode`
+  "mode" (preset + spoiler/co-op flags); `room_creation_kwargs` derives the dynamic goal /
+  `team_race` / `require_even_teams`; `roll` rolls the league preset or a spoiler game (scheduling the
+  spoiler race via the gateway); `send_room_welcome` is a no-op (league suppressed it). The legacy
+  in-`roll` `create_embeds` (built twice, only the second used) is dropped — the presenter builds the
+  embeds once in `process_race`. 9 new tests (mode fetch + error path, room kwargs solo/co-op/spoiler,
+  preset vs spoiler roll, no-op welcome, both definitions); 403 passing; import-linter 3-kept. Two
+  adversarial parity reviewers (overrides + ID/wiring): **clean — no divergences, IDs match digit-for-digit.**
+- **Registry unification (done, post-PR5)** — the dual-source drift is eliminated.
+  `_HARDCODED_TOURNAMENT_DATA` (the fallback used when `TOURNAMENT_CONFIG_ENABLED` is false — the
+  **production default**) is now *derived* from `AVAILABLE_TOURNAMENT_HANDLERS`:
+  `{slug: AVAILABLE_TOURNAMENT_HANDLERS[slug] for slug in _HARDCODED_ACTIVE_SLUGS}`. The fallback lists
+  declare only *which slugs* are active per profile; the *handler class* always comes from the catalog,
+  so the hardcoded path, the `config/tournaments.yaml` path, and the catalog can never disagree. The
+  production active set is unchanged (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) — the
+  one behavioral effect is that `invleague`/`alttprleague` now dispatch to the migrated (parity-reviewed)
+  orchestrator under the default path too, matching the config path. A no-drift regression test pins the
+  invariant (`tests/unit/services/test_tournament_registry.py`). **Because production runs the hardcoded
+  path, do a DEBUG/staging smoke test of the league rooms before the next deploy** — the new code is
+  static-parity-clean but not yet live-validated. Migrating a future handler in the catalog now
+  propagates to both paths automatically (no second registry edit).
+
+- **PR 6 (done)** — `smrl_playoff` (the Super Metroid Random League playoffs — `smrl`). The heaviest
+  handler so far. `SMRLPlayoffsOrchestrator` (`services/tournament/smrl.py`) extends the **base**
+  orchestrator (no ALTTPR embeds) and overrides: `process_race` (SM seeds via `SuperMetroidVaria` /
+  `smdash`, whisper the seed URL + set race-info, persist the permalink), `send_room_welcome` (a single
+  pinned welcome message carrying the action), `before_room_creation` (gate room creation on submitted
+  settings), and `process_submission_form` (map game# → randomizer/preset, persist, confirm). New shared
+  infrastructure: base `before_room_creation` gate + adapter honoring it; base `send_race_submission_form`
+  (reminders via presenter + `submitted` upsert) + base `process_submission_form` no-op; presenter
+  `send_player_reminders` + `send_submission_confirmation` (+ `_submission_dm_failed`); adapter
+  `process_submission_form` / `send_race_submission_form` / `versus` delegation; `TournamentDefinition.submission_form`
+  widened to `Any` so it can carry the SMRL form schema (`SMRL_SUBMISSION_FORM`). Registry repoints `smrl`
+  (seasonal — stays dormant in the production hardcoded set). 24 new tests; 431 passing; import-linter
+  3-kept. Verified by a 5-surface adversarial parity workflow (13 findings, **0 confirmed real**); the one
+  "uncertain" was a doc nit — the submission gate cleanly drops a *latent legacy crash* (legacy returned
+  `None` from `create_race_room`, which the un-null-checked base dereferenced → `AttributeError` + a
+  spurious audit error). Docstrings corrected to describe this as an intentional cleanup, not a mirror.
+
+- **PR 7 (done)** — the SG dailies (`alttprdaily` + `smz3`), the first **active production** handlers to
+  migrate. Open casual races: `SGDailyOrchestrator` (`services/tournament/dailies.py`) extends the **base**
+  orchestrator and overrides `room_creation_kwargs` (`invitational=False`, `team_race` from a "co-op" title
+  match), `update_data` (fetch episode/game/team, resolve **no** players — open race), `race_info` / `seed_time`,
+  and `send_player_room_info` → a channel **announcement** (`alttprdaily` also posts the SG webhook) instead of
+  player DMs. Two thin subclasses set the per-event presentation (series label, seed-time inclusion, role-mention
+  prefix, webhook). New collaborators: presenter `send_race_announcement` (discord timestamps + role mentions +
+  optional webhook), gateway `send_channel_message(mention_roles=)` + `send_webhook(username=)`. 12 new tests; 443
+  passing; import-linter 3-kept. Verified by a 4-surface adversarial parity workflow (15 findings, **0 behavior
+  divergences** — every announce/race-info string confirmed byte-for-byte; the one "confirmed" was a stale registry
+  comment, fixed). **Production runs the hardcoded path, so the dailies go live on the next deploy — smoke-test in
+  DEBUG first.**
+
+- **PR 8 (done)** — `alttpr_quals` (the ALTTPR main-tournament live qualifier, slug `alttpr`): the last and
+  most entangled active handler. `ALTTPRQualifierOrchestrator` (`services/tournament/alttpr_quals.py`) extends the
+  base orchestrator with the full live-race ↔ AsyncTournament flow: `before_update_data` (live-race gate, runs
+  *before* any I/O), `process_race` (guard ladder, mod/admin authz, room-lock, `triforce_text` seed, permalink
+  persistence, eligible-entrant writes), `on_race_start` (promote present entrants, prune no-shows, announce), plus
+  the open-race `update_data`/`race_info`/announce. New repo methods on `AsyncTournamentLiveRaceRepository`
+  (`get_by_episode_id[_with_relations]`, `set_permalink_and_slug`, `process_race_start`), `AsyncTournamentRepository`
+  (`create_live_permalink`, `count_completed_pool_races`, `user_has_active_race`, `create_pending_live_entry`), and
+  `UserRepository` (`get_or_create_by_rtgg_id`, `set_twitch_name`); gateway `get_entrants`/`get_started_at`; presenter
+  `seed_label`; an adapter-supplied async-authz callback (wraps `checks.is_async_tournament_user`) + a new
+  `before_update_data` pre-I/O gate hook. 18 unit + 4 repo round-trip tests; 462 passing; import-linter 3-kept.
+  Verified by a 5-surface adversarial parity workflow (16 findings, **1 confirmed (low)** — the live-race gate ran
+  *after* `update_data`; fixed by the pre-I/O `before_update_data` hook so a no-live-race episode short-circuits
+  before any SpeedGaming/RaceTime call, matching legacy). **Active production handler — smoke-test in DEBUG before deploy.**
+
+**★ MILESTONE — every active tournament handler is now a decomposed orchestrator.** All slugs in the production
+registry (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) and every seasonal slug dispatch through
+`services/tournament/` orchestrators + the presenter + gateways; no legacy god-object class is active.
+
+- **PR 9 (done) — final cleanup.** Deleted the 18 now-unused legacy handler subclass files under
+  `alttprbot/tournament/` (`boots`/`smwde`/`smrl_playoff`/`alttprleague`/`nologic`/`alttprhmg`/`alttprde`/`alttprmini`/
+  `alttpr_quals`/`test` + the `dailies/` package + the long-dead `alttpres`/`alttprfr`/`smz3coop`/`smbingo`/`smrl`/
+  `alttprsglive`/`alttprcd`), dropped the unused legacy-handler imports from `tournaments.py`, and routed
+  `create_tournament_race_room`'s lone `racetime_bots` lookup through the racetime gateway so the racetime-bot import
+  is gone. The `alttprbot/tournament/` package is now just the dispatch infra: `orchestrator_adapter.py` (the untiered
+  bridge), `registry_loader.py` (the YAML config path), and the `core.py` (`TournamentConfig` +
+  `UnableToLookupUserException`) / `alttpr.py` shims the discord cog still imports (type hints + the pre-existing-broken
+  cc2023 `roll_seed`/`generate_deck` commands — out of scope). 462 passing; import-linter 3-kept.
+
+## ★ Decomposition complete
+
+Every tournament handler is decomposed: the business orchestrators live in `alttprbot/services/tournament/`
+(actively under the import-linter layering + bot-singleton contracts), Discord rendering in
+`alttprbot/presentation/discord/tournament/presenter.py`, all RaceTime/Discord I/O behind the `_notify` gateways, and
+all ORM behind repositories. The `OrchestratorAdapter` is the one remaining transitional piece — an intentionally
+**untiered** bridge (in `alttprbot/tournament/`) that still touches `discordbot` for player/authz resolution and holds
+the live RaceTime handler, presenting the legacy dispatch interface to the un-migrated discord cog + racetime handler.
+
+**Follow-ups (beyond the handler decomposition):**
+- Retire the `OrchestratorAdapter` by rewiring the discord cog (`cogs/tournament.py`) and racetime handler
+  (`handlers/core.py`) to drive `(orchestrator, presenter)` directly — then `alttprbot/tournament/` can be deleted
+  entirely and the package relocated semantics finished. This is a dispatch-surface refactor, not a handler change.
+- Each migrated handler is static-parity-clean but **not yet live-validated**; smoke-test the active ones
+  (`alttpr`, `alttprdaily`, `smz3`, `invleague`, `alttprleague`) in DEBUG/staging before the next production deploy
+  (production runs the hardcoded path, so they go live on deploy).
+- Phase 10: flip the import-linter contracts to blocking + `SAHASRAHBOT_HOOKS_ENFORCE=1` once the guild-config
+  monkey-patch + legacy `database/config.py` also land.
+
+**RECOMMENDATION:** validate `boots` (full seed-roll) and one title-map event (`alttprde`) in DEBUG —
+confirm the room opens, the seed rolls from the title, embeds/DMs/audit/permalink fire, and a bad title
+posts "Invalid mode chosen" — before tackling the moderate handlers. The whole ALTTPR tail now shares
+the exact same exercised collaborators, so a single live pass de-risks it.
 
 ## 1. Why this is the last big piece
 

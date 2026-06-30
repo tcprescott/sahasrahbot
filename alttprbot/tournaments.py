@@ -5,11 +5,29 @@ import aiohttp
 
 import config
 from alttprbot import models
-from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttpr_quals
 from alttprbot.tournament import registry_loader
 from alttprbot.tournament.orchestrator_adapter import make_adapter
+from alttprbot.services._notify import racetime_gateway
 from alttprbot.services.tournament.test import TEST_DEFINITION, TestOrchestrator
-from alttprbot.presentation.racetime import bot as racetimebot
+from alttprbot.services.tournament.boots import BOOTS_DEFINITION, BootsOrchestrator
+from alttprbot.services.tournament.smwde import SMWDE_DEFINITION, SMWDEOrchestrator
+from alttprbot.services.tournament.nologic import NOLOGIC_DEFINITION, NoLogicOrchestrator
+from alttprbot.services.tournament.alttprhmg import ALTTPRHMG_DEFINITION, ALTTPRHMGOrchestrator
+from alttprbot.services.tournament.alttprde import ALTTPRDE_DEFINITION, ALTTPRDEOrchestrator
+from alttprbot.services.tournament.alttprmini import ALTTPRMINI_DEFINITION, ALTTPRMiniOrchestrator
+from alttprbot.services.tournament.alttprleague import (
+    INVITATIONAL_LEAGUE_DEFINITION,
+    OPEN_LEAGUE_DEFINITION,
+    ALTTPRLeagueOrchestrator,
+)
+from alttprbot.services.tournament.smrl import SMRL_DEFINITION, SMRLPlayoffsOrchestrator
+from alttprbot.services.tournament.dailies import (
+    ALTTPR_DAILY_DEFINITION,
+    SMZ3_DAILY_DEFINITION,
+    AlttprSGDailyOrchestrator,
+    SMZ3DailyOrchestrator,
+)
+from alttprbot.services.tournament.alttpr_quals import QUALIFIER_DEFINITION, ALTTPRQualifierOrchestrator
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -18,58 +36,52 @@ RACETIME_URL = config.RACETIME_URL
 # Active handlers are determined by TOURNAMENT_DATA (hardcoded fallback)
 # or by config/tournaments.yaml when TOURNAMENT_CONFIG_ENABLED is true.
 AVAILABLE_TOURNAMENT_HANDLERS = {
-    # 'test' is the first handler migrated to the decomposed orchestrator/presenter
-    # (debug-only; see docs/plans/tournament_decomposition.md). Other slugs keep their
-    # legacy god-object class until migrated one-per-PR.
+    # Migrated to the decomposed orchestrator/presenter (see
+    # docs/plans/tournament_decomposition.md): 'test' (debug), 'boots' (first seed-rolling),
+    # the trivial/low ALTTPR tail 'smwde'/'nologic'/'alttprhmg'/'alttprde'/'alttprmini', the
+    # moderate league handlers 'invleague'/'alttprleague' (one orchestrator, two configs), and
+    # 'smrl' (SM playoffs — custom SM seed flow + settings-submission form).
+    # Remaining slugs keep their legacy god-object class until migrated one-per-PR.
     'test': make_adapter(TestOrchestrator, TEST_DEFINITION),
-    'alttpr': alttpr_quals.ALTTPRQualifierRace,
-    'alttprdaily': dailies.AlttprSGDailyRace,
-    'smz3': dailies.SMZ3DailyRace,
-    'invleague': alttprleague.ALTTPRLeague,
-    'alttprleague': alttprleague.ALTTPROpenLeague,
-    'boots': boots.ALTTPRCASBootsTournamentRace,
-    'nologic': nologic.ALTTPRNoLogicRace,
-    'smwde': smwde.SMWDETournament,
-    'alttprhmg': alttprhmg.ALTTPRHMGTournament,
-    'alttprmini': alttprmini.ALTTPRMiniTournament,
-    'alttprde': alttprde.ALTTPRDETournament,
-    'smrl': smrl_playoff.SMRLPlayoffs,
+    'alttpr': make_adapter(ALTTPRQualifierOrchestrator, QUALIFIER_DEFINITION),
+    'alttprdaily': make_adapter(AlttprSGDailyOrchestrator, ALTTPR_DAILY_DEFINITION),
+    'smz3': make_adapter(SMZ3DailyOrchestrator, SMZ3_DAILY_DEFINITION),
+    'invleague': make_adapter(ALTTPRLeagueOrchestrator, INVITATIONAL_LEAGUE_DEFINITION),
+    'alttprleague': make_adapter(ALTTPRLeagueOrchestrator, OPEN_LEAGUE_DEFINITION),
+    'boots': make_adapter(BootsOrchestrator, BOOTS_DEFINITION),
+    'nologic': make_adapter(NoLogicOrchestrator, NOLOGIC_DEFINITION),
+    'smwde': make_adapter(SMWDEOrchestrator, SMWDE_DEFINITION),
+    'alttprhmg': make_adapter(ALTTPRHMGOrchestrator, ALTTPRHMG_DEFINITION),
+    'alttprmini': make_adapter(ALTTPRMiniOrchestrator, ALTTPRMINI_DEFINITION),
+    'alttprde': make_adapter(ALTTPRDEOrchestrator, ALTTPRDE_DEFINITION),
+    'smrl': make_adapter(SMRLPlayoffsOrchestrator, SMRL_DEFINITION),
 }
 
-# Phase 1: Hardcoded registry fallback (preserved for rollback safety)
-# This is the original registry logic, kept as emergency fallback.
-# Active when TOURNAMENT_CONFIG_ENABLED is false (default).
+# Hardcoded registry fallback (active when TOURNAMENT_CONFIG_ENABLED is false — the
+# production default). Single source of truth: the *handler* for every slug always comes
+# from AVAILABLE_TOURNAMENT_HANDLERS, so this fallback can never drift from the catalog (or
+# the config/tournaments.yaml path) — migrating a handler in the catalog propagates to both
+# paths automatically. These lists declare only *which* slugs are active per profile.
+#
+# Seasonal handlers are decomposed in the catalog but left inactive here; add a slug to the
+# production list to enable it for a season:
+#   boots, nologic, smwde, alttprhmg, alttprmini, alttprde, smrl
+# All active handlers are now decomposed orchestrators (no legacy god-objects remain active).
 if config.DEBUG:
-    _HARDCODED_TOURNAMENT_DATA = {
-        # 'test': test.TestTournament
-    }
+    # Debug: no auto-active tournaments (enable 'test' here manually when needed).
+    _HARDCODED_ACTIVE_SLUGS = []
 else:
-    _HARDCODED_TOURNAMENT_DATA = {
-        # REGULAR TOURNAMENTS
+    _HARDCODED_ACTIVE_SLUGS = [
+        'alttpr',         # ALTTPR main-tournament live qualifier (decomposed orchestrator)
+        'alttprdaily',    # ALTTPR daily series (decomposed orchestrator)
+        'smz3',           # SMZ3 weekly (decomposed orchestrator)
+        'invleague',      # ALTTPR Invitational League (decomposed orchestrator)
+        'alttprleague',   # ALTTPR Open League (decomposed orchestrator)
+    ]
 
-        # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        # 'alttprde': alttprde.ALTTPRDETournament,
-        # 'alttprmini': alttprmini.ALTTPRMiniTournament,
-        'alttpr': alttpr_quals.ALTTPRQualifierRace,
-        # 'boots': boots.ALTTPRCASBootsTournamentRace,
-        # 'nologic': nologic.ALTTPRNoLogicRace,
-        # 'smwde': smwde.SMWDETournament,
-        # 'alttprfr': alttprfr.ALTTPRFRTournament,
-        # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
-        # 'alttpres': alttpres.ALTTPRESTournament,
-        # 'smz3coop': smz3coop.SMZ3CoopTournament,
-        # 'smbingo': smbingo.SMBingoTournament,
-        # 'smrl': smrl_playoff.SMRLPlayoffs,
-        # 'sgl24alttpr': alttprsglive.ALTTPRSGLive,
-
-        # Dailies/Weeklies
-        'alttprdaily': dailies.AlttprSGDailyRace,
-        'smz3': dailies.SMZ3DailyRace,
-
-        # ALTTPR League
-        'invleague': alttprleague.ALTTPRLeague,
-        'alttprleague': alttprleague.ALTTPROpenLeague,
-    }
+_HARDCODED_TOURNAMENT_DATA = {
+    slug: AVAILABLE_TOURNAMENT_HANDLERS[slug] for slug in _HARDCODED_ACTIVE_SLUGS
+}
 
 
 # Phase 1: Dual-path runtime switch
@@ -150,11 +162,11 @@ async def fetch_tournament_handler_v2(event, episode: dict, rtgg_handler=None):
 
 async def create_tournament_race_room(event, episodeid):
     event_data = await TOURNAMENT_DATA[event].get_config()
-    rtgg_bot = racetimebot.racetime_bots[event_data.data.racetime_category]
+    category = event_data.data.racetime_category
     race = await models.TournamentResults.get_or_none(episode_id=episodeid)
     if race:
-        async with aiohttp.request(method='get', url=rtgg_bot.http_uri(f"/{race.srl_id}/data"),
-                                   raise_for_status=True) as resp:
+        data_url = racetime_gateway.get().http_uri(category, f"/{race.srl_id}/data")
+        async with aiohttp.request(method='get', url=data_url, raise_for_status=True) as resp:
             race_data = json.loads(await resp.read())
         status = race_data.get('status', {}).get('value')
         if not status == 'cancelled':
