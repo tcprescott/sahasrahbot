@@ -26,7 +26,7 @@ except ImportError:
 
 # Import the loader module
 try:
-    from alttprbot.tournament import registry_loader
+    from alttprbot.services.tournament import registry_loader
 except ImportError as e:
     print(f"ERROR: Failed to import registry_loader: {e}")
     sys.exit(1)

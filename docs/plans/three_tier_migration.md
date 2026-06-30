@@ -175,9 +175,17 @@ it does not violate them until its decomposition relocates it into `services/tou
   legacy handler files + the racetime-bot import). Every handler was adversarially OLD-vs-NEW parity-reviewed
   (a workflow of per-surface reviewers + independent verifiers). The registry is **single-source**: the
   hardcoded fallback (the production default) derives handler classes from `AVAILABLE_TOURNAMENT_HANDLERS`, so
-  the YAML and hardcoded paths can't drift. **Remaining tournament follow-up (a dispatch-surface refactor, not
-  a handler change):** retire the untiered `OrchestratorAdapter` by rewiring the discord cog + racetime handler
-  to drive `(orchestrator, presenter)` directly, after which `alttprbot/tournament/` can be deleted outright.
+  the YAML and hardcoded paths can't drift. **Tournament package retirement — ✅ DONE.** The untiered
+  `alttprbot/tournament/` package is deleted. Rather than rewrite the live racetime/cog dispatch, the
+  transitional `OrchestratorAdapter` (the `TournamentRace`-shaped bridge every active slug already resolves to)
+  was relocated into the Discord presentation tier (`presentation/discord/tournament/orchestrator_adapter.py`,
+  with player lookup routed through `UserService`); `registry_loader.py` moved to `services/tournament/`;
+  the live `TournamentConfig` dataclass moved to `presentation/discord/tournament/config.py` and
+  `UnableToLookupUserException` to `alttprbot/exceptions.py`. The dead `core.py` `TournamentRace`/`TournamentPlayer`
+  base and the entire `alttpr.py` (legacy `ALTTPRTournamentRace`/`ALTTPR2024Race`, never instantiated) were
+  deleted, and the two pre-existing-broken cog commands (`cc2023`/`tournament_deck`, which called
+  never-defined `alttpr.roll_seed`/`generate_deck`) removed. `tournaments.py` remains as thin untiered dispatch
+  glue. Behavior-preserving (462 tests green, import-linter 3 kept/0 broken) and adversarially reviewed.
   Migrated active handlers are static-parity-clean but not yet live-validated — smoke-test in DEBUG before deploy.
 - **Phase 9 util split — ✅ DONE.** The three tier-mixing util modules are gone: `triforce_text` →
   `TriforceTextService` (balanced/random selection + `generate_with_triforce_text`) over new
@@ -189,18 +197,10 @@ it does not violate them until its decomposition relocates it into `services/tou
   tier no longer imports discord. All cog/blueprint/service consumers rewired; the scoring characterization
   test moved to the services tier. Behavior-preserving (462 tests green, import-linter 3 kept/0 broken) and
   adversarially OLD-vs-NEW parity-reviewed (per-slice reviewers + finding verifiers off the git-HEAD originals).
-- **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`, then flip
-  all import-linter contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked
-  on the contract side** (all three are green); gated only on not regressing while the tournament
-  `OrchestratorAdapter` retirement lands.
-- **Phase 7 full tournament decomposition** — orchestrator/presenter/gateway + config
-  IDs, relocate `tournament/` → `services/tournament/`, migrate the 20+ subclasses one
-  per PR. These classes are untested and drive live tournaments; do not rush.
-- **Phase 9 util cleanup** — `util/{asynctournament,rankedchoice,triforce_text}.py` mix
-  model navigation, STV/scoring computation, and discord embed rendering; split the
-  discord rendering into presentation and the computation into services (entangled with
-  their cog/blueprint consumers).
-- **Phase 10** — retire the guild-config monkey-patch + legacy `database/config.py`
-  (after audit/misc/tournament callers migrate), then flip import-linter contracts to
-  blocking and set `SAHASRAHBOT_HOOKS_ENFORCE=1`. Blocked until the above land (the
-  presentation→models and service→presentation contracts still have open items).
+- **Phase 10 — the last remaining phase.** Retire the guild-config monkey-patch + legacy
+  `database/config.py` (after the audit/misc callers migrate), then flip all import-linter
+  contracts to blocking + set `SAHASRAHBOT_HOOKS_ENFORCE=1`. **Now unblocked on every prior
+  dependency:** the tournament decomposition and the `alttprbot/tournament/` package retirement
+  are done, Phase 9's util split is done, and all three contracts are green. What's left is the
+  guild-config monkey-patch removal and the enforcement flip itself. The migrated active tournament
+  handlers are static-parity-clean but not yet live-validated — smoke-test in DEBUG before deploy.

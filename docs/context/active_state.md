@@ -28,6 +28,21 @@
 
 ## Recent Completions
 
+- **`alttprbot/tournament/` package retired (three-tier migration).** The untiered tournament god-object
+  package is deleted. The transitional `OrchestratorAdapter` (the `TournamentRace`-shaped bridge that every
+  active event slug already resolves to via `make_adapter`) was relocated into the Discord presentation tier
+  (`presentation/discord/tournament/orchestrator_adapter.py`), with its player lookup routed through
+  `UserService` instead of `UserRepository`. `registry_loader.py` moved to `services/tournament/`; the live
+  `TournamentConfig` dataclass moved to `presentation/discord/tournament/config.py` and
+  `UnableToLookupUserException` to `alttprbot/exceptions.py`. The dead `core.py` `TournamentRace`/`TournamentPlayer`
+  base classes and the entire `alttpr.py` (`ALTTPRTournamentRace`/`ALTTPR2024Race`, never instantiated) were
+  deleted. Two **pre-existing-broken** cog commands — `cc2023` and `tournament_deck`, which called
+  `alttpr.roll_seed`/`alttpr.generate_deck` (functions that never existed in any branch, including master) —
+  were removed per owner decision, along with their stale commented experimental blocks and now-unused imports.
+  `tournaments.py` remains as thin untiered dispatch glue. Behavior-preserving: 462 tests green, import-linter
+  3 kept/0 broken, all surfaces import cleanly, and an adversarial 3-reviewer + verifier workflow checked the
+  dead-code-deletion safety, the cog removal, and the relocation parity. This was the last blocker before
+  Phase 10 (retire the guild-config monkey-patch, then flip the import-linter contracts to blocking).
 - **Phase 9 util split complete (three-tier migration).** The three tier-mixing modules under
   `alttprbot/util/` are deleted, their concerns split across the proper tiers: `triforce_text` →
   `TriforceTextService` (balanced/random text selection + `generate_with_triforce_text`) backed by new

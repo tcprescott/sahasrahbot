@@ -7,21 +7,23 @@ The discord cog, RaceTime handler, and ``tournaments.py`` dispatch all drive a
 interface but delegates business to a ``TournamentOrchestrator`` (service tier) and
 rendering/sends to a ``TournamentPresenter`` (discord presentation).
 
-It lives in the untiered ``alttprbot/tournament/`` package during the migration so it can
-still touch ``discordbot`` for the Discord-specific resolution the orchestrator pushes out
-(player lookup, gatekeeper role checks) and hold the live RaceTime handler. As handlers
-migrate one-by-one, ``TOURNAMENT_DATA`` points the migrated event-slug at a configured
-adapter (via :func:`make_adapter`); un-migrated slugs keep their original god-object class.
+It lives in the Discord presentation tier (``presentation/discord/tournament/``) because it
+touches ``discordbot`` for the Discord-specific resolution the orchestrator pushes out
+(player lookup, gatekeeper role checks) and holds the live RaceTime handler. ``tournaments.py``
+builds the per-event registry by binding each orchestrator class to this adapter via
+:func:`make_adapter`; every active event slug now resolves to a decomposed
+``(orchestrator, presenter)`` pair behind this interface.
 """
 
 import logging
 
 from alttprbot.presentation.discord.bot import discordbot
-from alttprbot.presentation.discord.tournament import TournamentPresenter
+from alttprbot.presentation.discord.tournament.presenter import TournamentPresenter
+from alttprbot.presentation.discord.tournament.config import TournamentConfig
 from alttprbot.services._notify import racetime_gateway
-from alttprbot.repositories import UserRepository
+from alttprbot.services import UserService
 from alttprbot.services.tournament.types import RaceRoom, TournamentPlayer
-from alttprbot.tournament.core import TournamentConfig, UnableToLookupUserException
+from alttprbot.exceptions import UnableToLookupUserException
 
 
 class OrchestratorAdapter:
@@ -272,7 +274,7 @@ class OrchestratorAdapter:
     async def _player_by_id(self, discord_id, guild):
         if guild is not None and guild.chunked is False:
             await guild.chunk(cache=True)
-        user = await UserRepository.get_by_discord_id(int(discord_id))
+        user = await UserService().get_by_discord_id(int(discord_id))
         if user is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_id}")
         member = guild.get_member(int(discord_id)) if guild else None
@@ -293,7 +295,7 @@ class OrchestratorAdapter:
         member = guild.get_member_named(discord_name) if guild else None
         if member is None:
             raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
-        user = await UserRepository.get_by_discord_id(member.id)
+        user = await UserService().get_by_discord_id(member.id)
         if user is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_name}")
         return TournamentPlayer(rtgg_id=user.rtgg_id, name=member.name, discord_user_id=member.id)
