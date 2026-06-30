@@ -6,6 +6,7 @@ from discord.ext import commands
 
 import config
 from alttprbot.services import UserService
+from alttprbot.presentation.discord.util import authz
 
 APP_URL = config.APP_URL
 
@@ -18,11 +19,8 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
     @app_commands.describe(
         role="Choose a role to blast",
     )
+    @authz.requires_admin_or_owner("Only the bot owner can use this command.")
     async def blast(self, interaction: discord.Interaction, role: discord.Role):
-        if not await self.bot.is_owner(interaction.user) and interaction.user.guild_permissions.administrator is False:
-            await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
-            return
-
         await interaction.response.defer(ephemeral=True)
         msg = []
         if interaction.guild.chunked is False:
@@ -53,11 +51,8 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
     @app_commands.describe(
         role="Choose a role to blast",
     )
+    @authz.requires_admin_or_owner("Only the bot owner can use this command.")
     async def report(self, interaction: discord.Interaction, role: discord.Role):
-        if not await self.bot.is_owner(interaction.user) and interaction.user.guild_permissions.administrator is False:
-            await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
-            return
-
         await interaction.response.defer(ephemeral=True)
         msg = []
         if interaction.guild.chunked is False:
