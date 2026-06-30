@@ -11,6 +11,7 @@ from discord.ext import commands
 from pytz import UnknownTimeZoneError
 
 import config
+from alttprbot.services import GuildConfigService
 from alttprbot.util.holyimage import HolyImage
 
 # TODO: make work with discord.py 2.0
@@ -49,7 +50,7 @@ WELCOME_MESSAGES = {
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
-    return await guild.config_get("HolyImageDefaultGame", "z3r")
+    return await GuildConfigService().get(guild.id, "HolyImageDefaultGame", "z3r")
 
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holyimages")
@@ -104,7 +105,7 @@ class Misc(commands.Cog):
             if interaction.guild is None:
                 game = "z3r"
             else:
-                game = await interaction.guild.config_get("HolyImageDefaultGame", "z3r")
+                game = await GuildConfigService().get(interaction.guild.id, "HolyImageDefaultGame", "z3r")
 
         holyimage = await HolyImage.construct(slug=slug, game=game)
 

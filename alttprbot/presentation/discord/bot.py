@@ -7,9 +7,6 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 import config
-from alttprbot.presentation.discord.util import guild_config
-
-guild_config.init()
 
 intents = discord.Intents.default()
 intents.members = True  # pylint: disable=assigning-non-slot

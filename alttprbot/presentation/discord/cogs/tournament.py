@@ -7,7 +7,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 import config
-from alttprbot.services import TournamentSchedulingService
+from alttprbot.services import GuildConfigService, TournamentSchedulingService
 from alttprbot import tournaments
 from alttprbot.util import speedgaming
 
@@ -177,7 +177,7 @@ class Tournament(commands.Cog):
         if ctx.guild is None:
             return False
 
-        if await ctx.guild.config_get('TournamentEnabled') == 'true':
+        if await GuildConfigService().get(ctx.guild.id, 'TournamentEnabled') == 'true':
             return True
         else:
             return False

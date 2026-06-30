@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from alttprbot.database import config  # TODO switch to ORM
+from alttprbot.services import GuildConfigService
 
 
 def restrict_to_channels_by_guild_config(parameter, default=True):
@@ -8,11 +8,11 @@ def restrict_to_channels_by_guild_config(parameter, default=True):
         if ctx.guild is None:
             return True
 
-        result = await config.get_parameter(ctx.guild.id, parameter)
-        if result is None:
+        value = await GuildConfigService().get(ctx.guild.id, parameter)
+        if value is None:
             return default
 
-        channels = result['value'].split(',')
+        channels = value.split(',')
         if ctx.channel.name in channels:
             return True
 
@@ -23,11 +23,11 @@ def restrict_to_channels_by_guild_config(parameter, default=True):
 
 def restrict_command_globally(parameter, default=False):
     async def predicate(ctx):
-        result = await config.get_parameter(0, parameter)
-        if result is None:
+        value = await GuildConfigService().get(0, parameter)
+        if value is None:
             return default
 
-        return result['value'] == 'true'
+        return value == 'true'
 
     return commands.check(predicate)
 

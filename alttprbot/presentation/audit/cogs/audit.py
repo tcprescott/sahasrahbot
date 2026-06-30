@@ -8,7 +8,7 @@ from contextlib import closing
 import discord
 from discord.ext import commands, tasks
 
-from alttprbot.services import AuditMessagesService
+from alttprbot.services import AuditMessagesService, GuildConfigService
 
 
 class Audit(commands.Cog):
@@ -88,7 +88,7 @@ class Audit(commands.Cog):
         # if message.author.bot:
         #     return
 
-        audit_channel_id = await guild.config_get('AuditLogChannel')
+        audit_channel_id = await GuildConfigService().get(guild.id, 'AuditLogChannel')
         if audit_channel_id:
             embed = await audit_embed_delete(guild, channel, payload.message_id)
             audit_channel = discord.utils.get(
@@ -109,7 +109,7 @@ class Audit(commands.Cog):
         # if message.author.bot:
         #     return
 
-        audit_channel_id = await guild.config_get('AuditLogChannel')
+        audit_channel_id = await GuildConfigService().get(guild.id, 'AuditLogChannel')
         if not audit_channel_id:
             return
 
@@ -138,7 +138,7 @@ class Audit(commands.Cog):
         old_message = await AuditMessagesService().get_message_history(message.id)
         if old_message and old_message[-1]['content'] == message.content:
             return
-        audit_channel_id = await message.guild.config_get('AuditLogChannel')
+        audit_channel_id = await GuildConfigService().get(message.guild.id, 'AuditLogChannel')
         if audit_channel_id:
             embed = await audit_embed_edit(old_message, message)
             audit_channel = discord.utils.get(
@@ -172,8 +172,8 @@ class Audit(commands.Cog):
     async def on_member_join(self, member):
         if member.guild is None:
             return
-        if await member.guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await member.guild.config_get('AuditLogChannel')
+        if await GuildConfigService().get(member.guild.id, 'AuditLogging') == 'true':
+            audit_channel_id = await GuildConfigService().get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_joined(member)
                 audit_channel = discord.utils.get(
@@ -185,8 +185,8 @@ class Audit(commands.Cog):
     async def on_member_remove(self, member):
         if member.guild is None:
             return
-        if await member.guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await member.guild.config_get('AuditLogChannel')
+        if await GuildConfigService().get(member.guild.id, 'AuditLogging') == 'true':
+            audit_channel_id = await GuildConfigService().get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_left(member)
                 audit_channel = discord.utils.get(
@@ -230,8 +230,8 @@ class Audit(commands.Cog):
     async def on_member_ban(self, guild: discord.Guild, user):
         if guild is None:
             return
-        if await guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await guild.config_get('AuditLogChannel')
+        if await GuildConfigService().get(guild.id, 'AuditLogging') == 'true':
+            audit_channel_id = await GuildConfigService().get(guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_banned(user)
                 audit_channel = discord.utils.get(guild.channels, id=int(audit_channel_id))

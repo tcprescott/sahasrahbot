@@ -7,16 +7,14 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 import config
-from alttprbot.presentation.discord.util import guild_config
-
-guild_config.init()
+from alttprbot.services import GuildConfigService
 
 
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
 
-    prefix = await message.guild.config_get("CommandPrefix", "$")
+    prefix = await GuildConfigService().get(message.guild.id, "CommandPrefix", "$")
     return prefix
 
 
