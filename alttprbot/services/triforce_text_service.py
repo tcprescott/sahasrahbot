@@ -1,5 +1,6 @@
-"""Triforce-text submission and moderation service."""
+"""Triforce-text submission, moderation, selection, and generation service."""
 
+import random
 import re
 from typing import List, Optional
 
@@ -50,3 +51,53 @@ class TriforceTextService:
             return None
         await self.repository.set_approved(text, approve)
         return text
+
+    async def get_balanced_text(self, pool_name: str) -> Optional[str]:
+        """Pick an approved triforce text, balanced across submitting users.
+
+        Chooses a random submitter first, then a random text from that submitter,
+        so prolific submitters don't dominate the pool.
+        """
+        discord_user_ids = await self.repository.list_approved_discord_user_ids(pool_name)
+        if not discord_user_ids:
+            return None
+
+        discord_user_id = random.choice(discord_user_ids)
+        triforce_texts = await self.repository.list_approved_for_user(pool_name, discord_user_id)
+        return random.choice(triforce_texts).text
+
+    async def get_random_text(self, pool_name: str) -> Optional[str]:
+        """Pick a uniformly random approved triforce text from the pool."""
+        triforce_texts = await self.repository.list_approved(pool_name)
+        if not triforce_texts:
+            return None
+        return random.choice(triforce_texts).text
+
+    async def generate_with_triforce_text(
+        self,
+        pool_name: str,
+        preset: str,
+        settings: dict = None,
+        branch: str = "live",
+        balanced: bool = True,
+    ):
+        """Generate an ALTTPR game with a community triforce text injected into the end credits."""
+        # Imported lazily to avoid pulling the seed generator into the service-tier
+        # import graph at module load (this service is imported from services/__init__).
+        from alttprbot.services.seedgen import generator
+
+        data = generator.ALTTPRPreset(preset)
+        await data.fetch()
+        if balanced:
+            text = await self.get_balanced_text(pool_name=pool_name)
+        else:
+            text = await self.get_random_text(pool_name=pool_name)
+
+        if text:
+            data.preset_data['settings']['texts'] = {}
+            data.preset_data['settings']['texts']['end_triforce'] = "{NOBORDER}\n" + text
+
+        if settings is not None and isinstance(settings, dict):
+            data.preset_data['settings'] = {**data.preset_data['settings'], **settings}
+
+        return await data.generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off", branch=branch)

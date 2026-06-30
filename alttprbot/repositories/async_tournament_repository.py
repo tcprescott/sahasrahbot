@@ -8,6 +8,8 @@ review/reattempt writes.
 from datetime import datetime
 from typing import List, Optional
 
+from tortoise.functions import Count
+
 from alttprbot import models
 
 
@@ -389,3 +391,131 @@ class AsyncTournamentRepository:
     @staticmethod
     async def save_tournament(tournament: models.AsyncTournament) -> None:
         await tournament.save()
+
+    # --- scoring / leaderboard / eligibility data access ---
+
+    @staticmethod
+    async def fetch_pools_with_permalinks(tournament: models.AsyncTournament) -> None:
+        await tournament.fetch_related("permalink_pools", "permalink_pools__permalinks")
+
+    @staticmethod
+    async def fetch_pools(tournament: models.AsyncTournament) -> None:
+        await tournament.fetch_related("permalink_pools")
+
+    @staticmethod
+    async def list_races_for_par(
+        permalink: models.AsyncTournamentPermalink, only_approved: bool = False
+    ) -> List[models.AsyncTournamentRace]:
+        """Races used to compute a permalink's par/scores: completed, non-reattempted."""
+        query_filter = {
+            "permalink": permalink,
+            "status__in": ["finished", "forfeit", "disqualified"],
+            "reattempted": False,
+        }
+        if only_approved:
+            query_filter["review_status"] = "approved"
+        return await models.AsyncTournamentRace.filter(**query_filter).order_by()
+
+    @staticmethod
+    async def save_permalink_par(
+        permalink: models.AsyncTournamentPermalink, par_time: float, par_updated_at: datetime
+    ) -> None:
+        permalink.par_time = par_time
+        permalink.par_updated_at = par_updated_at
+        await permalink.save()
+
+    @staticmethod
+    async def save_race_score(
+        race: models.AsyncTournamentRace, score: float, score_updated_at: datetime
+    ) -> None:
+        race.score = score
+        race.score_updated_at = score_updated_at
+        await race.save(update_fields=["score", "score_updated_at"])
+
+    @staticmethod
+    async def fetch_pool_tournament_and_permalinks(
+        pool: models.AsyncTournamentPermalinkPool,
+    ) -> None:
+        await pool.fetch_related("tournament", "permalinks")
+
+    @staticmethod
+    async def permalink_play_counts(pool: models.AsyncTournamentPermalinkPool) -> List[dict]:
+        """Per-permalink play counts for the pool (across all users)."""
+        return await models.AsyncTournamentRace.filter(
+            tournament=pool.tournament, permalink__pool=pool
+        ).annotate(count=Count("permalink_id")).group_by("permalink_id").values(
+            "permalink_id", "count"
+        )
+
+    @staticmethod
+    async def list_player_pool_history(
+        pool: models.AsyncTournamentPermalinkPool, user: models.Users
+    ) -> List[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.filter(
+            user=user, tournament=pool.tournament, permalink__pool=pool
+        ).prefetch_related("permalink")
+
+    @staticmethod
+    async def list_available_permalinks(
+        pool: models.AsyncTournamentPermalinkPool,
+    ) -> List[models.AsyncTournamentPermalink]:
+        return await pool.permalinks.filter(live_race=False)
+
+    @staticmethod
+    async def get_permalink_by_id(
+        permalink_id: int,
+    ) -> models.AsyncTournamentPermalink:
+        return await models.AsyncTournamentPermalink.get(id=permalink_id)
+
+    @staticmethod
+    async def list_participant_user_ids(tournament: models.AsyncTournament) -> List[int]:
+        rows = await tournament.races.all().distinct().values("user_id")
+        return [row["user_id"] for row in rows]
+
+    @staticmethod
+    async def list_user_pool_scored_races(
+        user_id: int,
+        tournament: models.AsyncTournament,
+        pool: models.AsyncTournamentPermalinkPool,
+    ) -> List[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.filter(
+            user_id=user_id,
+            tournament=tournament,
+            permalink__pool=pool,
+            status__in=["finished", "forfeit", "disqualified"],
+            reattempted=False,
+        )
+
+    @staticmethod
+    async def get_user(user_id: int) -> models.Users:
+        return await models.Users.get(id=user_id)
+
+    # --- test-data population (DEBUG only; the service enforces the guard) ---
+
+    @staticmethod
+    async def create_test_user(discord_user_id: int, display_name: str) -> models.Users:
+        return await models.Users.create(
+            discord_user_id=discord_user_id, display_name=display_name, test_user=True
+        )
+
+    @staticmethod
+    async def create_finished_test_race(
+        *,
+        tournament: models.AsyncTournament,
+        user: models.Users,
+        permalink: models.AsyncTournamentPermalink,
+        thread_id: int,
+        thread_open_time: datetime,
+        start_time: datetime,
+        end_time: datetime,
+    ) -> models.AsyncTournamentRace:
+        return await models.AsyncTournamentRace.create(
+            tournament=tournament,
+            thread_id=thread_id,
+            user=user,
+            thread_open_time=thread_open_time,
+            permalink=permalink,
+            status="finished",
+            start_time=start_time,
+            end_time=end_time,
+        )

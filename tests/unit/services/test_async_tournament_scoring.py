@@ -1,14 +1,14 @@
 """Characterization tests for the pure scoring math in async tournaments.
 
 Targets ``average_timedelta`` and ``calculate_qualifier_score`` from
-alttprbot/util/asynctournament.py. Both are pure; no mocking required.
+alttprbot/services/async_tournament_scoring_service.py. Both are pure; no mocking required.
 """
 
 from datetime import timedelta
 
 import pytest
 
-from alttprbot.util.asynctournament import (
+from alttprbot.services.async_tournament_scoring_service import (
     QUALIFIER_MAX_SCORE,
     QUALIFIER_MIN_SCORE,
     average_timedelta,

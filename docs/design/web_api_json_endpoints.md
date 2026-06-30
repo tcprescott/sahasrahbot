@@ -126,7 +126,7 @@ All endpoints in this section require `Authorization` header and `authorized_key
 
 ### GET /async/api/tournaments/<tournament_id>/leaderboard
 
-- Flow: loads tournament, computes leaderboard via `alttprbot.util.asynctournament.get_leaderboard(...)`.
+- Flow: loads tournament, computes leaderboard via `AsyncTournamentScoringService().get_leaderboard(...)`.
 - Response: custom JSON array containing:
   - `player` object
   - `score`

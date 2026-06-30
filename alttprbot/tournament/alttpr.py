@@ -9,7 +9,6 @@ from alttprbot import models
 from alttprbot.services.seedgen import generator
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
-from alttprbot.util import triforce_text
 from alttprbot.presentation.discord.bot import discordbot
 from alttprbot.presentation.discord.util.seed_embeds import seed_embed, seed_tournament_embed
 

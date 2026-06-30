@@ -187,7 +187,7 @@ async def test_process_race_happy_path(monkeypatch):
     live = _LiveRace(permalink=None, pool=_Pool("mypreset"), tournament=_Tournament())
     monkeypatch.setattr(quals_mod.AsyncTournamentLiveRaceRepository, "get_by_episode_id_with_relations", AsyncMock(return_value=live))
     monkeypatch.setattr(quals_mod.UserRepository, "get_by_rtgg_id", AsyncMock(return_value=object()))
-    monkeypatch.setattr(quals_mod.triforce_text, "generate_with_triforce_text", AsyncMock(return_value=_Seed()))
+    monkeypatch.setattr(quals_mod.TriforceTextService, "generate_with_triforce_text", AsyncMock(return_value=_Seed()))
     permalink_upsert = AsyncMock()
     monkeypatch.setattr(quals_mod.TournamentResultsRepository, "create_or_update_with_permalink", permalink_upsert)
     create_permalink = AsyncMock(return_value="PERMALINK")

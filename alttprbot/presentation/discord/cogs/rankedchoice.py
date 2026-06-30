@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import config
 from alttprbot.services import RankedChoiceService
-from alttprbot.util import rankedchoice
+from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
 
 APP_URL = config.APP_URL
 
@@ -37,11 +37,11 @@ class RankedChoiceMessageView(discord.ui.View):
         # await election.fetch_related('authorized_voters')
         await election.fetch_related('votes')
 
-        await rankedchoice.calculate_results(election)
+        await RankedChoiceService().calculate_results(election)
 
         await RankedChoiceService().close_election(election)
 
-        await rankedchoice.refresh_election_post(election, self.bot)
+        await ranked_choice_embeds.refresh_election_post(election, self.bot)
 
         await interaction.followup.send("Successfully ended the election.", ephemeral=True)
 
@@ -99,7 +99,7 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         # await election.fetch_related('authorized_voters')
         await election.fetch_related('votes')
 
-        await interaction.response.send_message(embed=rankedchoice.create_embed(election),
+        await interaction.response.send_message(embed=ranked_choice_embeds.create_embed(election),
                                                 view=RankedChoiceMessageView(self.bot))
         message = await interaction.original_response()
         await service.set_election_message_id(election, message.id)

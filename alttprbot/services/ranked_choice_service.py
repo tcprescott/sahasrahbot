@@ -1,10 +1,13 @@
 """Ranked-choice election service.
 
-Owns ballot validation and persistence. Discord-side concerns (voter-role checks,
-refreshing the election post) stay in the presentation layer.
+Owns ballot validation and persistence plus STV tabulation. Discord-side concerns
+(voter-role checks, building/refreshing the election post) stay in the presentation
+layer.
 """
 
 from typing import List, Optional
+
+import pyrankvote
 
 from alttprbot import models
 from alttprbot.repositories import RankedChoiceRepository
@@ -73,3 +76,39 @@ class RankedChoiceService:
 
         votes.sort(key=lambda v: v.rank)
         await self.repository.bulk_create_votes(votes)
+
+    async def calculate_results(self, election: models.RankedChoiceElection) -> None:
+        """Tabulate the election via single transferable vote and persist the outcome.
+
+        Marks the winning candidates and stores the human-readable result text on
+        the election. Hydrates the candidates/votes itself, so the caller need not.
+        """
+        await self.repository.fetch_for_results(election)
+
+        candidates = {
+            candidate.name: pyrankvote.Candidate(candidate.name)
+            for candidate in election.candidates
+        }
+        voters = list(set([a.user_id for a in election.votes]))
+        ballots = []
+        for voter in voters:
+            votes: List[models.RankedChoiceVotes] = [
+                v for v in election.votes if v.user_id == voter
+            ]
+            votes.sort(key=lambda x: x.rank)
+            ballot = pyrankvote.Ballot([candidates[v.candidate.name] for v in votes])
+            ballots.append(ballot)
+
+        election_result = pyrankvote.single_transferable_vote(
+            candidates=candidates.values(), ballots=ballots, number_of_seats=election.seats
+        )
+
+        winners = election_result.get_winners()
+        for winner in winners:
+            winner_candidate = next(
+                (c for c in election.candidates if c.name == winner.name), None
+            )
+            if winner_candidate:
+                await self.repository.mark_winner(winner_candidate)
+
+        await self.repository.save_results(election, str(election_result))

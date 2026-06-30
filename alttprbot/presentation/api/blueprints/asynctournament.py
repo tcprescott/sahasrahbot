@@ -1,8 +1,7 @@
 from quart import (Blueprint, abort, jsonify, request, Response)
 from alttprbot.presentation.api.oauth_client import Unauthorized
 
-from alttprbot.services import AsyncTournamentService, UserService
-from alttprbot.util import asynctournament
+from alttprbot.services import AsyncTournamentScoringService, AsyncTournamentService, UserService
 from alttprbot.presentation.api import auth
 from alttprbot.presentation.api.api import discord
 from alttprbot.presentation.api.util import checks
@@ -93,7 +92,7 @@ async def leaderboard_api(tournament_id):
     if tournament is None:
         return jsonify({'error': 'Tournament not found.'})
 
-    leaderboard = await asynctournament.get_leaderboard(tournament)
+    leaderboard = await AsyncTournamentScoringService().get_leaderboard(tournament)
 
     return jsonify([
         {
@@ -179,7 +178,7 @@ async def async_tournament_leaderboard_json(tournament_id: int):
     if not authorized and tournament.active:
         return jsonify({'error': 'Not authorized.'}), 403
 
-    leaderboard = await asynctournament.get_leaderboard(tournament)
+    leaderboard = await AsyncTournamentScoringService().get_leaderboard(tournament)
 
     return jsonify([
         {

@@ -54,3 +54,19 @@ class RankedChoiceRepository:
     @staticmethod
     async def bulk_create_votes(votes: List[models.RankedChoiceVotes]) -> None:
         await models.RankedChoiceVotes.bulk_create(votes)
+
+    @staticmethod
+    async def fetch_for_results(election: models.RankedChoiceElection) -> None:
+        """Hydrate the candidates and votes (with their candidate) used for tabulation."""
+        await election.fetch_related("candidates")
+        await election.fetch_related("votes", "votes__candidate")
+
+    @staticmethod
+    async def mark_winner(candidate: models.RankedChoiceCandidate) -> None:
+        candidate.winner = True
+        await candidate.save()
+
+    @staticmethod
+    async def save_results(election: models.RankedChoiceElection, results: str) -> None:
+        election.results = results
+        await election.save()
