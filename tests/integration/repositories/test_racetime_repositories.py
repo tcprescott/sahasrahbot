@@ -66,6 +66,17 @@ async def test_tournament_results_get_by_srl_id(tortoise_db):
     assert found is not None and found.event == "test"
 
 
+async def test_tournament_results_get_by_episode_id_and_delete(tortoise_db):
+    assert await TournamentResultsRepository.get_by_episode_id("55") is None
+
+    await models.TournamentResults.create(srl_id="room-55", episode_id="55", event="test")
+    found = await TournamentResultsRepository.get_by_episode_id("55")
+    assert found is not None and found.srl_id == "room-55"
+
+    await TournamentResultsRepository.delete(found)
+    assert await TournamentResultsRepository.get_by_episode_id("55") is None
+
+
 async def test_tournament_results_upsert_by_srl_id(tortoise_db):
     row, created = await TournamentResultsRepository.upsert_by_srl_id(
         "room-1", {"episode_id": "42", "event": "alttpr", "spoiler": None}

@@ -16,6 +16,14 @@ class TournamentResultsRepository:
         return await models.TournamentResults.get_or_none(srl_id=srl_id)
 
     @staticmethod
+    async def get_by_episode_id(episode_id) -> Optional[models.TournamentResults]:
+        return await models.TournamentResults.get_or_none(episode_id=episode_id)
+
+    @staticmethod
+    async def delete(result: models.TournamentResults) -> None:
+        await result.delete()
+
+    @staticmethod
     async def upsert_by_srl_id(
         srl_id: str, defaults: dict
     ) -> Tuple[models.TournamentResults, bool]:
