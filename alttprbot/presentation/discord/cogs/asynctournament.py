@@ -22,6 +22,7 @@ from alttprbot.services import (
     UserService,
 )
 from alttprbot.presentation.api.util import checks
+from alttprbot.presentation.discord.util import authz
 from alttprbot.services.seedgen import generator
 
 RACETIME_URL = config.RACETIME_URL
@@ -790,13 +791,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
             self.persistent_views_added = True
 
     @app_commands.command(name="create", description="Create an async tournament.  This command is only available to Synack.")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def create(self, interaction: discord.Interaction, name: str, permalinks: str,
                      report_channel: discord.TextChannel = None):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         await interaction.response.defer()
         embed = discord.Embed(title=name)
         try:
@@ -847,12 +844,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
         await interaction.followup.send(embed=embed, view=AsyncTournamentView())
 
     @app_commands.command(name="addseed", description="Add a seed to an async tournament.  This command is only available to Synack.")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def add_seed(self, interaction: discord.Interaction, pool_name: str, preset: str, num: int=1):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
             await interaction.response.send_message(
@@ -925,12 +918,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
             f"Timeout extended to {discord.utils.format_dt(thread_timeout_time, 'f')} ({discord.utils.format_dt(thread_timeout_time, 'R')}).")
 
     @app_commands.command(name="repost", description="Repost the tournament embed")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def repost(self, interaction: discord.Interaction):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         await interaction.response.defer()
         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
@@ -947,13 +936,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
         await finish_race(interaction)
 
     @app_commands.command(name="permissions", description="Configure permissions for this tournament")
+    @authz.requires_bot_owner("Only Synack may create an async tournament at this time.")
     async def permissions(self, interaction: discord.Interaction, permission: str, role: discord.Role = None,
                           user: discord.User = None):
-        if not await self.bot.is_owner(interaction.user):
-            await interaction.response.send_message("Only Synack may create an async tournament at this time.",
-                                                    ephemeral=True)
-            return
-
         await interaction.response.defer(ephemeral=True)
         async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel.id)
         if async_tournament is None:
@@ -1101,11 +1086,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
     if config.DEBUG:
         @app_commands.command(name="test", description="Populate tournament with dummy data.")
+        @authz.requires_bot_owner("Only Synack may perform this action.")
         async def test(self, interaction: discord.Interaction, participant_count: int = 1):
-            if not await self.bot.is_owner(interaction.user):
-                await interaction.response.send_message("Only Synack may perform this action.", ephemeral=True)
-                return
-
             tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
             if tournament is None:
                 await interaction.response.send_message("This channel is not configured for async tournaments.",
