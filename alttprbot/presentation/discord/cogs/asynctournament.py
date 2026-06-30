@@ -22,7 +22,6 @@ from alttprbot.services import (
     AuthorizationService,
     UserService,
 )
-from alttprbot.presentation.api.util import checks
 from alttprbot.presentation.discord.util import authz
 from alttprbot.services.seedgen import generator
 
@@ -893,9 +892,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_tournament_race.fetch_related("tournament")
 
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        authorized = await checks.is_async_tournament_user(user, async_tournament_race.tournament, ['admin', 'mod'])
-        if not authorized:
+        subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
+        user = subject.user
+        if not await AuthorizationService().is_async_tournament_user(subject, async_tournament_race.tournament, ['admin', 'mod']):
             await interaction.response.send_message(
                 "You are not authorized to extend the timeout for this tournament race.", ephemeral=True)
             return
@@ -1013,9 +1012,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
 
         await async_live_race.fetch_related("tournament")
 
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        authorized = await checks.is_async_tournament_user(user, async_live_race.tournament, ['admin', 'mod'])
-        if not authorized:
+        subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
+        if not await AuthorizationService().is_async_tournament_user(subject, async_live_race.tournament, ['admin', 'mod']):
             await interaction.response.send_message("You are not authorized to record this live race.", ephemeral=True)
             return
 
@@ -1114,9 +1112,8 @@ class AsyncTournament(commands.GroupCog, name="async"):
         #     await interaction.response.send_message("This tournament is not active.", ephemeral=True)
         #     return
 
-        user = await UserService().get_or_create_by_discord_id(interaction.user.id)
-        authorized = await checks.is_async_tournament_user(user, tournament, ['admin'])
-        if not authorized:
+        subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
+        if not await AuthorizationService().is_async_tournament_user(subject, tournament, ['admin']):
             await interaction.response.send_message("You are not authorized to perform a score recalculation.",
                                                     ephemeral=True)
             return
