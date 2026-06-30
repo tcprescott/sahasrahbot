@@ -455,7 +455,8 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
 
         user = await UserService().get_or_create_by_discord_id(interaction.user.id)
 
-        if tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, tournament_race):
             await interaction.response.send_message("Only the runner of this race can start it.", ephemeral=True)
             return
 
@@ -506,7 +507,8 @@ class AsyncTournamentRaceViewReady(discord.ui.View):
                        custom_id="sahasrahbot:async_forfeit")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, async_tournament_race):
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
 
@@ -536,7 +538,8 @@ class AsyncTournamentRaceViewInProgress(discord.ui.View):
                        custom_id="sahasrahbot:async_forfeit2")
     async def async_forfeit(self, interaction: discord.Interaction, button: discord.ui.Button):
         async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_user(interaction.channel.id)
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, async_tournament_race):
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
 
@@ -576,7 +579,8 @@ class AsyncTournamentRaceViewForfeit(discord.ui.View):
                                                     ephemeral=True)
             return
 
-        if async_tournament_race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, async_tournament_race):
             await interaction.response.send_message("Only the runner may forfeit this race.", ephemeral=True)
             return
 
@@ -621,8 +625,10 @@ class AsyncTournamentPostRaceView(discord.ui.View):
                 "This is not a race thread.  This should not have happened.  Please contact a moderator.")
             return
 
-        if race.user.discord_user_id != interaction.user.id:
+        subject = await authz.subject_from_interaction(interaction)
+        if not AuthorizationService().is_async_race_owner(subject, race):
             await interaction.response.send_message("Only the player may submit a VoD.", ephemeral=True)
+            return
 
         if race.tournament.customization == "gmpmt2023":
             await interaction.response.send_modal(SubmitCollectIGTModal())
@@ -1215,7 +1221,8 @@ async def finish_race(interaction: discord.Interaction):
         await interaction.response.send_message("This channel/thread is not an async race room.", ephemeral=True)
         return
 
-    if race.user.discord_user_id != interaction.user.id:
+    subject = await authz.subject_from_interaction(interaction)
+    if not AuthorizationService().is_async_race_owner(subject, race):
         await interaction.response.send_message("Only the player of this race may finish it.", ephemeral=True)
         return
 
