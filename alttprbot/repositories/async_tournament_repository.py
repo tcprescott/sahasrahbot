@@ -44,6 +44,12 @@ class AsyncTournamentRepository:
         ).exists()
 
     @staticmethod
+    async def is_user_whitelisted(
+        tournament: models.AsyncTournament, discord_user_id: int
+    ) -> bool:
+        return await tournament.whitelist.filter(user__discord_user_id=discord_user_id).exists()
+
+    @staticmethod
     async def get_permalink(
         permalink_id: int, tournament: models.AsyncTournament
     ) -> Optional[models.AsyncTournamentPermalink]:

@@ -17,7 +17,7 @@ from alttprbot.services.async_tournament_scoring_service import AsyncTournamentS
 from alttprbot.services.async_tournament_service import AsyncTournamentService
 from alttprbot.services.audit_messages_service import AuditMessagesService
 from alttprbot.services.audit_service import AuditActions, AuditService
-from alttprbot.services.authorization_service import AuthorizationService
+from alttprbot.services.authorization import AuthorizationService, AuthSubject
 from alttprbot.services.daily_service import DailyService
 from alttprbot.services.discord_server_service import DiscordServerService
 from alttprbot.services.guild_config_service import GuildConfigService
@@ -47,6 +47,7 @@ __all__ = [
     "AuditActions",
     "AuditMessagesService",
     "AuditService",
+    "AuthSubject",
     "AuthorizationService",
     "DailyService",
     "DiscordServerService",

@@ -61,6 +61,11 @@ class AsyncTournamentService:
     ) -> bool:
         return await self.repository.role_has_permission(tournament, discord_role_ids, roles)
 
+    async def is_user_whitelisted(
+        self, tournament: models.AsyncTournament, discord_user_id: int
+    ) -> bool:
+        return await self.repository.is_user_whitelisted(tournament, discord_user_id)
+
     # --- data facade (session-auth endpoints shape the JSON themselves) ---
 
     async def get_tournament(self, tournament_id: int) -> Optional[models.AsyncTournament]:
