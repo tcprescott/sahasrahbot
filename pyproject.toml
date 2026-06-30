@@ -105,7 +105,7 @@ forbidden_modules = [
     "quart",
     "alttprbot.presentation",
 ]
-allow_indirect_imports = "true"
+allow_indirect_imports = "false"
 
 # Contract 3 — the presentation tier must reach data only through services.
 # Enforced (blocking in CI) as of the final migration phase: the direct-model
@@ -119,6 +119,8 @@ source_modules = [
 forbidden_modules = [
     "alttprbot.models",
 ]
+# Direct-only: presentation may reach models transitively *through* services,
+# but must not import alttprbot.models itself.
 allow_indirect_imports = "true"
 
 [build-system]

@@ -31,7 +31,6 @@ if config.SENTRY_URL:
 
 async def load_extensions():
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.errors")
-    # await discordbot.load_extension("alttprbot.presentation.discord.cogs.bontamw")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.daily")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.misc")
@@ -46,13 +45,10 @@ async def load_extensions():
     
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.sgdailies")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.tournament")
-    await discordbot.load_extension("alttprbot.presentation.discord.cogs.smmulti")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.generator")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.inquiry")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.rankedchoice")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.asynctournament")
-    # await discordbot.load_extension("alttprbot.presentation.discord.cogs.doorsmw")  # Phase B: Multiworld deprecation
-    # await discordbot.load_extension("alttprbot.presentation.discord.cogs.admin")
     await discordbot.load_extension("alttprbot.presentation.discord.cogs.racer_verification")
 
     if config.DEBUG:
