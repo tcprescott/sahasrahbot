@@ -107,4 +107,7 @@ Two complementary layers:
 - **Claude Code hooks** (`.claude/scripts/`, wired by `.claude/settings.local.json`) —
   give edit-time feedback during agent sessions: `enforce_architecture.py`
   (PreToolUse), `enforce_no_orm_writes.py` + `check_layer_exports.py` (PostToolUse).
-  **Blocking** via `SAHASRAHBOT_HOOKS_ENFORCE=1` set in `.claude/settings.json`.
+  Still **notification-only** (`_hooklib.py` exits 0 when `SAHASRAHBOT_HOOKS_ENFORCE` is
+  unset). Flipping them to blocking is the one **pending owner step**: set
+  `SAHASRAHBOT_HOOKS_ENFORCE=1` (e.g. an `env` block in `.claude/settings.json`). The
+  durable enforcement — import-linter gating CI — is already blocking.
