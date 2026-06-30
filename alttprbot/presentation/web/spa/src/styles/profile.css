@@ -93,6 +93,39 @@
   color: var(--crimson);
 }
 
+/* linked-account rows */
+.profile-linked-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  flex-wrap: wrap;
+  padding: .55rem 0;
+}
+
+.profile-linked-label {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+
+.profile-linked-value {
+  font-family: 'Space Mono', monospace;
+  font-size: .85rem;
+  color: var(--ink-soft);
+}
+
+.profile-linked-value.muted {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.profile-linked-hint {
+  font-size: .78rem;
+  color: var(--ink-faint);
+}
+
 /* unauthenticated prompt */
 .profile-auth-prompt {
   display: flex;

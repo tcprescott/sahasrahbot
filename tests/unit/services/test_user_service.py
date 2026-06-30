@@ -2,6 +2,9 @@
 
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+from tortoise.exceptions import IntegrityError
+
 from alttprbot.services import AuthorizationService, UserService
 
 
@@ -56,6 +59,78 @@ async def test_link_merges_when_two_distinct_users_exist():
     service.repository.merge.assert_awaited_once_with(rtgg_user, discord_user)
     assert kept.display_name == "Alice"
     kept.save.assert_awaited_once()
+
+
+async def test_unlink_racetime_account_clears_link():
+    service = UserService()
+    service.repository = AsyncMock()
+    linked_user = MagicMock(rtgg_id="rt1")
+    service.repository.get_by_discord_id.return_value = linked_user
+
+    await service.unlink_racetime_account(10)
+
+    service.repository.clear_racetime_link.assert_awaited_once_with(linked_user)
+
+
+async def test_unlink_racetime_account_raises_when_no_user():
+    service = UserService()
+    service.repository = AsyncMock()
+    service.repository.get_by_discord_id.return_value = None
+
+    with pytest.raises(ValueError):
+        await service.unlink_racetime_account(10)
+
+    service.repository.clear_racetime_link.assert_not_awaited()
+
+
+async def test_unlink_racetime_account_raises_when_not_linked():
+    service = UserService()
+    service.repository = AsyncMock()
+    service.repository.get_by_discord_id.return_value = MagicMock(rtgg_id=None)
+
+    with pytest.raises(ValueError):
+        await service.unlink_racetime_account(10)
+
+    service.repository.clear_racetime_link.assert_not_awaited()
+
+
+async def test_update_display_name_rejects_empty():
+    service = UserService()
+    service.repository = AsyncMock()
+
+    with pytest.raises(ValueError):
+        await service.update_display_name(MagicMock(), "   ")
+
+    service.repository.set_display_name.assert_not_awaited()
+
+
+async def test_update_display_name_rejects_too_long():
+    service = UserService()
+    service.repository = AsyncMock()
+
+    with pytest.raises(ValueError):
+        await service.update_display_name(MagicMock(), "x" * 33)
+
+    service.repository.set_display_name.assert_not_awaited()
+
+
+async def test_update_display_name_strips_and_saves():
+    service = UserService()
+    service.repository = AsyncMock()
+    user = MagicMock()
+
+    await service.update_display_name(user, "  Alice  ")
+
+    service.repository.set_display_name.assert_awaited_once_with(user, "Alice")
+
+
+async def test_update_display_name_raises_on_duplicate():
+    service = UserService()
+    service.repository = AsyncMock()
+    service.repository.set_display_name.side_effect = IntegrityError()
+
+    with pytest.raises(ValueError):
+        await service.update_display_name(MagicMock(), "Alice")
 
 
 async def test_authorization_service_maps_permission_to_bool():

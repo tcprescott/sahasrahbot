@@ -2,6 +2,8 @@
 
 from typing import Optional
 
+from tortoise.exceptions import IntegrityError
+
 from alttprbot import models
 from alttprbot.repositories import UserRepository
 
@@ -23,7 +25,14 @@ class UserService:
         return await self.repository.list_without_display_name()
 
     async def update_display_name(self, user: models.Users, display_name: str) -> None:
-        await self.repository.set_display_name(user, display_name)
+        display_name = display_name.strip()
+        if not 1 <= len(display_name) <= 32:
+            raise ValueError("Display name must be between 1 and 32 characters.")
+
+        try:
+            await self.repository.set_display_name(user, display_name)
+        except IntegrityError as exc:
+            raise ValueError("That display name is already taken.") from exc
 
     async def get_or_create_by_discord_id(
         self, discord_user_id: int, *, display_name: Optional[str] = None
@@ -60,3 +69,11 @@ class UserService:
                 rtgg_id,
                 {"discord_user_id": discord_user_id, "rtgg_access_token": access_token, "display_name": display_name},
             )
+
+    async def unlink_racetime_account(self, discord_user_id: int) -> None:
+        """Clear a user's linked RaceTime.gg identity (local link only, no upstream revoke)."""
+        user = await self.repository.get_by_discord_id(discord_user_id)
+        if user is None or user.rtgg_id is None:
+            raise ValueError("No RaceTime.gg account is linked.")
+
+        await self.repository.clear_racetime_link(user)
