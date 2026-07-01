@@ -22,7 +22,7 @@ The active mode is controlled by the `TOURNAMENT_CONFIG_ENABLED` flag in `config
 
 #### 1. AVAILABLE_TOURNAMENT_HANDLERS
 
-Static capability catalog in `alttprbot/tournaments.py`:
+Static capability catalog in `alttprbot/services/tournament/registry.py`:
 
 ```python
 AVAILABLE_TOURNAMENT_HANDLERS = {
@@ -43,7 +43,7 @@ Runtime configuration file that controls which handlers are active (policy).
 
 #### 3. registry_loader.py
 
-Loader module in `alttprbot/tournament/registry_loader.py`:
+Loader module in `alttprbot/services/tournament/registry_loader.py`:
 
 - Parses YAML configuration
 - Validates schema and handler references
@@ -180,16 +180,6 @@ This validates:
 - Schema compliance
 - Handler references
 - Profile completeness
-
-### Demonstration
-
-```bash
-# Test hardcoded fallback path
-python3 helpers/demo_tournament_registry.py hardcoded
-
-# Test config-backed path
-python3 helpers/demo_tournament_registry.py config
-```
 
 ## Rollback Strategy
 

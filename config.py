@@ -83,8 +83,6 @@ class Settings(BaseSettings):
 
     ALTTP_ROM: str = '/opt/data/alttp_jp10.sfc'
     SM_ROM: str = '/opt/data/super_metroid.sfc'
-    ENEMIZER_HOME: str = '/opt/enemizer'
-    DOOR_RANDO_HOME: str = '/opt/ALttPDoorRandomizer'
 
     ALTTP_RANDOMIZER_SERVERS: str = ''
     MAIN_TOURNAMENT_SERVERS: str = ''

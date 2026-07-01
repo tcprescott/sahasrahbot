@@ -1,16 +1,13 @@
 .env
 /env/
 /deploy.sh
-/pyz3r
 __pycache__
 data/*.cookie
 data/*.sfc
 presets/bot_testing.yaml
-public/spoilers
 test_input/
 presets/alttprmystery/bot_testing.yaml
 .venv/
-settings.py
 .vscode/
 .idea/
 utils/enemizer/osx*

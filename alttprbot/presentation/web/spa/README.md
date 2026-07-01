@@ -2,7 +2,7 @@
 
 React frontend for SahasrahBot — the **"Speedrun the Legend"** redesign. Replaces the legacy
 Chameleon/Jinja2 templates (clean-break). See
-[`docs/design/web_frontend_spa_redesign.md`](../../docs/design/web_frontend_spa_redesign.md).
+[`docs/design/web_frontend_spa_redesign.md`](../../../../docs/design/web_frontend_spa_redesign.md).
 
 ## Stack
 - **React 18** + **React Router v6** + **TanStack Query v5**

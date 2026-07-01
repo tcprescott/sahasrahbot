@@ -1,3 +1,11 @@
+# Tournament Schedule Models — Design Sketch
+
+> Status: unimplemented design sketch, relocated from `alttprbot/notes.txt` during the 2026-07 structure
+> cleanup. The shipped scheduling models in `alttprbot/models/schedule.py` (`ScheduleEvent`/`ScheduleEpisode`/…)
+> implement scheduling differently; this sketch was never built. Kept for reference for the
+> Self-Service Tournament System work (see docs/design/self_service_tournaments.md).
+
+```python
 class TournamentSchedulePermissionRole(str, Enum):
     ADMIN = 'admin'
     MODERATOR = 'moderator'
@@ -105,4 +113,4 @@ class TournamentScheduleMatchTracker(Model):
     tracker = fields.ForeignKeyField('models.TournamentScheduleTracker', related_name='matches')
     approved = fields.BooleanField(default=False)
     created = fields.DatetimeField(auto_now_add=True)
-    updated = fields.DatetimeField(auto_now=True)
+    updated = fields.DatetimeField(auto_now=True)```
