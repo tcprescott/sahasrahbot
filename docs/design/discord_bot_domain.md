@@ -2,6 +2,10 @@
 
 > Last updated: 2026-02-12
 > Scope: `alttprbot_discord/` (main bot) and `alttprbot_audit/` (audit bot)
+> Note (2026-07-01): historical pre-migration snapshot. `alttprbot_discord/` is now
+> `alttprbot/presentation/discord/` and `alttprbot_audit/` is `alttprbot/presentation/audit/`;
+> business logic has since moved to `alttprbot/services/` — see
+> [architecture-layers.md](../architecture-layers.md).
 
 ---
 
@@ -651,7 +655,6 @@ All configuration is in `config.py` (loaded at module level, not via environment
 | `MULTIWORLDHOSTBASE` | Hostname for multiworld connections |
 | `SENTRY_URL` | Sentry DSN (null to disable) |
 | `ALTTP_ROM` / `SM_ROM` | ROM file paths for local generation |
-| `ENEMIZER_HOME` / `DOOR_RANDO_HOME` | Tool installation paths |
 | `DEBUG` | Enables debug mode (test guild sync, test cog, fast task loops) |
 
 ### Per-Guild Config (Dynamic, via `guild.config_get`)

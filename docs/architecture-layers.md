@@ -126,7 +126,7 @@ Two complementary layers:
 - **import-linter** (`pyproject.toml` `[tool.importlinter]`) — runs in CI
   (`.github/workflows/lint.yml`) and pre-commit (`.pre-commit-config.yaml`).
   `poetry run lint-imports`. **Blocking** as of the final migration phase (the CI
-  `continue-on-error` was removed): the three contracts are green, so any new
+  `continue-on-error` was removed): all five contracts are green, so any new
   boundary violation fails the build.
 - **Claude Code hooks** (`.claude/scripts/`, wired by `.claude/settings.local.json`) —
   give edit-time feedback during agent sessions: `enforce_architecture.py`

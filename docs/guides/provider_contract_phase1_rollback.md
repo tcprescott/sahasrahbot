@@ -1,5 +1,11 @@
 # Phase 1 Provider Contract - Rollback and Validation Guide
 
+> **Historical record (2026-07-01):** this Phase 1 rollback window is closed. The provider
+> modules referenced below have since moved from `alttprbot/alttprgen/` to
+> `alttprbot/services/seedgen/` in the three-tier migration, so the commands in this guide are
+> no longer executable as written. Kept as a record of the Phase 1 rollout.
+
+
 ## Quick Validation
 
 ### Test New Contract Modules

@@ -56,7 +56,7 @@ All existing reaction-role configurations will be archived before removal.
 **Implementation:**
 - Runtime disablement flag added: `DISCORD_ROLE_ASSIGNMENT_ENABLED`
 - Event listeners check flag before processing events
-- Conditional extension loading in `alttprbot_discord/bot.py`
+- Conditional extension loading in `alttprbot/presentation/discord/bot.py`
 - Commands check flag and return disabled message when `False`
 - List commands work even when disabled (read-only access)
 
@@ -95,8 +95,8 @@ If role-assignment features need to be re-enabled immediately:
    ```
 
 3. **Verify extensions loaded:**
-   - Check bot startup logs for "alttprbot_discord.cogs.role" loaded
-   - Check bot startup logs for "alttprbot_discord.cogs.voicerole" loaded
+   - Check bot startup logs for "alttprbot.presentation.discord.cogs.role" loaded
+   - Check bot startup logs for "alttprbot.presentation.discord.cogs.voicerole" loaded
 
 ### Code Rollback (Revert Changes)
 
@@ -127,8 +127,8 @@ If the implementation needs to be reverted:
 ```bash
 poetry run python sahasrahbot.py
 # Check logs for:
-# - "Loaded extension alttprbot_discord.cogs.role"
-# - "Loaded extension alttprbot_discord.cogs.voicerole"
+# - "Loaded extension alttprbot.presentation.discord.cogs.role"
+# - "Loaded extension alttprbot.presentation.discord.cogs.voicerole"
 # - No errors during extension loading
 ```
 

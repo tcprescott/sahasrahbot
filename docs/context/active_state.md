@@ -1,6 +1,6 @@
 # Active State
 
-> Last updated: 2026-06-30
+> Last updated: 2026-07-01
 
 ## Current Focus
 
@@ -14,19 +14,38 @@
 ## Known Issues
 
 - Secrets historically lived in `config.py`; configuration is environment-driven via `config.py` constants sourced from environment variables, but any previously exposed tokens/keys should be considered compromised and rotated.
-- Cross-layer dependency: `alttprbot/database/config.py` imports `CACHE` from `alttprbot_discord.util.guild_config`.
 - Many tournament handlers in `TOURNAMENT_DATA` registry are commented out between seasons.
 - The `reverify_racer` background task in the `racer_verification` cog is currently disabled via comment.
-- The `schedule` and `user` blueprints in the web API are DEBUG-only stubs.
-- **Architecture Debt**: `guild_config` monkey-patching and name-based channel config need removal.
+- **Architecture Debt**: name-based guild channel config still needs a data migration to channel IDs (the `guild_config` monkey-patch itself was removed in Phase 10).
 - **Operational Validation Pending**: Daily challenge retry/thread-failure hardening shipped, but production compatibility evidence capture is still pending.
 - **Runtime Security Debt**: `APP_SECRET_KEY` defaults to empty string.
 - **Startup Reliability Follow-up**: coordinated graceful shutdown is now implemented, but subsystem-level startup policies (strict fail-fast vs degraded mode) still need explicit owner-confirmed criteria.
 - **RaceTime Config Fragility**: per-category OAuth client keys are dynamically resolved from attribute names, making failures import/runtime-coupled.
 - **Auth Stack Follow-up**: Authlib is now the only API Discord OAuth path; post-cutover hardening and compatibility evidence collection remain open. Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
-- **Docs Tooling Drift**: `update_docs.py` writes legacy docs targets under `docs/` root instead of `docs/user-guide/`.
 
 ## Recent Completions
+
+- **Repository structure cleanup (2026-07-01).** Removed post-migration leftovers and fixed stale
+  tooling/config references. Deleted: `aerich.ini` (duplicated `[tool.aerich]` in pyproject),
+  `.vsls.json`, `config.py.example` (replaced by a plain `.env.example`), completed one-off helpers
+  (`migrate_env_to_settings.py`, `convert_legacy_config_to_env.py`, `demo_tournament_registry.py`,
+  `alttpr2023.csv`), dead modules (`alttprbot/util/rom.py` + its test, `alttprbot/util/console.py`,
+  `presentation/discord/util/checks.py`), and the stray `presets/smz3/README.md` (URL merged into
+  `presets/README.md`). Moved: `dbtest.py` → `helpers/`, `alttprbot/notes.txt` →
+  `docs/design/tournament_schedule_models_sketch.md`, `tests/unit/seedgen/` →
+  `tests/unit/services/seedgen/` (mirrors the package). Untracked committed `*.tsbuildinfo` build
+  artifacts (now gitignored). Fixed stale configs: `sonar-project.properties` exclusions repointed
+  from deleted `presentation/api/{static,spa}` paths to `presentation/web/spa`, `lint.yml` push
+  trigger (deleted `three-tier-migration` branch removed), `.gitignore` dead entries (`/pyz3r`,
+  `public/spoilers`, `settings.py`), session-start hook tier diagram (adds `web`), and removed the
+  unread `ENEMIZER_HOME`/`DOOR_RANDO_HOME` constants from `config.py`. Docs refreshed to
+  post-migration paths: `CLAUDE.md`, `README.md`, `system_patterns.md`, `coding_standards.md`,
+  `MASTER_INDEX.md` (now lists all on-disk docs incl. a new Audit Reports section),
+  `config_constants_inventory.md` (regenerated via new `helpers/scan_config_constants.py`), the
+  role-assignment and registry-config guides; historical banners added to the four pre-migration
+  design snapshots, the SPA handoff doc, and the Phase 1 rollback + tournament runbook guides.
+  462→469-test suite green (deleted `rom.py` characterization tests removed), import-linter
+  5 kept / 0 broken.
 
 - **REST API separated from the web UI.** `alttprbot/presentation/api/` previously mixed
   a session/OAuth-free REST surface (public or `auth.authorized_key()`-gated, for
@@ -190,24 +209,22 @@
 
 1. Record single-developer role mapping (same owner across delivery, validation, and rollback) per workstream in `plans/modernization_execution_tracker.md`.
 2. Execute first full compatibility gate evidence cycle using `plans/modernization_compatibility_gate_validation_runbook.md` and publish baseline pass/fail matrix for the current single-owner model.
-3. Monitor `GuildConfigService` pilot in `daily.py` and verify announcement reliability in production traffic.
-4. Continue incremental cog migration to `GuildConfigService` (`tournament.py`, `misc.py`, `audit.py`).
-5. Implement channel name→ID data migration script and rollout plan (Phase 3 of guild config modernization).
-6. Integrate dependency declaration guard (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
-7. Define and document explicit startup supervision/failure strategy for multi-subsystem boot.
-8. ~~Complete Tournament Registry Config Rollout Phase 2~~ — superseded by the Self-Service Tournament System design (`docs/design/self_service_tournaments.md`); next step is implementation Phase A (DB models + async registry).
-9. Sequence remaining modernization backlog against `plans/application_modernization_vision_2026_2027.md` and enforce phase gate checks.
-10. Start next bounded Phase 1 slices: telemetry service/table operationalization across surfaces and startup security validation checks.
-11. Rotate/revoke any previously committed secrets and finish operational `.env` hardening.
-12. Review and refine generated documentation, including `update_docs.py` target alignment with `docs/user-guide/`.
-13. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.
-14. Validate production `.env`/environment completeness against the new `pydantic-settings` config surface before next deployment restart.
-15. Validate RaceTime migration runtime by installing updated dependencies and running targeted startup/smoke checks for RaceTime bot initialization, API command lookup path, and tournament `startrace/get_team` call chains.
+3. Verify `GuildConfigService` announcement reliability in production traffic (all cogs — `daily.py`, `tournament.py`, `misc.py`, `audit.py` — migrated as of Phase 10).
+4. Implement channel name→ID data migration script and rollout plan (Phase 3 of guild config modernization).
+5. Integrate dependency declaration guard (`poetry run python helpers/check_dependency_declarations.py`) into CI when workflow scaffolding is enabled.
+6. Define and document explicit startup supervision/failure strategy for multi-subsystem boot.
+7. ~~Complete Tournament Registry Config Rollout Phase 2~~ — superseded by the Self-Service Tournament System design (`docs/design/self_service_tournaments.md`); next step is implementation Phase A (DB models + async registry).
+8. Sequence remaining modernization backlog against `plans/application_modernization_vision_2026_2027.md` and enforce phase gate checks.
+9. Start next bounded Phase 1 slices: telemetry service/table operationalization across surfaces and startup security validation checks.
+10. Rotate/revoke any previously committed secrets and finish operational `.env` hardening.
+11. Review and refine generated documentation under `docs/user-guide/` (the former `update_docs.py` generator script has been deleted; regeneration tooling is a new work item if still wanted).
+12. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.
+13. Validate production `.env`/environment completeness against the new `pydantic-settings` config surface before next deployment restart.
+14. Validate RaceTime migration runtime by installing updated dependencies and running targeted startup/smoke checks for RaceTime bot initialization, API command lookup path, and tournament `startrace/get_team` call chains.
 
 ## Open Why Questions
 
 - Why should insecure OAuth transport be enabled outside local development?
 - Why is an empty `APP_SECRET_KEY` acceptable in any non-test environment?
 - Why is startup task supervision intentionally best-effort instead of fail-fast on subsystem startup errors?
-- Why is config cache ownership split across legacy database and Discord utility layers?
 - Why are seasonal tournament/racetime toggles controlled through commented registries rather than explicit configuration?

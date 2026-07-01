@@ -2,8 +2,12 @@
 
 > Last updated: 2026-02-12
 > Scope: Core randomizer library, data models, database access patterns, and utility layer
+> Note (2026-07-01): historical pre-migration snapshot. `alttprbot/alttprgen/` is now
+> `alttprbot/services/seedgen/`, the `alttprbot/database/` raw-SQL layer was removed in favor
+> of `alttprbot/repositories/`, and the guild-config CACHE cross-layer import was fixed — see
+> [architecture-layers.md](../architecture-layers.md).
 
-This document describes current core-library and data-layer behavior from code analysis.
+This document described the then-current core-library and data-layer behavior from code analysis.
 
 ---
 
@@ -293,11 +297,9 @@ Helper modules that previously used raw SQL now call model filters/updates and r
 |---|---|
 | `__init__.py` | Empty — package marker |
 | `helpers.py` | `generate_random_string(length)` — alphanumeric random string generator |
-| `console.py` | Logging wrappers (`debug`, `info`, `warning`, `error`, `critical`) that auto-detect caller module name |
 | `http.py` | Generic async HTTP utilities: `request_generic()`, `request_json_post()`, `request_json_put()` — all use `aiohttp`, support text/json/binary/yaml response types |
 | `gsheet.py` | Google Sheets API client setup using `oauth2client` service account credentials from config |
 | `holyimage.py` | Fetches "holy images" from `alttp.mymm1.com` — community images with Discord embed support |
-| `rom.py` | SNES address conversion utilities: `snes_to_pc_lorom()`, `pc_to_snes_lorom()` |
 | `triforce_text.py` | End-game triforce text system: balanced/random selection from pools, generation with text injection into preset settings |
 | `asynctournament.py` | Async tournament scoring engine: par time calculation (avg of top 5), qualifier scoring (percentage of par), leaderboard computation with caching, test data population |
 | `rankedchoice.py` | Ranked choice voting: uses `pyrankvote` for Single Transferable Vote, Discord embed creation, election post refresh |

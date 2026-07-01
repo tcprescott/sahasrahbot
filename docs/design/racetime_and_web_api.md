@@ -2,6 +2,8 @@
 
 > Last updated: 2026-02-12
 > Scope: `alttprbot_racetime/` integration architecture and operational flow
+> Note (2026-07-01): historical pre-migration snapshot. `alttprbot_racetime/` is now
+> `alttprbot/presentation/racetime/` — see [architecture-layers.md](../architecture-layers.md).
 
 ## Canonical Scope Note
 

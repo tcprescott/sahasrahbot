@@ -2,6 +2,12 @@
 
 > Written 2026-06-12. Covers every page in the route map that is not yet implemented.
 > Intended to be handed to parallel agents; each section is self-contained.
+>
+> **Path note (2026-07-01):** written pre-migration — every `alttprbot_api/` path below now
+> lives under `alttprbot/presentation/` (`alttprbot_api/spa/` → `alttprbot/presentation/web/spa/`;
+> session/OAuth blueprints → `alttprbot/presentation/web/blueprints/`, REST-only blueprints →
+> `alttprbot/presentation/api/blueprints/`). Most sections have since shipped; see the
+> profile/linked-accounts work in the git history.
 
 ---
 

@@ -1,5 +1,15 @@
 # Tournament Module (Non-Async) Runbook
 
+> **Stale paths (2026-07-01):** this runbook predates the three-tier migration. The tournament
+> module was decomposed: handlers became orchestrators in `alttprbot/services/tournament/`
+> (registered in `registry.py` `AVAILABLE_TOURNAMENT_HANDLERS`), driven by
+> `alttprbot/presentation/discord/tournament/` (`coordinator.py`, `dispatch.py`, `presenter.py`);
+> `alttprbot/tournaments.py` and `alttprbot/tournament/` no longer exist, and the background loops
+> live in `alttprbot/presentation/discord/cogs/tournament.py`. Operational procedures below are
+> directionally correct but the paths and the handler-authoring workflow need a full owner-reviewed
+> rewrite.
+
+
 > Last updated: 2026-02-12  
 > Scope: Operations and developer workflow for non-async tournament automation
 

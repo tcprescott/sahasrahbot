@@ -48,17 +48,19 @@ alttprbot/                  # Single package — top-level directories ARE the t
     web/                    #   Web BFF — Quart app, OAuth, SPA (web.py, oauth_client.py, blueprints/, spa/)
   services/                 # Tier 2 — business logic
     seedgen/                #   Seed generation, was alttprgen/ (presets, providers)
+    tournament/             #   Tournament orchestrators + registry (was alttprbot/tournament/)
     _notify/                #   Fire-and-forget notification queue + presentation gateways
     audit_service.py        #   AuditService + AuditActions
   repositories/             # Tier 3 — pure Tortoise CRUD (returns models)
   models/                   # Tier 4 — Tortoise ORM models (50+ entities, unchanged)
-  tournament/               # Tournament handler classes (moves to services/ in Phase 7)
   util/                     # Shared utilities (telemetry, config contract, etc.)
   exceptions.py             # Custom exception hierarchy
 presets/                    # YAML preset files for randomizer generation
 config/                     # Tournament YAML config
 migrations/                 # Aerich database migrations
 helpers/                    # Standalone utility scripts (validation, conversion)
+utils/                      # Runtime tools: door-rando git submodules, enemizer installer, flips binaries
+data/                       # Runtime state dir (e.g. bingosync cookie); contents gitignored
 tests/                      # pytest + pytest-asyncio (unit/, integration/)
 docs/                       # All documentation (context, design, guides, plans, user-guide)
 ```
@@ -69,8 +71,12 @@ docs/                       # All documentation (context, design, guides, plans,
 # Install dependencies
 poetry install
 
+# Door-randomizer presets need the utils/ submodules + enemizer binaries
+git submodule update --init
+(cd utils/enemizer && ./install.sh)
+
 # Configure environment — copy and fill in required values
-cp config.py.example .env
+cp .env.example .env
 
 # Validate config before running
 poetry run python helpers/validate_runtime_config.py
@@ -81,6 +87,9 @@ poetry run python sahasrahbot.py
 # Database migrations
 poetry run aerich upgrade    # Apply pending migrations
 poetry run aerich migrate    # Create new migration
+
+# Seed local DB with test fixtures (DEBUG only)
+poetry run python helpers/seed_test_fixtures.py
 ```
 
 ## Key Conventions
@@ -112,7 +121,7 @@ poetry run aerich migrate    # Create new migration
 ### Configuration
 - Runtime config via `config.py` using pydantic-settings (`Settings` class)
 - Access as module-level constants: `import config; config.DISCORD_TOKEN`
-- Per-guild config stored in DB via monkey-patched `guild.config_get()`/`guild.config_set()`
+- Per-guild config stored in DB via `GuildConfigService` (`alttprbot/services/guild_config_service.py`)
 - Feature flags: `DISCORD_ROLE_ASSIGNMENT_ENABLED`, `TOURNAMENT_CONFIG_ENABLED`, `TELEMETRY_ENABLED`, `DEBUG`
 
 ### Database
@@ -125,9 +134,9 @@ poetry run aerich migrate    # Create new migration
 - Run `poetry run python helpers/check_dependency_declarations.py` to validate
 - No intentional transitive-only reliance on packages
 
-## Architecture: Three-Tier Layering (migration in progress)
+## Architecture: Three-Tier Layering
 
-SahasrahBot is migrating to a strict three-tier architecture inside a single `alttprbot/` package. Respect these boundaries — imports may only point downward:
+SahasrahBot uses a strict three-tier architecture inside a single `alttprbot/` package (migration completed 2026). Respect these boundaries — imports may only point downward:
 
 ```
 Presentation (alttprbot/presentation/{discord,audit,racetime,api,web}/)
@@ -138,7 +147,7 @@ Presentation (alttprbot/presentation/{discord,audit,racetime,api,web}/)
 - **Service:** business rules/validation/authz/orchestration/audit/notify. Raises `ValueError`/`PermissionError`/`SahasrahBotException`. Never imports `discord`/`racetime_bot`/`quart`/`alttprbot.presentation`; reach surfaces via a `_notify` gateway.
 - **Repository:** pure Tortoise CRUD; returns models. No business logic/notify.
 
-The four `alttprbot_*` packages have been folded into `alttprbot/presentation/`, and `alttprgen`/`tournament` into `alttprbot/services/`. Enforcement: `poetry run lint-imports` (import-linter, **blocking in CI** — see [.github/workflows/lint.yml](.github/workflows/lint.yml) and `.pre-commit-config.yaml`; all three contracts are green) + edit-time Claude Code hooks. **Full rules and phase plan:** [docs/architecture-layers.md](docs/architecture-layers.md), [docs/plans/three_tier_migration.md](docs/plans/three_tier_migration.md).
+The four `alttprbot_*` packages have been folded into `alttprbot/presentation/`, and `alttprgen`/`tournament` into `alttprbot/services/`. Enforcement: `poetry run lint-imports` (import-linter, **blocking in CI** — see [.github/workflows/lint.yml](.github/workflows/lint.yml) and `.pre-commit-config.yaml`; all five contracts are green) + edit-time Claude Code hooks. **Full rules and phase plan:** [docs/architecture-layers.md](docs/architecture-layers.md), [docs/plans/three_tier_migration.md](docs/plans/three_tier_migration.md).
 
 ## Architecture Patterns
 
@@ -147,12 +156,15 @@ The four `alttprbot_*` packages have been folded into `alttprbot/presentation/`,
 User Command → Preset Loader (YAML/DB) → Game-Specific Generator → External API → Embed + Response
 ```
 - Provider reliability contract: 60s timeout, 3-attempt exponential retry
-- Normalized exceptions in `alttprbot/alttprgen/provider_exceptions.py`
+- Normalized exceptions in `alttprbot/services/seedgen/provider_exceptions.py`
 
 ### Tournament System
-- Template Method pattern: `TournamentRace` base class with 20+ concrete subclasses
-- Subclasses override `configuration()`, `roll()`, and form handling
-- Seasonal enable/disable via registry (code-level, migration to config in progress)
+- Orchestrator classes in `alttprbot/services/tournament/` (business logic), registered in
+  `registry.py` (`AVAILABLE_TOURNAMENT_HANDLERS`, slug → `TournamentEntry`)
+- Driven from presentation by `presentation/discord/tournament/coordinator.py` (`TournamentCoordinator`)
+  and `dispatch.py`; Discord rendering in `presenter.py`
+- Seasonal enable/disable via registry (code-level; DB-backed self-service design approved — see
+  `docs/design/self_service_tournaments.md`)
 
 ### RaceTime Integration
 - Handler pattern: game-specific handlers extend `SahasrahBotCoreHandler`
@@ -162,7 +174,6 @@ User Command → Preset Loader (YAML/DB) → Game-Specific Generator → Externa
 ### Web API
 - Quart (async Flask-compatible) with blueprint pattern
 - Discord OAuth via Authlib
-- Some blueprints are DEBUG-only stubs (`schedule`, `user`)
 
 ## Important Files to Read First
 
