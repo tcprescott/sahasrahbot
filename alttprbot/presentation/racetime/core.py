@@ -44,7 +44,7 @@ class SahasrahBotRaceTimeBot(Bot):
 
         self.handler_class = handler_class
         if self.racetime_secure:
-            self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            self.ssl_context = ssl.create_default_context()
 
     def _create_background_task(self, coro):
         if self._stopping:

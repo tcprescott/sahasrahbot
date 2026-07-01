@@ -312,7 +312,7 @@ class Tournament(commands.Cog):
         embed = discord.Embed(
             title="Scheduling Needs",
             description="This is the current scheduling needs for the next 48 hours.\n\nTimes are shown in your **local time zone**.",
-            timestamp=datetime.datetime.utcnow()
+            timestamp=datetime.datetime.now(datetime.timezone.utc)
         )
         embed.add_field(
             name="Commentators Needed",

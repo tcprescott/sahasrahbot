@@ -388,7 +388,7 @@ def smvaria_embed(seed):
         title="Generated Super Metroid Varia Game",
         description=f"**Skills preset: **{seed.skills_preset}\n**Settings preset: **{seed.settings_preset}",
         color=discord.Colour.orange(),
-        timestamp=datetime.datetime.utcnow()
+        timestamp=datetime.datetime.now(datetime.timezone.utc)
     )
     embed.add_field(
         name="Link",

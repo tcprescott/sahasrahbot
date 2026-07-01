@@ -246,10 +246,10 @@ async def execute_with_contract(
                         attempts=attempt_number,
                         provider_message=str(e)
                     )
-                    logger.error(
+                    logger.exception(
                         f"Provider unexpected error: provider={provider_name}, operation={operation}, "
                         f"surface={surface}, attempt={attempt_number}, latency_ms={latency_ms}, "
-                        f"error_type={type(e).__name__}, error={str(e)}"
+                        f"error_type={type(e).__name__}"
                     )
                     raise last_exception
     

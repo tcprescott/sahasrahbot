@@ -129,7 +129,7 @@ def _initialize_tournament_registry():
 
         except registry_loader.TournamentConfigError as e:
             # Fatal error: invalid config should fail before operational loops begin
-            logging.error(f"FATAL: Tournament config validation failed: {e}")
+            logging.exception("FATAL: Tournament config validation failed")
             logging.error("Tournament loops will not start. Fix config and restart.")
             raise
 

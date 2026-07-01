@@ -33,7 +33,7 @@ class Daily(commands.Cog):
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
             await interaction.response.send_message(embed=embed)
         except (aiohttp.ClientError, ValueError, KeyError, TypeError, RuntimeError) as error:  # noqa: BLE001
-            logger.error('Failed to fetch daily challenge for slash command: %s', error)
+            logger.exception('Failed to fetch daily challenge for slash command')
             await interaction.response.send_message(
                 'Unable to fetch the daily challenge right now. Please try again shortly.',
                 ephemeral=True
@@ -55,7 +55,7 @@ class Daily(commands.Cog):
             embed = await seed_embed(seed, emojis=self.bot.emojis,
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         except (aiohttp.ClientError, ValueError, KeyError, TypeError, RuntimeError) as error:  # noqa: BLE001
-            logger.error('Failed daily announcement preparation: %s', error)
+            logger.exception('Failed daily announcement preparation')
             return
         try:
             daily_announcer_channels = await self.config_service.get_all_guilds_with_parameter('DailyAnnouncerChannel')
@@ -88,7 +88,7 @@ class Daily(commands.Cog):
                         logger.warning('Missing permissions to send daily to channel %s in guild %s', channel_id, guild.id)
                         continue
                     except discord.HTTPException as error:  # noqa: BLE001
-                        logger.error('Error sending daily to channel %s in guild %s: %s', channel_id, guild.id, error)
+                        logger.exception('Error sending daily to channel %s in guild %s', channel_id, guild.id)
                         continue
 
                     thread_name = _daily_thread_name(seed)

@@ -89,7 +89,7 @@ class AsyncTournamentView(discord.ui.View):
         # get the pools that have not been played twice
         available_pools = [a for a in async_tournament.permalink_pools if a not in played_pool_counts or played_pool_counts[a] < async_tournament.runs_per_pool]
 
-        if available_pools is None or len(available_pools) == 0:
+        if not available_pools:
             await interaction.response.send_message("You have already played all available pools for this tournament.",
                                                     ephemeral=True)
             return
