@@ -1,7 +1,7 @@
 import asyncio
 import json
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 from itertools import groupby
 
 import discord.utils
@@ -233,17 +233,17 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.tournament.on_race_pending()
 
     async def status_open(self):
-        pass
+        pass  # no-op: default status hook, overridden by subclasses
 
     async def status_invitational(self):
-        pass
+        pass  # no-op: default status hook, overridden by subclasses
 
     async def status_finished(self):
         if self.konot:
             await self.konot.create_next_room()
 
     async def race_data_hook(self):
-        pass
+        pass  # no-op: default hook, overridden by subclasses that need race data
 
     async def intro(self):
         """
@@ -359,7 +359,7 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.send_message("You do not have permission to override the stream requirement for this category.  Please contact a category owner if you need this to be changed.")
             return
 
-        if whitelisted_user.expires is not None and whitelisted_user.expires < datetime.utcnow():
+        if whitelisted_user.expires is not None and whitelisted_user.expires < datetime.now(timezone.utc).replace(tzinfo=None):
             await self.send_message("Your streaming exemption has expired.  Please contact a category owner if you need this to be renewed.")
             return
 

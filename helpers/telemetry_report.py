@@ -7,7 +7,7 @@ Generates usage reports from telemetry data for operators.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any
 
 from alttprbot import models
@@ -27,7 +27,7 @@ async def get_daily_feature_usage(days: int = 7) -> List[Dict[str, Any]]:
     
     Returns aggregated counts by day, surface, feature, and action.
     """
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
     
     results = await models.TelemetryEvent.filter(
         created_at__gte=cutoff_date
@@ -42,7 +42,7 @@ async def get_success_failure_rates(days: int = 7) -> List[Dict[str, Any]]:
     """
     Get success vs failure rates by feature and provider.
     """
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
     
     results = await models.TelemetryEvent.filter(
         created_at__gte=cutoff_date,
@@ -60,7 +60,7 @@ async def get_active_guild_count(days: int = 7) -> int:
     
     Note: This is an approximation due to hashing.
     """
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
     
     guilds = await models.TelemetryEvent.filter(
         created_at__gte=cutoff_date,
@@ -72,7 +72,7 @@ async def get_active_guild_count(days: int = 7) -> int:
 
 async def get_top_features(days: int = 7, limit: int = 10) -> List[Dict[str, Any]]:
     """Get the most-used features."""
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
     
     results = await models.TelemetryEvent.filter(
         created_at__gte=cutoff_date
@@ -90,7 +90,7 @@ async def print_report(days: int = 7):
     logger.info("=" * 80)
     
     # Total events
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
     total_events = await models.TelemetryEvent.filter(
         created_at__gte=cutoff_date
     ).count()
@@ -187,7 +187,7 @@ async def main():
         await print_report(days=days)
         
     except Exception as e:
-        logger.error(f"Report generation failed: {e}", exc_info=True)
+        logger.exception(f"Report generation failed: {e}")
         raise
     finally:
         await Tortoise.close_connections()

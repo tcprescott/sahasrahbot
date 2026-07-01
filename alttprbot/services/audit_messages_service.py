@@ -16,7 +16,7 @@ class AuditMessagesService:
         self.repository = AuditMessagesRepository()
 
     async def clean_old_messages(self, days: int = 30) -> int:
-        cutoff = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+        cutoff = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None) - datetime.timedelta(days=days)
         return await self.repository.delete_older_than(cutoff)
 
     async def list_user_history(self, guild_id: int, user_id: int, limit: int) -> List[Dict[str, Any]]:

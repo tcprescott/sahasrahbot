@@ -12,7 +12,7 @@ import asyncio
 import hashlib
 import logging
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Optional, Protocol
 from collections import deque
 
@@ -52,8 +52,8 @@ class TelemetryEvent:
     sample_rate: float = 1.0
     
     # Computed fields (not in constructor)
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    day_bucket: date = field(default_factory=lambda: datetime.utcnow().date())
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    day_bucket: date = field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None).date())
     guild_hash: Optional[str] = field(default=None, init=False)
     
     def __post_init__(self):
@@ -194,7 +194,7 @@ class DatabaseTelemetryService:
                 
             except Exception as e:
                 # Fail-open: log error but don't crash
-                logger.error(f"Failed to flush telemetry events: {e}", exc_info=True)
+                logger.exception(f"Failed to flush telemetry events: {e}")
 
 
 # Global telemetry service instance
