@@ -12,18 +12,18 @@ ARCHITECTURE: SahasrahBot is a strict three-tier app inside a single alttprbot/ 
 EOF
 
 for tier_dir in "$REPO/alttprbot/services" "$REPO/alttprbot/repositories"; do
-  [ -d "$tier_dir" ] || continue
+  [[ -d "$tier_dir" ]] || continue
   while IFS= read -r src; do
     init_file="$(dirname "$src")/__init__.py"
     stem="$(basename "$src" .py)"
-    if [ -f "$init_file" ] && ! grep -q "$stem" "$init_file" 2>/dev/null; then
+    if [[ -f "$init_file" ]] && ! grep -q "$stem" "$init_file" 2>/dev/null; then
       echo "EXPORT GAP: $src — not exported from $(dirname "$src")/__init__.py"
     fi
   done < <(find "$tier_dir" -type f \( -name '*_service.py' -o -name '*_repository.py' \) 2>/dev/null)
 done
 
 PRES="$REPO/alttprbot/presentation"
-if [ -d "$PRES" ]; then
+if [[ -d "$PRES" ]]; then
   COUNT=$(grep -rEl '^[[:space:]]*(from[[:space:]]+alttprbot[[:space:]]+import[[:space:]]+.*\bmodels\b|from[[:space:]]+alttprbot\.models|import[[:space:]]+alttprbot\.models)' "$PRES" 2>/dev/null | wc -l | tr -d ' ')
   echo "BURN-DOWN: $COUNT presentation file(s) still import alttprbot.models directly (target: 0)."
 fi
