@@ -8,7 +8,7 @@ Should be run as a scheduled task (e.g., daily cron job).
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 try:
     import config
@@ -32,7 +32,7 @@ async def purge_old_telemetry_events(retention_days: int = TELEMETRY_RETENTION_D
     
     Returns the number of events deleted.
     """
-    cutoff_date = datetime.utcnow() - timedelta(days=retention_days)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=retention_days)
     
     logger.info(f"Purging telemetry events older than {cutoff_date} ({retention_days} days)")
     
@@ -95,7 +95,7 @@ async def main():
         logger.info("\nPurge complete!")
         
     except Exception as e:
-        logger.error(f"Purge failed: {e}", exc_info=True)
+        logger.exception(f"Purge failed: {e}")
         raise
     finally:
         await Tortoise.close_connections()

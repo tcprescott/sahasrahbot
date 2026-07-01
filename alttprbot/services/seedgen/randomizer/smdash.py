@@ -10,7 +10,7 @@ async def create_smdash(mode="classic_mm", spoiler=False):
         route = f'https://www.dashrando.net/generate/{mode}?race=1'
         if spoiler:
             route += '&spoiler=1'
-        async with session.get(route, ssl=ssl.SSLContext(protocol=ssl.PROTOCOL_TLSv1_2),
+        async with session.get(route, ssl=ssl.create_default_context(),
                                allow_redirects=False) as resp:
             msg = await resp.text()
             if resp.status == 307:
@@ -25,12 +25,12 @@ async def get_smdash_presets():
     try:
         async with aiohttp.ClientSession() as session:
             route = f'https://www.dashrando.net/api/presets'
-            async with session.get(route, ssl=ssl.SSLContext(protocol=ssl.PROTOCOL_TLSv1_2),
+            async with session.get(route, ssl=ssl.create_default_context(),
                                 allow_redirects=False) as resp:
                 obj = await resp.json()
                 presets = []
                 for p in obj['data']:
                     presets.append(p['tags'][0])
                 return presets
-    except:
+    except Exception:
         return ['classic', 'recall', '2017_mm', 'chozo_bozo', 'sgl23', 'surprise_surprise']

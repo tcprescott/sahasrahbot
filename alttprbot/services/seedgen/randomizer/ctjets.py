@@ -1,3 +1,6 @@
+import asyncio
+from pathlib import Path
+
 import aiohttp
 from bs4 import BeautifulSoup
 
@@ -20,8 +23,8 @@ async def roll_ctjets(settings: dict, version: str = '3_1_0'):
         for key, val in settings.items():
             formdata.add_field(key, val)
 
-        with open('/opt/data/chronotrigger.sfc', 'rb') as rom:
-            formdata.add_field('rom_file', rom.read(), filename=None)
+        rom_bytes = await asyncio.to_thread(Path('/opt/data/chronotrigger.sfc').read_bytes)
+        formdata.add_field('rom_file', rom_bytes, filename=None)
 
         headers = {
             'Referer': f'https://ctjot.com/{version}/options/',

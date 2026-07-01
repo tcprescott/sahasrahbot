@@ -178,25 +178,25 @@ class TournamentOrchestrator:
 
     # --- business hooks (overridden per event; no-op base) ---
     async def roll(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def create_embeds(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def send_room_welcome(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def on_room_creation(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def on_room_resume(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def on_race_start(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def on_race_pending(self):
-        pass
+        pass  # no-op base hook; overridden per tournament
 
     async def process_race(self, args, message) -> bool:
         """Handle the ``!tournamentrace`` seed-roll for this room.
