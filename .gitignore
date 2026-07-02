@@ -1,16 +1,11 @@
 .env
 /env/
 /deploy.sh
-/pyz3r
 __pycache__
 data/*.cookie
 data/*.sfc
-presets/bot_testing.yaml
-public/spoilers
 test_input/
-presets/alttprmystery/bot_testing.yaml
 .venv/
-settings.py
 .vscode/
 .idea/
 utils/enemizer/osx*
@@ -24,3 +19,4 @@ config.backup.py
 .coverage.*
 htmlcov/
 .pytest_cache/
+.claude/settings.local.json

@@ -1,6 +1,6 @@
 # SahasrahBot Documentation — Master Index
 
-> Last updated: 2026-02-13
+> Last updated: 2026-07-01
 
 ## Context (AI Agent Reference)
 
@@ -37,6 +37,8 @@ Architectural analysis and domain documentation:
 | [Seed Provider Reliability Contract](design/seed_provider_reliability_contract.md) | Concrete cross-provider contract for timeouts, retries, normalized errors, audit parity, and migration phases |
 | [Discord OAuth Behavior Contract](design/discord_oauth_behavior_contract.md) | Phase 0 behavior parity matrix for Discord OAuth migration from Quart-Discord to Authlib with security/error handling requirements |
 | [Web Frontend SPA Redesign](design/web_frontend_spa_redesign.md) | Architecture and API contract for clean-break React SPA replacement of Jinja2/Chameleon server-rendered frontend |
+| [SPA Remaining Pages Handoff](design/spa_remaining_pages.md) | Agent handoff notes for the remaining SPA page builds (most sections since shipped) |
+| [Tournament Schedule Models Sketch](design/tournament_schedule_models_sketch.md) | Unimplemented ORM design sketch for self-service tournament scheduling (relocated from `alttprbot/notes.txt`) |
 
 ## Guides
 
@@ -48,13 +50,13 @@ Documentation standards and authoring references:
 | [Component Interrogation Agent Mode](guides/component_interrogation_agent_mode.md) | Reusable Copilot Agent workflow for component-level interrogation and intent capture |
 | [Component Interrogation Checklist](guides/component_interrogation_checklist.md) | Execution checklist for policy/permission/workflow interrogation sessions |
 | [Async Tournament Interrogation Runbook](guides/component_interrogation_runbook_async_tournament.md) | Example runbook showing interrogation workflow against the async tournament module |
-| [Tournament Module (Non-Async) Runbook](guides/tournament_module_runbook.md) | Operator/developer runbook for non-async tournament lifecycle, troubleshooting, and safe change workflow |
 | [Provider Contract Phase 1 Rollback Guide](guides/provider_contract_phase1_rollback.md) | Validation and rollback procedures for Phase 1 seed provider reliability contract implementation |
 | **[Telemetry Policy & Operator Runbook](guides/telemetry_policy_runbook.md)** | **Privacy policy, configuration, operations, and reporting for anonymous telemetry system (added 2026-02-12)** |
 | [Discord Role Assignment Deprecation Runbook](guides/discord_role_assignment_deprecation_runbook.md) | Operator runbook for Phase A/B role-assignment deprecation: feature flags, rollback procedures, and compatibility validation |
 | [Compatibility Evidence Packet Template](guides/compatibility_evidence_packet_template.md) | Standardized format for capturing compatibility workflow validation evidence per the compatibility gate validation runbook |
 | [Feature Flag Inventory](guides/feature_flag_inventory.md) | Active tracking of dual-path migration feature flags with owners and sunset dates |
 | [Config Constants Inventory](guides/config_constants_inventory.md) | Import-backed inventory of root `config.py` constants expected by runtime surfaces, including static usage map and dynamic RaceTime key pattern |
+| [Tournament Registry Config Guide](guides/tournament_registry_config_guide.md) | Operator guide for the YAML-backed seasonal tournament registry (`TOURNAMENT_CONFIG_ENABLED`; slated for retirement by the Self-Service Tournament System) |
 
 ## Plans
 
@@ -77,6 +79,16 @@ Execution plans and implementation checklists:
 | [Modernization Execution Tracker](plans/modernization_execution_tracker.md) | Live program status across WS1–WS5 workstreams with gate milestones, owners, phase progress, and 30/60/90-day targets |
 | [RaceTime Bot Official Migration Plan](plans/racetime_bot_official_migration_plan.md) | Implementation-ready migration sequence to replace forked `racetime-bot` with official upstream while preserving 1:1 RaceTime, tournament, API, and recovery behavior |
 | [RaceTime Migration Phase 0 Parity Checklist](plans/racetime_migration_phase0_parity_checklist.md) | Baseline pre-cutover checklist and evidence template for proving post-migration behavior parity |
+| [GuildConfigService Migration Notes](plans/guild_config_service_migration_notes.md) | Notes from the `GuildConfigService` pilot migration (`daily.py`) and follow-on cog migrations |
+
+## Audit Reports
+
+Point-in-time code audits (historical records; individual items may since be resolved):
+
+| File | Description |
+|------|-------------|
+| [Security Audit 2026-06](audit/security-audit-2026-06.md) | Repository-wide security audit findings and remediation status |
+| [Magic Numbers Issues](audit/magic-numbers-issues.md) | Inventory of undocumented magic numbers/constants with proposed cleanup issues |
 
 ## User Guide
 

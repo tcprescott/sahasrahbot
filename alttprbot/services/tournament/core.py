@@ -65,7 +65,8 @@ class TournamentOrchestrator:
         self._player_resolver = player_resolver
         self._gatekeep_checker = gatekeep_checker
         # adapter-supplied async-tournament authz check (DB + discord guild role); only the
-        # alttpr_quals orchestrator uses it (wraps presentation/api/util/checks).
+        # alttpr_quals orchestrator uses it (wired to the coordinator's _check_async_authz,
+        # which delegates to AuthorizationService.is_async_tournament_user).
         self._async_authz_checker = async_authz_checker
 
         # runtime state

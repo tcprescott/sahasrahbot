@@ -222,8 +222,8 @@ it does not violate them until its decomposition relocates it into `services/tou
     `ReactionRoleRepository` + `ReactionRoleService`; the reaction-role cog calls the service. The
     untiered `alttprbot/database/` package no longer exists.
   - **10c — enforcement flipped.** import-linter is **blocking in CI** (the `continue-on-error` was
-    removed; contracts are 3 kept / 0 broken). The Claude Code architecture hooks flip to blocking via
-    `SAHASRAHBOT_HOOKS_ENFORCE=1` in `.claude/settings.json` — **the one remaining manual step** (writing
-    agent-loaded config is gated for owner review).
+    removed; contracts are 5 kept / 0 broken). The Claude Code architecture hooks are now **blocking**
+    too: the tracked `.claude/settings.json` sets `SAHASRAHBOT_HOOKS_ENFORCE=1` (done 2026-07;
+    per-developer overrides moved to the untracked `.claude/settings.local.json`).
   - **Residual:** the migrated active tournament handlers are static-parity-clean but not yet
     live-validated — smoke-test in DEBUG before deploy.

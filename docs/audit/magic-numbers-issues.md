@@ -161,7 +161,7 @@ The value `2147483647` appears in multiple files and should be a shared constant
 
 Two utility functions contain complex logic with zero documentation:
 
-1. **`alttprbot/util/rom.py:1-7`** — SNES LoROM address conversion:
+1. ~~**`alttprbot/util/rom.py:1-7`** — SNES LoROM address conversion~~ *(resolved 2026-07: `rom.py` had no production callers and was deleted in the structure cleanup)*:
    ```python
    def snes_to_pc_lorom(snes_address):
        return (snes_address & 0x7F0000) >> 1 | (snes_address & 0x7FFF)
@@ -176,8 +176,8 @@ Two utility functions contain complex logic with zero documentation:
 
 ### Action items
 
-- [ ] Add docstrings to ROM conversion functions explaining the LoROM memory model
-- [ ] Name the magic bit masks as constants (e.g., `LOROM_BANK_MASK = 0x7F0000`)
+- [x] ~~Add docstrings to ROM conversion functions explaining the LoROM memory model~~ (mooted — module deleted)
+- [x] ~~Name the magic bit masks as constants (e.g., `LOROM_BANK_MASK = 0x7F0000`)~~ (mooted — module deleted)
 - [ ] Document the URL regex with inline comments or use `re.VERBOSE` mode
 - [ ] Rename `re_equ` to `URL_PATTERN` or similar
 - [ ] Consider replacing the regex with a URL parsing library

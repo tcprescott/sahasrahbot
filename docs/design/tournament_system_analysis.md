@@ -2,8 +2,13 @@
 
 > Last updated: 2026-02-12
 > Scope: Tournament architecture, handlers, SpeedGaming integration, orchestration, and operational flow
+> Note (2026-07-01): historical pre-migration snapshot. The `TournamentRace`/`ALTTPRTournamentRace`
+> template-method hierarchy described below was decomposed (three-tier migration, Phase 7) into
+> orchestrators in `alttprbot/services/tournament/` driven by
+> `alttprbot/presentation/discord/tournament/` — see
+> [architecture-layers.md](../architecture-layers.md).
 
-This document describes current tournament subsystem behavior based on repository code analysis.
+This document described the then-current tournament subsystem behavior based on repository code analysis.
 
 ---
 

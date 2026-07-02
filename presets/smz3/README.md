@@ -1,1 +1,0 @@
-https://samus.link/api/randomizers/smz3

@@ -4,7 +4,7 @@ REPO="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 
 cat <<'EOF'
 ARCHITECTURE: SahasrahBot is a strict three-tier app inside a single alttprbot/ package.
-  alttprbot/presentation/{discord,audit,racetime,api}  ->  alttprbot/services/  ->  alttprbot/repositories/  ->  alttprbot/models/
+  alttprbot/presentation/{discord,audit,racetime,api,web}  ->  alttprbot/services/  ->  alttprbot/repositories/  ->  alttprbot/models/
   - Presentation: thin; calls services, renders results, catches errors. No business logic; no ORM access.
   - Service: business rules/validation/authz/audit/notify. Raises ValueError/PermissionError. No discord/racetime_bot/quart/presentation imports.
   - Repository: pure Tortoise CRUD; returns models. No business logic/notify.

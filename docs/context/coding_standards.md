@@ -1,6 +1,6 @@
 # Coding Standards
 
-> Last updated: 2026-02-12
+> Last updated: 2026-07-01
 > Derived from existing codebase patterns (not prescriptive — descriptive of current state).
 
 ## Python Version
@@ -19,30 +19,26 @@
 ## Project Structure
 
 ```
-sahasrahbot.py          # Entry point — starts all 4 subsystems
-config.py               # Global configuration (module-level constants)
-alttprbot/              # Core library (shared across subsystems)
-  alttprgen/            # Randomizer generation
-  database/             # Legacy raw SQL database modules
-  models/               # Tortoise ORM models
-  tournament/           # Tournament handler classes
-  util/                 # Shared utilities
-alttprbot_discord/      # Main Discord bot
-  cogs/                 # Discord command groups
-  util/                 # Discord-specific utilities
-alttprbot_audit/        # Audit Discord bot
-  cogs/                 # Audit/moderation cogs
-alttprbot_racetime/     # RaceTime.gg bot
-  handlers/             # Per-category race handlers
-  misc/                 # Misc racetime utilities (KONOT)
-alttprbot_api/          # Quart web API
-  blueprints/           # Route groups
-  templates/            # Jinja2 templates
-  static/               # Static assets
-  util/                 # API utilities
-presets/                # YAML preset files
-migrations/             # Aerich database migrations
+sahasrahbot.py              # Entry point — starts all 4 subsystems
+config.py                   # Runtime config (pydantic-settings, env-backed)
+alttprbot/                  # Single package — top-level directories ARE the tiers
+  presentation/             # Tier 1 — thin adapters
+    discord/                #   Main Discord bot (bot.py, cogs/, util/)
+    audit/                  #   Audit Discord bot (separate token)
+    racetime/               #   RaceTime.gg bot (handlers/, misc/)
+    api/                    #   REST API — no session/OAuth (blueprints/)
+    web/                    #   Web BFF — Quart app, OAuth, SPA (blueprints/, spa/)
+  services/                 # Tier 2 — business logic (seedgen/, tournament/, _notify/, *_service.py)
+  repositories/             # Tier 3 — pure Tortoise CRUD (returns models)
+  models/                   # Tier 4 — Tortoise ORM models
+  util/                     # Shared utilities
+presets/                    # YAML preset files
+migrations/                 # Aerich database migrations
+tests/                      # pytest + pytest-asyncio (unit/, integration/)
 ```
+
+Import boundaries between the tiers are enforced by import-linter (`poetry run lint-imports`);
+see [docs/architecture-layers.md](../architecture-layers.md).
 
 ## Naming Conventions
 
@@ -101,11 +97,10 @@ record.field = value
 await record.save()
 ```
 
-### Legacy Raw SQL Helper
-```python
-# Legacy helper `alttprbot/util/orm.py` has been removed.
-# Use model operations for all application data access.
-```
+### Repository Pattern
+All application data access goes through repository classes in `alttprbot/repositories/`
+(pure Tortoise CRUD, returning models). The legacy raw SQL helpers (`alttprbot/util/orm.py`,
+`alttprbot/database/`) have been removed.
 
 ## Error Handling
 
@@ -118,7 +113,7 @@ await record.save()
 
 - Configuration is provided through `config.py` backed by `pydantic-settings`, exported as module-level constants consumed across the codebase.
 - Runtime values come from environment variables (and optional `.env`) via the shared `Settings` model in root `config.py`.
-- Per-guild config stored in database via `guild.config_get()`/`guild.config_set()`
+- Per-guild config stored in database via `GuildConfigService` (`alttprbot/services/guild_config_service.py`)
 - Config values cached with `aiocache`
 - `APP_SECRET_KEY` currently permits empty default in config model.
 
@@ -133,12 +128,12 @@ await record.save()
 - Why should insecure OAuth transport be globally enabled rather than debug-only?
 - Why is an empty app secret considered acceptable for any non-test runtime?
 - Why is startup supervision intentionally best-effort rather than fail-fast?
-- Why is config access still split across raw SQL helpers and ORM-backed guild monkey-patching?
 - Why are seasonal enable/disable toggles maintained as commented registry entries instead of explicit configuration?
 
 ## Testing
 
-- No formal test suite observed in the codebase
+- `pytest` + `pytest-asyncio` suite under `tests/` (`unit/`, `integration/`); run with `poetry run pytest`
+- Tests run in CI on every push/PR (`.github/workflows/lint.yml`)
 - Debug mode (`config.DEBUG`) enables:
   - Test guild for slash command syncing
   - Test tournament handler
@@ -150,4 +145,5 @@ await record.save()
 
 - `pycodestyle` and `pylint` available as dev dependencies
 - `autopep8` for auto-formatting
-- No enforced CI/CD lint step observed
+- Import boundaries enforced in CI: `poetry run lint-imports` is a blocking step in
+  `.github/workflows/lint.yml` (also wired into pre-commit)

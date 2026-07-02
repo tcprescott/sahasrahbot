@@ -2,7 +2,7 @@ name: lint
 
 on:
   push:
-    branches: [master, three-tier-migration]
+    branches: [master]
   pull_request:
 
 jobs:
@@ -17,9 +17,8 @@ jobs:
         run: pipx install poetry
       - name: Install dependencies
         run: poetry install --with dev
-      # Architecture boundaries (import-linter). Blocking as of the final migration
-      # phase: the three-tier contracts are green (3 kept / 0 broken), so any new
-      # boundary violation now fails the build.
+      # Architecture boundaries (import-linter). Blocking: all contracts are green,
+      # so any new boundary violation fails the build.
       - name: Check import boundaries
         run: poetry run lint-imports
       - name: Run tests

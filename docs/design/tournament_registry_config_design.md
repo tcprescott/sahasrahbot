@@ -192,4 +192,3 @@ Expected files when implementation begins:
 - `alttprbot/tournament/registry_loader.py` (new)
 - `alttprbot_discord/cogs/tournament.py`
 - `config/tournaments.yaml` (new)
-- `docs/guides/tournament_module_runbook.md` (update operational procedure)

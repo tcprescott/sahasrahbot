@@ -1,6 +1,6 @@
 # System Patterns
 
-> Last updated: 2026-02-13
+> Last updated: 2026-07-01
 
 ## Architecture Overview
 
@@ -9,9 +9,9 @@ SahasrahBot is a **monolithic async Python application** that runs four subsyste
 ```
 sahasrahbot.py (entry point)
 ├── Tortoise ORM init (MySQL)
-├── alttprbot_discord  → Discord bot (discord.py)
-├── alttprbot_audit    → Audit Discord bot (separate token)
-├── alttprbot_racetime → RaceTime.gg bot (racetime-bot)
+├── alttprbot/presentation/discord  → Discord bot (discord.py)
+├── alttprbot/presentation/audit    → Audit Discord bot (separate token)
+├── alttprbot/presentation/racetime → RaceTime.gg bot (racetime-bot)
 ├── alttprbot/presentation/api → REST API (no session/OAuth)
 └── alttprbot/presentation/web → Web BFF for the SPA (Quart app, Discord OAuth)
 ```
@@ -45,17 +45,21 @@ These intent notes were confirmed directly with the repository author (2026-02-1
 
 | Module | Responsibility |
 |--------|---------------|
-| `alttprbot/` | Core library: randomizer generation, models, database, utilities |
-| `alttprbot_discord/` | Main Discord bot with 17+ cogs |
-| `alttprbot_audit/` | Audit/moderation Discord bot (2 cogs) |
-| `alttprbot_racetime/` | RaceTime.gg integration (12+ game categories) |
+| `alttprbot/services/`, `alttprbot/repositories/`, `alttprbot/models/`, `alttprbot/util/` | Core tiers: business logic, data access, ORM models, shared utilities |
+| `alttprbot/presentation/discord/` | Main Discord bot with 17+ cogs |
+| `alttprbot/presentation/audit/` | Audit/moderation Discord bot (2 cogs) |
+| `alttprbot/presentation/racetime/` | RaceTime.gg integration (12+ game categories) |
 | `alttprbot/presentation/api/` | REST API surface — public/API-key JSON, no session (5 blueprints) |
 | `alttprbot/presentation/web/` | Web BFF — Quart app, Discord OAuth, SPA static serving, session-authenticated JSON for the SPA (6 blueprints) |
 
 ## Design Patterns
 
-### Template Method Pattern (Tournament System)
-The tournament system uses `TournamentRace` as a base class defining the match lifecycle. 20+ concrete subclasses override `configuration()`, `roll()`, and form handling. Intermediate class `ALTTPRTournamentRace` adds ALTTPR-specific seed/DM workflow.
+### Orchestrator + Coordinator Pattern (Tournament System)
+Tournament business logic lives in orchestrator classes under `alttprbot/services/tournament/`,
+registered in `registry.py` (`AVAILABLE_TOURNAMENT_HANDLERS`, slug → `TournamentEntry`). The Discord
+surface drives them through `alttprbot/presentation/discord/tournament/coordinator.py`
+(`TournamentCoordinator`) and `dispatch.py`, with rendering in `presenter.py`. (The former
+`TournamentRace` template-method hierarchy was decomposed in the three-tier migration, Phase 7.)
 
 ### Cog Pattern (Discord Bot)
 Discord functionality is organized into cogs — self-contained modules loaded as extensions. Each cog handles a specific domain (generation, tournaments, roles, etc.).
@@ -65,9 +69,9 @@ Each RaceTime game category has a handler class extending `SahasrahBotCoreHandle
 
 ### RaceTime Compatibility Adapter (Migration In Progress)
 RaceTime integration now includes a compatibility layer to preserve historical SahasrahBot expectations while moving to the official `racetime-bot` package:
-- `alttprbot_racetime/core.py` restores expected bot methods used across app surfaces (`start`, `join_race_room`, `startrace`, `get_team`) and tracks handlers in a task+handler container shape.
-- `alttprbot_racetime/compat.py` provides stable handler lookup (`get_room_handler`) for API/tournament callers.
-- `alttprbot_racetime/handlers/core.py` supports bot-injected context and websocket payload compatibility for `override_stream`.
+- `alttprbot/presentation/racetime/core.py` restores expected bot methods used across app surfaces (`start`, `join_race_room`, `startrace`, `get_team`) and tracks handlers in a task+handler container shape.
+- `alttprbot/presentation/racetime/compat.py` provides stable handler lookup (`get_room_handler`) for API/tournament callers.
+- `alttprbot/presentation/racetime/handlers/core.py` supports bot-injected context and websocket payload compatibility for `override_stream`.
 
 ### Blueprint Pattern (Web API)
 The Quart API uses blueprints to organize routes by feature (presets, tournaments, voting, etc.).
@@ -77,23 +81,25 @@ Randomizer seeds are generated via a preset system. `SahasrahBotPresetCore` load
 
 ### Provider Reliability Contract (Phase 1 Complete)
 Seed providers now support a shared execution contract for consistent reliability:
-- **Shared wrapper** (`alttprbot/alttprgen/provider_wrapper.py`) enforces:
+- **Shared wrapper** (`alttprbot/services/seedgen/provider_wrapper.py`) enforces:
   - 60-second timeout per attempt
   - 3-attempt exponential retry policy (1s, 2s backoff)
   - Structured logging for observability
-- **Normalized exception taxonomy** (`alttprbot/alttprgen/provider_exceptions.py`):
+- **Normalized exception taxonomy** (`alttprbot/services/seedgen/provider_exceptions.py`):
   - `SeedProviderTimeoutError` - timeout exceeded
   - `SeedProviderUnavailableError` - network/5xx errors
   - `SeedProviderRateLimitError` - HTTP 429 responses
   - `SeedProviderInvalidRequestError` - 4xx validation errors
   - `SeedProviderResponseFormatError` - parsing failures
-- **Canonical response object** (`alttprbot/alttprgen/provider_response.py`) standardizes provider outputs with metadata for audit
-- **Provider adapters** (`alttprbot/alttprgen/provider_adapters.py`) wrap legacy helper providers to use the shared contract
+- **Canonical response object** (`alttprbot/services/seedgen/provider_response.py`) standardizes provider outputs with metadata for audit
+- **Provider adapters** (`alttprbot/services/seedgen/provider_adapters.py`) wrap legacy helper providers to use the shared contract
   - SMDashProvider adapter implemented as Phase 1 validation
   - Legacy compatibility wrappers maintain backward compatibility during rollout
 
-### Guild Config Monkey-Patching
-`discord.Guild` is monkey-patched with `config_get/set/delete/list` methods backed by database + `aiocache` in-memory caching.
+### Guild Config Service
+Per-guild config is read/written through `GuildConfigService`
+(`alttprbot/services/guild_config_service.py`), backed by the guild-config repository with
+`aiocache` in-memory caching. (The former `discord.Guild` monkey-patch was removed in Phase 10.)
 
 ### Seasonal Registry Toggles
 Seasonal enable/disable currently relies on code-level registry edits (including commented entries) in tournament and RaceTime category registries.
@@ -128,7 +134,7 @@ Admin Creates Tournament → Seeds Added to Pools → Players Start Runs via Dis
 
 - **ORM**: Tortoise ORM with MySQL backend
 - **Migrations**: Aerich (97 migrations, 2021–2024)
-- **Access Pattern**: Application data access modules now use Tortoise model operations (legacy raw SQL helper usage removed from `alttprbot/database/`)
+- **Access Pattern**: Data access goes through repository classes (`alttprbot/repositories/`) using Tortoise model operations (the legacy `alttprbot/database/` package was removed)
 - **Caching**: `aiocache.SimpleMemoryCache` for guild config and various lookups
 
 ## External Integrations
