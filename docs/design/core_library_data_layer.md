@@ -236,7 +236,10 @@ A large subsystem for asynchronous tournaments:
 
 ### Schedule System (`models/schedule.py`)
 
-A full event scheduling system:
+A full event scheduling system. **Dormant (2026-07):** these models have live DB
+tables (migrations 84-94) but no current service/repository/presentation
+consumers — retained pending a decision on the scheduling feature, not part of
+any active runtime flow.
 
 | Model | Purpose |
 |---|---|

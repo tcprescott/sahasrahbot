@@ -128,10 +128,10 @@ Two complementary layers:
   `poetry run lint-imports`. **Blocking** as of the final migration phase (the CI
   `continue-on-error` was removed): all five contracts are green, so any new
   boundary violation fails the build.
-- **Claude Code hooks** (`.claude/scripts/`, wired by `.claude/settings.local.json`) —
+- **Claude Code hooks** (`.claude/scripts/`, wired by the tracked `.claude/settings.json`) —
   give edit-time feedback during agent sessions: `enforce_architecture.py`
   (PreToolUse), `enforce_no_orm_writes.py` + `check_layer_exports.py` (PostToolUse).
-  Still **notification-only** (`_hooklib.py` exits 0 when `SAHASRAHBOT_HOOKS_ENFORCE` is
-  unset). Flipping them to blocking is the one **pending owner step**: set
-  `SAHASRAHBOT_HOOKS_ENFORCE=1` (e.g. an `env` block in `.claude/settings.json`). The
-  durable enforcement — import-linter gating CI — is already blocking.
+  Now **blocking**: `.claude/settings.json` sets `SAHASRAHBOT_HOOKS_ENFORCE=1` in its `env`
+  block, so `_hooklib.py` exits 2 on a violation. (Per-developer overrides live in the
+  untracked `.claude/settings.local.json`.) The durable enforcement — import-linter gating
+  CI — is also blocking.

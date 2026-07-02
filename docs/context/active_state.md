@@ -25,6 +25,18 @@
 
 ## Recent Completions
 
+- **Structure cleanup follow-up — owner-decided items (2026-07-01).** Resolved the six items the
+  first pass flagged for the owner: (1) `alttprbot/models/schedule.py` (11 `Schedule*` models with
+  live tables, zero consumers) marked **dormant** via module docstring + doc note — models/tables
+  kept; (2) `presets/alttpr/enemizer_chaos.yml` renamed to `.yaml` (the loader only reads `.yaml`),
+  **activating** it as a user-facing preset, with a `docs/user-guide/presets.md` row added;
+  (3) `helpers/fix_alttprqual_data.py` (completed one-off) deleted and the config-constants inventory
+  regenerated; (4) Claude Code architecture hooks flipped to **blocking** — new tracked
+  `.claude/settings.json` carries the hooks + `SAHASRAHBOT_HOOKS_ENFORCE=1`, personal overrides moved
+  to the now-untracked/gitignored `.claude/settings.local.json`; (5) dead `bot_testing` `.gitignore`
+  rules and the broken `presets.md` link to the missing `alttprmystery/bot_testing.yaml` removed;
+  (6) the stale `docs/guides/tournament_module_runbook.md` deleted (MASTER_INDEX + design-doc pointer
+  cleaned). 469 tests green, import-linter 5 kept / 0 broken.
 - **Repository structure cleanup (2026-07-01).** Removed post-migration leftovers and fixed stale
   tooling/config references. Deleted: `aerich.ini` (duplicated `[tool.aerich]` in pyproject),
   `.vsls.json`, `config.py.example` (replaced by a plain `.env.example`), completed one-off helpers
@@ -124,7 +136,8 @@
   entirely. Enforcement: import-linter is now **blocking in CI** (`continue-on-error` removed; 3 kept /
   0 broken). **One owner step remains:** setting `SAHASRAHBOT_HOOKS_ENFORCE=1` in `.claude/settings.json`
   to make the Claude Code architecture hooks blocking — the agent's auto-write to agent-loaded config was
-  gated for review. 462 tests green throughout, all surfaces import cleanly. **This completes the strict
+  gated for review. _[Update 2026-07-01: done — the tracked `.claude/settings.json` now sets the flag; see
+  the cleanup follow-up entry above.]_ 462 tests green throughout, all surfaces import cleanly. **This completes the strict
   three-tier migration:** `alttprbot/presentation → services → repositories → models`, no legacy
   `database/` package, no `tournament/` god-object, contracts enforced.
 - **`alttprbot/tournament/` package retired (three-tier migration).** The untiered tournament god-object

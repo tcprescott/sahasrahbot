@@ -1,27 +1,7 @@
 {
-  "permissions": {
-    "allow": [
-      "mcp__chrome-devtools__take_screenshot",
-      "mcp__chrome-devtools__navigate_page",
-      "mcp__chrome-devtools__list_console_messages",
-      "mcp__chrome-devtools__click",
-      "mcp__chrome-devtools__evaluate_script",
-      "mcp__chrome-devtools__resize_page",
-      "Bash(kill %1)",
-      "Bash(pkill -f \"http.server 8777\")",
-      "Bash(npm -v)",
-      "Bash(echo \"npm: $\\(npm -v 2>/dev/null || echo MISSING\\)\")",
-      "Bash(pnpm -v)",
-      "Bash(echo \"pnpm: $\\(pnpm -v 2>/dev/null || echo MISSING\\)\")",
-      "Bash(yarn -v)",
-      "Bash(docker compose exec -T racetime.web python manage.py shell -c ' *)",
-      "Bash(poetry run *)"
-    ]
+  "env": {
+    "SAHASRAHBOT_HOOKS_ENFORCE": "1"
   },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "sentry"
-  ],
   "hooks": {
     "PreToolUse": [
       {

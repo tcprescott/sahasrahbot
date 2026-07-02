@@ -1,3 +1,13 @@
+"""Dormant scheduling models.
+
+The ``Schedule*`` models below were shipped and have live database tables
+(created by migrations 84-94 and never dropped), but no service, repository, or
+presentation code currently uses them. They are retained as-is pending a
+decision on the scheduling feature; do not assume they are wired into any
+runtime flow. (Distinct from the never-built ``TournamentSchedule*`` design
+sketch in ``docs/design/tournament_schedule_models_sketch.md``.)
+"""
+
 from tortoise import fields
 from tortoise.models import Model
 

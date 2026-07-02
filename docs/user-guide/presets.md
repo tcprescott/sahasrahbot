@@ -49,6 +49,7 @@ Notes:
 | [enemizer](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [enemizer_assured](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_assured.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [enemizer_bossesonly](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_bossesonly.yaml) |Some good ol' boss shuffle.|   |
+| [enemizer_chaos](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/enemizer_chaos.yaml) |Some good ol' enemy and boss shuffle.|   |
 | [expert](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/expert.yaml) |Expert item pool.|   |
 | [fadkeys](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower.| *Customizer*  |
 | [fadkeys_gt](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttpr/fadkeys_gt.yaml) |AD Keys, but the Castle Tower Keys are in Castle Tower and GT Big Key is in GT.| *Customizer*  |
@@ -140,7 +141,6 @@ Notes:
 | [aqttp](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/aqttp.yaml) |A Quebecois to the Past S2|   |
 | [bigjon](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/bigjon.yaml) |BigJon's favorite|   |
 | [boots](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/boots.yaml) |A boots weightset.  Designed for those who like boots.| *Customizer*  |
-| [bot_testing](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/bot_testing.yaml) |A door randomizer weightset|   |
 | [chaos](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/chaos.yaml) |Chaos... (please do not post in the bug reports channel if this breaks horribly, also not compatible with multiworld)| *Customizer*  |
 | [daily](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/daily.yaml) |Uses the weights currently in use for generating the daily games.|   |
 | [doors](https://github.com/tcprescott/sahasrahbot/blob/master/presets/alttprmystery/doors.yaml) |A door randomizer weightset|   |

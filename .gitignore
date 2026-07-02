@@ -4,9 +4,7 @@
 __pycache__
 data/*.cookie
 data/*.sfc
-presets/bot_testing.yaml
 test_input/
-presets/alttprmystery/bot_testing.yaml
 .venv/
 .vscode/
 .idea/
@@ -21,3 +19,4 @@ config.backup.py
 .coverage.*
 htmlcov/
 .pytest_cache/
+.claude/settings.local.json

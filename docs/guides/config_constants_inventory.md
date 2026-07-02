@@ -7,7 +7,7 @@
 This document captures constants expected from root `config.py`, based on import usage across the application.
 
 - Source scan command: `poetry run python helpers/scan_config_constants.py`
-- Scan result summary: 32 files with config constant reads, 34 unique constants
+- Scan result summary: 31 files with config constant reads, 34 unique constants
 - Coverage: static constant attribute usage discovered in application code
 
 ## Expected Constants (Static Reads)
@@ -25,11 +25,11 @@ This document captures constants expected from root `config.py`, based on import
 | `AWS_SPOILER_BUCKET_NAME` | 1 | `alttprbot/services/seedgen/spoilers.py` |
 | `CC_TOURNAMENT_AUDIT_CHANNELS` | 1 | `alttprbot/presentation/discord/cogs/tournament.py` |
 | `CC_TOURNAMENT_SERVERS` | 1 | `alttprbot/presentation/discord/cogs/tournament.py` |
-| `DB_HOST` | 4 | `helpers/dbtest.py`, `helpers/fix_alttprqual_data.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
-| `DB_NAME` | 4 | `helpers/dbtest.py`, `helpers/fix_alttprqual_data.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
-| `DB_PASS` | 4 | `helpers/dbtest.py`, `helpers/fix_alttprqual_data.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
-| `DB_PORT` | 4 | `helpers/dbtest.py`, `helpers/fix_alttprqual_data.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
-| `DB_USER` | 4 | `helpers/dbtest.py`, `helpers/fix_alttprqual_data.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
+| `DB_HOST` | 3 | `helpers/dbtest.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
+| `DB_NAME` | 3 | `helpers/dbtest.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
+| `DB_PASS` | 3 | `helpers/dbtest.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
+| `DB_PORT` | 3 | `helpers/dbtest.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
+| `DB_USER` | 3 | `helpers/dbtest.py`, `migrations/tortoise_config.py`, `sahasrahbot.py` |
 | `DEBUG` | 12 | `alttprbot/presentation/audit/bot.py`, `alttprbot/presentation/discord/bot.py`, `alttprbot/presentation/discord/cogs/asynctournament.py`, `alttprbot/presentation/discord/cogs/inquiry.py`, `alttprbot/presentation/discord/cogs/racer_verification.py`, `alttprbot/presentation/discord/cogs/tournament.py`, `alttprbot/presentation/racetime/config.py`, `alttprbot/presentation/web/web.py`, `alttprbot/services/async_tournament_scoring_service.py`, `alttprbot/services/tournament/registry.py`, `alttprbot/util/speedgaming.py`, `helpers/seed_test_fixtures.py` |
 | `DISCORD_CLIENT_ID` | 1 | `alttprbot/presentation/web/web.py` |
 | `DISCORD_CLIENT_SECRET` | 1 | `alttprbot/presentation/web/web.py` |
