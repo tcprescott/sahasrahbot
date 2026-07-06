@@ -23,6 +23,13 @@ npm run build         # type-check + Vite build → dist/
 npm run preview       # serve the production build locally
 ```
 
+## Interactive testing (Playwright)
+Claude Code can drive this SPA in a real browser via the Playwright MCP server
+(`.mcp.json` at the repo root, pointed at the pre-installed Chromium). Build the SPA,
+serve the web-only backend with `poetry run python helpers/run_web_dev.py`, and browse
+`http://127.0.0.1:5001`. Full workflow, prerequisites, and caveats:
+[`docs/guides/frontend_playwright_testing.md`](../../../../docs/guides/frontend_playwright_testing.md).
+
 Quart serves the built `dist/` via the SPA catch-all route in
 `alttprbot/presentation/api/api.py`; hashed assets land under `/spa-assets/`
 (`assetsDir` in `vite.config.ts`).
