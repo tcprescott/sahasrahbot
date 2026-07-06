@@ -1,8 +1,34 @@
 # Plan: Migrate to Official `racetime-bot`
 
-> Status: Draft  
-> Last updated: 2026-02-12  
-> Scope: Replace custom fork (`tcprescott/racetime-bot@48afdd4691f0f329eebb5dd33b1cbcf42921e980`) with official upstream (`racetimegg/racetime-bot`) while preserving 1:1 runtime behavior.
+> Status: Implemented (offline) — live parity validation pending  
+> Last updated: 2026-07-06  
+> Scope: Replace custom fork (`tcprescott/racetime-bot@48afdd4691f0f329eebb5dd33b1cbcf42921e980`) with official upstream (`racetimegg/racetime-bot` 2.3.0) while preserving 1:1 runtime behavior.
+
+## Implementation Outcome (2026-07-06)
+
+The dependency cutover and code reconciliation are done and verified offline (521 tests, import-linter
+5/0, dependency guard). The presentation-layer paths below predate the three-tier fold-in; the code now
+lives under `alttprbot/presentation/racetime/`, `alttprbot/presentation/api/`, and
+`alttprbot/services/tournament/` + `alttprbot/presentation/discord/tournament/`.
+
+- **Dependency:** `poetry.lock` regenerated so `racetime-bot = "^2.3.0"` resolves to the PyPI wheel
+  (deps `aiohttp/asgiref/requests/websockets`) instead of the fork URL archive; `websockets` resolves to
+  16.0.
+- **Bot core** (`alttprbot/presentation/racetime/core.py`): `create_handler` now builds a
+  `websockets.connect(...)` connection (upstream `RaceHandler` transport) with the `<14`/`≥14`
+  header-kwarg BC branch; shutdown ws-close made API-safe.
+- **Handler** (`alttprbot/presentation/racetime/handlers/core.py`): dropped the fork-only `bot=` kwarg
+  from the `super().__init__` call; re-added `chat_message` (`ex_*`+`ex2_*`, case-preserving), `edit`,
+  and a `handle()` override that keeps concurrent per-message consume.
+- **New helper:** `alttprbot/presentation/racetime/util/arg_parser.py` (ported from the fork's dropped
+  `racetime_bot.utils`).
+- **Unchanged (byte-identical upstream):** `msg_actions`, `monitor_cmd`, `can_monitor`, and the
+  `compat.py` handler-registry shim.
+- **Reconnect model:** now upstream's recreation-based recovery (connection ends → `refresh_races`
+  recreates), rather than the fork's in-place reconnect.
+
+Remaining: live parity validation against racetime.gg (needs per-category OAuth creds) per the
+Phase 0 checklist.
 
 ## 1. Goal
 

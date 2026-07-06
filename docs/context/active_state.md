@@ -25,6 +25,22 @@
 
 ## Recent Completions
 
+- **RaceTime SDK cutover to official upstream `racetime-bot` 2.3.0 (2026-07-06).** Replaced the forked
+  SDK (`tcprescott/racetime-bot@48afdd4`, still pinned as a URL archive in `poetry.lock`) with the
+  official PyPI package. Regenerated the lock (`poetry update racetime-bot` → registry wheel, deps
+  `aiohttp/asgiref/requests/websockets`). The bot core (`presentation/racetime/core.py`) already
+  reimplemented the whole fork-style `Bot`, so the only base-class coupling was `should_handle` /
+  `scan_races_every` (both compatible). Reconciled the handler layer against upstream's contract:
+  switched `create_handler` from an aiohttp websocket to `websockets.connect` (upstream's `RaceHandler`
+  transport, with the `<14`/`≥14` header-kwarg BC branch), stopped forwarding the fork-only `bot=` kwarg
+  into `RaceHandler.__init__`, and made shutdown ws-close API-safe. Re-added the fork behaviors upstream
+  lacks: `chat_message` dispatch for `ex_*`+`ex2_*` (case-preserving; upstream lowercases and only
+  routes `ex_*`), the `arg_parser` helper (`presentation/racetime/util/arg_parser.py`), a `RaceHandler.edit`
+  port, and a `handle()` override preserving concurrent per-message consume. `msg_actions` /
+  `monitor_cmd` / `can_monitor` are byte-identical upstream and untouched. 521 tests pass (incl. new
+  `arg_parser`/`chat_message`/`edit` coverage); import-linter 5/0; dependency guard green. Full record:
+  `docs/plans/racetime_bot_official_migration_plan.md`.
+
 - **Structure cleanup follow-up — owner-decided items (2026-07-01).** Resolved the six items the
   first pass flagged for the owner: (1) `alttprbot/models/schedule.py` (11 `Schedule*` models with
   live tables, zero consumers) marked **dormant** via module docstring + doc note — models/tables
@@ -233,7 +249,11 @@
 11. Review and refine generated documentation under `docs/user-guide/` (the former `update_docs.py` generator script has been deleted; regeneration tooling is a new work item if still wanted).
 12. Create reusable AI task templates for audits, migrations, and compatibility evidence packets.
 13. Validate production `.env`/environment completeness against the new `pydantic-settings` config surface before next deployment restart.
-14. Validate RaceTime migration runtime by installing updated dependencies and running targeted startup/smoke checks for RaceTime bot initialization, API command lookup path, and tournament `startrace/get_team` call chains.
+14. Validate the RaceTime SDK cutover in a **live** runtime (needs RaceTime OAuth creds): the dependency
+    cutover, offline import/DEBUG smoke checks, and the full test suite are done (2026-07-06) — remaining is
+    a real category connect to confirm websocket handling, `ex2_newrace` seed roll, API command injection,
+    and tournament `startrace/get_team` against racetime.gg, per
+    `docs/plans/racetime_migration_phase0_parity_checklist.md`.
 
 ## Open Why Questions
 

@@ -4,9 +4,13 @@ import math
 from datetime import datetime
 from itertools import groupby
 
+import aiohttp
 import discord.utils
+import isodate
 import tortoise.exceptions
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
+from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
+                      stop_after_attempt, wait_exponential)
 
 from alttprbot.services import (
     AuthorizationService,
@@ -17,6 +21,7 @@ from alttprbot.services import (
 from alttprbot.presentation.discord.bot import discordbot
 from alttprbot.presentation.discord.tournament import dispatch as tournament_dispatch
 from alttprbot.presentation.racetime.misc.konot import KONOT
+from alttprbot.presentation.racetime.util.arg_parser import arg_parser
 from alttprbot.presentation.racetime.util.authz import subject_from_message
 
 
@@ -33,8 +38,84 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     def __init__(self, bot=None, **kwargs):
         self.bot = bot
-        super().__init__(bot=bot, **kwargs)
+        # Upstream racetime-bot 2.3.0 ``RaceHandler.__init__`` is
+        # ``(logger, conn, state, command_prefix)`` and does not accept a
+        # ``bot`` argument (the fork did). Keep our own reference above and
+        # forward only the SDK kwargs to the base handler.
+        super().__init__(**kwargs)
         self.seed_rolled = False
+
+    async def handle(self):
+        """
+        Low-level websocket handler loop.
+
+        Mirrors upstream ``RaceHandler.handle`` (``websockets`` transport) but
+        dispatches each incoming message to its own task so that a long-running
+        command (e.g. seed generation during ``!newrace``) does not block the
+        receive loop. This preserves the concurrent-consume behavior the
+        previously-used fork provided.
+        """
+        self.logger.info('[%(race)s] Handler started' % {
+            'race': self.data.get('name'),
+        })
+        async with self.conn as ws:
+            self.ws = ws
+            if await self.should_stop():
+                return
+            await self.begin()
+            async for message in self.ws:
+                data = json.loads(message)
+                asyncio.create_task(self.consume(data))
+                if await self.should_stop():
+                    await self.end()
+                    break
+
+    async def chat_message(self, data):
+        """
+        Consume an incoming ``chat.message`` message and dispatch commands.
+
+        Ported from the previously-used fork so that both ``ex_<cmd>(args,
+        message)`` and ``ex2_<cmd>(message, positional_args, keyword_args)``
+        command forms are supported (upstream 2.3.0 only dispatches ``ex_*``
+        and lowercases the whole message). Case is preserved here so command
+        arguments (preset names, branches, seed codes) are passed through
+        untouched, and exceptions are echoed back to the race chat.
+        """
+        message = data.get('message', {})
+
+        if message.get('is_bot') or message.get('is_system'):
+            self.logger.debug('Ignoring bot/system message.')
+            return
+
+        words = message.get('message', '').split(' ')
+        if words and words[0].startswith(self.command_prefix):
+            # look to see if there's a command handler for this
+            method = 'ex_' + words[0][len(self.command_prefix):]
+            if hasattr(self, method):
+                args = words[1:]
+                self.logger.debug('[%(race)s] Calling handler for %(word)s' % {
+                    'race': self.data.get('name'),
+                    'word': words[0],
+                })
+                try:
+                    await getattr(self, method)(args, message)
+                except Exception as e:
+                    self.logger.error('Command raised exception.', exc_info=True)
+                    await self.send_message(f'Command raised exception: {str(e)}')
+
+            # if not, look to see if there's a new command handler for this
+            method = 'ex2_' + words[0][len(self.command_prefix):]
+            if hasattr(self, method):
+                self.logger.debug('[%(race)s] Calling new handler for %(word)s' % {
+                    'race': self.data.get('name'),
+                    'word': words[0],
+                })
+                try:
+                    positional_args, keyword_args = arg_parser(message.get('message', ''))
+                    await getattr(self, method)(message, positional_args, keyword_args)
+                except Exception as e:
+                    self.logger.error('Command raised exception.', exc_info=True)
+                    await self.send_message(f'Command raised exception: {str(e)}')
 
     async def begin(self):
         self.state['locked'] = False
@@ -218,6 +299,97 @@ class SahasrahBotCoreHandler(RaceHandler):
             'race': self.data.get('name'),
             'user': user
         })
+
+    async def edit(self, **kwargs):
+        """
+        Edits the race.  For valid options, see
+        https://github.com/racetimeGG/racetime-app/wiki/Category-bots#start-and-edit-races
+
+        This method allows you to only pass what you actually want to change.
+        Anything not specified will be pulled from the race room's data.
+
+        Ported from the previously-used fork: upstream ``RaceHandler`` has no
+        ``edit`` method. Uses the parent bot's HTTP session and access token to
+        POST to the race edit endpoint.
+        """
+        name = self.data.get('name')
+        status = self.data.get('status', {}).get('value')
+
+        if status in ['finished', 'cancelled']:
+            # TODO raise a better exception
+            raise Exception('Cannot edit a race that has finished or been cancelled.')
+
+        if 'invitational' in kwargs:
+            # TODO use a specific error class
+            raise Exception('Cannot set invitational status.  Use make_open or make_invitational instead.')
+
+        if kwargs.get('goal') and kwargs.get('custom_goal'):
+            # TODO use a specific error class
+            raise Exception('Either a goal or custom_goal can be specified, but not both.')
+
+        settings = {}
+
+        if self.data['goal'].get('custom'):
+            settings['custom_goal'] = self.data['goal']['name']
+        else:
+            settings['goal'] = self.data['goal']['name']
+
+        settings['unlisted'] = self.data['unlisted']
+        settings['info_user'] = self.data['info_user']
+        settings['start_delay'] = round(isodate.parse_duration(self.data['start_delay']).total_seconds())
+        settings['time_limit'] = round(isodate.parse_duration(self.data['time_limit']).total_seconds() / 3600)
+        settings['streaming_required'] = self.data['streaming_required']
+        settings['auto_start'] = self.data['auto_start']
+        settings['allow_comments'] = self.data['allow_comments']
+        settings['hide_comments'] = self.data.get('hide_comments', False)
+        settings['allow_prerace_chat'] = self.data.get('allow_prerace_chat', True)
+        settings['allow_midrace_chat'] = self.data['allow_midrace_chat']
+        settings['allow_non_entrant_chat'] = self.data['allow_non_entrant_chat']
+        settings['chat_message_delay'] = round(isodate.parse_duration(self.data['chat_message_delay']).total_seconds())
+
+        for keyword in kwargs:
+            if keyword == 'goal':
+                settings[keyword] = kwargs[keyword]
+                try:
+                    del settings['custom_goal']
+                except KeyError:
+                    pass
+            elif keyword == 'custom_goal':
+                settings['custom_goal'] = kwargs['custom_goal']
+                try:
+                    del settings['goal']
+                except KeyError:
+                    pass
+            else:
+                settings[keyword] = kwargs[keyword]
+
+        if status not in ['open', 'invitational']:
+            for k in ['goal', 'custom_goal', 'start_delay', 'time_limit', 'streaming_required', 'auto_start', 'allow_prerace_chat']:
+                try:
+                    del settings[k]
+                except KeyError:
+                    continue
+
+        try:
+            async for attempt in AsyncRetrying(
+                    stop=stop_after_attempt(5),
+                    retry=retry_if_exception_type(aiohttp.ClientResponseError),
+                    wait=wait_exponential(multiplier=1, min=4, max=10)):
+                with attempt:
+                    async with self.bot.http.post(
+                        url=self.bot.http_uri(f'/o/{name}/edit'),
+                        data=settings,
+                        ssl=self.bot.ssl_context,
+                        headers={
+                            'Authorization': 'Bearer ' + self.bot.access_token,
+                        }
+                    ) as resp:
+                        if resp.status == 200:
+                            return True
+        except RetryError as e:
+            raise e.last_attempt._exception from e
+
+        raise Exception('Received an unexpected response while editing a race.')
 
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
