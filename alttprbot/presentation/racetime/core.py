@@ -4,6 +4,7 @@ import ssl
 from functools import partial
 
 import aiohttp
+import websockets
 from racetime_bot import Bot
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt, wait_exponential)
@@ -119,12 +120,30 @@ class SahasrahBotRaceTimeBot(Bot):
             raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
 
     async def create_handler(self, race_data):
-        ws_conn = await self.http.ws_connect(
-            self.ws_uri(race_data.get('websocket_bot_url')),
-            headers={
+        connect_kwargs = {
+            'additional_headers': {
                 'Authorization': 'Bearer ' + self.access_token,
             },
-            ssl=self.ssl_context if self.ssl_context is not None else self.racetime_secure,
+        }
+
+        # BC for websockets<14, which used ``extra_headers`` rather than
+        # ``additional_headers``. Mirrors upstream ``Bot.create_handler``.
+        try:
+            ws_version = int(websockets.version.version.split('.')[0])
+        except (AttributeError, TypeError, ValueError):
+            ws_version = 14
+        if ws_version < 14:
+            connect_kwargs['extra_headers'] = connect_kwargs.pop('additional_headers')
+
+        if self.ssl_context is not None and self.racetime_secure:
+            connect_kwargs['ssl'] = self.ssl_context
+
+        # NB: not awaited. ``websockets.connect`` returns a connection object
+        # that the handler enters with ``async with self.conn`` inside
+        # ``handle()`` (upstream RaceHandler transport contract).
+        ws_conn = websockets.connect(
+            self.ws_uri(race_data.get('websocket_bot_url')),
+            **connect_kwargs,
         )
 
         race_name = race_data.get('name')
@@ -419,7 +438,11 @@ class SahasrahBotRaceTimeBot(Bot):
         for entry in list(self.handlers.values()):
             handler = getattr(entry, 'handler', entry)
             ws = getattr(handler, 'ws', None)
-            if ws is not None and not ws.closed:
+            # ``ws`` is the live ``websockets`` connection once ``handle()`` has
+            # entered it (``None`` beforehand). Closing an already-closed
+            # connection is a safe no-op, and the connection object may not
+            # expose a ``.closed`` attribute, so just attempt the close.
+            if ws is not None:
                 try:
                     await ws.close()
                 except Exception:
