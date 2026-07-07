@@ -41,8 +41,7 @@ class AsyncTournamentView(discord.ui.View):
     @discord.ui.button(label="Start new async run", style=discord.ButtonStyle.green, emoji="🏁",
                        custom_id="sahasrahbot:new_async_race")
     async def new_async_race(self, interaction: discord.Interaction, button: discord.ui.Button):
-        async_tournament = await AsyncTournamentService().get_by_channel_id(interaction.channel_id)
-        await async_tournament.fetch_related('permalink_pools')
+        async_tournament = await AsyncTournamentService().get_by_channel_id_with_pools(interaction.channel_id)
 
         if async_tournament is None:
             await interaction.response.send_message("This channel is not configured for async tournaments.",
@@ -285,8 +284,8 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
             await interaction.response.send_message("Please choose a pool.", ephemeral=True)
             return
 
-        active_races_for_user = await async_tournament.races.filter(user__discord_user_id=interaction.user.id,
-                                                                    status__in=["pending", "in_progress"])
+        active_races_for_user = await AsyncTournamentService().list_active_races_for_user(
+            async_tournament, interaction.user.id, ["pending", "in_progress"])
         if active_races_for_user:
             await interaction.response.send_message(
                 "You already have an active race.  If you believe this is in error, please contact a moderator.",
@@ -299,8 +298,8 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
             type=discord.ChannelType.private_thread
         )
 
-        pool = await async_tournament.permalink_pools.filter(
-            name=self.pool).first()  # TODO: add a unique constraint on this
+        # TODO: add a unique constraint on pool names within a tournament
+        pool = await AsyncTournamentService().get_pool_by_name(async_tournament, self.pool)
 
         # Double check that the player hasn't played from this pool already
         async_history = await AsyncTournamentService().list_user_races_by_discord_id(async_tournament, interaction.user.id)
@@ -311,8 +310,6 @@ class AsyncTournamentRaceViewConfirmNewRace(discord.ui.View):
         if num_played >= async_tournament.runs_per_pool:
             await interaction.response.send_message("You have already played the maximum number of seeds from this pool.", ephemeral=True)
             return
-
-        await pool.fetch_related("permalinks")
 
         user = await UserService().get_or_create_by_discord_id(interaction.user.id)
         permalink = await AsyncTournamentScoringService().get_eligible_permalink_from_pool(pool, user)
@@ -888,7 +885,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
         #     await interaction.response.send_message("Only Synack may create an async tournament at this time.", ephemeral=True)
         #     return
 
-        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id(interaction.channel.id)
+        async_tournament_race = await AsyncTournamentService().get_race_by_thread_id_with_tournament(interaction.channel.id)
         if not async_tournament_race:
             await interaction.response.send_message("This channel is not an async tournament thread.", ephemeral=True)
             return
@@ -896,8 +893,6 @@ class AsyncTournament(commands.GroupCog, name="async"):
         if async_tournament_race.status != "pending":
             await interaction.response.send_message("This race is not pending.  It cannot be extended.", ephemeral=True)
             return
-
-        await async_tournament_race.fetch_related("tournament")
 
         subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
         user = subject.user
@@ -1007,7 +1002,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
     # TODO: write autocomplete racetime_slug
     @app_commands.command(name="live_race_record", description="Used record the results of a live qualifier race.")
     async def live_race_record(self, interaction: discord.Interaction, racetime_slug: str, force: bool = False):
-        async_live_race = await AsyncTournamentLiveRaceService().get_by_racetime_slug(racetime_slug)
+        async_live_race = await AsyncTournamentLiveRaceService().get_by_racetime_slug_with_tournament(racetime_slug)
         if async_live_race is None:
             await interaction.response.send_message("That episode ID is not a async tournament live race.",
                                                     ephemeral=True)
@@ -1016,8 +1011,6 @@ class AsyncTournament(commands.GroupCog, name="async"):
         if not async_live_race.status == "in_progress" and not force:
             await interaction.response.send_message("This race is not currently in progress.", ephemeral=True)
             return
-
-        await async_live_race.fetch_related("tournament")
 
         subject = await authz.subject_from_interaction(interaction, with_user=True, with_roles=True)
         if not await AuthorizationService().is_async_tournament_user(subject, async_live_race.tournament, ['admin', 'mod']):
