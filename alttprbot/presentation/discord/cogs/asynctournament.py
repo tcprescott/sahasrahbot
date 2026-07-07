@@ -7,12 +7,12 @@ import aiohttp
 import discord
 import isodate
 import pytz
-import tortoise.exceptions
 from discord import app_commands
 from discord.ext import commands, tasks
 from slugify import slugify
 
 import config
+from alttprbot.exceptions import AsyncTournamentChannelInUse
 from alttprbot.services import (
     AsyncTournamentLiveRaceService,
     AsyncTournamentPermissionsService,
@@ -810,7 +810,7 @@ class AsyncTournament(commands.GroupCog, name="async"):
                 channel_id=interaction.channel.id,
                 owner_id=interaction.user.id
             )
-        except tortoise.exceptions.IntegrityError:
+        except AsyncTournamentChannelInUse:
             await interaction.followup.send(
                 "An async tournament is already associated with this channel.  Please create a new channel for the tournament or contact Synack for further assistance.",
                 ephemeral=True)

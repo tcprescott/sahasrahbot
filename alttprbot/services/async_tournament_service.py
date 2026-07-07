@@ -11,9 +11,11 @@ this service exposes; leaderboard scoring lives in its own service.
 import datetime
 from typing import List, Optional
 
+import tortoise.exceptions
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from alttprbot import models
+from alttprbot.exceptions import AsyncTournamentChannelInUse
 from alttprbot.repositories import AsyncTournamentRepository
 
 
@@ -182,10 +184,15 @@ class AsyncTournamentService:
         self, *, name: str, report_channel_id: Optional[int], active: bool,
         guild_id: int, channel_id: int, owner_id: int,
     ) -> models.AsyncTournament:
-        return await self.repository.create_tournament(
-            name=name, report_channel_id=report_channel_id, active=active,
-            guild_id=guild_id, channel_id=channel_id, owner_id=owner_id,
-        )
+        try:
+            return await self.repository.create_tournament(
+                name=name, report_channel_id=report_channel_id, active=active,
+                guild_id=guild_id, channel_id=channel_id, owner_id=owner_id,
+            )
+        except tortoise.exceptions.IntegrityError as e:
+            raise AsyncTournamentChannelInUse(
+                f"An async tournament is already associated with channel {channel_id}."
+            ) from e
 
     async def create_pool(self, *, tournament, name: str, preset: str) -> models.AsyncTournamentPermalinkPool:
         return await self.repository.create_pool(tournament=tournament, name=name, preset=preset)

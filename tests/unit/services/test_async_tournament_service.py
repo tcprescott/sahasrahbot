@@ -3,6 +3,10 @@
 import datetime
 from unittest.mock import AsyncMock, sentinel
 
+import pytest
+import tortoise.exceptions
+
+from alttprbot.exceptions import AsyncTournamentChannelInUse
 from alttprbot.services import AsyncTournamentService
 
 
@@ -34,3 +38,15 @@ async def test_submit_review_injects_reviewed_at_and_delegates():
     assert kwargs["reviewer_notes"] == "ok"
     assert kwargs["reviewer"] is sentinel.reviewer
     assert isinstance(kwargs["reviewed_at"], datetime.datetime)
+
+
+async def test_create_tournament_translates_integrity_error():
+    service = AsyncTournamentService()
+    service.repository = AsyncMock()
+    service.repository.create_tournament.side_effect = tortoise.exceptions.IntegrityError("dup")
+
+    with pytest.raises(AsyncTournamentChannelInUse):
+        await service.create_tournament(
+            name="T", report_channel_id=None, active=True,
+            guild_id=1, channel_id=2, owner_id=3,
+        )

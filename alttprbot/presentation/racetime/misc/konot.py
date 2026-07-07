@@ -1,5 +1,4 @@
-from tortoise.exceptions import DoesNotExist
-
+from alttprbot.exceptions import KONOTSegmentNotFound
 from alttprbot.services import KONOTService
 
 
@@ -27,9 +26,9 @@ class KONOT(object):
         service = KONOTService()
         konot.segment = await service.get_segment_by_room(rtgg_handler.data.get('name'))
         if konot.segment is None:
-            # Preserve the original .get() control-flow contract: a non-KONOT room
-            # raises DoesNotExist, which SahasrahBotCoreHandler.setup_konot() catches.
-            raise DoesNotExist("RaceTimeKONOTSegment")
+            # Control-flow contract: a non-KONOT room raises, which
+            # SahasrahBotCoreHandler.setup_konot() catches.
+            raise KONOTSegmentNotFound(rtgg_handler.data.get('name'))
         konot.game = await service.get_game(konot.segment.game_id)
         return konot
 
