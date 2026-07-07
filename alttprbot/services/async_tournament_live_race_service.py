@@ -13,5 +13,8 @@ class AsyncTournamentLiveRaceService:
     async def get_by_racetime_slug(self, racetime_slug: str) -> Optional[models.AsyncTournamentLiveRace]:
         return await self.repository.get_by_racetime_slug(racetime_slug)
 
+    async def get_by_racetime_slug_with_tournament(self, racetime_slug: str) -> Optional[models.AsyncTournamentLiveRace]:
+        return await self.repository.get_by_racetime_slug_with_tournament(racetime_slug)
+
     async def list_in_progress_slugs(self, slug_partial: str) -> List[Dict[str, Any]]:
         return await self.repository.list_in_progress_slugs(slug_partial)

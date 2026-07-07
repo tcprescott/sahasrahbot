@@ -30,10 +30,11 @@ def create_embed(election):
 
 
 async def refresh_election_post(election, bot):
-    await election.fetch_related('candidates')
-    await election.fetch_related('authorized_voters')
-    await election.fetch_related('votes')
+    """Re-render the posted election message.
 
+    The caller must pass an election with ``candidates`` fetched
+    (e.g. via ``RankedChoiceService.get_election_with_candidates``).
+    """
     channel = bot.get_channel(election.channel_id)
     message = await channel.fetch_message(election.message_id)
     if election.results:

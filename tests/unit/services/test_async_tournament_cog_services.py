@@ -52,6 +52,30 @@ async def test_live_race_service_delegates():
     assert await service.get_by_racetime_slug("alttpr/x") is sentinel.lr
 
 
+async def test_live_race_get_by_racetime_slug_with_tournament_delegates():
+    service = AsyncTournamentLiveRaceService()
+    service.repository = AsyncMock()
+    service.repository.get_by_racetime_slug_with_tournament.return_value = sentinel.lr
+    assert await service.get_by_racetime_slug_with_tournament("alttpr/x") is sentinel.lr
+    service.repository.get_by_racetime_slug_with_tournament.assert_awaited_once_with("alttpr/x")
+
+
+async def test_get_by_channel_id_with_pools_delegates():
+    service = AsyncTournamentService()
+    service.repository = AsyncMock()
+    service.repository.get_by_channel_id_with_pools.return_value = sentinel.t
+    assert await service.get_by_channel_id_with_pools(42) is sentinel.t
+    service.repository.get_by_channel_id_with_pools.assert_awaited_once_with(42)
+
+
+async def test_get_race_with_user_delegates():
+    service = AsyncTournamentService()
+    service.repository = AsyncMock()
+    service.repository.get_race_with_user.return_value = sentinel.race
+    assert await service.get_race_with_user(7, sentinel.t) is sentinel.race
+    service.repository.get_race_with_user.assert_awaited_once_with(7, sentinel.t)
+
+
 async def test_user_get_or_create_without_display_name():
     # regression: cog calls this with no display_name; the service must allow it
     service = UserService()

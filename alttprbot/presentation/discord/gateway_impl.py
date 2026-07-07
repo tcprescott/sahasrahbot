@@ -13,6 +13,8 @@ from typing import Any, Optional
 import aiohttp
 import discord
 
+from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
+from alttprbot.services import RankedChoiceService
 from alttprbot.services._notify import discord_gateway
 
 
@@ -61,6 +63,14 @@ class DiscordGatewayImpl:
             webhook = discord.Webhook.from_url(url, session=session)
             extra = {"username": username} if username is not None else {}
             await webhook.send(content=content, embed=embed, **extra)
+
+    async def refresh_ranked_choice_post(self, election_id: int) -> None:
+        # Runs later on the queue worker, so re-read fresh state by id rather
+        # than accepting a model instance across the gateway.
+        election = await RankedChoiceService().get_election_with_candidates(election_id)
+        if election is None or election.message_id is None:
+            return
+        await ranked_choice_embeds.refresh_election_post(election, self.bot)
 
     # --- resolvers ---
     def get_emojis(self) -> list:

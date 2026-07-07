@@ -71,3 +71,48 @@ async def test_live_race_lookup_and_slug_search(tortoise_db):
     slugs = {r["racetime_slug"] for r in await AsyncTournamentLiveRaceRepository.list_in_progress_slugs("cat")}
     assert slugs == {"alttpr/clever-cat"}
     assert await AsyncTournamentLiveRaceRepository.list_in_progress_slugs("dog") == []
+
+
+async def test_get_by_channel_id_with_pools(tortoise_db):
+    tournament = await _tournament(channel_id=504)
+    await AsyncTournamentRepository.create_pool(tournament=tournament, name="A", preset="open")
+    await AsyncTournamentRepository.create_pool(tournament=tournament, name="B", preset="casualboots")
+
+    fetched = await AsyncTournamentRepository.get_by_channel_id_with_pools(504)
+    assert fetched.id == tournament.id
+    # relation is hydrated — iterable without a further fetch_related
+    assert {p.name for p in fetched.permalink_pools} == {"A", "B"}
+
+    # unknown channel returns None (regression: the None guard must run before any relation access)
+    assert await AsyncTournamentRepository.get_by_channel_id_with_pools(999) is None
+
+
+async def test_get_by_racetime_slug_with_tournament(tortoise_db):
+    tournament = await _tournament(channel_id=505)
+    pool = await AsyncTournamentRepository.create_pool(tournament=tournament, name="A", preset="open")
+    await models.AsyncTournamentLiveRace.create(
+        tournament=tournament, pool=pool, racetime_slug="alttpr/brave-fox", status="in_progress"
+    )
+
+    live_race = await AsyncTournamentLiveRaceRepository.get_by_racetime_slug_with_tournament("alttpr/brave-fox")
+    assert live_race.tournament.id == tournament.id
+
+    assert await AsyncTournamentLiveRaceRepository.get_by_racetime_slug_with_tournament("nope") is None
+
+
+async def test_get_race_with_user(tortoise_db):
+    tournament = await _tournament(channel_id=506)
+    pool = await AsyncTournamentRepository.create_pool(tournament=tournament, name="A", preset="open")
+    permalink = await AsyncTournamentRepository.create_permalink(
+        pool=pool, url="http://x", notes="abc", live_race=False
+    )
+    user = await models.Users.create(discord_user_id=43)
+    race = await AsyncTournamentRepository.create_race(
+        tournament=tournament, user=user, permalink=permalink,
+        thread_id=778, thread_open_time=None,
+    )
+
+    fetched = await AsyncTournamentRepository.get_race_with_user(race.id, tournament)
+    assert fetched.user.discord_user_id == 43
+
+    assert await AsyncTournamentRepository.get_race_with_user(999999, tournament) is None

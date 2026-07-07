@@ -1,6 +1,6 @@
 # Active State
 
-> Last updated: 2026-07-01
+> Last updated: 2026-07-07
 
 ## Current Focus
 
@@ -24,6 +24,29 @@
 - **Auth Stack Follow-up**: Authlib is now the only API Discord OAuth path; post-cutover hardening and compatibility evidence collection remain open. Behavior contract documented in `docs/design/discord_oauth_behavior_contract.md`.
 
 ## Recent Completions
+
+- **Tier/feature separation final pass (2026-07-07).** Audited for violations invisible to
+  import-linter and closed them. (1) All runtime ORM usage removed from the presentation tier
+  (~15 sites): the asynctournament cog now uses prefetch-variant service lookups (new
+  `get_by_channel_id_with_pools`, `get_race_with_user`, `get_by_racetime_slug_with_tournament`,
+  plus rewires to existing `list_active_races_for_user`/`get_pool_by_name`/
+  `get_race_by_thread_id_with_tournament`), the ranked-choice cog/embed-util `fetch_related`
+  calls are gone (`create_embed` only needs candidates; `calculate_results` self-hydrates),
+  and the web review route uses `get_race_with_user`. Two latent bugs fixed in passing: a
+  `fetch_related` running *before* the None guard in `new_async_race` (crash on unconfigured
+  channels), and a dead un-awaited `fetch_related` in racer verification. (2) Presentation is
+  now **tortoise-free**: `KONOTSegmentNotFound` replaces the raised/caught `DoesNotExist`
+  control-flow contract (konot.py ↔ handlers/core.py), and `AsyncTournamentChannelInUse` is
+  raised by `AsyncTournamentService.create_tournament` instead of leaking `IntegrityError` to
+  the cog. (3) The one cross-surface feature leak closed: the web ballot blueprint no longer
+  imports `presentation.discord.util.ranked_choice` — `RankedChoiceService` enqueues
+  `refresh_ranked_choice_post(election_id)` on the `_notify` discord gateway after
+  `submit_ballot`/`close_election` (fire-and-forget; a Discord failure no longer 500s a
+  persisted vote). (4) Enforcement: **8 new import-linter contracts** (13 total, 0 broken) —
+  presentation↛repositories (CI parity with the edit-time hook), util stays bottom-tier,
+  five surface-independence contracts covering every currently-clean direction (by-design
+  racetime/web/api→discord edges stay allowed), and presentation↛tortoise. 533 tests green
+  (521 + 12 new/updated).
 
 - **RaceTime SDK cutover to official upstream `racetime-bot` 2.3.0 (2026-07-06).** Replaced the forked
   SDK (`tcprescott/racetime-bot@48afdd4`, still pinned as a URL archive in `poetry.lock`) with the

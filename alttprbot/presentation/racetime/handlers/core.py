@@ -7,11 +7,11 @@ from itertools import groupby
 import aiohttp
 import discord.utils
 import isodate
-import tortoise.exceptions
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt, wait_exponential)
 
+from alttprbot.exceptions import KONOTSegmentNotFound
 from alttprbot.services import (
     AuthorizationService,
     RaceRoomService,
@@ -230,7 +230,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         try:
             self.konot = await KONOT.resume(self)
-        except tortoise.exceptions.DoesNotExist:
+        except KONOTSegmentNotFound:
             self.konot = None
 
     async def race_data(self, data):

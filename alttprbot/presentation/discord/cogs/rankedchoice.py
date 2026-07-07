@@ -35,15 +35,10 @@ class RankedChoiceMessageView(discord.ui.View):
             await interaction.followup.send("This election is already closed.", ephemeral=True)
             return
 
-        await election.fetch_related('candidates')
-        # await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
-
         await RankedChoiceService().calculate_results(election)
 
+        # close_election enqueues the election-post refresh via the discord gateway
         await RankedChoiceService().close_election(election)
-
-        await ranked_choice_embeds.refresh_election_post(election, self.bot)
 
         await interaction.followup.send("Successfully ended the election.", ephemeral=True)
 
@@ -94,9 +89,8 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
         # if authorized_voters_role:
         #     await models.RankedChoiceAuthorizedVoters.bulk_create([models.RankedChoiceAuthorizedVoters(election=election, user_id=user_id) for user_id in [member.id for member in authorized_voters_role.members]])
 
-        await election.fetch_related('candidates')
-        # await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
+        # re-read with candidates hydrated for the embed
+        election = await service.get_election_with_candidates(election.id)
 
         await interaction.response.send_message(embed=ranked_choice_embeds.create_embed(election),
                                                 view=RankedChoiceMessageView(self.bot))
