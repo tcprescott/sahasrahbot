@@ -235,7 +235,6 @@ If you have any questions, please contact a server administrator.
                 verified_racer_member.id, display_name=verified_racer_member.name)
             verified_racer, _ = await VerifiedRacerService().get_or_create_for_user(
                 verified_racer_user, racer_verification)
-            verified_racer.fetch_related('user')
 
             # check if they're required to reverify
             if verified_racer.last_verified is not None and discord.utils.utcnow() - verified_racer.last_verified < timedelta(days=racer_verification.reverify_period_days):
