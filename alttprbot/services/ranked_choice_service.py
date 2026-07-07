@@ -11,11 +11,18 @@ import pyrankvote
 
 from alttprbot import models
 from alttprbot.repositories import RankedChoiceRepository
+from alttprbot.services._notify import discord_gateway, queue
 
 
 class RankedChoiceService:
     def __init__(self) -> None:
         self.repository = RankedChoiceRepository()
+
+    def _enqueue_post_refresh(self, election: models.RankedChoiceElection) -> None:
+        """Fire-and-forget refresh of the posted election embed, if one exists."""
+        if election.message_id is None or not discord_gateway.is_registered():
+            return
+        queue.enqueue(discord_gateway.get().refresh_ranked_choice_post(election.id))
 
     async def get_election_with_candidates(
         self, election_id: int
@@ -42,6 +49,7 @@ class RankedChoiceService:
 
     async def close_election(self, election: models.RankedChoiceElection) -> None:
         await self.repository.close(election)
+        self._enqueue_post_refresh(election)
 
     async def get_user_votes(
         self, election: models.RankedChoiceElection, user_id: int
@@ -76,6 +84,7 @@ class RankedChoiceService:
 
         votes.sort(key=lambda v: v.rank)
         await self.repository.bulk_create_votes(votes)
+        self._enqueue_post_refresh(election)
 
     async def calculate_results(self, election: models.RankedChoiceElection) -> None:
         """Tabulate the election via single transferable vote and persist the outcome.

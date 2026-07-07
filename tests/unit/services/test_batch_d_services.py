@@ -1,6 +1,7 @@
 """Unit tests for services added migrating the audit / rankedchoice / racer cogs."""
 
 import datetime
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, sentinel
 
 from alttprbot.services import (
@@ -42,8 +43,10 @@ async def test_add_candidates_delegates():
 async def test_close_election_delegates():
     service = RankedChoiceService()
     service.repository = AsyncMock()
-    await service.close_election(sentinel.election)
-    service.repository.close.assert_awaited_once_with(sentinel.election)
+    # message_id=None short-circuits the gateway post-refresh enqueue
+    election = SimpleNamespace(id=1, message_id=None)
+    await service.close_election(election)
+    service.repository.close.assert_awaited_once_with(election)
 
 
 # --- RacerVerificationService ---

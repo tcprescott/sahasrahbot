@@ -5,7 +5,6 @@ from quart import Blueprint, request, jsonify
 from alttprbot.presentation.web.oauth_client import requires_authorization
 
 from alttprbot.services import AuthorizationService, AuthSubject, RankedChoiceService
-from alttprbot.presentation.discord.util import ranked_choice as ranked_choice_embeds
 from alttprbot.presentation.web.web import discord
 from alttprbot.presentation.discord.bot import discordbot
 
@@ -102,10 +101,9 @@ async def submit_ballot_json(election_id: int):
     votes_data = payload.get('votes', [])
 
     try:
+        # submit_ballot enqueues the election-post refresh via the discord gateway
         await service.submit_ballot(election, user.id, votes_data)
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
-
-    await ranked_choice_embeds.refresh_election_post(election, discordbot)
 
     return jsonify({'success': True})
