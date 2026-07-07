@@ -386,7 +386,7 @@ async def async_tournament_review_submit_json(tournament_id: int, race_id: int):
     if not authorized:
         return jsonify({'error': 'Not authorized.'}), 403
 
-    race = await service.get_race(race_id, tournament)
+    race = await service.get_race_with_user(race_id, tournament)
     if race is None:
         return jsonify({'error': 'Race not found.'}), 404
 
@@ -396,7 +396,6 @@ async def async_tournament_review_submit_json(tournament_id: int, race_id: int):
     if race.reattempted:
         return jsonify({'error': 'Race was reattempted.'}), 400
 
-    await race.fetch_related('user')
     if race.user.id == user.id:
         return jsonify({'error': 'Cannot review your own run.'}), 403
 
