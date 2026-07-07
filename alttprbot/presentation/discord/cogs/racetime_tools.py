@@ -16,11 +16,11 @@ class RacetimeTools(commands.Cog):
 
     @commands.Cog.listener()
     async def on_racetime_open(self, handler, data):
-        pass
+        pass  # no-op: this racetime event needs no handling
 
     @commands.Cog.listener()
     async def on_racetime_invitational(self, handler, data):
-        pass
+        pass  # no-op: this racetime event needs no handling
 
     @commands.Cog.listener()
     async def on_racetime_in_progress(self, handler, data):
@@ -29,11 +29,11 @@ class RacetimeTools(commands.Cog):
 
     @commands.Cog.listener()
     async def on_racetime_cancelled(self, handler, data):
-        pass
+        pass  # no-op: this racetime event needs no handling
 
     @commands.Cog.listener()
     async def on_racetime_finished(self, handler, data):
-        pass
+        pass  # no-op: this racetime event needs no handling
 
     async def watchlisted_players(self, handler):
         entrant_ids = [a['user']['id'] for a in handler.data['entrants']]

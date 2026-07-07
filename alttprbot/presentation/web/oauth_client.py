@@ -184,7 +184,7 @@ class AuthlibDiscordOAuth:
             return flow_data
             
         except OAuth2Error as e:
-            logger.error("auth_callback_failed", extra={
+            logger.exception("auth_callback_failed", extra={
                 'error': str(e)
             })
             raise
@@ -221,7 +221,7 @@ class AuthlibDiscordOAuth:
             return DiscordUser(user_data)
             
         except Exception as e:
-            logger.error("auth_fetch_user_failed", extra={
+            logger.exception("auth_fetch_user_failed", extra={
                 'error': str(e)
             })
             raise Unauthorized("Failed to fetch user") from e

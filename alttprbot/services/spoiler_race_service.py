@@ -4,7 +4,7 @@ Owns the spoiler-race record lifecycle (lookup, schedule, mark started, delete).
 The countdown/timer orchestration stays in the RaceTime handler (presentation).
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from alttprbot import models
@@ -25,7 +25,7 @@ class SpoilerRaceService:
         return spoiler_race
 
     async def mark_started(self, spoiler_race: models.SpoilerRaces) -> None:
-        await self.repository.mark_started(spoiler_race, datetime.utcnow())
+        await self.repository.mark_started(spoiler_race, datetime.now(timezone.utc).replace(tzinfo=None))
 
     async def delete(self, spoiler_race: models.SpoilerRaces) -> None:
         await self.repository.delete_instance(spoiler_race)

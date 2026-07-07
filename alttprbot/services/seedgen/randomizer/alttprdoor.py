@@ -8,6 +8,7 @@ import re
 import string
 import tempfile
 import sys
+from pathlib import Path
 
 import aioboto3
 import aiofiles
@@ -55,8 +56,7 @@ class AlttprDoor():
             self.settings['names'] = ""
             self.settings['race'] = not self.spoilers
 
-            with open(settings_file_path, "w") as f:
-                json.dump(self.settings, f)
+            await asyncio.to_thread(Path(settings_file_path).write_text, json.dumps(self.settings))
 
             attempts = 0
             try:
