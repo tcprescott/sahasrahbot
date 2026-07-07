@@ -149,6 +149,120 @@ forbidden_modules = [
 ]
 allow_indirect_imports = "false"
 
+# Contract 6 — presentation may reach repositories only transitively through
+# services (mirrors contract 3's direct-only stance, and matches the edit-time
+# hook in .claude/scripts/enforce_architecture.py).
+[[tool.importlinter.contracts]]
+name = "Presentation must not import repositories directly"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation",
+]
+forbidden_modules = [
+    "alttprbot.repositories",
+]
+allow_indirect_imports = "true"
+
+# Contract 7 — shared util is bottom-tier plumbing: no upward imports, no
+# UI/transport libraries. (alttprbot.models stays allowed: util/telemetry.py
+# lazily imports it, and models is itself bottom-tier.)
+[[tool.importlinter.contracts]]
+name = "Shared util must stay bottom-tier"
+type = "forbidden"
+source_modules = [
+    "alttprbot.util",
+]
+forbidden_modules = [
+    "alttprbot.presentation",
+    "alttprbot.services",
+    "alttprbot.repositories",
+    "discord",
+    "racetime_bot",
+    "quart",
+]
+allow_indirect_imports = "false"
+
+# Contracts 8–12 — surface independence. Only the directions that are clean
+# today are forbidden; racetime→discord, web→discord, and api→{discord,racetime}
+# are by design (single process, live bot object) and stay allowed. api↔web is
+# already covered by contracts 4/5.
+[[tool.importlinter.contracts]]
+name = "Discord surface must not import sibling surfaces"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.discord",
+]
+forbidden_modules = [
+    "alttprbot.presentation.racetime",
+    "alttprbot.presentation.web",
+    "alttprbot.presentation.api",
+    "alttprbot.presentation.audit",
+]
+allow_indirect_imports = "false"
+
+[[tool.importlinter.contracts]]
+name = "Audit surface must not import sibling surfaces"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.audit",
+]
+forbidden_modules = [
+    "alttprbot.presentation.discord",
+    "alttprbot.presentation.racetime",
+    "alttprbot.presentation.web",
+    "alttprbot.presentation.api",
+]
+allow_indirect_imports = "false"
+
+[[tool.importlinter.contracts]]
+name = "RaceTime surface must not import api/web/audit"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.racetime",
+]
+forbidden_modules = [
+    "alttprbot.presentation.api",
+    "alttprbot.presentation.web",
+    "alttprbot.presentation.audit",
+]
+allow_indirect_imports = "false"
+
+[[tool.importlinter.contracts]]
+name = "Web surface must not import racetime/audit"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.web",
+]
+forbidden_modules = [
+    "alttprbot.presentation.racetime",
+    "alttprbot.presentation.audit",
+]
+allow_indirect_imports = "false"
+
+[[tool.importlinter.contracts]]
+name = "API surface must not import audit"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation.api",
+]
+forbidden_modules = [
+    "alttprbot.presentation.audit",
+]
+allow_indirect_imports = "false"
+
+# Contract 13 — the presentation tier is ORM-library-free: tortoise usage
+# (including its exceptions) belongs to the service/repository tiers.
+[[tool.importlinter.contracts]]
+name = "Presentation must not import tortoise directly"
+type = "forbidden"
+source_modules = [
+    "alttprbot.presentation",
+]
+forbidden_modules = [
+    "tortoise",
+]
+allow_indirect_imports = "true"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
