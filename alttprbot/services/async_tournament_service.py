@@ -98,6 +98,9 @@ class AsyncTournamentService:
     async def get_race(self, race_id, tournament) -> Optional[models.AsyncTournamentRace]:
         return await self.repository.get_race(race_id, tournament)
 
+    async def get_race_with_user(self, race_id, tournament) -> Optional[models.AsyncTournamentRace]:
+        return await self.repository.get_race_with_user(race_id, tournament)
+
     async def get_race_for_review(self, race_id, tournament) -> Optional[models.AsyncTournamentRace]:
         return await self.repository.get_race_for_review(race_id, tournament)
 
@@ -135,6 +138,9 @@ class AsyncTournamentService:
 
     async def get_by_channel_id(self, channel_id: int) -> Optional[models.AsyncTournament]:
         return await self.repository.get_by_channel_id(channel_id)
+
+    async def get_by_channel_id_with_pools(self, channel_id: int) -> Optional[models.AsyncTournament]:
+        return await self.repository.get_by_channel_id_with_pools(channel_id)
 
     async def list_active(self) -> List[models.AsyncTournament]:
         return await self.repository.list_active()

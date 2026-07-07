@@ -178,6 +178,14 @@ class AsyncTournamentRepository:
         return await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
 
     @staticmethod
+    async def get_race_with_user(
+        race_id: int, tournament: models.AsyncTournament
+    ) -> Optional[models.AsyncTournamentRace]:
+        return await models.AsyncTournamentRace.get_or_none(
+            id=race_id, tournament=tournament
+        ).prefetch_related("user")
+
+    @staticmethod
     async def get_race_for_review(
         race_id: int, tournament: models.AsyncTournament
     ) -> Optional[models.AsyncTournamentRace]:
@@ -239,6 +247,13 @@ class AsyncTournamentRepository:
     @staticmethod
     async def get_by_channel_id(channel_id: int) -> Optional[models.AsyncTournament]:
         return await models.AsyncTournament.get_or_none(channel_id=channel_id)
+
+    @staticmethod
+    async def get_by_channel_id_with_pools(channel_id: int) -> Optional[models.AsyncTournament]:
+        tournament = await models.AsyncTournament.get_or_none(channel_id=channel_id)
+        if tournament is not None:
+            await tournament.fetch_related("permalink_pools")
+        return tournament
 
     @staticmethod
     async def list_active() -> List[models.AsyncTournament]:

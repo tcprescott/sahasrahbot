@@ -12,6 +12,14 @@ class AsyncTournamentLiveRaceRepository:
         return await models.AsyncTournamentLiveRace.get_or_none(racetime_slug=racetime_slug)
 
     @staticmethod
+    async def get_by_racetime_slug_with_tournament(
+        racetime_slug: str,
+    ) -> Optional[models.AsyncTournamentLiveRace]:
+        return await models.AsyncTournamentLiveRace.get_or_none(
+            racetime_slug=racetime_slug
+        ).prefetch_related("tournament")
+
+    @staticmethod
     async def list_in_progress_slugs(slug_partial: str) -> List[Dict[str, Any]]:
         return await models.AsyncTournamentLiveRace.filter(
             racetime_slug__icontains=slug_partial, status="in_progress"
