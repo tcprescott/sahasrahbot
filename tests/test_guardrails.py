@@ -136,3 +136,91 @@ def test_guardrails_runner_rejects_option_like_base(base):
     )
     assert result.returncode != 0
     assert "expects a branch" in result.stderr
+
+
+# --- check_layers --------------------------------------------------------------
+
+LAYERS = HOOKS / "check_layers.py"
+
+
+@pytest.fixture
+def fake_repo(tmp_path):
+    """A throwaway tree with the five packages, so the real allowlist isn't involved."""
+    (tmp_path / ".claude" / "scripts").mkdir(parents=True)
+    for pkg in ("alttprbot", "alttprbot_discord", "alttprbot_api", "alttprbot_racetime", "alttprbot_audit"):
+        (tmp_path / pkg).mkdir()
+        (tmp_path / pkg / "__init__.py").write_text("")
+    (tmp_path / "alttprbot_discord" / "bot.py").write_text("discordbot = None\n")
+    (tmp_path / "alttprbot_discord" / "util").mkdir()
+    (tmp_path / "alttprbot_discord" / "util" / "__init__.py").write_text("")
+    (tmp_path / "alttprbot_discord" / "util" / "embeds.py").write_text("")
+    (tmp_path / "layer_allowlist.txt").write_text("")
+    return tmp_path
+
+
+def run_layers(root, file_path=None, *args):
+    env = {**os.environ, "CLAUDE_PROJECT_DIR": str(root)}
+    payload = json.dumps({"tool_input": {"file_path": str(file_path)}}) if file_path else ""
+    return subprocess.run(
+        [sys.executable, str(LAYERS), *args],
+        input=payload, capture_output=True, text=True, env=env, timeout=30,
+    )
+
+
+@pytest.mark.parametrize("rel, code", [
+    ("alttprbot/a.py", "from alttprbot_discord.bot import discordbot\n"),
+    ("alttprbot/a.py", "import alttprbot_racetime\n"),
+    ("alttprbot/a.py", "def f():\n    from alttprbot_discord.util import embeds\n"),
+    ("alttprbot_api/a.py", "from alttprbot_discord import bot\n"),
+    ("alttprbot_discord/a.py", "from alttprbot_api.util import checks\n"),
+    ("alttprbot_audit/a.py", "import alttprbot_discord.util.embeds\n"),
+])
+def test_layers_flags_cross_layer_import(fake_repo, rel, code):
+    path = fake_repo / rel
+    path.write_text(code)
+    result = run_layers(fake_repo, path)
+    assert result.returncode == 2
+    assert "layer boundary" in result.stderr
+
+
+@pytest.mark.parametrize("rel, code", [
+    ("alttprbot_discord/a.py", "from alttprbot import models\n"),
+    ("alttprbot_api/a.py", "from alttprbot.util import gsheet\nimport config\n"),
+    ("alttprbot_discord/a.py", "from .bot import discordbot\nfrom . import util\n"),
+    ("alttprbot/a.py", "import discord\nfrom alttprbot.tournament import core\n"),
+    ("sahasrahbot.py", "from alttprbot_discord.bot import discordbot\n"),
+])
+def test_layers_allows_downward_and_internal_imports(fake_repo, rel, code):
+    path = fake_repo / rel
+    path.write_text(code)
+    assert run_layers(fake_repo, path).returncode == 0
+
+
+def test_layers_submodule_resolution(fake_repo):
+    # `from pkg import mod` is an import of pkg.mod, so the allowlist names the module.
+    (fake_repo / "layer_allowlist.txt").write_text(
+        "# comment -> ignored\nalttprbot.a -> alttprbot_discord.util.embeds  # Phase 1\n"
+    )
+    path = fake_repo / "alttprbot" / "a.py"
+    path.write_text("from alttprbot_discord.util import embeds\n")
+    assert run_layers(fake_repo, path).returncode == 0
+    assert run_layers(fake_repo, None, "--all").returncode == 0
+
+
+def test_layers_stale_allowlist_line_fails(fake_repo):
+    (fake_repo / "layer_allowlist.txt").write_text("alttprbot.a -> alttprbot_discord.bot\n")
+    path = fake_repo / "alttprbot" / "a.py"
+    path.write_text("from alttprbot_discord.bot import discordbot\n")
+    assert run_layers(fake_repo, path).returncode == 0
+    path.write_text("x = 1\n")
+    result = run_layers(fake_repo, path)
+    assert result.returncode == 2
+    assert "no longer match" in result.stderr
+    # A deleted importer is only noticed by the whole-tree pass.
+    path.unlink()
+    assert run_layers(fake_repo, None, "--all").returncode == 2
+
+
+def test_layers_real_tree_matches_allowlist():
+    result = run_layers(ROOT, None, "--all")
+    assert result.returncode == 0, result.stderr
