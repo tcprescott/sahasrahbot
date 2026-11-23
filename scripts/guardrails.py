@@ -32,6 +32,13 @@ FILE_CHECKS = [
     "check_syntax",
     "check_privileged_intents",
     "check_config_keys",
+    "check_layers",
+]
+
+# Checks that also need a whole-tree pass, e.g. to notice an allowlist line whose
+# importing file was deleted. Run once, with ``--all``, whenever files are checked.
+TREE_CHECKS = [
+    "check_layers",
 ]
 
 
@@ -77,6 +84,15 @@ def run_check(check: str, rel: str) -> tuple[int, str]:
     return result.returncode, result.stderr.strip()
 
 
+def run_tree_check(check: str) -> tuple[int, str]:
+    result = subprocess.run(
+        [sys.executable, str(HOOKS / f"{check}.py"), "--all"],
+        cwd=ROOT, capture_output=True, text=True, timeout=120,
+        env={"CLAUDE_PROJECT_DIR": str(ROOT), "PATH": "/usr/bin:/bin"},
+    )
+    return result.returncode, result.stderr.strip()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     group = parser.add_mutually_exclusive_group()
@@ -100,6 +116,12 @@ def main() -> int:
             if code == 2:
                 failures += 1
                 print(f"✗ {check}: {rel}\n{err}\n")
+    if args.all or args.changed:
+        for check in TREE_CHECKS:
+            code, err = run_tree_check(check)
+            if code == 2:
+                failures += 1
+                print(f"✗ {check} --all\n{err}\n")
     print(f"guardrails: {len(files)} file(s), {len(FILE_CHECKS)} check(s), {failures} failure(s)")
     return 1 if failures else 0
 

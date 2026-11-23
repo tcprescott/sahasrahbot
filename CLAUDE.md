@@ -52,6 +52,7 @@ where things live. Read it before changing code.
 | `docker-compose.dev.yml` | The dev server's MariaDB (port 3307). Dev only |
 | `helpers/`, `dbtest.py`, `update_docs.py` | One-off maintenance scripts |
 | `utils/` | Vendored submodules (door randomizer, enemizer). Not our code; never edit |
+| `layer_allowlist.txt` | Baseline of cross-layer imports that already exist; only ever shrinks (see Layers below) |
 | `tests/` | pytest suite: import smoke tests, guardrail tests, and characterization unit tests per area (`test_<area>.py`); shared fixtures in `conftest.py` |
 | `.claude/` | Claude Code hooks and guardrails; see [.claude/README.md](.claude/README.md) |
 
@@ -76,7 +77,8 @@ Run `./scripts/check.sh` before you commit. It runs what CI runs
 
 1. `ruff check .` with `ruff.toml`: a small rule set (syntax errors, undefined names,
    broken comparisons), so every hit is a real bug.
-2. `python3 scripts/guardrails.py --all`: replays the `.claude/scripts/` file checks.
+2. `python3 scripts/guardrails.py --all`: replays the `.claude/scripts/` file checks, including the
+   layer-boundary check against `layer_allowlist.txt`.
 3. `poetry run python -m pytest -q tests`: imports every entry point and every cog
    `bot.py` loads, each in a fresh interpreter with `config.example.py`, plus the
    guardrail tests and the unit tests (about 35 seconds). Add `--cov` for a coverage
@@ -176,6 +178,11 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
   preset docs in `docs/` if users will look for it.
 - Dependencies are managed with Poetry. Use `poetry add`, never bare `pip install`.
   Never add `py-cord`: it installs into the same `discord` package as discord.py.
+- **Layers.** `alttprbot/` is core and must not import `alttprbot_discord`,
+  `alttprbot_api`, `alttprbot_racetime` or `alttprbot_audit`; those front ends may import
+  core but not each other. `.claude/scripts/check_layers.py` enforces this (hook, CI and
+  `check.sh`). Today's violations are baselined in `layer_allowlist.txt`. Never add a line
+  to it; when you remove one of those imports, delete its line in the same PR.
 - Leave unrelated code alone. This codebase has lots of old commented-out tournaments
   and unused imports; don't tidy them in a PR about something else.
 
