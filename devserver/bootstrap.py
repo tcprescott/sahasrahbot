@@ -102,10 +102,13 @@ def create_app(app_url: str):
     world, fake, real = install_fake_bot()
 
     from alttprbot_api.api import sahasrahbotapi
+    from alttprbot_discord import gateways
     from devserver.dev_tools import dev_tools
     from devserver.fake_services import fake_services
 
     _replace_lingering_bot(real, fake)
+    # What sahasrahbot.py does at startup: give services their Discord lookups (here, the fake bot's).
+    gateways.register()
 
     # Event bridge subscribers, as sahasrahbot.py registers them, so posts the web
     # app triggers through events (e.g. a ranked choice refresh) reach the outbox.

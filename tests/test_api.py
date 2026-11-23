@@ -17,7 +17,8 @@ from quart_discord import Unauthorized
 from alttprbot import models
 from alttprbot_api import api
 from alttprbot_api.blueprints import ranked_choice
-from alttprbot_api.util import checks
+from alttprbot.services import asynctournament as service
+from alttprbot_discord import gateways
 
 
 @pytest.fixture
@@ -238,20 +239,22 @@ async def setup_review(role="mod"):
 
 async def test_is_async_tournament_user(db):
     tournament, reviewer, runner, _ = await setup_review(role="mod")
-    assert await checks.is_async_tournament_user(reviewer, tournament, ["admin", "mod"]) is True
-    assert await checks.is_async_tournament_user(runner, tournament, ["admin", "mod"]) is False
-    assert await checks.is_async_tournament_user(None, tournament, ["admin", "mod"]) is False
-    assert await checks.is_async_tournament_user(None, tournament, ["public"]) is False  # tournament is active
+    assert await service.is_async_tournament_user(reviewer, tournament, ["admin", "mod"]) is True
+    assert await service.is_async_tournament_user(runner, tournament, ["admin", "mod"]) is False
+    assert await service.is_async_tournament_user(None, tournament, ["admin", "mod"]) is False
+    assert await service.is_async_tournament_user(None, tournament, ["public"]) is False  # tournament is active
     tournament.active = False
-    assert await checks.is_async_tournament_user(None, tournament, ["public"]) is True
+    assert await service.is_async_tournament_user(None, tournament, ["public"]) is True
 
 
 async def test_is_async_tournament_user_by_discord_role(db, monkeypatch):
     tournament, _, runner, _ = await setup_review(role=None)
     await models.AsyncTournamentPermissions.create(tournament=tournament, discord_role_id=777, role="mod")
     member = SimpleNamespace(roles=[SimpleNamespace(id=777)])
-    monkeypatch.setattr(checks.discord_members, "get_member", mock.AsyncMock(return_value=member))
-    assert await checks.is_async_tournament_user(runner, tournament, ["mod"]) is True
+    monkeypatch.setattr(gateways.discordbot, "get_guild", lambda guild_id: SimpleNamespace(id=guild_id))
+    monkeypatch.setattr(gateways.discord_members, "get_member", mock.AsyncMock(return_value=member))
+    monkeypatch.setattr(service, "_member_role_lookup", gateways.member_role_ids)  # sahasrahbot.py registers this
+    assert await service.is_async_tournament_user(runner, tournament, ["mod"]) is True
 
 
 async def test_review_submit_saves_accepted(client, login):
@@ -294,17 +297,16 @@ async def test_review_submit_rejections(client, login):
     assert (await client.post(f"/async/races/{tournament.id}/review/{race.id}", form={})).status_code == 403
 
 
-async def test_known_issue_mod_can_review_their_own_run(client, login):
-    """KNOWN ISSUE, pinned not endorsed: the "you may not review your own run"
-    guard compares ``race.user`` (an unfetched relation, so a QuerySet) with a
-    Users row. That is never equal, so a mod can accept their own run."""
+async def test_mod_cannot_review_their_own_run(client, login):
+    """Fixed in the async tournament service PR: the self-review guard used to compare
+    an unfetched relation with a Users row, so a mod could accept their own run."""
     tournament, _, runner, race = await setup_review()
     await models.AsyncTournamentPermissions.create(tournament=tournament, user=runner, role="mod")
     login(200)
     resp = await client.post(f"/async/races/{tournament.id}/review/{race.id}", form={"review_status": "accepted"})
-    assert resp.status_code == 302
+    assert resp.status_code == 403
     await race.refresh_from_db()
-    assert (race.review_status, race.reviewed_by_id) == ("accepted", runner.id)
+    assert (race.review_status, race.reviewed_by_id) == ("pending", None)
 
 
 async def test_review_page_claims_unreviewed_run(client, login):

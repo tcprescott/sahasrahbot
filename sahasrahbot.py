@@ -8,6 +8,7 @@ from tortoise import Tortoise
 import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_api.api import sahasrahbotapi
+from alttprbot_discord import gateways as discord_gateways
 from alttprbot_discord import notifications as discord_notifications
 from alttprbot_discord.bot import discordbot, start_bot as start_discord_bot
 from alttprbot_racetime.bot import start_racetime
@@ -48,6 +49,8 @@ if __name__ == '__main__':
     dbtask = loop.create_task(database())
     loop.run_until_complete(dbtask)
 
+    # Give services in alttprbot/ the Discord lookups they need.
+    discord_gateways.register()
     # Subscribers for the event bridge (alttprbot/events): services publish,
     # these turn events into Discord posts and DMs.
     discord_notifications.register(discordbot)

@@ -1,0 +1,65 @@
+# Imports that already cross a layer boundary, baselined 2026-11-23.
+#
+# .claude/scripts/check_layers.py fails on any cross-layer import NOT listed here,
+# and on any line here whose import no longer exists. So this list only shrinks:
+# when you remove one of these imports, delete its line in the same PR.
+#
+# Rules: core (alttprbot) must not import a front end (alttprbot_discord,
+# alttprbot_api, alttprbot_racetime, alttprbot_audit), and front ends must not
+# import each other. Front ends may import core.
+#
+# Format: one `importer -> imported` per line, dotted module names. `#` starts a
+# comment. Lines are grouped by the plan phase expected to remove them.
+# Re-print today's list with: python3 .claude/scripts/check_layers.py --baseline
+
+# --- Phase 1: seed generation imports the Discord embed builders ---------------
+alttprbot.alttprgen.generator -> alttprbot_discord.util.alttpr_discord
+alttprbot.alttprgen.generator -> alttprbot_discord.util.alttprdoors_discord
+alttprbot.alttprgen.generator -> alttprbot_discord.util.avianart_discord
+alttprbot.alttprgen.generator -> alttprbot_discord.util.sm_discord
+alttprbot.alttprgen.randomizer.mysterydoors -> alttprbot_discord.util.alttpr_discord
+alttprbot.alttprgen.randomizer.mysterydoors -> alttprbot_discord.util.alttprdoors_discord
+alttprbot.alttprgen.smvaria -> alttprbot_discord.util.smvaria_discord
+alttprbot.alttprgen.smz3multi -> alttprbot_discord.util.sm_discord
+alttprbot.alttprgen.spoilers -> alttprbot_discord.util.alttpr_discord
+alttprbot.tournament.alttpres -> alttprbot_discord.util.alttpr_discord
+alttprbot.tournament.alttprfr -> alttprbot_discord.util.alttpr_discord
+alttprbot.tournament.smrl -> alttprbot_discord.util.smvaria_discord
+alttprbot.tournament.smrl_playoff -> alttprbot_discord.util.smvaria_discord
+
+# --- Phase 2: async tournament permission check lives in the web app -----------
+
+# --- Phase 4: tournament engine reaches into the bot singletons ----------------
+alttprbot.tournament.alttpr -> alttprbot_discord.bot
+alttprbot.tournament.alttpr_quals -> alttprbot_discord.bot
+alttprbot.tournament.alttpr_quals -> alttprbot_racetime.bot
+alttprbot.tournament.alttpr_quals -> alttprbot_racetime.core
+alttprbot.tournament.alttprcd -> alttprbot_discord.bot
+alttprbot.tournament.alttprde -> alttprbot_discord.bot
+alttprbot.tournament.alttpres -> alttprbot_discord.bot
+alttprbot.tournament.alttprfr -> alttprbot_discord.bot
+alttprbot.tournament.alttprhmg -> alttprbot_discord.bot
+alttprbot.tournament.alttprleague -> alttprbot_discord.bot
+alttprbot.tournament.alttprmini -> alttprbot_discord.bot
+alttprbot.tournament.alttprsglive -> alttprbot_discord.bot
+alttprbot.tournament.boots -> alttprbot_discord.bot
+alttprbot.tournament.core -> alttprbot_discord.bot
+alttprbot.tournament.core -> alttprbot_racetime.bot
+alttprbot.tournament.core -> alttprbot_racetime.core
+alttprbot.tournament.dailies.alttprdaily -> alttprbot_discord.bot
+alttprbot.tournament.dailies.core -> alttprbot_discord.bot
+alttprbot.tournament.dailies.core -> alttprbot_racetime.bot
+alttprbot.tournament.dailies.smz3 -> alttprbot_discord.bot
+alttprbot.tournament.nologic -> alttprbot_discord.bot
+alttprbot.tournament.smbingo -> alttprbot_discord.bot
+alttprbot.tournament.smrl -> alttprbot_discord.bot
+alttprbot.tournament.smrl_playoff -> alttprbot_discord.bot
+alttprbot.tournament.smwde -> alttprbot_discord.bot
+alttprbot.tournament.smz3coop -> alttprbot_discord.bot
+alttprbot.tournament.test -> alttprbot_discord.bot
+alttprbot.tournaments -> alttprbot_racetime.bot
+
+# --- Phase 5: front ends reaching into each other's bot singletons -------------
+alttprbot_api.api -> alttprbot_discord.bot
+alttprbot_api.blueprints.racetime -> alttprbot_racetime.bot
+alttprbot_api.blueprints.ranked_choice -> alttprbot_discord.bot
