@@ -27,7 +27,16 @@ DISCORD_PRIVILEGED_INTENTS = True        # main bot: members intent
 AUDIT_DISCORD_PRIVILEGED_INTENTS = True  # audit bot: Intents.all(); defaults to DISCORD_PRIVILEGED_INTENTS
 ```
 
-Both default to `False`. The audit bot flag falls back to the main bot flag, so one line
+The audit bot is also switched off entirely for now. To start it again, add:
+
+```python
+AUDIT_BOT_ENABLED = True  # start the audit bot (sahasrahbot.py); defaults to False
+```
+
+It can run with or without `AUDIT_DISCORD_PRIVILEGED_INTENTS`. Without the intents it runs
+in the reduced mode described under "Audit bot" below.
+
+The intent flags default to `False`. The audit bot flag falls back to the main bot flag, so one line
 is enough if both apps get approved at the same time. Make sure the intents are also
 switched on for each application in the Discord Developer Portal (Bot > Privileged
 Gateway Intents), or the bot will fail to connect again.
@@ -66,6 +75,11 @@ Not new: the main bot never requested `message_content`, so its `$` prefix comma
 discord.py 2.0. That hasn't changed.
 
 ### Audit bot (members, presences, message_content)
+
+**The audit bot does not start at all** unless `AUDIT_BOT_ENABLED = True`, so every audit
+feature (message logging, deleted/edited message logs, join/leave/ban logs, link/phishing/ROM
+moderation, `$messagehistory`, `$deletedhistory`) is currently off. The table below describes
+what you'd get if you turned it back on *before* its intents are restored.
 
 | Feature | Where | What happens now | Workaround |
 |---|---|---|---|

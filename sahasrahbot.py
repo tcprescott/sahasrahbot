@@ -8,7 +8,6 @@ from tortoise import Tortoise
 import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_api.api import sahasrahbotapi
-from alttprbot_audit.bot import start_bot as start_audit_bot
 from alttprbot_discord.bot import start_bot as start_discord_bot
 from alttprbot_racetime.bot import start_racetime
 
@@ -42,7 +41,11 @@ if __name__ == '__main__':
     loop.run_until_complete(dbtask)
 
     loop.create_task(start_discord_bot())
-    loop.create_task(start_audit_bot())
+    # The audit bot is off by default while its privileged intents are unavailable.
+    # Set AUDIT_BOT_ENABLED = True in config.py to start it again.
+    if getattr(config, 'AUDIT_BOT_ENABLED', False):
+        from alttprbot_audit.bot import start_bot as start_audit_bot
+        loop.create_task(start_audit_bot())
     start_racetime(loop)
     loop.create_task(sahasrahbotapi.run(host='127.0.0.1', port=5001, use_reloader=False, loop=loop))
     loop.run_forever()
