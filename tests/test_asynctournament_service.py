@@ -5,12 +5,10 @@ network. Each test gets a fresh schema.
 """
 
 import ast
-import asyncio
 import datetime
 from pathlib import Path
 
 import pytest
-from tortoise import Tortoise
 
 from alttprbot import models
 from alttprbot.services import asynctournament as service
@@ -19,34 +17,10 @@ ROOT = Path(__file__).resolve().parent.parent
 UTC = datetime.timezone.utc
 
 
-def run(coro):
-    return asyncio.run(coro)
-
-
-async def _setup_db():
-    await Tortoise.init(
-        db_url="sqlite://:memory:",
-        modules={"models": ["alttprbot.models"]},
-        use_tz=True,
-        timezone="UTC",
-        _enable_global_fallback=True,
-    )
-    await Tortoise.generate_schemas()
-
-
-def db_test(fn):
-    """Run an async test body inside a fresh in-memory database."""
-    def wrapper(*args, **kwargs):
-        async def body():
-            await _setup_db()
-            try:
-                await fn(*args, **kwargs)
-            finally:
-                service.set_member_role_lookup(None)
-                await Tortoise.close_connections()
-        run(body())
-    wrapper.__name__ = fn.__name__
-    return wrapper
+@pytest.fixture(autouse=True)
+def _reset_member_role_lookup():
+    yield
+    service.set_member_role_lookup(None)
 
 
 async def make_tournament(runs_per_pool=1, active=True, pools=("Pool A",), seeds_per_pool=2):
@@ -78,8 +52,7 @@ async def audit_actions(tournament):
 
 # --- Website reattempts and reviews now write the audit log ---------------------
 
-@db_test
-async def test_reattempt_writes_audit_log():
+async def test_reattempt_writes_audit_log(db):
     tournament = await make_tournament()
     player = await make_user(10)
     race = await make_race(tournament, player)
@@ -94,8 +67,7 @@ async def test_reattempt_writes_audit_log():
     assert str(race.id) in log.details
 
 
-@db_test
-async def test_only_one_reattempt_per_tournament():
+async def test_only_one_reattempt_per_tournament(db):
     tournament = await make_tournament(pools=("Pool A", "Pool B"))
     player = await make_user(10)
     first = await make_race(tournament, player)
@@ -108,8 +80,7 @@ async def test_only_one_reattempt_per_tournament():
     assert await audit_actions(tournament) == ["reattempt"]
 
 
-@db_test
-async def test_cannot_reattempt_someone_elses_race():
+async def test_cannot_reattempt_someone_elses_race(db):
     tournament = await make_tournament()
     owner = await make_user(10)
     other = await make_user(11)
@@ -122,8 +93,7 @@ async def test_cannot_reattempt_someone_elses_race():
     assert e.value.status == 400
 
 
-@db_test
-async def test_review_writes_audit_log():
+async def test_review_writes_audit_log(db):
     tournament = await make_tournament()
     player = await make_user(10)
     reviewer = await make_user(20)
@@ -143,8 +113,7 @@ async def test_review_writes_audit_log():
     assert await audit_actions(tournament) == ["review_claim", "review"]
 
 
-@db_test
-async def test_review_rules():
+async def test_review_rules(db):
     tournament = await make_tournament()
     mod = await make_user(20)
     outsider = await make_user(30)
@@ -168,8 +137,7 @@ async def test_review_rules():
 
 # --- Permissions ---------------------------------------------------------------
 
-@db_test
-async def test_permissions_direct_role_and_public():
+async def test_permissions_direct_role_and_public(db):
     tournament = await make_tournament()
     admin = await make_user(20)
     via_role = await make_user(21)
@@ -198,8 +166,7 @@ async def test_permissions_direct_role_and_public():
 
 # --- Starting and running a Discord run ----------------------------------------
 
-@db_test
-async def test_start_race_flow_and_pool_limit():
+async def test_start_race_flow_and_pool_limit(db):
     tournament = await make_tournament(runs_per_pool=1, pools=("Pool A", "Pool B"))
     player = await make_user(10)
     old_account = datetime.datetime(2000, 1, 1, tzinfo=UTC)
@@ -224,8 +191,7 @@ async def test_start_race_flow_and_pool_limit():
     assert [p.name for p in pools] == ["Pool B"]
 
 
-@db_test
-async def test_check_can_start_rules():
+async def test_check_can_start_rules(db):
     tournament = await make_tournament()
     await make_user(10, linked=False)
     old_account = datetime.datetime(2000, 1, 1, tzinfo=UTC)
@@ -239,8 +205,7 @@ async def test_check_can_start_rules():
     assert e.value.status == 404
 
 
-@db_test
-async def test_run_lifecycle_audits_each_step():
+async def test_run_lifecycle_audits_each_step(db):
     tournament = await make_tournament()
     player = await make_user(10)
     race = await make_race(tournament, player, status="pending", thread_id=99)
@@ -262,8 +227,7 @@ async def test_run_lifecycle_audits_each_step():
         "race_ready", "race_countdown", "race_started", "race_finish", "submit_vod"]
 
 
-@db_test
-async def test_forfeit_and_extend_timeout():
+async def test_forfeit_and_extend_timeout(db):
     tournament = await make_tournament()
     player = await make_user(10)
     mod = await make_user(20)
@@ -305,8 +269,7 @@ def test_in_progress_timeout_action():
     assert service.in_progress_timeout_action(models.AsyncTournamentRace(start_time=None), start) is None
 
 
-@db_test
-async def test_timeout_sweep_forfeits_and_audits():
+async def test_timeout_sweep_forfeits_and_audits(db):
     tournament = await make_tournament()
     player = await make_user(10)
     opened = datetime.datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
