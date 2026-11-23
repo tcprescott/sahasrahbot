@@ -13,24 +13,8 @@
 # Re-print today's list with: python3 .claude/scripts/check_layers.py --baseline
 
 # --- Phase 1: seed generation imports the Discord embed builders ---------------
-alttprbot.alttprgen.generator -> alttprbot_discord.util.alttpr_discord
-alttprbot.alttprgen.generator -> alttprbot_discord.util.alttprdoors_discord
-alttprbot.alttprgen.generator -> alttprbot_discord.util.avianart_discord
-alttprbot.alttprgen.generator -> alttprbot_discord.util.sm_discord
-alttprbot.alttprgen.randomizer.mysterydoors -> alttprbot_discord.util.alttpr_discord
-alttprbot.alttprgen.randomizer.mysterydoors -> alttprbot_discord.util.alttprdoors_discord
-alttprbot.alttprgen.smvaria -> alttprbot_discord.util.smvaria_discord
-alttprbot.alttprgen.smz3multi -> alttprbot_discord.util.sm_discord
-alttprbot.alttprgen.spoilers -> alttprbot_discord.util.alttpr_discord
-alttprbot.tournament.alttpres -> alttprbot_discord.util.alttpr_discord
-alttprbot.tournament.alttprfr -> alttprbot_discord.util.alttpr_discord
-alttprbot.tournament.smrl -> alttprbot_discord.util.smvaria_discord
-alttprbot.tournament.smrl_playoff -> alttprbot_discord.util.smvaria_discord
 
 # --- Phase 2: async tournament permission check lives in the web app -----------
-alttprbot.tournament.alttpr_quals -> alttprbot_api.util.checks
-alttprbot_api.util.checks -> alttprbot_discord.bot
-alttprbot_discord.cogs.asynctournament -> alttprbot_api.util.checks
 
 # --- Phase 4: tournament engine reaches into the bot singletons ----------------
 alttprbot.tournament.alttpr -> alttprbot_discord.bot
