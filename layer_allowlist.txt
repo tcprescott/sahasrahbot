@@ -27,8 +27,6 @@ alttprbot.tournament.alttprfr -> alttprbot_discord.util.alttpr_discord
 alttprbot.tournament.smrl -> alttprbot_discord.util.smvaria_discord
 alttprbot.tournament.smrl_playoff -> alttprbot_discord.util.smvaria_discord
 
-# --- Phase 2: async tournament permission check lives in the web app -----------
-
 # --- Phase 4: tournament engine reaches into the bot singletons ----------------
 alttprbot.tournament.alttpr -> alttprbot_discord.bot
 alttprbot.tournament.alttpr_quals -> alttprbot_discord.bot
