@@ -16,10 +16,9 @@ concurrency:
 
 env:
   # Pinned so a tool release can't break every job at once. Bump deliberately.
-  POETRY_VERSION: '2.3.3'
+  POETRY_VERSION: '2.4.3'
   RUFF_VERSION: '0.16.9'
-  # Production runs 3.11; newer versions break the pinned discord.py.
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   lint:

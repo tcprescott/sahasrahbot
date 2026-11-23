@@ -32,9 +32,11 @@ that isn't installed all exit 0. Only a real violation exits 2.
 
 ### SessionStart
 
-- **`hooks/install-deps.sh`** (cloud sessions only). Points Poetry at Python 3.11 when
-  available, runs `poetry install --no-root`, installs `racetime-bot` from git if the
-  proxy blocked its archive URL, and installs pytest and ruff. Never edits
+- **`hooks/install-deps.sh`** (cloud sessions only). Points Poetry at Python 3.13 when
+  available and runs `poetry install --no-root`. If that aborts (the proxy refuses
+  `racetime-bot`'s archive URL), it installs the locked versions with pip, using
+  `hooks/lock_requirements.py`, and `racetime-bot` from git. Then it installs pytest and
+  ruff. Never edits
   `pyproject.toml` or `poetry.lock`.
 - **`hooks/session-start.sh`**. Prints the branch, whether a real `config.py` exists, and
   the check command.
