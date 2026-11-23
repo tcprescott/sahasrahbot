@@ -50,19 +50,20 @@ where things live. Read it before changing code.
 | `docs/` | **The public user site** (GitHub Pages, Jekyll, sahasrahbot.synack.live). User-facing command and preset docs only; developer notes belong in this file |
 | `helpers/`, `dbtest.py`, `update_docs.py` | One-off maintenance scripts |
 | `utils/` | Vendored submodules (door randomizer, enemizer). Not our code; never edit |
-| `tests/` | pytest suite: import smoke tests and guardrail tests |
+| `tests/` | pytest suite: import smoke tests, guardrail tests, and characterization unit tests per area (`test_<area>.py`); shared fixtures in `conftest.py` |
 | `.claude/` | Claude Code hooks and guardrails; see [.claude/README.md](.claude/README.md) |
 
 ## Working on the code
 
 ### Setup
 
-- Python **3.11** (what production runs). 3.13 breaks the pinned discord.py
-  (`audioop` was removed).
-- `poetry install --no-root`, then `poetry run python -m pip install pytest` (pytest is
-  not in the dev group yet). In a cloud session the SessionStart hook does both, and
-  falls back to a git install of `racetime-bot` when the egress proxy blocks its archive
-  URL.
+- Python **3.13** is what CI tests on; `pyproject.toml` allows 3.11 and up.
+- `poetry install --no-root`, then
+  `poetry run python -m pip install --only-binary=:all: -r requirements-test.txt` (pytest,
+  pytest-asyncio and pytest-cov are not in the dev group yet). In a cloud session the
+  SessionStart hook does both. The
+  egress proxy refuses `racetime-bot`'s archive URL, which makes Poetry abort, so the
+  hook then installs the locked versions with pip and `racetime-bot` from git.
 - Running the bot for real needs a `config.py` with real tokens and a MySQL database.
   You almost never need that: verify changes with the tests instead.
 
@@ -76,12 +77,38 @@ Run `./scripts/check.sh` before you commit. It runs what CI runs
 2. `python3 scripts/guardrails.py --all`: replays the `.claude/scripts/` file checks.
 3. `poetry run python -m pytest -q tests`: imports every entry point and every cog
    `bot.py` loads, each in a fresh interpreter with `config.example.py`, plus the
-   guardrail tests.
+   guardrail tests and the unit tests (about 35 seconds). Add `--cov` for a coverage
+   report (`.coveragerc`).
 
-The import smoke test is the main safety net, because there are few behavioural tests.
-It catches typo'd imports, renamed symbols, circular imports and missing config keys.
+The import smoke test catches typo'd imports, renamed symbols, circular imports and
+missing config keys. The unit tests are **characterization tests**: they pin what the
+code on master does today, so a refactor can be checked against them. Rules for them:
+
+- Async tests need no decorator (`asyncio_mode = auto` in `pytest.ini`).
+- `db` fixture: a fresh in-memory SQLite database with every model's table. `raw_sql`
+  also routes `alttprbot/util/orm.py` (MySQL `%s` SQL) to it. MySQL-only SQL
+  (`ON DUPLICATE KEY`, `TIMESTAMPADD`) can't run there; assert on the SQL instead.
+- `fake_http` fixture: a real local HTTP server for code that opens its own aiohttp
+  sessions. Point the code at it by monkeypatching the config value it builds URLs from
+  (e.g. `config.SG_API_ENDPOINT`). aioresponses doesn't work with our aiohttp version.
+- Never call Discord, racetime.gg, SpeedGaming, randomizer APIs, S3 or Google: replace
+  the client (`ALTTPRDiscord.generate`, `rtgg_handler`, `discord_members.get_member`, …)
+  with a mock. `config.DEBUG` is True in `config.example.py`; monkeypatch it where the
+  code branches on it.
+- Import `alttprbot_racetime.bot` before `alttprbot.tournament.*` or `alttprbot.tournaments`:
+  importing the tournament code first is a circular import.
+- When today's behaviour looks wrong, still pin it, but name the test
+  `test_known_issue_...` and say why in its docstring, or mark it
+  `xfail(strict=True)`. When you fix the bug, change that test in the same PR.
+
 When you fix a bug or add behaviour that can be tested without Discord or the network,
 add a focused test under `tests/`.
+
+SonarCloud (project `tcprescott_sahasrahbot`, org `tcprescott`) also analyses every PR.
+In a cloud session with a `SONAR_TOKEN`, the SessionStart hook installs the `sonar` CLI
+(`sonar list issues -p tcprescott_sahasrahbot --pull-request <N>`,
+`sonar qg status -p tcprescott_sahasrahbot`). The project is public, so without a token
+use the web API: `https://sonarcloud.io/api/issues/search?componentKeys=tcprescott_sahasrahbot&pullRequest=<N>&resolved=false`.
 
 ### Conventions
 

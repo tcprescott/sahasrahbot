@@ -32,12 +32,21 @@ that isn't installed all exit 0. Only a real violation exits 2.
 
 ### SessionStart
 
-- **`hooks/install-deps.sh`** (cloud sessions only). Points Poetry at Python 3.11 when
-  available, runs `poetry install --no-root`, installs `racetime-bot` from git if the
-  proxy blocked its archive URL, and installs pytest and ruff. Never edits
+- **`hooks/install-deps.sh`** (cloud sessions only). Points Poetry at Python 3.13 when
+  available and runs `poetry install --no-root`. If that aborts (the proxy refuses
+  `racetime-bot`'s archive URL), it installs the locked versions with pip, using
+  `hooks/lock_requirements.py`, and `racetime-bot` from git. Then it installs the test tooling
+  (`requirements-test.txt`) and ruff. Never edits
   `pyproject.toml` or `poetry.lock`.
 - **`hooks/session-start.sh`**. Prints the branch, whether a real `config.py` exists, and
   the check command.
+- **`hooks/sonar-setup.sh`** (cloud sessions with a `SONAR_TOKEN` only). Installs
+  sonarqube-cli, exports `SONARQUBE_CLI_TOKEN`/`_ORG`/`_SERVER` into the session through
+  `CLAUDE_ENV_FILE` (the container has no keychain), starts the Docker daemon if it is
+  stopped, and runs `sonar integrate claude` from `$HOME` so the MCP server is wired into
+  the user-level config, not the repo. The token is a cloud environment secret; never
+  commit it. Without one, SonarCloud's web API still works anonymously because the
+  project is public. Log: `/tmp/sonar-setup.log`.
 
 ### PreToolUse (Bash)
 
@@ -64,7 +73,7 @@ that isn't installed all exit 0. Only a real violation exits 2.
 ### Stop
 
 - **`scripts/run_tests.py`**: when any `.py` outside `utils/` changed, runs
-  `poetry run python -m pytest -q -x tests` (about 10 seconds) and keeps the turn open
+  `poetry run python -m pytest -q -x tests` (about 35 seconds) and keeps the turn open
   on failure. Skips if pytest isn't installed.
 
 ## Trying a hook by hand
