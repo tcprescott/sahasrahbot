@@ -36,10 +36,9 @@ class BingoSync(object):
         return bingo
 
     async def load_cookies(self):
-        jar = aiohttp.CookieJar(unsafe=True)
+        self.jar = aiohttp.CookieJar(unsafe=True)
         try:
-            jar.load('data/bingosync.cookie')
-            self.jar = jar
+            self.jar.load('data/bingosync.cookie')
         except FileNotFoundError:
             logging.warning("No bingosync cookie file found.  Will skip loading...")
 
@@ -62,7 +61,7 @@ class BingoSync(object):
         if variant_type is not None:
             data['variant_type'] = variant_type
 
-        async with aiohttp.ClientSession(cookie_jar=jar) as session:
+        async with aiohttp.ClientSession(cookie_jar=self.jar) as session:
             async with session.request(
                     method='post',
                     url=BINGOSYNC_BASE_URL,
@@ -72,7 +71,8 @@ class BingoSync(object):
                     raise_for_status=True,
                     data=data
             ) as resp:
-                jar.save('data/bingosync.cookie')
+                if self.jar is not None:
+                    self.jar.save('data/bingosync.cookie')
                 print(await resp.text())
                 if resp.status == 302:
                     self.room_id: str = resp.headers['Location'].split("/")[-1]
@@ -110,7 +110,7 @@ class BingoSync(object):
         if variant_type is not None:
             data['variant_type'] = variant_type
 
-        async with aiohttp.ClientSession(cookie_jar=jar) as session:
+        async with aiohttp.ClientSession(cookie_jar=self.jar) as session:
             async with session.request(
                     method='put',
                     url=f"{BINGOSYNC_BASE_URL}/api/new-card",
@@ -124,7 +124,7 @@ class BingoSync(object):
         return f"{self.base_url}/room/{self.room_id}"
 
     async def get_csrf_token(self):
-        async with aiohttp.ClientSession(cookie_jar=jar) as session:
+        async with aiohttp.ClientSession(cookie_jar=self.jar) as session:
             try:
                 async with session.request(
                         method='get',
