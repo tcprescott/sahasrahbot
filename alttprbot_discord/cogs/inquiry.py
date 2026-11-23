@@ -8,6 +8,7 @@ from discord.interactions import Interaction
 
 import config
 from alttprbot import models
+from alttprbot.util import discord_intents
 
 
 # TODO: make work with discord.py 2.0
@@ -83,12 +84,16 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
         await interaction.response.send_message(
             f"A new thread called {thread.mention} has been opened for this inquiry.", ephemeral=True)
 
-        if interaction.guild.chunked is False:
-            await interaction.guild.chunk(cache=True)
-
-        for member in role_ping.members:
-            logging.info(f"Adding {member.name} to thread {thread.name}")
-            await thread.add_user(member)
+        role_members = await discord_intents.get_role_members(role_ping) if role_ping else []
+        if role_members is None:
+            # Members intent disabled: we can't list the role's members, so mention the role instead.
+            # Mentioning a role in a private thread adds the role's members (who can see the channel) to it.
+            logging.info(f"Mentioning role {role_ping.name} in thread {thread.name} (members intent disabled)")
+            await thread.send(role_ping.mention, allowed_mentions=discord.AllowedMentions(roles=[role_ping]))
+        else:
+            for member in role_members:
+                logging.info(f"Adding {member.name} to thread {thread.name}")
+                await thread.add_user(member)
 
         logging.info(f"Adding {interaction.user.name} to thread {thread.name}")
 

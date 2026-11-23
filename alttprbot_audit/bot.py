@@ -6,6 +6,7 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 import config
+from alttprbot.util.discord_intents import audit_bot_intents, audit_bot_privileged_intents_enabled
 from alttprbot_discord.util import guild_config
 
 guild_config.init()
@@ -16,6 +17,10 @@ async def determine_prefix(bot, message):
         return "$"
 
     prefix = await message.guild.config_get("CommandPrefix", "$")
+    if not audit_bot_privileged_intents_enabled():
+        # Without the message_content intent, Discord only delivers message text when the bot is
+        # mentioned, so also accept "@bot command" as a prefix.
+        return commands.when_mentioned_or(prefix)(bot, message)
     return prefix
 
 
@@ -26,7 +31,8 @@ discordbot = commands.Bot(
         users=True,
         roles=False
     ),
-    intents=discord.Intents.all(),
+    # Privileged intents are controlled by config.AUDIT_DISCORD_PRIVILEGED_INTENTS.
+    intents=audit_bot_intents(),
     debug_guild=508335685044928540 if config.DEBUG else None
 )
 

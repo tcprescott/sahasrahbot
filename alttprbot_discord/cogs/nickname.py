@@ -6,6 +6,7 @@ from discord.ext import commands
 
 import config
 from alttprbot import models
+from alttprbot.util import discord_intents
 
 APP_URL = config.APP_URL
 
@@ -25,10 +26,12 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
 
         await interaction.response.defer(ephemeral=True)
         msg = []
-        if interaction.guild.chunked is False:
-            await interaction.guild.chunk(cache=True)
+        role_members = await discord_intents.get_role_members(role)
+        if role_members is None:
+            await interaction.followup.send(discord_intents.ROLE_MEMBERS_UNAVAILABLE, ephemeral=True)
+            return
 
-        for member in role.members:
+        for member in role_members:
             result = await models.Users.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
                 try:
@@ -60,10 +63,12 @@ class RtggAdmin(commands.GroupCog, name="rtggadmin", description="Admin commands
 
         await interaction.response.defer(ephemeral=True)
         msg = []
-        if interaction.guild.chunked is False:
-            await interaction.guild.chunk(cache=True)
+        role_members = await discord_intents.get_role_members(role)
+        if role_members is None:
+            await interaction.followup.send(discord_intents.ROLE_MEMBERS_UNAVAILABLE, ephemeral=True)
+            return
 
-        for member in role.members:
+        for member in role_members:
             result = await models.Users.get_or_none(discord_user_id=member.id)
             if result is None or result.rtgg_id is None:
                 msg.append(f"{member.name}#{member.discriminator}")

@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from datetime import timedelta
 from typing import List
@@ -12,6 +13,7 @@ from discord.ext import commands, tasks
 
 import config
 from alttprbot import models
+from alttprbot.util import discord_intents
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -114,6 +116,10 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
 
         await interaction.response.defer(ephemeral=True)
 
+        if not discord_intents.members_intent_enabled(interaction.guild):
+            await interaction.followup.send(discord_intents.ROLE_MEMBERS_UNAVAILABLE, ephemeral=True)
+            return
+
         racer_verifications = await models.RacerVerification.filter(guild_id=interaction.guild.id)
         for racer_verification in racer_verifications:
             revoked_users = await self.reverify_racer_verification(racer_verification, revoke=revoke)
@@ -215,15 +221,19 @@ If you have any questions, please contact a server administrator.
         # get all racers with this role
         guild = self.bot.get_guild(racer_verification.guild_id)
 
-        # chunk the guild if it hasn't been done yet
-        if guild.chunked is False:
-            await guild.chunk(cache=True)
-
         verified_racer_role = guild.get_role(racer_verification.role_id)
+
+        # chunks the guild if the members intent is enabled; None if role members can't be listed
+        verified_racer_role_members = await discord_intents.get_role_members(verified_racer_role)
+        if verified_racer_role_members is None:
+            logging.warning(
+                "Skipping reverification for racer verification %s: members intent is disabled.",
+                racer_verification.id)
+            return False
 
         revoked_users: List[models.VerifiedRacer] = []
 
-        for verified_racer_member in verified_racer_role.members:
+        for verified_racer_member in verified_racer_role_members:
             # create database records if they don't already exist
             verified_racer_user, _ = await models.Users.get_or_create(
                 discord_user_id=verified_racer_member.id,

@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from alttprbot import models
+from alttprbot.util import discord_intents
 
 
 class Audit(commands.Cog):
@@ -118,6 +119,11 @@ class Audit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
+        # Without the message_content intent we can't see message text, so edits can't be diffed.
+        # Re-enable with config.AUDIT_DISCORD_PRIVILEGED_INTENTS.
+        if not discord_intents.message_content_intent_enabled(self.bot):
+            return
+
         channel = self.bot.get_channel(payload.channel_id)
         if isinstance(channel, discord.DMChannel):
             return
@@ -298,8 +304,8 @@ async def audit_embed_edit(old_message, message):
     else:
         old_content = old_message[-1]['content']
 
-    old_content = '*empty*' if old_content == '' else old_content
-    new_content = '*empty*' if message.content == '' else message.content
+    old_content = _display_content(old_content)
+    new_content = _display_content(message.content)
 
     embed = discord.Embed(
         title="Message Edited",
@@ -325,18 +331,21 @@ async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=Fal
         old_attachment_url = None
         original_timestamp = '*unknown*'
     else:
-        if guild.chunked is False:
-            await guild.chunk(cache=True)
-        author = guild.get_member(int(old_message[-1]['user_id']))
+        author_id = int(old_message[-1]['user_id'])
+        if await discord_intents.ensure_chunked(guild):
+            author = guild.get_member(author_id)
+        else:
+            # members intent disabled: we only need the ID to mention them, so skip the lookup
+            author = discord.Object(id=author_id)
         old_content = old_message[-1]['content']
         old_attachment_url = old_message[-1]['attachment']
         original_timestamp = f"{old_message[0]['message_date']} UTC"
 
-    old_content = '*empty*' if old_content == '' else old_content
+    old_content = _display_content(old_content)
 
     embed = discord.Embed(
         title="Bulk Message Deleted" if bulk else "Message Deleted",
-        description=f"**Message sent by {'unknown' if author is None else author.mention} was deleted in {channel.mention}.**",
+        description=f"**Message sent by {'unknown' if author is None else f'<@{author.id}>'} was deleted in {channel.mention}.**",
         color=discord.Colour.dark_red(),
         timestamp=discord.utils.utcnow()
     )
@@ -351,6 +360,14 @@ async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=Fal
     embed.set_footer(text="Logged at")
 
     return embed
+
+
+def _display_content(content):
+    if content:
+        return content
+    if not discord_intents.audit_bot_privileged_intents_enabled():
+        return '*empty or unavailable (message content intent is disabled)*'
+    return '*empty*'
 
 
 async def record_message(message):
