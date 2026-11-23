@@ -97,13 +97,23 @@ class RaceSubmissionReminderFailed(Event):
     error: str
 
 
+@dataclasses.dataclass(frozen=True)
+class StaffNeed:
+    """One upcoming episode short on a restream role (part of SchedulingNeedsUpdated)."""
+    start_time: datetime
+    count: int
+    signup_url: str
+
+
 @_frozen
 class SchedulingNeedsUpdated(Event):
     """The list of upcoming episodes short on restream crew was recomputed."""
     name = "tournament.scheduling_needs_updated"
 
     event_slug: str
-    needs: tuple = ()
+    commentators: tuple[StaffNeed, ...] = ()
+    trackers: tuple[StaffNeed, ...] = ()
+    broadcasters: tuple[StaffNeed, ...] = ()
 
 
 @_frozen

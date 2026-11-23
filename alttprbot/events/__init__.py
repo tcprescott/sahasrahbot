@@ -24,6 +24,7 @@ from alttprbot.events.types import (
     TournamentRoomCreationFailed,
     RaceSubmissionReminderFailed,
     SchedulingNeedsUpdated,
+    StaffNeed,
     TournamentEpisodesRefreshed,
     UnmatchedPlayersFound,
 )
@@ -43,6 +44,7 @@ __all__ = [
     "TournamentRoomCreationFailed",
     "RaceSubmissionReminderFailed",
     "SchedulingNeedsUpdated",
+    "StaffNeed",
     "TournamentEpisodesRefreshed",
     "UnmatchedPlayersFound",
 ]
