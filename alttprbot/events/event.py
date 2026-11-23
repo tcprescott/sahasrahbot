@@ -18,4 +18,6 @@ class Event:
 
     name: ClassVar[str] = "event"
 
-    occurred_at: datetime = dataclasses.field(default_factory=lambda: datetime.now(timezone.utc))
+    # Left out of equality: two events with the same data are the same event.
+    occurred_at: datetime = dataclasses.field(
+        default_factory=lambda: datetime.now(timezone.utc), compare=False)

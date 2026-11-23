@@ -7,6 +7,8 @@ from tortoise import Tortoise
 
 import config
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.services import scheduled_jobs
+from alttprbot.services.scheduler import Scheduler
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord import gateways as discord_gateways
 from alttprbot_discord import notifications as discord_notifications
@@ -51,9 +53,17 @@ if __name__ == '__main__':
 
     # Give services in alttprbot/ the Discord lookups they need.
     discord_gateways.register()
-    # Subscribers for the event bridge (alttprbot/events): services publish,
-    # these turn events into Discord posts and DMs.
+    # Subscribers for the event bridge (alttprbot/events): services and the scheduled
+    # jobs publish, these turn events into Discord posts and DMs once the bot is ready.
     discord_notifications.register(discordbot)
+
+    # Periodic jobs run here, not in Discord cogs.
+    scheduler = Scheduler()
+    scheduled_jobs.register_jobs(
+        scheduler,
+        discord_ready=lambda: discord_notifications.wait_until_ready(discordbot),
+    )
+    loop.call_soon(scheduler.start)
 
     loop.create_task(start_discord_bot())
     # The audit bot is off by default while its privileged intents are unavailable.

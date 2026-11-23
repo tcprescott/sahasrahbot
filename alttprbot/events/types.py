@@ -71,7 +71,7 @@ class RankedChoiceBallotCast(Event):
 
 @_frozen
 class DailyChallengeAvailable(Event):
-    """A new ALTTPR daily challenge seed is out."""
+    """A new alttpr.com daily challenge was published."""
     name = "daily.challenge_available"
 
     hash_id: str
@@ -118,11 +118,11 @@ class SchedulingNeedsUpdated(Event):
 
 @_frozen
 class TournamentEpisodesRefreshed(Event):
-    """Upcoming SpeedGaming episodes for an event were fetched again."""
+    """The event's SpeedGaming episodes for the next week, as SpeedGaming returned them."""
     name = "tournament.episodes_refreshed"
 
     event_slug: str
-    episodes: tuple = ()
+    episodes: tuple[dict, ...] = ()
 
 
 @_frozen

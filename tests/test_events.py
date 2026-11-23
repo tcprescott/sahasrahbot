@@ -216,8 +216,8 @@ class FakeBot:
         self.channel = mock.AsyncMock()
         self.users = {1: mock.AsyncMock(), 2: mock.AsyncMock()}
 
-    async def wait_until_ready(self):
-        pass
+    def is_ready(self):
+        return True
 
     def get_channel(self, channel_id):
         return self.channel
