@@ -87,9 +87,21 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
         role_members = await discord_intents.get_role_members(role_ping) if role_ping else []
         if role_members is None:
             # Members intent disabled: we can't list the role's members, so mention the role instead.
-            # Mentioning a role in a private thread adds the role's members (who can see the channel) to it.
-            logging.info(f"Mentioning role {role_ping.name} in thread {thread.name} (members intent disabled)")
-            await thread.send(role_ping.mention, allowed_mentions=discord.AllowedMentions(roles=[role_ping]))
+            # Discord adds the members of a mentioned role (if it has < 100 members) who can view the
+            # thread.  This only works if the mention actually pings, i.e. the role is mentionable or
+            # the bot has the Mention Everyone permission in this channel.
+            can_ping_role = role_ping.mentionable or thread.permissions_for(interaction.guild.me).mention_everyone
+            if can_ping_role:
+                logging.info(f"Mentioning role {role_ping.name} in thread {thread.name} (members intent disabled)")
+                await thread.send(role_ping.mention, allowed_mentions=discord.AllowedMentions(roles=[role_ping]))
+            else:
+                logging.warning(
+                    f"Cannot add role {role_ping.name} to inquiry thread {thread.name}: members intent is disabled "
+                    f"and the role is not mentionable by the bot.")
+                await thread.send(
+                    f"Unable to add {role_ping.mention} to this thread automatically.  A moderator will need to "
+                    f"join it manually.",
+                    allowed_mentions=discord.AllowedMentions.none())
         else:
             for member in role_members:
                 logging.info(f"Adding {member.name} to thread {thread.name}")
