@@ -6,14 +6,12 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 import config
-from alttprbot.util.discord_intents import main_bot_intents
 from alttprbot_discord.util import guild_config
 
 guild_config.init()
 
-# Privileged intents (members) are controlled by config.DISCORD_PRIVILEGED_INTENTS.
-# See alttprbot/util/discord_intents.py.
-intents = main_bot_intents()
+# No privileged intents: member lookups go through alttprbot/util/discord_members.py.
+intents = discord.Intents.default()
 
 discordbot = commands.Bot(
     command_prefix=commands.when_mentioned_or("$"),

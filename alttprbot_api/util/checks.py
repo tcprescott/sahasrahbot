@@ -1,7 +1,7 @@
 from typing import List
 
 from alttprbot import models
-from alttprbot.util import discord_intents
+from alttprbot.util import discord_members
 from alttprbot_discord.bot import discordbot
 
 
@@ -17,8 +17,7 @@ async def is_async_tournament_user(user: models.Users, tournament: models.AsyncT
         return True
 
     guild = discordbot.get_guild(tournament.guild_id)
-    # chunks the guild when the members intent is enabled, otherwise fetches the member via REST
-    member = await discord_intents.get_member(guild, user.discord_user_id)
+    member = await discord_members.get_member(guild, user.discord_user_id)
     if member is None:
         return False
 

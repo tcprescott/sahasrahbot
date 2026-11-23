@@ -7,7 +7,6 @@ import discord
 from discord.ext import commands, tasks
 
 from alttprbot import models
-from alttprbot.util import discord_intents
 
 
 class Audit(commands.Cog):
@@ -120,8 +119,7 @@ class Audit(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
         # Without the message_content intent we can't see message text, so edits can't be diffed.
-        # Re-enable with config.AUDIT_DISCORD_PRIVILEGED_INTENTS.
-        if not discord_intents.message_content_intent_enabled(self.bot):
+        if not self.bot.intents.message_content:
             return
 
         channel = self.bot.get_channel(payload.channel_id)
@@ -332,11 +330,8 @@ async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=Fal
         original_timestamp = '*unknown*'
     else:
         author_id = int(old_message[-1]['user_id'])
-        if await discord_intents.ensure_chunked(guild):
-            author = guild.get_member(author_id)
-        else:
-            # members intent disabled: we only need the ID to mention them, so skip the lookup
-            author = discord.Object(id=author_id)
+        # we only need the ID to mention them, so skip the member lookup
+        author = discord.Object(id=author_id)
         old_content = old_message[-1]['content']
         old_attachment_url = old_message[-1]['attachment']
         original_timestamp = f"{old_message[0]['message_date']} UTC"
@@ -365,9 +360,7 @@ async def audit_embed_delete(guild: discord.Guild, channel, message_id, bulk=Fal
 def _display_content(content):
     if content:
         return content
-    if not discord_intents.audit_bot_privileged_intents_enabled():
-        return '*empty or unavailable (message content intent is disabled)*'
-    return '*empty*'
+    return '*empty or unavailable (no message content intent)*'
 
 
 async def record_message(message):
