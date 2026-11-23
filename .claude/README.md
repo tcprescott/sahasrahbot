@@ -60,6 +60,13 @@ that isn't installed all exit 0. Only a real violation exits 2.
 - **`scripts/check_config_keys.py`**: every `config.NAME` read in a module that does
   `import config` must exist in `config.example.py`, because `config.py` is gitignored
   and the example is the only record of the settings.
+- **`scripts/check_layers.py`**: blocks new imports across layer boundaries. Core
+  (`alttprbot`) must not import a front end (`alttprbot_discord`, `alttprbot_api`,
+  `alttprbot_racetime`, `alttprbot_audit`), and front ends must not import each other.
+  Imports that already break a rule are listed in
+  [`layer_allowlist.txt`](../layer_allowlist.txt), which only shrinks: a line whose
+  import is gone also fails, so delete it in the PR that removes the import. With
+  `--all` it checks the whole tree; `--baseline` prints today's violations.
 
 ### Stop
 
