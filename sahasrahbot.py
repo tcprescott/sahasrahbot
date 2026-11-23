@@ -8,6 +8,7 @@ from tortoise import Tortoise
 import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_api.api import sahasrahbotapi
+from alttprbot_discord import gateways as discord_gateways
 from alttprbot_discord.bot import start_bot as start_discord_bot
 from alttprbot_racetime.bot import start_racetime
 
@@ -47,6 +48,8 @@ if __name__ == '__main__':
     dbtask = loop.create_task(database())
     loop.run_until_complete(dbtask)
 
+    # Give services in alttprbot/ the Discord lookups they need.
+    discord_gateways.register()
     loop.create_task(start_discord_bot())
     # The audit bot is off by default while its privileged intents are unavailable.
     # Set AUDIT_BOT_ENABLED = True in config.py to start it again.
