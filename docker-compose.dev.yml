@@ -4,11 +4,11 @@
 services:
   db:
     image: mariadb:11
+    # Throwaway local database: root with no password, reachable only from this
+    # machine (the port is bound to 127.0.0.1).
     environment:
       MARIADB_DATABASE: sahasrahbot_dev
-      MARIADB_USER: sahasrahbot
-      MARIADB_PASSWORD: sahasrahbot
-      MARIADB_ROOT_PASSWORD: sahasrahbot-root
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "1"
     ports:
       - "127.0.0.1:3307:3306"
     volumes:

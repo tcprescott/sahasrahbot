@@ -90,7 +90,7 @@ Discord bot, no racetime bots and no real credentials. Use it to develop UI and 
 a web change in a real browser (Playwright, or the `run` skill).
 
 - **Database:** a MariaDB 11 container from `docker-compose.dev.yml` on 127.0.0.1:3307
-  (`sahasrahbot_dev`, user and password `sahasrahbot`). The schema is generated from the
+  (database `sahasrahbot_dev`, user `root` with no password, reachable only from this machine). The schema is generated from the
   current models, and `devserver/fixtures.py` seeds it the first time.
   `./scripts/dev.sh --reset` drops every table and reseeds. `DEV_DB_URL=mysql://…` uses your
   own MariaDB/MySQL instead of Docker. In a cloud session the script starts the Docker

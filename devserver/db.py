@@ -12,7 +12,8 @@ from tortoise import Tortoise, connections
 
 logger = logging.getLogger("devserver.db")
 
-DEFAULT_DB_URL = "mysql://sahasrahbot:sahasrahbot@127.0.0.1:3307/sahasrahbot_dev"
+# docker-compose.dev.yml's throwaway database: root, no password, bound to 127.0.0.1.
+DEFAULT_DB_URL = "mysql://root@127.0.0.1:3307/sahasrahbot_dev"
 
 
 def db_url() -> str:
