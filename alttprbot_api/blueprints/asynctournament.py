@@ -1,15 +1,13 @@
-import datetime
-
 from quart import (Blueprint, abort, jsonify, redirect,
                    render_template, request, url_for, Response)
 from quart_discord import requires_authorization, Unauthorized
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from alttprbot import models
+from alttprbot.services import asynctournament as service
 from alttprbot.util import asynctournament
 from alttprbot_api import auth
 from alttprbot_api.api import discord
-from alttprbot_api.util import checks
 
 asynctournament_blueprint = Blueprint('async', __name__)
 
@@ -163,20 +161,11 @@ async def async_tournament_reattempt(tournament_id: int):
     discord_user = await discord.fetch_user()
     user = await models.Users.get_or_none(discord_user_id=discord_user.id)
     tournament = await models.AsyncTournament.get(id=tournament_id)
-    race_id = request.args.get('race_id', None)
 
-    reattempted_races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament, reattempted=True)
-    if reattempted_races:
-        return abort(403, "You have already reattempted a race in this tournament.  Please contact a tournament admin if you believe this is in error.")
-
-    if race_id is None:
-        return abort(400, "You must supply a race_id")
-
-    # verify user of race matches logged in user
-    race = await models.AsyncTournamentRace.get_or_none(id=race_id, user=user, tournament=tournament)
-    if not race:
-        return abort(403, "You must be the player of this race to reattempt it.")
-
+    try:
+        race = await service.get_reattemptable_race(tournament, user, request.args.get('race_id', None))
+    except service.AsyncTournamentError as e:
+        return abort(e.status, e.message)
 
     return await render_template('asynctournament_reattempt.html', user=discord_user, player=user, tournament=tournament, race=race)
 
@@ -187,25 +176,11 @@ async def async_tournament_reattempt_submit(tournament_id: int):
     user = await models.Users.get_or_none(discord_user_id=discord_user.id)
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    reattempted_races = await models.AsyncTournamentRace.filter(user=user, tournament=tournament, reattempted=True)
-    if reattempted_races:
-        return abort(403, "You have already reattempted a race in this tournament.  Please contact a tournament admin if you believe this is in error.")
-
-    race_id = request.args.get('race_id', None)
-    if race_id is None:
-        return abort(400, "You must supply a race_id")
-
-    race = await models.AsyncTournamentRace.get_or_none(id=race_id, user=user, tournament=tournament)
-    if not race:
-        return abort(403, "You must be the player of this race to reattempt it.")
-
     payload = await request.form
-    reason = payload.get('reason', None)
-
-    race.reattempted = True
-    race.reattempt_reason = reason
-
-    await race.save()
+    try:
+        await service.reattempt(tournament, user, request.args.get('race_id', None), payload.get('reason', None))
+    except service.AsyncTournamentError as e:
+        return abort(e.status, e.message)
 
     return redirect(url_for('async.async_tournament', tournament_id=tournament_id))
 
@@ -242,7 +217,7 @@ async def async_tournament_queue(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await service.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -270,31 +245,15 @@ async def async_tournament_review(tournament_id: int, race_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    reviewable = True
+    try:
+        race = await service.get_race_for_review(tournament, user, race_id)
+    except service.AsyncTournamentError as e:
+        return abort(e.status, e.message)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
-    if not authorized:
-        reviewable = False  # doesn't matter for now
-        return abort(403, "You are not authorized to view this tournament.")
-
-    race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
-    if race is None:
-        abort(404, "Race not found.")
-
-    if race.status != 'finished':
-        reviewable = False
-
-    if race.reattempted:
-        reviewable = False
+    reviewable = service.is_reviewable(race)
+    await service.claim_review(race, user)
 
     await race.fetch_related('user', 'reviewed_by', 'permalink', 'permalink__pool', 'tournament', 'live_race')
-
-    # if race.user == user:
-    #     abort(403, "You are not authorized to review your own tournament run.")
-
-    if race.reviewed_by is None and reviewable:
-        race.reviewed_by = user
-        await race.save()
 
     return await render_template('asynctournament_race_view.html', user=discord_user,
                                  tournament=tournament, race=race, already_claimed=race.reviewed_by != user,
@@ -309,31 +268,13 @@ async def async_tournament_review_submit(tournament_id: int, race_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
-    if not authorized:
-        return abort(403, "You are not authorized to view this tournament.")
-
-    race = await models.AsyncTournamentRace.get_or_none(id=race_id, tournament=tournament)
-    if race is None:
-        abort(404, "Race not found.")
-
-    if race.status != 'finished':
-        abort(403, "This race cannot be reviewed yet.")
-
-    if race.reattempted:
-        abort(403, "This race was marked as reattempted and cannot be reviewed.")
-
-    if race.user == user:
-        abort(403, "You are not authorized to review your own tournament run.")
-
     payload = await request.form
-
-    race.review_status = payload.get('review_status', 'pending')
-    race.reviewer_notes = payload.get('reviewer_notes', None)
-    race.reviewed_at = datetime.datetime.now()
-    race.reviewed_by = user
-
-    await race.save()
+    try:
+        await service.submit_review(tournament, user, race_id,
+                                    review_status=payload.get('review_status', 'pending'),
+                                    reviewer_notes=payload.get('reviewer_notes', None))
+    except service.AsyncTournamentError as e:
+        return abort(e.status, e.message)
 
     return redirect(url_for("async.async_tournament_queue", tournament_id=tournament_id))
 
@@ -353,7 +294,7 @@ async def async_tournament_leaderboard(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod'])
+    authorized = await service.is_async_tournament_user(user, tournament, ['admin', 'mod'])
     if not authorized and tournament.active:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -384,7 +325,7 @@ async def async_tournament_player(tournament_id: int, user_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    authorized = await service.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
     if not authorized and tournament.active:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -411,7 +352,7 @@ async def async_tournament_pools(tournament_id: int):
 
     tournament = await models.AsyncTournament.get(id=tournament_id)
 
-    authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+    authorized = await service.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
     if not authorized and tournament.active:
         return abort(403, "You are not authorized to view this tournament.")
 
@@ -439,7 +380,7 @@ async def async_tournament_permalink(tournament_id: int, permalink_id: int):
 
     # skip authorization check if this was a live race
     if permalink.live_race is False:
-        authorized = await checks.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
+        authorized = await service.is_async_tournament_user(user, tournament, ['admin', 'mod', 'public'])
         if not authorized and tournament.active:
             return abort(403, "You are not authorized to view this tournament.")
 

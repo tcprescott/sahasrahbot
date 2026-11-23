@@ -7,7 +7,7 @@ the job does the work and publishes events, and a subscriber does any Discord ou
 from typing import Optional
 
 import config
-from alttprbot.services import daily, tournament_jobs
+from alttprbot.services import asynctournament_jobs, daily, tournament_jobs
 from alttprbot.services.scheduler import Gate, Scheduler
 
 MINUTE = 60
@@ -19,20 +19,28 @@ def _tournament_interval(seconds: float) -> float:
     return 15 if config.DEBUG else seconds
 
 
-def register_jobs(scheduler: Scheduler, tournament_ready: Optional[Gate] = None) -> None:
+def register_jobs(scheduler: Scheduler, discord_ready: Optional[Gate] = None) -> None:
     """Register every periodic job.
 
-    ``tournament_ready`` gates the tournament jobs: their event config
-    (``TournamentConfig``) still holds the Discord guild and channels, so they can't
-    start until the Discord bot is ready. ``sahasrahbot.py`` passes that wait.
+    ``discord_ready`` gates the jobs that can't do anything useful until the Discord
+    bot is ready: the tournament jobs, whose event config (``TournamentConfig``) still
+    holds the Discord guild and channels, and the async race timeouts, which only
+    apply once the runner has been told in Discord. ``sahasrahbot.py`` passes that wait.
     """
     scheduler.add_interval_job('daily.check_for_new_daily', daily.check_for_new_daily, seconds=5 * MINUTE)
 
     scheduler.add_interval_job('tournament.create_races', tournament_jobs.create_races,
-                               seconds=_tournament_interval(5 * MINUTE), wait_for=tournament_ready)
+                               seconds=_tournament_interval(5 * MINUTE), wait_for=discord_ready)
     scheduler.add_interval_job('tournament.week_races', tournament_jobs.week_races,
-                               seconds=_tournament_interval(15 * MINUTE), wait_for=tournament_ready)
+                               seconds=_tournament_interval(15 * MINUTE), wait_for=discord_ready)
     scheduler.add_interval_job('tournament.record_races', tournament_jobs.record_races,
-                               seconds=_tournament_interval(15 * MINUTE), wait_for=tournament_ready)
+                               seconds=_tournament_interval(15 * MINUTE), wait_for=discord_ready)
     scheduler.add_interval_job('tournament.find_races_with_bad_discord', tournament_jobs.find_races_with_bad_discord,
-                               seconds=_tournament_interval(4 * HOUR), wait_for=tournament_ready)
+                               seconds=_tournament_interval(4 * HOUR), wait_for=discord_ready)
+
+    scheduler.add_interval_job('asynctournament.timeout_pending_races', asynctournament_jobs.timeout_pending_races,
+                               seconds=MINUTE, wait_for=discord_ready)
+    scheduler.add_interval_job('asynctournament.timeout_in_progress_races',
+                               asynctournament_jobs.timeout_in_progress_races, seconds=MINUTE, wait_for=discord_ready)
+    scheduler.add_interval_job('asynctournament.calculate_scores', asynctournament_jobs.calculate_scores,
+                               seconds=HOUR)

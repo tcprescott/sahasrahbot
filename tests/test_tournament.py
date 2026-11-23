@@ -450,7 +450,7 @@ async def test_quals_process_tournament_race_requires_mod(db):
     race = quals_race()
     await make_live_race()
     await models.Users.create(rtgg_id="x", display_name="X")
-    with mock.patch.object(alttpr_quals.checks, "is_async_tournament_user", mock.AsyncMock(return_value=False)):
+    with mock.patch.object(alttpr_quals.asynctournament_service, "is_async_tournament_user", mock.AsyncMock(return_value=False)):
         await race.process_tournament_race([], {"user": {"id": "x"}})
     assert "Only a mod or admin" in race.rtgg_handler.send_message.call_args.args[0]
 
@@ -462,7 +462,7 @@ async def test_quals_process_tournament_race_rolls_and_registers(db):
     seed = SimpleNamespace(url="https://alttpr.test/h/xyz", code=["A", "B", "C", "D", "E"])
     race.rtgg_handler.data["entrants"] = [entrant("runner", "Runner")]
 
-    with mock.patch.object(alttpr_quals.checks, "is_async_tournament_user", mock.AsyncMock(return_value=True)), mock.patch.object(
+    with mock.patch.object(alttpr_quals.asynctournament_service, "is_async_tournament_user", mock.AsyncMock(return_value=True)), mock.patch.object(
         alttpr_quals.triforce_text, "generate_with_triforce_text", mock.AsyncMock(return_value=seed)
     ) as gen:
         await race.process_tournament_race([], {"user": {"id": "mod"}})

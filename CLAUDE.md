@@ -173,6 +173,8 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
   registered in `alttprbot/services/scheduled_jobs.py`, never as `discord.ext.tasks`
   loops in a cog (a test enforces this). A job does the work and publishes an event;
   Discord output is a subscriber in `alttprbot_discord/scheduled_job_notifications.py`.
+  When the job needs Discord's answer (the async race timeouts only forfeit once the
+  runner was told), it calls a function registered in `alttprbot_discord/gateways.py`.
 - New racetime categories: add a handler in `alttprbot_racetime/handlers/`, an entry in
   `alttprbot_racetime/config.py`, and its `RACETIME_CLIENT_ID_<SLUG>` /
   `RACETIME_CLIENT_SECRET_<SLUG>` to the loop in `config.example.py`.

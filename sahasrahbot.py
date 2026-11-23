@@ -10,6 +10,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.services import scheduled_jobs
 from alttprbot.services.scheduler import Scheduler
 from alttprbot_api.api import sahasrahbotapi
+from alttprbot_discord import gateways as discord_gateways
 from alttprbot_discord import scheduled_job_notifications
 from alttprbot_discord.bot import discordbot, start_bot as start_discord_bot
 from alttprbot_racetime.bot import start_racetime
@@ -50,13 +51,16 @@ if __name__ == '__main__':
     dbtask = loop.create_task(database())
     loop.run_until_complete(dbtask)
 
+    # Give services in alttprbot/ the Discord lookups they need.
+    discord_gateways.register()
+
     # Periodic jobs run here, not in Discord cogs. They publish events, and the Discord
     # subscribers registered first turn those into messages once the bot is ready.
     scheduled_job_notifications.register(discordbot)
     scheduler = Scheduler()
     scheduled_jobs.register_jobs(
         scheduler,
-        tournament_ready=lambda: scheduled_job_notifications.wait_until_ready(discordbot),
+        discord_ready=lambda: scheduled_job_notifications.wait_until_ready(discordbot),
     )
     loop.call_soon(scheduler.start)
 
