@@ -1,0 +1,15 @@
+# Coverage for `pytest --cov`. Measures the bot's own packages, including the
+# Discord cogs (which have no __init__.py, so they're listed by path).
+[run]
+source =
+    alttprbot
+    alttprbot_api
+    alttprbot_audit
+    alttprbot_discord
+    alttprbot_discord/cogs
+    alttprbot_racetime
+omit =
+    */__pycache__/*
+
+[report]
+skip_empty = true

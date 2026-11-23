@@ -4,7 +4,7 @@ Stop hook: run the test suite before a turn ends, if Python source changed.
 
 Gated so idle turns stay fast: only runs when the working tree, the index, or
 untracked files contain a changed ``.py`` outside utils/. The suite is small
-(import smoke tests plus guardrail tests, ~10s), so it runs whole.
+(import smoke, guardrail and unit tests, ~35s), so it runs whole.
 
 Fails open when pytest isn't installed in the project venv: the session-start
 hook installs it in cloud sessions, and CI runs the suite regardless.
