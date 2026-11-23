@@ -17,13 +17,13 @@ class AuditGeneratedGames(Model):
     class Meta:
         table = "audit_generated_games"
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     randomizer = fields.CharField(45, null=True)
-    hash_id = fields.CharField(50, index=True, null=True)
+    hash_id = fields.CharField(50, db_index=True, null=True)
     permalink = fields.CharField(2000, null=True)
     settings = fields.JSONField(null=True)
-    gentype = fields.CharField(45, index=True, null=True)
-    genoption = fields.CharField(45, index=True, null=True)
+    gentype = fields.CharField(45, db_index=True, null=True)
+    genoption = fields.CharField(45, db_index=True, null=True)
     timestamp = fields.DatetimeField(auto_now=True, null=True)
     customizer = fields.IntField(null=True)
     doors = fields.BooleanField(default=False, null=False)
@@ -34,7 +34,7 @@ class AuditMessages(Model):
     class Meta:
         table = "audit_messages"
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=True)
     message_id = fields.BigIntField(null=True)
     user_id = fields.BigIntField(null=True)
@@ -49,7 +49,7 @@ class Config(Model):
     class Meta:
         table = "config"
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=False)
     parameter = fields.CharField(45, null=False)
     value = fields.CharField(45, null=True)
@@ -59,15 +59,15 @@ class Daily(Model):
     class Meta:
         table = "daily"
 
-    id = fields.IntField(pk=True)
-    hash = fields.CharField(45, index=True)
+    id = fields.IntField(primary_key=True)
+    hash = fields.CharField(45, db_index=True)
 
 
 class DiscordServerLists(Model):
     class Meta:
         table = 'discord_server_lists'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     server_description = fields.CharField(200, null=False)
     invite_id = fields.CharField(45, null=False)
     category = fields.ForeignKeyField('models.DiscordServerCategories', related_name='server_list')
@@ -77,7 +77,7 @@ class DiscordServerCategories(Model):
     class Meta:
         table = 'discord_server_categories'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     order = fields.IntField(null=False, default=0)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
@@ -86,7 +86,7 @@ class DiscordServerCategories(Model):
 
 
 class InquiryMessageConfig(Model):
-    message_id = fields.BigIntField(pk=True, generated=False)
+    message_id = fields.BigIntField(primary_key=True, generated=False)
     role_id = fields.BigIntField(null=False)
 
 
@@ -94,21 +94,21 @@ class PatchDistribution(Model):
     class Meta:
         table = 'patch_distribution'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     patch_id = fields.CharField(45, null=True)
     game = fields.CharField(45, null=True)
-    used = fields.SmallIntField(index=True)
+    used = fields.SmallIntField(db_index=True)
 
 
 class RacetimeKONOTGame(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     category_slug = fields.CharField(50, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
 
 
 class RaceTimeKONOTSegment(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     racetime_room = fields.CharField(200, null=False)
     game_id = fields.IntField(null=False)
     segment_number = fields.IntField(null=False)
@@ -120,7 +120,7 @@ class ReactionGroup(Model):
     class Meta:
         table = 'reaction_group'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
     message_id = fields.BigIntField(null=False)
@@ -133,7 +133,7 @@ class ReactionRole(Model):
     class Meta:
         table = 'reaction_role'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=False)
     reaction_group = fields.ForeignKeyField('models.ReactionGroup', related_name='reaction_roles')
     role_id = fields.BigIntField(null=True)
@@ -146,7 +146,7 @@ class SMZ3Multiworld(Model):
     class Meta:
         table = 'smz3_multiworld'
 
-    message_id = fields.BigIntField(pk=True, generated=False)
+    message_id = fields.BigIntField(primary_key=True, generated=False)
     owner_id = fields.BigIntField(null=True)
     randomizer = fields.CharField(45, null=True)
     preset = fields.CharField(45, null=True)
@@ -154,7 +154,7 @@ class SMZ3Multiworld(Model):
 
 
 class Multiworld(Model):
-    message_id = fields.BigIntField(pk=True, generated=False)
+    message_id = fields.BigIntField(primary_key=True, generated=False)
     owner_id = fields.BigIntField(null=True)
     randomizer = fields.CharField(45, null=True)
     preset = fields.CharField(45, null=True)
@@ -162,7 +162,7 @@ class Multiworld(Model):
 
 
 class MultiworldEntrant(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     discord_user_id = fields.BigIntField(null=True)
     multiworld = fields.ForeignKeyField('models.Multiworld', related_name='entrant')
 
@@ -171,7 +171,7 @@ class SpoilerRaces(Model):
     class Meta:
         table = 'spoiler_races'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     srl_id = fields.CharField(45, null=True)
     spoiler_url = fields.CharField(255, null=True)
     studytime = fields.IntField(null=True)
@@ -183,13 +183,13 @@ class NickVerification(Model):
     class Meta:
         table = 'nick_verification'
 
-    key = fields.BigIntField(pk=True, generated=False)
+    key = fields.BigIntField(primary_key=True, generated=False)
     discord_user_id = fields.BigIntField(null=True)
     timestamp = fields.DatetimeField(auto_now=True, null=True)
 
 
 class PresetNamespaces(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     name = fields.CharField(50, null=False, unique=True)
     discord_user_id = fields.BigIntField(null=False, unique=True)
 
@@ -200,7 +200,7 @@ class PresetNamespaceCollaborators(Model):
     class Meta:
         unique_together = ('namespace', 'discord_user_id')
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='collaborators')
     discord_user_id = fields.BigIntField(null=False)
 
@@ -209,7 +209,7 @@ class Presets(Model):
     class Meta:
         unique_together = ('randomizer', 'preset_name', 'namespace')
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     randomizer = fields.CharField(50)
     preset_name = fields.CharField(50)
     namespace = fields.ForeignKeyField('models.PresetNamespaces', related_name='presets')
@@ -219,26 +219,26 @@ class Presets(Model):
 
 
 class AuthorizationKeys(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     key = fields.CharField(200, null=False, unique=True)
     name = fields.CharField(200, null=False)
 
 
 class AuthorizationKeyPermissions(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     auth_key = fields.ForeignKeyField('models.AuthorizationKeys', related_name='permissions')
     type = fields.CharField(45, null=False)
     subtype = fields.TextField(null=True)
 
 
 class RTGGUnlistedRooms(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     room_name = fields.CharField(200, null=False)
     category = fields.CharField(50, null=False)
 
 
 class RTGGWatcher(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
     notify_on_new_player = fields.BooleanField(default=False)  # NYI
@@ -246,26 +246,26 @@ class RTGGWatcher(Model):
 
 
 class RTGGWatcherPlayer(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     rtgg_watcher = fields.ForeignKeyField('models.RTGGWatcher', related_name='watched_player')
     racetime_id = fields.CharField(50, null=False)
 
 
 class RTGGAnnouncers(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     category = fields.CharField(50, null=False)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False)
 
 
 class RTGGAnnouncerMessages(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     announcer = fields.ForeignKeyField('models.RTGGAnnouncers', related_name='announcer_messages')
     message_id = fields.BigIntField(null=False)
     room_name = fields.CharField(50)
 
 class RTGGOverrideWhitelist(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     racetime_id = fields.CharField(50, null=False)
     category = fields.CharField(50, null=False)
     created = fields.DatetimeField(auto_now_add=True)
@@ -277,7 +277,7 @@ class SrlRaces(Model):
     class Meta:
         table = 'srl_races'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     srl_id = fields.CharField(45, null=True)
     goal = fields.CharField(200, null=True)
     timestamp = fields.DatetimeField(auto_now=True)
@@ -288,19 +288,19 @@ class SRLNick(Model):
     class Meta:
         table = 'srlnick'
 
-    discord_user_id = fields.BigIntField(pk=True, generated=False)
-    twitch_name = fields.CharField(200, index=True, null=True)
-    rtgg_id = fields.CharField(200, index=True, null=True)
-    display_name = fields.CharField(200, index=True, null=True)
+    discord_user_id = fields.BigIntField(primary_key=True, generated=False)
+    twitch_name = fields.CharField(200, db_index=True, null=True)
+    rtgg_id = fields.CharField(200, db_index=True, null=True)
+    display_name = fields.CharField(200, db_index=True, null=True)
 
 
 class Users(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     discord_user_id = fields.BigIntField(null=True, unique=True)
     twitch_name = fields.CharField(200, null=True)
     rtgg_id = fields.CharField(200, null=True, unique=True)
     rtgg_access_token = fields.CharField(200, null=True)
-    display_name = fields.CharField(200, index=True, null=True, unique=True)
+    display_name = fields.CharField(200, db_index=True, null=True, unique=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     test_user = fields.BooleanField(default=False)
@@ -337,7 +337,7 @@ class TournamentGames(Model):
     class Meta:
         table = 'tournament_games'
 
-    episode_id = fields.IntField(pk=True, generated=False)
+    episode_id = fields.IntField(primary_key=True, generated=False)
     event = fields.CharField(45, null=True)
     game_number = fields.IntField(null=True)
     settings = fields.JSONField(null=True)
@@ -349,7 +349,7 @@ class TournamentGames(Model):
 
 
 class TournamentPresetHistory(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     preset = fields.CharField(max_length=255)
     discord_user_id = fields.BigIntField()
     episode_id = fields.BigIntField(null=True)
@@ -361,7 +361,7 @@ class TournamentResults(Model):
     class Meta:
         table = 'tournament_results'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     srl_id = fields.CharField(45, null=True)
     episode_id = fields.CharField(45, null=True)
     permalink = fields.CharField(1000, null=True)
@@ -376,7 +376,7 @@ class TournamentResults(Model):
 
 
 class TriforceTexts(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     pool_name = fields.CharField(45, null=False)
     text = fields.CharField(200, null=False)
     discord_user_id = fields.BigIntField(null=True)
@@ -387,14 +387,14 @@ class TriforceTexts(Model):
 
 
 class TriforceTextsConfig(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     pool_name = fields.CharField(45, null=False)
     key_name = fields.CharField(2000, null=False)
     value = fields.CharField(2000, null=False)
 
 
 class ScheduledEvents(Model):
-    scheduled_event_id = fields.BigIntField(pk=True, generated=False)
+    scheduled_event_id = fields.BigIntField(primary_key=True, generated=False)
     event_slug = fields.CharField(40, null=False)
     episode_id = fields.IntField(null=False, unique=True)
 
@@ -403,7 +403,7 @@ class SpeedGamingDailies(Model):
     class Meta:
         table = 'sgdailies'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     slug = fields.CharField(45, null=True)
     guild_id = fields.BigIntField(null=False)
     announce_channel = fields.BigIntField(null=False)
@@ -418,7 +418,7 @@ class VoiceRole(Model):
     class Meta:
         table = 'voice_role'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=False)
     voice_channel_id = fields.BigIntField(null=False)
     role_id = fields.BigIntField(null=False)
@@ -428,7 +428,7 @@ class RankedChoiceElection(Model):
     class Meta:
         table = 'ranked_choice_election'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     guild_id = fields.BigIntField(null=True)
     channel_id = fields.BigIntField(null=True)
     message_id = fields.BigIntField(null=True)
@@ -449,7 +449,7 @@ class RankedChoiceAuthorizedVoters(Model):
     class Meta:
         table = 'ranked_choice_authorized_voters'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='authorized_voters')
     user_id = fields.BigIntField(null=False)
 
@@ -458,7 +458,7 @@ class RankedChoiceCandidate(Model):
     class Meta:
         table = 'ranked_choice_candidate'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='candidates')
     name = fields.CharField(200, null=False)
     created = fields.DatetimeField(auto_now_add=True)
@@ -470,7 +470,7 @@ class RankedChoiceVotes(Model):
     class Meta:
         table = 'ranked_choice_votes'
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='votes')
     user_id = fields.BigIntField(null=False)
     candidate = fields.ForeignKeyField('models.RankedChoiceCandidate', related_name='votes')
@@ -480,7 +480,7 @@ class RankedChoiceVotes(Model):
 
 
 class AsyncTournament(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     name = fields.CharField(45, null=False)
     guild_id = fields.BigIntField(null=False)
     channel_id = fields.BigIntField(null=False, unique=True)
@@ -502,11 +502,12 @@ class AsyncTournament(Model):
 
     class PydanticMeta:
         backward_relations = False
-        exclude = ['permissions', 'whitelist']
+        # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
+        exclude = ['permissions', 'whitelist', 'races', 'permalink_pools', 'live_races']
 
 
 class AsyncTournamentWhitelist(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='whitelist')
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_whitelist', on_delete="RESTRICT")
     discord_user_id = fields.BigIntField(null=True)
@@ -519,7 +520,7 @@ class AsyncTournamentWhitelist(Model):
 
 
 class AsyncTournamentPermissions(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permissions')
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT",
                                   null=True)
@@ -530,7 +531,7 @@ class AsyncTournamentPermissions(Model):
 
 
 class AsyncTournamentPermalink(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='permalinks')
     url = fields.CharField(200, null=False)
     notes = fields.CharField(200, null=True)
@@ -558,14 +559,15 @@ class AsyncTournamentPermalink(Model):
     class PydanticMeta:
         # computed = ['par_time_formatted']
         backward_relations = False
-        exclude = ['created', 'updated']
+        # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
+        exclude = ['created', 'updated', 'races', 'live_races']
 
 
 class AsyncTournamentPermalinkPool(Model):
     class Meta:
         unique_together = ('tournament', 'name')
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permalink_pools')
     name = fields.CharField(45, null=False)
     preset = fields.CharField(45, null=True)
@@ -581,7 +583,7 @@ class AsyncTournamentPermalinkPool(Model):
 
 
 class AsyncTournamentLiveRace(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='live_races')
     pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='live_races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='live_races', null=True)
@@ -607,7 +609,7 @@ class AsyncTournamentLiveRace(Model):
 
 
 class AsyncTournamentReviewNotes(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     race = fields.ForeignKeyField('models.AsyncTournamentRace', related_name='review_notes')
     author = fields.ForeignKeyField('models.Users', related_name='async_tournament_review_notes', on_delete="RESTRICT")
     created = fields.DatetimeField(auto_now_add=True)
@@ -615,7 +617,7 @@ class AsyncTournamentReviewNotes(Model):
 
 
 class AsyncTournamentRace(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=False)
@@ -752,11 +754,12 @@ class AsyncTournamentRace(Model):
     class PydanticMeta:
         # computed = ['elapsed_time']
         backward_relations = False
-        exclude = ['created', 'updated', 'tournament']
+        # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
+        exclude = ['created', 'updated', 'tournament', 'review_notes']
 
 
 class AsyncTournamentAuditLog(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='audit_log')
     user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True,
                                   on_delete="RESTRICT")
@@ -767,7 +770,7 @@ class AsyncTournamentAuditLog(Model):
 
 
 class RacerVerification(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     message_id = fields.BigIntField(null=True)
     channel_id = fields.BigIntField(null=True)
     guild_id = fields.BigIntField(null=False)
@@ -785,7 +788,7 @@ class RacerVerification(Model):
     verified_racers: fields.ReverseRelation['VerifiedRacer']
 
 class VerifiedRacer(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     user = fields.ForeignKeyField('models.Users', related_name='verified_racer', on_delete="RESTRICT")
     racer_verification = fields.ForeignKeyField('models.RacerVerification', related_name='verified_racer', on_delete="CASCADE")
     estimated_count = fields.IntField(null=True)
@@ -793,7 +796,7 @@ class VerifiedRacer(Model):
     last_verified = fields.DatetimeField(null=True)
 
 class SGL2023OnsiteHistory(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     date = fields.DatetimeField(auto_now_add=True)
     tournament = fields.CharField(45, null=False)
     url = fields.CharField(300, null=False)

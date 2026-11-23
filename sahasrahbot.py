@@ -29,13 +29,20 @@ if config.SENTRY_URL:
 
 async def database():
     await Tortoise.init(
-        db_url=f'mysql://{config.DB_USER}:{urllib.parse.quote_plus(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
-        modules={'models': ['alttprbot.models']}
+        db_url=f'mysql://{config.DB_USER}:{urllib.parse.quote(config.DB_PASS, safe="")}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}',
+        modules={'models': ['alttprbot.models']},
+        # Return timezone-aware UTC datetimes, which is what Tortoise 0.21 did in practice.
+        use_tz=True,
+        timezone='UTC',
+        # Tortoise 1.x keeps ORM state in a context var. The bots and the API query
+        # from other tasks, so expose this context globally.
+        _enable_global_fallback=True,
     )
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     dbtask = loop.create_task(database())
     loop.run_until_complete(dbtask)
