@@ -15,6 +15,7 @@ from slugify import slugify
 import config
 from alttprbot import models
 from alttprbot.util import asynctournament, triforce_text
+from alttprbot.util import discord_intents
 from alttprbot_api.util import checks
 from alttprbot.alttprgen import generator
 
@@ -978,10 +979,12 @@ class AsyncTournament(commands.GroupCog, name="async"):
             return
 
         if role is not None:
-            if interaction.guild.chunked is False:
-                await interaction.guild.chunk()
+            role_members = await discord_intents.get_role_members_or_reply(
+                interaction, role, extra="  Please grant permissions to individual users instead.")
+            if role_members is None:
+                return
 
-            for member in role.members:
+            for member in role_members:
                 dbuser, _ = await models.Users.get_or_create(discord_user_id=member.id,
                                                              defaults={"display_name": member.name})
                 async_tournament_permission = await models.AsyncTournamentPermissions.get_or_none(

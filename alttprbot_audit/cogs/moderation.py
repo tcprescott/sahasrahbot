@@ -14,6 +14,7 @@ from discord.ext import commands
 from urlextract import URLExtract
 
 from alttprbot.util import http
+from alttprbot.util import discord_intents
 
 # from alttprbot import models
 
@@ -26,6 +27,11 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        # Without the message_content intent Discord strips content and attachments from messages,
+        # so none of the checks below can work.  Re-enable with config.AUDIT_DISCORD_PRIVILEGED_INTENTS.
+        if not discord_intents.message_content_intent_enabled(self.bot):
+            return
+
         # don't moderate if a DM
         if message.guild is None:
             return
