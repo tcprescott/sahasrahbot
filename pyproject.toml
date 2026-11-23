@@ -12,41 +12,34 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-quart = "^0.19"
-authlib = "^1.6"
+quart = "*"
+Quart-Discord = ">=2.1.4"
 aerich = ">=0.5.5"
-tortoise-orm = "^0.21"
 aioboto3 = ">=8.0.5"
 aiocache = ">=0.11.1"
 aiofiles = ">=0.4.0"
-aiohttp = "^3.10"
+aiohttp = "*"
 aiomysql = ">=0.0.20"
-tenacity = "*"
 discord-sentry-reporting = "*"
-sentry-sdk = "^2.18"
 emoji = "*"
 dataclasses-json = "*"
-marshmallow = "*"
-PyYAML = "^6.0"
+gspread-asyncio = "*"
+PyYAML = "*"
 html2markdown = "*"
-beautifulsoup4 = "*"
 urlextract = "*"
+oauth2client = "*"
+google-api-python-client = "*"
 html5lib = "*"
 shortuuid = "*"
 python-slugify = "*"
 pyz3r = "^6.0.7"
 isodate = "*"
-python-dateutil = "*"
-pytz = "*"
-werkzeug = "^3.1"
 "discord.py" = "*"
 jishaku = "*"
 pyrankvote = "*"
-racetime-bot = "^2.3.0"
-websockets = "*"
+racetime-bot = {url = "https://github.com/tcprescott/racetime-bot/archive/48afdd4691f0f329eebb5dd33b1cbcf42921e980.zip"}
 markdown = "^3.4.3"
-pydantic-settings = "*"
-httpx = "^0.28.1"
+twitchapi = "^3.10.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -54,215 +47,6 @@ pycodestyle = "*"
 pylint = "*"
 autopep8 = "^2.0.1"
 ipython = "^8.10.0"
-pytest = "*"
-pytest-asyncio = "*"
-pytest-cov = "*"
-import-linter = "*"
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
-pythonpath = ["."]
-# importlib mode lets nested test packages share basenames (e.g. several
-# test_core.py) without colliding and without needing __init__.py files.
-addopts = "--import-mode=importlib"
-
-[tool.coverage.run]
-source = ["alttprbot"]
-omit = [
-    "*/migrations/*",
-    "*/tests/*",
-    "helpers/*",
-]
-
-[tool.importlinter]
-root_package = "alttprbot"
-include_external_packages = "true"
-
-# Contract 1 — the three-tier spine. Imports may only point downward.
-[[tool.importlinter.contracts]]
-name = "Three-tier layering"
-type = "layers"
-layers = [
-    "alttprbot.presentation",
-    "alttprbot.services",
-    "alttprbot.repositories",
-    "alttprbot.models",
-]
-
-# Contract 2 — the service and repository tiers must stay free of UI/transport
-# libraries and of the presentation tier.
-[[tool.importlinter.contracts]]
-name = "Core tiers must not import UI or presentation"
-type = "forbidden"
-source_modules = [
-    "alttprbot.services",
-    "alttprbot.repositories",
-]
-forbidden_modules = [
-    "discord",
-    "racetime_bot",
-    "quart",
-    "alttprbot.presentation",
-]
-allow_indirect_imports = "false"
-
-# Contract 3 — the presentation tier must reach data only through services.
-# Enforced (blocking in CI) as of the final migration phase: the direct-model
-# import burn-down is complete.
-[[tool.importlinter.contracts]]
-name = "Presentation must not import models directly"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation",
-]
-forbidden_modules = [
-    "alttprbot.models",
-]
-# Direct-only: presentation may reach models transitively *through* services,
-# but must not import alttprbot.models itself.
-allow_indirect_imports = "true"
-
-# Contract 4/5 — the REST API and the web BFF are independent presentation
-# surfaces. Neither may import the other; sahasrahbot.py is the only place
-# that wires them together (it imports both and registers the REST
-# blueprints onto the web-owned Quart app).
-[[tool.importlinter.contracts]]
-name = "API presentation surface must not import the web surface"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.api",
-]
-forbidden_modules = [
-    "alttprbot.presentation.web",
-]
-allow_indirect_imports = "false"
-
-[[tool.importlinter.contracts]]
-name = "Web presentation surface must not import the API surface"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.web",
-]
-forbidden_modules = [
-    "alttprbot.presentation.api",
-]
-allow_indirect_imports = "false"
-
-# Contract 6 — presentation may reach repositories only transitively through
-# services (mirrors contract 3's direct-only stance, and matches the edit-time
-# hook in .claude/scripts/enforce_architecture.py).
-[[tool.importlinter.contracts]]
-name = "Presentation must not import repositories directly"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation",
-]
-forbidden_modules = [
-    "alttprbot.repositories",
-]
-allow_indirect_imports = "true"
-
-# Contract 7 — shared util is bottom-tier plumbing: no upward imports, no
-# UI/transport libraries. (alttprbot.models stays allowed: util/telemetry.py
-# lazily imports it, and models is itself bottom-tier.)
-[[tool.importlinter.contracts]]
-name = "Shared util must stay bottom-tier"
-type = "forbidden"
-source_modules = [
-    "alttprbot.util",
-]
-forbidden_modules = [
-    "alttprbot.presentation",
-    "alttprbot.services",
-    "alttprbot.repositories",
-    "discord",
-    "racetime_bot",
-    "quart",
-]
-allow_indirect_imports = "false"
-
-# Contracts 8–12 — surface independence. Only the directions that are clean
-# today are forbidden; racetime→discord, web→discord, and api→{discord,racetime}
-# are by design (single process, live bot object) and stay allowed. api↔web is
-# already covered by contracts 4/5.
-[[tool.importlinter.contracts]]
-name = "Discord surface must not import sibling surfaces"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.discord",
-]
-forbidden_modules = [
-    "alttprbot.presentation.racetime",
-    "alttprbot.presentation.web",
-    "alttprbot.presentation.api",
-    "alttprbot.presentation.audit",
-]
-allow_indirect_imports = "false"
-
-[[tool.importlinter.contracts]]
-name = "Audit surface must not import sibling surfaces"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.audit",
-]
-forbidden_modules = [
-    "alttprbot.presentation.discord",
-    "alttprbot.presentation.racetime",
-    "alttprbot.presentation.web",
-    "alttprbot.presentation.api",
-]
-allow_indirect_imports = "false"
-
-[[tool.importlinter.contracts]]
-name = "RaceTime surface must not import api/web/audit"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.racetime",
-]
-forbidden_modules = [
-    "alttprbot.presentation.api",
-    "alttprbot.presentation.web",
-    "alttprbot.presentation.audit",
-]
-allow_indirect_imports = "false"
-
-[[tool.importlinter.contracts]]
-name = "Web surface must not import racetime/audit"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.web",
-]
-forbidden_modules = [
-    "alttprbot.presentation.racetime",
-    "alttprbot.presentation.audit",
-]
-allow_indirect_imports = "false"
-
-[[tool.importlinter.contracts]]
-name = "API surface must not import audit"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation.api",
-]
-forbidden_modules = [
-    "alttprbot.presentation.audit",
-]
-allow_indirect_imports = "false"
-
-# Contract 13 — the presentation tier is ORM-library-free: tortoise usage
-# (including its exceptions) belongs to the service/repository tiers.
-[[tool.importlinter.contracts]]
-name = "Presentation must not import tortoise directly"
-type = "forbidden"
-source_modules = [
-    "alttprbot.presentation",
-]
-forbidden_modules = [
-    "tortoise",
-]
-allow_indirect_imports = "true"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

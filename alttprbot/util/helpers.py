@@ -9,4 +9,11 @@ def generate_random_string(length: int):
     :param length: The length of the string to generate.
     :return: The generated string.
     """
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+    chars = string.ascii_letters + string.digits
+
+    # generate the random string of the desired length
+    random_string = ''
+    for i in range(length):
+        random_string += random.choice(chars)
+
+    return random_string

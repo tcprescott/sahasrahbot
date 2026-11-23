@@ -1,5 +1,0 @@
-/* Tailwind layers. Element reset + design tokens live in tokens.css
-   (Tailwind preflight is disabled in tailwind.config.js). */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
