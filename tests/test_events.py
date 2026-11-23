@@ -247,6 +247,23 @@ def test_room_opened_dms_the_players():
         assert "https://racetime.gg/alttpr/clever-link-1234" in embed.description
 
 
+def test_room_opened_dm_failure_does_not_stop_the_others():
+    import discord
+
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    bot.users[1].send.side_effect = discord.HTTPException(mock.Mock(status=403), "nope")
+    notifications.register(bot)
+
+    async def main():
+        events.publish(room_opened(event_slug="alttprleague", player_discord_ids=(1, 2)))
+        await events.drain()
+
+    run(main())
+    bot.users[2].send.assert_awaited_once()
+
+
 def test_daily_room_opened_posts_the_announcement(monkeypatch):
     import config
 

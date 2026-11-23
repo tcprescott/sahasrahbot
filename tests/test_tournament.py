@@ -273,16 +273,22 @@ async def test_send_player_message_dm_failure_reports_to_audit_and_room():
     race.rtgg_handler.send_message.assert_awaited_once()
 
 
-async def test_send_player_room_info_dms_every_player_and_tolerates_failures():
+async def test_send_player_room_info_publishes_room_opened(monkeypatch):
+    """The DMs themselves are sent by alttprbot_discord/notifications.py (tests/test_events.py)."""
+    published = []
+    monkeypatch.setattr(core.events, "publish", published.append)
     race = make_race()
     race.rtgg_bot = mock.Mock(http_uri=lambda path: f"https://racetime.test{path}")
-    race.rtgg_handler.data = {"url": "/alttpr/room"}
-    race.players[0].discord_user.send.side_effect = discord.HTTPException(mock.Mock(status=403), "nope")
+    race.rtgg_handler.data = {"url": "/alttpr/room", "name": "alttpr/room"}
 
     await race.send_player_room_info()
-    embed = race.players[1].discord_user.send.call_args.kwargs["embed"]
-    assert "https://racetime.test/alttpr/room" in embed.description
-    assert embed.title == "RT.gg Room Opened - Alice vs. Bob"
+    [event] = published
+    assert isinstance(event, core.events.TournamentRoomOpened)
+    assert event.room_url == "https://racetime.test/alttpr/room"
+    assert event.versus == "Alice vs. Bob"
+    assert event.player_discord_ids == tuple(p.discord_user.id for p in race.players)
+    for player in race.players:
+        player.discord_user.send.assert_not_called()
 
 
 async def test_known_issue_player_without_discord_member_crashes_room_info():
