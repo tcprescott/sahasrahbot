@@ -12,7 +12,7 @@ from alttprbot import models
 from alttprbot import tournaments
 from alttprbot.tournament import core, alttpr
 from alttprbot.util import speedgaming
-from alttprbot.util import discord_intents
+from alttprbot.util import discord_members
 
 # TODO: use asyncio.semaphore() to limit the number of concurrent tasks
 
@@ -31,8 +31,6 @@ class ChallengeCupDeleteHistoryView(discord.ui.View):
     @discord.ui.button(label='Delete from Tournament History', style=discord.ButtonStyle.danger,
                        custom_id='sahabot:delete_history')
     async def delete_history(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await discord_intents.ensure_chunked(interaction.guild)
-
         if not interaction.user.guild_permissions.administrator:
             await interaction.response.send_message("You must be an administrator to delete history.", ephemeral=True)
             return
@@ -384,10 +382,8 @@ class Tournament(commands.Cog):
                         if player['displayName'].startswith('Loser of '):
                             continue
 
-                        # these helpers chunk the guild when the members intent is enabled,
-                        # otherwise they fall back to REST / targeted member queries
                         try:
-                            member = await discord_intents.get_member(event_data.guild, int(player.get('discordId', '')))
+                            member = await discord_members.get_member(event_data.guild, int(player.get('discordId', '')))
                         except ValueError:
                             member = None
 
@@ -395,7 +391,7 @@ class Tournament(commands.Cog):
                             discord_name: str = player.get('discordTag', '')
                             if discord_name.endswith('#0'):  # strip the #0 off the end of the name
                                 discord_name = discord_name[:-2]
-                            member = await discord_intents.get_member_named(event_data.guild, discord_name)
+                            member = await discord_members.get_member_named(event_data.guild, discord_name)
 
                         if member is None:
                             messages.append(
@@ -435,7 +431,6 @@ class Tournament(commands.Cog):
     async def cc2023(self, interaction: discord.Interaction, opponent: discord.Member,
                      on_behalf_of: discord.Member = None, player3: discord.Member = None,
                      player4: discord.Member = None):
-        await discord_intents.ensure_chunked(interaction.guild)
 
         if on_behalf_of and interaction.guild.get_role(CC_TOURNAMENT_ADMIN_ROLE_ID) not in interaction.user.roles:
             await interaction.response.send_message(

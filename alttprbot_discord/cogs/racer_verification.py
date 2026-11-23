@@ -1,19 +1,15 @@
-import logging
 from datetime import datetime
 from datetime import timedelta
-from typing import List
-from io import StringIO
-
 import aiohttp
 import discord
 import isodate
 import pytz
 from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 import config
 from alttprbot import models
-from alttprbot.util import discord_intents
+from alttprbot.util import discord_members
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -75,32 +71,6 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.persistent_views_added = False
-        # self.reverify_racer.start() # pylint: disable=no-member
-
-    @tasks.loop(minutes=1 if config.DEBUG else 1440, reconnect=True)
-    async def reverify_racer(self):
-        racer_verifications = await models.RacerVerification.all()
-        for racer_verification in racer_verifications:
-            revoked_users = await self.reverify_racer_verification(racer_verification, revoke=racer_verification.revoke_ineligible)
-
-            if revoked_users:
-                guild = self.bot.get_guild(racer_verification.guild_id)
-                audit_channel = guild.get_channel(racer_verification.audit_channel_id)
-                if audit_channel is not None:
-                    # attach a list of users who were revoked
-                    revoked_users_list = '\n'.join([x.display_name for x in revoked_users])
-                    if len(revoked_users_list) > 1800:
-                        # attach the list as a file if it's too long
-                        await audit_channel.send(
-                            f"**{len(revoked_users)}** users were revoked from the {guild.get_role(racer_verification.role_id).name} role due to ineligibility.",
-                            file=discord.File(fp=StringIO(revoked_users_list), filename="revoked_users.txt"))
-                    else:
-                        await audit_channel.send(
-                            f"**{len(revoked_users)}** users were revoked from the {guild.get_role(racer_verification.role_id).name} role due to ineligibility.\n\n{revoked_users_list}")
-
-    @reverify_racer.before_loop
-    async def before_create_races(self):
-        await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -110,41 +80,9 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
 
     @app_commands.command(description="Reverify all racers in this server.")
     async def reverify(self, interaction: discord.Interaction, revoke: bool=False):
-        if interaction.user.guild_permissions.administrator is False and self.bot.is_owner(interaction.user) is False:
-            await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
-            return
-
-        await interaction.response.defer(ephemeral=True)
-
-        if not discord_intents.members_intent_enabled(interaction.guild):
-            await interaction.followup.send(discord_intents.ROLE_MEMBERS_UNAVAILABLE, ephemeral=True)
-            return
-
-        racer_verifications = await models.RacerVerification.filter(guild_id=interaction.guild.id)
-        for racer_verification in racer_verifications:
-            revoked_users = await self.reverify_racer_verification(racer_verification, revoke=revoke)
-            racer_verification_role = interaction.guild.get_role(racer_verification.role_id)
-
-            if revoked_users:
-                # attach a list of users who were revoked
-                revoked_users_list = '\n'.join([x.display_name for x in revoked_users])
-                if len(revoked_users_list) > 1800:
-                    # attach the list as a file if it's too long
-                    await interaction.followup.send(
-                        f"**{len(revoked_users)}** users were revoked from the {racer_verification_role.mention} role due to ineligibility.",
-                        file=discord.File(fp=StringIO(revoked_users_list), filename="revoked_users.txt"),
-                        ephemeral=True
-                    )
-                else:
-                    await interaction.followup.send(
-                        f"**{len(revoked_users)}** users were revoked from the {racer_verification_role.mention} role due to ineligibility.\n\n{revoked_users_list}",
-                        ephemeral=True
-                    )
-            else:
-                await interaction.followup.send(
-                    f"No users were revoked from the {racer_verification_role.mention} role due to ineligibility.",
-                    ephemeral=True
-                )
+        # Reverification walked every member of the verified-racer role, which needs the
+        # privileged members intent.  SahasrahBot no longer uses it.
+        await interaction.response.send_message(discord_members.ROLE_MEMBERS_UNAVAILABLE, ephemeral=True)
 
 
     @app_commands.command(description="Create a racer verification message.")
@@ -212,68 +150,6 @@ If you have any questions, please contact a server administrator.
         racer_verification.message_id = message.id
         racer_verification.channel_id = message.channel.id
         await racer_verification.save()
-
-    async def reverify_racer_verification(self, racer_verification: models.RacerVerification, revoke=False):
-        if racer_verification.reverify_period_days is None:
-            # skip this as this racer verification is not set to reverify
-            return False
-
-        # get all racers with this role
-        guild = self.bot.get_guild(racer_verification.guild_id)
-
-        verified_racer_role = guild.get_role(racer_verification.role_id)
-
-        # chunks the guild if the members intent is enabled; None if role members can't be listed
-        verified_racer_role_members = await discord_intents.get_role_members(verified_racer_role)
-        if verified_racer_role_members is None:
-            logging.warning(
-                "Skipping reverification for racer verification %s: members intent is disabled.",
-                racer_verification.id)
-            return False
-
-        revoked_users: List[models.VerifiedRacer] = []
-
-        for verified_racer_member in verified_racer_role_members:
-            # create database records if they don't already exist
-            verified_racer_user, _ = await models.Users.get_or_create(
-                discord_user_id=verified_racer_member.id,
-                defaults={
-                    'display_name': verified_racer_member.name,
-                }
-            )
-            verified_racer, _ = await models.VerifiedRacer.get_or_create(
-                user=verified_racer_user,
-                defaults={
-                    'racer_verification': racer_verification,
-                }
-            )
-            verified_racer.fetch_related('user')
-
-            # check if they're required to reverify
-            if verified_racer.last_verified is not None and discord.utils.utcnow() - verified_racer.last_verified < timedelta(days=racer_verification.reverify_period_days):
-                # skip this racer as they're not due for reverification
-                continue
-            
-            # check if they still meet the requirements
-            eligible, count = await determine_eligibility(verified_racer_member.name, verified_racer_user, racer_verification)
-
-            if eligible:
-                verified_racer.estimated_count = count
-                verified_racer.last_verified = discord.utils.utcnow()
-                await verified_racer.save()
-            else:
-                revoked_users.append(verified_racer_user)
-                if revoke:
-                    # remove the role
-                    await verified_racer_member.remove_roles(verified_racer_role, reason="Racer Verification")
-                    # delete the database record
-                    await verified_racer.delete()
-                    # send a message to the user
-                    await verified_racer_member.send(
-                        f"Your verification for __{verified_racer_role.name}__ has expired.  Please re-verify by clicking the button in the message in the {guild.name} server.\n\nIf you believe this is in error, please contact a server administrator for assistance."
-                    )
-
-        return revoked_users
 
 async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_count=1):
     page = 1

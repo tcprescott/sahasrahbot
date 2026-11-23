@@ -8,7 +8,6 @@ from discord.interactions import Interaction
 
 import config
 from alttprbot import models
-from alttprbot.util import discord_intents
 
 
 # TODO: make work with discord.py 2.0
@@ -84,28 +83,23 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
         await interaction.response.send_message(
             f"A new thread called {thread.mention} has been opened for this inquiry.", ephemeral=True)
 
-        role_members = await discord_intents.get_role_members(role_ping) if role_ping else []
-        if role_members is None:
-            # Members intent disabled: we can't list the role's members, so mention the role instead.
+        if role_ping is not None:
+            # The bot can't list a role's members (no members intent), so mention the role instead.
             # Discord adds the members of a mentioned role (if it has < 100 members) who can view the
             # thread.  This only works if the mention actually pings, i.e. the role is mentionable or
             # the bot has the Mention Everyone permission in this channel.
             can_ping_role = role_ping.mentionable or thread.permissions_for(interaction.guild.me).mention_everyone
             if can_ping_role:
-                logging.info(f"Mentioning role {role_ping.name} in thread {thread.name} (members intent disabled)")
+                logging.info(f"Mentioning role {role_ping.name} in thread {thread.name}")
                 await thread.send(role_ping.mention, allowed_mentions=discord.AllowedMentions(roles=[role_ping]))
             else:
                 logging.warning(
-                    f"Cannot add role {role_ping.name} to inquiry thread {thread.name}: members intent is disabled "
-                    f"and the role is not mentionable by the bot.")
+                    f"Cannot add role {role_ping.name} to inquiry thread {thread.name}: "
+                    f"the role is not mentionable by the bot.")
                 await thread.send(
                     f"Unable to add {role_ping.mention} to this thread automatically.  A moderator will need to "
                     f"join it manually.",
                     allowed_mentions=discord.AllowedMentions.none())
-        else:
-            for member in role_members:
-                logging.info(f"Adding {member.name} to thread {thread.name}")
-                await thread.add_user(member)
 
         logging.info(f"Adding {interaction.user.name} to thread {thread.name}")
 

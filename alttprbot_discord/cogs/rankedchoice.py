@@ -5,7 +5,6 @@ from discord.ext import commands
 import config
 from alttprbot import models
 from alttprbot.util import rankedchoice
-from alttprbot.util import discord_intents
 
 APP_URL = config.APP_URL
 
@@ -88,8 +87,6 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
             seats=seats,
             voter_role_id=authorized_voters_role.id if authorized_voters_role else None
         )
-
-        await discord_intents.ensure_chunked(interaction.guild)
 
         await models.RankedChoiceCandidate.bulk_create(
             [models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in

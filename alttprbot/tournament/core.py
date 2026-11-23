@@ -8,7 +8,7 @@ import pytz
 import config
 from alttprbot import models
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.util import discord_intents, speedgaming
+from alttprbot.util import discord_members, speedgaming
 from alttprbot_discord.bot import discordbot
 from alttprbot_racetime import bot as racetime
 from alttprbot_racetime.core import SahasrahBotRaceTimeBot
@@ -64,8 +64,7 @@ class TournamentPlayer(object):
         playerobj.data = await models.Users.get_or_none(discord_user_id=discord_id)
         if playerobj.data is None:
             raise UnableToLookupUserException(f"Unable to pull nick data for {discord_id}")
-        # chunks the guild when the members intent is enabled, otherwise fetches via REST
-        playerobj.discord_user = await discord_intents.get_member(guild, int(discord_id))
+        playerobj.discord_user = await discord_members.get_member(guild, int(discord_id))
 
         return playerobj
 
@@ -76,8 +75,7 @@ class TournamentPlayer(object):
         if discord_name.endswith('#0'):
             discord_name = discord_name[:-2]  # strip the #0 off the end of the name
 
-        # chunks the guild when the members intent is enabled, otherwise uses a targeted member query
-        playerobj.discord_user = await discord_intents.get_member_named(guild, discord_name)
+        playerobj.discord_user = await discord_members.get_member_named(guild, discord_name)
         if playerobj.discord_user is None:
             raise UnableToLookupUserException(f"Unable to lookup player {discord_name}")
         playerobj.data = await models.Users.get_or_none(discord_user_id=playerobj.discord_user.id)
@@ -276,7 +274,7 @@ class TournamentRace(object):
         if not nickname:
             return False
 
-        discord_user = await discord_intents.get_member(self.guild, nickname.discord_user_id)
+        discord_user = await discord_members.get_member(self.guild, nickname.discord_user_id)
 
         if not discord_user:
             return False
