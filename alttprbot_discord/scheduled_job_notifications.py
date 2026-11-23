@@ -15,7 +15,7 @@ import discord
 from discord.ext import commands
 
 from alttprbot import models, tournaments
-from alttprbot.services import job_events as events
+from alttprbot.services import guild_config, job_events as events
 from alttprbot.tournament import core
 
 logger = logging.getLogger(__name__)
@@ -97,13 +97,13 @@ class ScheduledJobDiscordOutput:
         await wait_until_ready(self.bot)
         seed = await get_daily_seed(event.hash_id)
         embed = await seed.embed(emojis=self.bot.emojis, notes=DAILY_NOTES)
-        daily_announcer_channels = await models.Config.filter(parameter='DailyAnnouncerChannel')
-        for result in daily_announcer_channels:
-            guild = self.bot.get_guild(result.guild_id)
+        daily_announcer_channels = await guild_config.guilds_with('DailyAnnouncerChannel')
+        for guild_id, value in daily_announcer_channels.items():
+            guild = self.bot.get_guild(guild_id)
             if guild is None:
-                logger.warning("Daily announcer guild %s is not available.", result.guild_id)
+                logger.warning("Daily announcer guild %s is not available.", guild_id)
                 continue
-            for channel_name in result.value.split(","):
+            for channel_name in (value or "").split(","):
                 channel = discord.utils.get(guild.text_channels, name=channel_name)
                 if channel is None:
                     logger.warning("Daily announcer channel %s not found in guild %s.", channel_name, guild.id)

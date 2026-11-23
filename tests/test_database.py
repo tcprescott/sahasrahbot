@@ -1,5 +1,7 @@
-"""Characterization tests for the raw-SQL data access helpers (alttprbot/database/)
-and the ORM-backed guild config (alttprbot_discord/util/guild_config.py).
+"""Characterization tests for the raw-SQL data access helpers (alttprbot/database/).
+
+Guild config moved to alttprbot/services/guild_config.py; its tests are in
+tests/test_guild_config_service.py.
 
 The helpers are written for MySQL (``%s`` placeholders, backticks). The
 ``raw_sql`` fixture runs them against the in-memory SQLite schema built from
@@ -13,86 +15,8 @@ from unittest import mock
 import pytest
 
 from alttprbot import models
-from alttprbot.database import config as db_config
 from alttprbot.database import discord_server_lists, role, smz3_multiworld, spoiler_races, tournament_results, voicerole
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util import guild_config
-
-# ---------------------------------------------------------------------------
-# alttprbot.database.config
-# ---------------------------------------------------------------------------
-
-
-async def test_config_set_get_delete(raw_sql):
-    assert await db_config.get_parameter(1, "Foo") is None
-    assert await db_config.get(1, "Foo") is False
-    assert await db_config.get(1, "Foo", default="d") == "d"
-
-    await db_config.set_parameter(1, "Foo", "bar")
-    await db_config.set_parameter(1, "Foo", "baz")  # set replaces
-    await db_config.set_parameter(2, "Foo", "other")
-
-    assert await db_config.get(1, "Foo") == "baz"
-    assert [r["value"] for r in await db_config.get_parameters_by_guild(1)] == ["baz"]
-    assert sorted(r["value"] for r in await db_config.get_all_parameters_by_name("Foo")) == ["baz", "other"]
-
-    await db_config.delete_parameter(1, "Foo")
-    assert await db_config.get_parameter(1, "Foo") is None
-
-
-async def test_config_get_parameter_is_cached(raw_sql):
-    await db_config.set_parameter(1, "Foo", "bar")
-    assert (await db_config.get_parameter(1, "Foo"))["value"] == "bar"
-    await models.Config.filter(guild_id=1).update(value="changed-behind-the-cache")
-    assert (await db_config.get_parameter(1, "Foo"))["value"] == "bar"
-
-
-async def test_known_issue_config_cache_key_shared_with_guild_config(raw_sql):
-    """KNOWN ISSUE, pinned not endorsed: ``alttprbot.database.config`` reuses the
-    guild_config CACHE with the same ``{parameter}_{guild_id}_config`` key, but
-    guild_config caches the bare value while database.config caches a list of
-    rows. After ``guild.config_get`` runs, ``get_parameter`` returns the first
-    character of the value instead of a row."""
-    await db_config.set_parameter(1, "Foo", "bar")
-    guild = SimpleNamespace(id=1)
-    assert await guild_config.config_get(guild, "Foo") == "bar"
-    assert await db_config.get_parameter(1, "Foo") == "b"
-
-
-# ---------------------------------------------------------------------------
-# alttprbot_discord.util.guild_config (ORM)
-# ---------------------------------------------------------------------------
-
-
-async def test_guild_config_roundtrip(db):
-    guild = SimpleNamespace(id=10)
-    assert await guild_config.config_get(guild, "Missing", default="dflt") == "dflt"
-
-    await guild_config.config_set(guild, "Key", "v1")
-    assert await guild_config.config_get(guild, "Key") == "v1"
-    await guild_config.config_set(guild, "Key", "v2")  # update_or_create, cache invalidated
-    assert await guild_config.config_get(guild, "Key") == "v2"
-    assert [(r["parameter"], r["value"]) for r in await guild_config.config_list(guild)] == [("Key", "v2")]
-
-    await guild_config.config_delete(guild, "Key")
-    assert await guild_config.config_get(guild, "Key") is None
-    assert await guild_config.config_list(guild) == []
-
-
-async def test_guild_config_caches_defaults_too(db):
-    guild = SimpleNamespace(id=10)
-    assert await guild_config.config_get(guild, "Key", default="first") == "first"
-    # the miss is cached with the first default; a later default is ignored
-    assert await guild_config.config_get(guild, "Key", default="second") == "first"
-
-
-def test_guild_config_init_patches_discord_guild():
-    import discord
-
-    guild_config.init()
-    assert discord.Guild.config_get is guild_config.config_get
-    assert discord.Guild.config_set is guild_config.config_set
-
 
 # ---------------------------------------------------------------------------
 # alttprbot.database.role (reaction roles)

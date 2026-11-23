@@ -9,6 +9,7 @@ import config
 from alttprbot import models
 # Must be imported before alttprbot.tournament.alttpr, which is circular with tournament.core otherwise.
 from alttprbot import tournaments  # noqa: F401
+from alttprbot.services import guild_config
 from alttprbot.tournament import alttpr
 
 # TODO: use asyncio.semaphore() to limit the number of concurrent tasks
@@ -75,10 +76,7 @@ class Tournament(commands.Cog):
         if ctx.guild is None:
             return False
 
-        if await ctx.guild.config_get('TournamentEnabled') == 'true':
-            return True
-        else:
-            return False
+        return await guild_config.is_enabled(ctx.guild.id, 'TournamentEnabled')
 
     # @app_commands.command(description="Generate an ALTTPR practice seed from an SG Episode that's already been submitted.")
     # async def practice(self, interaction: discord.Interaction, episode_id: int):
