@@ -1,6 +1,5 @@
+import dataclasses
 import datetime
-
-import discord
 
 from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
@@ -40,29 +39,8 @@ class SGDailyRaceCore(TournamentRace):
         return self.rtgg_handler
 
     @property
-    def announce_channel(self):
-        return discordbot.get_channel(307861467838021633)
-
-    @property
     def player_racetime_ids(self):
         return []
-
-    @property
-    def announce_message(self):
-        msg = "SpeedGaming Daily Race Series - {title} at {start_time} ({start_time_remain})".format(
-            title=self.friendly_name,
-            start_time=discord.utils.format_dt(self.race_start_time),
-            start_time_remain=discord.utils.format_dt(self.race_start_time, "R")
-        )
-
-        if self.broadcast_channels:
-            msg += f" on {', '.join(self.broadcast_channels)}"
-
-        msg += " - Seed Distributed {seed_time} - {racetime_url}".format(
-            seed_time=discord.utils.format_dt(self.seed_time, "R"),
-            racetime_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])
-        )
-        return msg
 
     @property
     def race_info(self):
@@ -84,11 +62,9 @@ class SGDailyRaceCore(TournamentRace):
     def seed_time(self):
         return self.race_start_time - datetime.timedelta(minutes=10)
 
-    async def send_player_room_info(self):
-        await self.announce_channel.send(
-            content=self.announce_message,
-            allowed_mentions=discord.AllowedMentions(roles=True)
-        )
+    def room_opened_event(self):
+        # The announcement itself is posted by alttprbot_discord/notifications.py.
+        return dataclasses.replace(super().room_opened_event(), seed_time=self.seed_time)
 
     async def update_data(self, update_episode=True):
         self.episode = await speedgaming.get_episode(self.episodeid)

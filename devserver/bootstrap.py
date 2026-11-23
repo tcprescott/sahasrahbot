@@ -110,6 +110,11 @@ def create_app(app_url: str):
     # What sahasrahbot.py does at startup: give services their Discord lookups (here, the fake bot's).
     gateways.register()
 
+    # Event bridge subscribers, as sahasrahbot.py registers them, so posts the web
+    # app triggers through events (e.g. a ranked choice refresh) reach the outbox.
+    from alttprbot_discord import notifications
+    notifications.register(fake)
+
     sahasrahbotapi.config["DEV_WORLD"] = world
     sahasrahbotapi.register_blueprint(fake_services)
     sahasrahbotapi.register_blueprint(dev_tools)

@@ -2,13 +2,12 @@
 
 These used to be ``discord.ext.tasks`` loops in ``alttprbot_discord/cogs/tournament.py``.
 They do the work and publish events; Discord output is done by the subscribers in
-``alttprbot_discord/scheduled_job_notifications.py``.
+``alttprbot_discord/notifications.py``.
 """
 import datetime
 import logging
 
-from alttprbot import tournaments
-from alttprbot.services import job_events as events
+from alttprbot import events, tournaments
 from alttprbot.tournament import core
 from alttprbot.util import discord_members, speedgaming
 

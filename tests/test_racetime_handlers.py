@@ -228,8 +228,8 @@ def race_payload(status="open", unlisted=False, entrants=None):
 
 
 async def test_race_data_fires_status_handler_only_on_change(db, monkeypatch):
-    dispatched = []
-    monkeypatch.setattr(core.discordbot, "dispatch", lambda event, *a: dispatched.append(event))
+    published = []
+    monkeypatch.setattr(core.events, "publish", published.append)
     h = make_handler()
     h.status_pending = mock.AsyncMock()
 
@@ -239,7 +239,8 @@ async def test_race_data_fires_status_handler_only_on_change(db, monkeypatch):
 
     await h.race_data(race_payload("pending"))
     h.status_pending.assert_awaited_once()
-    assert dispatched == ["racetime_pending"]
+    assert [(type(e).__name__, e.status, e.room_name) for e in published] == [
+        ("RaceStatusChanged", "pending", "alttpr/cool-room-1234")]
 
 
 async def test_race_data_tracks_unlisted_rooms(db):

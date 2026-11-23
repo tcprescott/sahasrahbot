@@ -9,8 +9,7 @@ import logging
 import aiocache
 import aiohttp
 
-from alttprbot import models
-from alttprbot.services import job_events as events
+from alttprbot import events, models
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,4 @@
-"""Tests for the in-process scheduler, the job event shim and the scheduled job logic."""
+"""Tests for the in-process scheduler and the scheduled job logic."""
 import asyncio
 import datetime
 import re
@@ -7,7 +7,6 @@ from types import SimpleNamespace
 
 import pytest
 
-from alttprbot.services import job_events as events
 from alttprbot.services.scheduler import Scheduler
 
 # Imported at collection time, before any test closes an event loop: importing the
@@ -212,38 +211,6 @@ def test_timeout_notifier_error_skips_that_run(monkeypatch):
 
     run(asynctournament_jobs.timeout_pending_races())
     assert applied == [actions[1]]
-
-
-# --- Event shim -----------------------------------------------------------------
-
-def test_publish_delivers_to_matching_subscribers_and_survives_errors():
-    received = []
-
-    async def handler(event):
-        received.append(event)
-
-    async def broken(event):
-        raise RuntimeError("subscriber failed")
-
-    async def main():
-        tokens = [
-            events.subscribe(events.DailyChallengeAvailable, handler),
-            events.subscribe((events.DailyChallengeAvailable, events.UnmatchedPlayersFound), broken),
-        ]
-        try:
-            events.publish(events.DailyChallengeAvailable(hash_id='abc'))
-            events.publish(events.TournamentRoomCreationFailed(event_slug='x', episode_id=1, error='e'))
-            await events.drain()
-        finally:
-            for token in tokens:
-                events.unsubscribe(token)
-
-    run(main())
-    assert received == [events.DailyChallengeAvailable(hash_id='abc')]
-
-
-def test_publish_without_subscribers_or_loop_does_not_raise():
-    events.publish(events.DailyChallengeAvailable(hash_id='abc'))
 
 
 # --- Scheduling needs -------------------------------------------------------------
