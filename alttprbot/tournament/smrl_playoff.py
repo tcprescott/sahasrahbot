@@ -77,10 +77,6 @@ class SMRLPlayoffs(TournamentRace):
             pinned=True
         )
 
-    async def send_audit_message(self, message=None, embed: discord.Embed = None):
-        if self.audit_channel:
-            await self.audit_channel.send(content=message, embed=embed)
-
     @property
     def submission_form(self):
         return "submission_smrl.html"
@@ -163,23 +159,7 @@ class SMRLPlayoffs(TournamentRace):
                                                       defaults={'settings': settings, 'event': self.event_slug,
                                                                 'game_number': game_number})
 
-        if self.audit_channel:
-            await self.audit_channel.send(embed=embed)
-
-        for name, player in self.player_discords:
-            if player is None:
-                logging.error("Could not send DM to %s", name)
-                if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {name}",
-                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-                continue
-            try:
-                await player.send(embed=embed)
-            except discord.HTTPException:
-                logging.exception("Could not send DM to %s", name)
-                if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}",
-                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+        self.publish_settings_submitted(embed)
 
 
 def get_embed_field(name: str, embed: discord.Embed) -> str:

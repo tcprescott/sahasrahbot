@@ -237,19 +237,59 @@ async def test_can_gatekeep(db):
 # ---------------------------------------------------------------------------
 
 
-async def test_send_audit_and_commentary_messages():
+async def test_send_audit_and_commentary_messages_publish_events(monkeypatch):
+    """Changed when the engine moved onto the event bridge: these publish, and
+    alttprbot_discord/notifications.py posts (see tests/test_events.py)."""
+    published = []
+    monkeypatch.setattr(core.events, "publish", published.append)
     race = make_race()
-    await race.send_audit_message("hello")
-    race.data.audit_channel.send.assert_awaited_once_with(content="hello", embed=None)
+    race.data.audit_channel.id = 111
+    race.data.commentary_channel.id = 222
 
+    await race.send_audit_message("hello")
     embed = discord.Embed(title="x")
     await race.send_commentary_message(embed)
-    race.data.commentary_channel.send.assert_awaited_once_with(embed=embed)
-
-    race.episode["channels"] = []  # no restream, no commentary post
-    race.data.commentary_channel.send.reset_mock()
-    await race.send_commentary_message(embed)
+    assert published == [
+        core.events.TournamentAuditRecorded(event_slug="alttpr", episode_id=12345, channel_id=111,
+                                            content="hello", embed=None),
+        core.events.TournamentCommentaryReady(event_slug="alttpr", episode_id=12345, channel_id=222,
+                                              embed=embed.to_dict()),
+    ]
+    race.data.audit_channel.send.assert_not_called()
     race.data.commentary_channel.send.assert_not_called()
+
+    published.clear()
+    race.episode["channels"] = []  # no restream, no commentary post
+    await race.send_commentary_message(embed)
+    assert published == []
+
+
+async def test_no_audit_channel_publishes_nothing(monkeypatch):
+    published = []
+    monkeypatch.setattr(core.events, "publish", published.append)
+    race = make_race()
+    race.data.audit_channel = None
+    race.data.commentary_channel = None
+    await race.send_audit_message("hello")
+    await race.send_commentary_message(discord.Embed(title="x"))
+    assert published == []
+
+
+async def test_publish_settings_submitted(monkeypatch):
+    published = []
+    monkeypatch.setattr(core.events, "publish", published.append)
+    race = make_race()
+    race.data.audit_channel.id = 111
+    embed = discord.Embed(title="Settings")
+
+    race.publish_settings_submitted(embed)
+    [event] = published
+    assert event.audit_channel_id == 111 and event.episode_id == 12345 and event.event_slug == "alttpr"
+    assert event.embed == embed.to_dict()
+    assert event.players == (
+        core.events.TournamentPlayerRef(name="Alice", discord_id=race.players[0].discord_user.id),
+        core.events.TournamentPlayerRef(name="Bob", discord_id=race.players[1].discord_user.id),
+    )
 
 
 async def test_send_player_message_without_handler_raises():

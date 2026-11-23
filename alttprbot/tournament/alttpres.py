@@ -86,20 +86,4 @@ class ALTTPRESTournament(ALTTPRTournamentRace):
                                                       defaults={'settings': preset_dict['settings'],
                                                                 'event': 'alttpres'})
 
-        if self.audit_channel:
-            await self.audit_channel.send(embed=embed)
-
-        for name, player in self.player_discords:
-            if player is None:
-                logging.error(f"Could not send DM to {name}")
-                if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {name}",
-                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-                continue
-            try:
-                await player.send(embed=embed)
-            except discord.HTTPException:
-                logging.exception(f"Could not send DM to {name}")
-                if self.audit_channel:
-                    await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}",
-                                                  allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
+        self.publish_settings_submitted(embed)

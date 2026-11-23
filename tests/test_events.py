@@ -295,3 +295,128 @@ def test_register_twice_does_not_double_deliver():
 
     run(main())
     assert bot.users[1].send.call_count == 1
+
+
+# --- tournament engine audit, commentary and settings -----------------------
+
+
+def test_audit_recorded_posts_content_and_embed():
+    import discord
+
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    notifications.register(bot)
+    embed = discord.Embed(title="Seed", description="details")
+    embed.add_field(name="Permalink", value="https://alttpr.com/h/abc")
+
+    async def main():
+        events.publish(events.TournamentAuditRecorded(
+            event_slug="alttpr", episode_id=1, channel_id=111, content="hello", embed=embed.to_dict()))
+        await events.drain()
+
+    run(main())
+    sent = bot.channel.send.call_args.kwargs
+    assert sent["content"] == "hello"
+    assert sent["embed"].to_dict() == embed.to_dict()
+
+
+def test_audit_recorded_without_embed():
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    notifications.register(bot)
+
+    async def main():
+        events.publish(events.TournamentAuditRecorded(event_slug="alttpr", episode_id=1, channel_id=111, content="x"))
+        await events.drain()
+
+    run(main())
+    bot.channel.send.assert_awaited_once_with(content="x", embed=None)
+
+
+def test_commentary_ready_posts_the_embed():
+    import discord
+
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    notifications.register(bot)
+    embed = discord.Embed(title="Commentary")
+
+    async def main():
+        events.publish(events.TournamentCommentaryReady(
+            event_slug="alttpr", episode_id=1, channel_id=222, embed=embed.to_dict()))
+        await events.drain()
+
+    run(main())
+    assert bot.channel.send.call_args.kwargs["embed"].title == "Commentary"
+
+
+def test_missing_channel_is_skipped():
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    bot.get_channel = lambda channel_id: None
+    notifications.register(bot)
+
+    async def main():
+        events.publish(events.TournamentAuditRecorded(event_slug="alttpr", episode_id=1, channel_id=1, content="x"))
+        await events.drain()
+
+    run(main())  # no exception, nothing to assert on beyond that
+
+
+def settings_submitted(players):
+    import discord
+
+    return events.TournamentSettingsSubmitted(
+        event_slug="alttpres", episode_id=7, audit_channel_id=111,
+        embed=discord.Embed(title="Settings").to_dict(), players=players)
+
+
+def test_settings_submitted_posts_audit_and_dms_players():
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    notifications.register(bot)
+
+    async def main():
+        events.publish(settings_submitted((
+            events.TournamentPlayerRef(name="a", discord_id=1),
+            events.TournamentPlayerRef(name="b", discord_id=2),
+        )))
+        await events.drain()
+
+    run(main())
+    assert bot.channel.send.call_args.kwargs["embed"].title == "Settings"
+    bot.channel.send.assert_awaited_once()
+    for user in bot.users.values():
+        assert user.send.call_args.kwargs["embed"].title == "Settings"
+
+
+def test_settings_submitted_reports_players_it_cannot_dm():
+    """Same wording and @here mention as the engine's old direct sends."""
+    import discord
+
+    from alttprbot_discord import notifications
+
+    bot = FakeBot()
+    bot.users[2].send.side_effect = discord.HTTPException(mock.Mock(status=403), "nope")
+    bot.users[2].name = "bob"
+    bot.users[2].discriminator = "0"
+    notifications.register(bot)
+
+    async def main():
+        events.publish(settings_submitted((
+            events.TournamentPlayerRef(name="carol", discord_id=None),
+            events.TournamentPlayerRef(name="bob", discord_id=2),
+        )))
+        await events.drain()
+
+    run(main())
+    alerts = [c for c in bot.channel.send.call_args_list if c.args]
+    assert [c.args[0] for c in alerts] == ["@here could not send DM to carol", "@here could not send DM to bob#0"]
+    for c in alerts:
+        assert c.kwargs["allowed_mentions"].everyone is True
+        assert c.kwargs["embed"].title == "Settings"

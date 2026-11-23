@@ -403,12 +403,42 @@ class TournamentRace(object):
         pass
 
     async def send_audit_message(self, message=None, embed: discord.Embed = None):
+        # alttprbot_discord/notifications.py posts it to the audit channel.
         if self.audit_channel:
-            await self.audit_channel.send(content=message, embed=embed)
+            events.publish(events.TournamentAuditRecorded(
+                event_slug=self.data.event_slug,
+                episode_id=self.episodeid,
+                channel_id=self.audit_channel.id,
+                content=message,
+                embed=embed.to_dict() if embed else None,
+            ))
 
     async def send_commentary_message(self, embed: discord.Embed):
+        # alttprbot_discord/notifications.py posts it to the commentary channel.
         if self.commentary_channel and len(self.broadcast_channels) > 0:
-            await self.commentary_channel.send(embed=embed)
+            events.publish(events.TournamentCommentaryReady(
+                event_slug=self.data.event_slug,
+                episode_id=self.episodeid,
+                channel_id=self.commentary_channel.id,
+                embed=embed.to_dict() if embed else None,
+            ))
+
+    def publish_settings_submitted(self, embed: discord.Embed):
+        """Send submitted settings to the audit channel and DM them to the players.
+
+        alttprbot_discord/notifications.py does the posting, and reports in the
+        audit channel any player it can't DM.
+        """
+        events.publish(events.TournamentSettingsSubmitted(
+            event_slug=self.data.event_slug,
+            episode_id=self.episodeid,
+            audit_channel_id=self.audit_channel.id if self.audit_channel else None,
+            embed=embed.to_dict(),
+            players=tuple(
+                events.TournamentPlayerRef(name=name, discord_id=player.id if player else None)
+                for name, player in self.player_discords
+            ),
+        ))
 
     async def send_player_message(self, name: str, player: discord.Member, embed: discord.Embed):
         if self.rtgg_handler is None:
