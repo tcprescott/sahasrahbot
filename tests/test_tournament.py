@@ -284,7 +284,9 @@ async def test_publish_settings_submitted(monkeypatch):
 
     race.publish_settings_submitted(embed)
     [event] = published
-    assert event.audit_channel_id == 111 and event.episode_id == 12345 and event.event_slug == "alttpr"
+    assert event.audit_channel_id == 111
+    assert event.episode_id == 12345
+    assert event.event_slug == "alttpr"
     assert event.embed == embed.to_dict()
     assert event.players == (
         core.events.TournamentPlayerRef(name="Alice", discord_id=race.players[0].discord_user.id),

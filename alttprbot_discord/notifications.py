@@ -334,7 +334,7 @@ class DiscordNotifier:
             except discord.HTTPException:
                 logger.info("Could not send room opening DM to %s for episode %s", user_id, event.episode_id)
 
-    async def _channel(self, channel_id: int, event) -> discord.abc.Messageable:
+    def _channel(self, channel_id: int, event) -> discord.abc.Messageable:
         channel = self.bot.get_channel(channel_id)
         if channel is None:
             logger.warning("Channel %s for %s (episode %s) is not available.", channel_id, event.name, event.episode_id)
@@ -342,14 +342,14 @@ class DiscordNotifier:
 
     async def on_tournament_audit_recorded(self, event: events.TournamentAuditRecorded):
         await wait_until_ready(self.bot)
-        channel = await self._channel(event.channel_id, event)
+        channel = self._channel(event.channel_id, event)
         if channel is None:
             return
         await channel.send(content=event.content, embed=_embed(event.embed))
 
     async def on_tournament_commentary_ready(self, event: events.TournamentCommentaryReady):
         await wait_until_ready(self.bot)
-        channel = await self._channel(event.channel_id, event)
+        channel = self._channel(event.channel_id, event)
         if channel is None:
             return
         await channel.send(embed=_embed(event.embed))
@@ -359,28 +359,29 @@ class DiscordNotifier:
         embed = _embed(event.embed)
         audit_channel = None
         if event.audit_channel_id is not None:
-            audit_channel = await self._channel(event.audit_channel_id, event)
+            audit_channel = self._channel(event.audit_channel_id, event)
         if audit_channel:
             await audit_channel.send(embed=embed)
 
-        here = discord.AllowedMentions(everyone=True)
         for player in event.players:
-            if player.discord_id is None:
-                logger.error("Could not send DM to %s", player.name)
-                if audit_channel:
-                    await audit_channel.send(f"@here could not send DM to {player.name}", allowed_mentions=here,
-                                             embed=embed)
-                continue
-            user = None
-            try:
-                user = await self._user(player.discord_id)
-                await user.send(embed=embed)
-            except discord.HTTPException:
-                logger.exception("Could not send DM to %s", player.name)
-                if audit_channel:
-                    who = f"{user.name}#{user.discriminator}" if user else player.name
-                    await audit_channel.send(f"@here could not send DM to {who}", allowed_mentions=here,
-                                             embed=embed)
+            await self._dm_settings(player, embed, audit_channel)
+
+    async def _dm_settings(self, player: events.TournamentPlayerRef, embed, audit_channel):
+        here = discord.AllowedMentions(everyone=True)
+        if player.discord_id is None:
+            logger.error("Could not send DM to %s", player.name)
+            if audit_channel:
+                await audit_channel.send(f"@here could not send DM to {player.name}", allowed_mentions=here, embed=embed)
+            return
+        user = None
+        try:
+            user = await self._user(player.discord_id)
+            await user.send(embed=embed)
+        except discord.HTTPException:
+            logger.exception("Could not send DM to %s", player.name)
+            if audit_channel:
+                who = f"{user.name}#{user.discriminator}" if user else player.name
+                await audit_channel.send(f"@here could not send DM to {who}", allowed_mentions=here, embed=embed)
 
     async def _announce_daily(self, event: events.TournamentRoomOpened, settings: dict):
         message = daily_announcement(event, settings)
