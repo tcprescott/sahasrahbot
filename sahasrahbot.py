@@ -7,8 +7,10 @@ from tortoise import Tortoise
 
 import config
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.util import seed_presenter
 from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord.bot import start_bot as start_discord_bot
+from alttprbot_discord.util import seed_embeds
 from alttprbot_racetime.bot import start_racetime
 
 if config.SENTRY_URL:
@@ -41,6 +43,9 @@ async def database():
 
 
 if __name__ == '__main__':
+    # The tournament engine (core) builds seed embeds through this hook, not by importing Discord code.
+    seed_presenter.register(seed_embeds.seed_embed, seed_embeds.seed_tournament_embed)
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 

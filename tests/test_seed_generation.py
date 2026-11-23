@@ -127,3 +127,31 @@ def test_seed_embed_rejects_unknown_seed_type():
 
     with pytest.raises(TypeError):
         asyncio.run(seed_embed(object()))
+
+
+def test_seed_presenter_requires_registration_then_delegates():
+    """Core reaches the Discord embed builders only through the hook sahasrahbot.py registers."""
+    from alttprbot.util import seed_presenter
+
+    saved = (seed_presenter._embed_builder, seed_presenter._tournament_embed_builder)
+    try:
+        seed_presenter.register(None, None)
+        with pytest.raises(RuntimeError):
+            asyncio.run(seed_presenter.seed_embed(object()))
+
+        async def public(seed, **kwargs):
+            return ("public", seed, kwargs)
+
+        async def tournament(seed, **kwargs):
+            return ("tournament", seed, kwargs)
+
+        seed_presenter.register(public, tournament)
+        assert asyncio.run(seed_presenter.seed_embed("s", name="n")) == ("public", "s", {"name": "n"})
+        assert asyncio.run(seed_presenter.seed_tournament_embed("s")) == ("tournament", "s", {})
+    finally:
+        seed_presenter.register(*saved)
+
+
+def test_entry_point_registers_discord_seed_embeds():
+    text = (ROOT / "sahasrahbot.py").read_text()
+    assert "seed_presenter.register(seed_embeds.seed_embed, seed_embeds.seed_tournament_embed)" in text

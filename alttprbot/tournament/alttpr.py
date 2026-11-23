@@ -10,8 +10,8 @@ from alttprbot.alttprgen import generator
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import triforce_text
+from alttprbot.util.seed_presenter import seed_embed, seed_tournament_embed
 from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util.seed_embeds import seed_embed, seed_tournament_embed
 
 
 class ALTTPRTournamentRace(TournamentRace):
