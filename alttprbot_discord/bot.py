@@ -38,7 +38,6 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
     await discordbot.load_extension("alttprbot_discord.cogs.nickname")
-    await discordbot.load_extension("alttprbot_discord.cogs.racetime_tools")
     await discordbot.load_extension("alttprbot_discord.cogs.role")
     await discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
     await discordbot.load_extension("alttprbot_discord.cogs.tournament")

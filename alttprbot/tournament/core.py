@@ -6,7 +6,7 @@ import discord
 import pytz
 
 import config
-from alttprbot import models
+from alttprbot import events, models
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import discord_members, speedgaming
 from alttprbot_discord.bot import discordbot
@@ -173,23 +173,30 @@ class TournamentRace(object):
     async def configuration(self) -> TournamentConfig:
         self.data = None
 
-    async def send_player_room_info(self):
-        embed = discord.Embed(
-            title=f"RT.gg Room Opened - {self.versus}",
-            description=f"Greetings!  A RaceTime.gg race room has been automatically opened for you.\nYou may access it at {self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])}\n\nEnjoy!",
-            color=discord.Colour.blue(),
-            timestamp=discord.utils.utcnow()
-        )
-
+    def room_opened_event(self) -> events.TournamentRoomOpened:
+        player_discord_ids = []
         for name, player in self.player_discords:
             if player is None:
                 logging.info(f'Could not DM {name}')
                 continue
-            try:
-                await player.send(embed=embed)
-            except discord.HTTPException:
-                logging.info(f'Could not send room opening DM to {name}')
-                continue
+            player_discord_ids.append(player.id)
+
+        return events.TournamentRoomOpened(
+            event_slug=self.event_slug,
+            episode_id=self.episodeid,
+            room_name=self.race_room_name,
+            room_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url']),
+            title=self.friendly_name,
+            versus=self.versus,
+            start_time=self.race_start_time,
+            broadcast_channels=tuple(self.broadcast_channels),
+            player_discord_ids=tuple(player_discord_ids),
+        )
+
+    async def send_player_room_info(self):
+        # alttprbot_discord/notifications.py DMs the players (and posts the
+        # announcement for open races such as the SG dailies).
+        events.publish(self.room_opened_event())
 
     async def send_room_welcome(self):
         pass

@@ -8,7 +8,8 @@ from tortoise import Tortoise
 import config
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_api.api import sahasrahbotapi
-from alttprbot_discord.bot import start_bot as start_discord_bot
+from alttprbot_discord import notifications as discord_notifications
+from alttprbot_discord.bot import discordbot, start_bot as start_discord_bot
 from alttprbot_racetime.bot import start_racetime
 
 if config.SENTRY_URL:
@@ -46,6 +47,10 @@ if __name__ == '__main__':
 
     dbtask = loop.create_task(database())
     loop.run_until_complete(dbtask)
+
+    # Subscribers for the event bridge (alttprbot/events): services publish,
+    # these turn events into Discord posts and DMs.
+    discord_notifications.register(discordbot)
 
     loop.create_task(start_discord_bot())
     # The audit bot is off by default while its privileged intents are unavailable.
