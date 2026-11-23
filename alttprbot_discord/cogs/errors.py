@@ -68,7 +68,7 @@ class Errors(commands.Cog, name="errors"):
                 await edit(
                     content=f"{riplink} Something is missing. `{ctx.clean_prefix}{ctx.command.name} <{'> <'.join(ctx.command.clean_params)}>`")
         # UserInputError -> BadArgument
-        except (commands.MemberNotFound, commands.UserNotFound):
+        except (commands.MemberNotFound, commands.UserNotFound) as d_error:
             if edit is not None:
                 await edit(
                     content=f"{riplink} Member `{str(d_error).split(' ')[1]}` not found ! Don't hesitate to ping the requested member.")
