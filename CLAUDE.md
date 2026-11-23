@@ -81,6 +81,12 @@ It catches typo'd imports, renamed symbols, circular imports and missing config 
 When you fix a bug or add behaviour that can be tested without Discord or the network,
 add a focused test under `tests/`.
 
+SonarCloud (project `tcprescott_sahasrahbot`, org `tcprescott`) also analyses every PR.
+In a cloud session with a `SONAR_TOKEN`, the SessionStart hook installs the `sonar` CLI
+(`sonar list issues -p tcprescott_sahasrahbot --pull-request <N>`,
+`sonar qg status -p tcprescott_sahasrahbot`). The project is public, so without a token
+use the web API: `https://sonarcloud.io/api/issues/search?componentKeys=tcprescott_sahasrahbot&pullRequest=<N>&resolved=false`.
+
 ### Conventions
 
 - Everything is async on one event loop. Never block it: no `time.sleep`, no

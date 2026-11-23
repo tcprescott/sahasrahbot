@@ -40,6 +40,13 @@ that isn't installed all exit 0. Only a real violation exits 2.
   `pyproject.toml` or `poetry.lock`.
 - **`hooks/session-start.sh`**. Prints the branch, whether a real `config.py` exists, and
   the check command.
+- **`hooks/sonar-setup.sh`** (cloud sessions with a `SONAR_TOKEN` only). Installs
+  sonarqube-cli, exports `SONARQUBE_CLI_TOKEN`/`_ORG`/`_SERVER` into the session through
+  `CLAUDE_ENV_FILE` (the container has no keychain), starts the Docker daemon if it is
+  stopped, and runs `sonar integrate claude` from `$HOME` so the MCP server is wired into
+  the user-level config, not the repo. The token is a cloud environment secret; never
+  commit it. Without one, SonarCloud's web API still works anonymously because the
+  project is public. Log: `/tmp/sonar-setup.log`.
 
 ### PreToolUse (Bash)
 
