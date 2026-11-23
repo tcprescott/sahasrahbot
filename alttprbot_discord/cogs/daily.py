@@ -7,6 +7,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from alttprbot import models
+from alttprbot.services import guild_config
 from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
 
 
@@ -32,10 +33,10 @@ class Daily(commands.Cog):
             seed = await get_daily_seed(hash_id)
             embed = await seed.embed(emojis=self.bot.emojis,
                                      notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
-            daily_announcer_channels = await models.Config.filter(parameter='DailyAnnouncerChannel')
-            for result in daily_announcer_channels:
-                guild = self.bot.get_guild(result.guild_id)
-                for channel_name in result.value.split(","):
+            daily_announcer_channels = await guild_config.guilds_with('DailyAnnouncerChannel')
+            for guild_id, value in daily_announcer_channels.items():
+                guild = self.bot.get_guild(guild_id)
+                for channel_name in value.split(","):
                     channel = discord.utils.get(guild.text_channels, name=channel_name)
                     message: discord.Message = await channel.send(embed=embed)
                     await message.create_thread(name=seed.data['spoiler']['meta'].get('name'),
