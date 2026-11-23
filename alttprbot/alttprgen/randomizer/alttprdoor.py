@@ -148,6 +148,10 @@ class AlttprDoor():
         return seed
 
     @property
+    def generated_goal(self):
+        return "door randomizer"
+
+    @property
     def url(self):
         return f"https://alttprpatch.synack.live/patcher.html?patch={self.patch_url}"
 

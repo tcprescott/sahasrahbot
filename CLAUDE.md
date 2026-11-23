@@ -37,10 +37,10 @@ where things live. Read it before changing code.
 | `config.example.py` | Every setting the code reads, with placeholders. Tests load it when `config.py` is absent |
 | `alttprbot/models/` | Tortoise models (`models.py`, `schedule.py`), re-exported from `alttprbot.models` |
 | `alttprbot/database/` | Older data-access helpers, mostly raw SQL through `alttprbot/util/orm.py`. Prefer models for new code |
-| `alttprbot/alttprgen/` | Seed generation: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one module per external randomizer), `spoilers.py` |
+| `alttprbot/alttprgen/` | Seed generation, with no Discord, racetime or web imports: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one API client per external randomizer, e.g. `alttpr.py`'s `ALTTPRClient`), `spoilers.py` |
 | `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`) |
 | `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `asynctournament.py`, `gsheet.py`, `triforce_text.py`, … |
-| `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `util/` (per-randomizer embeds, guild config, checks) |
+| `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `util/` (`seed_embeds.py` builds every seed embed, guild config, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
 | `alttprbot_api/` | Quart web app on 127.0.0.1:5001: `api.py`, `auth.py` (Discord OAuth), `blueprints/`, `templates/`, `static/` |
 | `alttprbot_audit/` | Second Discord bot for moderation/audit logs. Disabled by default (see above) |

@@ -6,8 +6,8 @@ import random
 
 from pyz3r.mystery import get_random_option, generate_random_settings
 
-from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
+from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
+from alttprbot.alttprgen.randomizer.alttprdoor import AlttprDoor
 
 
 @dataclass
@@ -17,7 +17,7 @@ class AlttprMystery:
     customizer: bool = False
     doors: bool = False
     custom_instructions: str = None
-    seed: Union[AlttprDoorDiscord, ALTTPRDiscord] = None
+    seed: Union[AlttprDoor, ALTTPRClient] = None
     branch: str = None
 
 

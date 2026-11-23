@@ -13,6 +13,7 @@ from alttprbot import tournaments
 from alttprbot.tournament import core, alttpr
 from alttprbot.util import speedgaming
 from alttprbot.util import discord_members
+from alttprbot_discord.util.seed_embeds import seed_embed
 
 # TODO: use asyncio.semaphore() to limit the number of concurrent tasks
 
@@ -472,7 +473,7 @@ class Tournament(commands.Cog):
 
         seed, preset, deck = await alttpr.roll_seed(players, event_slug="cc2023", episode_id=msg_id)
 
-        embed = await seed.embed(emojis=self.bot.emojis, include_settings=False)
+        embed = await seed_embed(seed, emojis=self.bot.emojis, include_settings=False)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         if deck:
             embed.insert_field_at(1, name="Deck", value="\n".join([f"**{p}**: {c}" for p, c in deck.items()]),

@@ -14,7 +14,8 @@ from alttprbot.alttprgen.randomizer import smdash, z2r
 from alttprbot.alttprgen.spoilers import (generate_spoiler_game,
                                           generate_spoiler_game_custom)
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
+from alttprbot_discord.util.seed_embeds import build_file_select_code, seed_embed, smvaria_embed
 
 # from z3rsramr import parse_sram  # pylint: disable=no-name-in-module
 
@@ -67,7 +68,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         )
         if not seed:
             raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
-        embed = await seed.embed(emojis=self.bot.emojis)
+        embed = await seed_embed(seed, emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
 
         await interaction.followup.send(embed=embed)
@@ -114,7 +115,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             branch=branch,
         )
 
-        embed: discord.Embed = await seed.embed(emojis=self.bot.emojis)
+        embed: discord.Embed = await seed_embed(seed, emojis=self.bot.emojis)
         embed.add_field(name="Saved as preset!",
                         value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`",
                         inline=False)
@@ -140,7 +141,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             branch=branch
         )
 
-        embed = await spoiler.seed.embed(emojis=self.bot.emojis)
+        embed = await seed_embed(spoiler.seed, emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
 
@@ -174,7 +175,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         content = await yamlfile.read()
         spoiler = await generate_spoiler_game_custom(content, branch=branch)
 
-        embed = await spoiler.seed.embed(emojis=self.bot.emojis)
+        embed = await seed_embed(spoiler.seed, emojis=self.bot.emojis)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
 
         await interaction.followup.send(embed=embed)
@@ -199,7 +200,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             tournament=race == "yes"
         )
 
-        embed = await mystery.seed.embed(emojis=self.bot.emojis, name="Mystery Game")
+        embed = await seed_embed(mystery.seed, emojis=self.bot.emojis, name="Mystery Game")
 
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
@@ -231,7 +232,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
 
         mystery = await data.generate(spoilers="mystery" if mask_settings else "off", tournament=race == "yes")
 
-        embed = await mystery.seed.embed(emojis=self.bot.emojis, name="Mystery Game")
+        embed = await seed_embed(mystery.seed, emojis=self.bot.emojis, name="Mystery Game")
 
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
@@ -258,7 +259,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
     ):
         await interaction.response.defer()
 
-        seeds = await create_priestmode(count=count, genclass=ALTTPRDiscord)
+        seeds = await create_priestmode(count=count, genclass=ALTTPRClient)
         embed = discord.Embed(
             title='Kiss Priest Games',
             color=discord.Color.blurple()
@@ -266,7 +267,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         for idx, seed in enumerate(seeds):
             embed.add_field(
                 name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
-                value=f"{seed.url}\n{seed.build_file_select_code(self.bot.emojis)}",
+                value=f"{seed.url}\n{build_file_select_code(seed, self.bot.emojis)}",
                 inline=False
             )
         await interaction.followup.send(embed=embed)
@@ -344,7 +345,7 @@ class AlttprUtils(commands.GroupCog, name="alttprutils", description="Utilities 
     #             )
     #         )
     #         if not parsed.get('hash id', 'none') == 'none':
-    #             seed = await ALTTPRDiscord.retrieve(hash_id=parsed.get('hash id', 'none'))
+    #             seed = await ALTTPRClient.retrieve(hash_id=parsed.get('hash id', 'none'))
     #             embed.add_field(name='File Select Code', value=seed.build_file_select_code(
     #                 emojis=self.bot.emojis
     #             ), inline=False)
@@ -443,7 +444,7 @@ class Generator(commands.Cog):
         await interaction.response.defer()
         smpreset = generator.SMPreset(preset)
         await smpreset.generate(tournament=race == "yes", spoilers=False)
-        embed = await smpreset.seed.embed()
+        embed = await seed_embed(smpreset.seed)
         await interaction.followup.send(embed=embed)
 
     @sm.autocomplete("preset")
@@ -470,7 +471,7 @@ class Generator(commands.Cog):
         await interaction.response.defer()
         smz3preset = generator.SMZ3Preset(preset)
         await smz3preset.generate(tournament=race == "yes", spoilers=spoiler_race == "yes")
-        embed = await smz3preset.seed.embed()
+        embed = await seed_embed(smz3preset.seed)
         if spoiler_url := smz3preset.spoiler_url():
             embed.add_field(name='Race Spoiler Log', value=spoiler_url)
         await interaction.followup.send(embed=embed)
@@ -503,7 +504,7 @@ class Generator(commands.Cog):
             skills=skills,
             race=race == "yes"
         )
-        await interaction.followup.send(embed=seed.embed())
+        await interaction.followup.send(embed=smvaria_embed(seed))
 
     @smvaria.autocomplete("skills")
     async def autocomplete_smvaria_skills(self, interaction: discord.Interaction, current: str):

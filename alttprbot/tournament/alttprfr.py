@@ -6,7 +6,7 @@ from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
 from alttprbot_discord.bot import discordbot
-from alttprbot_discord.util import alttpr_discord
+from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
 
 
 class ALTTPRFRTournament(ALTTPRTournamentRace):
@@ -15,7 +15,7 @@ class ALTTPRFRTournament(ALTTPRTournamentRace):
             raise Exception('Missing bracket settings.  Please submit!')
 
         self.preset_dict = None
-        self.seed = await alttpr_discord.ALTTPRDiscord.generate(settings=self.bracket_settings)
+        self.seed = await ALTTPRClient.generate(settings=self.bracket_settings)
 
     async def configuration(self):
         guild = discordbot.get_guild(470200169841950741)
