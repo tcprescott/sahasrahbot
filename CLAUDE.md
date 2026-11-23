@@ -97,6 +97,10 @@ add a focused test under `tests/`.
   `load_extensions()` in `alttprbot_discord/bot.py`. Prefer slash commands
   (`app_commands`); prefix commands that read message text can't work without
   message_content.
+- **Periodic jobs** run on the in-process scheduler (`alttprbot/services/scheduler.py`),
+  registered in `alttprbot/services/scheduled_jobs.py`, never as `discord.ext.tasks`
+  loops in a cog (a test enforces this). A job does the work and publishes an event;
+  Discord output is a subscriber in `alttprbot_discord/scheduled_job_notifications.py`.
 - New racetime categories: add a handler in `alttprbot_racetime/handlers/`, an entry in
   `alttprbot_racetime/config.py`, and its `RACETIME_CLIENT_ID_<SLUG>` /
   `RACETIME_CLIENT_SECRET_<SLUG>` to the loop in `config.example.py`.
