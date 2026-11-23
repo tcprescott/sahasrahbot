@@ -20,3 +20,4 @@ utils/enemizer/ubuntu*
 .ruff_cache/
 tests/_scratch/
 .claude/settings.local.json
+.devdb-password

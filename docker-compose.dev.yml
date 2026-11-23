@@ -4,11 +4,13 @@
 services:
   db:
     image: mariadb:11
-    # Throwaway local database: root with no password, reachable only from this
-    # machine (the port is bound to 127.0.0.1).
+    # Throwaway local database, reachable only from this machine. dev.sh generates
+    # the password into the gitignored .devdb-password file on first run.
     environment:
       MARIADB_DATABASE: sahasrahbot_dev
-      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "1"
+      MARIADB_USER: sahasrahbot
+      MARIADB_PASSWORD: ${DEV_DB_PASSWORD:?run ./scripts/dev.sh, which sets DEV_DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
     ports:
       - "127.0.0.1:3307:3306"
     volumes:

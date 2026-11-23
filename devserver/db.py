@@ -12,12 +12,13 @@ from tortoise import Tortoise, connections
 
 logger = logging.getLogger("devserver.db")
 
-# docker-compose.dev.yml's throwaway database: root, no password, bound to 127.0.0.1.
-DEFAULT_DB_URL = "mysql://root@127.0.0.1:3307/sahasrahbot_dev"
-
-
 def db_url() -> str:
-    return os.environ.get("DEV_DB_URL", DEFAULT_DB_URL)
+    """The dev database URL. ``scripts/dev.sh`` sets it, with a password it generated."""
+    url = os.environ.get("DEV_DB_URL")
+    if not url:
+        raise SystemExit("DEV_DB_URL is not set. Start the dev server with ./scripts/dev.sh, "
+                         "or set DEV_DB_URL=mysql://user:pass@host:port/db yourself.")
+    return url
 
 
 def describe(url: str) -> str:

@@ -30,4 +30,4 @@ description: >-
    ids, restart with `--reset`, and add the page to `LINKS` in `devserver/dev_tools.py`.
 
 Seed generation (randomizer APIs) is not faked yet, so pages that roll seeds fail.
-Stop the database with `./scripts/dev.sh db-down`.
+Stop the database with `./scripts/dev.sh db-down`; `db-destroy` also deletes its data.
