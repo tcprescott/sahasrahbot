@@ -1,10 +1,10 @@
 from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 
 class AlttprSGDailyRace(SGDailyRaceCore):
     async def configuration(self):
-        guild = discordbot.get_guild(307860211333595146)
+        guild = bots.discord().get_guild(307860211333595146)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',

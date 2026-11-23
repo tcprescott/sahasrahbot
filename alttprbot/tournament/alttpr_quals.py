@@ -8,22 +8,20 @@ from alttprbot import models
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
 from alttprbot.util import speedgaming, triforce_text
 from alttprbot.services import asynctournament as asynctournament_service
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
-from alttprbot_racetime.core import SahasrahBotRaceTimeBot
+from alttprbot.services import bots
 
 
 class ALTTPRQualifierRace(TournamentRace):
     async def configuration(self):
-        guild = discordbot.get_guild(334795604918272012)
+        guild = bots.discord().get_guild(334795604918272012)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="alttpr",
-            audit_channel=discordbot.get_channel(647966639266201620),
-            commentary_channel=discordbot.get_channel(947095820673638400),
-            scheduling_needs_channel=discordbot.get_channel(434560353461075969),
+            audit_channel=bots.discord().get_channel(647966639266201620),
+            commentary_channel=bots.discord().get_channel(947095820673638400),
+            scheduling_needs_channel=bots.discord().get_channel(434560353461075969),
             scheduling_needs_tracker=True,
             create_scheduled_events=True,
             stream_delay=0,
@@ -162,7 +160,7 @@ class ALTTPRQualifierRace(TournamentRace):
 
     @property
     def announce_channel(self):
-        return discordbot.get_channel(407803705375850506)
+        return bots.discord().get_channel(407803705375850506)
 
     @property
     def announce_message(self):
@@ -248,7 +246,7 @@ class ALTTPRQualifierRace(TournamentRace):
 
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
 
-        self.rtgg_bot: SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
+        self.rtgg_bot = bots.racetime_bot(self.data.racetime_category)
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
 

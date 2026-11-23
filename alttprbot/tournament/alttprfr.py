@@ -5,7 +5,7 @@ import discord
 from alttprbot import models
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
 
 
@@ -18,14 +18,14 @@ class ALTTPRFRTournament(ALTTPRTournamentRace):
         self.seed = await ALTTPRClient.generate(settings=self.bracket_settings)
 
     async def configuration(self):
-        guild = discordbot.get_guild(470200169841950741)
+        guild = bots.discord().get_guild(470200169841950741)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game',
             event_slug="alttprfr",
-            audit_channel=discordbot.get_channel(856581631241486346),
-            commentary_channel=discordbot.get_channel(470202208261111818),
+            audit_channel=bots.discord().get_channel(856581631241486346),
+            commentary_channel=bots.discord().get_channel(470202208261111818),
             helper_roles=[
                 guild.get_role(482266765137805333),
                 guild.get_role(507932829527703554),

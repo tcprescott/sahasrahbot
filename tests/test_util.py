@@ -15,9 +15,9 @@ from unittest import mock
 import discord
 import pytest
 
-import alttprbot_racetime.bot  # noqa: F401  # import order: see tests/test_tournament.py
 import config
 from alttprbot import models, tournaments
+from alttprbot.services import bots
 from alttprbot.alttprgen import generator, spoilers
 from alttprbot.util import discord_members, helpers, http, rankedchoice, speedgaming, triforce_text
 
@@ -374,7 +374,7 @@ async def test_create_tournament_race_room_skips_existing_live_room(db, fake_htt
     event.get_config = mock.AsyncMock(return_value=SimpleNamespace(data=SimpleNamespace(racetime_category="test")))
     event.construct_race_room = mock.AsyncMock(return_value={"name": "new"})
     monkeypatch.setitem(tournaments.TOURNAMENT_DATA, "evt", event)
-    monkeypatch.setitem(tournaments.racetimebot.racetime_bots, "test", bot)
+    monkeypatch.setattr(bots, "_racetime_bots", {"test": bot})
     await models.TournamentResults.create(srl_id="test/old", episode_id="9", event="evt")
 
     fake_http.add("GET", "/test/old/data", body=json.dumps({"status": {"value": "open"}}))

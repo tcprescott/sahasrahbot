@@ -9,42 +9,7 @@
 # import each other. Front ends may import core.
 #
 # Format: one `importer -> imported` per line, dotted module names. `#` starts a
-# comment. Lines are grouped by the plan phase expected to remove them.
+# comment.
 # Re-print today's list with: python3 .claude/scripts/check_layers.py --baseline
 
-# --- Phase 1: seed generation imports the Discord embed builders ---------------
-
-# --- Phase 4: tournament engine reaches into the bot singletons ----------------
-alttprbot.tournament.alttpr -> alttprbot_discord.bot
-alttprbot.tournament.alttpr_quals -> alttprbot_discord.bot
-alttprbot.tournament.alttpr_quals -> alttprbot_racetime.bot
-alttprbot.tournament.alttpr_quals -> alttprbot_racetime.core
-alttprbot.tournament.alttprcd -> alttprbot_discord.bot
-alttprbot.tournament.alttprde -> alttprbot_discord.bot
-alttprbot.tournament.alttpres -> alttprbot_discord.bot
-alttprbot.tournament.alttprfr -> alttprbot_discord.bot
-alttprbot.tournament.alttprhmg -> alttprbot_discord.bot
-alttprbot.tournament.alttprleague -> alttprbot_discord.bot
-alttprbot.tournament.alttprmini -> alttprbot_discord.bot
-alttprbot.tournament.alttprsglive -> alttprbot_discord.bot
-alttprbot.tournament.boots -> alttprbot_discord.bot
-alttprbot.tournament.core -> alttprbot_discord.bot
-alttprbot.tournament.core -> alttprbot_racetime.bot
-alttprbot.tournament.core -> alttprbot_racetime.core
-alttprbot.tournament.dailies.alttprdaily -> alttprbot_discord.bot
-alttprbot.tournament.dailies.core -> alttprbot_discord.bot
-alttprbot.tournament.dailies.core -> alttprbot_racetime.bot
-alttprbot.tournament.dailies.smz3 -> alttprbot_discord.bot
-alttprbot.tournament.nologic -> alttprbot_discord.bot
-alttprbot.tournament.smbingo -> alttprbot_discord.bot
-alttprbot.tournament.smrl -> alttprbot_discord.bot
-alttprbot.tournament.smrl_playoff -> alttprbot_discord.bot
-alttprbot.tournament.smwde -> alttprbot_discord.bot
-alttprbot.tournament.smz3coop -> alttprbot_discord.bot
-alttprbot.tournament.test -> alttprbot_discord.bot
-alttprbot.tournaments -> alttprbot_racetime.bot
-
-# --- Phase 5: front ends reaching into each other's bot singletons -------------
-alttprbot_api.api -> alttprbot_discord.bot
-alttprbot_api.blueprints.racetime -> alttprbot_racetime.bot
-alttprbot_api.blueprints.ranked_choice -> alttprbot_discord.bot
+# Empty since 2026-11-23: every cross-layer import has been removed. Keep it that way.

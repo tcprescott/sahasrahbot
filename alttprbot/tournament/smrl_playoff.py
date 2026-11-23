@@ -7,7 +7,7 @@ from werkzeug.datastructures import MultiDict
 from alttprbot import models
 from alttprbot.alttprgen.randomizer import smdash
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 from pyz3r.smvaria import SuperMetroidVaria
 
 
@@ -86,13 +86,13 @@ class SMRLPlayoffs(TournamentRace):
         return "submission_smrl.html"
 
     async def configuration(self):
-        guild = discordbot.get_guild(500362417629560881)
+        guild = bots.discord().get_guild(500362417629560881)
         return TournamentConfig(
             guild=guild,
             racetime_category='smr',
             racetime_goal='Beat the game',
             event_slug="smrl",
-            audit_channel=discordbot.get_channel(1080994224880750682),
+            audit_channel=bots.discord().get_channel(1080994224880750682),
             helper_roles=[
                 guild.get_role(500363025958567948),
                 guild.get_role(501810831504179250),

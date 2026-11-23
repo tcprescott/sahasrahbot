@@ -8,7 +8,7 @@ from quart_discord import requires_authorization
 import config
 from alttprbot import models
 from alttprbot_api.api import discord
-from alttprbot_racetime import bot as racetimebot
+from alttprbot.services import bots
 
 racetime_blueprint = Blueprint('racetime', __name__)
 
@@ -32,7 +32,7 @@ async def bot_command():
     if access is None:
         return abort(403)
 
-    racetime_bot = racetimebot.racetime_bots.get(category)
+    racetime_bot = bots.racetime_bots().get(category)
     if not racetime_bot:
         raise Exception("Invalid game category")
 

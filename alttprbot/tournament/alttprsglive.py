@@ -2,7 +2,7 @@ from alttprbot import models
 from alttprbot.alttprgen import spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 from racetime_bot import msg_actions
 
@@ -16,13 +16,13 @@ class ALTTPRSGLive(ALTTPRTournamentRace):
         await self.rtgg_handler.schedule_spoiler_race(spoiler.spoiler_log_url, 900)
 
     async def configuration(self):
-        guild = discordbot.get_guild(590331405624410116)
+        guild = bots.discord().get_guild(590331405624410116)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game - Tournament (Solo)',
             event_slug='sgl24alttpr',
-            audit_channel=discordbot.get_channel(772351829022474260),
+            audit_channel=bots.discord().get_channel(772351829022474260),
             helper_roles=[
                 guild.get_role(590804526114668544),
                 guild.get_role(859868643613474816),

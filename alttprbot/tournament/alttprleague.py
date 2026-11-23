@@ -7,7 +7,7 @@ from alttprbot.alttprgen import generator
 from alttprbot.alttprgen import spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):
@@ -47,15 +47,15 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         await self.get_league_data()
 
     async def configuration(self):
-        guild = discordbot.get_guild(543577975032119296)
+        guild = bots.discord().get_guild(543577975032119296)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="invleague",
-            audit_channel=discordbot.get_channel(546728638272241674),
-            commentary_channel=discordbot.get_channel(1157407211094556703),
-            # scheduling_needs_channel=discordbot.get_channel(878075812996337744),
+            audit_channel=bots.discord().get_channel(546728638272241674),
+            commentary_channel=bots.discord().get_channel(1157407211094556703),
+            # scheduling_needs_channel=bots.discord().get_channel(878075812996337744),
             # scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(543596853871116288),
@@ -182,15 +182,15 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
 class ALTTPROpenLeague(ALTTPRLeague):
     async def configuration(self):
-        guild = discordbot.get_guild(543577975032119296)
+        guild = bots.discord().get_guild(543577975032119296)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="alttprleague",
-            audit_channel=discordbot.get_channel(546728638272241674),
-            commentary_channel=discordbot.get_channel(1157407211094556703),
-            # scheduling_needs_channel=discordbot.get_channel(878076083193389096),
+            audit_channel=bots.discord().get_channel(546728638272241674),
+            commentary_channel=bots.discord().get_channel(1157407211094556703),
+            # scheduling_needs_channel=bots.discord().get_channel(878076083193389096),
             # scheduling_needs_tracker=True,
             helper_roles=[
                 guild.get_role(543596853871116288),

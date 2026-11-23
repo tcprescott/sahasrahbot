@@ -18,6 +18,7 @@ from alttprbot import models
 from alttprbot_api import api
 from alttprbot_api.blueprints import ranked_choice
 from alttprbot.services import asynctournament as service
+from alttprbot.services import bots
 from alttprbot_discord import gateways
 
 
@@ -80,17 +81,19 @@ async def test_unknown_page_renders_not_found_page_with_status_200(client, login
 
 
 async def test_healthcheck(client, monkeypatch):
-    bot = api.discordbot
-    monkeypatch.setattr(bot, "is_closed", lambda: False)
-    monkeypatch.setattr(bot, "application_info", mock.AsyncMock(return_value=SimpleNamespace(owner=SimpleNamespace(id=1))))
-    monkeypatch.setattr(bot, "fetch_user", mock.AsyncMock())
+    bot = SimpleNamespace(
+        is_closed=lambda: False,
+        application_info=mock.AsyncMock(return_value=SimpleNamespace(owner=SimpleNamespace(id=1))),
+        fetch_user=mock.AsyncMock(),
+    )
+    monkeypatch.setattr(bots, "_discord_client", bot)  # sahasrahbot.py registers the real bot
     resp = await client.get("/healthcheck")
     assert resp.status_code == 200
     assert await resp.get_json() == {"success": True}
 
 
 async def test_healthcheck_when_discord_closed(client, login, monkeypatch):
-    monkeypatch.setattr(api.discordbot, "is_closed", lambda: True)
+    monkeypatch.setattr(bots, "_discord_client", SimpleNamespace(is_closed=lambda: True))
     resp = await client.get("/healthcheck")
     assert "Something Bad Happened" in await resp.get_data(as_text=True)
 

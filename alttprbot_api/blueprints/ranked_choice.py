@@ -7,7 +7,7 @@ from quart_discord import requires_authorization
 
 from alttprbot import events, models
 from alttprbot_api.api import discord
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 # TODO: add a way to resubmit votes (low priority)
 # TODO: client-side verification that ranked choices are unique
@@ -31,7 +31,7 @@ async def get_ballot(election_id: int):
         return abort(404, "Election is inactive.")
 
     if election.private:
-        guild = await discordbot.fetch_guild(election.guild_id)
+        guild = await bots.discord().fetch_guild(election.guild_id)
         voter_role = guild.get_role(election.voter_role_id)
         try:
             member = await guild.fetch_member(user.id)
@@ -68,7 +68,7 @@ async def submit_ballot(election_id: int):
         return abort(404, "Election is inactive.")
 
     if election.private:
-        guild = await discordbot.fetch_guild(election.guild_id)
+        guild = await bots.discord().fetch_guild(election.guild_id)
         voter_role = guild.get_role(election.voter_role_id)
         member = await guild.fetch_member(user.id)
         if voter_role not in member.roles:

@@ -1,7 +1,7 @@
 from alttprbot.alttprgen import generator
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 
 class ALTTPRCASBootsTournamentRace(ALTTPRTournamentRace):
@@ -9,7 +9,7 @@ class ALTTPRCASBootsTournamentRace(ALTTPRTournamentRace):
         self.seed = await generator.ALTTPRPreset('casualboots').generate(allow_quickswap=True)
 
     async def configuration(self):
-        guild = discordbot.get_guild(973765801528139837)
+        guild = bots.discord().get_guild(973765801528139837)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
