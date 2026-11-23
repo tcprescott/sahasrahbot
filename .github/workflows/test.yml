@@ -69,10 +69,13 @@ jobs:
       - name: Install dependencies
         run: |
           poetry env use python${{ env.PYTHON_VERSION }}
+          # Four locked packages ship only as source (html2markdown,
+          # python-bps-continued, quart-discord, racetime-bot), so this install
+          # has to run their build scripts. Everything else is a wheel.
           poetry install --no-root --no-interaction
           # pytest isn't in the Poetry dev group yet; install it into the venv
           # without changing the dependency files.
-          poetry run python -m pip install pytest
+          poetry run python -m pip install --only-binary=:all: pytest
       - name: Pytest
         # No config.py in CI: tests/conftest.py loads config.example.py.
         run: poetry run python -m pytest -q tests

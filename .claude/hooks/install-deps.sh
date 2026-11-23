@@ -34,7 +34,7 @@ fi
 # Test tooling. pytest is not (yet) in the Poetry dev group; install it into the
 # venv without touching the dependency files.
 if ! poetry run python -c "import pytest" >/dev/null 2>&1; then
-  poetry run python -m pip install -q pytest >>/tmp/poetry-install.log 2>&1 || true
+  poetry run python -m pip install -q --only-binary=:all: pytest >>/tmp/poetry-install.log 2>&1 || true
 fi
 command -v ruff >/dev/null 2>&1 || pipx install ruff >/dev/null 2>&1 || true
 

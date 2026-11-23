@@ -124,3 +124,15 @@ def test_config_keys(scratch):
     # Not the config module: app.config['X'], self.config.X
     other = write(scratch, "cfg_other.py", "import config\nx = self.config.NOT_OURS\n")
     assert run_hook("check_config_keys", {"file_path": other}).returncode == 0
+
+
+# --- scripts/guardrails.py ---------------------------------------------------
+
+@pytest.mark.parametrize("base", ["--output=/tmp/x", "-p", "a..b", "origin/master HEAD"])
+def test_guardrails_runner_rejects_option_like_base(base):
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "guardrails.py"), f"--changed={base}"],
+        capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode != 0
+    assert "expects a branch" in result.stderr

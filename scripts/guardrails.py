@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -39,9 +40,28 @@ def tracked_python_files() -> list[str]:
     return [f for f in out.stdout.splitlines() if not f.startswith("utils/")]
 
 
-def changed_python_files(base: str) -> list[str]:
+# A ref name or commit id: no leading dash (so it can't be read as an option),
+# no whitespace, no range syntax of its own.
+_REF = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_./~^-]*$")
+
+
+def resolve_base(base: str) -> str:
+    """Resolve ``base`` to a commit id, refusing anything that isn't a plain ref."""
+    if not _REF.fullmatch(base) or ".." in base:
+        raise SystemExit(f"guardrails: --changed expects a branch, tag or commit, got {base!r}")
     out = subprocess.run(
-        ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{base}...HEAD"],
+        ["git", "rev-parse", "--verify", "--quiet", "--end-of-options", f"{base}^{{commit}}"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    if out.returncode != 0:
+        raise SystemExit(f"guardrails: unknown base {base!r}")
+    return out.stdout.strip()
+
+
+def changed_python_files(base: str) -> list[str]:
+    sha = resolve_base(base)
+    out = subprocess.run(
+        ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{sha}...HEAD", "--"],
         cwd=ROOT, capture_output=True, text=True, check=True,
     )
     return [f for f in out.stdout.splitlines() if f.endswith(".py") and not f.startswith("utils/")]
