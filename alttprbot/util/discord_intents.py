@@ -158,6 +158,18 @@ async def get_role_members(role: discord.Role) -> Optional[List[discord.Member]]
     return role.members
 
 
+async def get_role_members_or_reply(interaction: discord.Interaction, role: discord.Role,
+                                    extra: str = '') -> Optional[List[discord.Member]]:
+    """
+    Like get_role_members, but sends an ephemeral followup explaining the feature is
+    unavailable (and returns None) when role members can't be listed.
+    """
+    role_members = await get_role_members(role)
+    if role_members is None:
+        await interaction.followup.send(ROLE_MEMBERS_UNAVAILABLE + extra, ephemeral=True)
+    return role_members
+
+
 ROLE_MEMBERS_UNAVAILABLE = (
     "This feature is temporarily unavailable: listing the members of a role needs the Discord "
     "server members intent, which is currently disabled for SahasrahBot."

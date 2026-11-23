@@ -979,11 +979,9 @@ class AsyncTournament(commands.GroupCog, name="async"):
             return
 
         if role is not None:
-            role_members = await discord_intents.get_role_members(role)
+            role_members = await discord_intents.get_role_members_or_reply(
+                interaction, role, extra="  Please grant permissions to individual users instead.")
             if role_members is None:
-                await interaction.followup.send(
-                    discord_intents.ROLE_MEMBERS_UNAVAILABLE + "  Please grant permissions to individual users instead.",
-                    ephemeral=True)
                 return
 
             for member in role_members:
