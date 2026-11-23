@@ -2,7 +2,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 class ScheduleEvent(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     event_slug = fields.CharField(50, unique=True)
     name = fields.TextField()
     description = fields.TextField()
@@ -20,17 +20,17 @@ class ScheduleEvent(Model):
     max_restreamers = fields.IntField(default=1)
 
 class ScheduleRole(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     event = fields.ForeignKeyField('models.ScheduleEvent', related_name='roles')
     name = fields.CharField(50) # admin, mod, player, commentator, tracker, restreamer
 
 class ScheduleRoleMember(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     role = fields.ForeignKeyField('models.ScheduleRole', related_name='members')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_event_roles')
 
 class ScheduleEpisode(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     event = fields.ForeignKeyField('models.ScheduleEvent', related_name='episodes')
     scheduled_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
@@ -49,12 +49,12 @@ class ScheduleEpisode(Model):
     restreamers: fields.ReverseRelation['ScheduleEpisodeRestreamer']
 
 class ScheduleEpisodePlayer(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='players')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_events', on_delete="RESTRICT")
 
 class ScheduleEpisodeCommentator(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='commentators')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_commentators', on_delete="RESTRICT")
     approved = fields.BooleanField(default=False)
@@ -66,12 +66,12 @@ class ScheduleEpisodeCommentator(Model):
     preferred_partner: fields.ReverseRelation['ScheduleEpisodeCommentatorPreferredPartner']
 
 class ScheduleEpisodeCommentatorPreferredPartner(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='preferred_commentator_partners')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_preferred_commentator_partners', on_delete="RESTRICT")
 
 class ScheduleEpisodeTracker(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='trackers')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_trackers', on_delete="RESTRICT")
     approved = fields.BooleanField(default=False)
@@ -81,7 +81,7 @@ class ScheduleEpisodeTracker(Model):
     submitter_notes = fields.TextField(null=True)
 
 class ScheduleEpisodeRestreamer(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='restreamers')
     user = fields.ForeignKeyField('models.Users', related_name='schedule_restreamers', on_delete="RESTRICT")
     approved = fields.BooleanField(default=False)
@@ -92,7 +92,7 @@ class ScheduleEpisodeRestreamer(Model):
 
 
 class ScheduleBroadcastChannels(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     event = fields.ForeignKeyField('models.ScheduleEvent', related_name='broadcast_channels')
     channel_type = fields.CharField(200, default="twitch", null=False) # only twitch supported for now
     channel_name = fields.CharField(200)
@@ -103,7 +103,7 @@ class ScheduleBroadcastChannels(Model):
         return f"https://twitch.tv/{self.channel_name}"
 
 class ScheduleAudit(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     event = fields.ForeignKeyField('models.ScheduleEvent', related_name='audits')
     episode = fields.ForeignKeyField('models.ScheduleEpisode', related_name='audits', null=True)
     user = fields.ForeignKeyField('models.Users', related_name='schedule_audits', on_delete="RESTRICT")
