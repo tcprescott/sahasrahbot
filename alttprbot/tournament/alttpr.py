@@ -11,7 +11,7 @@ from alttprbot.exceptions import SahasrahBotException
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import triforce_text
 from alttprbot.util.seed_presenter import seed_embed, seed_tournament_embed
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 
 class ALTTPRTournamentRace(TournamentRace):
@@ -84,14 +84,14 @@ class ALTTPRTournamentRace(TournamentRace):
             self.seed,
             name=self.race_info,
             notes=self.versus,
-            emojis=discordbot.emojis
+            emojis=bots.discord().emojis
         )
 
         self.tournament_embed = await seed_tournament_embed(
             self.seed,
             name=self.race_info,
             notes=self.versus,
-            emojis=discordbot.emojis
+            emojis=bots.discord().emojis
         )
 
         self.tournament_embed.insert_field_at(0, name='RaceTime.gg',
@@ -136,15 +136,15 @@ class ALTTPRTournamentRace(TournamentRace):
 
 class ALTTPR2024Race(TournamentRace):
     async def configuration(self):
-        guild = discordbot.get_guild(334795604918272012)
+        guild = bots.discord().get_guild(334795604918272012)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game - Tournament (Solo)',
             event_slug="alttpr",
-            audit_channel=discordbot.get_channel(647966639266201620),
-            commentary_channel=discordbot.get_channel(947095820673638400),
-            scheduling_needs_channel=discordbot.get_channel(434560353461075969),
+            audit_channel=bots.discord().get_channel(647966639266201620),
+            commentary_channel=bots.discord().get_channel(947095820673638400),
+            scheduling_needs_channel=bots.discord().get_channel(434560353461075969),
             scheduling_needs_tracker=True,
             create_scheduled_events=True,
             stream_delay=10,

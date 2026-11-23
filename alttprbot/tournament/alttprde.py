@@ -10,7 +10,7 @@
 from alttprbot.alttprgen.generator import ALTTPRPreset
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
 from alttprbot.tournament.core import TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 ALTTPRDE_TITLE_MAP = {
     'Open': 'open',
@@ -41,14 +41,14 @@ class ALTTPRDETournament(ALTTPRTournamentRace):
         self.seed = await ALTTPRPreset(preset).generate(hints=False, spoilers="off", allow_quickswap=True)
 
     async def configuration(self):
-        guild = discordbot.get_guild(469300113290821632)
+        guild = bots.discord().get_guild(469300113290821632)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
             racetime_goal='Beat the game',
             event_slug="alttprde",
-            audit_channel=discordbot.get_channel(473668481011679234),
-            commentary_channel=discordbot.get_channel(469317757331308555),
+            audit_channel=bots.discord().get_channel(473668481011679234),
+            commentary_channel=bots.discord().get_channel(469317757331308555),
             helper_roles=[
                 guild.get_role(534030648713674765),
                 guild.get_role(469300493542490112),

@@ -109,6 +109,8 @@ def create_app(app_url: str):
     _replace_lingering_bot(real, fake)
     # What sahasrahbot.py does at startup: give services their Discord lookups (here, the fake bot's).
     gateways.register()
+    from alttprbot_racetime import gateways as racetime_gateways
+    racetime_gateways.register()
 
     # Event bridge subscribers, as sahasrahbot.py registers them, so posts the web
     # app triggers through events (e.g. a ranked choice refresh) reach the outbox.

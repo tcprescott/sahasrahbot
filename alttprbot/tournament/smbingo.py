@@ -8,20 +8,20 @@ import config
 from alttprbot import models
 from alttprbot.alttprgen.randomizer.bingosync import BingoSync
 from alttprbot.tournament.core import TournamentRace, TournamentConfig
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 BINGO_COLLAB_DISCORD_WEBHOOK = config.BINGO_COLLAB_DISCORD_WEBHOOK
 
 
 class SMBingoTournament(TournamentRace):
     async def configuration(self):
-        guild = discordbot.get_guild(155487315530088448)
+        guild = bots.discord().get_guild(155487315530088448)
         return TournamentConfig(
             guild=guild,
             racetime_category='sm',
             racetime_goal='Triple Bingo',
             event_slug="smbingo",
-            audit_channel=discordbot.get_channel(871187586687856670),
+            audit_channel=bots.discord().get_channel(871187586687856670),
             helper_roles=[
                 guild.get_role(404395533482983447),
                 guild.get_role(338121128004288513),

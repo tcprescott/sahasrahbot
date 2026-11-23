@@ -16,7 +16,6 @@ from unittest import mock
 
 import pytest
 
-import alttprbot_racetime.bot  # noqa: F401  # import order: see tests/test_tournament.py
 import alttprbot_racetime.handlers as handlers_pkg
 from alttprbot import models
 from alttprbot.alttprgen import generator

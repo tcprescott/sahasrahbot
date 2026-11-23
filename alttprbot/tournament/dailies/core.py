@@ -4,13 +4,12 @@ import datetime
 from alttprbot import models
 from alttprbot.tournament.core import TournamentConfig, TournamentRace
 from alttprbot.util import speedgaming
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
+from alttprbot.services import bots
 
 
 class SGDailyRaceCore(TournamentRace):
     async def configuration(self):
-        guild = discordbot.get_guild(307860211333595146)
+        guild = bots.discord().get_guild(307860211333595146)
         return TournamentConfig(
             guild=guild,
             racetime_category='alttpr',
@@ -71,5 +70,5 @@ class SGDailyRaceCore(TournamentRace):
 
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
 
-        self.rtgg_bot: racetime.SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
+        self.rtgg_bot = bots.racetime_bot(self.data.racetime_category)
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')

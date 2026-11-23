@@ -53,7 +53,7 @@ where things live. Read it before changing code.
 | `docker-compose.dev.yml` | The dev server's MariaDB (port 3307). Dev only |
 | `helpers/`, `dbtest.py`, `update_docs.py` | One-off maintenance scripts |
 | `utils/` | Vendored submodules (door randomizer, enemizer). Not our code; never edit |
-| `layer_allowlist.txt` | Baseline of cross-layer imports that already exist; only ever shrinks (see Layers below) |
+| `layer_allowlist.txt` | Baseline of allowed cross-layer imports; empty, and stays that way (see Layers below) |
 | `tests/` | pytest suite: import smoke tests, guardrail tests, and characterization unit tests per area (`test_<area>.py`); shared fixtures in `conftest.py` |
 | `.claude/` | Claude Code hooks and guardrails; see [.claude/README.md](.claude/README.md) |
 
@@ -100,8 +100,10 @@ code on master does today, so a refactor can be checked against them. Rules for 
   the client (`ALTTPRClient.generate`, `rtgg_handler`, `discord_members.get_member`, …)
   with a mock. `config.DEBUG` is True in `config.example.py`; monkeypatch it where the
   code branches on it.
-- Import `alttprbot_racetime.bot` before `alttprbot.tournament.*` or `alttprbot.tournaments`:
-  importing the tournament code first is a circular import.
+- Code that uses the live bots gets them from `alttprbot.services.bots` (`bots.discord()`,
+  `bots.racetime_bot(category)`), which nothing registers in tests. Give it a fake with
+  `monkeypatch.setattr(bots, "_discord_client", fake)` or
+  `monkeypatch.setattr(bots, "_racetime_bots", {"alttpr": fake_bot})`.
 - When today's behaviour looks wrong, still pin it, but name the test
   `test_known_issue_...` and say why in its docstring, or mark it
   `xfail(strict=True)`. When you fix the bug, change that test in the same PR.
@@ -201,8 +203,9 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
 - **Layers.** `alttprbot/` is core and must not import `alttprbot_discord`,
   `alttprbot_api`, `alttprbot_racetime` or `alttprbot_audit`; those front ends may import
   core but not each other. `.claude/scripts/check_layers.py` enforces this (hook, CI and
-  `check.sh`). Today's violations are baselined in `layer_allowlist.txt`. Never add a line
-  to it; when you remove one of those imports, delete its line in the same PR.
+  `check.sh`). `layer_allowlist.txt` is empty now; never add a line to it. When core needs
+  a front end's live object, the front end registers it at startup instead: the bots via
+  `alttprbot/services/bots.py`, other lookups via `alttprbot_discord/gateways.py`.
 - Leave unrelated code alone. This codebase has lots of old commented-out tournaments
   and unused imports; don't tidy them in a PR about something else.
 

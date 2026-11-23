@@ -13,6 +13,7 @@ from alttprbot_api.api import sahasrahbotapi
 from alttprbot_discord import gateways as discord_gateways
 from alttprbot_discord import notifications as discord_notifications
 from alttprbot_discord.bot import discordbot, start_bot as start_discord_bot
+from alttprbot_racetime import gateways as racetime_gateways
 from alttprbot_racetime.bot import start_racetime
 
 if config.SENTRY_URL:
@@ -53,6 +54,8 @@ if __name__ == '__main__':
 
     # Give services in alttprbot/ the Discord lookups they need.
     discord_gateways.register()
+    # ... and the racetime.gg bots (alttprbot.services.bots).
+    racetime_gateways.register()
     # Subscribers for the event bridge (alttprbot/events): services and the scheduled
     # jobs publish, these turn events into Discord posts and DMs once the bot is ready.
     discord_notifications.register(discordbot)

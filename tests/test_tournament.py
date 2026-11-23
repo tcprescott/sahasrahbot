@@ -12,14 +12,10 @@ from unittest import mock
 import discord
 import pytest
 
-import alttprbot_racetime.bot  # noqa: F401  # must come first, see note below
 import config
 from alttprbot import models
+from alttprbot.services import bots
 from alttprbot.tournament import alttpr_quals, core
-
-# Import-order note: importing alttprbot.tournament.core first fails with a
-# circular import (core -> alttprbot_racetime.bot -> handlers -> alttprbot.tournaments
-# -> alttpr_quals -> core). Production always imports the racetime bot first.
 
 
 def episode(players=("Alice", "Bob"), channels=("ALTTPRandomizer",), **overrides):
@@ -201,7 +197,7 @@ async def test_update_data_skips_ignored_players(db, monkeypatch):
     race.episode["match1"]["players"][1]["publicStream"] = "ignore"
     rtgg_bot = mock.Mock()
     rtgg_bot.get_team = mock.AsyncMock(return_value={"members": []})
-    monkeypatch.setitem(core.racetime.racetime_bots, "alttpr", rtgg_bot)
+    monkeypatch.setattr(bots, "_racetime_bots", {"alttpr": rtgg_bot})
     made = []
 
     async def fake_make(p):

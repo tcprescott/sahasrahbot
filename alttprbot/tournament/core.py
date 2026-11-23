@@ -9,9 +9,7 @@ import config
 from alttprbot import events, models
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util import discord_members, speedgaming
-from alttprbot_discord.bot import discordbot
-from alttprbot_racetime import bot as racetime
-from alttprbot_racetime.core import SahasrahBotRaceTimeBot
+from alttprbot.services import bots
 
 APP_URL = config.APP_URL
 
@@ -115,7 +113,7 @@ class TournamentRace(object):
         tournament_race = cls(episodeid, rtgg_handler)
 
         logging.info(f"TournamentRace: Waiting for discordbot to be ready to construct {episodeid}")
-        await discordbot.wait_until_ready()
+        await bots.discord().wait_until_ready()
         logging.info(f"TournamentRace: Finished constructing {episodeid}")
         tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
@@ -127,7 +125,7 @@ class TournamentRace(object):
         tournament_race = cls(episode['id'], rtgg_handler)
         tournament_race.episode = episode
 
-        await discordbot.wait_until_ready()
+        await bots.discord().wait_until_ready()
         tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data(update_episode=False)
 
@@ -137,7 +135,7 @@ class TournamentRace(object):
     async def construct_race_room(cls, episodeid):
         tournament_race = cls(episodeid=episodeid, rtgg_handler=None)
 
-        await discordbot.wait_until_ready()
+        await bots.discord().wait_until_ready()
         tournament_race.data = await tournament_race.configuration()
         await tournament_race.update_data()
 
@@ -166,7 +164,7 @@ class TournamentRace(object):
     async def get_config(cls):
         tournament_race = cls()
 
-        await discordbot.wait_until_ready()
+        await bots.discord().wait_until_ready()
         tournament_race.data = await tournament_race.configuration()
         return tournament_race
 
@@ -242,7 +240,7 @@ class TournamentRace(object):
 
         self.tournament_game = await models.TournamentGames.get_or_none(episode_id=self.episodeid)
 
-        self.rtgg_bot: SahasrahBotRaceTimeBot = racetime.racetime_bots[self.data.racetime_category]
+        self.rtgg_bot = bots.racetime_bot(self.data.racetime_category)
         self.restream_team = await self.rtgg_bot.get_team('sg-volunteers')
 
         self.players = []

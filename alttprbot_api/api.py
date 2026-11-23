@@ -8,7 +8,7 @@ from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
 
 import config
 from alttprbot import models
-from alttprbot_discord.bot import discordbot
+from alttprbot.services import bots
 
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")
@@ -108,11 +108,11 @@ if config.DEBUG:
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
-    if discordbot.is_closed():
+    if bots.discord().is_closed():
         abort(500, description='Connection to Discord is closed.')
 
-    appinfo = await discordbot.application_info()
-    await discordbot.fetch_user(appinfo.owner.id)
+    appinfo = await bots.discord().application_info()
+    await bots.discord().fetch_user(appinfo.owner.id)
 
     return jsonify(
         success=True

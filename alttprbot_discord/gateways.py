@@ -10,6 +10,7 @@ from typing import List, Optional
 import discord
 
 from alttprbot.services import asynctournament as asynctournament_service
+from alttprbot.services import bots
 from alttprbot.services import asynctournament_jobs
 from alttprbot.util import discord_members, seed_presenter
 from alttprbot_discord.bot import discordbot
@@ -48,6 +49,8 @@ async def notify_async_race_timeout(action: asynctournament_service.TimeoutActio
 
 
 def register() -> None:
+    # The tournament engine and the web app reach the Discord client through this.
+    bots.set_discord_client(discordbot)
     asynctournament_service.set_member_role_lookup(member_role_ids)
     asynctournament_jobs.set_timeout_notifier(notify_async_race_timeout)
     # The tournament engine posts seed embeds through this hook instead of importing Discord code.
