@@ -254,7 +254,7 @@ class FakeGuild:
         return results[:limit]
 
     async def chunk(self, **kwargs):
-        raise RuntimeError("guild.chunk() needs the privileged members intent, which SahasrahBot does not use")
+        raise RuntimeError("guild.chunk() needs the privileged members intent, which SahasrahBot does not use")  # intents: ok
 
     async def create_scheduled_event(self, **kwargs):
         record(f"{self.name} scheduled event", content=kwargs.get("name"))
