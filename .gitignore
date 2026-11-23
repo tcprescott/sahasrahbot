@@ -21,3 +21,9 @@ utils/enemizer/ubuntu*
 tests/_scratch/
 .claude/settings.local.json
 .devdb-password
+
+# test coverage output
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
