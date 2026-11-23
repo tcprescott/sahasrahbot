@@ -94,7 +94,7 @@ code on master does today, so a refactor can be checked against them. Rules for 
   sessions. Point the code at it by monkeypatching the config value it builds URLs from
   (e.g. `config.SG_API_ENDPOINT`). aioresponses doesn't work with our aiohttp version.
 - Never call Discord, racetime.gg, SpeedGaming, randomizer APIs, S3 or Google: replace
-  the client (`ALTTPRDiscord.generate`, `rtgg_handler`, `discord_members.get_member`, …)
+  the client (`ALTTPRClient.generate`, `rtgg_handler`, `discord_members.get_member`, …)
   with a mock. `config.DEBUG` is True in `config.example.py`; monkeypatch it where the
   code branches on it.
 - Import `alttprbot_racetime.bot` before `alttprbot.tournament.*` or `alttprbot.tournaments`:
