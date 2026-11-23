@@ -176,8 +176,11 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
   calls at startup. Delivery is best effort and in-process: keep a direct call where the
   caller needs the result (a reply to a command, a racetime chat message, a DM whose
   failure must change what happens next). The tournament engine
-  (`alttprbot/tournament/`) still posts audit, commentary and seed DMs directly; that is
-  a later phase.
+  (`alttprbot/tournament/`) publishes its audit and commentary posts and submitted
+  settings (`send_audit_message`, `send_commentary_message`, `publish_settings_submitted`),
+  with embeds as `embed.to_dict()`. Its seed DMs (`send_player_message`) and settings
+  reminders stay direct: a failed seed DM is reported in the race room, and a failed
+  reminder is retried on the next run.
 - Raise `SahasrahBotException` (`alttprbot/exceptions.py`) for user-facing errors; Sentry
   drops them on purpose.
 - Model changes: edit `alttprbot/models/`, then `poetry run aerich migrate --name <topic>`

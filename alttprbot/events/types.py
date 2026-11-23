@@ -57,6 +57,55 @@ class TournamentRoomOpened(Event):
     player_discord_ids: tuple[int, ...] = ()
 
 
+@_frozen
+class TournamentAuditRecorded(Event):
+    """A tournament race produced an entry for its event's audit channel.
+
+    ``embed`` is a ``discord.Embed.to_dict()`` payload (plain data), or None.
+    """
+    name = "tournament.audit_recorded"
+
+    event_slug: str
+    episode_id: Optional[int]
+    channel_id: int
+    content: Optional[str] = None
+    embed: Optional[dict] = None
+
+
+@_frozen
+class TournamentCommentaryReady(Event):
+    """A restreamed race's seed details are ready for its commentators."""
+    name = "tournament.commentary_ready"
+
+    event_slug: str
+    episode_id: Optional[int]
+    channel_id: int
+    embed: Optional[dict] = None
+
+
+@dataclasses.dataclass(frozen=True)
+class TournamentPlayerRef:
+    """A player as the engine knows them: their name, and Discord id if they were found."""
+    name: str
+    discord_id: Optional[int] = None
+
+
+@_frozen
+class TournamentSettingsSubmitted(Event):
+    """Settings for an upcoming race were submitted through the web form.
+
+    The settings go to the audit channel (if any) and to each player by DM; a
+    player who can't be DMed is reported in the audit channel.
+    """
+    name = "tournament.settings_submitted"
+
+    event_slug: str
+    episode_id: Optional[int]
+    audit_channel_id: Optional[int]
+    embed: dict
+    players: tuple[TournamentPlayerRef, ...] = ()
+
+
 # --- ranked choice elections ------------------------------------------------
 
 @_frozen
@@ -137,6 +186,9 @@ class UnmatchedPlayersFound(Event):
 ALL_EVENTS: tuple[type[Event], ...] = (
     RaceStatusChanged,
     TournamentRoomOpened,
+    TournamentAuditRecorded,
+    TournamentCommentaryReady,
+    TournamentSettingsSubmitted,
     RankedChoiceBallotCast,
     DailyChallengeAvailable,
     TournamentRoomCreationFailed,

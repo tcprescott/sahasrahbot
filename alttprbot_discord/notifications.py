@@ -89,6 +89,11 @@ DAILY_NOTES = "This is today's daily challenge.  The latest challenge can always
 BAD_DISCORD_REPORT_MENTION = "<@185198185990324225>"
 
 
+def _embed(data):
+    """Rebuild an embed the engine sent as ``discord.Embed.to_dict()``."""
+    return discord.Embed.from_dict(data) if data else None
+
+
 async def wait_until_ready(bot: commands.Bot) -> None:
     """Wait for the bot to be ready.
 
@@ -329,6 +334,55 @@ class DiscordNotifier:
             except discord.HTTPException:
                 logger.info("Could not send room opening DM to %s for episode %s", user_id, event.episode_id)
 
+    def _channel(self, channel_id: int, event) -> discord.abc.Messageable:
+        channel = self.bot.get_channel(channel_id)
+        if channel is None:
+            logger.warning("Channel %s for %s (episode %s) is not available.", channel_id, event.name, event.episode_id)
+        return channel
+
+    async def on_tournament_audit_recorded(self, event: events.TournamentAuditRecorded):
+        await wait_until_ready(self.bot)
+        channel = self._channel(event.channel_id, event)
+        if channel is None:
+            return
+        await channel.send(content=event.content, embed=_embed(event.embed))
+
+    async def on_tournament_commentary_ready(self, event: events.TournamentCommentaryReady):
+        await wait_until_ready(self.bot)
+        channel = self._channel(event.channel_id, event)
+        if channel is None:
+            return
+        await channel.send(embed=_embed(event.embed))
+
+    async def on_tournament_settings_submitted(self, event: events.TournamentSettingsSubmitted):
+        await wait_until_ready(self.bot)
+        embed = _embed(event.embed)
+        audit_channel = None
+        if event.audit_channel_id is not None:
+            audit_channel = self._channel(event.audit_channel_id, event)
+        if audit_channel:
+            await audit_channel.send(embed=embed)
+
+        for player in event.players:
+            await self._dm_settings(player, embed, audit_channel)
+
+    async def _dm_settings(self, player: events.TournamentPlayerRef, embed, audit_channel):
+        here = discord.AllowedMentions(everyone=True)
+        if player.discord_id is None:
+            logger.error("Could not send DM to %s", player.name)
+            if audit_channel:
+                await audit_channel.send(f"@here could not send DM to {player.name}", allowed_mentions=here, embed=embed)
+            return
+        user = None
+        try:
+            user = await self._user(player.discord_id)
+            await user.send(embed=embed)
+        except discord.HTTPException:
+            logger.exception("Could not send DM to %s", player.name)
+            if audit_channel:
+                who = f"{user.name}#{user.discriminator}" if user else player.name
+                await audit_channel.send(f"@here could not send DM to {who}", allowed_mentions=here, embed=embed)
+
     async def _announce_daily(self, event: events.TournamentRoomOpened, settings: dict):
         message = daily_announcement(event, settings)
         channel = self.bot.get_channel(settings['channel_id'])
@@ -415,6 +469,9 @@ def register(bot: commands.Bot) -> DiscordNotifier:
     jobs = ScheduledJobDiscordOutput(bot)
     _tokens.extend([
         events.subscribe(events.TournamentRoomOpened, notifier.on_tournament_room_opened),
+        events.subscribe(events.TournamentAuditRecorded, notifier.on_tournament_audit_recorded),
+        events.subscribe(events.TournamentCommentaryReady, notifier.on_tournament_commentary_ready),
+        events.subscribe(events.TournamentSettingsSubmitted, notifier.on_tournament_settings_submitted),
         events.subscribe(events.RaceStatusChanged, notifier.on_race_status_changed),
         events.subscribe(events.RankedChoiceBallotCast, notifier.on_ranked_choice_ballot_cast),
         events.subscribe(events.DailyChallengeAvailable, jobs.announce_daily),

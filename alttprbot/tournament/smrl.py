@@ -148,10 +148,6 @@ class SMRandoLeague(TournamentRace):
             pinned=True
         )
 
-    async def send_audit_message(self, message=None, embed: discord.Embed = None):
-        if self.audit_channel:
-            await self.audit_channel.send(content=message, embed=embed)
-
     async def configuration(self):
         guild = bots.discord().get_guild(500362417629560881)
         return TournamentConfig(
