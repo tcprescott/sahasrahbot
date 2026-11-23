@@ -20,10 +20,10 @@ from alttprbot import models
 from alttprbot.alttprgen.randomizer import ctjets, mysterydoors
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.util.helpers import generate_random_string
-from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
-from alttprbot_discord.util.alttprdoors_discord import AlttprDoorDiscord
-from alttprbot_discord.util.avianart_discord import AVIANARTDiscord
-from alttprbot_discord.util.sm_discord import SMDiscord, SMZ3Discord
+from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
+from alttprbot.alttprgen.randomizer.alttprdoor import AlttprDoor
+from alttprbot.alttprgen.randomizer.avianart import AVIANART
+from alttprbot.alttprgen.randomizer.sm import SMClient, SMZ3Client
 
 
 class PresetNotFoundException(SahasrahBotException):
@@ -168,7 +168,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
     # TODO: Make this so it isn't an absolute dumpster fire
     # this code really sucks
     async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False,
-                       endpoint_prefix="", branch=None) -> ALTTPRDiscord:
+                       endpoint_prefix="", branch=None) -> ALTTPRClient:
         if self.preset_data is None:
             await self.fetch()
 
@@ -185,7 +185,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             if allow_quickswap:
                 settings['quickswap'] = True
 
-            seed = await AlttprDoorDiscord.create(
+            seed = await AlttprDoor.create(
                 settings=settings,
                 spoilers=spoilers == "on",
                 branch=branch
@@ -193,7 +193,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             hash_id = seed.hash
         elif avianart:
             preset = settings['preset']
-            seed = await AVIANARTDiscord.create(
+            seed = await AVIANART.create(
                 preset=preset,
                 race=tournament,
             )
@@ -247,7 +247,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             else:
                 baseurl = config.ALTTPR_BASEURL
 
-            seed = await ALTTPRDiscord.generate(
+            seed = await ALTTPRClient.generate(
                 settings=settings,
                 endpoint=endpoint,
                 baseurl=baseurl,
@@ -287,7 +287,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
                         mystery = await mystery_generate(self.preset_data, spoilers=spoilers)
 
                         if mystery.doors:
-                            seed = await AlttprDoorDiscord.create(
+                            seed = await AlttprDoor.create(
                                 settings=mystery.settings,
                                 spoilers=spoilers != "mystery",
                                 branch=mystery.branch
@@ -300,7 +300,7 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 
                             mystery.settings['tournament'] = tournament
                             mystery.settings['allow_quickswap'] = allow_quickswap
-                            seed = await ALTTPRDiscord.generate(settings=mystery.settings, endpoint=endpoint)
+                            seed = await ALTTPRClient.generate(settings=mystery.settings, endpoint=endpoint)
                     except:
                         # await models.AuditGeneratedGames.create(
                         #     randomizer='alttpr',
@@ -340,9 +340,9 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 
 class SMPreset(SahasrahBotPresetCore):
     randomizer = 'sm'
-    randomizer_class = SMDiscord
+    randomizer_class = SMClient
     spoiler_key: str = None
-    seed: SMDiscord = None
+    seed: SMClient = None
 
     async def generate(self, tournament=True, spoilers=False):
         if self.preset_data is None:
@@ -405,7 +405,7 @@ class SMPreset(SahasrahBotPresetCore):
 
 class SMZ3Preset(SMPreset):
     randomizer = 'smz3'
-    randomizer_class = SMZ3Discord
+    randomizer_class = SMZ3Client
 
     @property
     def baseurl(self):

@@ -11,8 +11,9 @@ import discord
 
 from alttprbot.services import asynctournament as asynctournament_service
 from alttprbot.services import asynctournament_jobs
-from alttprbot.util import discord_members
+from alttprbot.util import discord_members, seed_presenter
 from alttprbot_discord.bot import discordbot
+from alttprbot_discord.util import seed_embeds
 
 
 async def member_role_ids(guild_id: int, discord_user_id: int) -> Optional[List[int]]:
@@ -49,3 +50,5 @@ async def notify_async_race_timeout(action: asynctournament_service.TimeoutActio
 def register() -> None:
     asynctournament_service.set_member_role_lookup(member_role_ids)
     asynctournament_jobs.set_timeout_notifier(notify_async_race_timeout)
+    # The tournament engine posts seed embeds through this hook instead of importing Discord code.
+    seed_presenter.register(seed_embeds.seed_embed, seed_embeds.seed_tournament_embed)

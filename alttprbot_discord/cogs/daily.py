@@ -4,7 +4,8 @@ from discord import app_commands
 from discord.ext import commands
 
 from alttprbot.services.daily import find_daily_hash
-from alttprbot_discord.util.alttpr_discord import ALTTPRDiscord
+from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
+from alttprbot_discord.util.seed_embeds import seed_embed
 
 
 class Daily(commands.Cog):
@@ -16,7 +17,7 @@ class Daily(commands.Cog):
         daily_challenge = await find_daily_hash()
         hash_id = daily_challenge['hash']
         seed = await get_daily_seed(hash_id)
-        embed = await seed.embed(emojis=self.bot.emojis,
+        embed = await seed_embed(seed, emojis=self.bot.emojis,
                                  notes="This is today's daily challenge.  The latest challenge can always be found at https://alttpr.com/daily")
         await interaction.response.send_message(embed=embed)
 
@@ -27,4 +28,4 @@ async def setup(bot: commands.Bot):
 
 @aiocache.cached(ttl=86400, cache=aiocache.SimpleMemoryCache)
 async def get_daily_seed(hash_id):
-    return await ALTTPRDiscord.retrieve(hash_id=hash_id)
+    return await ALTTPRClient.retrieve(hash_id=hash_id)

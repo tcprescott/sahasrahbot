@@ -46,6 +46,10 @@ class AVIANART():
         return seed
 
     @property
+    def generated_goal(self):
+        return self.preset
+
+    @property
     def url(self):
         if self.status != 'finished':
             return None

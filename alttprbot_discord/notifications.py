@@ -26,6 +26,7 @@ from alttprbot import events, models, tournaments
 from alttprbot.services import guild_config
 from alttprbot.tournament import core
 from alttprbot.util import rankedchoice
+from alttprbot_discord.util.seed_embeds import seed_embed
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +148,7 @@ class ScheduledJobDiscordOutput:
 
         await wait_until_ready(self.bot)
         seed = await get_daily_seed(event.hash_id)
-        embed = await seed.embed(emojis=self.bot.emojis, notes=DAILY_NOTES)
+        embed = await seed_embed(seed, emojis=self.bot.emojis, notes=DAILY_NOTES)
         daily_announcer_channels = await guild_config.guilds_with('DailyAnnouncerChannel')
         for guild_id, value in daily_announcer_channels.items():
             guild = self.bot.get_guild(guild_id)
