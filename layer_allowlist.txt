@@ -48,4 +48,3 @@ alttprbot.tournaments -> alttprbot_racetime.bot
 alttprbot_api.api -> alttprbot_discord.bot
 alttprbot_api.blueprints.racetime -> alttprbot_racetime.bot
 alttprbot_api.blueprints.ranked_choice -> alttprbot_discord.bot
-alttprbot_racetime.handlers.core -> alttprbot_discord.bot

@@ -7,9 +7,8 @@ import discord.utils
 import tortoise.exceptions
 from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
-from alttprbot import models
+from alttprbot import events, models
 from alttprbot import tournaments
-from alttprbot_discord.bot import discordbot
 from alttprbot_racetime.misc.konot import KONOT
 
 
@@ -177,7 +176,14 @@ class SahasrahBotCoreHandler(RaceHandler):
             self.status = status
             method = f'status_{status}'
 
-            discordbot.dispatch(f"racetime_{status}", self, data)
+            events.publish(events.RaceStatusChanged(
+                category=self.bot.category_slug,
+                room_name=self.data.get('name'),
+                room_url=self.bot.http_uri(self.data.get('url', '')),
+                base_url=self.bot.http_uri(''),
+                status=status,
+                entrant_ids=tuple(e['user']['id'] for e in self.data.get('entrants', [])),
+            ))
 
             if hasattr(self, method):
                 self.logger.debug('[%(race)s] Calling status handler for %(status)s' % {

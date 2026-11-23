@@ -5,8 +5,7 @@ from discord.errors import NotFound
 from quart import Blueprint, render_template, request, abort
 from quart_discord import requires_authorization
 
-from alttprbot import models
-from alttprbot.util import rankedchoice
+from alttprbot import events, models
 from alttprbot_api.api import discord
 from alttprbot_discord.bot import discordbot
 
@@ -120,7 +119,8 @@ async def submit_ballot(election_id: int):
     votes.sort(key=sort_rank)
     await models.RankedChoiceVotes.bulk_create(votes)
 
-    await rankedchoice.refresh_election_post(election, discordbot)
+    # alttprbot_discord/notifications.py refreshes the election's Discord post.
+    events.publish(events.RankedChoiceBallotCast(election_id=election.id))
 
     return await render_template('ranked_choice_submit.html', election=election, votes=votes, user=user)
 

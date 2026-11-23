@@ -152,6 +152,20 @@ def test_seed_presenter_requires_registration_then_delegates():
         seed_presenter.register(*saved)
 
 
-def test_entry_point_registers_discord_seed_embeds():
-    text = (ROOT / "sahasrahbot.py").read_text()
-    assert "seed_presenter.register(seed_embeds.seed_embed, seed_embeds.seed_tournament_embed)" in text
+def test_discord_gateways_register_seed_embeds(monkeypatch):
+    """sahasrahbot.py calls alttprbot_discord.gateways.register() at startup, which installs the builders."""
+    from alttprbot.util import seed_presenter
+    from alttprbot_discord import gateways
+    from alttprbot_discord.util import seed_embeds
+
+    # Leave the async tournament service's hooks alone; only the seed hook is under test.
+    monkeypatch.setattr(gateways.asynctournament_service, "set_member_role_lookup", lambda fn: None)
+    monkeypatch.setattr(gateways.asynctournament_jobs, "set_timeout_notifier", lambda fn: None)
+
+    saved = (seed_presenter._embed_builder, seed_presenter._tournament_embed_builder)
+    try:
+        gateways.register()
+        assert seed_presenter._embed_builder is seed_embeds.seed_embed
+        assert seed_presenter._tournament_embed_builder is seed_embeds.seed_tournament_embed
+    finally:
+        seed_presenter.register(*saved)

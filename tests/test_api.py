@@ -496,11 +496,15 @@ async def test_ranked_choice_ballot_submission(client, login, monkeypatch):
     election = await models.RankedChoiceElection.create(owner_id=1, title="Best", seats=1, channel_id=1, message_id=1)
     a = await models.RankedChoiceCandidate.create(election=election, name="A")
     b = await models.RankedChoiceCandidate.create(election=election, name="B")
-    monkeypatch.setattr(ranked_choice.rankedchoice, "refresh_election_post", mock.AsyncMock())
+    published = []
+    monkeypatch.setattr(ranked_choice.events, "publish", published.append)
     login(9)
 
     resp = await client.post(f"/ranked_choice/{election.id}", form={f"candidate_{a.id}": "2", f"candidate_{b.id}": "1"})
     assert resp.status_code == 200
+    # The Discord post refresh is a subscriber's job (alttprbot_discord/notifications.py).
+    assert published == [ranked_choice.events.RankedChoiceBallotCast(
+        election_id=election.id, occurred_at=published[0].occurred_at)]
     votes = await models.RankedChoiceVotes.filter(user_id=9).order_by("rank").prefetch_related("candidate")
     assert [(v.candidate.name, v.rank) for v in votes] == [("B", 1), ("A", 2)]
 

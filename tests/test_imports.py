@@ -25,6 +25,8 @@ ENTRY_POINTS = [
     "alttprbot_racetime.bot",
     "alttprbot_api.api",
     "alttprbot_audit.bot",
+    # Not imported by any of the above; sahasrahbot.py registers it at startup.
+    "alttprbot_discord.notifications",
 ]
 
 _RUNNER = """

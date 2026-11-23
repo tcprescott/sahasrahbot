@@ -40,8 +40,9 @@ where things live. Read it before changing code.
 | `alttprbot/database/` | Older data-access helpers, mostly raw SQL through `alttprbot/util/orm.py`. Prefer models for new code |
 | `alttprbot/alttprgen/` | Seed generation, with no Discord, racetime or web imports: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one API client per external randomizer, e.g. `alttpr.py`'s `ALTTPRClient`), `spoilers.py` |
 | `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`) |
+| `alttprbot/events/` | The event bridge: `types.py` (one frozen dataclass per event, listed in `ALL_EVENTS`), `bus.py` (`publish`, `subscribe`). Imports no front end |
 | `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `asynctournament.py`, `gsheet.py`, `triforce_text.py`, … |
-| `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `util/` (`seed_embeds.py` builds every seed embed, checks) |
+| `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
 | `alttprbot_api/` | Quart web app on 127.0.0.1:5001: `api.py`, `auth.py` (Discord OAuth), `blueprints/`, `templates/`, `static/` |
 | `alttprbot_audit/` | Second Discord bot for moderation/audit logs. Disabled by default (see above) |
@@ -162,6 +163,19 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
 - **New settings go in `config.example.py`** with a placeholder and a comment, read as
   `config.NAME`. Tell the user which real value production needs. A hook
   (`check_config_keys.py`) rejects a `config.X` missing from the example.
+- **Notifications go through the event bridge.** When domain or service code (tournaments,
+  racetime handlers, web blueprints, scheduled jobs) needs to tell someone something
+  happened, it publishes an event instead of calling Discord:
+  `events.publish(events.RankedChoiceBallotCast(election_id=...))` with
+  `from alttprbot import events`. `publish` is synchronous, never blocks and never raises.
+  Define the event in `alttprbot/events/types.py` (frozen dataclass, `name = "object.verb"`,
+  plain data only, add it to `ALL_EVENTS`) and handle it in
+  `alttprbot_discord/notifications.py`, subscribed in `register()`, which `sahasrahbot.py`
+  calls at startup. Delivery is best effort and in-process: keep a direct call where the
+  caller needs the result (a reply to a command, a racetime chat message, a DM whose
+  failure must change what happens next). The tournament engine
+  (`alttprbot/tournament/`) still posts audit, commentary and seed DMs directly; that is
+  a later phase.
 - Raise `SahasrahBotException` (`alttprbot/exceptions.py`) for user-facing errors; Sentry
   drops them on purpose.
 - Model changes: edit `alttprbot/models/`, then `poetry run aerich migrate --name <topic>`
@@ -171,6 +185,12 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
   `load_extensions()` in `alttprbot_discord/bot.py`. Prefer slash commands
   (`app_commands`); prefix commands that read message text can't work without
   message_content.
+- **Periodic jobs** run on the in-process scheduler (`alttprbot/services/scheduler.py`),
+  registered in `alttprbot/services/scheduled_jobs.py`, never as `discord.ext.tasks`
+  loops in a cog (a test enforces this). A job does the work and publishes an event;
+  Discord output is a subscriber in `alttprbot_discord/notifications.py` (see the event bridge above).
+  When the job needs Discord's answer (the async race timeouts only forfeit once the
+  runner was told), it calls a function registered in `alttprbot_discord/gateways.py`.
 - New racetime categories: add a handler in `alttprbot_racetime/handlers/`, an entry in
   `alttprbot_racetime/config.py`, and its `RACETIME_CLIENT_ID_<SLUG>` /
   `RACETIME_CLIENT_SECRET_<SLUG>` to the loop in `config.example.py`.

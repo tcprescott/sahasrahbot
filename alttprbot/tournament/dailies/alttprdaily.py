@@ -1,11 +1,5 @@
-import aiohttp
-import discord
-
-import config
 from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
 from alttprbot_discord.bot import discordbot
-
-SG_DISCORD_WEBHOOK = config.SG_DISCORD_WEBHOOK
 
 
 class AlttprSGDailyRace(SGDailyRaceCore):
@@ -18,27 +12,6 @@ class AlttprSGDailyRace(SGDailyRaceCore):
             event_slug="alttprdaily",
             room_open_time=60
         )
-
-    @property
-    def announce_channel(self):
-        return discordbot.get_channel(307861467838021633)
-
-    @property
-    def announce_message(self):
-        msg = "SpeedGaming Daily Race Series - {title} - {start_time} ({start_time_remain})".format(
-            title=self.friendly_name,
-            start_time=discord.utils.format_dt(self.race_start_time),
-            start_time_remain=discord.utils.format_dt(self.race_start_time, "R")
-        )
-
-        if self.broadcast_channels:
-            msg += f" on {', '.join(self.broadcast_channels)}"
-
-        msg += " - Seed Distributed {seed_time} - {racetime_url}".format(
-            seed_time=discord.utils.format_dt(self.seed_time, "R"),
-            racetime_url=self.rtgg_bot.http_uri(self.rtgg_handler.data['url'])
-        )
-        return msg
 
     @property
     def race_info(self):
@@ -55,13 +28,3 @@ class AlttprSGDailyRace(SGDailyRaceCore):
         )
         msg += f" - {self.episodeid}"
         return msg
-
-    async def send_player_room_info(self):
-        await self.announce_channel.send(
-            content=self.announce_message,
-            allowed_mentions=discord.AllowedMentions(roles=True)
-        )
-
-        async with aiohttp.ClientSession() as session:
-            webhook = discord.Webhook.from_url(SG_DISCORD_WEBHOOK, session=session)
-            await webhook.send(f"<@&399038388964950016> {self.announce_message}", username="SahasrahBot")
