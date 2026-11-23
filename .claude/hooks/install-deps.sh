@@ -12,16 +12,23 @@ fi
 
 source "$( dirname "${BASH_SOURCE[0]}" )/_repo.sh"
 
-# Production runs Python 3.11. Newer interpreters break the pinned discord.py
-# (3.13 removed `audioop`), so prefer 3.11 when the container has it.
-if command -v python3.11 >/dev/null 2>&1; then
-  poetry env use python3.11 >/dev/null 2>&1 || true
+# CI runs Python 3.13 (.github/workflows/test.yml); match it when available.
+if command -v python3.13 >/dev/null 2>&1; then
+  poetry env use python3.13 >/dev/null 2>&1 || true
 fi
 
 # racetime-bot is pinned as a GitHub archive URL, which the cloud egress proxy
 # can refuse. Install everything Poetry can, then fall back to a git install of
 # the same commit for racetime-bot if it is still missing.
-poetry install --no-root --no-interaction --no-ansi >/tmp/poetry-install.log 2>&1 || true
+if ! poetry install --no-root --no-interaction --no-ansi >/tmp/poetry-install.log 2>&1; then
+  # Poetry aborts the whole install on the one refused download, which can leave
+  # other packages missing or at stale versions. Install the locked versions
+  # directly instead (racetime-bot is handled below).
+  reqs=$(mktemp)
+  python3 "$REPO/.claude/hooks/lock_requirements.py" >"$reqs"
+  poetry run python -m pip install -q --no-deps -r "$reqs" >>/tmp/poetry-install.log 2>&1 || true
+  rm -f "$reqs"
+fi
 
 if ! poetry run python -c "import racetime_bot" >/dev/null 2>&1; then
   ref=$(grep -o 'racetime-bot/archive/[0-9a-f]*' pyproject.toml | head -1 | sed 's|.*/||')
@@ -38,7 +45,7 @@ if ! poetry run python -c "import pytest" >/dev/null 2>&1; then
 fi
 command -v ruff >/dev/null 2>&1 || pipx install ruff >/dev/null 2>&1 || true
 
-if poetry run python -c "import discord, racetime_bot, pytest" >/dev/null 2>&1; then
+if poetry run python -c "import discord, racetime_bot, pytest, tortoise" >/dev/null 2>&1; then
   echo "Dependencies installed (poetry, Python $(poetry run python -c 'import platform; print(platform.python_version())'))."
 else
   echo "WARNING: dependency install incomplete — see /tmp/poetry-install.log. Import tests may fail."

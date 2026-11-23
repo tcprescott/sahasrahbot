@@ -56,12 +56,11 @@ where things live. Read it before changing code.
 
 ### Setup
 
-- Python **3.11** (what production runs). 3.13 breaks the pinned discord.py
-  (`audioop` was removed).
+- Python **3.13** is what CI tests on; `pyproject.toml` allows 3.11 and up.
 - `poetry install --no-root`, then `poetry run python -m pip install pytest` (pytest is
-  not in the dev group yet). In a cloud session the SessionStart hook does both, and
-  falls back to a git install of `racetime-bot` when the egress proxy blocks its archive
-  URL.
+  not in the dev group yet). In a cloud session the SessionStart hook does both. The
+  egress proxy refuses `racetime-bot`'s archive URL, which makes Poetry abort, so the
+  hook then installs the locked versions with pip and `racetime-bot` from git.
 - Running the bot for real needs a `config.py` with real tokens and a MySQL database.
   You almost never need that: verify changes with the tests instead.
 
