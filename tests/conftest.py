@@ -72,7 +72,7 @@ async def _clear_caches():
     yield
     for name in (
         "alttprbot.util.asynctournament",
-        "alttprbot_discord.util.guild_config",
+        "alttprbot.services.guild_config",
         "alttprbot.database.role",
         "alttprbot.database.smz3_multiworld",
         "alttprbot.database.tournament_results",

@@ -6,16 +6,14 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 import config
-from alttprbot_discord.util import guild_config
-
-guild_config.init()
+from alttprbot.services import guild_config
 
 
 async def determine_prefix(bot, message):
     if message.guild is None:
         return "$"
 
-    prefix = await message.guild.config_get("CommandPrefix", "$")
+    prefix = await guild_config.get(message.guild.id, "CommandPrefix", "$")
     # Without the message_content intent, Discord only delivers message text when the bot is
     # mentioned, so commands must be invoked as "@bot command".
     return commands.when_mentioned_or(prefix)(bot, message)

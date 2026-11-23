@@ -6,10 +6,6 @@ from discord.ext import commands
 from discord_sentry_reporting import use_sentry
 
 import config
-from alttprbot_discord.util import guild_config
-
-guild_config.init()
-
 # No privileged intents: member lookups go through alttprbot/util/discord_members.py.
 intents = discord.Intents.default()
 

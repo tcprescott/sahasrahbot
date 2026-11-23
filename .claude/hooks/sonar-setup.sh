@@ -11,7 +11,7 @@
 #   curl "https://sonarcloud.io/api/issues/search?componentKeys=tcprescott_sahasrahbot&pullRequest=<N>&resolved=false"
 set -uo pipefail
 
-if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ] || [ -z "${SONAR_TOKEN:-}" ]; then
+if [[ "${CLAUDE_CODE_REMOTE:-}" != "true" || -z "${SONAR_TOKEN:-}" ]]; then
   exit 0
 fi
 
@@ -24,7 +24,7 @@ export PATH="$SONAR_BIN_DIR:$PATH"
 # 1. Install the CLI (SonarSource's script downloads one binary into $SONAR_BIN_DIR).
 if ! command -v sonar >/dev/null 2>&1; then
   script=$(mktemp)
-  if curl -fsSL -o "$script" \
+  if curl -fsSL --proto '=https' --tlsv1.2 -o "$script" \
       https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh; then
     PROFILE=/dev/null bash "$script" >>"$LOG" 2>&1 || true
   fi
@@ -40,7 +40,7 @@ fi
 export SONARQUBE_CLI_TOKEN="$SONAR_TOKEN"
 export SONARQUBE_CLI_ORG="$SONAR_ORG"
 export SONARQUBE_CLI_SERVER="$SONAR_SERVER"
-if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+if [[ -n "${CLAUDE_ENV_FILE:-}" ]]; then
   {
     echo "export PATH=\"$SONAR_BIN_DIR:\$PATH\""
     echo 'export SONARQUBE_CLI_TOKEN="$SONAR_TOKEN"'

@@ -10,6 +10,7 @@ import config
 # from alttprbot_discord.util import alttpr_discord
 from alttprbot import models
 from alttprbot import tournaments
+from alttprbot.services import guild_config
 from alttprbot.tournament import core, alttpr
 from alttprbot.util import speedgaming
 from alttprbot.util import discord_members
@@ -167,10 +168,7 @@ class Tournament(commands.Cog):
         if ctx.guild is None:
             return False
 
-        if await ctx.guild.config_get('TournamentEnabled') == 'true':
-            return True
-        else:
-            return False
+        return await guild_config.is_enabled(ctx.guild.id, 'TournamentEnabled')
 
     async def update_scheduled_event(self, event_data: core.TournamentRace, event_slug: str, episodes: dict):
 

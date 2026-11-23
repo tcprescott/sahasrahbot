@@ -1,7 +1,7 @@
 """Characterization tests for preset loading and seed generation (alttprbot/alttprgen).
 
-No randomizer API is called: ALTTPRDiscord, AlttprDoorDiscord, AVIANARTDiscord,
-SMDiscord/SMZ3Discord and ctjets are replaced with fakes that record what they
+No randomizer API is called: ALTTPRClient, AlttprDoor, AVIANART,
+SMClient/SMZ3Client and ctjets are replaced with fakes that record what they
 were asked to generate. The tests pin which settings and endpoint each preset
 path sends, and that every shipped preset file still loads and goes through
 generation without errors.
@@ -51,11 +51,11 @@ def randomizers(monkeypatch):
         smz3=mock.AsyncMock(return_value=fake_seed()),
         ctjets=mock.AsyncMock(return_value="https://ctjets.test/seed/1"),
     )
-    monkeypatch.setattr(generator.ALTTPRDiscord, "generate", fakes.alttpr)
-    monkeypatch.setattr(generator.AlttprDoorDiscord, "create", fakes.doors)
-    monkeypatch.setattr(generator.AVIANARTDiscord, "create", fakes.avianart)
-    monkeypatch.setattr(generator.SMDiscord, "create", fakes.sm)
-    monkeypatch.setattr(generator.SMZ3Discord, "create", fakes.smz3)
+    monkeypatch.setattr(generator.ALTTPRClient, "generate", fakes.alttpr)
+    monkeypatch.setattr(generator.AlttprDoor, "create", fakes.doors)
+    monkeypatch.setattr(generator.AVIANART, "create", fakes.avianart)
+    monkeypatch.setattr(generator.SMClient, "create", fakes.sm)
+    monkeypatch.setattr(generator.SMZ3Client, "create", fakes.smz3)
     monkeypatch.setattr(generator.ctjets, "roll_ctjets", fakes.ctjets)
     return fakes
 
