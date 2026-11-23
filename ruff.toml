@@ -20,8 +20,3 @@ select = [
     "F7",    # misplaced statements (return outside function, etc.)
     "F82",   # undefined names
 ]
-
-[lint.per-file-ignores]
-# Known pre-existing bug: the BingoSync client references a cookie `jar` that is
-# never defined. Fix it, then delete this entry.
-"alttprbot/alttprgen/randomizer/bingosync.py" = ["F821"]

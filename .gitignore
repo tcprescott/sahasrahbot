@@ -20,3 +20,9 @@ utils/enemizer/ubuntu*
 .ruff_cache/
 tests/_scratch/
 .claude/settings.local.json
+
+# test coverage output
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
