@@ -16,3 +16,7 @@ config.py
 .idea/
 utils/enemizer/osx*
 utils/enemizer/ubuntu*
+.pytest_cache/
+.ruff_cache/
+tests/_scratch/
+.claude/settings.local.json

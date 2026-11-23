@@ -1,0 +1,78 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Pinned so a tool release can't break every job at once. Bump deliberately.
+  POETRY_VERSION: '2.3.3'
+  RUFF_VERSION: '0.16.9'
+  # Production runs 3.11; newer versions break the pinned discord.py.
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  lint:
+    # Small, bug-only rule set (see ruff.toml). Needs no project install.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Ruff
+        run: pipx run ruff==${{ env.RUFF_VERSION }} check --output-format=github .
+
+  guardrails:
+    # The checks in .claude/scripts/ encode rules from CLAUDE.md (no privileged
+    # intents, every config key in config.example.py, valid syntax). As Claude
+    # Code hooks they only fire inside a Claude session; here they bind every
+    # commit, whoever wrote it. Stdlib only.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Guardrails
+        run: python scripts/guardrails.py --all
+
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: poetry-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: |
+          poetry env use python${{ env.PYTHON_VERSION }}
+          poetry install --no-root --no-interaction
+          # pytest isn't in the Poetry dev group yet; install it into the venv
+          # without changing the dependency files.
+          poetry run python -m pip install pytest
+      - name: Pytest
+        # No config.py in CI: tests/conftest.py loads config.example.py.
+        run: poetry run python -m pytest -q tests
