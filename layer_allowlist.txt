@@ -14,8 +14,6 @@
 
 # --- Phase 1: seed generation imports the Discord embed builders ---------------
 
-# --- Phase 2: async tournament permission check lives in the web app -----------
-
 # --- Phase 4: tournament engine reaches into the bot singletons ----------------
 alttprbot.tournament.alttpr -> alttprbot_discord.bot
 alttprbot.tournament.alttpr_quals -> alttprbot_discord.bot
