@@ -140,14 +140,6 @@ async def merge_users(user_to_keep: models.Users, victim: models.Users):
     if victim.rtgg_id:
         user_to_keep.rtgg_id = victim.rtgg_id
 
-    # update everything to the new user
-    # we should be figuring this out dynamically by looking at the models
-    await models.AsyncTournamentAuditLog.filter(user=victim).update(user=user_to_keep)
-    await models.AsyncTournamentPermissions.filter(user=victim).update(user=user_to_keep)
-    await models.AsyncTournamentRace.filter(user=victim).update(user=user_to_keep)
-    await models.AsyncTournamentRace.filter(reviewed_by=victim).update(reviewed_by=user_to_keep)
-    await models.AsyncTournamentReviewNotes.filter(author=victim).update(author=user_to_keep)
-
     await victim.delete()
     await user_to_keep.save()
 

@@ -30,7 +30,6 @@ sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.sglive_blueprint, url_prefix="/sglive")
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
 
 # not ready for prime time
 if config.DEBUG:
