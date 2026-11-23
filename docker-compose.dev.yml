@@ -1,0 +1,23 @@
+# Local database for the standalone web app (devserver/). Start it with
+# ./scripts/dev.sh, which runs `docker compose -f docker-compose.dev.yml up -d --wait`.
+# Never point this at production data: devserver drops and reseeds it on --reset.
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: sahasrahbot_dev
+      MARIADB_USER: sahasrahbot
+      MARIADB_PASSWORD: sahasrahbot
+      MARIADB_ROOT_PASSWORD: sahasrahbot-root
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - devdb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  devdb:
