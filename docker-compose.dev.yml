@@ -1,0 +1,25 @@
+# Local database for the standalone web app (devserver/). Start it with
+# ./scripts/dev.sh, which runs `docker compose -f docker-compose.dev.yml up -d --wait`.
+# Never point this at production data: devserver drops and reseeds it on --reset.
+services:
+  db:
+    image: mariadb:11
+    # Throwaway local database, reachable only from this machine. dev.sh generates
+    # the password into the gitignored .devdb-password file on first run.
+    environment:
+      MARIADB_DATABASE: sahasrahbot_dev
+      MARIADB_USER: sahasrahbot
+      MARIADB_PASSWORD: ${DEV_DB_PASSWORD:?run ./scripts/dev.sh, which sets DEV_DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - devdb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  devdb:
