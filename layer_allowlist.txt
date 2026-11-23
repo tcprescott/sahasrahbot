@@ -32,10 +32,6 @@ alttprbot.tournament.alttpr_quals -> alttprbot_api.util.checks
 alttprbot_api.util.checks -> alttprbot_discord.bot
 alttprbot_discord.cogs.asynctournament -> alttprbot_api.util.checks
 
-# --- Phase 3: guild config ------------------------------------------------------
-alttprbot.database.config -> alttprbot_discord.util.guild_config
-alttprbot_audit.bot -> alttprbot_discord.util.guild_config
-
 # --- Phase 4: tournament engine reaches into the bot singletons ----------------
 alttprbot.tournament.alttpr -> alttprbot_discord.bot
 alttprbot.tournament.alttpr_quals -> alttprbot_discord.bot
