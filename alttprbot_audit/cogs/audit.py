@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands, tasks
 
 from alttprbot import models
+from alttprbot.services import guild_config
 
 
 class Audit(commands.Cog):
@@ -77,7 +78,7 @@ class Audit(commands.Cog):
         # if message.author.bot:
         #     return
 
-        audit_channel_id = await guild.config_get('AuditLogChannel')
+        audit_channel_id = await guild_config.get(guild.id, 'AuditLogChannel')
         if audit_channel_id:
             embed = await audit_embed_delete(guild, channel, payload.message_id)
             audit_channel = discord.utils.get(
@@ -102,7 +103,7 @@ class Audit(commands.Cog):
         # if message.author.bot:
         #     return
 
-        audit_channel_id = await guild.config_get('AuditLogChannel')
+        audit_channel_id = await guild_config.get(guild.id, 'AuditLogChannel')
         if not audit_channel_id:
             return
 
@@ -137,7 +138,7 @@ class Audit(commands.Cog):
         old_message = await models.AuditMessages.filter(message_id=message.id).order_by('id').values()
         if old_message and old_message[-1]['content'] == message.content:
             return
-        audit_channel_id = await message.guild.config_get('AuditLogChannel')
+        audit_channel_id = await guild_config.get(message.guild.id, 'AuditLogChannel')
         if audit_channel_id:
             embed = await audit_embed_edit(old_message, message)
             audit_channel = discord.utils.get(
@@ -149,30 +150,30 @@ class Audit(commands.Cog):
 
     # @commands.Cog.listener()
     # async def on_reaction_clear(self, message, reactions):
-    #     if await message.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(message.guild.id, 'AuditLogging'):
     #         logging.info("cleared reactions")
 
     # @commands.Cog.listener()
     # async def on_guild_channel_delete(self, channel):
-    #     if await channel.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(channel.guild.id, 'AuditLogging'):
     #         logging.info("channel delete")
 
     # @commands.Cog.listener()
     # async def on_guild_channel_create(self, channel):
-    #     if await channel.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(channel.guild.id, 'AuditLogging'):
     #         logging.info("channel create")
 
     # @commands.Cog.listener()
     # async def on_guild_channel_update(self, before, after):
-    #     if await after.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(after.guild.id, 'AuditLogging'):
     #         logging.info("channel update")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
         if member.guild is None:
             return
-        if await member.guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await member.guild.config_get('AuditLogChannel')
+        if await guild_config.is_enabled(member.guild.id, 'AuditLogging'):
+            audit_channel_id = await guild_config.get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_joined(member)
                 audit_channel = discord.utils.get(
@@ -184,8 +185,8 @@ class Audit(commands.Cog):
     async def on_member_remove(self, member):
         if member.guild is None:
             return
-        if await member.guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await member.guild.config_get('AuditLogChannel')
+        if await guild_config.is_enabled(member.guild.id, 'AuditLogging'):
+            audit_channel_id = await guild_config.get(member.guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_left(member)
                 audit_channel = discord.utils.get(
@@ -197,40 +198,40 @@ class Audit(commands.Cog):
     # # display_name
     # @commands.Cog.listener()
     # async def on_member_update(self, before, after):
-    #     if await after.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(after.guild.id, 'AuditLogging'):
     #         logging.info("member update")
 
     # @commands.Cog.listener()
     # async def on_user_update(self, before, after):
-    #     if await after.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(after.guild.id, 'AuditLogging'):
     #         logging.info("user update")
 
     # @commands.Cog.listener()
     # async def on_guild_role_create(self, role):
-    #     if await role.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(role.guild.id, 'AuditLogging'):
     #         logging.info("role create")
 
     # @commands.Cog.listener()
     # async def on_guild_role_delete(self, role):
-    #     if await role.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(role.guild.id, 'AuditLogging'):
     #         logging.info("role delete")
 
     # @commands.Cog.listener()
     # async def on_guild_role_update(self, before, after):
-    #     if await after.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(after.guild.id, 'AuditLogging'):
     #         logging.info("role update")
 
     # @commands.Cog.listener()
     # async def on_voice_state_update(self, member, before, after):
-    #     if await after.guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(after.guild.id, 'AuditLogging'):
     #         logging.info("voice state change")
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user):
         if guild is None:
             return
-        if await guild.config_get('AuditLogging') == 'true':
-            audit_channel_id = await guild.config_get('AuditLogChannel')
+        if await guild_config.is_enabled(guild.id, 'AuditLogging'):
+            audit_channel_id = await guild_config.get(guild.id, 'AuditLogChannel')
             if audit_channel_id:
                 embed = await audit_embed_member_banned(user)
                 audit_channel = discord.utils.get(guild.channels, id=int(audit_channel_id))
@@ -239,7 +240,7 @@ class Audit(commands.Cog):
 
     # @commands.Cog.listener()
     # async def on_member_unban(self, guild, user):
-    #     if await guild.config_get('AuditLogging') == 'true':
+    #     if await guild_config.is_enabled(guild.id, 'AuditLogging'):
     #         logging.info("member unban")
 
     # @tasks.loop(minutes=1, reconnect=True)
