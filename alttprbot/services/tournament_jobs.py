@@ -96,20 +96,20 @@ def scheduling_needs(event_slug: str, episodes: list[dict], lang: str = 'en',
         commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == lang]
         if (c_needed := 2 - len(commentators_approved)) > 0:
             comms_needed.append(events.StaffNeed(
-                start_time, c_needed, f"http://speedgaming.org/commentator/signup/{episode['id']}/"))
+                start_time, c_needed, f"https://speedgaming.org/commentator/signup/{episode['id']}/"))
 
         if include_trackers:
             trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == lang]
             t_needed = (2 if len(episode['match1']['players']) > 2 else 1) - len(trackers_approved)
             if t_needed > 0:
                 trackers_needed.append(events.StaffNeed(
-                    start_time, t_needed, f"http://speedgaming.org/tracker/signup/{episode['id']}/"))
+                    start_time, t_needed, f"https://speedgaming.org/tracker/signup/{episode['id']}/"))
 
         if broadcast_channels[0] in BROADCASTER_CHANNELS:
             broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == lang]
             if (b_needed := 1 - len(broadcasters_approved)) > 0:
                 broadcasters_needed.append(events.StaffNeed(
-                    start_time, b_needed, f"http://speedgaming.org/broadcaster/signup/{episode['id']}/"))
+                    start_time, b_needed, f"https://speedgaming.org/broadcaster/signup/{episode['id']}/"))
 
     return events.SchedulingNeedsUpdated(
         event_slug=event_slug,

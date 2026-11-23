@@ -188,7 +188,7 @@ def test_scheduling_needs():
 
     assert [(n.signup_url.rsplit('/', 2)[-2], n.count) for n in needs.commentators] == [('1', 1), ('3', 2)]
     assert [(n.signup_url.rsplit('/', 2)[-2], n.count) for n in needs.trackers] == [('1', 1), ('3', 2)]
-    assert [n.signup_url for n in needs.broadcasters] == ['http://speedgaming.org/broadcaster/signup/1/']
+    assert [n.signup_url for n in needs.broadcasters] == ['https://speedgaming.org/broadcaster/signup/1/']
     assert needs.commentators[0].start_time == datetime.datetime(2026, 11, 24, 18, tzinfo=datetime.timezone.utc)
 
     without_trackers = scheduling_needs('alttpr', [_episode(1)], include_trackers=False)
