@@ -9,7 +9,7 @@ import isodate
 import pytz
 import tortoise.exceptions
 from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 from slugify import slugify
 
 import config
@@ -555,72 +555,7 @@ class SubmitCollectIGTModal(discord.ui.Modal, title="Submit Collection Rate and 
 class AsyncTournament(commands.GroupCog, name="async"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.timeout_warning_task.start()
-        self.timeout_in_progress_races_task.start()
-        self.score_calculation_task.start()
         self.persistent_views_added = False
-
-    @tasks.loop(seconds=60, reconnect=True)
-    async def timeout_warning_task(self):
-        try:
-            for action in await service.find_pending_timeouts():
-                await self._post_timeout_action(action)
-        except Exception:
-            logging.exception("Exception in timeout_warning_task")
-
-    @tasks.loop(seconds=60, reconnect=True)
-    async def timeout_in_progress_races_task(self):
-        try:
-            for action in await service.find_in_progress_timeouts():
-                await self._post_timeout_action(action)
-        except Exception:
-            logging.exception("Exception in timeout_in_progress_races_task")
-
-    async def _post_timeout_action(self, action: service.TimeoutAction):
-        """Tell the runner, then forfeit if needed. A run whose thread can't be found is left alone."""
-        race = action.race
-        thread = self.bot.get_channel(race.thread_id)
-        if thread is None:
-            logging.warning("Cannot access thread for race %s.  This should not have happened.", race.id)
-            return
-
-        mention = f"<@{race.user.discord_user_id}>"
-        if action.kind == service.WARN:
-            msg = f"{mention}, your race will be permanently forfeit on {discord.utils.format_dt(action.deadline, 'f')} ({discord.utils.format_dt(action.deadline, 'R')}) if you do not start it by then.  Please start your run as soon as possible.  Please ping the @Admins if you require more time."
-        elif action.kind == service.FORFEIT_PENDING:
-            msg = f"{mention}, the grace period for the start of this run has elapsed.  This run has been forfeit.  Please contact the @Admins if you believe this was in error."
-        else:
-            msg = f"{mention}, this race has exceeded 12 hours.  This run has been forfeit.  Please contact the @Admins if you believe this was in error."
-
-        await thread.send(msg, allowed_mentions=discord.AllowedMentions(users=True))
-        if action.forfeits:
-            await service.apply_timeout_forfeit(action)
-
-    @tasks.loop(hours=1, reconnect=True)
-    async def score_calculation_task(self):
-        try:
-            tournaments = await models.AsyncTournament.filter(active=True)
-            for tournament in tournaments:
-                logging.info("Calculating scores for tournament %s", tournament.id)
-                try:
-                    await asynctournament.calculate_async_tournament(tournament)
-                except Exception:
-                    logging.exception("Exception in score_calculation_task for tournament %s", tournament.id)
-                logging.info("Finished calculating scores for tournament %s", tournament.id)
-        except Exception:
-            logging.exception("Exception in score_calculation_task")
-
-    @timeout_warning_task.before_loop
-    async def before_timeout_warning_task(self):
-        await self.bot.wait_until_ready()
-
-    @timeout_in_progress_races_task.before_loop
-    async def before_timeout_in_progress_races_task(self):
-        await self.bot.wait_until_ready()
-
-    @score_calculation_task.before_loop
-    async def before_score_calculation_task(self):
-        await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
     async def on_ready(self):
