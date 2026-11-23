@@ -2,12 +2,11 @@ import asyncio
 import logging
 import random
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from functools import cached_property
 from typing import List
 
 import aiocache
-import discord
 from tortoise.exceptions import MultipleObjectsReturned
 from tortoise.functions import Count
 
@@ -22,6 +21,10 @@ MAX_POOL_IMBALANCE = 3
 CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
 
 score_calculation_lock = asyncio.Lock()
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 async def calculate_async_tournament(tournament: models.AsyncTournament, only_approved: bool = False, cache=True):
@@ -80,13 +83,13 @@ async def calculate_permalink_par(permalink: models.AsyncTournamentPermalink, on
     par_time = average_timedelta([race.elapsed_time for race in top_finishes])
 
     permalink.par_time = float(par_time.total_seconds())
-    permalink.par_updated_at = discord.utils.utcnow()
+    permalink.par_updated_at = _utcnow()
     await permalink.save()
 
     for race in races:
         race.score = calculate_qualifier_score(par_time=par_time,
                                                elapsed_time=race.elapsed_time) if race.status == "finished" else 0
-        race.score_updated_at = discord.utils.utcnow()
+        race.score_updated_at = _utcnow()
         await race.save(update_fields=["score", "score_updated_at"])
 
     return True
@@ -180,11 +183,11 @@ async def populate_test_data(tournament: models.AsyncTournament, participant_cou
                 tournament=tournament,
                 thread_id=random.randint(1, 10000000000000),
                 user=user,
-                thread_open_time=discord.utils.utcnow(),
+                thread_open_time=_utcnow(),
                 permalink=permalink,
                 status="finished",
-                start_time=discord.utils.utcnow(),
-                end_time=discord.utils.utcnow() + timedelta(seconds=random.randint(3600000, 7200000) / 1000),
+                start_time=_utcnow(),
+                end_time=_utcnow() + timedelta(seconds=random.randint(3600000, 7200000) / 1000),
             )
 
 
