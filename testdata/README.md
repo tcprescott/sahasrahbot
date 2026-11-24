@@ -33,7 +33,7 @@ Fixture primary keys start at 1001, so they sit beside the dev server's hand-mad
 Unzip the dump **outside the repo** and run:
 
 ```bash
-poetry run python -I scripts/scrub_prod_dump.py /path/to/Dump20261123
+cat /path/to/Dump20261123/*.sql | poetry run python -I scripts/scrub_prod_dump.py
 ```
 
 The script only parses the SQL text; it never runs it. Before writing, it searches the

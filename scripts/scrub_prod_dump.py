@@ -2,11 +2,12 @@
 
 Usage (from the repo root, with the dump unzipped somewhere OUTSIDE the repo)::
 
-    python3 -I scripts/scrub_prod_dump.py /path/to/Dump20261123 [--out testdata]
+    cat /path/to/Dump20261123/*.sql | poetry run python -I scripts/scrub_prod_dump.py
 
-The dump is read as text: this script parses the ``CREATE TABLE`` and ``INSERT``
-statements of a MySQL Workbench / mysqldump export (one ``<db>_<table>.sql`` file per
-table, or one big file) and never executes any of it.
+The dump is read as text from standard input: this script parses the ``CREATE TABLE``
+and ``INSERT`` statements of a MySQL Workbench / mysqldump export (the per-table files
+concatenated, or one big file) and never executes any of it. Output goes to
+``testdata/`` next to this script.
 
 What it does, per feature (see ``FEATURES``):
 
@@ -26,7 +27,6 @@ import datetime
 import hashlib
 import json
 import pathlib
-import random
 import re
 import sys
 
@@ -34,7 +34,7 @@ import sys
 # Reading the dump
 # --------------------------------------------------------------------------------------
 
-_CREATE_RE = re.compile(r"CREATE TABLE `(?P<name>[^`]+)` \((?P<body>.*?)\n\)[^;]*;", re.S)
+_CREATE_RE = re.compile(r"^CREATE TABLE `(?P<name>[^`]+)` \($", re.M)
 _INSERT_RE = re.compile(r"^INSERT INTO `(?P<name>[^`]+)` VALUES ", re.M)
 _ESCAPES = {"0": "\0", "b": "\b", "n": "\n", "r": "\r", "t": "\t", "Z": "\x1a"}
 
@@ -104,23 +104,17 @@ def _columns(body: str):
     return [m.group(1) for m in re.finditer(r"^\s+`([^`]+)`", body, re.M)]
 
 
-def load_dump(path: pathlib.Path) -> dict:
-    """Return {table: (columns, rows)} for every table in the dump file(s)."""
-    files = sorted(path.glob("*.sql")) if path.is_dir() else [path]
+def load_dump(text: str) -> dict:
+    """Return {table: (columns, rows)} for every table in the dump text."""
+    text = text.replace("\r\n", "\n")
     tables = {}
-    for f in files:
-        text = f.read_text(encoding="utf-8")
-        for m in _CREATE_RE.finditer(text):
-            tables[m.group("name")] = (_columns(m.group("body")), [])
-        for m in _INSERT_RE.finditer(text):
-            rows, _ = _parse_values(text, m.end())
-            tables[m.group("name")][1].extend(rows)
+    for m in _CREATE_RE.finditer(text):
+        body = text[m.end():text.index("\n)", m.end())]
+        tables[m.group("name")] = (_columns(body), [])
+    for m in _INSERT_RE.finditer(text):
+        rows, _ = _parse_values(text, m.end())
+        tables[m.group("name")][1].extend(rows)
     return tables
-
-
-def read_table(path, table):
-    """Convenience for poking at one table: (columns, rows)."""
-    return load_dump(pathlib.Path(path))[table]
 
 
 def as_dicts(tables: dict, table: str) -> list:
@@ -177,11 +171,35 @@ _SAFE_SHORT_TEXT = re.compile(r"[A-Za-z0-9 #._:/-]{0,24}")
 _SAFE_NUMBERISH = re.compile(r"[0-9:./ ]{0,20}")
 
 
+class Picker:
+    """Deterministic stand-in for ``random``: the same label always gives the same picks,
+    so regenerating from the same dump gives the same files."""
+
+    def __init__(self, label: str):
+        self.label = label
+        self.calls = 0
+
+    def _int(self) -> int:
+        self.calls += 1
+        digest = hashlib.sha256(f"{self.label}:{self.calls}".encode()).digest()
+        return int.from_bytes(digest[:8], "big")
+
+    def randint(self, low: int, high: int) -> int:
+        return low + self._int() % (high - low + 1)
+
+    def choice(self, seq):
+        return seq[self._int() % len(seq)]
+
+    def sample(self, seq, k: int) -> list:
+        pool = list(seq)
+        return [pool.pop(self._int() % len(pool)) for _ in range(k)]
+
+
 class Faker:
     """Hands out consistent fake values. The same real value always gets the same fake."""
 
-    def __init__(self, seed: int = 20261123):
-        self.rng = random.Random(seed)
+    def __init__(self, seed: str = "20261123"):
+        self.rng = Picker(f"faker-{seed}")
         self.maps = {}
         self.counters = {}
         self.real = {"ids": set(), "names": set(), "secrets": set()}
@@ -212,7 +230,7 @@ class Faker:
         noun = _NOUNS[((n - 1) // len(_ADJECTIVES)) % len(_NOUNS)]
         return f"{adj.capitalize()}{noun.capitalize()}{n:03d}"
 
-    def token(self, n, length=14):
+    def token(self, length=14):
         alphabet = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         return "".join(self.rng.choice(alphabet) for _ in range(length))
 
@@ -272,7 +290,7 @@ class World:
                 "discord_user_id": discord_id,
                 "display_name": name,
                 "twitch_name": name.lower() if real["twitch_name"] else None,
-                "rtgg_id": self.f.map("rtgg", real["rtgg_id"], lambda n: f"fk{n:04d}{self.f.token(n, 10)}"),
+                "rtgg_id": self.f.map("rtgg", real["rtgg_id"], lambda n: f"fk{n:04d}{self.f.token(10)}"),
                 "rtgg_access_token": None,
                 "test_user": False,
                 "created": real["created"],
@@ -349,7 +367,7 @@ class World:
 
 def slice_asynctournament(tables, world: World):
     f = world.f
-    rng = random.Random(1)
+    rng = Picker("slice-1")
     out = {k: [] for k in ("AsyncTournament", "AsyncTournamentPermissions", "AsyncTournamentPermalinkPool",
                            "AsyncTournamentPermalink", "AsyncTournamentLiveRace", "AsyncTournamentRace",
                            "AsyncTournamentReviewNotes", "AsyncTournamentWhitelist")}
@@ -385,9 +403,9 @@ def slice_asynctournament(tables, world: World):
             n = f.pk("permalink", lk["id"])
             url = lk["url"] or ""
             if "alttpr.com" in url:
-                url = f"https://alttpr.com/h/{f.token(n, 10)}"
+                url = f"https://alttpr.com/h/{f.token(10)}"
             elif "avianart" in url:
-                url = f"https://avianart.games/perm/{f.token(n, 12)}"
+                url = f"https://avianart.games/perm/{f.token(12)}"
             else:
                 url = f"https://example.com/seed{n}"
             out["AsyncTournamentPermalink"].append({
@@ -484,7 +502,7 @@ def _results_text(candidates, ballots, seats):
 
 def slice_ranked_choice(tables, world: World):
     f = world.f
-    rng = random.Random(2)
+    rng = Picker("slice-2")
     out = {"RankedChoiceElection": [], "RankedChoiceCandidate": [], "RankedChoiceAuthorizedVoters": [],
            "RankedChoiceVotes": []}
     elections = {e["id"]: e for e in as_dicts(tables, "ranked_choice_election")}
@@ -540,15 +558,16 @@ def slice_ranked_choice(tables, world: World):
             for row in cand_rows.values():
                 row["winner"] = row["name"] in winners or None
         out["RankedChoiceCandidate"].extend(cand_rows.values())
+        noun = "candidates" if people else "options"
+        description = (f"Rank the {noun} in order of preference. "
+                       f"(Fixture election {new_e}; the original description was removed.)")
         out["RankedChoiceElection"].append({
             "id": new_e, "guild_id": guild,
             "channel_id": world.channel(guild, e["channel_id"], f"elections-{new_e}") if guild else None,
             "message_id": f.snowflake("message", e["message_id"]),
             "owner_id": world.discord_user(e["owner_id"]),
             "title": e["title"],
-            "description": f"Rank the {'candidates' if people else 'options'} in order of preference. "
-                           f"(Fixture election {new_e}; the original description was removed.)"
-            if e["description"] else None,
+            "description": description if e["description"] else None,
             "show_vote_count": bool(e["show_vote_count"]), "active": bool(e["active"]),
             "private": bool(e["private"]), "voter_role_id": role, "seats": e["seats"],
             "results": results, "created": e["created"], "updated": e["updated"],
@@ -565,7 +584,7 @@ def slice_ranked_choice(tables, world: World):
 
 def slice_presets(tables, world: World, repo: pathlib.Path):
     f = world.f
-    rng = random.Random(3)
+    rng = Picker("slice-3")
     namespaces = as_dicts(tables, "presetnamespaces")
     for ns in namespaces:
         if ns["name"]:
@@ -618,7 +637,7 @@ def _name_of(world: World, discord_id):
 # Checks
 # --------------------------------------------------------------------------------------
 
-_BIG_INT = re.compile(r"(?<![0-9.])[0-9]{15,20}(?![0-9])")
+_BIG_INT = re.compile(r"(?<![\d.])\d{15,20}(?!\d)")
 
 
 def find_leaks(outputs: dict, faker: Faker, tables: dict, public_texts=frozenset()) -> list:
@@ -685,8 +704,8 @@ def _strings(data):
 ALLOWED_WORDS_FILE = "allowed_words.txt"
 
 
-def build(dump: pathlib.Path, repo: pathlib.Path):
-    tables = load_dump(dump)
+def build(dump_text: str, repo: pathlib.Path):
+    tables = load_dump(dump_text)
     faker = Faker()
     world = World(faker, tables)
     features = {
@@ -706,16 +725,14 @@ def build(dump: pathlib.Path, repo: pathlib.Path):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("dump", type=pathlib.Path, help="the unzipped dump folder (or one .sql file)")
-    parser.add_argument("--out", type=pathlib.Path, default=None, help="output folder (default: <repo>/testdata)")
     parser.add_argument("--check-only", action="store_true", help="build and check, but write nothing")
     args = parser.parse_args(argv)
     repo = pathlib.Path(__file__).resolve().parent.parent
-    out_dir = args.out or repo / "testdata"
-    if repo in args.dump.resolve().parents or args.dump.resolve() == repo:
-        parser.error("keep the raw dump outside the repository")
+    out_dir = repo / "testdata"
+    if sys.stdin.isatty():
+        parser.error("pipe the dump's .sql files into standard input")
 
-    tables, faker, data = build(args.dump, repo)
+    tables, faker, data = build(sys.stdin.read(), repo)
     allowed = set()
     allowed_path = out_dir / ALLOWED_WORDS_FILE
     if allowed_path.exists():
@@ -725,7 +742,8 @@ def main(argv=None):
 
     texts = {name: json.dumps(payload, indent=1, ensure_ascii=False, default=str) + "\n"
              for name, payload in data.items()}
-    public = {p.read_text(encoding="utf-8") for p in (repo / "presets").glob("*/*.yaml")}
+    preset_files = list((repo / "presets").glob("*/*.yaml"))
+    public = {p.read_text(encoding="utf-8") for p in preset_files} | {p.stem for p in preset_files}
     problems = find_leaks(texts, faker, tables, public)
     if problems:
         print("Refusing to write: real values found in the output.", file=sys.stderr)
