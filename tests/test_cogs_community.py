@@ -337,6 +337,17 @@ async def role_world(db):
     return SimpleNamespace(channel=channel, message=message, role=role, guild=guild, group=group, ctx=ctx)
 
 
+async def test_reaction_role_description_fits_production_column(role_world):
+    """Production's reaction_role.description is VARCHAR(400), so the model must
+    refuse anything longer before MySQL does."""
+    from tortoise.exceptions import ValidationError
+
+    assert models.ReactionRole._meta.fields_map["description"].max_length == 400
+    await reaction_roles.create_role(1, role_world.group.id, 501, "runner", "🏃", "x" * 400, True)
+    with pytest.raises(ValidationError):
+        await reaction_roles.create_role(1, role_world.group.id, 502, "racer", "🏁", "x" * 401, True)
+
+
 async def test_reaction_role_create_update_delete(role_world):
     w = role_world
     cog = role_cog.Role(w.ctx.bot)
