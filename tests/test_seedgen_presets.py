@@ -199,8 +199,9 @@ async def test_namespaced_preset_with_broken_yaml_raises_user_facing_error(db):
     namespace = await models.PresetNamespaces.create(name="synack", discord_user_id=42)
     await models.Presets.create(namespace=namespace, randomizer="alttpr", preset_name="broken", content=BROKEN_PRESET)
 
+    broken = generator.ALTTPRPreset("synack/broken")
     with pytest.raises(generator.InvalidPresetError, match=r"synack/broken isn't valid YAML.*line 2, column 3"):
-        await generator.ALTTPRPreset("synack/broken").fetch()
+        await broken.fetch()
 
 
 async def test_namespaced_errors(db):

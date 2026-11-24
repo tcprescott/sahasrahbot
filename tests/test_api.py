@@ -270,7 +270,8 @@ async def test_preset_save_creates_replaces_and_validates(client, login):
                              {"content": 'goal_name: "x"\n  goal: ganon\n'})
     not_mapping = await send_json(client, "PUT", "/api/v1/presets/namespaces/synack/alttpr/ok", {"content": "- a\n- b"})
     assert (broken[0], not_mapping[0]) == (400, 400)
-    assert "isn't valid YAML" in broken[1]["error"] and "line 2" in broken[1]["error"]
+    assert "isn't valid YAML" in broken[1]["error"]
+    assert "line 2" in broken[1]["error"]
     assert "YAML mapping" in not_mapping[1]["error"]
     assert not await models.Presets.exists(preset_name="ok")
 
