@@ -162,7 +162,8 @@ class Inquiry(commands.Cog):
         await models.InquiryMessageConfig.create(message_id=original_message.id, role_id=role.id)
 
 
-def check_private_threads(interaction: discord.Interaction):  # NOSONAR: discord.py passes the interaction to every check
+# discord.py passes the interaction to every check, used or not.
+def check_private_threads(interaction: discord.Interaction):  # NOSONAR
     return True
 
 

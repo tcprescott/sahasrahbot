@@ -7,6 +7,9 @@ is recorded in ``OUTBOX`` so it can be inspected at ``/_dev/outbox``.
 
 The world they describe (guilds, roles, channels, members) is built from
 ``devserver.fixtures`` and can be changed at runtime from the ``/_dev`` pages.
+
+Methods marked NOSONAR mirror discord.py's signatures: they stay async, and keep
+parameters they ignore, because the app awaits them and passes those arguments.
 """
 import datetime
 import itertools
@@ -46,14 +49,14 @@ class FakeMessage:
         self.content = entry["content"]
         self._entry = entry
 
-    async def edit(self, content=None, embed=None, embeds=None, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def edit(self, content=None, embed=None, embeds=None, **kwargs):  # NOSONAR
         record(f"{self._entry['target']} (edit of {self.id})", content=content, embed=embed, embeds=embeds, **kwargs)
         return self
 
-    async def delete(self, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def delete(self, **kwargs):  # NOSONAR
         return None
 
-    async def add_reaction(self, emoji):  # NOSONAR: mirrors the discord.py API
+    async def add_reaction(self, emoji):  # NOSONAR
         return None
 
     @property
@@ -100,10 +103,10 @@ class FakeUser:
 
     avatar = display_avatar
 
-    async def send(self, content=None, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def send(self, content=None, **kwargs):  # NOSONAR
         return record(f"DM @{self.name}", content=content, **kwargs)
 
-    async def create_dm(self):  # NOSONAR: mirrors the discord.py API
+    async def create_dm(self):  # NOSONAR
         return self
 
     def __str__(self):
@@ -141,16 +144,16 @@ class FakeMember(FakeUser):
         roles += [r for r in (self.guild.get_role(rid) for rid in self._role_ids) if r is not None]
         return roles
 
-    async def add_roles(self, *roles, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def add_roles(self, *roles, **kwargs):  # NOSONAR
         for role in roles:
             if role.id not in self._role_ids:
                 self._role_ids.append(role.id)
 
-    async def remove_roles(self, *roles, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def remove_roles(self, *roles, **kwargs):  # NOSONAR
         ids = {r.id for r in roles}
         self._role_ids = [r for r in self._role_ids if r not in ids]
 
-    async def edit(self, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def edit(self, **kwargs):  # NOSONAR
         if "nick" in kwargs:
             self.nick = kwargs["nick"]
 
@@ -163,16 +166,16 @@ class FakeChannel:
         self.mention = f"<#{self.id}>"
         self.jump_url = f"https://discord.com/channels/{guild.id if guild else '@me'}/{self.id}"
 
-    async def send(self, content=None, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def send(self, content=None, **kwargs):  # NOSONAR
         return record(f"#{self.name}", content=content, **kwargs)
 
-    async def fetch_message(self, message_id):  # NOSONAR: mirrors the discord.py API
+    async def fetch_message(self, message_id):  # NOSONAR
         return FakeMessage({"id": int(message_id), "content": None, "target": f"#{self.name}"})
 
     def get_partial_message(self, message_id):
         return FakeMessage({"id": int(message_id), "content": None, "target": f"#{self.name}"})
 
-    async def create_thread(self, name=None, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def create_thread(self, name=None, **kwargs):  # NOSONAR
         thread = FakeChannel(self.guild, next(_message_ids), f"{self.name}/{name}")
         if self.guild:
             self.guild._channels[thread.id] = thread
@@ -215,7 +218,7 @@ class FakeGuild:
     def get_channel(self, channel_id) -> Optional[FakeChannel]:
         return self._channels.get(int(channel_id)) if channel_id is not None else None
 
-    async def fetch_channel(self, channel_id):  # NOSONAR: mirrors the discord.py API
+    async def fetch_channel(self, channel_id):  # NOSONAR
         return self.get_channel(channel_id)
 
     # members
@@ -228,21 +231,21 @@ class FakeGuild:
     def member_count(self):
         return len(self._members)
 
-    def get_member(self, user_id) -> Optional[FakeMember]:  # NOSONAR: mirrors the discord.py API
+    def get_member(self, user_id) -> Optional[FakeMember]:  # NOSONAR
         # Like production without the members intent, the cache holds nobody, so
         # code has to go through discord_members.get_member (which falls back to fetch).
         return None
 
-    async def fetch_member(self, user_id) -> FakeMember:  # NOSONAR: mirrors the discord.py API
+    async def fetch_member(self, user_id) -> FakeMember:  # NOSONAR
         member = self._members.get(int(user_id))
         if member is None:
             raise _not_found(f"Unknown Member {user_id}")
         return member
 
-    def get_member_named(self, name):  # NOSONAR: mirrors the discord.py API
+    def get_member_named(self, name):  # NOSONAR
         return None
 
-    async def query_members(self, query=None, limit=5, user_ids=None, cache=True, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def query_members(self, query=None, limit=5, user_ids=None, cache=True, **kwargs):  # NOSONAR
         results = []
         for member in self._members.values():
             if user_ids is not None and member.id not in user_ids:
@@ -253,10 +256,10 @@ class FakeGuild:
             results.append(member)
         return results[:limit]
 
-    async def chunk(self, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def chunk(self, **kwargs):  # NOSONAR
         raise RuntimeError("guild.chunk() needs the privileged members intent, which SahasrahBot does not use")  # intents: ok
 
-    async def create_scheduled_event(self, **kwargs):  # NOSONAR: mirrors the discord.py API
+    async def create_scheduled_event(self, **kwargs):  # NOSONAR
         record(f"{self.name} scheduled event", content=kwargs.get("name"))
         return None
 
@@ -331,13 +334,13 @@ class FakeDiscordBot:
     def is_ready(self):
         return True
 
-    async def wait_until_ready(self):  # NOSONAR: mirrors the discord.py API
+    async def wait_until_ready(self):  # NOSONAR
         return None
 
     def get_guild(self, guild_id) -> Optional[FakeGuild]:
         return self.world.guilds.get(int(guild_id)) if guild_id is not None else None
 
-    async def fetch_guild(self, guild_id) -> FakeGuild:  # NOSONAR: mirrors the discord.py API
+    async def fetch_guild(self, guild_id) -> FakeGuild:  # NOSONAR
         guild = self.get_guild(guild_id)
         if guild is None:
             raise _not_found(f"Unknown Guild {guild_id}")
@@ -346,7 +349,7 @@ class FakeDiscordBot:
     def get_channel(self, channel_id):
         return self.world.channel(channel_id) if channel_id is not None else None
 
-    async def fetch_channel(self, channel_id):  # NOSONAR: mirrors the discord.py API
+    async def fetch_channel(self, channel_id):  # NOSONAR
         channel = self.get_channel(channel_id)
         if channel is None:
             raise _not_found(f"Unknown Channel {channel_id}")
@@ -355,20 +358,20 @@ class FakeDiscordBot:
     def get_user(self, user_id) -> Optional[FakeUser]:
         return self.world.users.get(int(user_id)) if user_id is not None else None
 
-    async def fetch_user(self, user_id) -> FakeUser:  # NOSONAR: mirrors the discord.py API
+    async def fetch_user(self, user_id) -> FakeUser:  # NOSONAR
         user = self.get_user(user_id)
         if user is None:
             raise _not_found(f"Unknown User {user_id}")
         return user
 
-    async def application_info(self):  # NOSONAR: mirrors the discord.py API
+    async def application_info(self):  # NOSONAR
         return _AppInfo(self.get_user(self.world.owner_id) or self.user)
 
-    def get_emoji(self, emoji_id):  # NOSONAR: mirrors the discord.py API
+    def get_emoji(self, emoji_id):  # NOSONAR
         return None
 
     def dispatch(self, event, *args, **kwargs):
         logger.info("Discord event dispatched: %s", event)
 
-    async def load_extension(self, name):  # NOSONAR: mirrors the discord.py API
+    async def load_extension(self, name):  # NOSONAR
         logger.info("Skipping Discord extension %s in the dev server", name)
