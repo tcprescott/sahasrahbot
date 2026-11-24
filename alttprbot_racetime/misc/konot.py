@@ -1,4 +1,5 @@
 from alttprbot import models
+from alttprbot.services import konot as konot_service
 
 
 class KONOT(object):
@@ -10,30 +11,20 @@ class KONOT(object):
     @classmethod
     async def create_new(cls, category, rtgg_handler):
         konot = cls(rtgg_handler)
-        konot.game = await models.RacetimeKONOTGame.create(category_slug=category)
-        konot.segment = await models.RaceTimeKONOTSegment.create(
-            racetime_room=rtgg_handler.data.get('name'),
-            game_id=konot.game.id,
-            segment_number=1
-        )
+        konot.game, konot.segment = await konot_service.start_game(category, rtgg_handler.data.get('name'))
         return konot
 
     @classmethod
     async def resume(cls, rtgg_handler):
         konot = cls(rtgg_handler)
-        konot.segment = await models.RaceTimeKONOTSegment.get(racetime_room=rtgg_handler.data.get('name'))
-        konot.game = await models.RacetimeKONOTGame.get(id=konot.segment.game_id)
+        konot.game, konot.segment = await konot_service.find_by_room(rtgg_handler.data.get('name'))
         return konot
 
     @classmethod
     async def next_segment(cls, rtgg_handler, game: models.RacetimeKONOTGame, segment_number):
         konot = cls(rtgg_handler)
         konot.game = game
-        konot.segment = await models.RaceTimeKONOTSegment.create(
-            racetime_room=rtgg_handler.data.get('name'),
-            game_id=konot.game.id,
-            segment_number=segment_number
-        )
+        konot.segment = await konot_service.add_segment(konot.game.id, rtgg_handler.data.get('name'), segment_number)
         return konot
 
     def calc_advancing(self):

@@ -6,7 +6,7 @@ from tenacity import (AsyncRetrying, RetryError, retry_if_exception_type,
                       stop_after_attempt)
 
 import config
-from alttprbot import models
+from alttprbot.services import racetime_rooms
 
 RACETIME_HOST = config.RACETIME_HOST
 RACETIME_SECURE = config.RACETIME_SECURE
@@ -53,7 +53,7 @@ class SahasrahBotRaceTimeBot(Bot):
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
 
-        unlisted_rooms = await models.RTGGUnlistedRooms.filter(category=self.category_slug)
+        unlisted_rooms = await racetime_rooms.unlisted_rooms(self.category_slug)
         for unlisted_room in unlisted_rooms:
             try:
                 race_data = None
@@ -68,7 +68,7 @@ class SahasrahBotRaceTimeBot(Bot):
                             race_data = await resp.json()
 
                 if race_data and (race_data['status']['value'] in ['finished', 'cancelled'] or not race_data['unlisted']):
-                    await unlisted_room.delete()
+                    await racetime_rooms.forget_unlisted(unlisted_room.room_name)
                 elif race_data:
                     await self.join_race_room(unlisted_room.room_name)
 

@@ -1,6 +1,5 @@
 import asyncio
 import math
-from datetime import datetime
 from itertools import groupby
 
 import discord.utils
@@ -9,6 +8,7 @@ from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 
 from alttprbot import events, models
 from alttprbot import tournaments
+from alttprbot.services import racetime_rooms, spoiler_races
 from alttprbot_racetime.misc.konot import KONOT
 
 
@@ -38,9 +38,7 @@ class SahasrahBotCoreHandler(RaceHandler):
         await self.setup_spoiler_race()
 
     async def setup_spoiler_race(self):
-        self.spoiler_race = await models.SpoilerRaces.get_or_none(
-            srl_id=self.data.get('name')
-        )
+        self.spoiler_race = await spoiler_races.get(self.data.get('name'))
 
         if self.spoiler_race is None:
             return
@@ -64,8 +62,7 @@ class SahasrahBotCoreHandler(RaceHandler):
         if self.spoiler_race is None:
             return
 
-        self.spoiler_race.started = datetime.utcnow()
-        await self.spoiler_race.save(update_fields=['started'])
+        await spoiler_races.mark_started(self.spoiler_race)
         await self.send_message('Sending spoiler log...')
         await self.send_message('---------------')
         await self.send_message(f"This race\'s spoiler log: {self.spoiler_race.spoiler_url}")
@@ -107,32 +104,27 @@ class SahasrahBotCoreHandler(RaceHandler):
             await asyncio.sleep(.1 if timeleft <= 10 else 1)
 
     async def schedule_spoiler_race(self, spoiler_url: str, studytime: int):
-        self.spoiler_race, _ = await models.SpoilerRaces.update_or_create(
-            srl_id=self.data.get('name'),
-            defaults={
-                'spoiler_url': spoiler_url,
-                'studytime': studytime,
-            }
-        )
+        self.spoiler_race = await spoiler_races.schedule(self.data.get('name'), spoiler_url, studytime)
         return self.spoiler_race
 
     async def delete_spoiler_race(self):
         if self.spoiler_race:
-            await self.spoiler_race.delete()
+            await spoiler_races.delete(self.spoiler_race)
         self.spoiler_race = None
 
     async def setup_tournament(self):
         if self.tournament:
             return
 
-        race = await models.TournamentResults.get_or_none(srl_id=self.data.get('name'))
+        race = await racetime_rooms.tournament_race(self.data.get('name'))
         if not race:
             return
+        event, episode_id = race
 
         try:
             self.tournament = await tournaments.fetch_tournament_handler(
-                event=race.event,
-                episodeid=race.episode_id,
+                event=event,
+                episodeid=episode_id,
                 rtgg_handler=self
             )
             await self.tournament.on_room_resume()
@@ -194,11 +186,7 @@ class SahasrahBotCoreHandler(RaceHandler):
 
         unlisted = self.data.get('unlisted', False)
         if unlisted != self.unlisted:
-            if unlisted:
-                await models.RTGGUnlistedRooms.update_or_create(room_name=self.data.get('name'),
-                                                                defaults={'category': self.bot.category_slug})
-            else:
-                await models.RTGGUnlistedRooms.filter(room_name=self.data.get('name')).delete()
+            await racetime_rooms.set_unlisted(self.data.get('name'), self.bot.category_slug, unlisted)
         self.unlisted = unlisted
 
     # TODO: this should be implemented in the base class
@@ -355,13 +343,13 @@ class SahasrahBotCoreHandler(RaceHandler):
     async def ex_override(self, args, message):
         racetime_id = message.get('user', {}).get('id', None)
         racetime_category = self.data['category']['slug']
-        whitelisted_user = await models.RTGGOverrideWhitelist.get_or_none(racetime_id=racetime_id, category=racetime_category)
+        override_status = await racetime_rooms.stream_override_status(racetime_id, racetime_category)
 
-        if whitelisted_user is None:
+        if override_status == racetime_rooms.OVERRIDE_NOT_WHITELISTED:
             await self.send_message("You do not have permission to override the stream requirement for this category.  Please contact a category owner if you need this to be changed.")
             return
 
-        if whitelisted_user.expires is not None and whitelisted_user.expires < datetime.utcnow():
+        if override_status == racetime_rooms.OVERRIDE_EXPIRED:
             await self.send_message("Your streaming exemption has expired.  Please contact a category owner if you need this to be renewed.")
             return
 
