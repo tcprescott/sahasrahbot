@@ -1,10 +1,10 @@
-import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 import config
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.integrations import doors_multiworld
 
 
 class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door Randomizer multiworld."):
@@ -25,10 +25,8 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
             }
         }
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post('http://localhost:5002/game', json=data) as resp:
-                    multiworld = await resp.json()
-        except aiohttp.ClientResponseError as err:
+            multiworld = await doors_multiworld.create_game(data)
+        except doors_multiworld.MultiworldServerError as err:
             raise SahasrahBotException(
                 'Unable to generate host using the provided multidata.  Ensure you\'re using the latest version of the mutiworld (<https://github.com/Bonta0/ALttPEntranceRandomizer/tree/multiworld_31>)!') from err
 
@@ -43,9 +41,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
         data = {
             'token': token
         }
-        async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:5002/game', json=data) as resp:
-                multiworld = await resp.json()
+        multiworld = await doors_multiworld.create_game(data)
         await interaction.response.send_message(embed=make_embed(multiworld))
 
     @app_commands.command(description="Kick a player from a multiworld game.")
@@ -80,45 +76,26 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
     @send.autocomplete("player")
     async def autocomplete_player(self, interaction: discord.Interaction, current: str):
         token = interaction.namespace.token
-        params = {
-            'player': current,
-            'token': token
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.get('http://localhost:5002/autocomplete/players', params=params) as resp:
-                result = await resp.json()
+        result = await doors_multiworld.autocomplete_players(token, current)
 
         return [app_commands.Choice(name=player, value=player) for player in result]
 
     @send.autocomplete("item")
     async def autocomplete_item(self, interaction: discord.Interaction, current: str):
-        params = {
-            'item': current
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.get('http://localhost:5002/autocomplete/items', params=params) as resp:
-                result = await resp.json()
+        result = await doors_multiworld.autocomplete_items(current)
 
         return [app_commands.Choice(name=item, value=item) for item in result]
 
     @kick.autocomplete("player")
     async def autocomplete_kick(self, interaction: discord.Interaction, current: str):
         token = interaction.namespace.token
-        params = {
-            'client': current,
-            'token': token
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.get('http://localhost:5002/autocomplete/clients', params=params) as resp:
-                result = await resp.json()
+        result = await doors_multiworld.autocomplete_clients(token, current)
 
         return [app_commands.Choice(name=client, value=client) for client in result]
 
     @app_commands.command(description="Send a message to the multiworld server.")
     async def msg(self, interaction: discord.Interaction, token: str, msg: str):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'http://localhost:5002/game/{token}') as multiworld_resp:
-                multiworld = await multiworld_resp.json()
+        multiworld = await doors_multiworld.get_game(token)
 
         if not multiworld.get('success', True):
             raise SahasrahBotException("That game does not exist.")
@@ -126,12 +103,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
         if not (multiworld['admin'] == interaction.user.id):
             raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
-        data = {
-            'msg': msg
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.put(f'http://localhost:5002/game/{token}/msg', json=data) as msg_response:
-                response = await msg_response.json()
+        response = await doors_multiworld.send_message(token, msg)
 
         if response.get('success', True) is False:
             raise SahasrahBotException(response.get(
@@ -145,9 +117,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
 
 
 async def send_command(token, interaction: discord.Interaction, **data):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'http://localhost:5002/game/{token}') as multiworld_resp:
-            multiworld = await multiworld_resp.json()
+    multiworld = await doors_multiworld.get_game(token)
 
     if not multiworld.get('success', True):
         raise SahasrahBotException("That game does not exist.")
@@ -155,9 +125,7 @@ async def send_command(token, interaction: discord.Interaction, **data):
     if not (multiworld['admin'] == interaction.user.id):
         raise SahasrahBotException('You must be the creator of the game to send items to players.')
 
-    async with aiohttp.ClientSession() as session:
-        async with session.put(f'http://localhost:5002/game/{token}/cmd', json=data) as send_response:
-            response = await send_response.json()
+    response = await doors_multiworld.send_command(token, data)
 
     if response.get('success', True) is False:
         return response.get('error', response.get('description', 'Unknown error occured while processing command.'))

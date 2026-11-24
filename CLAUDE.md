@@ -18,6 +18,8 @@ where things live. Read it before changing code.
   them. A hook (`check_privileged_intents.py`) enforces this.
 - **The audit bot was removed** (2026-11), along with other dead features (orphaned
   tournament classes, SG Live, `/cc2023`). Don't bring them back without asking.
+- **KONOT race series (`!konot`) were removed** (2026-11) at the user's request; the
+  `RacetimeKONOTGame` / `RaceTimeKONOTSegment` models and tables stay.
 - **The async tournament feature was removed** (2026-11) at the user's request, but its
   `AsyncTournament*` models and tables stay, along with the rows the racetime.gg
   account-merge in `alttprbot_api/blueprints/racetime.py` rewrites. Don't drop them
@@ -35,8 +37,9 @@ where things live. Read it before changing code.
 | `config.example.py` | Every setting the code reads, with placeholders. Tests load it when `config.py` is absent |
 | `alttprbot/models/` | Tortoise models (`models.py`, `schedule.py`), re-exported from `alttprbot.models` |
 | `alttprbot/services/` | Service layer: one module per domain, called by cogs, routes and racetime handlers. Services may use models directly and must not import any `alttprbot_*` package. `guild_config.py` is the only code that touches the `config` table (per-guild settings, cached) |
+| `alttprbot/integrations/` | One small HTTP client per external API (racetime.gg, ALTTPR Ladder, Door Randomizer multiworld server, holy images). Plain data in and out; no Discord, racetime-bot, web or model imports (a test enforces this). New outbound HTTP goes here, not in a cog or handler |
 | `alttprbot/alttprgen/` | Seed generation, with no Discord, racetime or web imports: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one API client per external randomizer, e.g. `alttpr.py`'s `ALTTPRClient`), `spoilers.py` |
-| `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`) |
+| `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`); Sheets result recording is `alttprbot/services/tournament_results.py` |
 | `alttprbot/events/` | The event bridge: `types.py` (one frozen dataclass per event, listed in `ALL_EVENTS`), `bus.py` (`publish`, `subscribe`). Imports no front end |
 | `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `gsheet.py`, `triforce_text.py`, … |
 | `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
