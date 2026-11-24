@@ -8,10 +8,11 @@ from racetime_bot import msg_actions
 from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.exceptions import SahasrahBotException
-from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot.tournament.core import TournamentRace
 from alttprbot.util import triforce_text
 from alttprbot.util.seed_presenter import seed_embed, seed_tournament_embed
 from alttprbot.services import bots
+from alttprbot.tournament import event_settings
 
 
 class ALTTPRTournamentRace(TournamentRace):
@@ -136,25 +137,4 @@ class ALTTPRTournamentRace(TournamentRace):
 
 class ALTTPR2024Race(TournamentRace):
     async def configuration(self):
-        guild = bots.discord().get_guild(334795604918272012)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Tournament (Solo)',
-            event_slug="alttpr",
-            audit_channel=bots.discord().get_channel(647966639266201620),
-            commentary_channel=bots.discord().get_channel(947095820673638400),
-            scheduling_needs_channel=bots.discord().get_channel(434560353461075969),
-            scheduling_needs_tracker=True,
-            create_scheduled_events=True,
-            stream_delay=10,
-            gsheet_id='1epZRDXfe-O4BBerzOEZbFMOVCFrVXU6TCDNjp66P7ZI',
-            helper_roles=[
-                guild.get_role(334797023054397450),
-                guild.get_role(435200206552694794),
-                guild.get_role(482353483853332481),
-                guild.get_role(426487540829388805),
-                guild.get_role(613394561594687499),
-                guild.get_role(334796844750209024)
-            ]
-        )
+        return event_settings.tournament_config("alttpr")
