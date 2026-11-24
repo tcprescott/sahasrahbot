@@ -145,7 +145,7 @@ class ReactionRole(Model):
     name = fields.CharField(45, null=True)
     emoji = fields.CharField(200, null=True)
     protect_mentions = fields.SmallIntField(null=True)
-    description = fields.CharField(1000, null=True)
+    description = fields.CharField(400, null=True)  # production's column is VARCHAR(400)
 
 
 class SMZ3Multiworld(Model):
