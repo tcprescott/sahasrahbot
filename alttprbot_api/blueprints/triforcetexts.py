@@ -9,6 +9,7 @@ from alttprbot_api.api import discord
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
 
 ERROR_TEMPLATE = 'error.html'
+INVALID_INPUT = 'Invalid input.'
 
 
 @triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>', methods=['GET'])
@@ -30,13 +31,13 @@ async def submit(pool_name):
         r"^[A-Za-z0-9 ?!,-….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ]{0,19}$")
 
     if not regex.match(payload['first_line']):
-        return await render_template(ERROR_TEMPLATE, user=user, title="Invalid input.",
+        return await render_template(ERROR_TEMPLATE, user=user, title=INVALID_INPUT,
                                      message="Invalid text entered for the first line.")
     if not regex.match(payload['second_line']):
-        return await render_template(ERROR_TEMPLATE, user=user, title="Invalid input.",
+        return await render_template(ERROR_TEMPLATE, user=user, title=INVALID_INPUT,
                                      message="Invalid text entered for the second line.")
     if not regex.match(payload['third_line']):
-        return await render_template(ERROR_TEMPLATE, user=user, title="Invalid input.",
+        return await render_template(ERROR_TEMPLATE, user=user, title=INVALID_INPUT,
                                      message="Invalid text entered for the third line.")
 
     text = f"{payload['first_line']}\n{payload['second_line']}\n{payload['third_line']}"
