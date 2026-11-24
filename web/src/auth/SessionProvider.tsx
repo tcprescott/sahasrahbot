@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, loginUrl, unwrap, type SessionUser } from '../api/client'
 import { Spinner } from '../components'
+import { browser } from '../lib/browser'
 import { setTelemetryUser } from '../telemetry'
 
 interface SessionState {
@@ -42,7 +43,7 @@ export function useSession(): SessionState {
 export function RequireSignIn({ children }: Readonly<{ children: (user: SessionUser) => ReactNode }>) {
   const { user } = useSession()
   useEffect(() => {
-    if (user === null) window.location.assign(loginUrl())
+    if (user === null) browser.assign(loginUrl())
   }, [user])
   if (user === undefined) return <Spinner label="Loading" />
   if (user === null) return <Spinner label="Taking you to Discord to sign in" />

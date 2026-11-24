@@ -101,9 +101,9 @@ jobs:
       - name: Generate the API client types
         working-directory: web
         run: npm run gen:api
-      - name: Typecheck, unit tests, build
+      - name: Typecheck, unit tests (with the coverage floor), build
         working-directory: web
         run: |
           npm run typecheck
-          npm test
+          npm run test:coverage
           npm run build
