@@ -8,7 +8,7 @@ import { Banner, Button, EmptyState, Icon, PageHeader, Panel } from '../componen
 import { namespacePath, presetParams, presetPath } from './paths'
 import { YamlField } from './YamlField'
 
-const NAME = /^[A-Za-z0-9_]{1,50}$/
+const NAME = /^\w{1,50}$/
 
 export function NewPresetScreen() {
   return <RequireSignIn>{() => <NewPreset />}</RequireSignIn>

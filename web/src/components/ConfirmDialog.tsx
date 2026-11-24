@@ -3,8 +3,8 @@ import { FormDialog } from './Dialog'
 
 /**
  * The confirmation every destructive menu item opens: says what will happen,
- * then does it. `onConfirm` resolves true to close, false to stay open (it
- * showed its own error).
+ * then does it. The dialog closes when `onConfirm` finishes, unless it
+ * resolves `false` to stay open (it showed its own error).
  */
 export function ConfirmDialog({
   open,
@@ -13,14 +13,14 @@ export function ConfirmDialog({
   children,
   action,
   onConfirm,
-}: {
+}: Readonly<{
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
   children: ReactNode
   action: string
-  onConfirm: () => Promise<boolean>
-}) {
+  onConfirm: () => Promise<boolean | void>
+}>) {
   const [busy, setBusy] = useState(false)
   return (
     <FormDialog
@@ -35,7 +35,7 @@ export function ConfirmDialog({
         setBusy(true)
         const ok = await onConfirm()
         setBusy(false)
-        if (ok) onOpenChange(false)
+        if (ok !== false) onOpenChange(false)
       }}
     >
       <p className="confirm-dialog__text">{children}</p>

@@ -1,7 +1,9 @@
 const enc = encodeURIComponent
 
-export const namespacePath = (ns: string, randomizer?: string) =>
-  `/presets/manage/${enc(ns)}${randomizer ? `/${enc(randomizer)}` : ''}`
+export const namespacePath = (ns: string, randomizer?: string) => {
+  const base = `/presets/manage/${enc(ns)}`
+  return randomizer ? `${base}/${enc(randomizer)}` : base
+}
 
 export const presetPath = (ns: string, randomizer: string, name: string) =>
   `/presets/manage/${enc(ns)}/${enc(randomizer)}/${enc(name)}`

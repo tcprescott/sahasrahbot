@@ -12,3 +12,10 @@ class PermissionDeniedError(SahasrahBotException):
 
 class InvalidInputError(SahasrahBotException):
     """The user sent something we can't accept. The web API answers 400."""
+
+
+class SeedGenerationError(Exception):
+    """An external randomizer or generator failed to produce a seed.
+
+    Deliberately not a SahasrahBotException, so Sentry still reports it.
+    """

@@ -39,7 +39,7 @@ title:  Mystery Weights
 """
 markdown_contents += "| Preset | Description | |\n|---|---|---|\n"
 
-for weight in [f for f in sorted(os.listdir('presets/alttprmystery')) if f.endswith('.yaml') and not f == 'bot_testing.yaml']:
+for weight in [f for f in sorted(os.listdir('presets/alttprmystery')) if f.endswith('.yaml') and f != 'bot_testing.yaml']:
     with open(os.path.join('presets/alttprmystery', weight)) as f:
         weight_file = yaml.safe_load(f)
     description = weight_file.get('description', '').replace('\n', ' ')

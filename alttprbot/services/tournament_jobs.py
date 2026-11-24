@@ -98,6 +98,16 @@ async def send_race_form(event_slug: str, episode: dict) -> None:
             event_slug=event_slug, episode_id=int(episode['id']), error=str(e)))
 
 
+def _approved(people: list[dict], lang: str) -> int:
+    return sum(1 for p in people if p['approved'] and p['language'] == lang)
+
+
+def _staff_need(start_time, wanted: int, have: int, role: str, episode_id) -> events.StaffNeed | None:
+    if (needed := wanted - have) > 0:
+        return events.StaffNeed(start_time, needed, f"https://speedgaming.org/{role}/signup/{episode_id}/")
+    return None
+
+
 def scheduling_needs(event_slug: str, episodes: list[dict], lang: str = 'en',
                      include_trackers: bool = True) -> events.SchedulingNeedsUpdated:
     """Work out which restreamed episodes still need commentators, trackers or broadcasters."""
@@ -112,24 +122,19 @@ def scheduling_needs(event_slug: str, episodes: list[dict], lang: str = 'en',
             continue
 
         start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
-
-        commentators_approved = [p for p in episode['commentators'] if p['approved'] and p['language'] == lang]
-        if (c_needed := 2 - len(commentators_approved)) > 0:
-            comms_needed.append(events.StaffNeed(
-                start_time, c_needed, f"https://speedgaming.org/commentator/signup/{episode['id']}/"))
-
+        needs = [(comms_needed, _staff_need(
+            start_time, 2, _approved(episode['commentators'], lang), "commentator", episode['id']))]
         if include_trackers:
-            trackers_approved = [p for p in episode['trackers'] if p['approved'] and p['language'] == lang]
-            t_needed = (2 if len(episode['match1']['players']) > 2 else 1) - len(trackers_approved)
-            if t_needed > 0:
-                trackers_needed.append(events.StaffNeed(
-                    start_time, t_needed, f"https://speedgaming.org/tracker/signup/{episode['id']}/"))
-
+            wanted = 2 if len(episode['match1']['players']) > 2 else 1
+            needs.append((trackers_needed, _staff_need(
+                start_time, wanted, _approved(episode['trackers'], lang), "tracker", episode['id'])))
         if broadcast_channels[0] in BROADCASTER_CHANNELS:
-            broadcasters_approved = [p for p in episode['broadcasters'] if p['approved'] and p['language'] == lang]
-            if (b_needed := 1 - len(broadcasters_approved)) > 0:
-                broadcasters_needed.append(events.StaffNeed(
-                    start_time, b_needed, f"https://speedgaming.org/broadcaster/signup/{episode['id']}/"))
+            needs.append((broadcasters_needed, _staff_need(
+                start_time, 1, _approved(episode['broadcasters'], lang), "broadcaster", episode['id'])))
+
+        for bucket, need in needs:
+            if need is not None:
+                bucket.append(need)
 
     return events.SchedulingNeedsUpdated(
         event_slug=event_slug,
@@ -159,6 +164,34 @@ async def find_races_with_bad_discord() -> None:
             events.publish(events.UnmatchedPlayersFound(event_slug=event_slug, messages=tuple(messages)))
 
 
+def _players_to_check(episode: dict):
+    """The real players of an episode's matches (not ignored, not "Winner of"/"Loser of" placeholders)."""
+    for match in ['match1', 'match2']:
+        if not episode[match]:
+            continue
+        for player in episode[match]['players']:
+            if player['publicStream'] == 'ignore':
+                continue
+            if player['displayName'].startswith(('Winner of ', 'Loser of ')):
+                continue
+            yield player
+
+
+async def _find_player_member(guild, player: dict):
+    """Look the player up by Discord id, then by Discord tag (without a trailing #0)."""
+    try:
+        member = await discord_members.get_member(guild, int(player.get('discordId', '')))
+    except ValueError:
+        member = None
+    if member is not None:
+        return member
+
+    discord_name: str = player.get('discordTag', '')
+    if discord_name.endswith('#0'):  # strip the #0 off the end of the name
+        discord_name = discord_name[:-2]
+    return await discord_members.get_member_named(guild, discord_name)
+
+
 async def report_bad_player_discord(event_slug: str) -> list[str]:
     tournament_class = tournaments.TOURNAMENT_DATA[event_slug]
 
@@ -168,31 +201,9 @@ async def report_bad_player_discord(event_slug: str) -> list[str]:
     messages = []
 
     for episode in episodes:
-        for match in ['match1', 'match2']:
-            if episode[match]:
-                for player in episode[match]['players']:
-                    if player['publicStream'] == 'ignore':
-                        continue
-
-                    if player['displayName'].startswith('Winner of '):
-                        continue
-
-                    if player['displayName'].startswith('Loser of '):
-                        continue
-
-                    try:
-                        member = await discord_members.get_member(event_data.guild, int(player.get('discordId', '')))
-                    except ValueError:
-                        member = None
-
-                    if member is None:
-                        discord_name: str = player.get('discordTag', '')
-                        if discord_name.endswith('#0'):  # strip the #0 off the end of the name
-                            discord_name = discord_name[:-2]
-                        member = await discord_members.get_member_named(event_data.guild, discord_name)
-
-                    if member is None:
-                        messages.append(
-                            f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
+        for player in _players_to_check(episode):
+            if await _find_player_member(event_data.guild, player) is None:
+                messages.append(
+                    f"Episode {episode['id']} - {event_slug} - {player['displayName']} could not be found")
 
     return messages

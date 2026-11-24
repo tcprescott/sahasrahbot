@@ -14,6 +14,7 @@ import aiofiles
 from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
 import config
+from alttprbot.exceptions import SeedGenerationError
 
 
 class AlttprDoor():
@@ -40,7 +41,7 @@ class AlttprDoor():
             self.settings['create_spoiler'] = True
             self.settings['calc_playthrough'] = False
             self.settings['rom'] = config.ALTTP_ROM
-            if not self.branch == "volatile":
+            if self.branch != "volatile":
                 self.settings['enemizercli'] = os.path.join(
                     os.getcwd(),
                     "utils",
@@ -55,8 +56,8 @@ class AlttprDoor():
             self.settings['names'] = ""
             self.settings['race'] = not self.spoilers
 
-            with open(settings_file_path, "w") as f:
-                json.dump(self.settings, f)
+            async with aiofiles.open(settings_file_path, "w") as f:
+                await f.write(json.dumps(self.settings))
 
             attempts = 0
             try:
@@ -78,10 +79,10 @@ class AlttprDoor():
                         except asyncio.TimeoutError as e:
                             proc.kill()
                             await proc.wait()
-                            raise Exception('DungeonRandomizer.py timed out after 2 minutes') from e
+                            raise SeedGenerationError('DungeonRandomizer.py timed out after 2 minutes') from e
                         logging.info(stdout.decode())
                         if proc.returncode > 0:
-                            raise Exception(f'Exception while generating game: {stderr.decode()}')
+                            raise SeedGenerationError(f'Exception while generating game: {stderr.decode()}')
 
             except RetryError as e:
                 raise e.last_attempt._exception from e
@@ -109,7 +110,7 @@ class AlttprDoor():
             stdout, stderr = await proc.communicate()
             logging.info(stdout.decode())
             if proc.returncode > 0:
-                raise Exception(f'Exception while while creating patch: {stderr.decode()}')
+                raise SeedGenerationError(f'Exception while creating patch: {stderr.decode()}')
 
             async with aiofiles.open(patch_path, "rb") as f:
                 patchfile = await f.read()
@@ -166,7 +167,7 @@ class AlttprDoor():
     # Pull the code from the spoiler file, and translate it to what SahasrahBot expects
     @property
     def code(self):
-        file_select_code = re.search("Hash:*\s(.*,.*,.*,.*,.*)", self.spoilerfile.decode()).groups()[0]
+        file_select_code = re.search(r"Hash:*\s([^,\n]*(?:,[^,\n]*){4,})", self.spoilerfile.decode()).groups()[0]
         code = list(file_select_code.split(', '))
         code_map = {
             'Bomb': 'Bombs',
@@ -180,13 +181,13 @@ class AlttprDoor():
             'Pearl': 'Moon Pearl',
             'Key': 'Big Key'
         }
-        p = list(map(lambda x: code_map.get(x, x), code))
+        p = [code_map.get(x, x) for x in code]
         return [p[0], p[1], p[2], p[3], p[4]]
 
     @property
     def version(self):
         return \
-        re.search("ALttP Dungeon Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
+        re.search(r"ALttP Dungeon Randomizer Version (.*) {2}- {2}Seed: (\d*)", self.spoilerfile.decode()).groups()[0]
 
     @property
     def doors(self):

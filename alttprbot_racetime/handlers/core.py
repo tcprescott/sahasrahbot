@@ -10,6 +10,20 @@ from alttprbot import tournaments
 from alttprbot.services import racetime_rooms, spoiler_races
 
 
+def _countdown_message(timeleft: int) -> str:
+    minutes = math.floor(timeleft / 60)
+    seconds = math.ceil(timeleft % 60)
+    if minutes == 0:
+        return f'{seconds} second(s) remain!'
+    return f'{minutes} minute(s), {seconds} seconds remain!'
+
+
+# Chat messages shared by the category handlers.
+MSG_NO_PRESET = "You must specify a preset!"
+MSG_GENERATING = "Generating game, please wait.  If nothing happens after a minute, contact Synack."
+MSG_ROLL_COMPLETE = "Seed rolling complete.  See race info for details."
+
+
 class SahasrahBotCoreHandler(RaceHandler):
     """
     SahasrahBot race handler. Generates seeds, presets, and frustration.
@@ -78,20 +92,10 @@ class SahasrahBotCoreHandler(RaceHandler):
         start_time = loop.time()
         end_time = loop.time() + duration_in_seconds
         while True:
-            # logging.info(datetime.datetime.now())
             timeleft = math.ceil(
                 start_time - loop.time() + duration_in_seconds)
-            # logging.info(timeleft)
             if timeleft in reminders:
-                minutes = math.floor(timeleft / 60)
-                seconds = math.ceil(timeleft % 60)
-                if minutes == 0 and seconds > 10:
-                    msg = f'{seconds} second(s) remain!'
-                elif minutes == 0 and seconds <= 10:
-                    msg = f"{seconds} second(s) remain!"
-                else:
-                    msg = f'{minutes} minute(s), {seconds} seconds remain!'
-                await self.send_message(msg)
+                await self.send_message(_countdown_message(timeleft))
                 reminders.remove(timeleft)
             if loop.time() >= end_time:
                 if beginmessage:
@@ -196,7 +200,6 @@ class SahasrahBotCoreHandler(RaceHandler):
 
     async def error(self, data):
         await self.send_message(f"Command raised exception: {','.join(data.get('errors'))}")
-        # raise Exception(data.get('errors'))
 
     async def status_in_progress(self):
         await self.send_spoiler_log()
@@ -208,17 +211,16 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.tournament.on_race_pending()
 
     async def status_open(self):
-        pass
+        """Hook for category handlers; the core handler does nothing when a room opens."""
 
     async def status_invitational(self):
-        pass
+        """Hook for category handlers; the core handler does nothing for invitational rooms."""
 
     async def status_finished(self):
-        # Hook for category handlers; the core handler does nothing when a race finishes.
-        pass
+        """Hook for category handlers; the core handler does nothing when a race finishes."""
 
     async def race_data_hook(self):
-        pass
+        """Hook for category handlers, called on every race data update. The core handler does nothing."""
 
     async def intro(self):
         """
@@ -237,7 +239,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     @property
     def teams(self):
         if self.data.get('team_race', False) is False:
-            raise Exception('This is not a team race.')
+            raise RuntimeError('This is not a team race.')
 
         entrants = [(e['user']['name'], e['team']['name']) for e in self.data['entrants']]
         return {key: [v[0] for v in val] for key, val in

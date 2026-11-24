@@ -69,7 +69,7 @@ def publish(event: Event) -> None:
         logger.warning("Dropped %s: published with no running event loop", event.name)
         return
 
-    for classes, handler in list(_subscribers.values()):
+    for classes, handler in _subscribers.values():
         if not isinstance(event, classes):
             continue
         try:

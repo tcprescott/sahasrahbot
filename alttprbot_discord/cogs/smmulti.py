@@ -8,6 +8,8 @@ from slugify import slugify
 from alttprbot.services import multiworld as multiworld_service
 from alttprbot.services.multiworld import MultiworldNotAuthorized, MultiworldNotReady
 
+NOT_YET_CHOSEN = "Not yet chosen"
+
 # TODO: make these dynamic based on current presets
 PRESET_OPTIONS = {
     'sm': [
@@ -39,22 +41,6 @@ PRESET_OPTIONS = {
 }
 
 
-# class MultiworldPresetDropdown(discord.ui.Select):
-#     def __init__(self, randomizer, mwcreateview):
-#         self.mwcreateview = mwcreateview
-
-#         super().__init__(
-#             placeholder="Choose a preset...",
-#             min_values=1,
-#             max_values=1,
-#             options=PRESET_OPTIONS[randomizer],
-#             row=1
-#         )
-
-#     async def callback(self, interaction: discord.Interaction):
-#         self.mwcreateview.preset_name = self.values[0]
-
-
 class MultiworldSignupView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -80,7 +66,7 @@ class MultiworldSignupView(discord.ui.View):
 
         embed = interaction.message.embeds[0]
         embed = set_embed_field("Randomizer", multiworld.randomizer, embed)
-        embed = set_embed_field("Preset", "Not yet chosen", embed)
+        embed = set_embed_field("Preset", NOT_YET_CHOSEN, embed)
         preset_select: discord.ui.Select = discord.utils.get(self.children, custom_id='sahabot:multiworld:preset')
         preset_select.disabled = False
         preset_select.options = PRESET_OPTIONS[multiworld.randomizer]
@@ -244,8 +230,8 @@ class SMMulti(commands.Cog):
         )
         embed.add_field(name="Owner", value=interaction.user.mention, inline=False)
         embed.add_field(name="Status", value="👍 Open for entry", inline=False)
-        embed.add_field(name="Randomizer", value="Not yet chosen", inline=False)
-        embed.add_field(name="Preset", value="Not yet chosen", inline=False)
+        embed.add_field(name="Randomizer", value=NOT_YET_CHOSEN, inline=False)
+        embed.add_field(name="Preset", value=NOT_YET_CHOSEN, inline=False)
         embed.add_field(name="Players", value="No players yet.", inline=False)
 
         await interaction.response.send_message(embed=embed)
@@ -261,7 +247,7 @@ def set_embed_field(name: str, value: str, embed: discord.Embed) -> discord.Embe
     return embed
 
 
-def get_embed_field(name: str, embed: discord.Embed) -> str:
+def get_embed_field(name: str, embed: discord.Embed) -> str | None:
     for field in embed.fields:
         if field.name == name:
             return field.value

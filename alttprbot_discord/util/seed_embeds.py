@@ -8,6 +8,7 @@ Use ``seed_embed`` / ``seed_tournament_embed`` when the seed could come from
 any randomizer; they pick the right builder for the seed's type.
 """
 import datetime
+import inspect
 
 import discord
 import html2markdown
@@ -17,6 +18,10 @@ from pyz3r.smvaria import SuperMetroidVaria
 
 from alttprbot.alttprgen.randomizer.alttprdoor import AlttprDoor
 from alttprbot.alttprgen.randomizer.avianart import AVIANART
+
+DOOR_RANDOMIZER = 'Door Randomizer'
+REQUESTED_SEED = "Requested Seed"
+FILE_SELECT_CODE = 'File Select Code'
 
 # File select code item name -> SahasrahBot custom emoji name.
 EMOJI_CODE_MAP = {
@@ -58,8 +63,7 @@ EMOJI_CODE_MAP = {
 def build_file_select_code(seed, emojis=None):
     """The seed's file select code, as emojis plus text when ``emojis`` is given."""
     if emojis:
-        emoji_list = list(map(lambda x: str(discord.utils.get(
-            emojis, name=EMOJI_CODE_MAP[x])), seed.code))
+        emoji_list = [str(discord.utils.get(emojis, name=EMOJI_CODE_MAP[x])) for x in seed.code]
         return ' '.join(emoji_list) + ' (' + '/'.join(seed.code) + ')'
     else:
         return '/'.join(seed.code)
@@ -71,13 +75,89 @@ def _footer_icon(emojis):
 
 # --- ALTTPR (alttpr.com) ---
 
+def _add_mystery_fields(embed, meta):
+    embed.add_field(
+        name='Mystery Game',
+        value="No meta information is available for this game.",
+        inline=False)
+    embed.add_field(
+        name='Item Placement',
+        value=f"**Glitches Required:** {meta['logic']}",
+        inline=True)
+
+
+def _add_festive_fields(embed, meta, settings_map):
+    embed.add_field(
+        name='Festive Randomizer',
+        value="This game is a festive randomizer.  Spooky!",
+        inline=False)
+    embed.add_field(
+        name='Settings',
+        value=(f"**Item Placement:** {settings_map['item_placement'][meta['item_placement']]}\n"
+               f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
+               f"**Accessibility:** {settings_map['accessibility'][meta['accessibility']]}\n"
+               f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
+               f"**Hints:** {meta['hints']}\n"
+               f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
+               f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
+               f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
+               ),
+        inline=False
+    )
+
+
+def _add_settings_fields(embed, meta, settings_map):
+    embed.add_field(
+        name='Item Placement',
+        value="**Glitches Required:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
+            logic=meta['logic'],
+            item_placement=settings_map['item_placement'][meta['item_placement']],
+            dungeon_items=settings_map['dungeon_items'][meta['dungeon_items']],
+            accessibility=settings_map['accessibility'][meta['accessibility']],
+        ),
+        inline=True)
+
+    embed.add_field(
+        name='Goal',
+        value="**Goal:** {goal}\n**Open Tower:** {tower}\n**Ganon Vulnerable:** {ganon}".format(
+            goal=settings_map['goals'][meta['goal']],
+            tower=meta.get(
+                'entry_crystals_tower', 'unknown'),
+            ganon=meta.get(
+                'entry_crystals_ganon', 'unknown'),
+        ),
+        inline=True)
+    embed.add_field(
+        name='Gameplay',
+        value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Pot Shuffle:** {pot}\n**Hints:** {hints}".format(
+            mode=settings_map['world_state'][meta['mode']],
+            entrance=settings_map['entrance_shuffle'][meta['shuffle']
+            ] if 'shuffle' in meta else "None",
+            boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
+            enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
+            pot=meta.get('enemizer.pot_shuffle', 'off'),
+            hints=meta['hints']
+        ),
+        inline=True)
+    embed.add_field(
+        name='Difficulty',
+        value="**Swords:** {weapons}\n**Item Pool:** {pool}\n**Item Functionality:** {functionality}\n**Enemy Damage:** {damage}\n**Enemy Health:** {health}".format(
+            weapons=settings_map['weapons'][meta['weapons']],
+            pool=settings_map['item_pool'][meta['item_pool']],
+            functionality=settings_map['item_functionality'][meta['item_functionality']],
+            damage=settings_map['enemy_damage'][meta['enemizer.enemy_damage']],
+            health=settings_map['enemy_health'][meta['enemizer.enemy_health']],
+        ),
+        inline=True)
+
+
 async def _alttpr_embed(seed: ALTTPR, emojis, name, notes, include_settings, tournament):
     settings_map = await seed.randomizer_settings()
 
     meta = seed.data['spoiler'].get('meta', {})
 
     embed = discord.Embed(
-        title=meta.get('name', 'Requested Seed') if not name else name,
+        title=meta.get('name', REQUESTED_SEED) if not name else name,
         description=html2markdown.convert(
             meta.get('notes', '')) if not notes else notes,
         color=discord.Colour.dark_gold() if tournament else discord.Colour.dark_red(),
@@ -86,78 +166,13 @@ async def _alttpr_embed(seed: ALTTPR, emojis, name, notes, include_settings, tou
 
     if include_settings:
         if meta.get('spoilers', 'off') == "mystery":
-            embed.add_field(
-                name='Mystery Game',
-                value="No meta information is available for this game.",
-                inline=False)
-            embed.add_field(
-                name='Item Placement',
-                value=f"**Glitches Required:** {meta['logic']}",
-                inline=True)
+            _add_mystery_fields(embed, meta)
+        elif meta.get('special', False):
+            _add_festive_fields(embed, meta, settings_map)
         else:
-            if meta.get('special', False):
-                embed.add_field(
-                    name='Festive Randomizer',
-                    value="This game is a festive randomizer.  Spooky!",
-                    inline=False)
-                embed.add_field(
-                    name='Settings',
-                    value=(f"**Item Placement:** {settings_map['item_placement'][meta['item_placement']]}\n"
-                           f"**Dungeon Items:** {settings_map['dungeon_items'][meta['dungeon_items']]}\n"
-                           f"**Accessibility:** {settings_map['accessibility'][meta['accessibility']]}\n"
-                           f"**World State:** {settings_map['world_state'][meta['mode']]}\n"
-                           f"**Hints:** {meta['hints']}\n"
-                           f"**Swords:** {settings_map['weapons'][meta['weapons']]}\n"
-                           f"**Item Pool:** {settings_map['item_pool'][meta['item_pool']]}\n"
-                           f"**Item Functionality:** {settings_map['item_functionality'][meta['item_functionality']]}"
-                           ),
-                    inline=False
-                )
-            else:
-                embed.add_field(
-                    name='Item Placement',
-                    value="**Glitches Required:** {logic}\n**Item Placement:** {item_placement}\n**Dungeon Items:** {dungeon_items}\n**Accessibility:** {accessibility}".format(
-                        logic=meta['logic'],
-                        item_placement=settings_map['item_placement'][meta['item_placement']],
-                        dungeon_items=settings_map['dungeon_items'][meta['dungeon_items']],
-                        accessibility=settings_map['accessibility'][meta['accessibility']],
-                    ),
-                    inline=True)
+            _add_settings_fields(embed, meta, settings_map)
 
-                embed.add_field(
-                    name='Goal',
-                    value="**Goal:** {goal}\n**Open Tower:** {tower}\n**Ganon Vulnerable:** {ganon}".format(
-                        goal=settings_map['goals'][meta['goal']],
-                        tower=meta.get(
-                            'entry_crystals_tower', 'unknown'),
-                        ganon=meta.get(
-                            'entry_crystals_ganon', 'unknown'),
-                    ),
-                    inline=True)
-                embed.add_field(
-                    name='Gameplay',
-                    value="**World State:** {mode}\n**Entrance Shuffle:** {entrance}\n**Boss Shuffle:** {boss}\n**Enemy Shuffle:** {enemy}\n**Pot Shuffle:** {pot}\n**Hints:** {hints}".format(
-                        mode=settings_map['world_state'][meta['mode']],
-                        entrance=settings_map['entrance_shuffle'][meta['shuffle']
-                        ] if 'shuffle' in meta else "None",
-                        boss=settings_map['boss_shuffle'][meta['enemizer.boss_shuffle']],
-                        enemy=settings_map['enemy_shuffle'][meta['enemizer.enemy_shuffle']],
-                        pot=meta.get('enemizer.pot_shuffle', 'off'),
-                        hints=meta['hints']
-                    ),
-                    inline=True)
-                embed.add_field(
-                    name='Difficulty',
-                    value="**Swords:** {weapons}\n**Item Pool:** {pool}\n**Item Functionality:** {functionality}\n**Enemy Damage:** {damage}\n**Enemy Health:** {health}".format(
-                        weapons=settings_map['weapons'][meta['weapons']],
-                        pool=settings_map['item_pool'][meta['item_pool']],
-                        functionality=settings_map['item_functionality'][meta['item_functionality']],
-                        damage=settings_map['enemy_damage'][meta['enemizer.enemy_damage']],
-                        health=settings_map['enemy_health'][meta['enemizer.enemy_health']],
-                    ),
-                    inline=True)
-
-    embed.add_field(name='File Select Code', value=build_file_select_code(
+    embed.add_field(name=FILE_SELECT_CODE, value=build_file_select_code(
         seed, emojis=emojis), inline=False)
 
     if not tournament:
@@ -177,19 +192,19 @@ async def alttpr_tournament_embed(seed: ALTTPR, emojis=False, name=False, notes=
 
 # --- Door Randomizer (generated locally) ---
 
-async def door_embed(seed: AlttprDoor, emojis=False, name=False, notes=False, include_settings=True):
+def door_embed(seed: AlttprDoor, emojis=False, name=False, notes=False, include_settings=True):
     embed = discord.Embed(
-        title=name if name else "Requested Seed",
+        title=name if name else REQUESTED_SEED,
         description=notes if notes else "Requested Door Randomizer Game.",
         color=discord.Colour.dark_red()
     )
 
     embed.add_field(
-        name='Door Randomizer',
+        name=DOOR_RANDOMIZER,
         value="This game was generated using Aerinon's Door Randomizer.",
         inline=False)
 
-    embed.add_field(name='File Select Code', value=build_file_select_code(
+    embed.add_field(name=FILE_SELECT_CODE, value=build_file_select_code(
         seed, emojis=emojis), inline=False)
 
     embed.add_field(name='Permalink', value=seed.url, inline=False)
@@ -204,7 +219,7 @@ async def door_embed(seed: AlttprDoor, emojis=False, name=False, notes=False, in
     return embed
 
 
-async def door_tournament_embed(seed: AlttprDoor, emojis=False, name=False, notes=False, include_settings=True):
+def door_tournament_embed(seed: AlttprDoor, emojis=False, name=False, notes=False, include_settings=True):
     embed = discord.Embed(
         title=name,
         description=notes,
@@ -212,11 +227,11 @@ async def door_tournament_embed(seed: AlttprDoor, emojis=False, name=False, note
     )
 
     embed.add_field(
-        name='Door Randomizer',
+        name=DOOR_RANDOMIZER,
         value="This game was generated using Aerinon's Door Randomizer.",
         inline=False)
 
-    embed.add_field(name='File Select Code', value=build_file_select_code(seed, emojis=emojis), inline=False)
+    embed.add_field(name=FILE_SELECT_CODE, value=build_file_select_code(seed, emojis=emojis), inline=False)
 
     if seed.spoilers:
         embed.add_field(name='Spoiler Log', value=seed.spoiler_url, inline=False)
@@ -231,9 +246,9 @@ async def door_tournament_embed(seed: AlttprDoor, emojis=False, name=False, note
 
 # --- AVIANART ---
 
-async def avianart_embed(seed: AVIANART, emojis=False, name=False, notes=False, include_settings=True):
+def avianart_embed(seed: AVIANART, emojis=False, name=False, notes=False, include_settings=True):
     embed = discord.Embed(
-        title=name if name else "Requested Seed",
+        title=name if name else REQUESTED_SEED,
         description=notes if notes else "Requested Door Randomizer Game.",
         color=discord.Colour.dark_red()
     )
@@ -244,7 +259,7 @@ async def avianart_embed(seed: AVIANART, emojis=False, name=False, notes=False, 
         inline=False)
 
     embed.add_field(name='Preset', value=seed.preset, inline=False)
-    embed.add_field(name='File Select Code', value=build_file_select_code(
+    embed.add_field(name=FILE_SELECT_CODE, value=build_file_select_code(
         seed, emojis=emojis), inline=False)
 
     embed.add_field(name='Permalink', value=seed.url, inline=False)
@@ -254,7 +269,7 @@ async def avianart_embed(seed: AVIANART, emojis=False, name=False, notes=False, 
     return embed
 
 
-async def avianart_tournament_embed(seed: AVIANART, emojis=False, name=False, notes=False, include_settings=True):
+def avianart_tournament_embed(seed: AVIANART, emojis=False, name=False, notes=False, include_settings=True):
     embed = discord.Embed(
         title=name,
         description=notes,
@@ -262,11 +277,11 @@ async def avianart_tournament_embed(seed: AVIANART, emojis=False, name=False, no
     )
 
     embed.add_field(
-        name='Door Randomizer',
+        name=DOOR_RANDOMIZER,
         value="This game was generated using Hi, I'm Cody's AVIANART generator.",
         inline=False)
 
-    embed.add_field(name='File Select Code', value=build_file_select_code(seed, emojis=emojis), inline=False)
+    embed.add_field(name=FILE_SELECT_CODE, value=build_file_select_code(seed, emojis=emojis), inline=False)
 
     # No spoiler currently for AVIANART, this causes the game to faile to generate.
     # if seed.spoilers:
@@ -282,7 +297,7 @@ async def avianart_tournament_embed(seed: AVIANART, emojis=False, name=False, no
 
 # --- Super Metroid / SMZ3 (samus.link) ---
 
-async def sm_embed(seed: smClass, name="Requested Seed", notes: str = None, emojis=None, include_settings=True):
+def sm_embed(seed: smClass, name=REQUESTED_SEED, notes: str = None, emojis=None, include_settings=True):
     if notes is None:
         notes = f"Requested {seed.randomizer.upper()} Randomizer Game."
     embed = discord.Embed(
@@ -291,13 +306,13 @@ async def sm_embed(seed: smClass, name="Requested Seed", notes: str = None, emoj
         color=discord.Colour.dark_red()
     )
 
-    embed.add_field(name='File Select Code', value=seed.code, inline=False)
+    embed.add_field(name=FILE_SELECT_CODE, value=seed.code, inline=False)
     embed.add_field(name='Permalink', value=seed.url, inline=False)
     embed.set_footer(text="Generated by SahasrahBot")
     return embed
 
 
-async def sm_tournament_embed(seed: smClass, name='Requested Tournament Seed', notes='See notes', emojis=None,
+def sm_tournament_embed(seed: smClass, name='Requested Tournament Seed', notes='See notes', emojis=None,
                               include_settings=True):
     embed = discord.Embed(
         title=name,
@@ -305,7 +320,7 @@ async def sm_tournament_embed(seed: smClass, name='Requested Tournament Seed', n
         color=discord.Colour.dark_gold()
     )
 
-    embed.add_field(name='File Select Code', value=seed.code, inline=False)
+    embed.add_field(name=FILE_SELECT_CODE, value=seed.code, inline=False)
     embed.set_footer(text="Generated by SahasrahBot")
     return embed
 
@@ -317,7 +332,7 @@ def smvaria_embed(seed: SuperMetroidVaria):
         title="Generated Super Metroid Varia Game",
         description=f"**Skills preset: **{seed.skills_preset}\n**Settings preset: **{seed.settings_preset}",
         color=discord.Colour.orange(),
-        timestamp=datetime.datetime.utcnow()
+        timestamp=datetime.datetime.now(datetime.timezone.utc)
     )
     embed.add_field(
         name="Link",
@@ -344,6 +359,11 @@ _BUILDERS = [
 ]
 
 
+async def _built(result) -> discord.Embed:
+    """Builders that call alttpr.com are coroutines; the rest return the embed directly."""
+    return await result if inspect.isawaitable(result) else result
+
+
 def _builders_for(seed):
     for cls, embed, tournament_embed in _BUILDERS:
         if isinstance(seed, cls):
@@ -354,10 +374,10 @@ def _builders_for(seed):
 async def seed_embed(seed, **kwargs) -> discord.Embed:
     """The public embed for any generated seed."""
     embed, _ = _builders_for(seed)
-    return await embed(seed, **kwargs)
+    return await _built(embed(seed, **kwargs))
 
 
 async def seed_tournament_embed(seed, **kwargs) -> discord.Embed:
     """The tournament (staff/player) embed for any generated seed, without the permalink."""
     _, tournament_embed = _builders_for(seed)
-    return await tournament_embed(seed, **kwargs)
+    return await _built(tournament_embed(seed, **kwargs))

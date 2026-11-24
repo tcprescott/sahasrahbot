@@ -26,7 +26,7 @@ function Ballot() {
   )
 }
 
-function Header({ election }: { election: Election }) {
+function Header({ election }: Readonly<{ election: Election }>) {
   return (
     <PageHeader
       title={election.title}
@@ -38,7 +38,7 @@ function Header({ election }: { election: Election }) {
   )
 }
 
-function Submitted({ election }: { election: Election }) {
+function Submitted({ election }: Readonly<{ election: Election }>) {
   const names = new Map(election.candidates.map((c) => [c.id, c.name]))
   const ballot = election.ballot ?? []
   return (
@@ -59,7 +59,7 @@ function Submitted({ election }: { election: Election }) {
   )
 }
 
-function Vote({ election, onVoted }: { election: Election; onVoted: () => void }) {
+function Vote({ election, onVoted }: Readonly<{ election: Election; onVoted: () => void }>) {
   const [ranking, setRanking] = useState<number[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()

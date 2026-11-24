@@ -6,12 +6,22 @@ type BannerTone = 'info' | 'warning' | 'error' | 'accent'
 
 const ICON: Record<BannerTone, IconName> = { info: 'info', warning: 'warning', error: 'error', accent: 'info' }
 
-export function Banner({ tone = 'info', children, action }: { tone?: BannerTone; children: ReactNode; action?: ReactNode }) {
-  return (
-    <div className={`banner banner--${tone}`} role={tone === 'error' ? 'alert' : 'status'}>
+export function Banner({ tone = 'info', children, action }: Readonly<{ tone?: BannerTone; children: ReactNode; action?: ReactNode }>) {
+  const className = `banner banner--${tone}`
+  const body = (
+    <>
       <Icon name={ICON[tone]} />
-      <div className="banner__text">{children}</div>
-      {action && <div className="banner__action">{action}</div>}
-    </div>
+      <span className="banner__text">{children}</span>
+      {action && <span className="banner__action">{action}</span>}
+    </>
   )
+  // Errors interrupt (role="alert"); everything else is a polite status message.
+  if (tone === 'error') {
+    return (
+      <div className={className} role="alert">
+        {body}
+      </div>
+    )
+  }
+  return <output className={className}>{body}</output>
 }

@@ -1,17 +1,17 @@
-import * as RT from '@radix-ui/react-tooltip'
+import * as RadixTooltip from '@radix-ui/react-tooltip'
 import type { ReactNode } from 'react'
 
-export const TooltipProvider = RT.Provider
+export const TooltipProvider = RadixTooltip.Provider
 
-export function Tooltip({ content, children }: { content: string; children: ReactNode }) {
+export function Tooltip({ content, children }: Readonly<{ content: string; children: ReactNode }>) {
   return (
-    <RT.Root delayDuration={400}>
-      <RT.Trigger asChild>{children}</RT.Trigger>
-      <RT.Portal>
-        <RT.Content className="tooltip" sideOffset={6}>
+    <RadixTooltip.Root delayDuration={400}>
+      <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+      <RadixTooltip.Portal>
+        <RadixTooltip.Content className="tooltip" sideOffset={6}>
           {content}
-        </RT.Content>
-      </RT.Portal>
-    </RT.Root>
+        </RadixTooltip.Content>
+      </RadixTooltip.Portal>
+    </RadixTooltip.Root>
   )
 }

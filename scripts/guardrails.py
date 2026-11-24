@@ -49,7 +49,7 @@ def tracked_python_files() -> list[str]:
 
 # A ref name or commit id: no leading dash (so it can't be read as an option),
 # no whitespace, no range syntax of its own.
-_REF = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_./~^-]*$")
+_REF = re.compile(r"^\w[\w./~^-]*$", re.ASCII)
 
 
 def resolve_base(base: str) -> str:
@@ -93,6 +93,27 @@ def run_tree_check(check: str) -> tuple[int, str]:
     return result.returncode, result.stderr.strip()
 
 
+def _run_file_checks(files) -> int:
+    failures = 0
+    for rel in files:
+        for check in FILE_CHECKS:
+            code, err = run_check(check, rel)
+            if code == 2:
+                failures += 1
+                print(f"✗ {check}: {rel}\n{err}\n")
+    return failures
+
+
+def _run_tree_checks() -> int:
+    failures = 0
+    for check in TREE_CHECKS:
+        code, err = run_tree_check(check)
+        if code == 2:
+            failures += 1
+            print(f"✗ {check} --all\n{err}\n")
+    return failures
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     group = parser.add_mutually_exclusive_group()
@@ -109,19 +130,9 @@ def main() -> int:
         files = args.paths
     files = [f for f in files if (ROOT / f).exists()]
 
-    failures = 0
-    for rel in files:
-        for check in FILE_CHECKS:
-            code, err = run_check(check, rel)
-            if code == 2:
-                failures += 1
-                print(f"✗ {check}: {rel}\n{err}\n")
+    failures = _run_file_checks(files)
     if args.all or args.changed:
-        for check in TREE_CHECKS:
-            code, err = run_tree_check(check)
-            if code == 2:
-                failures += 1
-                print(f"✗ {check} --all\n{err}\n")
+        failures += _run_tree_checks()
     print(f"guardrails: {len(files)} file(s), {len(FILE_CHECKS)} check(s), {failures} failure(s)")
     return 1 if failures else 0
 

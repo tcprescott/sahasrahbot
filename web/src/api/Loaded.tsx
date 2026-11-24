@@ -13,12 +13,12 @@ export function Loaded<T>({
   label,
   notFound = "This page doesn't exist, or it's gone.",
   children,
-}: {
+}: Readonly<{
   query: QueryState<T>
   label: string
   notFound?: string
   children: (data: T) => ReactNode
-}) {
+}>) {
   if (query.data !== undefined) return <>{children(query.data)}</>
   if (query.error) {
     if (query.error instanceof ApiError && query.error.status === 404) {

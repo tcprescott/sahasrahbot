@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from pyz3r.spoiler import mw_filter
+from alttprbot.exceptions import SahasrahBotException
 
 REGIONLIST = [
     'Hyrule Castle',
@@ -61,11 +62,7 @@ PROGRESSION_ITEMS = [
     'SilverArrowUpgrade',
     'ProgressiveGlove',
     'ProgressiveBow',
-    # 'TriforcePiece',
-    # 'PowerStar',
     'BugCatchingNet',
-    # 'MirrorShield',
-    # 'ProgressiveShield',
     'CaneOfByrna',
     # 'TenBombs',
     # 'HalfMagic',
@@ -74,13 +71,13 @@ PROGRESSION_ITEMS = [
 
 
 def create_progression_spoiler(seed):
-    if not seed.data['spoiler']['meta'].get('spoilers') in ['on', 'generate']:
+    if seed.data['spoiler']['meta'].get('spoilers') not in ['on', 'generate']:
         return None
 
     spoiler = seed.data['spoiler']
 
     if spoiler['meta'].get('shuffle', 'none') != 'none':
-        raise Exception("Entrance randomizer is not yet supported.")
+        raise SahasrahBotException("Entrance randomizer is not yet supported.")
 
     progression_spoiler = OrderedDict()
 

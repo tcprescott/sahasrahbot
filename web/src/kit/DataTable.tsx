@@ -6,7 +6,7 @@ import './table.css'
 export interface Column<T> {
   key: string
   header: string
-  cell: (row: T) => ReactNode
+  render: (row: T) => ReactNode
   /** The column that names the row: the card's title on a phone. Exactly one. */
   primary?: boolean
   align?: 'start' | 'end'
@@ -25,7 +25,7 @@ interface DataTableProps<T> {
   /** Names the ⋮ for a screen reader, e.g. "More for SGL26". */
   rowMenuLabel?: (row: T) => string
   /** The row's one button, beside the ⋮. */
-  rowAction?: (row: T) => ReactNode
+  renderRowAction?: (row: T) => ReactNode
   empty?: { icon: IconName; title: string; body?: ReactNode }
   /** Opening a row (a side sheet, say). The primary cell becomes a button that does it. */
   onOpen?: (row: T) => void
@@ -46,12 +46,12 @@ export function DataTable<T>({
   rowKey,
   rowMenu,
   rowMenuLabel,
-  rowAction,
+  renderRowAction,
   empty,
   onOpen,
   openLabel,
   selectedKey,
-}: DataTableProps<T>) {
+}: Readonly<DataTableProps<T>>) {
   const phone = usePhone()
   if (rows.length === 0 && empty) {
     return (
@@ -65,18 +65,18 @@ export function DataTable<T>({
   const title = (row: T) =>
     onOpen ? (
       <button type="button" className="data-table__open" aria-label={openLabel?.(row)} onClick={() => onOpen(row)}>
-        {primary.cell(row)}
+        {primary.render(row)}
       </button>
     ) : (
-      primary.cell(row)
+      primary.render(row)
     )
   const selected = (row: T) => selectedKey != null && rowKey(row) === selectedKey
   const actions = (row: T) => {
-    if (!rowAction && !rowMenu) return null
+    if (!renderRowAction && !rowMenu) return null
     const items = rowMenu?.(row) ?? []
     return (
       <span className="data-table__actions">
-        {rowAction?.(row)}
+        {renderRowAction?.(row)}
         {items.length > 0 && <RowMenu label={rowMenuLabel?.(row) ?? 'More'} items={items} />}
       </span>
     )
@@ -97,7 +97,7 @@ export function DataTable<T>({
                 {rest.map((c) => (
                   <div key={c.key} className="data-card__field">
                     <dt>{c.header}</dt>
-                    <dd>{c.cell(row)}</dd>
+                    <dd>{c.render(row)}</dd>
                   </div>
                 ))}
               </dl>
@@ -109,7 +109,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="data-table__wrap" role="region" aria-label={label} tabIndex={0}>
+    <section className="data-table__wrap" aria-label={label} tabIndex={0} /* NOSONAR: focusable so keyboard users can scroll a wide table */>
       <table className="data-table" aria-label={label}>
         <thead>
           <tr>
@@ -118,7 +118,7 @@ export function DataTable<T>({
                 {c.header}
               </th>
             ))}
-            {(rowAction || rowMenu) && (
+            {(renderRowAction || rowMenu) && (
               <th scope="col" className="data-table__end">
                 <span className="visually-hidden">Actions</span>
               </th>
@@ -135,15 +135,15 @@ export function DataTable<T>({
                   </th>
                 ) : (
                   <td key={c.key} className={c.align === 'end' ? 'data-table__end' : undefined}>
-                    {c.cell(row)}
+                    {c.render(row)}
                   </td>
                 ),
               )}
-              {(rowAction || rowMenu) && <td className="data-table__end">{actions(row)}</td>}
+              {(renderRowAction || rowMenu) && <td className="data-table__end">{actions(row)}</td>}
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   )
 }

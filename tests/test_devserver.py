@@ -80,4 +80,5 @@ print("ok")
 def test_devserver_fakes():
     code = _SCRIPT.format(root=str(ROOT))
     result = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True, timeout=120)
-    assert result.returncode == 0 and "ok" in result.stdout, result.stderr[-4000:]
+    assert result.returncode == 0, result.stderr[-4000:]
+    assert "ok" in result.stdout, result.stderr[-4000:]

@@ -1,16 +1,6 @@
 import discord
 
 
-def config(ctx, configdict):
-    embed = discord.Embed(
-        title="Server Configuration",
-        description="List of configuration parameters for this server.",
-        color=discord.Colour.teal())
-    for item in configdict:
-        embed.add_field(name=item['parameter'], value=item['value'])
-    return embed
-
-
 async def reaction_group_list(ctx, reaction_groups):
     embed = discord.Embed(
         title="Server Reaction Groups",
@@ -48,7 +38,7 @@ def reaction_role_list(ctx, reaction_roles):
     return embed
 
 
-def reaction_menu(ctx, group, roles):
+def reaction_menu(group, roles):
     embed = discord.Embed(
         title=group.name,
         description=group.description,
