@@ -56,14 +56,11 @@ def test_unknown_racetime_category_is_a_key_error(unregistered):
 
 
 def test_discord_gateways_register_the_real_bot(unregistered, monkeypatch):
-    from alttprbot.services import asynctournament, asynctournament_jobs
     from alttprbot.util import seed_presenter
     from alttprbot_discord import gateways
     from alttprbot_discord.bot import discordbot
 
     # register() also wires other services; keep those globals as they were.
-    monkeypatch.setattr(asynctournament, "set_member_role_lookup", lambda fn: None)
-    monkeypatch.setattr(asynctournament_jobs, "set_timeout_notifier", lambda fn: None)
     monkeypatch.setattr(seed_presenter, "register", lambda *a: None)
 
     gateways.register()

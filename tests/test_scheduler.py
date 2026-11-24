@@ -12,8 +12,6 @@ from alttprbot.services.scheduler import Scheduler
 # Imported at collection time, before any test closes an event loop: importing the
 # tournament modules builds the racetime bots, which call asyncio.get_event_loop().
 from alttprbot.services import scheduled_jobs  # noqa: E402
-from alttprbot.services import asynctournament as asynctournament_service  # noqa: E402
-from alttprbot.services import asynctournament_jobs  # noqa: E402
 from alttprbot.services.tournament_jobs import scheduling_needs  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -129,88 +127,7 @@ def test_register_jobs_registers_every_job():
         'tournament.week_races',
         'tournament.record_races',
         'tournament.find_races_with_bad_discord',
-        'asynctournament.timeout_pending_races',
-        'asynctournament.timeout_in_progress_races',
-        'asynctournament.calculate_scores',
     }
-
-
-# --- Async tournament timeouts -------------------------------------------------------
-
-def _timeout_action(kind):
-    race = SimpleNamespace(id=1, thread_id=2, user=SimpleNamespace(discord_user_id=3))
-    return asynctournament_service.TimeoutAction(
-        race, kind, datetime.datetime(2026, 11, 24, tzinfo=datetime.timezone.utc))
-
-
-@pytest.mark.parametrize("kind, told, forfeited", [
-    (asynctournament_service.WARN, True, False),
-    (asynctournament_service.FORFEIT_PENDING, True, True),
-    (asynctournament_service.FORFEIT_IN_PROGRESS, True, True),
-    # A runner who couldn't be told (thread gone) is left alone.
-    (asynctournament_service.FORFEIT_PENDING, False, False),
-])
-def test_timeout_forfeits_only_after_runner_is_told(monkeypatch, kind, told, forfeited):
-    action = _timeout_action(kind)
-    notified, applied = [], []
-
-    async def find():
-        return [action]
-
-    async def notifier(a):
-        notified.append(a)
-        return told
-
-    async def apply(a):
-        applied.append(a)
-
-    monkeypatch.setattr(asynctournament_service, 'find_pending_timeouts', find)
-    monkeypatch.setattr(asynctournament_service, 'apply_timeout_forfeit', apply)
-    monkeypatch.setattr(asynctournament_jobs, '_timeout_notifier', notifier)
-
-    run(asynctournament_jobs.timeout_pending_races())
-    assert notified == [action]
-    assert applied == ([action] if forfeited else [])
-
-
-def test_timeout_without_notifier_forfeits_nothing(monkeypatch):
-    applied = []
-
-    async def find():
-        return [_timeout_action(asynctournament_service.FORFEIT_IN_PROGRESS)]
-
-    async def apply(a):
-        applied.append(a)
-
-    monkeypatch.setattr(asynctournament_service, 'find_in_progress_timeouts', find)
-    monkeypatch.setattr(asynctournament_service, 'apply_timeout_forfeit', apply)
-    monkeypatch.setattr(asynctournament_jobs, '_timeout_notifier', None)
-
-    run(asynctournament_jobs.timeout_in_progress_races())
-    assert applied == []
-
-
-def test_timeout_notifier_error_skips_that_run(monkeypatch):
-    actions = [_timeout_action(asynctournament_service.FORFEIT_PENDING) for _ in range(2)]
-    applied = []
-
-    async def find():
-        return actions
-
-    async def notifier(a):
-        if a is actions[0]:
-            raise RuntimeError("Discord is down")
-        return True
-
-    async def apply(a):
-        applied.append(a)
-
-    monkeypatch.setattr(asynctournament_service, 'find_pending_timeouts', find)
-    monkeypatch.setattr(asynctournament_service, 'apply_timeout_forfeit', apply)
-    monkeypatch.setattr(asynctournament_jobs, '_timeout_notifier', notifier)
-
-    run(asynctournament_jobs.timeout_pending_races())
-    assert applied == [actions[1]]
 
 
 # --- Scheduling needs -------------------------------------------------------------

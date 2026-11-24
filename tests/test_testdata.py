@@ -1,8 +1,7 @@
 """The anonymized production-shaped fixtures in ``testdata/``.
 
 Two kinds of checks: the data stays anonymous and consistent (no real-looking ids,
-no tokens, every foreign key resolves), and real code runs against it (the async
-leaderboard, ranked choice tallies, namespaced preset lookup). A feature whose JSON
+no tokens, every foreign key resolves), and real code runs against it (ranked choice tallies, namespaced preset lookup). A feature whose JSON
 file has been deleted is skipped.
 """
 import collections
@@ -101,20 +100,6 @@ async def test_feature_loads_into_the_database(db, name):
 async def test_all_features_load_together(db):
     counts = await testdata.load()
     assert counts["Users"] == len(testdata.rows(testdata.USERS, "Users"))
-
-
-async def test_async_leaderboards_build_for_every_tournament(db):
-    need("asynctournament")
-    from alttprbot.util import asynctournament
-
-    await testdata.load("asynctournament")
-    races = testdata.rows("asynctournament", "AsyncTournamentRace")
-    for t in await models.AsyncTournament.all():
-        leaderboard = await asynctournament.get_leaderboard(t, cache=False)
-        runners = {r["user_id"] for r in races if r["tournament_id"] == t.id
-                   and r["status"] in ("finished", "forfeit", "disqualified")}
-        assert {entry.player.id for entry in leaderboard} <= runners
-        assert leaderboard, t.name
 
 
 async def test_ranked_choice_results_match_a_recount(db):

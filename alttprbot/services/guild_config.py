@@ -1,8 +1,8 @@
 """Per-guild settings stored in the ``config`` table.
 
 This is the only module that reads or writes ``models.Config``. Callers pass a guild
-id (an int), never a ``discord.Guild``, so the Discord bot, the audit bot, the web app
-and the racetime bots can all share it.
+id (an int), never a ``discord.Guild``, so the Discord bot, the web app and the
+racetime bots can all share it.
 
 Values are strings (``'true'``, a channel id, a comma-separated list of channel
 names, …), exactly as stored. Guild id ``0`` holds bot-wide settings.

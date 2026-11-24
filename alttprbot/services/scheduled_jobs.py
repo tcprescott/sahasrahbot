@@ -7,7 +7,7 @@ the job does the work and publishes events, and a subscriber does any Discord ou
 from typing import Optional
 
 import config
-from alttprbot.services import asynctournament_jobs, daily, tournament_jobs
+from alttprbot.services import daily, tournament_jobs
 from alttprbot.services.scheduler import Gate, Scheduler
 
 MINUTE = 60
@@ -24,8 +24,7 @@ def register_jobs(scheduler: Scheduler, discord_ready: Optional[Gate] = None) ->
 
     ``discord_ready`` gates the jobs that can't do anything useful until the Discord
     bot is ready: the tournament jobs, whose event config (``TournamentConfig``) still
-    holds the Discord guild and channels, and the async race timeouts, which only
-    apply once the runner has been told in Discord. ``sahasrahbot.py`` passes that wait.
+    holds the Discord guild and channels. ``sahasrahbot.py`` passes that wait.
     """
     scheduler.add_interval_job('daily.check_for_new_daily', daily.check_for_new_daily, seconds=5 * MINUTE)
 
@@ -37,10 +36,3 @@ def register_jobs(scheduler: Scheduler, discord_ready: Optional[Gate] = None) ->
                                seconds=_tournament_interval(15 * MINUTE), wait_for=discord_ready)
     scheduler.add_interval_job('tournament.find_races_with_bad_discord', tournament_jobs.find_races_with_bad_discord,
                                seconds=_tournament_interval(4 * HOUR), wait_for=discord_ready)
-
-    scheduler.add_interval_job('asynctournament.timeout_pending_races', asynctournament_jobs.timeout_pending_races,
-                               seconds=MINUTE, wait_for=discord_ready)
-    scheduler.add_interval_job('asynctournament.timeout_in_progress_races',
-                               asynctournament_jobs.timeout_in_progress_races, seconds=MINUTE, wait_for=discord_ready)
-    scheduler.add_interval_job('asynctournament.calculate_scores', asynctournament_jobs.calculate_scores,
-                               seconds=HOUR)

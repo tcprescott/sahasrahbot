@@ -78,13 +78,6 @@ class RacerVerification(commands.GroupCog, name="racerverification"):
             self.bot.add_view(RacerVerificationView(self.bot))
             self.persistent_views_added = True
 
-    @app_commands.command(description="Reverify all racers in this server.")
-    async def reverify(self, interaction: discord.Interaction, revoke: bool=False):
-        # Reverification walked every member of the verified-racer role, which needs the
-        # privileged members intent.  SahasrahBot no longer uses it.
-        await interaction.response.send_message(discord_members.ROLE_MEMBERS_UNAVAILABLE, ephemeral=True)
-
-
     @app_commands.command(description="Create a racer verification message.")
     @app_commands.describe(role="The role to assign to verified racers.")
     @app_commands.describe(racetime_categories="A comma-separated list of racetime categories to include in verification.")
@@ -139,8 +132,6 @@ If you have any questions, please contact a server administrator.
 - Must be a member of this Discord server
 """
 
-        if reverify_period_days is not None:
-            content += f"- Must reverify every {reverify_period_days} {'day' if reverify_period_days == 1 else 'days'}.  This process is automatic and requires no action by you.\n"
 
         await interaction.response.send_message(
             content=content,

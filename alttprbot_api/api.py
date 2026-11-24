@@ -27,15 +27,8 @@ sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.sglive_blueprint, url_prefix="/sglive")
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
-
-# not ready for prime time
-if config.DEBUG:
-    sahasrahbotapi.register_blueprint(blueprints.schedule_blueprint, url_prefix="/schedule")
-    sahasrahbotapi.register_blueprint(blueprints.user_blueprint, url_prefix="/user")
 
 if config.DEBUG:
     sahasrahbotapi.config['TEMPLATES_AUTO_RELOAD'] = True

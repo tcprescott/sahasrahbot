@@ -71,11 +71,8 @@ async def _clear_caches():
     """aiocache memory caches are module globals; don't let one test's entries leak into the next."""
     yield
     for name in (
-        "alttprbot.util.asynctournament",
         "alttprbot.services.guild_config",
         "alttprbot.database.role",
-        "alttprbot.database.smz3_multiworld",
-        "alttprbot.database.tournament_results",
     ):
         module = sys.modules.get(name)
         if module is not None and hasattr(module, "CACHE"):

@@ -4,7 +4,6 @@ users, plus the database rows seeded for them.
 Ids are fixed so pages, tests and agents can link to them. Add to these lists to
 cover a new page; ``python -m devserver --reset`` reseeds from scratch.
 """
-import datetime
 
 from devserver.fake_discord import FakeChannel, FakeGuild, FakeRole, FakeUser, FakeWorld
 
@@ -56,7 +55,7 @@ USERS = [
         "key": "admin",
         "id": 200000000000000001,
         "name": "dev-admin",
-        "description": "Bot owner and server Admin. Owns the async tournaments, presets and elections.",
+        "description": "Bot owner and server Admin. Owns the presets and elections.",
         "memberships": {GUILD_ID: [ROLE_ADMIN], OTHER_GUILD_ID: []},
         "rtgg_id": "devAdmin0000001",
     },
@@ -64,7 +63,7 @@ USERS = [
         "key": "mod",
         "id": 200000000000000002,
         "name": "async-mod",
-        "description": "Has the Async Mod role, which the dev async tournament grants 'mod' to.",
+        "description": "Has the Async Mod role (left over from the removed async tournaments) and can vote.",
         "memberships": {GUILD_ID: [ROLE_ASYNC_MOD, ROLE_VOTER]},
         "rtgg_id": "devMod000000002",
     },
@@ -72,7 +71,7 @@ USERS = [
         "key": "runner1",
         "id": 200000000000000003,
         "name": "runner-one",
-        "description": "Racer with finished, reviewed async runs and a racetime account.",
+        "description": "Racer with a racetime account.",
         "memberships": {GUILD_ID: [ROLE_RACER, ROLE_VOTER]},
         "rtgg_id": "devRunner000003",
     },
@@ -170,22 +169,14 @@ async def seed_database():
     First the hand-made rows below, then the anonymized production-shaped slices in
     ``testdata/`` (ids from 1001 up, so they don't collide).
     """
-    from alttprbot import models
-
-    users = await _seed_handmade()
+    await _seed_handmade()
     import testdata
 
     await testdata.load()
-    # Let the dev admin into the testdata tournaments, whose admins are fake users.
-    if "asynctournament" in testdata.features():
-        for row in testdata.rows("asynctournament", "AsyncTournament"):
-            await models.AsyncTournamentPermissions.create(tournament_id=row["id"], user=users["admin"], role="admin")
 
 
 async def _seed_handmade():
     from alttprbot import models
-
-    now = datetime.datetime.now(datetime.timezone.utc)
 
     users = {}
     for spec in USERS:
@@ -200,93 +191,8 @@ async def _seed_handmade():
 
     # --- API keys -------------------------------------------------------------
     key = await models.AuthorizationKeys.create(key=API_KEY, name="dev")
-    for perm in ("racetimecmd", "asynctournament"):
+    for perm in ("racetimecmd",):
         await models.AuthorizationKeyPermissions.create(auth_key=key, type=perm)
-
-    # --- Async tournaments -----------------------------------------------------
-    tournament = await models.AsyncTournament.create(
-        id=1,
-        name="Dev Async Tournament",
-        guild_id=GUILD_ID,
-        channel_id=CHANNEL_ASYNC,
-        report_channel_id=CHANNEL_ASYNC_REPORTS,
-        owner_id=user("admin")["id"],
-        active=True,
-        allowed_reattempts=1,
-        runs_per_pool=1,
-    )
-    await models.AsyncTournamentPermissions.create(tournament=tournament, user=users["admin"], role="admin")
-    await models.AsyncTournamentPermissions.create(tournament=tournament, discord_role_id=ROLE_ASYNC_MOD, role="mod")
-
-    pools = {}
-    permalinks = {}
-    for pool_name, preset, seeds in [
-        ("Open", "open", [("OPEN0001", 5400.0), ("OPEN0002", 5700.0)]),
-        ("Keysanity", "keysanity", [("KEYS0001", 7200.0), ("KEYS0002", None)]),
-    ]:
-        pool = await models.AsyncTournamentPermalinkPool.create(tournament=tournament, name=pool_name, preset=preset)
-        pools[pool_name] = pool
-        for seed_hash, par in seeds:
-            permalinks[seed_hash] = await models.AsyncTournamentPermalink.create(
-                pool=pool,
-                url=f"https://alttpr.com/h/{seed_hash}",
-                notes=f"{pool_name} seed {seed_hash[-1]}",
-                par_time=par,
-                par_updated_at=now if par else None,
-            )
-
-    def run(hours_ago, minutes):
-        start = now - datetime.timedelta(hours=hours_ago)
-        return start, start + datetime.timedelta(minutes=minutes)
-
-    races = [
-        # (user, permalink, status, review_status, reviewer, minutes, hours_ago, score)
-        ("runner1", "OPEN0001", "finished", "approved", "mod", 88, 50, 1.02),
-        ("runner1", "KEYS0001", "finished", "approved", "admin", 115, 30, 1.04),
-        ("runner2", "OPEN0002", "finished", "pending", None, 101, 20, None),
-        ("runner2", "KEYS0001", "forfeit", "pending", None, 40, 10, 0.0),
-        ("runner3", "OPEN0001", "finished", "rejected", "admin", 95, 8, None),
-        ("mod", "OPEN0002", "in_progress", "pending", None, 0, 1, None),
-    ]
-    for key_, seed_hash, status, review_status, reviewer, minutes, hours_ago, score in races:
-        start, end = run(hours_ago, minutes)
-        await models.AsyncTournamentRace.create(
-            tournament=tournament,
-            permalink=permalinks[seed_hash],
-            user=users[key_],
-            thread_id=130000000000000000 + len(seed_hash) + hours_ago,
-            thread_open_time=start - datetime.timedelta(minutes=5),
-            start_time=start,
-            end_time=end if status in ("finished", "forfeit") else None,
-            status=status,
-            runner_vod_url="https://www.twitch.tv/videos/0" if status == "finished" else None,
-            run_igt=f"{minutes // 60}:{minutes % 60:02}:00" if status == "finished" else None,
-            run_collection_rate="216" if status == "finished" else None,
-            runner_notes="Fun seed." if status == "finished" else None,
-            review_status=review_status,
-            reviewed_by=users[reviewer] if reviewer else None,
-            reviewed_at=end + datetime.timedelta(hours=1) if reviewer else None,
-            reviewer_notes="Looks good." if review_status == "approved" else (
-                "VOD is missing the end of the run." if review_status == "rejected" else None),
-            score=score,
-            score_updated_at=now if score is not None else None,
-        )
-
-    old = await models.AsyncTournament.create(
-        id=2,
-        name="Finished Async (public)",
-        guild_id=GUILD_ID,
-        channel_id=CHANNEL_OLD_ASYNC,
-        owner_id=user("admin")["id"],
-        active=False,
-    )
-    old_pool = await models.AsyncTournamentPermalinkPool.create(tournament=old, name="Standard", preset="standard")
-    old_link = await models.AsyncTournamentPermalink.create(pool=old_pool, url="https://alttpr.com/h/OLD00001", par_time=6000.0)
-    start, end = run(24 * 60, 99)
-    await models.AsyncTournamentRace.create(
-        tournament=old, permalink=old_link, user=users["runner1"], start_time=start, end_time=end,
-        status="finished", review_status="approved", reviewed_by=users["admin"], score=1.0,
-    )
 
     # --- Presets ---------------------------------------------------------------
     namespace = await models.PresetNamespaces.create(name="dev-admin", discord_user_id=user("admin")["id"])
@@ -331,21 +237,5 @@ async def _seed_handmade():
         await models.TournamentGames.create(
             episode_id=episode_id, event="alttpr", game_number=game, preset="open", submitted=1,
         )
-
-    # --- Schedule (DEBUG-only /schedule pages) -------------------------------------
-    event = await models.ScheduleEvent.create(
-        event_slug="devevent", name="Dev Event", description="A scheduled event for UI work.",
-    )
-    channel = await models.ScheduleBroadcastChannels.create(
-        event=event, channel_name="speedgaming", display_name="SpeedGaming",
-    )
-    for hours_from_now, players in [(2, ["runner1", "runner2"]), (26, ["runner2", "runner3"])]:
-        episode = await models.ScheduleEpisode.create(
-            event=event, channel=channel,
-            when_countdown=now + datetime.timedelta(hours=hours_from_now),
-            approved=hours_from_now < 24,
-        )
-        for key_ in players:
-            await models.ScheduleEpisodePlayer.create(episode=episode, user=users[key_])
 
     return users

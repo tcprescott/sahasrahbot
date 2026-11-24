@@ -34,10 +34,6 @@ else:
             category_slug='alttpr',
             handler_class=handlers.alttpr.GameHandler,
         ),
-        'contra': RacetimeBotConfig(
-            category_slug='contra',
-            handler_class=handlers.contra.GameHandler,
-        ),
         'ct-jets': RacetimeBotConfig(
             category_slug='ct-jets',
             handler_class=handlers.ctjets.GameHandler,
@@ -46,14 +42,6 @@ else:
             category_slug='ff1r',
             handler_class=handlers.ff1r.GameHandler,
         ),
-        'sgl': RacetimeBotConfig(
-            category_slug='sgl',
-            handler_class=handlers.sgl.GameHandler,
-        ),
-#        'sm': RacetimeBotConfig(
-#            category_slug='sm',
-#            handler_class=handlers.sm.GameHandler,
-#        ),
         'smb3r': RacetimeBotConfig(
             category_slug='smb3r',
             handler_class=handlers.smb3r.GameHandler,
@@ -61,10 +49,6 @@ else:
         'smr': RacetimeBotConfig(
             category_slug='smr',
             handler_class=handlers.smr.GameHandler,
-        ),
-        'smw-hacks': RacetimeBotConfig(
-            category_slug='smw-hacks',
-            handler_class=handlers.smwhacks.GameHandler,
         ),
         'smz3': RacetimeBotConfig(
             category_slug='smz3',
