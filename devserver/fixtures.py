@@ -5,6 +5,8 @@ Ids are fixed so pages, tests and agents can link to them. Add to these lists to
 cover a new page; ``python -m devserver --reset`` reseeds from scratch.
 """
 
+import datetime
+
 from devserver.fake_discord import FakeChannel, FakeGuild, FakeRole, FakeUser, FakeWorld
 
 GUILD_ID = 100000000000000001
@@ -229,8 +231,29 @@ async def _seed_handmade():
     )
     for election, names in [(public, ["Open", "Keysanity", "Inverted", "Enemizer"]),
                             (private, ["Alice", "Bob", "Carol"])]:
-        for name in names:
-            await models.RankedChoiceCandidate.create(election=election, name=name)
+        for position, name in enumerate(names):
+            await models.RankedChoiceCandidate.create(election=election, name=name, position=position)
+
+    # A closed committee vote with ballots (its count is made on first view of the
+    # results page, like an election closed before counts were stored) and a draft.
+    closed = await models.RankedChoiceElection.create(
+        id=3, guild_id=GUILD_ID, channel_id=CHANNEL_ELECTIONS, message_id=140000000000000003, owner_id=user("admin")["id"],
+        title="2026 Tournament Committee", description="Three seats on the committee.", seats=3,
+        status="closed", active=False, closed_at=datetime.datetime(2026, 11, 2, 2, tzinfo=datetime.timezone.utc),
+    )
+    people = {}
+    for position, name in enumerate(["Andy", "Bea", "Coral", "Dmitri", "Eli"]):
+        people[name] = await models.RankedChoiceCandidate.create(election=closed, name=name, position=position)
+    ballots = [["Coral", "Andy"]] * 5 + [["Andy", "Eli"]] * 4 + [["Eli", "Bea"]] * 3 + [["Bea", "Eli"]] * 2 + [["Dmitri", "Bea"]]
+    for voter, ranking in enumerate(ballots, start=1):
+        for rank, name in enumerate(ranking, start=1):
+            await models.RankedChoiceVotes.create(election=closed, candidate=people[name], user_id=voter, rank=rank)
+    draft = await models.RankedChoiceElection.create(
+        id=4, guild_id=GUILD_ID, channel_id=CHANNEL_ELECTIONS, owner_id=user("admin")["id"], method="approval",
+        title="Next mystery weights", seats=1, status="draft", active=False,
+    )
+    for position, name in enumerate(["Classic", "Chaos", "Friendly"]):
+        await models.RankedChoiceCandidate.create(election=draft, name=name, position=position)
 
     # --- Tournament games (/api/tournament/games) ---------------------------------
     for episode_id, game in [(1001, 1), (1002, 2)]:

@@ -1,17 +1,18 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { Icon } from '../components'
-import { DOCS_URL, TABS } from './tabs'
+import { DOCS_URL, tabsFor } from './tabs'
 
 /**
  * One list of destinations, drawn as a left rail on desktop and a bottom tab
  * bar on phone. Both are in the DOM; CSS shows one, and the hidden one is
  * display:none so it's out of the accessibility tree too.
  */
-export function NavTabs({ variant }: Readonly<{ variant: 'rail' | 'tabbar' }>) {
+export function NavTabs({ variant, elections = false }: Readonly<{ variant: 'rail' | 'tabbar'; elections?: boolean }>) {
   const { pathname } = useLocation()
+  const tabs = tabsFor(elections)
   return (
     <ul className={`nav nav--${variant}`}>
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const active = tab.match(pathname)
         return (
           <li key={tab.path}>

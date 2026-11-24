@@ -20,11 +20,27 @@ export const TABS: Tab[] = [
   },
 ]
 
+/** Shown to server admins only, between Presets and Me. */
+export const ELECTIONS_TAB: Tab = {
+  path: '/elections',
+  label: 'Elections',
+  icon: 'how_to_vote',
+  match: (p) => p.startsWith('/elections') && !p.endsWith('/results'),
+}
+
+/** The tabs a visitor sees: Elections only for someone who can run one. */
+export function tabsFor(canRunElections: boolean): Tab[] {
+  if (!canRunElections) return TABS
+  return [...TABS.slice(0, 2), ELECTIONS_TAB, ...TABS.slice(2)]
+}
+
 export const DOCS_URL = 'https://sahasrahbot.synack.live/'
 
 /** The top bar's title for a path. */
 export function titleFor(pathname: string): string {
   if (pathname.startsWith('/ranked_choice')) return 'Vote'
+  if (pathname.startsWith('/elections') && pathname.endsWith('/results')) return 'Results'
+  if (pathname.startsWith('/elections')) return 'Elections'
   if (pathname.startsWith('/triforcetexts')) return 'Triforce texts'
   if (pathname.startsWith('/submit')) return 'Race settings'
   return TABS.find((tab) => tab.match(pathname))?.label ?? 'SahasrahBot'
