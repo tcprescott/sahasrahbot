@@ -1,17 +1,10 @@
-from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
-from alttprbot.services import bots
+from alttprbot.tournament.dailies.core import SGDailyRaceCore
+from alttprbot.tournament import event_settings
 
 
 class SMZ3DailyRace(SGDailyRaceCore):
     async def configuration(self):
-        guild = bots.discord().get_guild(445948207638511616)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='smz3',
-            racetime_goal='Beat the games',
-            event_slug="smz3",
-            room_open_time=60
-        )
+        return event_settings.tournament_config("smz3")
 
     @property
     def race_info(self):
