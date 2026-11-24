@@ -1,7 +1,9 @@
+import json
 import os
 from pathlib import Path
 from urllib.parse import quote
 
+import aiofiles
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
 from quart import Quart, abort, jsonify, make_response, redirect, request, send_from_directory, session
 from quart_discord import AccessDenied, DiscordOAuth2Session, Unauthorized
@@ -10,6 +12,7 @@ from werkzeug.exceptions import HTTPException
 
 import config
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
+from alttprbot.observability import sentry as observability
 from alttprbot.services import bots
 
 # The React app (web/) is built into web/dist and served from here: its files by
@@ -49,6 +52,9 @@ QuartSchema(
 )
 
 import alttprbot_api.blueprints as blueprints  # nopep8
+from alttprbot_api import telemetry  # nopep8
+
+telemetry.install(sahasrahbotapi)
 
 sahasrahbotapi.register_blueprint(blueprints.app_api_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
@@ -202,6 +208,22 @@ async def app_page(path: str):
         return response
     if not (WEB_DIST / 'index.html').is_file():
         return await make_response(NOT_BUILT, 200)
-    response = await send_from_directory(WEB_DIST, 'index.html')
+    response = await make_response(await _index_html(), 200, {'Content-Type': 'text/html; charset=utf-8'})
     response.cache_control.no_cache = True
     return response
+
+
+async def _index_html() -> str:
+    """The app's index.html with the browser's Sentry settings inlined.
+
+    ``web/src/telemetry.ts`` reads ``window.__SAHASRAHBOT_SENTRY__`` so Sentry starts
+    before the first render without a round trip (``null`` means off). A native
+    wrapper, whose index.html isn't served from here, asks ``/api/v1/telemetry``.
+    """
+    async with aiofiles.open(WEB_DIST / 'index.html', encoding='utf-8') as f:
+        html = await f.read()
+    settings = json.dumps(observability.browser_config()).replace('<', '\\u003c')
+    script = f'<script>window.__SAHASRAHBOT_SENTRY__={settings};</script>'
+    if '</head>' in html:
+        return html.replace('</head>', f'{script}</head>', 1)
+    return script + html

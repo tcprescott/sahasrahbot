@@ -17,7 +17,10 @@ takes everything down. Work in this order and stop as soon as the cause is clear
 
 - **Sentry** (if the Sentry connector is available): search recent unresolved issues and
   open the newest event's stack trace. `SahasrahBotException` is filtered out on purpose,
-  so a missing user-facing error is expected.
+  so a missing user-facing error is expected. Narrow with the tags (`job`,
+  `discord_command`, `racetime_room`, `route`, `release`; see "Sentry" in CLAUDE.md),
+  read Sentry Logs around the time, and for "it's slow" check the `loop.lag_p95`,
+  `process.cpu` and `loop.stalls` metrics and any `event-loop-blocked` issue first.
 - **The bot is completely offline?** Check first for a privileged intent sneaking back in
   (`Intents.all()`, `intents.members = True`, …). Discord rejects the login with close
   code 4014. `python3 scripts/guardrails.py --all` finds it in seconds.

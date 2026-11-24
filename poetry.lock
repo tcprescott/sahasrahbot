@@ -1121,21 +1121,6 @@ test = ["coverage[toml]", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock
 voice = ["PyNaCl (>=1.5.0,<1.6)", "davey (>=0.1.0)"]
 
 [[package]]
-name = "discord-sentry-reporting"
-version = "2.0.4"
-description = "A small compatibility library that provides functionality to report errors from discord.py to Sentry."
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "discord-sentry-reporting-2.0.4.tar.gz", hash = "sha256:788d4bb3e754595768577a6011695f22096894b0f34554c03c3329abfe97e85f"},
-    {file = "discord_sentry_reporting-2.0.4-py3-none-any.whl", hash = "sha256:6300aaf092b2d1ca3823974e98f85e0adce97d05620ea0d6261b3554a1d934d4"},
-]
-
-[package.dependencies]
-sentry-sdk = "*"
-
-[[package]]
 name = "executing"
 version = "2.3.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -3985,4 +3970,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "78e2d141ececca642424e95a0bb448eae91862b603a81fd1a046d3311980182f"
+content-hash = "38ac53461ef94695ba6a543d8ae3f43fed1521a6e4c69e767c00564c8a982eb2"

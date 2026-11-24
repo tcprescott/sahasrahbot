@@ -8,12 +8,21 @@ Semantics match the ``discord.ext.tasks`` loops they replace: a job runs once wh
 starts (after its ``wait_for`` gate, if any), then every ``interval`` seconds measured
 from the start of the previous run. A job never overlaps itself, and an exception is
 logged and does not stop the job.
+
+Each run is its own Sentry trace (op ``job``), tagged ``job=<name>``, and emits
+``job.calls`` / ``job.duration`` with ``job`` and ``outcome``; a failure is a Sentry
+issue tagged with the job.
 """
 import asyncio
 import dataclasses
 import logging
 import time
 from typing import Awaitable, Callable, Optional
+
+import sentry_sdk
+
+from alttprbot.observability import metrics
+from alttprbot.observability.sentry import sentry_tags
 
 logger = logging.getLogger(__name__)
 
@@ -105,11 +114,20 @@ class Scheduler:
         async with self._locks[job.name]:
             job.last_started = time.time()
             job.runs += 1
-            try:
-                await job.func()
-            except asyncio.CancelledError:
-                raise
-            except Exception as e:
-                job.failures += 1
-                job.last_error = e
-                logger.exception("Scheduled job %s failed", job.name)
+            started = time.perf_counter()
+            error: Optional[BaseException] = None
+            with sentry_sdk.isolation_scope(), sentry_tags(job=job.name):
+                sentry_sdk.new_trace()
+                with sentry_sdk.start_span(name=job.name, attributes={'sentry.op': 'job'}):
+                    try:
+                        await job.func()
+                    except asyncio.CancelledError as e:
+                        error = e
+                        raise
+                    except Exception as e:
+                        error = e
+                        job.failures += 1
+                        job.last_error = e
+                        logger.exception("Scheduled job %s failed", job.name)
+                    finally:
+                        metrics.record_call('job', started, error, {'job': job.name})

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, loginUrl, unwrap, type SessionUser } from '../api/client'
 import { Spinner } from '../components'
+import { setTelemetryUser } from '../telemetry'
 
 interface SessionState {
   /** undefined while loading, null when nobody is signed in. */
@@ -17,6 +18,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     try {
       const body = unwrap(await api.GET('/api/v1/session'))
       setUser(body.user ?? null)
+      setTelemetryUser(body.user ?? null)
     } catch {
       setUser(null)
     }

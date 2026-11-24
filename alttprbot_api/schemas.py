@@ -25,6 +25,20 @@ class SessionInfo(BaseModel):
     user: Optional[SessionUser]
 
 
+class BrowserSentry(BaseModel):
+    """What the React app hands the Sentry browser SDK."""
+    dsn: str
+    environment: str
+    release: Optional[str]
+    sample_rate: float = Field(description="Share of browser errors sent, 0 to 1.")
+    traces_sample_rate: float = Field(description="Share of page loads and navigations traced, 0 to 1.")
+    replay: bool = Field(description="Record a session replay to send with an error.")
+
+
+class Telemetry(BaseModel):
+    sentry: Optional[BrowserSentry] = Field(description="Null when Sentry is off; the app then loads no SDK.")
+
+
 class Profile(BaseModel):
     user: SessionUser
     racetime_linked: bool
