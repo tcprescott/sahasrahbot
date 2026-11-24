@@ -153,6 +153,8 @@ Android app (Capacitor, as Wizzrobe plans), so no browser-only assumptions.
   light and dark. Icons: add the name to `web/src/components/icons.ts`, in order.
 - **Checks:** `npm run typecheck`, `npm test` (Vitest, `src/**/*.test.ts`) and
   `npm run build`, all run by `check.sh` and CI. Node 22.
+- **Production:** deploys with `git pull`, then `scripts/build_web.sh` (Node 22 only: `npm ci`
+  and `vite build`, no Python or type generation), then a restart. `web/dist` is never committed.
 
 ### Running the web app standalone
 

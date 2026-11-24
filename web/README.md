@@ -13,6 +13,9 @@ npm test            # Vitest
 npm run build       # web/dist
 ```
 
+Production runs `scripts/build_web.sh` after each `git pull` (Node 22; `npm ci` and
+`npm run build:site`, which skips type checking and so needs no Python).
+
 `npm run dev` needs the backend running: `./scripts/dev.sh` from the repo root (fake
 Discord, seeded MariaDB). Set `SAHASRAHBOT_API` to proxy somewhere else.
 

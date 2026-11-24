@@ -185,7 +185,7 @@ async def robots():
 
 NOT_BUILT = (
     "<!doctype html><meta charset=utf-8><title>SahasrahBot</title>"
-    "<p>The web app hasn't been built. Run <code>npm ci && npm run build</code> in <code>web/</code>.</p>"
+    "<p>The web app hasn't been built. Run <code>scripts/build_web.sh</code>.</p>"
 )
 
 
