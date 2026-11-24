@@ -4,6 +4,7 @@ import { loginUrl } from '../api/client'
 import { useSession } from '../auth/SessionProvider'
 import { useTheme, type ThemeChoice } from '../theme/ThemeProvider'
 import { useNavigate } from 'react-router-dom'
+import { browser } from '../lib/browser'
 
 const THEMES: { choice: ThemeChoice; label: string }[] = [
   { choice: 'system', label: 'Match my device' },
@@ -73,7 +74,7 @@ export function UserMenu() {
       items={[
         { label: 'Me', icon: 'person', onSelect: () => navigate('/me') },
         ...themeItems,
-        { label: 'Sign out', icon: 'logout', onSelect: () => window.location.assign('/logout/') },
+        { label: 'Sign out', icon: 'logout', onSelect: () => browser.assign('/logout/') },
       ]}
     />
   )

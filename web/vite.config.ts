@@ -22,5 +22,14 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
+    setupFiles: ['src/test/setup.ts'],
+    // `npm run test:coverage` (CI) fails below these. Raise them when coverage
+    // goes up; don't lower them to get a PR through.
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/api/schema.d.ts', 'src/main.tsx'],
+      thresholds: { lines: 90, statements: 90, functions: 90, branches: 85 },
+    },
   },
 })

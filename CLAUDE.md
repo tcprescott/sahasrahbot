@@ -108,6 +108,11 @@ code on master does today, so a refactor can be checked against them. Rules for 
   `bots.racetime_bot(category)`), which nothing registers in tests. Give it a fake with
   `monkeypatch.setattr(bots, "_discord_client", fake)` or
   `monkeypatch.setattr(bots, "_racetime_bots", {"alttpr": fake_bot})`.
+- Cogs are tested by calling a command's body with fakes from `tests/discord_fakes.py`:
+  `await call(cog.rom, cog, FakeInteraction())`, then `interaction.sent()` for what it
+  replied. Buttons and selects: `await view.<item>.callback(interaction)`.
+- Coverage has a floor (`fail_under` in `.coveragerc`), enforced by CI's `--cov` run.
+  Raise it when coverage goes up; never lower it to get a PR through.
 - `testdata` gives realistic data: `await testdata.load("ranked_choice")` (inside the `db`
   fixture) inserts fake users plus that feature's rows, ids from 1001. Regenerate the files
   with `scripts/scrub_prod_dump.py`; never hand-edit them, and never commit a raw dump.
@@ -154,8 +159,16 @@ Android app (Capacitor, as Wizzrobe plans), so no browser-only assumptions.
   desktop, cards on a phone). One main button plus an Actions menu per page; one button
   plus a ⋮ per row; destructive actions confirm first. Check phone (390px) and desktop,
   light and dark. Icons: add the name to `web/src/components/icons.ts`, in order.
-- **Checks:** `npm run typecheck`, `npm test` (Vitest, `src/**/*.test.ts`) and
-  `npm run build`, all run by `check.sh` and CI. Node 22.
+- **Checks:** `npm run typecheck`, `npm test` (Vitest, `src/**/*.test.{ts,tsx}`) and
+  `npm run build`, all run by `check.sh` and CI. Node 22. CI runs `npm run test:coverage`,
+  which fails below the floor in `vite.config.ts` (`coverage.thresholds`); raise it when
+  coverage goes up, never lower it.
+- **Screen tests:** render the whole app at a URL with `renderApp(path, { signedIn, routes })`
+  (`web/src/test/renderApp.tsx`) against a fake API: `routes` maps `'GET /api/v1/me'` to a
+  body, `fail(status, message)` or a function of the call, and `api.callsTo(route)` shows
+  what the screen sent. Find things by role and name, as a person would. Leaving the app
+  (sign-in, sign-out, downloads) goes through `web/src/lib/browser.ts`, which `renderApp`
+  records in `assigned`.
 - **Production:** deploys with `git pull`, then `scripts/build_web.sh` (Node 22 only: `npm ci`
   and `vite build`, no Python or type generation), then a restart. `web/dist` is never committed.
 
