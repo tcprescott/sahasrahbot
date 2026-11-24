@@ -80,7 +80,7 @@ async def get_racetime_count(racetime_id, category_slugs=None, days=365, max_cou
                          if x['category']['slug'] in category_slugs
                          and x['status']['value'] == 'finished'
                          and tz_aware_greater_than(isodate.parse_datetime(x['opened_at']),
-                                                   datetime.utcnow() - timedelta(days=days))
+                                                   datetime.now(timezone.utc) - timedelta(days=days))
                          ]
 
         count += len(filtered_data)

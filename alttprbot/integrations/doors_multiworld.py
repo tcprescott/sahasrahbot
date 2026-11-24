@@ -16,9 +16,8 @@ class MultiworldServerError(Exception):
 
 async def _request(method: str, path: str, **kwargs):
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.request(method, f'{BASE_URL}{path}', **kwargs) as resp:
-                return await resp.json()
+        async with aiohttp.ClientSession() as session, session.request(method, f'{BASE_URL}{path}', **kwargs) as resp:
+            return await resp.json()
     except aiohttp.ClientResponseError as err:
         raise MultiworldServerError(str(err)) from err
 

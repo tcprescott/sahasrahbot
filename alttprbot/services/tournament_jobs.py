@@ -33,7 +33,7 @@ async def create_tournament_race_room(event, episodeid):
     if race:
         race_data = await racetime.get_race(race.srl_id, base_url=rtgg_bot.http_uri(""))
         status = race_data.get('status', {}).get('value')
-        if not status == 'cancelled':
+        if status != 'cancelled':
             return
         await race.delete()
 

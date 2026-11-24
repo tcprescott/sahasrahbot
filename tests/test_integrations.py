@@ -239,7 +239,8 @@ async def test_verification_records(db):
 
     rv = await verification.create_or_update(guild_id=1, role_id=2, minimum_races=3, racetime_categories="alttpr")
     again = await verification.create_or_update(guild_id=1, role_id=2, minimum_races=4, racetime_categories="alttpr")
-    assert again.id == rv.id and again.minimum_races == 4
+    assert again.id == rv.id
+    assert again.minimum_races == 4
     await verification.attach_message(again, message_id=10, channel_id=11)
     assert (await verification.get_for_message(10, 1)).id == rv.id
     assert await verification.get_for_message(10, 99) is None
@@ -316,3 +317,25 @@ def test_integrations_import_no_front_end_or_models():
                 names = [node.module] + [f"{node.module}.{a.name}" for a in node.names]
             for name in names:
                 assert not any(name == b or name.startswith(b + ".") for b in banned), f"{path.name} imports {name}"
+
+
+async def test_record_race_page_without_token_raises(racetime_site):
+    racetime_site.add("GET", "/alttpr/room", body="<html>logged out</html>", content_type="text/html")
+    with pytest.raises(racetime.RacetimeRecordError):
+        await racetime.record_race({"url": "/alttpr/room", "recorded": False, "recordable": True})
+
+
+@pytest.mark.parametrize("status, recorded, deleted", [("finished", True, False), ("cancelled", False, True), ("open", False, False)])
+async def test_record_one_race(db, monkeypatch, status, recorded, deleted):
+    race = await models.TournamentResults.create(srl_id="alttpr/room", episode_id="5", event="evt")
+    race_data = {"status": {"value": status}, "url": "/alttpr/room", **_finished_race("2020-01-01T01:30:00+00:00")}
+    monkeypatch.setattr(racetime, "get_race", mock.AsyncMock(return_value=race_data))
+    record = mock.AsyncMock()
+    monkeypatch.setattr(racetime, "record_race", record)
+    wks = mock.Mock(append_row=mock.AsyncMock())
+
+    await tournament_results._record_race(wks, race, SimpleNamespace(stream_delay=0, auto_record=True))
+
+    assert wks.append_row.await_count == (1 if recorded else 0)
+    assert record.await_count == (1 if recorded else 0)
+    assert await models.TournamentResults.filter(srl_id="alttpr/room").exists() is not deleted

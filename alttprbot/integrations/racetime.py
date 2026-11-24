@@ -15,6 +15,10 @@ import config
 logger = logging.getLogger(__name__)
 
 
+class RacetimeRecordError(Exception):
+    """The race page needed to record a race couldn't be fetched or had no CSRF token."""
+
+
 def _base(base_url):
     return config.RACETIME_URL if base_url is None else base_url
 
@@ -53,8 +57,8 @@ async def record_race(race_data: dict, base_url: str = None) -> None:
 
     Does nothing when the race is already recorded or can't be. racetime.gg has
     no API for this, so it scrapes the CSRF token from the race page and posts
-    the monitor form. Raises when the race page can't be fetched; a failed post
-    is only logged.
+    the monitor form. Raises ``RacetimeRecordError`` when the race page can't be
+    fetched or has no token; a failed post is only logged.
     """
     base = _base(base_url)
     url = base + race_data['url']
@@ -78,10 +82,12 @@ async def record_race(race_data: dict, base_url: str = None) -> None:
             ) as resp:
                 soup = BeautifulSoup(await resp.text(), features="html5lib")
         except Exception as e:
-            raise Exception("Unable to acquire CSRF token.  Please contact Synack for help.") from e
+            raise RacetimeRecordError("Unable to acquire CSRF token.  Please contact Synack for help.") from e
 
-        csrftoken = soup.find('input', {'name': 'csrfmiddlewaretoken'})['value']
-        data = {'csrfmiddlewaretoken': csrftoken}
+        token_input = soup.find('input', {'name': 'csrfmiddlewaretoken'})
+        if token_input is None or not token_input.get('value'):
+            raise RacetimeRecordError("Unable to acquire CSRF token.  Please contact Synack for help.")
+        data = {'csrfmiddlewaretoken': token_input['value']}
 
         try:
             async with aiohttp.request(
@@ -93,6 +99,6 @@ async def record_race(race_data: dict, base_url: str = None) -> None:
                     data=data,
                     raise_for_status=True
             ):
-                pass
+                logger.info("Recorded %s on racetime.gg", race_data['url'])
         except Exception:
             logger.exception("Unable to automatically record race. Skipping...")

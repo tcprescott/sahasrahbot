@@ -47,38 +47,50 @@ async def record_results():
         if not races:
             continue
 
-        try:
-            wks = await wb.worksheet(event)
-        except gspread.exceptions.WorksheetNotFound:
-            wks = await wb.add_worksheet(event, 50, 10)
-            await wks.append_row(values=SHEET_HEADER)
+        wks = await _worksheet(wb, event)
 
         for race in races:
             logger.info(f"Recording {race.episode_id} for {event} to {event_data.data.gsheet_id}")
             try:
-                race_data = await racetime.get_race(race.srl_id)
-
-                if race_data['status']['value'] == 'finished':
-                    row = result_row(race, race_data, stream_delay=event_data.data.stream_delay)
-                    if row is None:
-                        continue
-
-                    await wks.append_row(values=row)
-                    race.status = "RECORDED"
-                    race.written_to_gsheet = 1
-                    await race.save()
-
-                    if event_data.data.auto_record:
-                        await racetime.record_race(race_data)
-
-                elif race_data['status']['value'] == 'cancelled':
-                    await race.delete()
-                else:
-                    continue
+                await _record_race(wks, race, event_data.data)
             except Exception:
                 logger.exception("Encountered a problem when attempting to record a race.")
 
     logger.debug('done')
+
+
+async def _worksheet(wb, event: str):
+    """The event's tab in its workbook, created with a header row if missing."""
+    try:
+        return await wb.worksheet(event)
+    except gspread.exceptions.WorksheetNotFound:
+        wks = await wb.add_worksheet(event, 50, 10)
+        await wks.append_row(values=SHEET_HEADER)
+        return wks
+
+
+async def _record_race(wks, race: models.TournamentResults, settings) -> None:
+    """Write one finished race once its stream delay is over; forget a cancelled one."""
+    race_data = await racetime.get_race(race.srl_id)
+    status = race_data['status']['value']
+
+    if status == 'cancelled':
+        await race.delete()
+        return
+    if status != 'finished':
+        return
+
+    row = result_row(race, race_data, stream_delay=settings.stream_delay)
+    if row is None:
+        return
+
+    await wks.append_row(values=row)
+    race.status = "RECORDED"
+    race.written_to_gsheet = 1
+    await race.save()
+
+    if settings.auto_record:
+        await racetime.record_race(race_data)
 
 
 def result_row(race: models.TournamentResults, race_data: dict, stream_delay: int, now: datetime.datetime = None):
