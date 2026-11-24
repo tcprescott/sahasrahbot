@@ -4,7 +4,6 @@ users, plus the database rows seeded for them.
 Ids are fixed so pages, tests and agents can link to them. Add to these lists to
 cover a new page; ``python -m devserver --reset`` reseeds from scratch.
 """
-import datetime
 
 from devserver.fake_discord import FakeChannel, FakeGuild, FakeRole, FakeUser, FakeWorld
 
@@ -170,9 +169,7 @@ async def seed_database():
     First the hand-made rows below, then the anonymized production-shaped slices in
     ``testdata/`` (ids from 1001 up, so they don't collide).
     """
-    from alttprbot import models
-
-    users = await _seed_handmade()
+    await _seed_handmade()
     import testdata
 
     await testdata.load()
@@ -180,8 +177,6 @@ async def seed_database():
 
 async def _seed_handmade():
     from alttprbot import models
-
-    now = datetime.datetime.now(datetime.timezone.utc)
 
     users = {}
     for spec in USERS:
