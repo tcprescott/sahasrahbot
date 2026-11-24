@@ -76,6 +76,12 @@ that isn't installed all exit 0. Only a real violation exits 2.
   [`layer_allowlist.txt`](../layer_allowlist.txt), which only shrinks: a line whose
   import is gone also fails, so delete it in the PR that removes the import. With
   `--all` it checks the whole tree; `--baseline` prints today's violations.
+- **`scripts/check_model_queries.py`**: in the front ends (`alttprbot_discord`,
+  `alttprbot_api`, `alttprbot_racetime`), rejects a Tortoise query method called on a
+  model class (`models.Users.get_or_none(...)`, `Presets.filter(...)`, `create`,
+  `update_or_create`, `bulk_create`, `all`, `exclude`, `delete`, …). They get data from
+  `alttprbot/services/`. Reading a returned model's attributes and type annotations are
+  fine. A line can opt out with `# model-query: ok`. `--all` checks every front-end file.
 
 ### Stop
 

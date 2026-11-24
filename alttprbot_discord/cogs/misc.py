@@ -11,7 +11,7 @@ from discord.ext import commands
 import config
 from alttprbot.integrations import holyimage as holyimage_api
 from alttprbot.services import guild_config
-from alttprbot.util.holyimage import HolyImage
+from alttprbot_discord.util.holyimage import HolyImage
 
 
 ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))

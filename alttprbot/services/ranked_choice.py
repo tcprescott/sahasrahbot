@@ -10,7 +10,7 @@ import logging
 from alttprbot import events, models
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 from alttprbot.services import bots
-from alttprbot.util import discord_members
+from alttprbot.util import discord_members, rankedchoice
 
 logger = logging.getLogger(__name__)
 
@@ -78,3 +78,66 @@ async def cast_ballot(election_id: int, user_id: int, ranking: list[int]) -> dic
     events.publish(events.RankedChoiceBallotCast(election_id=election.id))
 
     return await get_ballot(election_id, user_id)
+
+
+# --- running an election from Discord (alttprbot_discord/cogs/rankedchoice.py) ---
+
+
+async def get_election(election_id: int):
+    """The election, or None. Open or closed."""
+    return await models.RankedChoiceElection.get_or_none(id=election_id)
+
+
+async def create_election(*, title: str, description, candidates: list[str], seats: int, guild_id: int,
+                          channel_id: int, owner_id: int, voter_role_id, show_vote_count: bool):
+    """Open a new election with these candidates (names are stripped). It is private
+    when ``voter_role_id`` is set. Returns it with ``candidates`` and ``votes`` fetched;
+    its ``message_id`` is set afterwards with ``set_message_id``."""
+    election = await models.RankedChoiceElection.create(
+        title=title,
+        description=description,
+        private=voter_role_id is not None,
+        active=True,
+        guild_id=guild_id,
+        channel_id=channel_id,
+        message_id=None,  # set this later
+        owner_id=owner_id,
+        show_vote_count=show_vote_count,
+        seats=seats,
+        voter_role_id=voter_role_id,
+    )
+    await models.RankedChoiceCandidate.bulk_create(
+        [models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in candidates])
+
+    await election.fetch_related('candidates')
+    await election.fetch_related('votes')
+    return election
+
+
+async def set_message_id(election_id: int, message_id: int) -> None:
+    """Remember the Discord message that shows the election."""
+    await models.RankedChoiceElection.filter(id=election_id).update(message_id=message_id)
+
+
+async def end_election(message_id: int, user_id: int):
+    """Close the election shown in ``message_id`` and count the ballots.
+
+    Only its owner may. Raises ``DoesNotExist`` for a message that isn't an election,
+    ``PermissionDeniedError`` for anyone else, and ``InvalidInputError`` when it has
+    already closed. Returns the closed election, ready for ``refresh_election_post``.
+    """
+    election = await models.RankedChoiceElection.get(message_id=message_id)
+
+    if election.owner_id != user_id:
+        raise PermissionDeniedError("You are not the owner of this election.")
+    if election.active is False:
+        raise InvalidInputError("This election is already closed.")
+
+    await election.fetch_related('candidates')
+    await election.fetch_related('votes')
+
+    await rankedchoice.calculate_results(election)
+
+    election.active = False
+    await election.save()
+    return election

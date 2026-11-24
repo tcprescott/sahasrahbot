@@ -5,23 +5,20 @@ The preset pages themselves are the React app's (web/src/presets/), over /api/v1
 from io import BytesIO
 
 from quart import Blueprint, abort, request, send_file, jsonify
-from tortoise.query_utils import Prefetch
-
-from alttprbot import models
 from alttprbot.alttprgen import generator
+from alttprbot.services import presets
 
 presets_blueprint = Blueprint('presets', __name__)
 
 
 @presets_blueprint.route('/presets/download/<string:namespace>/<string:randomizer>/<string:preset>', methods=['GET'])
 async def download_preset(namespace, randomizer, preset):
-    preset_data = await models.Presets.get_or_none(preset_name=preset, randomizer=randomizer,
-                                                   namespace__name=namespace)
-    if preset_data is None:
+    content = await presets.preset_content(namespace, randomizer, preset)
+    if content is None:
         abort(404, description="That preset doesn't exist.")
 
     return await send_file(
-        BytesIO(preset_data.content.encode()),
+        BytesIO(content.encode()),
         mimetype="application/octet-stream",
         attachment_filename=f"{namespace}-{preset}.yaml",
         as_attachment=True
@@ -39,20 +36,9 @@ async def api_get_presets(randomizer):
         'ctjets': generator.CTJetsPreset
     }
     global_presets = await generators[randomizer]().get_presets(namespace=None)
-    namespaces = await models.PresetNamespaces.all().prefetch_related(
-        Prefetch('presets', queryset=models.Presets.filter(randomizer=randomizer)))
-
     output = {
         'global': global_presets,
-        'namespaces': [
-            {
-                'name': namespace.name,
-                'presets': [
-                    n.preset_name for n in namespace.presets
-                ]
-            } for namespace in namespaces
-            if namespace.presets
-        ]
+        'namespaces': await presets.namespace_preset_names(randomizer),
     }
 
     return jsonify(output)

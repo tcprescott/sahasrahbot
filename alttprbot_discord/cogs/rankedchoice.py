@@ -3,7 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 
 import config
-from alttprbot import models
+from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
+from alttprbot.services import ranked_choice
 from alttprbot.util import rankedchoice
 
 APP_URL = config.APP_URL
@@ -19,24 +20,11 @@ class RankedChoiceMessageView(discord.ui.View):
     async def end_election(self, interaction: discord.Interaction, button: discord.ui.Button):
         # await interaction.response.send_message("Ending the election is not yet implemented.", ephemeral=True)
         await interaction.response.defer()
-        election = await models.RankedChoiceElection.get(message_id=interaction.message.id)
-
-        if election.owner_id != interaction.user.id:
-            await interaction.followup.send("You are not the owner of this election.", ephemeral=True)
+        try:
+            election = await ranked_choice.end_election(interaction.message.id, interaction.user.id)
+        except (PermissionDeniedError, InvalidInputError) as e:
+            await interaction.followup.send(str(e), ephemeral=True)
             return
-
-        if election.active is False:
-            await interaction.followup.send("This election is already closed.", ephemeral=True)
-            return
-
-        await election.fetch_related('candidates')
-        # await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
-
-        await rankedchoice.calculate_results(election)
-
-        election.active = False
-        await election.save()
 
         await rankedchoice.refresh_election_post(election, self.bot)
 
@@ -70,33 +58,22 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
             await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
             return
 
-        election = await models.RankedChoiceElection.create(
+        election = await ranked_choice.create_election(
             title=title,
             description=description,
-            private=authorized_voters_role is not None,
-            active=True,
+            candidates=candidates.split(','),
+            seats=seats,
             guild_id=interaction.guild.id,
             channel_id=interaction.channel.id,
-            message_id=None,  # set this later
             owner_id=interaction.user.id,
+            voter_role_id=authorized_voters_role.id if authorized_voters_role else None,
             show_vote_count=show_vote_count,
-            seats=seats,
-            voter_role_id=authorized_voters_role.id if authorized_voters_role else None
         )
-
-        await models.RankedChoiceCandidate.bulk_create(
-            [models.RankedChoiceCandidate(election=election, name=candidate.strip()) for candidate in
-             candidates.split(',')])
-
-        await election.fetch_related('candidates')
-        # await election.fetch_related('authorized_voters')
-        await election.fetch_related('votes')
 
         await interaction.response.send_message(embed=rankedchoice.create_embed(election),
                                                 view=RankedChoiceMessageView(self.bot))
         message = await interaction.original_response()
-        election.message_id = message.id
-        await election.save()
+        await ranked_choice.set_message_id(election.id, message.id)
 
 
 async def setup(bot: commands.Bot):
