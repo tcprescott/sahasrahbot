@@ -16,7 +16,7 @@ from alttprbot_discord import elections as election_posts
 from tests.discord_fakes import FakeDirectory
 
 ADMIN, OWNER, VOTER, MEMBER, OUTSIDER = 7, 1, 9, 10, 11
-GUILD, OTHER_GUILD = 5, 6
+GUILD, OTHER_GUILD, THIRD_GUILD = 5, 6, 8
 
 
 @pytest.fixture
@@ -570,7 +570,9 @@ class Guild:
         self.id, self.name, self._members = guild_id, name, members
         self.me = object() if me else None
 
-    async def fetch_channels(self):
+    @property
+    def channels(self):
+        # The gateway cache: channel types discord.py doesn't know are left out of it.
         return [TextChannel(2, "second", 2), TextChannel(1, "first", 1), TextChannel(3, "locked", 3, can_post=False),
                 SimpleNamespace(id=4, name="voice", type=discord.ChannelType.voice)]
 
@@ -584,6 +586,7 @@ def bot(monkeypatch):
     guilds = {
         GUILD: Guild(GUILD, "Community", {ADMIN: Member(admin=True, roles=[Role(77, "Voters")]), VOTER: Member()}),
         OTHER_GUILD: Guild(OTHER_GUILD, "Another", {ADMIN: Member(admin=False)}, me=False),
+        THIRD_GUILD: Guild(THIRD_GUILD, "Third", {}, me=False),
     }
 
     async def get_member(guild, user_id):
@@ -616,7 +619,8 @@ async def test_directory_lookups(bot):
     assert await d.guild_name(OTHER_GUILD) == "Another"
     assert await d.guild_name(999) is None
     assert [c.name for c in await d.text_channels(GUILD)] == ["#first", "#second"]
-    assert [c.name for c in await d.text_channels(OTHER_GUILD)] == ["#first", "#second", "#locked"]
+    assert [c.name for c in await d.text_channels(THIRD_GUILD)] == ["#first", "#second", "#locked"]  # no bot member
+    assert await d.text_channels(OTHER_GUILD) == []  # not in the cache: the bot isn't really in it
     assert await d.text_channels(999) == []
     assert [r.name for r in await d.roles(GUILD)] == ["@Mods", "@Voters"]
     assert await d.roles(999) == []
