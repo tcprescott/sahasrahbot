@@ -4,7 +4,6 @@
 source =
     alttprbot
     alttprbot_api
-    alttprbot_audit
     alttprbot_discord
     alttprbot_discord/cogs
     alttprbot_racetime
@@ -13,3 +12,6 @@ omit =
 
 [report]
 skip_empty = true
+# CI runs pytest with --cov, so the suite fails if coverage drops below this.
+# Raise it when coverage goes up; don't lower it to make a PR pass.
+fail_under = 90
