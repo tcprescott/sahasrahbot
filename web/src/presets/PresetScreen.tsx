@@ -4,6 +4,7 @@ import { api, unwrap } from '../api/client'
 import { Loaded } from '../api/Loaded'
 import { useQuery } from '../api/useQuery'
 import { ActionsMenu, Banner, Button, ConfirmDialog, Icon, PageHeader, Panel } from '../components'
+import { browser } from '../lib/browser'
 import { fullDate } from '../lib/time'
 import { downloadPath, namespacePath, presetParams } from './paths'
 import { YamlField } from './YamlField'
@@ -62,7 +63,7 @@ export function PresetScreen() {
                           {
                             label: 'Download',
                             icon: 'download',
-                            onSelect: () => window.location.assign(downloadPath(p.namespace, p.randomizer, p.name)),
+                            onSelect: () => browser.assign(downloadPath(p.namespace, p.randomizer, p.name)),
                           },
                           { label: 'Delete', icon: 'delete', destructive: true, onSelect: () => setDeleting(true) },
                         ]}
