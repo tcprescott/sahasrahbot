@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api, unwrap, type ElectionDetail, type ElectionMethod, type ServerOption } from '../api/client'
 import { Loaded } from '../api/Loaded'
 import { useQuery } from '../api/useQuery'
@@ -58,11 +58,18 @@ interface Draft {
 let nextKey = 1
 const row = (name = '') => ({ key: nextKey++, name })
 
-function fromDetail(e: ElectionDetail | undefined, servers: ServerOption[]): Draft {
+/** What /elections/new?server=…&channel=… asks for (the /rankedchoice create command links there). */
+interface Prefill {
+  server: string | null
+  channel: string | null
+}
+
+function fromDetail(e: ElectionDetail | undefined, servers: ServerOption[], prefill?: Prefill): Draft {
   if (!e) {
+    const linked = servers.find((s) => s.id === prefill?.server)
     return {
-      guildId: servers[0]?.id ?? '',
-      channelId: '',
+      guildId: (linked ?? servers[0])?.id ?? '',
+      channelId: linked ? (prefill?.channel ?? '') : '',
       title: '',
       description: '',
       candidates: [row(), row()],
@@ -168,7 +175,12 @@ function Form({
 }: Readonly<{ servers: ServerOption[]; election: ElectionDetail | undefined; onSaved: () => void }>) {
   const navigate = useNavigate()
   const notice = (useLocation().state as { notice?: string; error?: string } | null) ?? {}
-  const [draft, setDraft] = useState(() => fromDetail(election, servers))
+  const [params] = useSearchParams()
+  // A channel picked by a link may be one the bot can't post in; then the first channel is used.
+  const [linkedChannel] = useState(() => !election && !!params.get('channel'))
+  const [draft, setDraft] = useState(() =>
+    fromDetail(election, servers, { server: params.get('server'), channel: params.get('channel') }),
+  )
   const [busy, setBusy] = useState<'save' | 'post'>()
   const [error, setError] = useState(notice.error)
   const [saved, setSaved] = useState(notice.notice)
@@ -191,10 +203,13 @@ function Form({
   const channels = options.data?.channels ?? []
   const roles = options.data?.roles ?? []
 
-  // Pick the first channel once the server's channels arrive, if none is chosen.
+  // Pick the first channel once the server's channels arrive, if none is chosen (or a link chose one it can't use).
   useEffect(() => {
-    if (!draft.channelId && channels[0]) setDraft((d) => (d.channelId ? d : { ...d, channelId: channels[0]!.id }))
-  }, [channels, draft.channelId])
+    const first = channels[0]
+    if (!first) return
+    const usable = (id: string) => !!id && (!linkedChannel || channels.some((c) => c.id === id))
+    if (!usable(draft.channelId)) setDraft((d) => (usable(d.channelId) ? d : { ...d, channelId: first.id }))
+  }, [channels, draft.channelId, linkedChannel])
 
   useEffect(() => {
     if (error) errorRef.current?.scrollIntoView({ block: 'nearest' })

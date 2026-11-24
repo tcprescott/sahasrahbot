@@ -151,6 +151,31 @@ describe('elections list', () => {
   })
 })
 
+describe('opening the form from the /rankedchoice create command', () => {
+  const TWO = { servers: [{ id: '100000000000000001', name: 'Dev Server' }, { id: '100000000000000002', name: 'Other Server' }] }
+  const routes = {
+    'GET /api/v1/elections/servers': TWO,
+    'GET /api/v1/elections/servers/100000000000000002': OPTIONS,
+  }
+
+  it('starts on the linked server and channel', async () => {
+    renderApp('/elections/new?server=100000000000000002&channel=301', admin(routes))
+    await waitFor(() => expect((screen.getByLabelText('Post it in') as HTMLSelectElement).value).toBe('301'))
+    expect((screen.getByLabelText('Server') as HTMLSelectElement).value).toBe('100000000000000002')
+  })
+
+  it('uses the first channel when the bot cannot post in the linked one', async () => {
+    renderApp('/elections/new?server=100000000000000002&channel=999', admin(routes))
+    await waitFor(() => expect((screen.getByLabelText('Post it in') as HTMLSelectElement).value).toBe('300'))
+  })
+
+  it('ignores a server the viewer does not administer', async () => {
+    renderApp('/elections/new?server=555&channel=301', admin(routes))
+    await waitFor(() => expect((screen.getByLabelText('Server') as HTMLSelectElement).value).toBe('100000000000000001'))
+    await waitFor(() => expect((screen.getByLabelText('Post it in') as HTMLSelectElement).value).toBe('300'))
+  })
+})
+
 describe('creating an election', () => {
   const fill = async (user: ReturnType<typeof renderApp>['user']) => {
     await user.type(await screen.findByLabelText('Title'), 'Committee')

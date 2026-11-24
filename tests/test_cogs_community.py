@@ -577,6 +577,38 @@ async def test_persistent_views_are_added_once():
 
 
 # ---------------------------------------------------------------------------
+# /rankedchoice create
+# ---------------------------------------------------------------------------
+
+
+def test_rankedchoice_is_for_admins_in_servers_only():
+    group = elections_cog.Elections.rankedchoice
+    assert group.guild_only
+    assert group.default_permissions == discord.Permissions(administrator=True)
+    assert [c.name for c in group.commands] == ["create"]
+
+
+@pytest.mark.parametrize("channel, picked", [
+    (FakeChannel(channel_id=301), 301),
+    (SimpleNamespace(id=999, parent_id=301), 301),  # a thread: its channel is picked
+])
+async def test_rankedchoice_create_links_to_the_prefilled_form(monkeypatch, channel, picked):
+    monkeypatch.setattr(config, "APP_URL", "https://sahasrahbot.example")
+    cog = elections_cog.Elections(FakeBot())
+    interaction = FakeInteraction(guild=FakeGuild(guild_id=123456789012345678), channel=channel)
+    await call(cog.create, cog, interaction)
+
+    sent = interaction.sent()
+    assert sent.ephemeral is True
+    assert f"<#{picked}>" in sent.content
+    links = {b.label: b.url for b in sent.view.children}
+    assert links == {
+        "Create election": f"https://sahasrahbot.example/elections/new?server=123456789012345678&channel={picked}",
+        "All elections": "https://sahasrahbot.example/elections",
+    }
+
+
+# ---------------------------------------------------------------------------
 # /racerverification and its button
 # ---------------------------------------------------------------------------
 
