@@ -1,0 +1,50 @@
+.ballot {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ballot__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+.ballot__row:first-child {
+  border-top: 0;
+}
+.ballot__rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--link);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.ballot__rank--none {
+  color: var(--fg-muted);
+  background: none;
+  border: 1px dashed var(--border-strong);
+}
+.ballot__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.ballot__moves {
+  display: flex;
+  gap: 2px;
+}
+@media (max-width: 767.98px) {
+  .ballot__submit .btn {
+    flex: 1;
+  }
+}

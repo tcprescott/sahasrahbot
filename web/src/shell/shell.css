@@ -1,0 +1,241 @@
+/* Shell A: left rail on desktop, bottom tab bar on phone (below 768px). */
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--link);
+  box-shadow: var(--shadow-2);
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+.shell__rail {
+  position: sticky;
+  top: 0;
+  flex: none;
+  width: var(--rail-w);
+  height: 100vh;
+  height: 100dvh;
+  padding: 12px 10px;
+  background: var(--surface);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 10px 14px;
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+.brand {
+  color: var(--fg);
+  text-decoration: none;
+}
+.brand__mark {
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated;
+}
+
+.shell__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--topbar-h);
+  padding: 0 20px;
+  padding-top: env(safe-area-inset-top);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.topbar__title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+
+.shell__content {
+  width: 100%;
+  max-width: calc(var(--content-max) + 56px);
+  padding: 24px 28px 48px;
+  outline: none;
+}
+
+.nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--fg-secondary);
+  font-weight: 700;
+}
+.nav__link.active {
+  color: var(--link);
+}
+
+.nav--rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav--rail .nav__link {
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+}
+.nav--rail .nav__link:hover {
+  background: var(--surface-sunken);
+}
+.nav--rail .nav__link.active {
+  background: var(--accent-soft);
+}
+.nav--rail .count-badge {
+  margin-left: auto;
+}
+
+.shell__tabbar {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .shell__rail,
+  .user-pill__name {
+    display: none;
+  }
+  .topbar {
+    padding: 0 12px;
+    padding-top: env(safe-area-inset-top);
+    height: calc(52px + env(safe-area-inset-top));
+  }
+  .shell__content {
+    padding: 14px 12px calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom));
+  }
+  .shell__tabbar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    background: var(--surface);
+    border-top: 1px solid var(--border-subtle);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav--tabbar {
+    display: flex;
+    height: var(--tabbar-h);
+  }
+  .nav--tabbar li {
+    flex: 1;
+    min-width: 0;
+  }
+  .nav--tabbar .nav__link {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    height: 100%;
+    font-size: var(--text-xs);
+  }
+  .nav--tabbar .nav__icon {
+    display: inline-flex;
+    padding: 2px 16px;
+    border-radius: 14px;
+  }
+  .nav--tabbar .active .nav__icon {
+    background: var(--accent-soft);
+  }
+  .nav--tabbar .count-badge {
+    position: absolute;
+    top: 4px;
+    left: calc(50% + 8px);
+  }
+}
+
+.topbar__title .brand {
+  display: none;
+  padding: 0;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav__external {
+  margin-left: auto;
+  color: var(--fg-muted);
+}
+
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 8px 0 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--fg-secondary);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.user-pill:hover,
+.user-pill[data-state='open'] {
+  background: var(--surface-sunken);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-sunken);
+  color: var(--fg-secondary);
+  font-size: var(--text-xs);
+  object-fit: cover;
+}
+
+@media (max-width: 767.98px) {
+  .topbar__page {
+    display: none;
+  }
+  .topbar__title .brand {
+    display: flex;
+  }
+}

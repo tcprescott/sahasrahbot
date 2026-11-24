@@ -11,7 +11,9 @@ from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 
 MAX_LINE = 19
-LINE = re.compile(r"^[A-Za-z0-9 ?!,-….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ]{0,19}$")
+# The hyphen is last on purpose: the old form had it between "," and "…", which made a
+# range that let through almost every character (é, ß, emoji are all in it).
+LINE = re.compile(r"^[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ\-]{0,19}$")
 LINE_NAMES = ('first', 'second', 'third')
 STATUSES = ('pending', 'approved', 'rejected', 'all')
 

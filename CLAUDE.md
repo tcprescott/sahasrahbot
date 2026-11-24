@@ -42,7 +42,8 @@ where things live. Read it before changing code.
 | `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `gsheet.py`, `triforce_text.py`, … |
 | `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
-| `alttprbot_api/` | Quart web app on 127.0.0.1:5001: `api.py`, `auth.py` (Discord OAuth), `blueprints/`, `templates/`, `static/` |
+| `alttprbot_api/` | Quart app on 127.0.0.1:5001: `api.py` (Discord sign-in, errors, serves `web/dist`), `schemas.py` (API bodies), `blueprints/` (`app_api.py` is the `/api/v1` JSON API the web app uses; the rest are the racetime command API, preset downloads and public preset JSON, settingsgen, tournament games). No server-rendered pages |
+| `web/` | **The website**: a React + TypeScript app (Vite), built like Wizzrobe's `web/`. See "The web app" below |
 | `presets/` | YAML presets per randomizer (`alttpr/`, `sm/`, `smz3/`, `alttprmystery/`, `ctjets/`). The file name is the preset name |
 | `migrations/` | Aerich migrations (generated; don't hand-edit old ones) and `tortoise_config.py` |
 | `docs/` | **The public user site** (GitHub Pages, Jekyll, sahasrahbot.synack.live). User-facing command and preset docs only; developer notes belong in this file |
@@ -59,7 +60,8 @@ where things live. Read it before changing code.
 
 ### Setup
 
-- Python **3.13** is what CI tests on; `pyproject.toml` allows 3.11 and up.
+- Python **3.13** is what CI tests on; `pyproject.toml` allows 3.11 and up. The web app
+  needs Node.js 22 (`cd web && npm ci`).
 - `poetry install --no-root`, then
   `poetry run python -m pip install --only-binary=:all: -r requirements-test.txt` (pytest,
   pytest-asyncio and pytest-cov are not in the dev group yet). In a cloud session the
@@ -82,6 +84,7 @@ Run `./scripts/check.sh` before you commit. It runs what CI runs
    `bot.py` loads, each in a fresh interpreter with `config.example.py`, plus the
    guardrail tests and the unit tests (about 35 seconds). Add `--cov` for a coverage
    report (`.coveragerc`).
+4. When Node.js is installed, the web app: `gen:api`, typecheck, Vitest and a build.
 
 The import smoke test catches typo'd imports, renamed symbols, circular imports and
 missing config keys. The unit tests are **characterization tests**: they pin what the
@@ -117,6 +120,39 @@ In a cloud session with a `SONAR_TOKEN`, the SessionStart hook installs the `son
 (`sonar list issues -p tcprescott_sahasrahbot --pull-request <N>`,
 `sonar qg status -p tcprescott_sahasrahbot`). The project is public, so without a token
 use the web API: `https://sonarcloud.io/api/issues/search?componentKeys=tcprescott_sahasrahbot&pullRequest=<N>&resolved=false`.
+
+### The web app (`web/`)
+
+The website is a single-page React app, modelled on Wizzrobe's new app (`tcprescott/wizzrobe`,
+`web/` and `docs/style-guide.md`): React 19, TypeScript, Vite, react-router, Radix headless
+parts styled with Wizzrobe's "Studio" tokens, Material Symbols icons. The accent is
+SahasrahBot purple. `npm run build` puts it in `web/dist`, which Quart serves: files by
+name, and `index.html` for every other page path. It must stay able to become an iOS and
+Android app (Capacitor, as Wizzrobe plans), so no browser-only assumptions.
+
+- **Data:** only through `/api/v1` (`alttprbot_api/blueprints/app_api.py`). Routes are
+  thin: who's signed in, call a service in `alttprbot/services/`, return a model from
+  `alttprbot_api/schemas.py`. Services raise `NotFoundError` / `PermissionDeniedError` /
+  `InvalidInputError` (`alttprbot/exceptions.py`), which become 404/403/400 with
+  `{"error": "..."}`, a sentence a person can read.
+- **Types:** `npm run gen:api` writes `web/openapi.json` (`scripts/export_openapi.py`) and
+  `web/src/api/schema.d.ts` from it. Both are gitignored; CI generates them, so a route
+  change that breaks a screen fails the `web` job. Call the API with
+  `api.GET('/api/v1/…')` and `unwrap` (`web/src/api/client.ts`). Discord ids are strings.
+- **Sign-in:** the Discord OAuth session cookie (`/login/?next=<path>`). Requests that change
+  something need `X-Requested-With: SahasrahBot` (the client adds it), which is the CSRF
+  guard. A native app will need token sign-in; that's planned as its own PR.
+- **URLs:** pages keep the old server-rendered URLs (`/ranked_choice/<id>`,
+  `/triforcetexts/<pool>`, `/submit/<event>`, `/presets/manage/…`), because Discord
+  messages already sent link to them. Routes are in `web/src/App.tsx`.
+- **Look:** colour from `web/src/styles/tokens.css` only, never a hex in a component. Use
+  `web/src/components/` (`Button`, `Panel`, `PageHeader`, `Chip`, `Banner`, `EmptyState`,
+  `Dialog`/`ConfirmDialog`, `RowMenu`/`ActionsMenu`) and `web/src/kit/DataTable.tsx` (a table on
+  desktop, cards on a phone). One main button plus an Actions menu per page; one button
+  plus a ⋮ per row; destructive actions confirm first. Check phone (390px) and desktop,
+  light and dark. Icons: add the name to `web/src/components/icons.ts`, in order.
+- **Checks:** `npm run typecheck`, `npm test` (Vitest, `src/**/*.test.ts`) and
+  `npm run build`, all run by `check.sh` and CI. Node 22.
 
 ### Running the web app standalone
 

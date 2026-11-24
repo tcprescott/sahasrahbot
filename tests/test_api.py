@@ -455,3 +455,33 @@ async def test_racetime_cmd_requires_key_for_category(client):
     payload = {"category": "smz3", "room": "r", "cmd": "!race open"}
     resp = await client.post("/api/racetime/cmd?auth_key=k", data=json.dumps(payload), headers={"Content-Type": "application/json"})
     assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# Triforce text characters
+# ---------------------------------------------------------------------------
+
+
+def test_triforce_lines_only_allow_the_games_characters():
+    """The hyphen used to sit between "," and "…" in the character class, making a
+    range that let almost anything through (é, ß, emoji)."""
+    from alttprbot.services import triforce_texts
+
+    for ok in ("HELLO-WORLD", "ゼルダ", "WHY? BECAUSE!", ""):
+        assert triforce_texts.LINE.match(ok), ok
+    for bad in ("café", "straße", "😀", "x" * 20):
+        assert not triforce_texts.LINE.match(bad), bad
+
+
+def test_triforce_characters_match_the_web_app():
+    """web/src/triforce/rules.ts checks lines as you type; it must allow exactly
+    what the server does."""
+    import re
+    from pathlib import Path
+
+    from alttprbot.services import triforce_texts
+
+    server = re.match(r"\^\[(.*)\]\{0,19\}\$", triforce_texts.LINE.pattern).group(1)
+    rules = (Path(__file__).resolve().parent.parent / "web/src/triforce/rules.ts").read_text(encoding="utf-8")
+    web = re.search(r"/\^\[(.*?)\]\*\$/u", rules).group(1)
+    assert web == server

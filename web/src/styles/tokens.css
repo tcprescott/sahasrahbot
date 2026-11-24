@@ -1,0 +1,123 @@
+/*
+ * Studio design tokens, from Wizzrobe (web/src/styles/tokens.css), with
+ * SahasrahBot's purple as the accent. Components read these and nothing else:
+ * no hex in a component. Dark mode is :root[data-theme='dark'], which index.html
+ * and theme/ThemeProvider set from the viewer's choice or the system setting.
+ *
+ * The accent means "you can act here" or "you are here": filled buttons, links,
+ * the active nav item, focus rings. Never titles, table headers or decoration.
+ * Brand-coloured text uses --link. Light: #6D3FC0 is 6.7:1 on white and carries
+ * white text. Dark: #B79CF5 is 7.3:1 on --surface and carries #160A2E text.
+ *
+ * A token that aliases a mode-dependent token is restated in the dark block:
+ * :root resolves var() once, so an alias would keep the light value.
+ */
+
+:root {
+  --purple: #6D3FC0;
+  --purple-light: #B79CF5;
+
+  --accent: var(--purple);
+  --accent-fg: #FFFFFF;
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  --link: color-mix(in srgb, var(--accent) 85%, #000);
+
+  --n-0: #FFFFFF;
+  --n-25: #FAFAF9;
+  --n-50: #F5F5F4;
+  --n-100: #ECECEA;
+  --n-200: #E2E1DE;
+  --n-300: #D4D3CF;
+  --n-500: #6F6D67;
+  --n-700: #3F3D39;
+  --n-900: #1C1B19;
+
+  --page-bg: var(--n-50);
+  --surface: var(--n-0);
+  --surface-alt: var(--n-25);
+  --surface-sunken: var(--n-100);
+  --border-subtle: var(--n-200);
+  --border-strong: var(--n-300);
+  --fg: var(--n-900);
+  --fg-secondary: var(--n-700);
+  --fg-muted: var(--n-500);
+
+  --status-ok: #557A1F;
+  --status-pending: #B45309;
+  --status-live: #0E7470;
+  --status-neutral: #6B6258;
+  --status-cancelled: #B3362B;
+  --status-info: #2F5F8A;
+  --count-bg: var(--status-cancelled);
+  --count-fg: var(--n-0);
+
+  --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.375rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(28, 27, 25, 0.05);
+  --shadow-2: 0 4px 12px rgba(28, 27, 25, 0.08);
+  --shadow-3: 0 12px 32px rgba(28, 27, 25, 0.14);
+  --scrim: rgba(28, 27, 25, 0.4);
+
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
+
+  --rail-w: 232px;
+  --topbar-h: 56px;
+  --tabbar-h: 64px;
+  --content-max: 1100px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --accent: var(--purple-light);
+  --accent-fg: #160A2E;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  --link: var(--accent);
+
+  --page-bg: #161513;
+  --surface: #1F1D1A;
+  --surface-alt: #262420;
+  --surface-sunken: #2C2925;
+  --border-subtle: #353230;
+  --border-strong: #46423D;
+  --fg: #ECEBE8;
+  --fg-secondary: #CFCCC6;
+  --fg-muted: #A8A59E;
+
+  --status-ok: #A8C46B;
+  --status-pending: #F0A848;
+  --status-live: #52B8AE;
+  --status-neutral: #A8A59E;
+  --status-cancelled: #E06650;
+  --status-info: #7FB0DC;
+  --count-bg: var(--status-cancelled);
+  --count-fg: var(--n-900);
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 12px 36px rgba(0, 0, 0, 0.55);
+  --scrim: rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
