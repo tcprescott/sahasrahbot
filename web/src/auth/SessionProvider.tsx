@@ -10,7 +10,7 @@ interface SessionState {
 
 const SessionContext = createContext<SessionState | null>(null)
 
-export function SessionProvider({ children }: { children: ReactNode }) {
+export function SessionProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<SessionUser | null>()
 
   const refresh = useCallback(async () => {
@@ -37,7 +37,7 @@ export function useSession(): SessionState {
 }
 
 /** Screens that need a Discord sign-in: send a signed-out visitor to Discord and back. */
-export function RequireSignIn({ children }: { children: (user: SessionUser) => ReactNode }) {
+export function RequireSignIn({ children }: Readonly<{ children: (user: SessionUser) => ReactNode }>) {
   const { user } = useSession()
   useEffect(() => {
     if (user === null) window.location.assign(loginUrl())

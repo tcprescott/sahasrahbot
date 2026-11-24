@@ -140,7 +140,8 @@ async def test_get_presets_lists_global_yaml_files():
 async def test_search_is_prefix_match_sorted_and_capped_at_25():
     results = await generator.ALTTPRPreset().search("CROSS")
     assert results == sorted(results)
-    assert results and all(r.startswith("cross") for r in results)
+    assert results
+    assert all(r.startswith("cross") for r in results)
     assert len(await generator.ALTTPRPreset().search("")) == 25
 
 
@@ -155,8 +156,9 @@ async def test_fetch_global_preset():
 
 
 async def test_fetch_missing_global_preset_raises_user_facing_error():
+    p = generator.ALTTPRPreset("nope")
     with pytest.raises(generator.PresetNotFoundException, match="Could not find preset nope"):
-        await generator.ALTTPRPreset("nope").fetch()
+        await p.fetch()
 
 
 async def test_name_with_a_slash_is_a_namespace_lookup_not_a_path(db):
@@ -167,8 +169,9 @@ async def test_name_with_a_slash_is_a_namespace_lookup_not_a_path(db):
 
 
 async def test_fetch_without_name_raises():
+    p = generator.ALTTPRPreset()
     with pytest.raises(generator.NoPresetSpecified):
-        await generator.ALTTPRPreset().fetch()
+        await p.fetch()
 
 
 async def test_namespaced_preset_save_and_fetch_roundtrip(db):
@@ -189,21 +192,25 @@ async def test_namespaced_preset_save_and_fetch_roundtrip(db):
 
 
 async def test_namespaced_errors(db):
+    ghost = generator.ALTTPRPreset("ghost/x")
     with pytest.raises(generator.PresetNotFoundException, match="in namespace ghost"):
-        await generator.ALTTPRPreset("ghost/x").fetch()
+        await ghost.fetch()
+    unnamed = generator.ALTTPRPreset()
     with pytest.raises(generator.NamespaceNotFound):
-        await generator.ALTTPRPreset().get_presets(namespace="ghost")
+        await unnamed.get_presets(namespace="ghost")
+    global_preset = await generator.ALTTPRPreset.custom_from_dict({}, "global")
     with pytest.raises(generator.AttemptToSaveGlobalPreset):
-        await (await generator.ALTTPRPreset.custom_from_dict({}, "global")).save()
+        await global_preset.save()
     with pytest.raises(generator.NoPresetSpecified):
-        await generator.ALTTPRPreset().save()
+        await unnamed.save()
 
 
 async def test_create_or_retrieve_namespace_slugifies_username(db):
     ns = await generator.create_or_retrieve_namespace(42, "Some User!")
     assert ns.name == "some-user"
     again = await generator.create_or_retrieve_namespace(42, "Renamed")
-    assert again.id == ns.id and again.name == "some-user"
+    assert again.id == ns.id
+    assert again.name == "some-user"
 
 
 async def test_is_namespace_owner(db):
@@ -420,7 +427,8 @@ async def test_every_smz3_preset_generates(db, randomizers, name):
 async def test_sm_spoiler_key_and_urls(db, randomizers):
     p = await generator.SMPreset.custom_from_dict({"settings": {}, "release": "beta"}, "x")
     assert p.baseurl == "https://beta.sm.samus.link"
-    assert p.hash_id is None and p.guid is None
+    assert p.hash_id is None
+    assert p.guid is None
     with pytest.raises(Exception, match="not been generated"):
         p.spoiler_url()
 

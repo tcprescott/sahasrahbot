@@ -28,6 +28,7 @@ export DEV_DB_PASSWORD="$(cat "$PASSWORD_FILE")"
 case "${1:-}" in
   db-down) exec "${COMPOSE[@]}" down ;;
   db-destroy) exec "${COMPOSE[@]}" down -v ;;
+  *) ;;  # anything else starts the app below
 esac
 
 if [[ -z "${DEV_DB_URL:-}" ]]; then

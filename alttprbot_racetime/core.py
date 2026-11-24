@@ -38,43 +38,51 @@ class SahasrahBotRaceTimeBot(Bot):
 
     async def start(self):
         self.http = aiohttp.ClientSession(raise_for_status=True)
-        try:
-            result = await self.authorize()
-            if result is None:
-                self.logger.error('Authorization failed: authorize() returned None.')
-                return
-            self.access_token, self.reauthorize_every = result
-        except aiohttp.ClientResponseError as e:
-            if e.status == 401:
-                self.logger.error(f'RaceTime API returned 401 Unauthorized while attempting to create bot for {self.category_slug}. '
-                                 f'Please check your API key and try again.')
-                return
-            else:
-                raise
+        if not await self._authorize():
+            return
         self.loop.create_task(self.reauthorize())
         self.loop.create_task(self.refresh_races())
 
         unlisted_rooms = await racetime_rooms.unlisted_rooms(self.category_slug)
         for unlisted_room in unlisted_rooms:
             try:
-                race_data = None
-                async for attempt in AsyncRetrying(
-                        stop=stop_after_attempt(5),
-                        retry=retry_if_exception_type(aiohttp.ClientResponseError)):
-                    with attempt:
-                        async with self.http.get(
-                                self.http_uri(f'/{unlisted_room.room_name}/data'),
-                                ssl=self.ssl_context,
-                        ) as resp:
-                            race_data = await resp.json()
-
-                if race_data and (race_data['status']['value'] in ['finished', 'cancelled'] or not race_data['unlisted']):
-                    await racetime_rooms.forget_unlisted(unlisted_room.room_name)
-                elif race_data:
-                    await self.join_race_room(unlisted_room.room_name)
-
+                await self._resume_unlisted_room(unlisted_room.room_name)
             except RetryError as e:
                 if e.last_attempt and e.last_attempt._exception:
                     raise e.last_attempt._exception from e
                 else:
                     raise RuntimeError("RetryError occurred but no exception found in last_attempt.") from e
+
+    async def _authorize(self) -> bool:
+        """Get an access token; False (after logging why) when racetime.gg refused."""
+        try:
+            result = await self.authorize()
+        except aiohttp.ClientResponseError as e:
+            if e.status == 401:
+                self.logger.error(f'RaceTime API returned 401 Unauthorized while attempting to create bot for {self.category_slug}. '
+                                  f'Please check your API key and try again.')
+                return False
+            raise
+        if result is None:
+            self.logger.error('Authorization failed: authorize() returned None.')
+            return False
+        self.access_token, self.reauthorize_every = result
+        return True
+
+    async def _resume_unlisted_room(self, room_name: str):
+        """Rejoin an unlisted room we opened, or forget it once it's over or listed."""
+        race_data = None
+        async for attempt in AsyncRetrying(
+                stop=stop_after_attempt(5),
+                retry=retry_if_exception_type(aiohttp.ClientResponseError)):
+            with attempt:
+                async with self.http.get(
+                        self.http_uri(f'/{room_name}/data'),
+                        ssl=self.ssl_context,
+                ) as resp:
+                    race_data = await resp.json()
+
+        if race_data and (race_data['status']['value'] in ['finished', 'cancelled'] or not race_data['unlisted']):
+            await racetime_rooms.forget_unlisted(room_name)
+        elif race_data:
+            await self.join_race_room(room_name)

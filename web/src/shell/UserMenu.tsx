@@ -1,3 +1,4 @@
+import type { IconName } from '../components/icons'
 import { Button, Icon, Menu, type MenuItem } from '../components'
 import { loginUrl } from '../api/client'
 import { useSession } from '../auth/SessionProvider'
@@ -9,6 +10,12 @@ const THEMES: { choice: ThemeChoice; label: string }[] = [
   { choice: 'light', label: 'Light' },
   { choice: 'dark', label: 'Dark' },
 ]
+
+const THEME_ICONS: Record<ThemeChoice, IconName> = {
+  system: 'brightness_auto',
+  light: 'light_mode',
+  dark: 'dark_mode',
+}
 
 function initials(name: string): string {
   return name.replace(/[^\p{L}\p{N}]/gu, '').slice(0, 2).toUpperCase() || '?'
@@ -22,7 +29,7 @@ export function UserMenu() {
 
   const themeItems: MenuItem[] = THEMES.map((t) => ({
     label: `${t.choice === choice ? '✓ ' : ''}Theme: ${t.label}`,
-    icon: t.choice === 'dark' ? 'dark_mode' : t.choice === 'light' ? 'light_mode' : 'brightness_auto',
+    icon: THEME_ICONS[t.choice],
     onSelect: () => setChoice(t.choice),
   }))
 

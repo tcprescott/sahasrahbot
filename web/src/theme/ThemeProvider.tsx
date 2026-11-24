@@ -24,8 +24,8 @@ function systemDark(): boolean {
   return typeof matchMedia === 'function' && matchMedia(QUERY).matches
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [choice, setChoiceState] = useState<ThemeChoice>(storedChoice)
+export function ThemeProvider({ children }: Readonly<{ children: ReactNode }>) {
+  const [choice, setChoice] = useState<ThemeChoice>(storedChoice)
   const [prefersDark, setPrefersDark] = useState(systemDark)
 
   useEffect(() => {
@@ -36,18 +36,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => media.removeEventListener('change', onChange)
   }, [])
 
-  const resolved: Resolved = choice === 'system' ? (prefersDark ? 'dark' : 'light') : choice
+  const systemTheme: Resolved = prefersDark ? 'dark' : 'light'
+  const resolved: Resolved = choice === 'system' ? systemTheme : choice
 
   useEffect(() => {
     document.documentElement.dataset.theme = resolved
   }, [resolved])
 
-  const setChoice = useCallback((next: ThemeChoice) => {
+  const updateChoice = useCallback((next: ThemeChoice) => {
     writeStored(KEY, next === 'system' ? null : next)
-    setChoiceState(next)
+    setChoice(next)
   }, [])
 
-  const value = useMemo(() => ({ choice, resolved, setChoice }), [choice, resolved, setChoice])
+  const value = useMemo(() => ({ choice, resolved, setChoice: updateChoice }), [choice, resolved, updateChoice])
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 

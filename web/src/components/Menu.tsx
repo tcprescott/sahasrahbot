@@ -1,4 +1,4 @@
-import * as DM from '@radix-ui/react-dropdown-menu'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { ReactNode } from 'react'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -14,11 +14,11 @@ export interface MenuItem {
   disabled?: boolean
 }
 
-function MenuContent({ items }: { items: MenuItem[] }) {
+function MenuContent({ items }: Readonly<{ items: MenuItem[] }>) {
   const safe = items.filter((item) => !item.destructive)
   const destructive = items.filter((item) => item.destructive)
   const render = (item: MenuItem) => (
-    <DM.Item
+    <DropdownMenu.Item
       key={item.label}
       className={['menu__item', item.destructive && 'menu__item--danger'].filter(Boolean).join(' ')}
       disabled={item.disabled}
@@ -26,56 +26,56 @@ function MenuContent({ items }: { items: MenuItem[] }) {
     >
       {item.icon && <Icon name={item.icon} size={20} />}
       {item.label}
-    </DM.Item>
+    </DropdownMenu.Item>
   )
   return (
-    <DM.Portal>
-      <DM.Content className="menu" align="end" sideOffset={4} collisionPadding={8}>
+    <DropdownMenu.Portal>
+      <DropdownMenu.Content className="menu" align="end" sideOffset={4} collisionPadding={8}>
         {safe.map(render)}
-        {safe.length > 0 && destructive.length > 0 && <DM.Separator className="menu__sep" />}
+        {safe.length > 0 && destructive.length > 0 && <DropdownMenu.Separator className="menu__sep" />}
         {destructive.map(render)}
-      </DM.Content>
-    </DM.Portal>
+      </DropdownMenu.Content>
+    </DropdownMenu.Portal>
   )
 }
 
 /** The one ⋮ on a row or card. `label` names what it's for, e.g. "More for Thomas vs CheckRaise". */
-export function RowMenu({ label, items }: { label: string; items: MenuItem[] }) {
+export function RowMenu({ label, items }: Readonly<{ label: string; items: MenuItem[] }>) {
   return (
-    <DM.Root modal={false}>
-      <DM.Trigger asChild>
+    <DropdownMenu.Root modal={false}>
+      <DropdownMenu.Trigger asChild>
         <IconButton icon="more_vert" label={label} tooltip={false} />
-      </DM.Trigger>
+      </DropdownMenu.Trigger>
       <MenuContent items={items} />
-    </DM.Root>
+    </DropdownMenu.Root>
   )
 }
 
 /** A page toolbar's secondary actions, beside its one main button. */
-export function ActionsMenu({ items, label = 'Actions' }: { items: MenuItem[]; label?: string }) {
+export function ActionsMenu({ items, label = 'Actions' }: Readonly<{ items: MenuItem[]; label?: string }>) {
   return (
-    <DM.Root modal={false}>
-      <DM.Trigger asChild>
+    <DropdownMenu.Root modal={false}>
+      <DropdownMenu.Trigger asChild>
         <Button variant="outline">
           {label}
           <Icon name="keyboard_arrow_down" size={18} />
         </Button>
-      </DM.Trigger>
+      </DropdownMenu.Trigger>
       <MenuContent items={items} />
-    </DM.Root>
+    </DropdownMenu.Root>
   )
 }
 
 /** A menu on any trigger (the community picker, the avatar). */
-export function Menu({ trigger, items, header }: { trigger: ReactNode; items: MenuItem[]; header?: ReactNode }) {
+export function Menu({ trigger, items, header }: Readonly<{ trigger: ReactNode; items: MenuItem[]; header?: ReactNode }>) {
   return (
-    <DM.Root modal={false}>
-      <DM.Trigger asChild>{trigger}</DM.Trigger>
-      <DM.Portal>
-        <DM.Content className="menu" align="end" sideOffset={4} collisionPadding={8}>
-          {header && <DM.Label className="menu__label">{header}</DM.Label>}
+    <DropdownMenu.Root modal={false}>
+      <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className="menu" align="end" sideOffset={4} collisionPadding={8}>
+          {header && <DropdownMenu.Label className="menu__label">{header}</DropdownMenu.Label>}
           {items.map((item) => (
-            <DM.Item
+            <DropdownMenu.Item
               key={item.label}
               className={['menu__item', item.destructive && 'menu__item--danger'].filter(Boolean).join(' ')}
               disabled={item.disabled}
@@ -83,10 +83,10 @@ export function Menu({ trigger, items, header }: { trigger: ReactNode; items: Me
             >
               {item.icon && <Icon name={item.icon} size={20} />}
               {item.label}
-            </DM.Item>
+            </DropdownMenu.Item>
           ))}
-        </DM.Content>
-      </DM.Portal>
-    </DM.Root>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   )
 }

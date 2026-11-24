@@ -44,7 +44,7 @@ export function NamespaceScreen() {
             {error && <Banner tone="error">{error}</Banner>}
             <div className="stack">
               {counts.size > 1 && (
-                <div className="filter-chips" role="group" aria-label="Randomizer">
+                <fieldset className="filter-chips" aria-label="Randomizer">
                   <button
                     type="button"
                     className="filter-chip"
@@ -64,7 +64,7 @@ export function NamespaceScreen() {
                       {r} <span className="filter-chips__n">{n}</span>
                     </button>
                   ))}
-                </div>
+                </fieldset>
               )}
               <DataTable
                 label={`${ns.name}'s presets`}
@@ -80,21 +80,21 @@ export function NamespaceScreen() {
                     key: 'name',
                     header: 'Name',
                     primary: true,
-                    cell: (p) => <Link to={presetPath(ns.name, p.randomizer, p.name)}>{p.name}</Link>,
+                    render: (p) => <Link to={presetPath(ns.name, p.randomizer, p.name)}>{p.name}</Link>,
                   },
-                  { key: 'randomizer', header: 'Randomizer', cell: (p) => p.randomizer },
+                  { key: 'randomizer', header: 'Randomizer', render: (p) => p.randomizer },
                   {
                     key: 'modified',
                     header: 'Changed',
-                    cell: (p) => (
+                    render: (p) => (
                       <span className="muted" title={fullDate(p.modified)}>
                         {ago(p.modified)}
                       </span>
                     ),
                   },
-                  { key: 'rolled', header: 'Rolled', align: 'end', cell: (p) => p.generated_count },
+                  { key: 'rolled', header: 'Rolled', align: 'end', render: (p) => p.generated_count },
                 ]}
-                rowAction={(p) => (
+                renderRowAction={(p) => (
                   <Button asChild variant="outline" size="sm">
                     <a href={downloadPath(ns.name, p.randomizer, p.name)} aria-label={`Download ${p.name}`}>
                       Download

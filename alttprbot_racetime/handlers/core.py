@@ -10,6 +10,14 @@ from alttprbot import tournaments
 from alttprbot.services import racetime_rooms, spoiler_races
 
 
+def _countdown_message(timeleft: int) -> str:
+    minutes = math.floor(timeleft / 60)
+    seconds = math.ceil(timeleft % 60)
+    if minutes == 0:
+        return f'{seconds} second(s) remain!'
+    return f'{minutes} minute(s), {seconds} seconds remain!'
+
+
 # Chat messages shared by the category handlers.
 MSG_NO_PRESET = "You must specify a preset!"
 MSG_GENERATING = "Generating game, please wait.  If nothing happens after a minute, contact Synack."
@@ -84,20 +92,10 @@ class SahasrahBotCoreHandler(RaceHandler):
         start_time = loop.time()
         end_time = loop.time() + duration_in_seconds
         while True:
-            # logging.info(datetime.datetime.now())
             timeleft = math.ceil(
                 start_time - loop.time() + duration_in_seconds)
-            # logging.info(timeleft)
             if timeleft in reminders:
-                minutes = math.floor(timeleft / 60)
-                seconds = math.ceil(timeleft % 60)
-                if minutes == 0 and seconds > 10:
-                    msg = f'{seconds} second(s) remain!'
-                elif minutes == 0 and seconds <= 10:
-                    msg = f"{seconds} second(s) remain!"
-                else:
-                    msg = f'{minutes} minute(s), {seconds} seconds remain!'
-                await self.send_message(msg)
+                await self.send_message(_countdown_message(timeleft))
                 reminders.remove(timeleft)
             if loop.time() >= end_time:
                 if beginmessage:

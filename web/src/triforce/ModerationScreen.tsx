@@ -61,7 +61,7 @@ function Moderation() {
         Submission form
       </Link>
       <PageHeader title="Review triforce texts" lede={<>Submissions to <span className="code">{pool}</span>. Approved texts can appear in seeds.</>} />
-      <div className="filter-chips" role="group" aria-label="Show">
+      <fieldset className="filter-chips" aria-label="Show">
         {FILTERS.map((f) => (
           <button
             key={f.status}
@@ -73,7 +73,7 @@ function Moderation() {
             {f.label}
           </button>
         ))}
-      </div>
+      </fieldset>
       {error && <Banner tone="error">{error}</Banner>}
       <div className="mt-3">
         <Loaded query={query} label="Loading submissions">

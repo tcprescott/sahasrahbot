@@ -13,14 +13,14 @@ export function ConfirmDialog({
   children,
   action,
   onConfirm,
-}: {
+}: Readonly<{
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
   children: ReactNode
   action: string
   onConfirm: () => Promise<boolean | void>
-}) {
+}>) {
   const [busy, setBusy] = useState(false)
   return (
     <FormDialog

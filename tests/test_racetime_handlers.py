@@ -87,7 +87,8 @@ async def test_help_command_replies_where_defined(module):
     if module == "twwr":
         assert said(h) == []  # twwr deliberately silences !help, !lock and !unlock
         return
-    assert said(h) and "Command raised exception" not in said(h)[0]
+    assert said(h)
+    assert "Command raised exception" not in said(h)[0]
 
 
 # ---------------------------------------------------------------------------
@@ -153,7 +154,8 @@ async def test_intro_sent_once():
     h = make_handler()
     await h.intro()
     await h.intro()
-    assert len(said(h)) == 1 and "SahasrahBot" in said(h)[0]
+    assert len(said(h)) == 1
+    assert "SahasrahBot" in said(h)[0]
 
 
 async def test_core_cancel_resets_seed_state():

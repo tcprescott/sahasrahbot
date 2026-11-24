@@ -41,8 +41,6 @@
   padding: 8px 10px 14px;
   font-weight: 700;
   font-size: var(--text-lg);
-}
-.brand {
   color: var(--fg);
   text-decoration: none;
 }
