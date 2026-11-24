@@ -332,20 +332,4 @@ async def _seed_handmade():
             episode_id=episode_id, event="alttpr", game_number=game, preset="open", submitted=1,
         )
 
-    # --- Schedule (DEBUG-only /schedule pages) -------------------------------------
-    event = await models.ScheduleEvent.create(
-        event_slug="devevent", name="Dev Event", description="A scheduled event for UI work.",
-    )
-    channel = await models.ScheduleBroadcastChannels.create(
-        event=event, channel_name="speedgaming", display_name="SpeedGaming",
-    )
-    for hours_from_now, players in [(2, ["runner1", "runner2"]), (26, ["runner2", "runner3"])]:
-        episode = await models.ScheduleEpisode.create(
-            event=event, channel=channel,
-            when_countdown=now + datetime.timedelta(hours=hours_from_now),
-            approved=hours_from_now < 24,
-        )
-        for key_ in players:
-            await models.ScheduleEpisodePlayer.create(episode=episode, user=users[key_])
-
     return users

@@ -152,7 +152,6 @@ LINKS = [
     ("testdata: active role-gated election", "/ranked_choice/1004"),
     ("testdata: all preset namespaces", "/presets"),
     ("Racetime verification", "/racetime/verification/initiate"),
-    ("Schedule (DEBUG)", "/schedule/devevent"),
     ("Healthcheck", "/healthcheck"),
 ]
 
