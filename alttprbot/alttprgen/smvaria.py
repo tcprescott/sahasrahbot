@@ -11,112 +11,102 @@ async def generate_preset(settings, skills, race=False):
     return seed
 
 
+AQUEDUCT = 'Aqueduct'
+BIG_PINK = 'Big Pink'
+BUBBLE_MOUNTAIN = 'Bubble Mountain'
+BUSINESS_CENTER = 'Business Center'
+ETECOONS_SUPERS = 'Etecoons Supers'
+FIREFLEAS_TOP = 'Firefleas Top'
+GAUNTLET_TOP = 'Gauntlet Top'
+GOLDEN_FOUR = 'Golden Four'
+GREEN_BRINSTAR_ELEVATOR = 'Green Brinstar Elevator'
+RED_BRINSTAR_ELEVATOR = 'Red Brinstar Elevator'
+WRECKED_SHIP_MAIN = 'Wrecked Ship Main'
+LANDING_SITE = 'Landing Site'
+
+CHOOZO_SPLITS = {
+    "FullCountdown": "FullWithHUD",
+    "M/m": "Major",
+    "RandomSplit": "random"
+}
+
+CHOOZO_AREAS = {
+    "FullArea": "full",
+    "LightArea": "light",
+    "VanillaArea": "off",
+}
+
+CHOOZO_BOSSES = ('RandomBoss', 'VanillaBoss')
+
+CHOOZO_DIFFICULTIES = {
+    "HarderDifficulty": "harder",
+    "HardDifficulty": "hard",
+    "MediumDifficulty": "medium",
+    "EasyDifficulty": "easy",
+    "BasicDifficulty": "easy"
+}
+
+CHOOZO_ESCAPES = ('RandomEscape', 'VanillaEscape')
+
+CHOOZO_MORPHS = {
+    "LateMorph": "late",
+    "RandomMorph": "random",
+    "EarlyMorph": "early"
+}
+
+CHOOZO_STARTS = {
+    "DeepStart": [AQUEDUCT, BUBBLE_MOUNTAIN, FIREFLEAS_TOP],
+    "RandomStart": [
+        AQUEDUCT, BIG_PINK, BUBBLE_MOUNTAIN, BUSINESS_CENTER, ETECOONS_SUPERS, FIREFLEAS_TOP,
+        GAUNTLET_TOP, GOLDEN_FOUR, GREEN_BRINSTAR_ELEVATOR, RED_BRINSTAR_ELEVATOR, WRECKED_SHIP_MAIN,
+    ],
+    "NotDeepStart": [
+        BIG_PINK, BUSINESS_CENTER, ETECOONS_SUPERS, GAUNTLET_TOP, GOLDEN_FOUR,
+        GREEN_BRINSTAR_ELEVATOR, RED_BRINSTAR_ELEVATOR, WRECKED_SHIP_MAIN,
+    ],
+    "ShallowStart": [BIG_PINK, GAUNTLET_TOP, GREEN_BRINSTAR_ELEVATOR, WRECKED_SHIP_MAIN],
+    "VanillaStart": [LANDING_SITE],
+}
+
+
+def _require_choice(value, choices, setting):
+    """Raise ValueError unless value is one of choices (listed in the message in order)."""
+    if value not in choices:
+        names = list(choices)
+        allowed = ", ".join(names[:-1]) + " or " + names[-1] if len(names) > 2 else " or ".join(names)
+        raise ValueError(f"Invalid {setting} setting.  Must be {allowed}.")
+
+
 async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morph, start):
-    if split not in ['FullCountdown', 'M/m', 'RandomSplit']:
-        raise ValueError("Invalid item split setting.  Must be FullCountdown, M/m or RandomSplit.")
-
-    if area not in ['FullArea', 'LightArea', 'VanillaArea']:
-        raise ValueError("Invalid area setting.  Must be FullArea, LightArea or VanillaArea.")
-
-    if boss not in ['RandomBoss', 'VanillaBoss']:
-        raise ValueError("Invalid boss setting.  Must be RandomBoss or VanillaBoss.")
-
-    if difficulty not in ['HarderDifficulty', 'HardDifficulty', 'MediumDifficulty', 'EasyDifficulty',
-                          'BasicDifficulty']:
-        raise ValueError(
-            "Invalid difficulty setting.  Must be HarderDifficulty, HardDifficulty, MediumDifficulty, EasyDifficulty or BasicDifficulty.")
-
-    if escape not in ['RandomEscape', 'VanillaEscape']:
-        raise ValueError("Invalid escape setting.  Must be RandomEscape or VanillaEscape.")
-
-    if morph not in ['LateMorph', 'RandomMorph', 'EarlyMorph']:
-        raise ValueError("Invalid morph setting.  Must be LateMorph, RandomMorph or EarlyMorph.")
-
-    if start not in ['DeepStart', 'RandomStart', 'NotDeepStart', 'ShallowStart', 'VanillaStart']:
-        raise ValueError(
-            "Invalid start setting.  Must be DeepStart, RandomStart, NotDeepStart, ShallowStart or VanillaStart.")
-
-    splitDict = {
-        "FullCountdown": "FullWithHUD",
-        "M/m": "Major",
-        "RandomSplit": "random"
-    }
-
-    difficultyDict = {
-        "HarderDifficulty": "harder",
-        "HardDifficulty": "hard",
-        "MediumDifficulty": "medium",
-        "EasyDifficulty": "easy",
-        "BasicDifficulty": "easy"
-    }
-
-    morphDict = {
-        "LateMorph": "late",
-        "RandomMorph": "random",
-        "EarlyMorph": "early"
-    }
-
-    startDict = {
-        "DeepStart": [
-            'Aqueduct',
-            'Bubble Mountain',
-            'Firefleas Top'
-        ],
-        "RandomStart": [
-            'Aqueduct',
-            'Big Pink',
-            'Bubble Mountain',
-            'Business Center',
-            'Etecoons Supers',
-            'Firefleas Top',
-            'Gauntlet Top',
-            'Golden Four',
-            'Green Brinstar Elevator',
-            'Red Brinstar Elevator',
-            'Wrecked Ship Main'
-        ],
-        "NotDeepStart": [
-            'Big Pink',
-            'Business Center',
-            'Etecoons Supers',
-            'Gauntlet Top',
-            'Golden Four',
-            'Green Brinstar Elevator',
-            'Red Brinstar Elevator',
-            'Wrecked Ship Main'
-        ],
-        "ShallowStart": [
-            'Big Pink',
-            'Gauntlet Top',
-            'Green Brinstar Elevator',
-            'Wrecked Ship Main'
-        ],
-        "VanillaStart": [
-            'Landing Site'
-        ]
-    }
+    _require_choice(split, CHOOZO_SPLITS, "item split")
+    _require_choice(area, CHOOZO_AREAS, "area")
+    _require_choice(boss, CHOOZO_BOSSES, "boss")
+    _require_choice(difficulty, CHOOZO_DIFFICULTIES, "difficulty")
+    _require_choice(escape, CHOOZO_ESCAPES, "escape")
+    _require_choice(morph, CHOOZO_MORPHS, "morph")
+    _require_choice(start, CHOOZO_STARTS, "start")
 
     settings = {
         "hud": "on",
         "suitsRestriction": "off",
         "variaTweaks": "on",
 
-        "majorsSplit": splitDict[split],
+        "majorsSplit": CHOOZO_SPLITS[split],
         "majorsSplitMultiSelect": ['FullWithHUD', 'Major'],
 
-        "areaRandomization": "full" if area == "FullArea" else "light" if area == "LightArea" else "off",
+        "areaRandomization": CHOOZO_AREAS[area],
         "areaLayout": "off" if area == "VanillaArea" else "on",
 
         "bossRandomization": "off" if boss == "VanillaBoss" else "on",
 
-        "maxDifficulty": difficultyDict[difficulty],
+        "maxDifficulty": CHOOZO_DIFFICULTIES[difficulty],
 
         "escapeRando": "off" if escape == "VanillaEscape" else "on",
 
-        "morphPlacement": morphDict[morph],
+        "morphPlacement": CHOOZO_MORPHS[morph],
 
-        "startLocation": "Landing Site" if start == "VanillaStart" else "random",
-        "startLocationMultiSelect": startDict[start]
+        "startLocation": LANDING_SITE if start == "VanillaStart" else "random",
+        "startLocationMultiSelect": CHOOZO_STARTS[start]
     }
 
     await ctx.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")

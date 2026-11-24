@@ -24,7 +24,7 @@ async def calculate_results(election: models.RankedChoiceElection):
         ballots.append(ballot)
 
     election_result = pyrankvote.single_transferable_vote(candidates=candidates.values(), ballots=ballots,
-                                                          number_of_seats=election.seats)  # TODO: make this a variable
+                                                          number_of_seats=election.seats)
 
     winners = election_result.get_winners()
 

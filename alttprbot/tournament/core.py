@@ -1,9 +1,9 @@
 import logging
 from dataclasses import dataclass
+from zoneinfo import ZoneInfo
 
 import dateutil.parser
 import discord
-import pytz
 
 import config
 from alttprbot import events, models
@@ -36,10 +36,10 @@ class TournamentConfig:
 
     scheduling_needs_tracker: bool = False
 
-    admin_roles: list = None
-    helper_roles: list = None
-    commentator_roles: list = None
-    mod_roles: list = None
+    admin_roles: list | None = None
+    helper_roles: list | None = None
+    commentator_roles: list | None = None
+    mod_roles: list | None = None
 
     stream_delay: int = 0
     room_open_time: int = 35
@@ -103,7 +103,7 @@ class TournamentRace(object):
         self.players = []
 
         self.episode = None
-        self.data: TournamentConfig = None
+        self.data: TournamentConfig | None = None
 
         self.rtgg_bot = None
         self.restream_team = None
@@ -197,22 +197,22 @@ class TournamentRace(object):
         events.publish(self.room_opened_event())
 
     async def send_room_welcome(self):
-        pass
+        """Hook: post a welcome message when the room opens. Events override it; the default sends nothing."""
 
     async def on_room_creation(self):
-        pass
+        """Hook: called after the race room is created. The default does nothing."""
 
     async def on_room_resume(self):
-        pass
+        """Hook: called when the bot reconnects to an existing room. The default does nothing."""
 
     async def on_race_start(self):
-        pass
+        """Hook: called when the race starts. The default does nothing."""
 
     async def on_race_pending(self):
-        pass
+        """Hook: called when the race goes to pending. The default does nothing."""
 
     async def process_tournament_race(self, args, message):
-        pass
+        """Hook: handle !tournamentrace. Events that roll seeds override it."""
 
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
@@ -390,17 +390,17 @@ class TournamentRace(object):
 
     @property
     def timezone(self):
-        return pytz.timezone('US/Eastern')
+        return ZoneInfo('America/New_York')
 
     @property
     def hours_before_room_open(self):
         return ((self.data.stream_delay + self.data.room_open_time) / 60)
 
     async def create_embeds(self):
-        pass
+        """Hook: build the seed embeds for this event. The default builds none."""
 
     async def process_submission_form(self, payload, submitted_by):
-        pass
+        """Hook: handle a settings submission from the web form. The default ignores it."""
 
     async def send_audit_message(self, message=None, embed: discord.Embed = None):
         # alttprbot_discord/notifications.py posts it to the audit channel.

@@ -53,7 +53,7 @@ class Role(commands.Cog):
     @commands.group(aliases=['rr'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactionrole(self, ctx):
-        pass
+        """Command group for reaction roles; the subcommands do the work."""
 
     @reactionrole.command(name='create', aliases=['c'])
     async def role_create(self, ctx, group_id: int, role_name: discord.Role, name, description, emoji,
@@ -94,7 +94,7 @@ class Role(commands.Cog):
     @commands.group(aliases=['rg'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactiongroup(self, ctx):
-        pass
+        """Command group for reaction role groups; the subcommands do the work."""
 
     @reactiongroup.command(name='create', aliases=['c'])
     async def group_create(self, ctx, channel: discord.TextChannel, name, description=None, bot_managed: bool = True,

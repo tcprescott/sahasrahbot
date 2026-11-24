@@ -1,7 +1,6 @@
 import copy
 import logging
 from dataclasses import dataclass
-from typing import Union
 import random
 
 from pyz3r.mystery import get_random_option, generate_random_settings
@@ -16,9 +15,9 @@ class AlttprMystery:
     settings: dict
     customizer: bool = False
     doors: bool = False
-    custom_instructions: str = None
-    seed: Union[AlttprDoor, ALTTPRClient] = None
-    branch: str = None
+    custom_instructions: str | None = None
+    seed: AlttprDoor | ALTTPRClient | None = None
+    branch: str | None = None
 
 
 BASE_DOORS_PAYLOAD = {

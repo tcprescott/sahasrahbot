@@ -22,14 +22,14 @@ class SessionUser(BaseModel):
 
 
 class SessionInfo(BaseModel):
-    user: Optional[SessionUser]
+    user: Optional[SessionUser] = None
 
 
 class Profile(BaseModel):
     user: SessionUser
     racetime_linked: bool
-    racetime_id: Optional[str]
-    preset_namespace: Optional[str]
+    racetime_id: Optional[str] = None
+    preset_namespace: Optional[str] = None
     moderated_triforce_pools: list[str]
 
 
@@ -54,7 +54,7 @@ class PresetSummary(BaseModel):
     namespace: str
     randomizer: str
     name: str
-    modified: Optional[datetime]
+    modified: Optional[datetime] = None
     generated_count: int
 
 
@@ -81,11 +81,11 @@ class Candidate(BaseModel):
 class Election(BaseModel):
     id: int
     title: str
-    description: Optional[str]
+    description: Optional[str] = None
     private: bool
     seats: int
     candidates: list[Candidate]
-    ballot: Optional[list[int]] = Field(description="Candidate ids the viewer ranked, most preferred first; null until they vote")
+    ballot: Optional[list[int]] = Field(default=None, description="Candidate ids the viewer ranked, most preferred first; null until they vote")
 
 
 class BallotIn(BaseModel):
@@ -99,7 +99,7 @@ class TriforceText(BaseModel):
     id: int
     lines: list[str]
     status: TextStatus
-    submitted: Optional[datetime]
+    submitted: Optional[datetime] = None
     author: Optional[str] = None
 
 

@@ -56,13 +56,13 @@ class PresetData:
     randomizer: str
     preset_name: str
     preset_data: dict
-    namespace: str = None
+    namespace: str | None = None
 
 
 class SahasrahBotPresetCore():
     randomizer: str = "default"
-    preset_data: dict = None
-    raw: str = None
+    preset_data: dict | None = None
+    raw: str | None = None
 
     @property
     def global_preset_path(self) -> str:
@@ -71,7 +71,7 @@ class SahasrahBotPresetCore():
     def __init__(self, preset: str = None):
         self.namespace = None
         self.preset = None
-        self.preset_data: dict = None
+        self.preset_data: dict | None = None
 
         if preset:
             parsed = preset.lower().split('/')
@@ -341,8 +341,8 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 class SMPreset(SahasrahBotPresetCore):
     randomizer = 'sm'
     randomizer_class = SMClient
-    spoiler_key: str = None
-    seed: SMClient = None
+    spoiler_key: str | None = None
+    seed: SMClient | None = None
 
     async def generate(self, tournament=True, spoilers=False):
         if self.preset_data is None:

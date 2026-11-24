@@ -1,7 +1,7 @@
 from racetime_bot import monitor_cmd, msg_actions
 
 from alttprbot.alttprgen import preset, spoilers, generator
-from .core import SahasrahBotCoreHandler
+from .core import MSG_GENERATING, MSG_NO_PRESET, MSG_ROLL_COMPLETE, SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
@@ -73,7 +73,7 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
@@ -89,7 +89,7 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
         try:
@@ -107,11 +107,11 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             spoiler = await spoilers.generate_spoiler_game(preset_name)
         except preset.PresetNotFoundException as e:
@@ -139,11 +139,11 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             spoiler = await spoilers.generate_spoiler_game(preset_name, branch='tournament')
         except preset.PresetNotFoundException as e:
@@ -171,11 +171,11 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             spoiler = await spoilers.generate_spoiler_game(preset_name, spoiler_type='progression')
         except preset.PresetNotFoundException as e:
@@ -200,7 +200,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         if not preset_name:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
@@ -217,7 +217,7 @@ class GameHandler(SahasrahBotCoreHandler):
         spoiler_race = keyword_args.get('spoiler_race', False)
 
         if spoiler_race:
-            await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+            await self.send_message(MSG_GENERATING)
             try:
                 spoiler = await spoilers.generate_spoiler_game(preset_name, branch=branch,
                                                                allow_quickswap=allow_quickswap, festive=festive)
@@ -233,7 +233,7 @@ class GameHandler(SahasrahBotCoreHandler):
                 f"The spoiler log for this race will be sent after the race begins in this room.  A {countdown}s countdown timer at that time will begin.")
             await self.schedule_spoiler_race(spoiler.spoiler_log_url, countdown)
         else:
-            await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+            await self.send_message(MSG_GENERATING)
             try:
                 seed = await generator.ALTTPRPreset(preset_name).generate(
                     hints=hints,
@@ -250,7 +250,7 @@ class GameHandler(SahasrahBotCoreHandler):
             race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
             await self.set_bot_raceinfo(race_info)
             await self.send_message(seed.url)
-            await self.send_message("Seed rolling complete.  See race info for details.")
+            await self.send_message(MSG_ROLL_COMPLETE)
 
         self.seed_rolled = True
 
@@ -260,7 +260,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         weightset = args[0] if args else 'weighted'
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             mystery = await generator.ALTTPRMystery(weightset).generate(tournament=True, spoilers="mystery")
             seed = mystery.seed
@@ -276,7 +276,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.set_bot_raceinfo(f"mystery {weightset} - {seed.url} - ({'/'.join(seed.code)})")
 
         await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     # TODO: refactor this pile of shit
@@ -307,7 +307,7 @@ class GameHandler(SahasrahBotCoreHandler):
         if await self.is_locked(message):
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             seed = await generator.ALTTPRPreset(preset_name).generate(
                 hints=False,
@@ -324,5 +324,5 @@ class GameHandler(SahasrahBotCoreHandler):
         race_info = f"{preset_name} - {seed.url} - ({'/'.join(seed.code)})"
         await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True

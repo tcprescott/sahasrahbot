@@ -21,7 +21,7 @@ class ALTTPRTournamentRace(TournamentRace):
     """
 
     async def roll(self):
-        pass
+        """Hook: roll the seed for this race. The default rolls nothing."""
 
     async def process_tournament_race(self, args, message):
         await self.rtgg_handler.send_message(

@@ -56,7 +56,7 @@ async def bot_command():
                 'can_moderate': True,
             },
             'bot': False,
-            'posted_at': datetime.datetime.utcnow().isoformat(),
+            'posted_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'message': cmd,
             'message_plain': cmd,
             'highlight': False,
@@ -66,7 +66,7 @@ async def bot_command():
             'delay': 0
         },
         'type': 'message.chat',
-        'date': datetime.datetime.utcnow().isoformat(),
+        'date': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
     await racetime_handler.send_message(f"Executing command from API request: {cmd}")

@@ -5,7 +5,7 @@ The handler-level behaviour (chat replies, countdowns, room creation) is pinned 
 tests/test_racetime_handlers.py; these pin the data each service stores and returns.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -57,13 +57,14 @@ async def test_stream_override_status(db):
     assert await racetime_rooms.stream_override_status("u1", "smz3") == racetime_rooms.OVERRIDE_NOT_WHITELISTED
 
 
-async def test_known_issue_stream_override_status_with_expiry_raises(db):
-    """KNOWN ISSUE, pinned not endorsed: ``expires`` comes back timezone-aware and is
-    compared with naive ``datetime.utcnow()``, so any entry with an expiry raises
-    TypeError (see test_known_issue_override_with_expiry_date_crashes)."""
-    await models.RTGGOverrideWhitelist.create(racetime_id="u1", category="alttpr", expires=datetime.utcnow() + timedelta(days=1))
-    with pytest.raises(TypeError):
-        await racetime_rooms.stream_override_status("u1", "alttpr")
+async def test_stream_override_status_checks_expiry(db):
+    """``expires`` comes back timezone-aware and is compared with an aware now. It
+    used to be compared with naive ``utcnow()`` and raise TypeError."""
+    now = datetime.now(timezone.utc)
+    await models.RTGGOverrideWhitelist.create(racetime_id="u1", category="alttpr", expires=now + timedelta(days=1))
+    await models.RTGGOverrideWhitelist.create(racetime_id="u2", category="alttpr", expires=now - timedelta(days=1))
+    assert await racetime_rooms.stream_override_status("u1", "alttpr") == racetime_rooms.OVERRIDE_ALLOWED
+    assert await racetime_rooms.stream_override_status("u2", "alttpr") == racetime_rooms.OVERRIDE_EXPIRED
 
 
 async def test_tournament_race(db):

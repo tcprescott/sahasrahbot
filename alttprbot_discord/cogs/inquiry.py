@@ -10,9 +10,6 @@ import config
 from alttprbot import models
 
 
-# TODO: make work with discord.py 2.0
-
-
 class ConfirmInquiryThread(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)

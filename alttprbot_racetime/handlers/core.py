@@ -10,6 +10,12 @@ from alttprbot import tournaments
 from alttprbot.services import racetime_rooms, spoiler_races
 
 
+# Chat messages shared by the category handlers.
+MSG_NO_PRESET = "You must specify a preset!"
+MSG_GENERATING = "Generating game, please wait.  If nothing happens after a minute, contact Synack."
+MSG_ROLL_COMPLETE = "Seed rolling complete.  See race info for details."
+
+
 class SahasrahBotCoreHandler(RaceHandler):
     """
     SahasrahBot race handler. Generates seeds, presets, and frustration.
@@ -207,17 +213,16 @@ class SahasrahBotCoreHandler(RaceHandler):
             await self.tournament.on_race_pending()
 
     async def status_open(self):
-        pass
+        """Hook for category handlers; the core handler does nothing when a room opens."""
 
     async def status_invitational(self):
-        pass
+        """Hook for category handlers; the core handler does nothing for invitational rooms."""
 
     async def status_finished(self):
-        # Hook for category handlers; the core handler does nothing when a race finishes.
-        pass
+        """Hook for category handlers; the core handler does nothing when a race finishes."""
 
     async def race_data_hook(self):
-        pass
+        """Hook for category handlers, called on every race data update. The core handler does nothing."""
 
     async def intro(self):
         """
