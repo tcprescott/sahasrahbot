@@ -131,7 +131,8 @@ async def test_refresh_rotates_and_the_old_token_stops_working(client):
     resp = await client.post("/token", form={"grant_type": "refresh_token", "refresh_token": tokens["refresh_token"],
                                              "client_id": tokens["client_id"]})
     fresh = await resp.get_json()
-    assert resp.status_code == 200 and fresh["access_token"] != tokens["access_token"]
+    assert resp.status_code == 200
+    assert fresh["access_token"] != tokens["access_token"]
     assert (await client.post("/mcp", json={}, headers=headers(tokens["access_token"]))).status_code == 401
     assert (await rpc(client, fresh["access_token"], "tools/list"))["tools"]
 

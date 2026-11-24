@@ -181,7 +181,8 @@ async def test_approve_returns_a_single_use_code(db):
     assert await mcp_auth.load_code("other-client", raw_code) is None
 
     access, refresh, expires_in = await mcp_auth.exchange_code(code)
-    assert access.startswith("sb_mcp_") and refresh.startswith("sb_mcpr_")
+    assert access.startswith("sb_mcp_")
+    assert refresh.startswith("sb_mcpr_")
     assert expires_in == int(mcp_auth.ACCESS_TOKEN_TTL.total_seconds())
     token = await api_tokens.authenticate(access, api_tokens.OAUTH)
     assert (token.discord_user_id, token.read_only, token.name) == (ALICE, True, "Claude")
@@ -225,7 +226,8 @@ async def test_refresh_rotates_both_tokens_once(db):
     assert record is not None
     assert await mcp_auth.load_refresh_token("other-client", refresh) is None
     new_access, new_refresh, _ = await mcp_auth.exchange_refresh(record)
-    assert new_access != access and new_refresh != refresh
+    assert new_access != access
+    assert new_refresh != refresh
     assert await api_tokens.authenticate(access, api_tokens.OAUTH) is None
     assert await api_tokens.authenticate(new_access, api_tokens.OAUTH) is not None
     assert await mcp_auth.load_refresh_token(client.client_id, refresh) is None

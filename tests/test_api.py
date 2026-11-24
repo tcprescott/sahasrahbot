@@ -677,5 +677,6 @@ async def test_consent_screen_routes(client, login, monkeypatch):
 
     txn = begin()
     status, body = await send_json(client, "POST", f"/api/v1/oauth/requests/{txn}/deny")
-    assert status == 200 and "error=access_denied" in body["redirect_url"]
+    assert status == 200
+    assert "error=access_denied" in body["redirect_url"]
     assert await api_tokens.list_for_user(91000000000000001) == []
