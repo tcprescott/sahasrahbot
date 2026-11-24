@@ -66,6 +66,10 @@ sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 
+from alttprbot_api import mcp  # nopep8
+
+mcp.mount(sahasrahbotapi)
+
 
 def _wants_json() -> bool:
     return request.path.startswith('/api/') or request.path == '/healthcheck'

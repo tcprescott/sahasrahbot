@@ -32,6 +32,11 @@ class Directory(Protocol):
     async def is_admin(self, guild_id: int, user_id: int) -> bool:
         """Whether ``user_id`` has Administrator in ``guild_id``."""
 
+    async def admin_guilds(self, user_id: int) -> list[Named]:
+        """Every server the bot is in where ``user_id`` has Administrator, sorted by name.
+        One member lookup per server, so slow; the web app asks Discord with the
+        person's own sign-in instead, and only API tokens need this."""
+
     async def guild_name(self, guild_id: int) -> Optional[str]:
         """The server's name, or None if the bot isn't in it."""
 

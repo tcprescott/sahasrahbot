@@ -1,0 +1,99 @@
+/* The API access page and the AI client consent screen. */
+
+.copy-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 6px 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+.copy-field__value {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  background: transparent;
+  padding: 0;
+}
+
+.api-setup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+.api-setup > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.api-setup__cmd {
+  overflow-wrap: anywhere;
+}
+.api-name {
+  display: inline-flex;
+  flex-direction: column;
+}
+.api-footnote {
+  font-size: var(--text-sm);
+}
+.api-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.consent-page {
+  min-height: 100vh;
+  background: var(--page-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 16px;
+}
+.consent-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: var(--text-lg);
+}
+.consent-brand img {
+  width: 32px;
+  height: 32px;
+}
+.consent {
+  width: min(520px, 100%);
+}
+.consent__title {
+  font-size: var(--text-xl);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.consent__lede {
+  margin: 0;
+}
+.consent__heading {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  margin: 0 0 6px;
+}
+.consent__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.consent__list li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

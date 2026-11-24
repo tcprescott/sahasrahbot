@@ -268,3 +268,73 @@ class SubmissionDone(BaseModel):
     event: str
     episode_id: int
     versus: str
+
+
+class SeedRollIn(BaseModel):
+    randomizer: Literal['alttpr', 'alttprmystery', 'sm', 'smz3'] = Field(
+        description="Which randomizer the preset is for.")
+    preset: str = Field(description="A built-in preset (`open`), or someone's own as `namespace/name`.")
+    race: bool = Field(False, description="A race seed: no spoiler log, and tournament settings where they apply.")
+    hints: bool = Field(False, description="ALTTPR only: turn hints on.")
+    allow_quickswap: bool = Field(True, description="ALTTPR and mystery only.")
+    branch: Literal['live', 'beeta', 'tournament'] = Field('live', description="ALTTPR only: which alttpr.com.")
+    spoiler_race: bool = Field(False, description="SMZ3 only: make a spoiler log for a spoiler race.")
+
+
+class Seed(BaseModel):
+    randomizer: str
+    preset: str
+    url: str = Field(description="Where to download the seed.")
+    hash: Optional[str] = None
+    file_select_code: Optional[list[str]] = Field(None, description="ALTTPR only: the item names on the file select screen.")
+    spoiler_url: Optional[str] = None
+    custom_instructions: Optional[str] = Field(None, description="Mystery only: anything the weightset tells runners.")
+
+
+class SeedLookup(BaseModel):
+    hash: str
+    randomizer: Optional[str] = None
+    kind: Optional[str] = Field(None, description="How it was rolled: `preset`, `mystery`, …")
+    preset: Optional[str] = None
+    url: Optional[str] = None
+    rolled_at: Optional[datetime] = Field(None, description="UTC.")
+
+
+class ApiTokenRow(BaseModel):
+    id: int
+    name: str
+    kind: Literal['token', 'client'] = Field(description="`token` for a personal token, `client` for a connected AI client.")
+    read_only: bool
+    prefix: Optional[str] = Field(None, description="The token's first characters, to tell it apart. Tokens only.")
+    created_at: datetime
+    last_used_at: Optional[datetime] = None
+    expires_at: Optional[datetime] = Field(None, description="UTC. Null means it never expires.")
+
+
+class ApiTokenList(BaseModel):
+    tokens: list[ApiTokenRow]
+    mcp_url: str = Field(description="The address to add to an AI client as a connector.")
+
+
+class ApiTokenIn(BaseModel):
+    name: str
+    read_only: bool = True
+    expires_in_days: Optional[Literal[30, 90, 365]] = Field(None, description="Null for a token that never expires.")
+
+
+class ApiTokenCreated(BaseModel):
+    token: str = Field(description="The token. It's shown this once and never again.")
+    row: ApiTokenRow
+
+
+class OAuthRequest(BaseModel):
+    client_name: str = Field(description="The name the AI client gave itself. Anyone can register any name.")
+    redirect_target: str = Field(description="Where approving sends the person: the part a client can't fake.")
+
+
+class OAuthAnswerIn(BaseModel):
+    allow_changes: bool = False
+
+
+class OAuthRedirect(BaseModel):
+    redirect_url: str

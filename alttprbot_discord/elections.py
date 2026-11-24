@@ -6,6 +6,7 @@ Vote and Manage links and an End election button, and swaps it for the winners a
 a link to the full count when it closes.
 """
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -187,6 +188,16 @@ class DiscordDirectory:
         # One member lookup in this one server (the cache, else one REST call).
         member = await self._member(guild_id, user_id)
         return member is not None and member.guild_permissions.administrator
+
+    async def admin_guilds(self, user_id: int) -> list[Named]:
+        limit = asyncio.Semaphore(8)
+
+        async def check(guild):
+            async with limit:
+                return guild if await self.is_admin(guild.id, user_id) else None
+
+        found = await asyncio.gather(*(check(g) for g in self.bot.guilds))
+        return sorted((Named(g.id, g.name) for g in found if g is not None), key=lambda g: g.name.casefold())
 
     async def bot_guilds(self, guild_ids) -> list[Named]:
         guilds = (self.bot.get_guild(int(gid)) for gid in set(guild_ids))

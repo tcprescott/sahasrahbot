@@ -237,6 +237,75 @@ class AuthorizationKeyPermissions(Model):
     subtype = fields.TextField(null=True)
 
 
+class ApiToken(Model):
+    """A credential for the REST API (``origin='pat'``) or the MCP server (``origin='oauth'``).
+
+    Only SHA-256 hashes are stored. A token acts as the Discord user who made or
+    approved it; ``read_only`` refuses anything that changes data. An OAuth token
+    also carries a refresh token, and both rotate on every refresh.
+    """
+
+    class Meta:
+        table = "api_tokens"
+
+    id = fields.IntField(primary_key=True)
+    discord_user_id = fields.BigIntField(db_index=True)
+    user_name = fields.CharField(100)
+    name = fields.CharField(100)
+    origin = fields.CharField(10)
+    token_hash = fields.CharField(64, unique=True)
+    token_prefix = fields.CharField(20)
+    read_only = fields.BooleanField(default=True)
+    oauth_client = fields.ForeignKeyField('models.McpOAuthClient', related_name='tokens', null=True,
+                                          on_delete=fields.CASCADE)
+    refresh_token_hash = fields.CharField(64, unique=True, null=True)
+    refresh_expires_at = fields.DatetimeField(null=True)
+    created_at = fields.DatetimeField(auto_now_add=True)
+    expires_at = fields.DatetimeField(null=True)
+    last_used_at = fields.DatetimeField(null=True)
+    revoked_at = fields.DatetimeField(null=True)
+
+
+class McpOAuthClient(Model):
+    """An MCP client (Claude, say) registered itself through RFC 7591 dynamic
+    registration. Public: no secret is kept, PKCE binds a code to its client."""
+
+    class Meta:
+        table = "mcp_oauth_clients"
+
+    id = fields.IntField(primary_key=True)
+    client_id = fields.CharField(64, unique=True)
+    client_name = fields.CharField(255)
+    redirect_uris = fields.JSONField(default=list)
+    grant_types = fields.JSONField(default=list)
+    response_types = fields.JSONField(default=list)
+    scope = fields.CharField(255, null=True)
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+
+class McpAuthorizationCode(Model):
+    """A single-use OAuth authorization code, stored as a hash, waiting to be exchanged."""
+
+    class Meta:
+        table = "mcp_authorization_codes"
+
+    id = fields.IntField(primary_key=True)
+    code_hash = fields.CharField(64, unique=True)
+    client = fields.ForeignKeyField('models.McpOAuthClient', related_name='authorization_codes',
+                                    on_delete=fields.CASCADE)
+    discord_user_id = fields.BigIntField()
+    user_name = fields.CharField(100)
+    redirect_uri = fields.CharField(2048)
+    redirect_uri_provided_explicitly = fields.BooleanField(default=True)
+    code_challenge = fields.CharField(128)
+    scope = fields.CharField(255, null=True)
+    resource = fields.CharField(2048, null=True)
+    read_only = fields.BooleanField(default=True)
+    expires_at = fields.DatetimeField()
+    consumed_at = fields.DatetimeField(null=True)
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+
 class RTGGUnlistedRooms(Model):
     id = fields.IntField(primary_key=True)
     room_name = fields.CharField(200, null=False)
