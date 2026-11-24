@@ -77,7 +77,8 @@ def test_tournament_config_defaults():
     cfg = core.TournamentConfig(guild=None, racetime_category="c", racetime_goal="g", event_slug="e")
     assert (cfg.schedule_type, cfg.stream_delay, cfg.room_open_time, cfg.lang, cfg.coop) == ("sg", 0, 35, "en", False)
     assert cfg.gsheet_id == config.TOURNAMENT_RESULTS_SHEET
-    assert cfg.auto_record is False and cfg.create_scheduled_events is False
+    assert cfg.auto_record is False
+    assert cfg.create_scheduled_events is False
 
 
 def test_episode_id_is_coerced_to_int_when_possible():
@@ -97,7 +98,8 @@ def test_race_properties_from_episode():
     assert race.submit_link == f"{config.APP_URL}/submit/alttpr?episode_id=12345"
     assert race.lang == "en"
     assert race.game_number == ""
-    assert race.seed_code is None and race.submission_form is None
+    assert race.seed_code is None
+    assert race.submission_form is None
 
 
 def test_versus_with_more_than_two_players_uses_commas():
@@ -352,7 +354,8 @@ async def test_send_race_submission_form(db):
     await race.send_race_submission_form()
     for p in race.players:
         msg = p.discord_user.send.call_args.args[0]
-        assert msg.startswith("Greetings!") and race.submit_link in msg
+        assert msg.startswith("Greetings!")
+        assert race.submit_link in msg
     game = await models.TournamentGames.get(episode_id=12345)
     assert (game.event, game.submitted) == ("alttpr", 1)
 
@@ -380,5 +383,6 @@ async def test_create_race_room_passes_racetime_options():
     assert handler is race.rtgg_bot.startrace.return_value
     kwargs = race.rtgg_bot.startrace.call_args.kwargs
     assert kwargs["goal"] == "Beat the game"
-    assert kwargs["invitational"] is True and kwargs["team_race"] is True
+    assert kwargs["invitational"] is True
+    assert kwargs["team_race"] is True
     assert kwargs["info_user"] == race.race_info

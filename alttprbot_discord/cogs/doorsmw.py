@@ -100,7 +100,7 @@ class DoorsMultiworld(commands.GroupCog, name="doorsmw", description="ALTTP Door
         if not multiworld.get('success', True):
             raise SahasrahBotException("That game does not exist.")
 
-        if not (multiworld['admin'] == interaction.user.id):
+        if multiworld['admin'] != interaction.user.id:
             raise SahasrahBotException('You must be the creator of the game to send messages to it.')
 
         response = await doors_multiworld.send_message(token, msg)
@@ -122,7 +122,7 @@ async def send_command(token, interaction: discord.Interaction, **data):
     if not multiworld.get('success', True):
         raise SahasrahBotException("That game does not exist.")
 
-    if not (multiworld['admin'] == interaction.user.id):
+    if multiworld['admin'] != interaction.user.id:
         raise SahasrahBotException('You must be the creator of the game to send items to players.')
 
     response = await doors_multiworld.send_command(token, data)

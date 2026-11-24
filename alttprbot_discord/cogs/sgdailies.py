@@ -7,7 +7,6 @@ import config
 from alttprbot.util import speedgaming
 
 
-
 ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))
 
 
@@ -48,7 +47,7 @@ class SgDaily(commands.Cog):
                 embed.add_field(
                     name='Time', value=f"{discord.utils.format_dt(when, 'f')} ({discord.utils.format_dt(when, 'R')})",
                     inline=False)
-                broadcast_channels = [a['slug'] for a in episode['channels'] if not " " in a['name']]
+                broadcast_channels = [a['slug'] for a in episode['channels'] if " " not in a['name']]
                 if broadcast_channels:
                     embed.add_field(name="Twitch Channels", value=', '.join(
                         [f"[{a}](https://twitch.tv/{a})" for a in broadcast_channels]), inline=False)

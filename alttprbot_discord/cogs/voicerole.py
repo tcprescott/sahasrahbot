@@ -4,48 +4,31 @@ from discord.ext import commands
 from alttprbot.services import voice_roles
 
 
+def _roles_for_channel(guild, vc_roles, channel_id):
+    """The guild roles mapped to this voice channel (skipping roles that no longer exist)."""
+    for vc_role in vc_roles:
+        if vc_role.voice_channel_id == channel_id:
+            role = discord.utils.get(guild.roles, id=vc_role.role_id)
+            if role is not None:
+                yield role
+
+
 class VoiceRole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        if after.channel is not None and before.channel is not None and after.channel.id == before.channel.id:
+            return
+
         vc_roles = await voice_roles.for_guild(member.guild.id)
-
-        if after.channel is not None and before.channel is not None:
-            if after.channel.id == before.channel.id:
-                return
         if after.channel is not None:
-            for vc_role in vc_roles:
-                if after.channel.id == vc_role.voice_channel_id:
-                    role = discord.utils.get(
-                        member.guild.roles, id=vc_role.role_id)
-                    await member.add_roles(role, reason='Joined voice channel.')
+            for role in _roles_for_channel(member.guild, vc_roles, after.channel.id):
+                await member.add_roles(role, reason='Joined voice channel.')
         if before.channel is not None:
-            for vc_role in vc_roles:
-                if before.channel.id == vc_role.voice_channel_id:
-                    role = discord.utils.get(
-                        member.guild.roles, id=vc_role.role_id)
-                    await member.remove_roles(role, reason='Left voice channel.')
-        return
-
-    # voicerole = discord.commands.SlashCommandGroup(
-    #     "voicerole",
-    #     "Commands for managing voice roles.",
-    #     permissions=[permissions.CommandPermission(
-    #         "owner", 2, True
-    #     )
-    #     ])
-
-    # @voicerole.command(name='create')
-    # async def vr_create(self, ctx, voice_channel: Option(discord.VoiceChannel, description="Voice channel to monitor."), role: Option(discord.Role, description="Role to assign to members in the voice channel.")):
-    #     await voicerole.create_voice_role(ctx.guild.id, voice_channel.id, role.id)
-    #     await ctx.respond(f"Created voice role mapping for {voice_channel.mention}", ephemeral=True)
-
-    # @voicerole.command(name='delete')
-    # async def vr_delete(self, ctx, role_id: int):
-    #     await voicerole.delete_voice_role(ctx.guild.id, role_id)
-    #     await ctx.respond(f"Deleted voice role mapping for {role_id}", ephemeral=True)
+            for role in _roles_for_channel(member.guild, vc_roles, before.channel.id):
+                await member.remove_roles(role, reason='Left voice channel.')
 
 
 async def setup(bot):

@@ -6,8 +6,7 @@ from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen import spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.tournament.core import TournamentConfig
-from alttprbot.services import bots
+from alttprbot.tournament import event_settings
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):
@@ -36,43 +35,14 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             await self.rtgg_handler.send_message(
                 "No active League mode!  This should not have happened.  Contact a league admin/mod for help.")
 
-    # async def roll(self):
-    #     if self.tournament_game.preset is None:
-    #         raise Exception('Missing preset.  Please submit!')
-
-    #     self.seed = await generator.ALTTPRPreset(self.tournament_game.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
-
     async def update_data(self, update_episode=True):
         await super().update_data(update_episode=update_episode)
         await self.get_league_data()
 
     async def configuration(self):
-        guild = bots.discord().get_guild(543577975032119296)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Tournament (Solo)',
-            event_slug="invleague",
-            audit_channel=bots.discord().get_channel(546728638272241674),
-            commentary_channel=bots.discord().get_channel(1157407211094556703),
-            # scheduling_needs_channel=bots.discord().get_channel(878075812996337744),
-            # scheduling_needs_tracker=True,
-            helper_roles=[
-                guild.get_role(543596853871116288),
-                guild.get_role(543597099649073162),
-                guild.get_role(676530377812082706),
-                guild.get_role(553295025190993930),
-                guild.get_role(674109759179194398),
-            ],
-            stream_delay=10,
-            create_scheduled_events=True,
-        )
+        return event_settings.tournament_config("invleague")
 
     async def create_race_room(self):
-        # if self.tournament_game is None or self.tournament_game.preset is None:
-        #     await self.send_race_submission_form(warning=True)
-        #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
-
         goal_type = 'Co-op' if self.league_data['coop'] or self.league_data['spoiler'] else 'Solo'
         self.rtgg_handler = await self.rtgg_bot.startrace(
             goal=f"Beat the game - Tournament ({goal_type})",
@@ -120,85 +90,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
     #     await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
 
-    # @property
-    # def bracket_settings(self):
-    #     if self.tournament_game:
-    #         return self.tournament_game.settings
-
-    #     return None
-
-    # @property
-    # def submission_form(self):
-    #     return "submission_league.html"
-
-    # async def process_submission_form(self, payload, submitted_by):
-    #     embed = discord.Embed(
-    #         title=f"ALTTPR League - {self.versus}",
-    #         description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a tournament admin.',
-    #         color=discord.Colour.blue()
-    #     )
-
-    #     if payload['game'] == '1':
-    #         preset_name = 'casualboots'
-    #     elif payload['game'] == '2':
-    #         preset_name = 'crosskeys'
-    #     elif payload['game'] == '5':
-    #         preset_name = 'retrance'
-    #     else:
-    #         if payload['preset'] == 'default':
-    #             raise Exception('Must choose a preset for games 3 or 4.')
-    #         preset_name = payload['preset']
-
-    #     embed.add_field(name="Game Number", value=payload['game'], inline=False)
-    #     embed.add_field(name="Preset", value=preset_name, inline=False)
-
-    #     embed.add_field(name="Submitted by", value=submitted_by, inline=False)
-
-    #     await models.TournamentGames.update_or_create(
-    #         episode_id=self.episodeid,
-    #         defaults={
-    #             'event': self.event_slug,
-    #             'game_number': payload['game'],
-    #             'preset': preset_name
-    #         }
-    #     )
-
-    #     if self.audit_channel:
-    #         await self.audit_channel.send(embed=embed)
-
-    #     for name, player in self.player_discords:
-    #         if player is None:
-    #             logging.error(f"Could not send DM to {name}")
-    #             if self.audit_channel:
-    #                 await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-    #             continue
-    #         try:
-    #             await player.send(embed=embed)
-    #         except discord.HTTPException:
-    #             logging.exception(f"Could not send DM to {name}")
-    #             if self.audit_channel:
-    #                 await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-
 
 class ALTTPROpenLeague(ALTTPRLeague):
     async def configuration(self):
-        guild = bots.discord().get_guild(543577975032119296)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Tournament (Solo)',
-            event_slug="alttprleague",
-            audit_channel=bots.discord().get_channel(546728638272241674),
-            commentary_channel=bots.discord().get_channel(1157407211094556703),
-            # scheduling_needs_channel=bots.discord().get_channel(878076083193389096),
-            # scheduling_needs_tracker=True,
-            helper_roles=[
-                guild.get_role(543596853871116288),
-                guild.get_role(543597099649073162),
-                guild.get_role(676530377812082706),
-                guild.get_role(553295025190993930),
-                guild.get_role(674109759179194398),
-            ],
-            stream_delay=10,
-            create_scheduled_events=True,
-        )
+        return event_settings.tournament_config("alttprleague")

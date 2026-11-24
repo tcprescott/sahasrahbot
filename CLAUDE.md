@@ -32,20 +32,22 @@ where things live. Read it before changing code.
 
 | Path | What it is |
 |---|---|
-| `sahasrahbot.py` | Entry point: Sentry, `Tortoise.init`, then starts the Discord bot, the racetime bots and the API on one loop |
+| `sahasrahbot.py` | Entry point: `init_sentry()`, `Tortoise.init`, then starts the Discord bot, the racetime bots and the API on one loop |
 | `config.py` | **Gitignored, holds production secrets.** Never print, edit or commit it |
 | `config.example.py` | Every setting the code reads, with placeholders. Tests load it when `config.py` is absent |
 | `alttprbot/models/` | Tortoise models (`models.py`, `schedule.py`), re-exported from `alttprbot.models` |
 | `alttprbot/services/` | Service layer: one module per domain, called by cogs, routes and racetime handlers. Services may use models directly and must not import any `alttprbot_*` package. `guild_config.py` is the only code that touches the `config` table (per-guild settings, cached) |
 | `alttprbot/integrations/` | One small HTTP client per external API (racetime.gg, ALTTPR Ladder, Door Randomizer multiworld server, holy images). Plain data in and out; no Discord, racetime-bot, web or model imports (a test enforces this). New outbound HTTP goes here, not in a cog or handler |
 | `alttprbot/alttprgen/` | Seed generation, with no Discord, racetime or web imports: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one API client per external randomizer, e.g. `alttpr.py`'s `ALTTPRClient`), `spoilers.py` |
-| `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`); Sheets result recording is `alttprbot/services/tournament_results.py` |
+| `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`); each class's `configuration()` is `event_settings.tournament_config("<event slug>")`, built from `tournaments.yaml`; Sheets result recording is `alttprbot/services/tournament_results.py` |
+| `alttprbot/observability/` | Sentry: `sentry.py` (init, settings, `sentry_tags`), `metrics.py`, `instrument.py` (times every service/API-client/seed call), `runtime.py` (30s process and bot gauges), `watchdog.py` (blocked event loop). See "Sentry" below |
 | `alttprbot/events/` | The event bridge: `types.py` (one frozen dataclass per event, listed in `ALL_EVENTS`), `bus.py` (`publish`, `subscribe`). Imports no front end |
 | `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `gsheet.py`, `triforce_text.py`, … |
 | `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
 | `alttprbot_api/` | Quart app on 127.0.0.1:5001: `api.py` (Discord sign-in, errors, serves `web/dist`), `schemas.py` (API bodies), `blueprints/` (`app_api.py` is the `/api/v1` JSON API the web app uses; the rest are the racetime command API, preset downloads and public preset JSON, settingsgen, tournament games). No server-rendered pages |
 | `web/` | **The website**: a React + TypeScript app (Vite), built like Wizzrobe's `web/`. See "The web app" below |
+| `tournaments.yaml` | Per-event tournament and daily settings: Discord guild, channel and role ids, racetime goal, and the dailies' room-opened announcements. Read by `alttprbot/tournament/event_settings.py`, validated at startup. Put new event ids here, never in code |
 | `presets/` | YAML presets per randomizer (`alttpr/`, `sm/`, `smz3/`, `alttprmystery/`, `ctjets/`). The file name is the preset name |
 | `migrations/` | Aerich migrations (generated; don't hand-edit old ones) and `tortoise_config.py` |
 | `docs/` | **The public user site** (GitHub Pages, Jekyll, sahasrahbot.synack.live). User-facing command and preset docs only; developer notes belong in this file |
@@ -199,6 +201,54 @@ a web change in a real browser (Playwright, or the `run` skill).
 
 Production code doesn't know about the dev server: nothing in `alttprbot*/` imports
 `devserver`, and the dev server doesn't change production modules on disk.
+
+### Sentry
+
+One Sentry project (`sahasrahbot` in the `sahasrahbot` org, region us) gets the server
+and the browser, modelled on Wizzrobe's `docs/features/observability.md`. Everything is
+off unless `config.SENTRY_URL` (the DSN) is set; every other `SENTRY_*` setting is
+optional and documented in `config.example.py`. The SDK is **sentry-sdk 3.x**
+(span-first: `sentry_sdk.start_span(name=..., attributes={"sentry.op": ...})`,
+`data_collection` instead of `send_default_pii`), not the 2.x API Wizzrobe uses.
+
+- **Errors:** unhandled web errors, plus any `logger.error`/`logger.exception`
+  anywhere, so a failure someone relied on must log at ERROR (WARNING is a breadcrumb
+  and a Sentry Log only). `SahasrahBotException` is dropped on purpose.
+- **Logs:** INFO and up go to Sentry Logs (`SENTRY_LOGS_LEVEL`).
+- **Traces:** web requests at 10% in production, scheduled jobs and Discord/racetime
+  commands at 100% (each its own trace), browser page loads continuing into the server.
+  Inside a trace: MySQL queries, outbound aiohttp calls and a span per service,
+  API-client and seed-generator call. Profiles follow traced work.
+- **Tags:** `surface` (`server`/`browser`), `job`, `event`/`event_subscriber`,
+  `discord_command`/`discord_guild_id`/`discord_user_id`, `racetime_room`/
+  `racetime_category`/`racetime_command`, `route`, `loop_blocked_in`. New work that runs
+  outside a request wraps itself in `sentry_tags(...)`
+  (`alttprbot/observability/sentry.py`).
+- **Metrics** (Explore > Metrics). Call-style metrics come as `<x>.calls` (counter) and
+  `<x>.duration` (ms) with an `outcome` (`ok`, `rejected`, `cancelled`, `error`):
+
+  | Metric | Attributes | Source |
+  |---|---|---|
+  | `http.requests`, `http.request_duration` | `route` (URL rule), `method`, `status` | `alttprbot_api/telemetry.py` |
+  | `service.*`, `integration.*`, `randomizer.*`, `seed.*` | `target` (`presets.get_preset`, `ALTTPRClient.generate`) | `alttprbot/observability/instrument.py`, automatic for every public async function/method in those packages |
+  | `job.*` | `job` | `alttprbot/services/scheduler.py` |
+  | `events.published`; `event.*` | `event`; `event`, `subscriber` | `alttprbot/events/bus.py` |
+  | `discord.commands.*`, `discord.commands.delay` | `command`, `kind` | `alttprbot_discord/telemetry.py` (`SentryCommandTree`) |
+  | `discord.interactions`, `discord.gateway` | `type`; `event` | `alttprbot_discord/cogs/telemetry.py` |
+  | `racetime.commands.*`; `racetime.messages` | `category`, `command`; `category`, `type` | `alttprbot_racetime/telemetry.py` |
+  | `process.cpu`/`memory_rss`/`asyncio_tasks`/`threads`, `loop.lag_p50`/`p95`/`max`, `loop.stalls`, `gc.pause`, `gc.seconds`, `db_pool.*`, `events.pending`, `discord.latency`/`guilds`/`ready`, `racetime.rooms` | (`generation`, `category`) | `alttprbot/observability/runtime.py`, every 30s |
+  | `api.calls`, `api.duration` (browser) | `endpoint` (OpenAPI path), `method`, `status` | `web/src/telemetry.ts` |
+
+- **Blocked loop:** a stall of 2s or more is an ERROR issue fingerprinted
+  `event-loop-blocked` + the culprit line (`watchdog.py`); 0.5s+ is a WARNING log.
+- **Browser:** `web/src/telemetry.ts`. Settings come inlined in index.html
+  (`window.__SAHASRAHBOT_SENTRY__`) or from `GET /api/v1/telemetry`. Errors (own scripts
+  only), a masked replay of the minute before an error, page-load and navigation traces
+  named by route. Add new API calls through `api` and they are timed automatically.
+- **Adding to it:** new services, integrations and randomizer clients are instrumented
+  without changes. A new periodic job or event subscriber is too. For new long-running
+  work elsewhere, use `metrics.timed("<prefix>", {...})` and `sentry_tags(...)`; keep
+  metric attributes to small fixed sets (never an id).
 
 ### Conventions
 

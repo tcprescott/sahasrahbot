@@ -7,7 +7,7 @@ interface PanelProps {
 }
 
 /** A white card on the grey canvas, with an optional small-caps header. */
-export function Panel({ title, actions, children }: PanelProps) {
+export function Panel({ title, actions, children }: Readonly<PanelProps>) {
   return (
     <section className="panel">
       {(title || actions) && (
@@ -21,6 +21,6 @@ export function Panel({ title, actions, children }: PanelProps) {
   )
 }
 
-export function PanelRow({ children }: { children: ReactNode }) {
+export function PanelRow({ children }: Readonly<{ children: ReactNode }>) {
   return <div className="panel__row">{children}</div>
 }

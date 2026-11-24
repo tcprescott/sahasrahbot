@@ -47,11 +47,10 @@ function Purge() {
             unwrap(await api.POST('/api/v1/me/purge'))
           } catch (e) {
             setError((e as Error).message)
-            return true
+            return
           }
           await refresh()
           navigate('/', { replace: true })
-          return true
         }}
       >
         Your presets and nickname verifications are deleted for good, and you're signed out.

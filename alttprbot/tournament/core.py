@@ -1,9 +1,9 @@
 import logging
 from dataclasses import dataclass
+from zoneinfo import ZoneInfo
 
 import dateutil.parser
 import discord
-import pytz
 
 import config
 from alttprbot import events, models
@@ -36,10 +36,10 @@ class TournamentConfig:
 
     scheduling_needs_tracker: bool = False
 
-    admin_roles: list = None
-    helper_roles: list = None
-    commentator_roles: list = None
-    mod_roles: list = None
+    admin_roles: list | None = None
+    helper_roles: list | None = None
+    commentator_roles: list | None = None
+    mod_roles: list | None = None
 
     stream_delay: int = 0
     room_open_time: int = 35
@@ -103,7 +103,7 @@ class TournamentRace(object):
         self.players = []
 
         self.episode = None
-        self.data: TournamentConfig = None
+        self.data: TournamentConfig | None = None
 
         self.rtgg_bot = None
         self.restream_team = None
@@ -168,7 +168,8 @@ class TournamentRace(object):
         tournament_race.data = await tournament_race.configuration()
         return tournament_race
 
-    async def configuration(self) -> TournamentConfig:
+    # Async hook: callers await it and subclasses may do async work in it.
+    async def configuration(self) -> TournamentConfig:  # NOSONAR
         self.data = None
 
     def room_opened_event(self) -> events.TournamentRoomOpened:
@@ -191,28 +192,29 @@ class TournamentRace(object):
             player_discord_ids=tuple(player_discord_ids),
         )
 
-    async def send_player_room_info(self):
+    # Async hook: callers await it and subclasses may do async work in it.
+    async def send_player_room_info(self):  # NOSONAR
         # alttprbot_discord/notifications.py DMs the players (and posts the
         # announcement for open races such as the SG dailies).
         events.publish(self.room_opened_event())
 
     async def send_room_welcome(self):
-        pass
+        """Hook: post a welcome message when the room opens. Events override it; the default sends nothing."""
 
     async def on_room_creation(self):
-        pass
+        """Hook: called after the race room is created. The default does nothing."""
 
     async def on_room_resume(self):
-        pass
+        """Hook: called when the bot reconnects to an existing room. The default does nothing."""
 
     async def on_race_start(self):
-        pass
+        """Hook: called when the race starts. The default does nothing."""
 
     async def on_race_pending(self):
-        pass
+        """Hook: called when the race goes to pending. The default does nothing."""
 
     async def process_tournament_race(self, args, message):
-        pass
+        """Hook: handle !tournamentrace. Events that roll seeds override it."""
 
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
@@ -252,13 +254,13 @@ class TournamentRace(object):
             self.players.append(looked_up_player)
 
     async def make_tournament_player(self, player):
-        if not player['discordId'] == "":
+        if player['discordId'] != "":
             looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
         else:
             looked_up_player = None
 
         # then, if that doesn't work, try their discord tag kept by SG
-        if looked_up_player is None and not player['discordTag'] == '':
+        if looked_up_player is None and player['discordTag'] != '':
             looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'],
                                                                              guild=self.guild)
 
@@ -284,7 +286,7 @@ class TournamentRace(object):
         if not discord_user:
             return False
 
-        return any([True for x in self.data.helper_roles if x in discord_user.roles])
+        return any(x in discord_user.roles for x in self.data.helper_roles)
 
     @property
     def guild(self):
@@ -345,7 +347,7 @@ class TournamentRace(object):
 
     @property
     def broadcast_channels(self):
-        return [a['name'] for a in self.episode['channels'] if not " " in a['name']]
+        return [a['name'] for a in self.episode['channels'] if " " not in a['name']]
 
     @property
     def broadcast_channel_links(self):
@@ -390,19 +392,20 @@ class TournamentRace(object):
 
     @property
     def timezone(self):
-        return pytz.timezone('US/Eastern')
+        return ZoneInfo('America/New_York')
 
     @property
     def hours_before_room_open(self):
         return ((self.data.stream_delay + self.data.room_open_time) / 60)
 
     async def create_embeds(self):
-        pass
+        """Hook: build the seed embeds for this event. The default builds none."""
 
     async def process_submission_form(self, payload, submitted_by):
-        pass
+        """Hook: handle a settings submission from the web form. The default ignores it."""
 
-    async def send_audit_message(self, message=None, embed: discord.Embed = None):
+    # Async hook: callers await it and subclasses may do async work in it.
+    async def send_audit_message(self, message=None, embed: discord.Embed = None):  # NOSONAR
         # alttprbot_discord/notifications.py posts it to the audit channel.
         if self.audit_channel:
             events.publish(events.TournamentAuditRecorded(
@@ -413,7 +416,8 @@ class TournamentRace(object):
                 embed=embed.to_dict() if embed else None,
             ))
 
-    async def send_commentary_message(self, embed: discord.Embed):
+    # Async hook: callers await it and subclasses may do async work in it.
+    async def send_commentary_message(self, embed: discord.Embed):  # NOSONAR
         # alttprbot_discord/notifications.py posts it to the commentary channel.
         if self.commentary_channel and len(self.broadcast_channels) > 0:
             events.publish(events.TournamentCommentaryReady(

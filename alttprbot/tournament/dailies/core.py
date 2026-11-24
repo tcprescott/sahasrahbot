@@ -2,21 +2,12 @@ import dataclasses
 import datetime
 
 from alttprbot import models
-from alttprbot.tournament.core import TournamentConfig, TournamentRace
+from alttprbot.tournament.core import TournamentRace
 from alttprbot.util import speedgaming
 from alttprbot.services import bots
 
 
 class SGDailyRaceCore(TournamentRace):
-    async def configuration(self):
-        guild = bots.discord().get_guild(307860211333595146)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Casual',
-            event_slug="alttprdaily"
-        )
-
     async def create_race_room(self):
         self.rtgg_handler = await self.rtgg_bot.startrace(
             goal=self.data.racetime_goal,

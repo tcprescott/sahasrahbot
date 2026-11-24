@@ -16,7 +16,24 @@ Never commit real values to this file.
 DEBUG = True
 APP_URL = "http://localhost:5001"
 APP_SECRET_KEY = "dev-secret-key"
-SENTRY_URL = None  # Sentry DSN; None disables Sentry.
+
+# --- Sentry (alttprbot/observability/) ----------------------------------------
+# Only SENTRY_URL is needed in production; every other setting here may be left
+# out of config.py and falls back to the default in its comment. "Production"
+# means DEBUG = False.
+SENTRY_URL = None  # The project's DSN; None turns Sentry off (server and browser).
+SENTRY_ENVIRONMENT = None  # None: "production", or "development" when DEBUG.
+SENTRY_RELEASE = None  # None: "sahasrahbot@<git commit>" of the checkout.
+SENTRY_TRACES_SAMPLE_RATE = None  # Web requests traced, 0-1. None: 0.1 in production, else 0.
+SENTRY_COMMAND_TRACES_SAMPLE_RATE = None  # Jobs and Discord/racetime commands traced. None: 1.0 in production.
+SENTRY_PROFILES_SAMPLE_RATE = None  # Share of traced work profiled. None: 1.0 in production.
+SENTRY_LOGS_LEVEL = "INFO"  # Lowest level sent to Sentry Logs; "off" sends none.
+SENTRY_METRICS = True  # Sentry Metrics (load, requests, commands, jobs, seeds...).
+SENTRY_LOOP_WATCHDOG = True  # Report what blocks the event loop for 2s or more.
+SENTRY_BROWSER = True  # The web app reports browser errors to the same project.
+SENTRY_BROWSER_SAMPLE_RATE = 1.0  # Share of browser errors sent.
+SENTRY_BROWSER_TRACES_SAMPLE_RATE = None  # Page loads traced. None: SENTRY_TRACES_SAMPLE_RATE's value.
+SENTRY_BROWSER_REPLAY = True  # Send a masked session replay of the minute before a browser error.
 
 # --- Database (MySQL via Tortoise ORM) ---------------------------------------
 DB_HOST = "localhost"

@@ -7,7 +7,7 @@ This is the only module that reads or writes ``models.RTGGUnlistedRooms`` and
 ``alttpr/cool-room-1234``, category slugs, racetime user ids), never a handler or bot.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 
 from alttprbot import models
@@ -41,9 +41,8 @@ async def stream_override_status(racetime_id: str, category: str) -> str:
     whitelisted_user = await models.RTGGOverrideWhitelist.get_or_none(racetime_id=racetime_id, category=category)
     if whitelisted_user is None:
         return OVERRIDE_NOT_WHITELISTED
-    # Known issue (tests/test_racetime_handlers.py): ``expires`` comes back
-    # timezone-aware, so this comparison raises TypeError when it is set.
-    if whitelisted_user.expires is not None and whitelisted_user.expires < datetime.utcnow():
+    # ``expires`` comes back timezone-aware (use_tz=True), so compare with an aware now.
+    if whitelisted_user.expires is not None and whitelisted_user.expires < datetime.now(timezone.utc):
         return OVERRIDE_EXPIRED
     return OVERRIDE_ALLOWED
 

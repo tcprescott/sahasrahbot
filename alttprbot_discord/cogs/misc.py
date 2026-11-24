@@ -1,13 +1,12 @@
 import asyncio
 import datetime
 import random
+import zoneinfo
 
 import discord
-import pytz
 from aiocache import cached, Cache
 from discord import app_commands
 from discord.ext import commands
-from pytz import UnknownTimeZoneError
 
 import config
 from alttprbot.integrations import holyimage as holyimage_api
@@ -138,7 +137,7 @@ class Misc(commands.Cog):
         hour="The hour to use. Defaults to 0.",
         minute="The minute to use. Defaults to 0.",
         second="The second to use. Defaults to 0.",
-        timezone="Timezone to get the date for. Defaults to US/Eastern"
+        timezone="Timezone to get the date for. Defaults to America/New_York (US Eastern)"
     )
     async def datetime_cmd(
             self,
@@ -149,7 +148,7 @@ class Misc(commands.Cog):
             hour: app_commands.Range[int, 0, 23] = 0,
             minute: app_commands.Range[int, 0, 59] = 0,
             second: app_commands.Range[int, 0, 59] = 0,
-            timezone: str = "US/Eastern"
+            timezone: str = "America/New_York"
     ):
         if year is None:
             year = datetime.datetime.now().year
@@ -158,9 +157,9 @@ class Misc(commands.Cog):
         if day is None:
             day = datetime.datetime.now().day
         try:
-            tz = pytz.timezone(timezone)
-            time = tz.localize(datetime.datetime(year, month, day, hour, minute, second))
-        except UnknownTimeZoneError:
+            tz = zoneinfo.ZoneInfo(timezone)
+            time = datetime.datetime(year, month, day, hour, minute, second, tzinfo=tz)
+        except zoneinfo.ZoneInfoNotFoundError:
             await interaction.response.send_message(f"Unknown timezone: {timezone}", ephemeral=True)
             return
         except ValueError:
@@ -183,7 +182,7 @@ class Misc(commands.Cog):
 
     @datetime_cmd.autocomplete("timezone")
     async def datetime_autocomplete_tz(self, interaction: discord.Interaction, current: str):
-        timezones = sorted([val for val in pytz.all_timezones if val.startswith(current)][:25])
+        timezones = sorted(val for val in zoneinfo.available_timezones() if val.startswith(current))[:25]
         return [app_commands.Choice(name=timezone, value=timezone) for timezone in timezones]
 
 

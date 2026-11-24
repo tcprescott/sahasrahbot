@@ -56,13 +56,13 @@ class PresetData:
     randomizer: str
     preset_name: str
     preset_data: dict
-    namespace: str = None
+    namespace: str | None = None
 
 
 class SahasrahBotPresetCore():
     randomizer: str = "default"
-    preset_data: dict = None
-    raw: str = None
+    preset_data: dict | None = None
+    raw: str | None = None
 
     @property
     def global_preset_path(self) -> str:
@@ -71,7 +71,7 @@ class SahasrahBotPresetCore():
     def __init__(self, preset: str = None):
         self.namespace = None
         self.preset = None
-        self.preset_data: dict = None
+        self.preset_data: dict | None = None
 
         if preset:
             parsed = preset.lower().split('/')
@@ -165,8 +165,6 @@ class SahasrahBotPresetCore():
 class ALTTPRPreset(SahasrahBotPresetCore):
     randomizer = 'alttpr'
 
-    # TODO: Make this so it isn't an absolute dumpster fire
-    # this code really sucks
     async def generate(self, hints=False, nohints=False, spoilers="off", tournament=True, allow_quickswap=False,
                        endpoint_prefix="", branch=None) -> ALTTPRClient:
         if self.preset_data is None:
@@ -176,82 +174,17 @@ class ALTTPRPreset(SahasrahBotPresetCore):
         doors = self.preset_data.get('doors', False)
         avianart = self.preset_data.get('avianart', False)
         if doors:
-            branch = self.preset_data.get('branch', branch)  # stable, volatile
-            if hints:
-                settings['hints'] = 'on'
-            elif nohints:
-                settings['hints'] = 'off'
-
-            if allow_quickswap:
-                settings['quickswap'] = True
-
-            seed = await AlttprDoor.create(
-                settings=settings,
-                spoilers=spoilers == "on",
-                branch=branch
-            )
+            seed = await self._generate_doors(settings, hints, nohints, spoilers, allow_quickswap, branch)
             hash_id = seed.hash
         elif avianart:
-            preset = settings['preset']
             seed = await AVIANART.create(
-                preset=preset,
+                preset=settings['preset'],
                 race=tournament,
             )
             hash_id = seed.hash_id
         else:
-            branch = self.preset_data.get('branch', branch)  # live, tournament, beeta
-            if self.preset_data.get('customizer', False):
-                if 'l' not in settings:
-                    settings['l'] = {}
-                for i in self.preset_data.get('forced_locations', {}):
-                    quantity = i.get('quantity', 1)
-                    if quantity > len(i['locations']):
-                        quantity = len(i['locations'])
-                    for q in range(i.get('quantity', 1)):
-                        logging.info("Placing item %s (#%s)", i['item'], q)
-                        if random.randint(1, 100) <= i.get('chance', 100):
-                            location = random.choice([l for l in i['locations'] if l not in settings['l']])
-                            if not settings['l'].get(location, None) and i.get('override', True):
-                                settings['l'][location] = i['item']
-                                try:
-                                    i['locations'].remove(location)
-                                except ValueError:
-                                    continue
-                            else:
-                                logging.info(
-                                    "Skipping \"%s\" because it is already populated with \"%s\" and override is true.",
-                                    base64.b64decode(location).decode("utf8"), settings['l'][location])
-
-            if hints:
-                settings['hints'] = 'on'
-            elif nohints:
-                settings['hints'] = 'off'
-
-            settings['tournament'] = tournament
-            settings['spoilers'] = spoilers
-
-            if not 'allow_quickswap' in settings:
-                settings['allow_quickswap'] = allow_quickswap
-
-            if self.preset_data.get('customizer', False):
-                endpoint = endpoint_prefix + "/api/customizer"
-            else:
-                endpoint = endpoint_prefix + "/api/randomizer"
-
-            if branch == 'live':
-                baseurl = 'https://alttpr.com'
-            elif branch == 'beeta':
-                baseurl = 'https://beeta.alttpr.com'
-            elif branch == 'tournament':
-                baseurl = 'https://tournament.alttpr.com'
-            else:
-                baseurl = config.ALTTPR_BASEURL
-
-            seed = await ALTTPRClient.generate(
-                settings=settings,
-                endpoint=endpoint,
-                baseurl=baseurl,
-            )
+            seed = await self._generate_alttpr(settings, hints, nohints, spoilers, tournament, allow_quickswap,
+                                               endpoint_prefix, branch)
             hash_id = seed.hash
 
         await models.AuditGeneratedGames.create(
@@ -266,6 +199,77 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             avianart=avianart
         )
         return seed
+
+    async def _generate_doors(self, settings, hints, nohints, spoilers, allow_quickswap, branch):
+        branch = self.preset_data.get('branch', branch)  # stable, volatile
+        _apply_hints(settings, hints, nohints)
+
+        if allow_quickswap:
+            settings['quickswap'] = True
+
+        return await AlttprDoor.create(
+            settings=settings,
+            spoilers=spoilers == "on",
+            branch=branch
+        )
+
+    async def _generate_alttpr(self, settings, hints, nohints, spoilers, tournament, allow_quickswap,
+                               endpoint_prefix, branch):
+        branch = self.preset_data.get('branch', branch)  # live, tournament, beeta
+        customizer = self.preset_data.get('customizer', False)
+        if customizer:
+            settings.setdefault('l', {})
+            for forced in self.preset_data.get('forced_locations', {}):
+                _place_forced_item(settings['l'], forced)
+
+        _apply_hints(settings, hints, nohints)
+
+        settings['tournament'] = tournament
+        settings['spoilers'] = spoilers
+
+        if 'allow_quickswap' not in settings:
+            settings['allow_quickswap'] = allow_quickswap
+
+        endpoint = endpoint_prefix + ("/api/customizer" if customizer else "/api/randomizer")
+
+        return await ALTTPRClient.generate(
+            settings=settings,
+            endpoint=endpoint,
+            baseurl=ALTTPR_BRANCH_URLS.get(branch, config.ALTTPR_BASEURL),
+        )
+
+
+ALTTPR_BRANCH_URLS = {
+    'live': 'https://alttpr.com',
+    'beeta': 'https://beeta.alttpr.com',
+    'tournament': 'https://tournament.alttpr.com',
+}
+
+
+def _apply_hints(settings, hints, nohints):
+    if hints:
+        settings['hints'] = 'on'
+    elif nohints:
+        settings['hints'] = 'off'
+
+
+def _place_forced_item(placed: dict, forced: dict):
+    """Place a customizer preset's forced_locations entry into the placed-items map."""
+    for q in range(forced.get('quantity', 1)):
+        logging.info("Placing item %s (#%s)", forced['item'], q)
+        if random.randint(1, 100) > forced.get('chance', 100):
+            continue
+        location = random.choice([loc for loc in forced['locations'] if loc not in placed])
+        if not placed.get(location, None) and forced.get('override', True):
+            placed[location] = forced['item']
+            try:
+                forced['locations'].remove(location)
+            except ValueError:
+                continue
+        else:
+            logging.info(
+                "Skipping \"%s\" because it is already populated with \"%s\" and override is true.",
+                base64.b64decode(location).decode("utf8"), placed[location])
 
 
 class ALTTPRMystery(SahasrahBotPresetCore):
@@ -341,8 +345,8 @@ class ALTTPRMystery(SahasrahBotPresetCore):
 class SMPreset(SahasrahBotPresetCore):
     randomizer = 'sm'
     randomizer_class = SMClient
-    spoiler_key: str = None
-    seed: SMClient = None
+    spoiler_key: str | None = None
+    seed: SMClient | None = None
 
     async def generate(self, tournament=True, spoilers=False):
         if self.preset_data is None:
@@ -395,11 +399,11 @@ class SMPreset(SahasrahBotPresetCore):
     # I hate this, this should actually be a property of the seed
     def spoiler_url(self, use_yaml=True):
         if self.seed is None:
-            raise Exception("Seed has not been generated.")
+            raise RuntimeError("Seed has not been generated.")
         if self.spoiler_key is None:
             return None
         if self.hash_id is None:
-            raise Exception("Hash ID is not set.")
+            raise RuntimeError("Hash ID is not set.")
         return f"{self.seed.baseurl}/api/spoiler/{self.guid}?key={self.spoiler_key}&yaml={str(use_yaml)}"
 
 
@@ -446,7 +450,6 @@ async def mystery_generate(weights, spoilers="mystery"):
         else:
             data = ALTTPRPreset(rolledpreset)
             await data.fetch()
-            # preset_dict = await fetch_preset(rolledpreset, randomizer='alttpr')
             settings = data.preset_data['settings']
             customizer = data.preset_data.get('customizer', False)
             doors = data.preset_data.get('doors', False)

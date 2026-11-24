@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Icon } from './Icon'
 import type { IconName } from './icons'
 
-export function EmptyState({ icon, title, children }: { icon: IconName; title: string; children?: ReactNode }) {
+export function EmptyState({ icon, title, children }: Readonly<{ icon: IconName; title: string; children?: ReactNode }>) {
   return (
     <div className="empty">
       <Icon name={icon} size={36} />
@@ -12,11 +12,11 @@ export function EmptyState({ icon, title, children }: { icon: IconName; title: s
   )
 }
 
-export function Spinner({ label }: { label: string }) {
+export function Spinner({ label }: Readonly<{ label: string }>) {
   return (
-    <div className="spinner" role="status">
+    <output className="spinner">
       <Icon name="progress_activity" size={28} className="spin" />
       <span>{label}</span>
-    </div>
+    </output>
   )
 }

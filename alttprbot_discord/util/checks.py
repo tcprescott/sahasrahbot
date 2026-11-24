@@ -29,7 +29,7 @@ def restrict_command_globally(parameter, default=False):
 
 
 def has_any_channel(*channels):
-    async def predicate(ctx):
+    def predicate(ctx):
         if ctx.guild is None:
             return False
         return ctx.channel and ctx.channel.name in channels
@@ -38,7 +38,7 @@ def has_any_channel(*channels):
 
 
 def has_any_channel_id(*channels):
-    async def predicate(ctx):
+    def predicate(ctx):
         if ctx.guild is None:
             return False
         return ctx.channel and ctx.channel.id in channels

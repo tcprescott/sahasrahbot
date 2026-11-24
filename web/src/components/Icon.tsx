@@ -9,7 +9,7 @@ interface IconProps {
 }
 
 /** Decorative: the control around it carries the name. */
-export function Icon({ name, filled = false, size = 22, className }: IconProps) {
+export function Icon({ name, filled = false, size = 22, className }: Readonly<IconProps>) {
   const Svg = (filled && FILLED[name]) || ICONS[name]
   return (
     <Svg

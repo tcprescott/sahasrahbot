@@ -1,6 +1,6 @@
 from datetime import timedelta
-import pytz
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 import discord.utils
 import markdown
@@ -9,6 +9,11 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
+
+# Related-model references used by more than one field.
+USERS_MODEL = 'models.Users'
+ASYNC_TOURNAMENT_MODEL = 'models.AsyncTournament'
+RANKED_CHOICE_ELECTION_MODEL = 'models.RankedChoiceElection'
 
 RACETIME_URL = config.RACETIME_URL
 
@@ -331,7 +336,6 @@ class Users(Model):
             'async_tournament_audit_log'
         ]
         backward_relations = False
-    #     computed = ['racetime_profile']
 
 
 class TournamentGames(Model):
@@ -451,7 +455,7 @@ class RankedChoiceAuthorizedVoters(Model):
         table = 'ranked_choice_authorized_voters'
 
     id = fields.IntField(primary_key=True)
-    election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='authorized_voters')
+    election = fields.ForeignKeyField(RANKED_CHOICE_ELECTION_MODEL, related_name='authorized_voters')
     user_id = fields.BigIntField(null=False)
 
 
@@ -460,7 +464,7 @@ class RankedChoiceCandidate(Model):
         table = 'ranked_choice_candidate'
 
     id = fields.IntField(primary_key=True)
-    election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='candidates')
+    election = fields.ForeignKeyField(RANKED_CHOICE_ELECTION_MODEL, related_name='candidates')
     name = fields.CharField(200, null=False)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
@@ -472,7 +476,7 @@ class RankedChoiceVotes(Model):
         table = 'ranked_choice_votes'
 
     id = fields.IntField(primary_key=True)
-    election = fields.ForeignKeyField('models.RankedChoiceElection', related_name='votes')
+    election = fields.ForeignKeyField(RANKED_CHOICE_ELECTION_MODEL, related_name='votes')
     user_id = fields.BigIntField(null=False)
     candidate = fields.ForeignKeyField('models.RankedChoiceCandidate', related_name='votes')
     rank = fields.IntField(null=True)
@@ -509,8 +513,8 @@ class AsyncTournament(Model):
 
 class AsyncTournamentWhitelist(Model):
     id = fields.IntField(primary_key=True)
-    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='whitelist')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_whitelist', on_delete="RESTRICT")
+    tournament = fields.ForeignKeyField(ASYNC_TOURNAMENT_MODEL, related_name='whitelist')
+    user = fields.ForeignKeyField(USERS_MODEL, related_name='async_tournament_whitelist', on_delete="RESTRICT")
     discord_user_id = fields.BigIntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
@@ -522,8 +526,8 @@ class AsyncTournamentWhitelist(Model):
 
 class AsyncTournamentPermissions(Model):
     id = fields.IntField(primary_key=True)
-    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permissions')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_permissions', on_delete="RESTRICT",
+    tournament = fields.ForeignKeyField(ASYNC_TOURNAMENT_MODEL, related_name='permissions')
+    user = fields.ForeignKeyField(USERS_MODEL, related_name='async_tournament_permissions', on_delete="RESTRICT",
                                   null=True)
     discord_role_id = fields.BigIntField(null=True)
     role = fields.CharField(45, null=False)
@@ -558,7 +562,6 @@ class AsyncTournamentPermalink(Model):
         return f"{hours:02}:{minutes:02}:{seconds:02}"
 
     class PydanticMeta:
-        # computed = ['par_time_formatted']
         backward_relations = False
         # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
         exclude = ['created', 'updated', 'races', 'live_races']
@@ -569,7 +572,7 @@ class AsyncTournamentPermalinkPool(Model):
         unique_together = ('tournament', 'name')
 
     id = fields.IntField(primary_key=True)
-    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='permalink_pools')
+    tournament = fields.ForeignKeyField(ASYNC_TOURNAMENT_MODEL, related_name='permalink_pools')
     name = fields.CharField(45, null=False)
     preset = fields.CharField(45, null=True)
     created = fields.DatetimeField(auto_now_add=True)
@@ -585,7 +588,7 @@ class AsyncTournamentPermalinkPool(Model):
 
 class AsyncTournamentLiveRace(Model):
     id = fields.IntField(primary_key=True)
-    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='live_races')
+    tournament = fields.ForeignKeyField(ASYNC_TOURNAMENT_MODEL, related_name='live_races')
     pool = fields.ForeignKeyField('models.AsyncTournamentPermalinkPool', related_name='live_races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='live_races', null=True)
     racetime_slug = fields.CharField(200, null=True, unique=True)
@@ -604,7 +607,6 @@ class AsyncTournamentLiveRace(Model):
         return f"{RACETIME_URL}/{self.racetime_slug}"
 
     class PydanticMeta:
-        # computed = ['racetime_url']
         backward_relations = False
         exclude = ['created', 'updated', 'races']
 
@@ -612,16 +614,16 @@ class AsyncTournamentLiveRace(Model):
 class AsyncTournamentReviewNotes(Model):
     id = fields.IntField(primary_key=True)
     race = fields.ForeignKeyField('models.AsyncTournamentRace', related_name='review_notes')
-    author = fields.ForeignKeyField('models.Users', related_name='async_tournament_review_notes', on_delete="RESTRICT")
+    author = fields.ForeignKeyField(USERS_MODEL, related_name='async_tournament_review_notes', on_delete="RESTRICT")
     created = fields.DatetimeField(auto_now_add=True)
     note = fields.TextField(null=False)
 
 
 class AsyncTournamentRace(Model):
     id = fields.IntField(primary_key=True)
-    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='races')
+    tournament = fields.ForeignKeyField(ASYNC_TOURNAMENT_MODEL, related_name='races')
     permalink = fields.ForeignKeyField('models.AsyncTournamentPermalink', related_name='races')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_races', null=False)
+    user = fields.ForeignKeyField(USERS_MODEL, related_name='async_tournament_races', null=False)
     thread_id = fields.BigIntField(null=True)  # only set if run async in discord
     thread_open_time = fields.DatetimeField(null=True)  # only set if run async in discord
     thread_timeout_time = fields.DatetimeField(null=True)
@@ -639,7 +641,7 @@ class AsyncTournamentRace(Model):
     run_collection_rate = fields.CharField(100, null=True)
     run_igt = fields.CharField(100, null=True)
     review_status = fields.CharField(20, null=False, default="pending")  # pending, approved, rejected
-    reviewed_by = fields.ForeignKeyField('models.Users', related_name='async_tournament_reviews', null=True)
+    reviewed_by = fields.ForeignKeyField(USERS_MODEL, related_name='async_tournament_reviews', null=True)
     reviewed_at = fields.DatetimeField(null=True)
     reviewer_notes = fields.TextField(null=True)
     score = fields.FloatField(null=True)
@@ -673,14 +675,14 @@ class AsyncTournamentRace(Model):
         if self.thread_open_time is None:
             return "N/A"
 
-        return self.thread_open_time.astimezone(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
+        return self.thread_open_time.astimezone(tz=ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M:%S')
 
     @property
     def reviewed_at_formatted(self) -> Optional[str]:
         if self.reviewed_at is None:
             return ""
 
-        return self.reviewed_at.astimezone(tz=pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %H:%M:%S')
+        return self.reviewed_at.astimezone(tz=ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M:%S')
 
     @property
     def score_formatted(self) -> Optional[str]:
@@ -753,7 +755,6 @@ class AsyncTournamentRace(Model):
         return markdown.markdown(text)
 
     class PydanticMeta:
-        # computed = ['elapsed_time']
         backward_relations = False
         # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
         exclude = ['created', 'updated', 'tournament', 'review_notes']
@@ -761,8 +762,8 @@ class AsyncTournamentRace(Model):
 
 class AsyncTournamentAuditLog(Model):
     id = fields.IntField(primary_key=True)
-    tournament = fields.ForeignKeyField('models.AsyncTournament', related_name='audit_log')
-    user = fields.ForeignKeyField('models.Users', related_name='async_tournament_audit_log', null=True,
+    tournament = fields.ForeignKeyField(ASYNC_TOURNAMENT_MODEL, related_name='audit_log')
+    user = fields.ForeignKeyField(USERS_MODEL, related_name='async_tournament_audit_log', null=True,
                                   on_delete="RESTRICT")
     action = fields.CharField(45, null=False)
     created = fields.DatetimeField(auto_now_add=True)
@@ -790,7 +791,7 @@ class RacerVerification(Model):
 
 class VerifiedRacer(Model):
     id = fields.IntField(primary_key=True)
-    user = fields.ForeignKeyField('models.Users', related_name='verified_racer', on_delete="RESTRICT")
+    user = fields.ForeignKeyField(USERS_MODEL, related_name='verified_racer', on_delete="RESTRICT")
     racer_verification = fields.ForeignKeyField('models.RacerVerification', related_name='verified_racer', on_delete="CASCADE")
     estimated_count = fields.IntField(null=True)
     created = fields.DatetimeField(auto_now_add=True)

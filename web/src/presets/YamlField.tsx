@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { Button } from '../components'
 
 /** The preset's YAML: typed or pasted in, or loaded from a file on this device. */
-export function YamlField({ value, onChange, id = 'preset-yaml' }: { value: string; onChange: (value: string) => void; id?: string }) {
+export function YamlField({ value, onChange, id = 'preset-yaml' }: Readonly<{ value: string; onChange: (value: string) => void; id?: string }>) {
   const file = useRef<HTMLInputElement>(null)
   return (
     <div className="field">

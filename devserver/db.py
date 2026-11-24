@@ -38,7 +38,7 @@ async def init():
 
 async def _tables(conn):
     _, rows = await conn.execute_query("SHOW TABLES")
-    return [list(r.values())[0] for r in rows]
+    return [next(iter(r.values())) for r in rows]
 
 
 async def reset():

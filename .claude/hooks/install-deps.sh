@@ -6,7 +6,7 @@
 # Never edits pyproject.toml or poetry.lock.
 set -uo pipefail
 
-if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
+if [[ "${CLAUDE_CODE_REMOTE:-}" != "true" ]]; then
   exit 0
 fi
 
@@ -20,7 +20,9 @@ fi
 # racetime-bot is pinned as a GitHub archive URL, which the cloud egress proxy
 # can refuse. Install everything Poetry can, then fall back to a git install of
 # the same commit for racetime-bot if it is still missing.
-if ! poetry install --no-root --no-interaction --no-ansi >/tmp/poetry-install.log 2>&1; then
+# Four locked packages are source-only (see .github/workflows/test.yml), so their
+# build scripts have to run.
+if ! poetry install --no-root --no-interaction --no-ansi >/tmp/poetry-install.log 2>&1; then  # NOSONAR
   # Poetry aborts the whole install on the one refused download, which can leave
   # other packages missing or at stale versions. Install the locked versions
   # directly instead (racetime-bot is handled below).
@@ -32,7 +34,7 @@ fi
 
 if ! poetry run python -c "import racetime_bot" >/dev/null 2>&1; then
   ref=$(grep -o 'racetime-bot/archive/[0-9a-f]*' pyproject.toml | head -1 | sed 's|.*/||')
-  if [ -n "$ref" ]; then
+  if [[ -n "$ref" ]]; then
     poetry run python -m pip install -q "racetime-bot @ git+https://github.com/tcprescott/racetime-bot@${ref}" \
       >>/tmp/poetry-install.log 2>&1 || true
   fi
@@ -41,7 +43,7 @@ fi
 # Test tooling (requirements-test.txt) is not (yet) in the Poetry dev group;
 # install it into the venv without touching the dependency files.
 if ! poetry run python -c "import pytest, pytest_asyncio, pytest_cov" >/dev/null 2>&1; then
-  poetry run python -m pip install -q --only-binary=:all: -r requirements-test.txt >>/tmp/poetry-install.log 2>&1 || true
+  poetry run python -m pip install -q --only-binary=:all: -r requirements-test.txt >>/tmp/poetry-install.log 2>&1 || true  # NOSONAR: wheels only
 fi
 command -v ruff >/dev/null 2>&1 || pipx install ruff >/dev/null 2>&1 || true
 

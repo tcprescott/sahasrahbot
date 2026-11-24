@@ -10,10 +10,6 @@ from alttprbot.exceptions import SahasrahBotException
 from ..util import embed_formatter
 
 
-# from emoji import is_emoji
-
-# this is a pile of shit and needs to be refactored
-
 class Role(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -57,7 +53,7 @@ class Role(commands.Cog):
     @commands.group(aliases=['rr'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactionrole(self, ctx):
-        pass
+        """Command group for reaction roles; the subcommands do the work."""
 
     @reactionrole.command(name='create', aliases=['c'])
     async def role_create(self, ctx, group_id: int, role_name: discord.Role, name, description, emoji,
@@ -98,7 +94,7 @@ class Role(commands.Cog):
     @commands.group(aliases=['rg'])
     @commands.check_any(commands.has_permissions(manage_roles=True), commands.is_owner())
     async def reactiongroup(self, ctx):
-        pass
+        """Command group for reaction role groups; the subcommands do the work."""
 
     @reactiongroup.command(name='create', aliases=['c'])
     async def group_create(self, ctx, channel: discord.TextChannel, name, description=None, bot_managed: bool = True,
@@ -151,7 +147,7 @@ class Role(commands.Cog):
                     await ctx.reply(f"Failed to find member identified by {i['member']}")
                     continue
 
-                if not mode == "dry":
+                if mode != "dry":
                     await member_obj.add_roles(role_obj)
         else:
             raise SahasrahBotException("You must supply a valid csv file.")
@@ -175,7 +171,7 @@ async def refresh_bot_message(ctx, group_id):
     #                raise
 
     if group.bot_managed:
-        embed = embed_formatter.reaction_menu(ctx, group, roles)
+        embed = embed_formatter.reaction_menu(group, roles)
         await message.edit(content=None, embed=embed)
 
 

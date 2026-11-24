@@ -5,11 +5,11 @@ Events with ``auto_record`` on also get the race recorded on racetime.gg.
 """
 import datetime
 import logging
+from zoneinfo import ZoneInfo
 
 import gspread.exceptions
 import gspread_asyncio
 import isodate
-import pytz
 
 import config
 from alttprbot import models, tournaments
@@ -98,7 +98,7 @@ def result_row(race: models.TournamentResults, race_data: dict, stream_delay: in
     winner = [e for e in race_data['entrants'] if e['place'] == 1][0]
     runnerup = [e for e in race_data['entrants'] if e['place'] in [2, None]][0]
 
-    started_at = isodate.parse_datetime(race_data['started_at']).astimezone(pytz.timezone('US/Eastern'))
+    started_at = isodate.parse_datetime(race_data['started_at']).astimezone(ZoneInfo('America/New_York'))
     ended_at = isodate.parse_datetime(race_data['ended_at'])
     record_at = ended_at + datetime.timedelta(minutes=stream_delay)
 

@@ -25,14 +25,69 @@ class ALTTPRClient(ALTTPR):
         return generated_goal(self.data)
 
 
+ENEMY_SHUFFLE = 'enemizer.enemy_shuffle'
+BOSS_SHUFFLE = 'enemizer.boss_shuffle'
+ENEMY_DAMAGE = 'enemizer.enemy_damage'
+ENEMY_HEALTH = 'enemizer.enemy_health'
+
+GLITCH_WORDS = {
+    'OverworldGlitches': "overworld glitches",
+    'MajorGlitches': "major glitches",
+    'NoLogic': "no logic",
+}
+
+DUNGEON_ITEM_WORDS = {
+    'mc': "mc",
+    'mcs': "mcs",
+    'full': "keysanity",
+}
+
+
 def is_enemizer(settings):
-    return settings['enemizer.boss_shuffle'] != 'none' or settings['enemizer.enemy_shuffle'] != 'none' or settings[
-        'enemizer.enemy_damage'] != 'default' or settings['enemizer.enemy_health'] != 'default'
+    return settings[BOSS_SHUFFLE] != 'none' or settings[ENEMY_SHUFFLE] != 'none' or settings[
+        ENEMY_DAMAGE] != 'default' or settings[ENEMY_HEALTH] != 'default'
+
+
+def _is_normal_pool(settings):
+    return settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal'
+
+
+def _difficulty_word(settings):
+    if settings['item_pool'] not in ['easy', 'normal'] or settings['item_functionality'] not in ['easy', 'normal']:
+        return 'hard'
+    if settings['dungeon_items'] == 'full' and settings['goal'] != 'dungeons':
+        return 'normal'
+    return None
+
+
+def _mode_words(settings):
+    if settings['dungeon_items'] == 'full' and settings['goal'] == 'dungeons':
+        return []
+    mode, weapons = settings['mode'], settings['weapons']
+    if mode == 'open':
+        casual = (settings['shuffle'] == 'none' and not is_enemizer(settings) and _is_normal_pool(settings)
+                  and weapons != 'swordless')
+        return ['casual', 'open'] if casual else ['open']
+    if mode == 'standard' and weapons == 'randomized':
+        return ['standard']
+    if mode == 'standard' and weapons == 'assured' and _is_normal_pool(settings):
+        return ['casual']
+    if mode in ('inverted', 'retro'):
+        return [mode]
+    return []
+
+
+def _goal_word(settings):
+    goal, shuffled = settings['goal'], settings['shuffle'] != 'none'
+    if goal == 'ganon' and shuffled:
+        return "defeat ganon"
+    if goal == 'fast_ganon' and not shuffled:
+        return "fast ganon"
+    return {'dungeons': "all dungeons", 'triforce-hunt': "triforce hunt", 'pedestal': "pedestal"}.get(goal)
 
 
 def generated_goal(data):
     """Describe a generated ALTTPR game (e.g. "casual open") from its API response data."""
-    settings_list = []
     meta = data['spoiler'].get('meta', {})
 
     if meta.get('spoilers', 'off') == 'mystery':
@@ -49,73 +104,29 @@ def generated_goal(data):
         'item_functionality': meta.get('item_functionality', 'normal'),
         'entry_crystals_ganon': meta.get('entry_crystals_ganon', '7'),
         'entry_crystals_tower': meta.get('entry_crystals_tower', '7'),
-        'enemizer.boss_shuffle': meta.get('enemizer.boss_shuffle', 'none'),
-        'enemizer.enemy_damage': meta.get('enemizer.enemy_damage', 'default'),
-        'enemizer.enemy_health': meta.get('enemizer.enemy_health', 'default'),
-        'enemizer.enemy_shuffle': meta.get('enemizer.enemy_shuffle', 'none'),
+        BOSS_SHUFFLE: meta.get(BOSS_SHUFFLE, 'none'),
+        ENEMY_DAMAGE: meta.get(ENEMY_DAMAGE, 'default'),
+        ENEMY_HEALTH: meta.get(ENEMY_HEALTH, 'default'),
+        ENEMY_SHUFFLE: meta.get(ENEMY_SHUFFLE, 'none'),
     }
 
-    if not settings['item_pool'] in ['easy', 'normal'] or not settings['item_functionality'] in ['easy', 'normal']:
-        settings_list.append('hard')
-    elif settings['dungeon_items'] == 'full' and not settings['goal'] == 'dungeons':
-        settings_list.append('normal')
+    settings_list = [
+        _difficulty_word(settings),
+        "enemizer" if is_enemizer(settings) else None,
+        'swordless' if settings['weapons'] == 'swordless' else None,
+        *_mode_words(settings),
+        # The glitch level is read from 'goal', as it always has been.
+        GLITCH_WORDS.get(settings['goal']),
+    ]
 
-    if is_enemizer(settings):
-        settings_list.append("enemizer")
+    if settings['entry_crystals_tower'] != '7' or settings['entry_crystals_ganon'] != '7':
+        settings_list.append(f"{settings['entry_crystals_tower']}/{settings['entry_crystals_ganon']}")
 
-    if settings['weapons'] == 'swordless':
-        settings_list.append('swordless')
+    settings_list += [
+        _goal_word(settings),
+        DUNGEON_ITEM_WORDS.get(settings['dungeon_items']),
+        "+ entrance shuffle" if settings['shuffle'] != 'none' else None,
+        "(customizer)" if meta.get('difficulty', None) == 'custom' else None,
+    ]
 
-    if not (settings['dungeon_items'] == 'full' and settings['goal'] == 'dungeons'):
-        if settings['mode'] == 'open':
-            if settings['shuffle'] == 'none' and not is_enemizer(settings) and (
-                    settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal') and not \
-                    settings['weapons'] == 'swordless':
-                settings_list.append('casual')
-            settings_list.append('open')
-        elif settings['mode'] == 'standard' and settings['weapons'] == 'randomized':
-            settings_list.append('standard')
-        elif settings['mode'] == 'standard' and settings['weapons'] == 'assured' and (
-                settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal'):
-            settings_list.append('casual')
-        elif settings['mode'] == 'inverted':
-            settings_list.append('inverted')
-        elif settings['mode'] == 'retro':
-            settings_list.append('retro')
-
-    if settings['goal'] == 'OverworldGlitches':
-        settings_list.append("overworld glitches")
-    elif settings['goal'] == 'MajorGlitches':
-        settings_list.append("major glitches")
-    elif settings['goal'] == 'NoLogic':
-        settings_list.append("no logic")
-
-    if not settings['entry_crystals_tower'] == '7' or not settings['entry_crystals_ganon'] == '7':
-        settings_list.append(
-            f"{settings['entry_crystals_tower']}/{settings['entry_crystals_ganon']}")
-
-    if settings['goal'] == 'ganon' and settings['shuffle'] != 'none':
-        settings_list.append("defeat ganon")
-    elif settings['goal'] == 'fast_ganon' and settings['shuffle'] == 'none':
-        settings_list.append("fast ganon")
-    elif settings['goal'] == 'dungeons':
-        settings_list.append("all dungeons")
-    elif settings['goal'] == 'triforce-hunt':
-        settings_list.append("triforce hunt")
-    elif settings['goal'] == 'pedestal':
-        settings_list.append("pedestal")
-
-    if settings['dungeon_items'] == 'mc':
-        settings_list.append("mc")
-    elif settings['dungeon_items'] == 'mcs':
-        settings_list.append("mcs")
-    elif settings['dungeon_items'] == 'full':
-        settings_list.append("keysanity")
-
-    if not settings['shuffle'] == 'none':
-        settings_list.append("+ entrance shuffle")
-
-    if meta.get('difficulty', None) == 'custom':
-        settings_list.append("(customizer)")
-
-    return " ".join(settings_list)
+    return " ".join(word for word in settings_list if word)

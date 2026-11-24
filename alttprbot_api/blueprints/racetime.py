@@ -7,6 +7,7 @@ from quart_discord import requires_authorization
 
 import config
 from alttprbot import models
+from alttprbot.exceptions import NotFoundError
 from alttprbot_api.api import discord
 from alttprbot.services import bots
 
@@ -34,7 +35,7 @@ async def bot_command():
 
     racetime_bot = bots.racetime_bots().get(category)
     if not racetime_bot:
-        raise Exception("Invalid game category")
+        raise NotFoundError("Invalid game category")
 
     racetime_handler = racetime_bot.handlers.get(f"{category}/{room}").handler
 
@@ -55,7 +56,7 @@ async def bot_command():
                 'can_moderate': True,
             },
             'bot': False,
-            'posted_at': datetime.datetime.utcnow().isoformat(),
+            'posted_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'message': cmd,
             'message_plain': cmd,
             'highlight': False,
@@ -65,7 +66,7 @@ async def bot_command():
             'delay': 0
         },
         'type': 'message.chat',
-        'date': datetime.datetime.utcnow().isoformat(),
+        'date': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
     await racetime_handler.send_message(f"Executing command from API request: {cmd}")
@@ -117,7 +118,7 @@ async def return_racetime_verify():
     # this is really ugly and needs to be refactored
     rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
     discord_user = await models.Users.get_or_none(discord_user_id=user.id)
-    if not rtgg_user == discord_user and rtgg_user is not None and discord_user is not None:
+    if rtgg_user != discord_user and rtgg_user is not None and discord_user is not None:
         kept_user = await merge_users(rtgg_user, discord_user)
         kept_user.display_name = user.name
         await kept_user.save()

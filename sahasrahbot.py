@@ -1,35 +1,25 @@
 import asyncio
 import urllib.parse
 
-import sentry_sdk
-from sentry_sdk.integrations.aiohttp import AioHttpIntegration
-from tortoise import Tortoise
-
 import config
-from alttprbot.exceptions import SahasrahBotException
-from alttprbot.services import scheduled_jobs
-from alttprbot.services.scheduler import Scheduler
-from alttprbot_api.api import sahasrahbotapi
-from alttprbot_discord import gateways as discord_gateways
-from alttprbot_discord import notifications as discord_notifications
-from alttprbot_discord.bot import discordbot, start_bot as start_discord_bot
-from alttprbot_racetime import gateways as racetime_gateways
-from alttprbot_racetime.bot import start_racetime
+from alttprbot.observability import runtime as observability_runtime
+from alttprbot.observability import sentry as observability
+from alttprbot.observability import watchdog as observability_watchdog
 
-if config.SENTRY_URL:
-    def before_send(event, hint):
-        if 'exc_info' in hint:
-            _, exc_value, _ = hint['exc_info']
-            if isinstance(exc_value, (SahasrahBotException)):
-                return None
-        return event
+# Before the bots and the web app are built, so Sentry's integrations wrap them.
+# Does nothing without config.SENTRY_URL.
+observability.init_sentry()
 
+from tortoise import Tortoise  # noqa: E402
 
-    sentry_sdk.init(
-        config.SENTRY_URL,
-        integrations=[AioHttpIntegration()],
-        before_send=before_send
-    )
+from alttprbot.services import scheduled_jobs  # noqa: E402
+from alttprbot.services.scheduler import Scheduler  # noqa: E402
+from alttprbot_api.api import sahasrahbotapi  # noqa: E402
+from alttprbot_discord import gateways as discord_gateways  # noqa: E402
+from alttprbot_discord import notifications as discord_notifications  # noqa: E402
+from alttprbot_discord.bot import discordbot, start_bot as start_discord_bot  # noqa: E402
+from alttprbot_racetime import gateways as racetime_gateways  # noqa: E402
+from alttprbot_racetime.bot import start_racetime  # noqa: E402
 
 
 async def database():
@@ -71,4 +61,13 @@ if __name__ == '__main__':
     loop.create_task(start_discord_bot())
     start_racetime(loop)
     loop.create_task(sahasrahbotapi.run(host='127.0.0.1', port=5001, use_reloader=False, loop=loop))
-    loop.run_forever()
+
+    # Event-loop lag, process and bot gauges for Sentry, and the blocked-loop watchdog.
+    loop.call_soon(observability_runtime.start)
+    if observability.enabled() and observability.setting('SENTRY_LOOP_WATCHDOG', True):
+        loop.call_soon(observability_watchdog.start)
+
+    try:
+        loop.run_forever()
+    finally:
+        observability.flush()

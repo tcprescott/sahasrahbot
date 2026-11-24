@@ -13,7 +13,7 @@ from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDen
 MAX_LINE = 19
 # The hyphen is last on purpose: the old form had it between "," and "…", which made a
 # range that let through almost every character (é, ß, emoji are all in it).
-LINE = re.compile(r"^[A-Za-z0-9 ?!,….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ\-]{0,19}$")
+LINE = re.compile(r"^[A-Za-z0-9 ?!,….~～'↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ-]{0,19}$")
 LINE_NAMES = ('first', 'second', 'third')
 STATUSES = ('pending', 'approved', 'rejected', 'all')
 
@@ -33,7 +33,9 @@ async def moderated_pools(user_id: int) -> list[str]:
 
 
 def _status(approved) -> str:
-    return 'pending' if approved is None else 'approved' if approved else 'rejected'
+    if approved is None:
+        return 'pending'
+    return 'approved' if approved else 'rejected'
 
 
 def _text(row: models.TriforceTexts, with_author: bool) -> dict:

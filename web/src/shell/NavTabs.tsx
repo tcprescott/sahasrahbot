@@ -7,7 +7,7 @@ import { DOCS_URL, TABS } from './tabs'
  * bar on phone. Both are in the DOM; CSS shows one, and the hidden one is
  * display:none so it's out of the accessibility tree too.
  */
-export function NavTabs({ variant }: { variant: 'rail' | 'tabbar' }) {
+export function NavTabs({ variant }: Readonly<{ variant: 'rail' | 'tabbar' }>) {
   const { pathname } = useLocation()
   return (
     <ul className={`nav nav--${variant}`}>

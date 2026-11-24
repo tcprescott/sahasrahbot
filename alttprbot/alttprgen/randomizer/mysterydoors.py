@@ -1,7 +1,6 @@
 import copy
 import logging
 from dataclasses import dataclass
-from typing import Union
 import random
 
 from pyz3r.mystery import get_random_option, generate_random_settings
@@ -16,9 +15,9 @@ class AlttprMystery:
     settings: dict
     customizer: bool = False
     doors: bool = False
-    custom_instructions: str = None
-    seed: Union[AlttprDoor, ALTTPRClient] = None
-    branch: str = None
+    custom_instructions: str | None = None
+    seed: AlttprDoor | ALTTPRClient | None = None
+    branch: str | None = None
 
 
 BASE_DOORS_PAYLOAD = {
@@ -73,6 +72,66 @@ BASE_DOORS_PAYLOAD = {
 }
 
 
+def _roll_start_inventory(weights):
+    """Roll the starting items, capped at a random sample of startinventorylimit."""
+    inventoryweights: dict = weights.get('startinventory', {})
+
+    startinventory_limit = get_random_option(weights.get('startinventorylimit', None))
+
+    startitems = []
+    for item in inventoryweights:
+        count = get_random_option(weights['startinventory'][item])
+        if count > 0:
+            startitems += count * [item]
+
+    # if we have a startinventory limit, limit the number of items by random sampling
+    if startinventory_limit is not None and len(startitems) > startinventory_limit:
+        startitems = random.sample(startitems, k=startinventory_limit)
+    return startitems
+
+
+def _force_assured_swords(options):
+    # This is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
+    # Play https://alttpr.com/en/h/30yAqZ99yV if you don't believe me. <3
+    enemizer = (options['enemy_shuffle'] != 'none' or options['enemy_damage'] != 'default'
+                or options['enemy_health'] != 'default')
+    if options['weapons'] not in ['vanilla', 'assured'] and options['world_state'] == 'standard' and enemizer:
+        options['weapons'] = 'assured'
+
+
+def _rule_matches(rule, options):
+    """True when every exact-match condition of the rule holds (other match types are ignored)."""
+    return all(
+        options[condition['Key']] == condition['Value']
+        for condition in rule.get('conditions', {})
+        if condition.get('MatchType', 'exact') == 'exact'
+    )
+
+
+def _apply_rules(weights, options):
+    for rule in weights.get('rules', {}):
+        if _rule_matches(rule, options):
+            for key, value in rule.get('actions', {}).items():
+                options[key] = get_random_option(value)
+
+
+# setting -> (dungeon_items values that turn it on when the weights don't roll it directly)
+_DUNGEON_ITEM_DEFAULTS = {
+    "mapshuffle": ('mc', 'mcs', 'full'),
+    "compassshuffle": ('mc', 'mcs', 'full'),
+    "keyshuffle": ('mcs', 'full'),
+    "bigkeyshuffle": ('full',),
+    "keysanity": ('full',),
+}
+
+
+def _dungeon_item_settings(weights, options):
+    return {
+        setting: options[setting] == 'on' if setting in weights else options['dungeon_items'] in on_for
+        for setting, on_for in _DUNGEON_ITEM_DEFAULTS.items()
+    }
+
+
 def generate_doors_settings(weights, options):
     branch = weights.get('options', {}).get('branch', 'stable')
 
@@ -119,49 +178,11 @@ def generate_doors_settings(weights, options):
         options["keyshuffle"] = get_random_option(weights.get('keyshuffle', "none"))
         options["dropshuffle"] = get_random_option(weights.get('dropshuffle', "none"))
 
-    inventoryweights: dict = weights.get('startinventory', {})
-
-    startinventory_limit = get_random_option(weights.get('startinventorylimit', None))
-
-    # shuffle order of startinventory
-    startitems = []
-    for item in inventoryweights:
-        count = get_random_option(weights['startinventory'][item])
-        if count > 0:
-            startitems += count * [item]
-
-    # if we have a startinventory limit, limit the number of items by random sampling
-    if startinventory_limit is not None and len(startitems) > startinventory_limit:
-        startitems = random.sample(startitems, k=startinventory_limit)
-
+    startitems = _roll_start_inventory(weights)
     options['startinventory'] = ','.join(startitems)
 
-    # This if statement is dedicated to the survivors of http://www.speedrunslive.com/races/result/#!/264658
-    # Play https://alttpr.com/en/h/30yAqZ99yV if you don't believe me. <3
-    if options['weapons'] not in ['vanilla', 'assured'] and options['world_state'] == 'standard' and (
-            options['enemy_shuffle'] != 'none'
-            or options['enemy_damage'] != 'default'
-            or options['enemy_health'] != 'default'):
-        options['weapons'] = 'assured'
-
-    # apply rules
-    for rule in weights.get('rules', {}):
-        conditions = rule.get('conditions', {})
-        actions = rule.get('actions', {})
-
-        # iterate through each condition
-        match = True
-
-        for condition in conditions:
-            if condition.get('MatchType', 'exact') == 'exact':
-                if options[condition['Key']] == condition['Value']:
-                    continue
-                else:
-                    match = False
-
-        if match:
-            for key, value in actions.items():
-                options[key] = get_random_option(value)
+    _force_assured_swords(options)
+    _apply_rules(weights, options)
 
     settings = copy.deepcopy(BASE_DOORS_PAYLOAD)
 
@@ -170,8 +191,8 @@ def generate_doors_settings(weights, options):
 
     settings["logic"] = "noglitches"
 
-    settings["goal"] = 'crystals' if options['goals'] == 'fast_ganon' else (
-        'triforcehunt' if options['goals'] == 'triforce-hunt' else options['goals'])
+    door_goals = {'fast_ganon': 'crystals', 'triforce-hunt': 'triforcehunt'}
+    settings["goal"] = door_goals.get(options['goals'], options['goals'])
 
     settings["crystals_gt"] = options['tower_open']
     settings["crystals_ganon"] = options['ganon_open']
@@ -187,9 +208,8 @@ def generate_doors_settings(weights, options):
     settings["algorithm"] = options['algorithm']
     settings["shuffleganon"] = True
     settings["shuffle"] = "vanilla" if options['entrance_shuffle'] == "none" else options['entrance_shuffle']
-    settings["openpyramid"] = settings['goal'] in ['crystals', 'trinity'] if settings['shuffle'] in ['vanilla',
-                                                                                                     'dungeonsfull',
-                                                                                                     'dungeonssimple'] else False
+    settings["openpyramid"] = (settings['shuffle'] in ['vanilla', 'dungeonsfull', 'dungeonssimple']
+                               and settings['goal'] in ['crystals', 'trinity'])
     settings["shufflepots"] = options['pot_shuffle'] == 'on'
     settings["shuffleenemies"] = options['enemy_shuffle']
     settings["shufflebosses"] = options['boss_shuffle']
@@ -200,18 +220,7 @@ def generate_doors_settings(weights, options):
     settings["pottery"] = options['pottery']
     settings["colorizepots"] = options['colorizepots'] == 'on'
 
-    settings["mapshuffle"] = options['mapshuffle'] == 'on' if 'mapshuffle' in weights else options['dungeon_items'] in [
-        'mc', 'mcs', 'full']
-    settings["compassshuffle"] = options['compassshuffle'] == 'on' if 'compassshuffle' in weights else options[
-                                                                                                           'dungeon_items'] in [
-                                                                                                           'mc', 'mcs',
-                                                                                                           'full']
-    settings["keyshuffle"] = options['keyshuffle'] == 'on' if 'keyshuffle' in weights else options['dungeon_items'] in [
-        'mcs', 'full']
-    settings["bigkeyshuffle"] = options['bigkeyshuffle'] == 'on' if 'bigkeyshuffle' in weights else options[
-                                                                                                        'dungeon_items'] == 'full'
-    settings["keysanity"] = options['keysanity'] == 'on' if 'keysanity' in weights else options[
-                                                                                            'dungeon_items'] == 'full'
+    settings.update(_dungeon_item_settings(weights, options))
 
     settings["timer"] = options["timer"]
     settings["experimental"] = options['experimental'] == 'on'
@@ -278,7 +287,6 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
         customizer = False
         doors = True
         branch = weights.get('options', {}).get('branch', 'stable')
-        # return settings, False, True
     else:
         settings, customizer = generate_random_settings(weights, tournament=tournament, spoilers=spoilers)
         doors = False
