@@ -93,8 +93,8 @@ async def can_manage_elections(user_id: int, admin_guild_ids: Iterable[int]) -> 
     return await directory.is_owner(user_id) or bool(await directory.bot_guilds(admin_guild_ids))
 
 
-async def servers(user_id: int, admin_guild_ids: Iterable[int]) -> list[dict]:
-    """The servers ``user_id`` can run elections in: those of ``admin_guild_ids``
+async def servers(admin_guild_ids: Iterable[int]) -> list[dict]:
+    """The servers someone can run elections in: those of ``admin_guild_ids``
     (where Discord says they have Administrator) that the bot is in."""
     return [{'id': g.id, 'name': g.name} for g in await discord_directory.get().bot_guilds(admin_guild_ids)]
 

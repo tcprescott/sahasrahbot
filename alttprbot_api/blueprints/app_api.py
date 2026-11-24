@@ -271,7 +271,7 @@ async def election_servers():
     """Servers the viewer can run elections in. Empty means they can't run any (the web app hides the Elections tab)."""
     user = await require_user()
     return schemas.ServerList(servers=[schemas.ServerOption(id=str(s['id']), name=s['name'])
-                                       for s in await elections.servers(user.id, await admin_guild_ids(user.id))])
+                                       for s in await elections.servers(await admin_guild_ids(user.id))])
 
 
 @app_api_blueprint.get('/elections/servers/<int:guild_id>')

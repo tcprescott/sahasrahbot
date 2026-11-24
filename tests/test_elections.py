@@ -63,7 +63,7 @@ async def test_admins_and_the_owner_manage(db, server):
     assert await elections.can_manage_elections(OWNER, [])
     assert not await elections.can_manage_elections(VOTER, [])
     assert not await elections.can_manage_elections(VOTER, [999])  # a server the bot isn't in
-    assert await elections.servers(ADMIN, [GUILD, 999]) == [{"id": GUILD, "name": "Community"}]
+    assert await elections.servers([GUILD, 999]) == [{"id": GUILD, "name": "Community"}]
 
 
 async def test_server_options(db, server):
