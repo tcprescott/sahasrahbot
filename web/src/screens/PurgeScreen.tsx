@@ -22,6 +22,7 @@ function Purge() {
           <ul>
             <li>Your preset namespace and every preset in it.</li>
             <li>Your nickname verifications.</li>
+            <li>Your API tokens, and the AI clients you connected.</li>
           </ul>
           <p className="muted">
             Everything else, like race results and your racetime.gg link, stays. This can't be
@@ -53,7 +54,7 @@ function Purge() {
           navigate('/', { replace: true })
         }}
       >
-        Your presets and nickname verifications are deleted for good, and you're signed out.
+        Your presets, nickname verifications and API tokens are deleted for good, and you're signed out.
       </ConfirmDialog>
     </>
   )

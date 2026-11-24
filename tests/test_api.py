@@ -616,3 +616,66 @@ def test_triforce_characters_match_the_web_app():
     rules = (Path(__file__).resolve().parent.parent / "web/src/triforce/rules.ts").read_text(encoding="utf-8")
     web = re.search(r"/\^\[(.*?)\]\*\$/u", rules).group(1)
     assert web == server
+
+
+# --- API access page and AI client consent -----------------------------------
+
+
+async def test_tokens_page_makes_lists_and_revokes(client, login):
+    login(91000000000000001, "alice")
+    status, made = await send_json(client, "POST", "/api/v1/tokens",
+                                   {"name": "script", "read_only": False, "expires_in_days": 30})
+    assert status == 201
+    assert made["token"].startswith("sb_pat_")
+    assert made["row"]["read_only"] is False
+
+    status, body = await get_json(client, "/api/v1/tokens")
+    assert status == 200
+    assert [t["name"] for t in body["tokens"]] == ["script"]
+    assert body["mcp_url"].endswith("/mcp")
+    assert "token" not in body["tokens"][0]
+
+    resp = await client.delete(f"/api/v1/tokens/{made['row']['id']}", headers=CSRF)
+    assert resp.status_code == 204
+    assert (await get_json(client, "/api/v1/tokens"))[1]["tokens"] == []
+    status, body = await send_json(client, "DELETE", f"/api/v1/tokens/{made['row']['id']}")
+    assert status == 404
+
+
+async def test_tokens_page_needs_sign_in_and_the_csrf_header(client, login):
+    assert (await client.get("/api/v1/tokens")).status_code == 401
+    login(91000000000000001, "alice")
+    status, _ = await send_json(client, "POST", "/api/v1/tokens", {"name": "x"}, headers={})
+    assert status == 403
+    status, body = await send_json(client, "POST", "/api/v1/tokens", {"name": "x", "expires_in_days": 7})
+    assert status == 400
+
+
+async def test_consent_screen_routes(client, login, monkeypatch):
+    from urllib.parse import parse_qs, urlsplit
+
+    from alttprbot.services import api_tokens, mcp_auth
+    monkeypatch.setattr(mcp_auth, "_pending", {})
+    redirect = "https://claude.ai/api/mcp/auth_callback"
+    await mcp_auth.register_client("c", "Claude", [redirect], ["authorization_code"], ["code"], mcp_auth.CLIENT_SCOPE)
+
+    def begin():
+        return mcp_auth.begin_authorization(mcp_auth.PendingAuthorization(
+            client_id="c", redirect_uri=redirect, redirect_uri_provided_explicitly=True, code_challenge="x",
+            state="s", resource=None))
+
+    login(91000000000000001, "alice")
+    txn = begin()
+    status, body = await get_json(client, f"/api/v1/oauth/requests/{txn}")
+    assert (status, body) == (200, {"client_name": "Claude", "redirect_target": "claude.ai"})
+    status, body = await send_json(client, "POST", f"/api/v1/oauth/requests/{txn}/approve", {"allow_changes": True})
+    assert status == 200
+    code = parse_qs(urlsplit(body["redirect_url"]).query)["code"][0]
+    stored = await mcp_auth.load_code("c", code)
+    assert (stored.discord_user_id, stored.read_only) == (91000000000000001, False)
+    assert (await get_json(client, f"/api/v1/oauth/requests/{txn}"))[0] == 404
+
+    txn = begin()
+    status, body = await send_json(client, "POST", f"/api/v1/oauth/requests/{txn}/deny")
+    assert status == 200 and "error=access_denied" in body["redirect_url"]
+    assert await api_tokens.list_for_user(91000000000000001) == []

@@ -17,9 +17,12 @@ async def profile(discord_user_id: int) -> dict:
 
 
 async def purge(discord_user_id: int) -> None:
-    """Delete the user's preset namespace (and its presets) and nickname verifications."""
+    """Delete the user's preset namespace (and its presets), nickname verifications,
+    API tokens and connected AI clients."""
     await models.PresetNamespaces.filter(discord_user_id=discord_user_id).delete()
     await models.NickVerification.filter(discord_user_id=discord_user_id).delete()
+    await models.ApiToken.filter(discord_user_id=discord_user_id).delete()
+    await models.McpAuthorizationCode.filter(discord_user_id=discord_user_id).delete()
 
 
 async def link_racetime(discord_user_id: int, discord_name: str, rtgg_id: str, rtgg_access_token: str) -> None:

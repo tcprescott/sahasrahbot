@@ -14,6 +14,7 @@ import CheckCircleIcon from '@material-symbols/svg-400/outlined/check_circle.svg
 import ChevronLeftIcon from '@material-symbols/svg-400/outlined/chevron_left.svg?react'
 import ChevronRightIcon from '@material-symbols/svg-400/outlined/chevron_right.svg?react'
 import CloseIcon from '@material-symbols/svg-400/outlined/close.svg?react'
+import ContentCopyIcon from '@material-symbols/svg-400/outlined/content_copy.svg?react'
 import DarkModeIcon from '@material-symbols/svg-400/outlined/dark_mode.svg?react'
 import DeleteIcon from '@material-symbols/svg-400/outlined/delete.svg?react'
 import DescriptionIcon from '@material-symbols/svg-400/outlined/description.svg?react'
@@ -28,6 +29,7 @@ import HomeFillIcon from '@material-symbols/svg-400/outlined/home-fill.svg?react
 import HowToVoteIcon from '@material-symbols/svg-400/outlined/how_to_vote.svg?react'
 import HowToVoteFillIcon from '@material-symbols/svg-400/outlined/how_to_vote-fill.svg?react'
 import InfoIcon from '@material-symbols/svg-400/outlined/info.svg?react'
+import KeyIcon from '@material-symbols/svg-400/outlined/key.svg?react'
 import KeyboardArrowDownIcon from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?react'
 import LightModeIcon from '@material-symbols/svg-400/outlined/light_mode.svg?react'
 import LinkIcon from '@material-symbols/svg-400/outlined/link.svg?react'
@@ -41,6 +43,7 @@ import PersonFillIcon from '@material-symbols/svg-400/outlined/person-fill.svg?r
 import ProgressActivityIcon from '@material-symbols/svg-400/outlined/progress_activity.svg?react'
 import RefreshIcon from '@material-symbols/svg-400/outlined/refresh.svg?react'
 import SearchIcon from '@material-symbols/svg-400/outlined/search.svg?react'
+import SmartToyIcon from '@material-symbols/svg-400/outlined/smart_toy.svg?react'
 import UndoIcon from '@material-symbols/svg-400/outlined/undo.svg?react'
 import UploadIcon from '@material-symbols/svg-400/outlined/upload.svg?react'
 import VisibilityIcon from '@material-symbols/svg-400/outlined/visibility.svg?react'
@@ -60,6 +63,7 @@ export const ICONS = {
   chevron_left: ChevronLeftIcon,
   chevron_right: ChevronRightIcon,
   close: CloseIcon,
+  content_copy: ContentCopyIcon,
   dark_mode: DarkModeIcon,
   delete: DeleteIcon,
   description: DescriptionIcon,
@@ -71,6 +75,7 @@ export const ICONS = {
   home: HomeIcon,
   how_to_vote: HowToVoteIcon,
   info: InfoIcon,
+  key: KeyIcon,
   keyboard_arrow_down: KeyboardArrowDownIcon,
   light_mode: LightModeIcon,
   link: LinkIcon,
@@ -83,6 +88,7 @@ export const ICONS = {
   progress_activity: ProgressActivityIcon,
   refresh: RefreshIcon,
   search: SearchIcon,
+  smart_toy: SmartToyIcon,
   undo: UndoIcon,
   upload: UploadIcon,
   visibility: VisibilityIcon,

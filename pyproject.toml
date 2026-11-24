@@ -45,6 +45,7 @@ tenacity = ">=9.2"
 tortoise-orm = ">=1.1.9"
 werkzeug = ">=3.1.9"
 quart-schema = {version = "^0.25", extras = ["pydantic"]}
+mcp = ">=2.3,<3"
 
 
 [tool.poetry.group.dev.dependencies]

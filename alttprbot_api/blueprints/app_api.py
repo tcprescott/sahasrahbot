@@ -1,27 +1,40 @@
-"""The JSON API the React app in ``web/`` uses: ``/api/v1/...``.
+"""The JSON API: ``/api/v1/...``. The React app in ``web/`` uses it, and so can
+anyone's scripts, with a personal access token.
 
-Routes are thin: they find out who's signed in (the Discord OAuth session cookie),
-call a service in ``alttprbot/services/``, and return a model from ``schemas.py``.
-Services raise ``NotFoundError`` / ``PermissionDeniedError`` / ``InvalidInputError``,
-which ``api.py`` turns into 404 / 403 / 400 with ``{"error": "..."}``.
+Routes are thin: they find out who's calling, call a service in
+``alttprbot/services/``, and return a model from ``schemas.py``. Services raise
+``NotFoundError`` / ``PermissionDeniedError`` / ``InvalidInputError``, which
+``api.py`` turns into 404 / 403 / 400 with ``{"error": "..."}``.
 
-Requests that change something must carry ``X-Requested-With: SahasrahBot``. A
-cross-site form can't set that header, which keeps the session cookie from being
-used against the user (CSRF).
+Who's calling is either the Discord OAuth session cookie (the web app) or
+``Authorization: Bearer sb_pat_...`` (a token made on the API access page). A
+bearer request ignores the cookie. A read-only token is refused anything that
+changes data, except the POSTs in ``READ_ONLY_POSTS`` (rolling a seed changes
+nothing of yours). Making tokens, deleting your data and approving an AI client
+need the cookie: a token can't mint another token.
+
+Requests that change something with the cookie must carry
+``X-Requested-With: SahasrahBot``. A cross-site form can't set that header, which
+keeps the session cookie from being used against the user (CSRF). A bearer token
+isn't sent by a browser on its own, so it needs no such header.
 """
 
 import asyncio
 import time
+from dataclasses import dataclass
 from typing import Optional
 
 import discord as discord_py
-from quart import Blueprint, abort, request
+from quart import Blueprint, abort, g, request
 from quart_discord import RateLimited, Unauthorized
 from quart_schema import tag, validate_querystring, validate_request, validate_response
 
-from alttprbot.exceptions import InvalidInputError
+import config
+from alttprbot import models
+from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
-from alttprbot.services import accounts, elections, presets, tournament_submissions, triforce_texts
+from alttprbot.services import (accounts, api_tokens, elections, mcp_auth, presets, seeds, tournament_submissions,
+                                triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -29,11 +42,41 @@ app_api_blueprint = Blueprint('app_api', __name__, url_prefix='/api/v1')
 
 CSRF_HEADER = 'X-Requested-With'
 CSRF_VALUE = 'SahasrahBot'
+SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
+# POSTs a read-only token may make: they change nothing that's the caller's.
+READ_ONLY_POSTS = frozenset({'app_api.roll_seed'})
+
+
+@dataclass(frozen=True)
+class Caller:
+    """Whoever is calling: a Discord sign-in, or a personal access token acting as one."""
+
+    id: int
+    name: str
+    discriminator: str = '0'
+    avatar_url: Optional[str] = None
+    token: Optional[models.ApiToken] = None
+
+
+def _bearer() -> Optional[str]:
+    header = request.headers.get('Authorization', '')
+    if header[:7].lower() != 'bearer ':
+        return None
+    return header[7:].strip()
 
 
 @app_api_blueprint.before_request
-async def require_csrf_header():
-    if request.method not in ('GET', 'HEAD', 'OPTIONS') and request.headers.get(CSRF_HEADER) != CSRF_VALUE:
+async def authenticate_request():
+    raw = _bearer()
+    if raw is not None:
+        token = await api_tokens.authenticate(raw, api_tokens.PAT)
+        if token is None:
+            abort(401, description="That API token is invalid, expired or revoked.")
+        g.api_token = token
+        if token.read_only and request.method not in SAFE_METHODS and request.endpoint not in READ_ONLY_POSTS:
+            abort(403, description="This token is read-only. Make one that can make changes on the API access page.")
+        return
+    if request.method not in SAFE_METHODS and request.headers.get(CSRF_HEADER) != CSRF_VALUE:
         abort(403, description=f"Missing the {CSRF_HEADER} header.")
 
 
@@ -42,8 +85,8 @@ async def _granted_scopes() -> set[str]:
     return set(scope.split() if isinstance(scope, str) else scope)
 
 
-async def signed_in_user():
-    """The signed-in Discord user, or None.
+async def _session_user():
+    """The Discord user of the session cookie, or None.
 
     A session from before the app asked for every scope in ``SIGN_IN_SCOPES`` is
     signed out, so the person signs in again once and grants the rest."""
@@ -58,18 +101,37 @@ async def signed_in_user():
         return None
 
 
-async def require_user():
+async def signed_in_user() -> Optional[Caller]:
+    """Who's calling, or None."""
+    token = g.get('api_token')
+    if token is not None:
+        return Caller(id=token.discord_user_id, name=token.user_name, token=token)
+    user = await _session_user()
+    if user is None:
+        return None
+    return Caller(id=user.id, name=user.name, discriminator=str(getattr(user, 'discriminator', '0')),
+                  avatar_url=getattr(user, 'avatar_url', None) or None)
+
+
+async def require_user() -> Caller:
     user = await signed_in_user()
     if user is None:
         raise Unauthorized()
     return user
 
 
-def _session_user(user) -> schemas.SessionUser:
-    return schemas.SessionUser(id=str(user.id), name=user.name, avatar_url=getattr(user, 'avatar_url', None) or None)
+async def require_session_user() -> Caller:
+    """The signed-in user, for things only the website may do, never a token."""
+    if g.get('api_token') is not None:
+        raise PermissionDeniedError("Do this on the SahasrahBot website, signed in with Discord, not with a token.")
+    return await require_user()
 
 
-def _author(user) -> str:
+def _session_user_schema(user: Caller) -> schemas.SessionUser:
+    return schemas.SessionUser(id=str(user.id), name=user.name, avatar_url=user.avatar_url)
+
+
+def _author(user: Caller) -> str:
     return f"{user.name}#{user.discriminator}"
 
 
@@ -82,7 +144,7 @@ def _author(user) -> str:
 async def get_session():
     """Who is signed in. Never 401: ``user`` is null when nobody is."""
     user = await signed_in_user()
-    return schemas.SessionInfo(user=_session_user(user) if user else None)
+    return schemas.SessionInfo(user=_session_user_schema(user) if user else None)
 
 
 @app_api_blueprint.get('/telemetry')
@@ -99,14 +161,14 @@ async def get_telemetry():
 @validate_response(schemas.Profile)
 async def get_me():
     user = await require_user()
-    return schemas.Profile(user=_session_user(user), **await accounts.profile(user.id))
+    return schemas.Profile(user=_session_user_schema(user), **await accounts.profile(user.id))
 
 
 @app_api_blueprint.post('/me/purge')
 @tag(['session'])
 async def purge_me():
     """Delete what SahasrahBot keeps about the user, then sign them out."""
-    user = await require_user()
+    user = await require_session_user()
     await accounts.purge(user.id)
     discord.revoke()
     return '', 204
@@ -190,20 +252,20 @@ def _int_id(value: Optional[str], what: str) -> Optional[int]:
         raise InvalidInputError(f"That {what} isn't a Discord id.") from None
 
 
-def _summary(data: dict) -> dict:
+def election_summary(data: dict) -> dict:
     return {**data, 'guild_id': _id(data['guild_id'])}
 
 
-def _detail(data: dict) -> schemas.ElectionDetail:
+def election_detail(data: dict) -> schemas.ElectionDetail:
     return schemas.ElectionDetail(**{
-        **_summary(data),
+        **election_summary(data),
         'channel_id': _id(data['channel_id']),
         'message_id': _id(data['message_id']),
         'voter_role_id': _id(data['voter_role_id']),
     })
 
 
-def _election_input(data: schemas.ElectionIn) -> elections.ElectionInput:
+def election_input(data: schemas.ElectionIn) -> elections.ElectionInput:
     return elections.ElectionInput(
         guild_id=_int_id(data.guild_id, 'server'),
         channel_id=_int_id(data.channel_id, 'channel'),
@@ -251,7 +313,10 @@ def _is_admin(guild: dict) -> bool:
     return bool(guild.get('owner')) or discord_py.Permissions(int(guild.get('permissions') or 0)).administrator
 
 
-async def admin_guild_ids(user_id: int) -> frozenset[int]:
+async def admin_guild_ids(user: Caller) -> frozenset[int]:
+    """The servers ``user`` administers. A token has no Discord sign-in to ask with,
+    so for one the bot checks each of its servers instead (slower, same answer)."""
+    user_id = user.id
     cached = _admin_guilds.get(user_id)
     if cached and cached[0] > time.monotonic():
         return cached[1]
@@ -259,7 +324,10 @@ async def admin_guild_ids(user_id: int) -> frozenset[int]:
         cached = _admin_guilds.get(user_id)
         if cached and cached[0] > time.monotonic():
             return cached[1]
-        ids = frozenset(int(g['id']) for g in await _fetch_discord_guilds() if _is_admin(g))
+        if user.token is not None:
+            ids = await elections.administered_guild_ids(user_id)
+        else:
+            ids = frozenset(int(guild['id']) for guild in await _fetch_discord_guilds() if _is_admin(guild))
         _admin_guilds[user_id] = (time.monotonic() + ADMIN_GUILDS_TTL, ids)
         return ids
 
@@ -271,7 +339,7 @@ async def election_servers():
     """Servers the viewer can run elections in. Empty means they can't run any (the web app hides the Elections tab)."""
     user = await require_user()
     return schemas.ServerList(servers=[schemas.ServerOption(id=str(s['id']), name=s['name'])
-                                       for s in await elections.servers(await admin_guild_ids(user.id))])
+                                       for s in await elections.servers(await admin_guild_ids(user))])
 
 
 @app_api_blueprint.get('/elections/servers/<int:guild_id>')
@@ -292,8 +360,8 @@ async def election_server_options(guild_id: int):
 @validate_response(schemas.ElectionList)
 async def list_elections():
     user = await require_user()
-    return schemas.ElectionList(elections=[schemas.ElectionSummary(**_summary(e))
-                                           for e in await elections.list_elections(user.id, await admin_guild_ids(user.id))])
+    return schemas.ElectionList(elections=[schemas.ElectionSummary(**election_summary(e))
+                                           for e in await elections.list_elections(user.id, await admin_guild_ids(user))])
 
 
 @app_api_blueprint.post('/elections')
@@ -303,7 +371,7 @@ async def list_elections():
 async def create_election(data: schemas.ElectionIn):
     """Save a new election as a draft. Post it with ``POST /elections/{id}/publish``."""
     user = await require_user()
-    return _detail(await elections.create_draft(user.id, _election_input(data))), 201
+    return election_detail(await elections.create_draft(user.id, election_input(data))), 201
 
 
 @app_api_blueprint.get('/elections/<int:election_id>')
@@ -311,7 +379,7 @@ async def create_election(data: schemas.ElectionIn):
 @validate_response(schemas.ElectionDetail)
 async def get_election_detail(election_id: int):
     user = await require_user()
-    return _detail(await elections.get_for_admin(election_id, user.id))
+    return election_detail(await elections.get_for_admin(election_id, user.id))
 
 
 @app_api_blueprint.put('/elections/<int:election_id>')
@@ -320,7 +388,7 @@ async def get_election_detail(election_id: int):
 @validate_response(schemas.ElectionDetail)
 async def update_election(election_id: int, data: schemas.ElectionIn):
     user = await require_user()
-    return _detail(await elections.update(election_id, user.id, _election_input(data)))
+    return election_detail(await elections.update(election_id, user.id, election_input(data)))
 
 
 @app_api_blueprint.delete('/elections/<int:election_id>')
@@ -337,7 +405,7 @@ async def delete_election(election_id: int):
 async def publish_election(election_id: int):
     """Post a draft in its Discord channel and open voting."""
     user = await require_user()
-    return _detail(await elections.publish(election_id, user.id))
+    return election_detail(await elections.publish(election_id, user.id))
 
 
 @app_api_blueprint.post('/elections/<int:election_id>/close')
@@ -346,7 +414,7 @@ async def publish_election(election_id: int):
 async def close_election(election_id: int):
     """End voting now and count the ballots."""
     user = await require_user()
-    return _detail(await elections.close(election_id, user.id))
+    return election_detail(await elections.close(election_id, user.id))
 
 
 @app_api_blueprint.get('/elections/<int:election_id>/ballot')
@@ -452,3 +520,98 @@ async def submit_settings(event: str, data: schemas.SubmissionIn):
     user = await require_user()
     done = await tournament_submissions.submit(event, data.episode_id, data.settings, _author(user))
     return schemas.SubmissionDone(**done)
+
+
+# --- Seeds -------------------------------------------------------------------
+
+
+@app_api_blueprint.post('/seeds')
+@tag(['seeds'])
+@validate_request(schemas.SeedRollIn)
+@validate_response(schemas.Seed, 201)
+async def roll_seed(data: schemas.SeedRollIn):
+    """Roll a seed from a preset, as the Discord commands do. Takes a few seconds.
+
+    Read-only tokens may call this: rolling a seed changes nothing of yours."""
+    await require_user()
+    options = seeds.RollOptions(race=data.race, hints=data.hints, allow_quickswap=data.allow_quickswap,
+                                branch=data.branch, spoiler_race=data.spoiler_race)
+    return schemas.Seed(**await seeds.roll(data.randomizer, data.preset, options)), 201
+
+
+@app_api_blueprint.get('/seeds/<string:hash_id>')
+@tag(['seeds'])
+@validate_response(schemas.SeedLookup)
+async def lookup_seed(hash_id: str):
+    """What SahasrahBot recorded about a seed it rolled: randomizer, preset and link."""
+    await require_user()
+    return schemas.SeedLookup(**await seeds.lookup(hash_id))
+
+
+# --- API tokens --------------------------------------------------------------
+
+
+def _mcp_url() -> str:
+    return f"{config.APP_URL}/mcp"
+
+
+@app_api_blueprint.get('/tokens')
+@tag(['tokens'])
+@validate_response(schemas.ApiTokenList)
+async def list_tokens():
+    """Your personal tokens and connected AI clients. Website only."""
+    user = await require_session_user()
+    rows = [schemas.ApiTokenRow(**t) for t in await api_tokens.list_for_user(user.id)]
+    return schemas.ApiTokenList(tokens=rows, mcp_url=_mcp_url())
+
+
+@app_api_blueprint.post('/tokens')
+@tag(['tokens'])
+@validate_request(schemas.ApiTokenIn)
+@validate_response(schemas.ApiTokenCreated, 201)
+async def create_token(data: schemas.ApiTokenIn):
+    """Make a personal access token. Its value is in this response and nowhere else. Website only."""
+    user = await require_session_user()
+    raw, row = await api_tokens.create_personal_token(user.id, user.name, data.name, data.read_only,
+                                                      data.expires_in_days)
+    return schemas.ApiTokenCreated(token=raw, row=schemas.ApiTokenRow(**row)), 201
+
+
+@app_api_blueprint.delete('/tokens/<int:token_id>')
+@tag(['tokens'])
+async def revoke_token(token_id: int):
+    """Revoke a token, or disconnect an AI client. Website only."""
+    user = await require_session_user()
+    await api_tokens.revoke(token_id, user.id)
+    return '', 204
+
+
+# --- AI client consent (MCP OAuth) --------------------------------------------
+
+
+@app_api_blueprint.get('/oauth/requests/<string:txn>')
+@tag(['tokens'])
+@validate_response(schemas.OAuthRequest)
+async def get_oauth_request(txn: str):
+    """The AI client asking to connect, for the consent screen. Website only."""
+    await require_session_user()
+    return schemas.OAuthRequest(**await mcp_auth.describe_request(txn))
+
+
+@app_api_blueprint.post('/oauth/requests/<string:txn>/approve')
+@tag(['tokens'])
+@validate_request(schemas.OAuthAnswerIn)
+@validate_response(schemas.OAuthRedirect)
+async def approve_oauth_request(txn: str, data: schemas.OAuthAnswerIn):
+    """Let the AI client connect as you: read-only, or also making changes. Website only."""
+    user = await require_session_user()
+    return schemas.OAuthRedirect(redirect_url=await mcp_auth.approve(txn, user.id, user.name, data.allow_changes))
+
+
+@app_api_blueprint.post('/oauth/requests/<string:txn>/deny')
+@tag(['tokens'])
+@validate_response(schemas.OAuthRedirect)
+async def deny_oauth_request(txn: str):
+    """Turn the AI client away. Website only."""
+    await require_session_user()
+    return schemas.OAuthRedirect(redirect_url=mcp_auth.deny(txn))

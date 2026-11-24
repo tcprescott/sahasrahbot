@@ -15,6 +15,8 @@ Never commit real values to this file.
 # --- General -----------------------------------------------------------------
 DEBUG = True
 APP_URL = "http://localhost:5001"
+# The MCP server at APP_URL/mcp, for AI clients like Claude. False turns it off.
+MCP_ENABLED = True
 APP_SECRET_KEY = "dev-secret-key"
 
 # --- Sentry (alttprbot/observability/) ----------------------------------------

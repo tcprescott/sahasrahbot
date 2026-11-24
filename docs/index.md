@@ -13,3 +13,4 @@ title:  SahasrahBot
 
 ## Documentation
 1. [Mystery YAML file documentation](mysteryyaml.md)
+2. [The API and AI clients (MCP)](api.md)

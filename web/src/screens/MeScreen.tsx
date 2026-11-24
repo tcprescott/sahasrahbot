@@ -72,10 +72,18 @@ function Me() {
               ))}
             </Panel>
           )}
+          <Panel title="API access">
+            <PanelRow>
+              <span className="grow muted">Tokens for your own scripts, and AI clients like Claude connected to your account.</span>
+              <Button asChild variant="outline">
+                <Link to="/me/api">API access</Link>
+              </Button>
+            </PanelRow>
+          </Panel>
           <Panel title="Your data">
             <PanelRow>
               <span className="grow muted">
-                Delete your presets and nickname verifications, and sign out.
+                Delete your presets, nickname verifications and API tokens, and sign out.
               </span>
               <Button asChild variant="outline">
                 <Link to="/purgeme">Delete my data</Link>

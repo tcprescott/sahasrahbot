@@ -46,6 +46,7 @@ where things live. Read it before changing code.
 | `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
 | `alttprbot_api/` | Quart app on 127.0.0.1:5001: `api.py` (Discord sign-in, errors, serves `web/dist`), `schemas.py` (API bodies), `blueprints/` (`app_api.py` is the `/api/v1` JSON API the web app uses; the rest are the racetime command API, preset downloads and public preset JSON, settingsgen, tournament games). No server-rendered pages |
+| `alttprbot_api/mcp/` | The MCP server at `/mcp` and its OAuth (`/authorize`, `/token`, `/register`, `/revoke`, `/.well-known/*`), mounted on the Quart app's port. See "The REST API and the MCP server" below |
 | `web/` | **The website**: a React + TypeScript app (Vite), built like Wizzrobe's `web/`. See "The web app" below |
 | `tournaments.yaml` | Per-event tournament and daily settings: Discord guild, channel and role ids, racetime goal, and the dailies' room-opened announcements. Read by `alttprbot/tournament/event_settings.py`, validated at startup. Put new event ids here, never in code |
 | `presets/` | YAML presets per randomizer (`alttpr/`, `sm/`, `smz3/`, `alttprmystery/`, `ctjets/`). The file name is the preset name |
@@ -171,6 +172,43 @@ Android app (Capacitor, as Wizzrobe plans), so no browser-only assumptions.
   records in `assigned`.
 - **Production:** deploys with `git pull`, then `scripts/build_web.sh` (Node 22 only: `npm ci`
   and `vite build`, no Python or type generation), then a restart. `web/dist` is never committed.
+
+### The REST API and the MCP server
+
+`/api/v1` is also the public REST API, and `/mcp` is an MCP server for AI clients,
+both modelled on Wizzrobe's (`docs/features/mcp-server.md`, `docs/reference/rest-api.md`
+there). Both call the same services as the website and act as the person who made the
+token; neither holds rules of its own.
+
+- **Personal access tokens** (`sb_pat_…`, `alttprbot/services/api_tokens.py`, table
+  `api_tokens`): made on the website's API access page (`/me/api`), stored as a SHA-256
+  hash, read-only or read-and-change, expiring in 30/90/365 days or never. Sent as
+  `Authorization: Bearer`, they sign in on `/api/v1` (`authenticate_request` in
+  `app_api.py`) and skip the CSRF header. A read-only token gets 403 on anything but
+  GET, except the endpoints in `READ_ONLY_POSTS` (rolling a seed). Routes only the
+  website may use (tokens, consent, purge) call `require_session_user()`. Token callers
+  have no Discord OAuth session, so their admin servers come from the bot
+  (`elections.administered_guild_ids`). The racetime command API's `AuthorizationKeys`
+  are separate and unchanged.
+- **MCP OAuth** (`alttprbot/services/mcp_auth.py`, `alttprbot_api/mcp/oauth.py`): the SDK's
+  OAuth 2.1 routes with dynamic client registration and PKCE. `/authorize` sends the person
+  to the website's consent screen (`/oauth/consent?txn=`, `web/src/apiaccess/`), which
+  approves through `/api/v1/oauth/requests/<txn>`. One "Also let it make changes as you"
+  box decides read-only. Access tokens (`sb_mcp_`, 1 hour) and refresh tokens (`sb_mcpr_`,
+  30 days, rotated on use) are `api_tokens` rows with `origin='oauth'`, so revoking on the
+  API access page disconnects the client. Pending requests are in memory (one process).
+- **Tools** (`alttprbot_api/mcp/tools.py`): thin calls into services, returning the
+  `schemas.py` models. Register each with `registry.register(..., write=True)` when it
+  changes data: that sets `readOnlyHint`, refuses it on a read-only connection and hides
+  it from `tools/list` there. Service errors become `not_found:` / `forbidden:` /
+  `invalid_request:` tool errors (`errors.py`); anything else is logged at ERROR and
+  reaches the model as an opaque `internal_error:`. `tests/test_mcp.py` checks every tool
+  is registered and which are writes, so a new tool updates `WRITE_TOOLS` there.
+- **Transport:** stateless streamable HTTP with JSON responses (`server.py`), mounted by
+  wrapping `app.asgi_app` (`mcp/__init__.py`); the session manager runs in its own task
+  for the app's life. `MCP_ENABLED = False` turns it all off. Production's reverse proxy
+  must forward `/mcp`, `/authorize`, `/token`, `/register`, `/revoke` and
+  `/.well-known/` to the app.
 
 ### Running the web app standalone
 

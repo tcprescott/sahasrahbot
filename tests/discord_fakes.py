@@ -228,6 +228,9 @@ class FakeDirectory:
         return sorted((self._named(gid, g["name"]) for gid, g in self.guilds.items() if gid in ids),
                       key=lambda g: g.name.casefold())
 
+    async def admin_guilds(self, user_id):
+        return await self.bot_guilds(self.admin_guild_ids(user_id))
+
     async def is_admin(self, guild_id, user_id):
         return user_id in self.guilds.get(guild_id, {}).get("admins", set())
 

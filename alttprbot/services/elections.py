@@ -87,6 +87,12 @@ async def _check_voter(election: models.RankedChoiceElection, user_id: int) -> N
 # Asking the bot would take a member lookup in every server it's in.
 
 
+async def administered_guild_ids(user_id: int) -> frozenset[int]:
+    """The servers the bot is in where ``user_id`` is an Administrator, by asking the
+    bot (one member lookup per server). For API tokens, which have no Discord sign-in."""
+    return frozenset(g.id for g in await discord_directory.get().admin_guilds(user_id))
+
+
 async def can_manage_elections(user_id: int, admin_guild_ids: Iterable[int]) -> bool:
     """Whether to show this user the Elections tab: they administer a server the bot is in."""
     directory = discord_directory.get()

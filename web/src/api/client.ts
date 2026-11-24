@@ -45,6 +45,9 @@ export type ServerOption = GetBody<'/api/v1/elections/servers'>['servers'][numbe
 export type TriforcePool = GetBody<'/api/v1/triforce-texts/{pool}'>
 export type TriforceText = TriforcePool['mine'][number]
 export type SubmissionForm = GetBody<'/api/v1/tournaments/{event}/submission-form'>
+export type ApiTokenList = GetBody<'/api/v1/tokens'>
+export type ApiTokenRow = ApiTokenList['tokens'][number]
+export type OAuthRequest = GetBody<'/api/v1/oauth/requests/{txn}'>
 
 export class ApiError extends Error {
   constructor(
