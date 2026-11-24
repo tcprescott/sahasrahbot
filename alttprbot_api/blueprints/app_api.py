@@ -10,17 +10,20 @@ cross-site form can't set that header, which keeps the session cookie from being
 used against the user (CSRF).
 """
 
+import asyncio
+import time
 from typing import Optional
 
+import discord as discord_py
 from quart import Blueprint, abort, request
-from quart_discord import Unauthorized
+from quart_discord import RateLimited, Unauthorized
 from quart_schema import tag, validate_querystring, validate_request, validate_response
 
 from alttprbot.exceptions import InvalidInputError
 from alttprbot.observability import sentry as observability
 from alttprbot.services import accounts, elections, presets, tournament_submissions, triforce_texts
 from alttprbot_api import schemas
-from alttprbot_api.api import discord
+from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
 app_api_blueprint = Blueprint('app_api', __name__, url_prefix='/api/v1')
 
@@ -34,9 +37,20 @@ async def require_csrf_header():
         abort(403, description=f"Missing the {CSRF_HEADER} header.")
 
 
+async def _granted_scopes() -> set[str]:
+    scope = (await discord.get_authorization_token() or {}).get('scope') or []
+    return set(scope.split() if isinstance(scope, str) else scope)
+
+
 async def signed_in_user():
-    """The signed-in Discord user, or None."""
+    """The signed-in Discord user, or None.
+
+    A session from before the app asked for every scope in ``SIGN_IN_SCOPES`` is
+    signed out, so the person signs in again once and grants the rest."""
     if not await discord.authorized:
+        return None
+    if not set(SIGN_IN_SCOPES) <= await _granted_scopes():
+        discord.revoke()
         return None
     try:
         return await discord.fetch_user()
@@ -204,6 +218,52 @@ def _election_input(data: schemas.ElectionIn) -> elections.ElectionInput:
     )
 
 
+# The servers the signed-in user administers, from Discord's /users/@me/guilds (one
+# request with their own token, which lists their permissions in each server). Cached
+# briefly per user, and one request at a time per user: Discord rate-limits it hard,
+# and the app asks for it from several screens at once.
+ADMIN_GUILDS_TTL = 60
+_admin_guilds: dict[int, tuple[float, frozenset[int]]] = {}
+_admin_guild_locks: dict[int, asyncio.Lock] = {}
+GUILD_PAGE = 200
+
+
+async def _fetch_discord_guilds() -> list[dict]:
+    """Every server the signed-in user is in, as Discord's partial guild objects."""
+    guilds: list[dict] = []
+    after = 0
+    while True:
+        for attempt in range(2):
+            try:
+                page = await discord.request(f"/users/@me/guilds?limit={GUILD_PAGE}&after={after}")
+                break
+            except RateLimited as e:
+                if attempt or e.retry_after > 5:
+                    raise
+                await asyncio.sleep(e.retry_after)
+        guilds.extend(page)
+        if len(page) < GUILD_PAGE:
+            return guilds
+        after = page[-1]['id']
+
+
+def _is_admin(guild: dict) -> bool:
+    return bool(guild.get('owner')) or discord_py.Permissions(int(guild.get('permissions') or 0)).administrator
+
+
+async def admin_guild_ids(user_id: int) -> frozenset[int]:
+    cached = _admin_guilds.get(user_id)
+    if cached and cached[0] > time.monotonic():
+        return cached[1]
+    async with _admin_guild_locks.setdefault(user_id, asyncio.Lock()):
+        cached = _admin_guilds.get(user_id)
+        if cached and cached[0] > time.monotonic():
+            return cached[1]
+        ids = frozenset(int(g['id']) for g in await _fetch_discord_guilds() if _is_admin(g))
+        _admin_guilds[user_id] = (time.monotonic() + ADMIN_GUILDS_TTL, ids)
+        return ids
+
+
 @app_api_blueprint.get('/elections/servers')
 @tag(['elections'])
 @validate_response(schemas.ServerList)
@@ -211,7 +271,7 @@ async def election_servers():
     """Servers the viewer can run elections in. Empty means they can't run any (the web app hides the Elections tab)."""
     user = await require_user()
     return schemas.ServerList(servers=[schemas.ServerOption(id=str(s['id']), name=s['name'])
-                                       for s in await elections.servers(user.id)])
+                                       for s in await elections.servers(await admin_guild_ids(user.id))])
 
 
 @app_api_blueprint.get('/elections/servers/<int:guild_id>')
@@ -233,7 +293,7 @@ async def election_server_options(guild_id: int):
 async def list_elections():
     user = await require_user()
     return schemas.ElectionList(elections=[schemas.ElectionSummary(**_summary(e))
-                                           for e in await elections.list_elections(user.id)])
+                                           for e in await elections.list_elections(user.id, await admin_guild_ids(user.id))])
 
 
 @app_api_blueprint.post('/elections')

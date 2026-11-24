@@ -17,7 +17,7 @@ the election needs.
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Iterable, Optional
 
 from tortoise.transactions import in_transaction
 
@@ -82,15 +82,21 @@ async def _check_voter(election: models.RankedChoiceElection, user_id: int) -> N
         raise PermissionDeniedError("You don't have the role this election needs to vote.")
 
 
-async def can_manage_elections(user_id: int) -> bool:
+# Which servers someone administers comes from their own Discord sign-in (the web
+# app asks Discord once, with the ``guilds`` scope), passed in as ``admin_guild_ids``.
+# Asking the bot would take a member lookup in every server it's in.
+
+
+async def can_manage_elections(user_id: int, admin_guild_ids: Iterable[int]) -> bool:
     """Whether to show this user the Elections tab: they administer a server the bot is in."""
     directory = discord_directory.get()
-    return await directory.is_owner(user_id) or bool(await directory.admin_guilds(user_id))
+    return await directory.is_owner(user_id) or bool(await directory.bot_guilds(admin_guild_ids))
 
 
-async def servers(user_id: int) -> list[dict]:
-    """The servers ``user_id`` can run elections in."""
-    return [{'id': g.id, 'name': g.name} for g in await discord_directory.get().admin_guilds(user_id)]
+async def servers(admin_guild_ids: Iterable[int]) -> list[dict]:
+    """The servers someone can run elections in: those of ``admin_guild_ids``
+    (where Discord says they have Administrator) that the bot is in."""
+    return [{'id': g.id, 'name': g.name} for g in await discord_directory.get().bot_guilds(admin_guild_ids)]
 
 
 async def server_options(guild_id: int, user_id: int) -> dict:
@@ -132,11 +138,11 @@ async def _summary(election: models.RankedChoiceElection, guild_names: Optional[
     }
 
 
-async def list_elections(user_id: int) -> list[dict]:
-    """Elections in the servers ``user_id`` administers, newest first. The bot owner
-    sees every election."""
+async def list_elections(user_id: int, admin_guild_ids: Iterable[int]) -> list[dict]:
+    """Elections in the servers ``user_id`` administers (``admin_guild_ids``), newest
+    first. The bot owner sees every election."""
     directory = discord_directory.get()
-    guilds = {g.id: g.name for g in await directory.admin_guilds(user_id)}
+    guilds = {g.id: g.name for g in await directory.bot_guilds(admin_guild_ids)}
     query = models.RankedChoiceElection.all()
     if not await directory.is_owner(user_id):
         query = query.filter(guild_id__in=list(guilds))

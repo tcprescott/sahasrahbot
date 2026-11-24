@@ -6,11 +6,9 @@ Vote and Manage links and an End election button, and swaps it for the winners a
 a link to the full count when it closes.
 """
 
-import asyncio
 import logging
 from typing import Optional
 
-import aiocache
 import discord
 from discord.ext import commands
 
@@ -26,10 +24,6 @@ END_BUTTON_ID = "sahasrahbot:rankedchoice:end_election"  # unchanged, so buttons
 OPEN_COLOUR = discord.Colour(0x6D3FC0)
 CLOSED_COLOUR = discord.Colour.green()
 
-# Which servers someone administers takes a member lookup per server, so it's cached.
-ADMIN_CACHE_TTL = 300
-ADMIN_CACHE = aiocache.Cache(aiocache.SimpleMemoryCache)
-LOOKUP_CONCURRENCY = 8
 POSTABLE_CHANNEL_TYPES = (discord.ChannelType.text, discord.ChannelType.news)
 
 
@@ -190,25 +184,13 @@ class DiscordDirectory:
         return None if member is None else [r.id for r in member.roles]
 
     async def is_admin(self, guild_id: int, user_id: int) -> bool:
-        return guild_id in {g.id for g in await self.admin_guilds(user_id)}
+        # One member lookup in this one server (the cache, else one REST call).
+        member = await self._member(guild_id, user_id)
+        return member is not None and member.guild_permissions.administrator
 
-    async def admin_guilds(self, user_id: int) -> list[Named]:
-        cached = await ADMIN_CACHE.get(user_id)
-        if cached is not None:
-            return cached
-        limit = asyncio.Semaphore(LOOKUP_CONCURRENCY)
-
-        async def check(guild: discord.Guild) -> Optional[Named]:
-            async with limit:
-                member = await discord_members.get_member(guild, user_id)
-            if member is not None and member.guild_permissions.administrator:
-                return Named(guild.id, guild.name)
-            return None
-
-        found = await asyncio.gather(*(check(g) for g in self.bot.guilds))
-        result = sorted((g for g in found if g), key=lambda g: g.name.casefold())
-        await ADMIN_CACHE.set(user_id, result, ttl=ADMIN_CACHE_TTL)
-        return result
+    async def bot_guilds(self, guild_ids) -> list[Named]:
+        guilds = (self.bot.get_guild(int(gid)) for gid in set(guild_ids))
+        return sorted((Named(g.id, g.name) for g in guilds if g is not None), key=lambda g: g.name.casefold())
 
     async def guild_name(self, guild_id: int) -> Optional[str]:
         guild = await self._guild(guild_id)

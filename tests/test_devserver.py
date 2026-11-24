@@ -65,8 +65,9 @@ async def main():
     # The election directory (alttprbot_discord/elections.py) runs for real on the fakes.
     from alttprbot.services import discord_directory
     directory = discord_directory.get()
-    assert [g.id for g in await directory.admin_guilds(admin["id"])] == [fixtures.GUILD_ID]
-    assert await directory.admin_guilds(fixtures.user("mod")["id"]) == []
+    assert [g.id for g in await directory.bot_guilds([fixtures.GUILD_ID, 1])] == [fixtures.GUILD_ID]
+    assert await directory.is_admin(fixtures.GUILD_ID, admin["id"])
+    assert not await directory.is_admin(fixtures.GUILD_ID, fixtures.user("mod")["id"])
     assert await directory.is_owner(admin["id"])
     assert "#elections" in [c.name for c in await directory.text_channels(fixtures.GUILD_ID)]
     assert "@Voter" in [r.name for r in await directory.roles(fixtures.GUILD_ID)]

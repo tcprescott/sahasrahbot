@@ -99,7 +99,7 @@ async def discord_token():
         refresh_token=f"dev-refresh-{user_id}",
         token_type="Bearer",
         expires_in=7 * 24 * 3600,
-        scope="identify",
+        scope="identify guilds",
     )
 
 
@@ -128,6 +128,20 @@ async def discord_me():
         locale="en-US",
         mfa_enabled=False,
     )
+
+
+@fake_services.route("/discord/api/users/@me/guilds")
+async def discord_my_guilds():
+    """The servers the signed-in user is in, with their permissions there (Administrator
+    is 0x8; a role named "Admin" grants it in the fake world). One page holds them all."""
+    user_id = _bearer_user_id("dev-token-")
+    if not (user_id and user_id.isdigit() and int(user_id) in _world().users):
+        return jsonify(message="401: Unauthorized", code=0), 401
+    return jsonify([
+        {"id": str(m.guild.id), "name": m.guild.name, "owner": False,
+         "permissions": "8" if m.guild_permissions.administrator else "0"}
+        for m in _world().memberships(int(user_id))
+    ])
 
 
 @fake_services.route("/discord/avatars/<int:user_id>/<path:rest>")
