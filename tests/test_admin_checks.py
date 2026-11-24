@@ -57,8 +57,9 @@ async def test_lets_an_admin_or_the_owner_through(monkeypatch, cog_class, comman
     monkeypatch.setattr(service, function, mock.AsyncMock(side_effect=RuntimeError("past the check")))
     cog = cog_class(bot(owner=owner))
     it = interaction(administrator=administrator)
+    run = getattr(cog, command).callback(cog, it, *args())
 
     with pytest.raises(RuntimeError, match="past the check"):
-        await getattr(cog, command).callback(cog, it, *args())
+        await run
 
     assert all("not authorized" not in str(c) for c in it.response.send_message.await_args_list)
