@@ -108,15 +108,17 @@ async def test_create_draft_cleans_and_orders_candidates(db, server):
     (dict(voter_role_id=12345), "role isn't in this server"),
 ])
 async def test_create_draft_refuses_bad_forms(db, server, overrides, message):
+    bad = form(**overrides)
     with pytest.raises(InvalidInputError, match=message):
-        await elections.create_draft(ADMIN, form(**overrides))
+        await elections.create_draft(ADMIN, bad)
 
 
 async def test_only_admins_create(db, server):
+    mine, elsewhere = form(), form(guild_id=OTHER_GUILD, channel_id=400)
     with pytest.raises(PermissionDeniedError):
-        await elections.create_draft(VOTER, form())
+        await elections.create_draft(VOTER, mine)
     with pytest.raises(PermissionDeniedError):
-        await elections.create_draft(ADMIN, form(guild_id=OTHER_GUILD, channel_id=400))
+        await elections.create_draft(ADMIN, elsewhere)
 
 
 async def test_drafts_may_be_incomplete_but_posting_needs_everything(db, server):
@@ -169,8 +171,9 @@ async def test_edit_an_open_election_refreshes_its_post(db, server, published):
     edited = await elections.update(election["id"], ADMIN, form(title="Renamed", description="Now with words"))
     assert edited["title"] == "Renamed"
     assert [type(e) for e in published] == [events.ElectionUpdated]
+    moved = form(channel_id=301)
     with pytest.raises(InvalidInputError, match="another channel"):
-        await elections.update(election["id"], ADMIN, form(channel_id=301))
+        await elections.update(election["id"], ADMIN, moved)
 
 
 async def test_moving_servers(db, server):
@@ -179,8 +182,9 @@ async def test_moving_servers(db, server):
     moved = await elections.update(draft["id"], ADMIN, form(guild_id=OTHER_GUILD, channel_id=400))
     assert moved["guild_id"] == OTHER_GUILD
     election = await posted()
+    moved = form(guild_id=OTHER_GUILD, channel_id=400)
     with pytest.raises(InvalidInputError, match="another server"):
-        await elections.update(election["id"], ADMIN, form(guild_id=OTHER_GUILD, channel_id=400))
+        await elections.update(election["id"], ADMIN, moved)
 
 
 async def test_ballots_lock_candidates_and_method(db, server, published):
@@ -188,16 +192,18 @@ async def test_ballots_lock_candidates_and_method(db, server, published):
     andy = election["candidates"][0]["id"]
     await elections.cast_ballot(election["id"], VOTER, [andy])
     for change in (dict(candidates=["Andy", "Bea"]), dict(method="approval")):
+        changed = form(**change)
         with pytest.raises(InvalidInputError, match="already voted"):
-            await elections.update(election["id"], ADMIN, form(**change))
+            await elections.update(election["id"], ADMIN, changed)
     assert (await elections.update(election["id"], ADMIN, form(title="Still fine")))["locked"] is True
 
 
 async def test_closed_elections_cant_be_edited(db, server, published):
     election = await posted()
     await elections.close(election["id"], ADMIN)
+    unchanged = form()
     with pytest.raises(InvalidInputError, match="has closed"):
-        await elections.update(election["id"], ADMIN, form())
+        await elections.update(election["id"], ADMIN, unchanged)
 
 
 async def test_missing_election_and_strangers(db, server):
@@ -244,7 +250,8 @@ async def test_ranked_ballot_and_changing_it(db, server, published):
     assert (await elections.get_ballot(election["id"], VOTER))["ballot"] is None
     assert (await elections.cast_ballot(election["id"], VOTER, [b, a]))["ballot"] == [b, a]
     again = await elections.cast_ballot(election["id"], VOTER, [c])
-    assert again["ballot"] == [c] and again["voted_at"] is not None
+    assert again["ballot"] == [c]
+    assert again["voted_at"] is not None
     assert await elections.ballot_count(election["id"]) == 1
     assert [type(e) for e in published] == [events.ElectionBallotCast, events.ElectionBallotCast]
 
@@ -424,7 +431,8 @@ def test_open_embed():
 def test_open_embed_options():
     embed = election_posts.build_embed(view_data(method="approval", show_vote_count=False, voter_role_id=None,
                                                  closes_at=None))
-    assert "Winners" not in fields(embed) and "Ballots" not in fields(embed)
+    assert "Winners" not in fields(embed)
+    assert "Ballots" not in fields(embed)
     assert fields(embed)["Who can vote"] == "Everyone in the server"
     assert fields(embed)["Closes"] == "When an admin ends it"
 
@@ -524,8 +532,9 @@ async def test_post_refresh_and_delete(db, server, published):
 ])
 async def test_post_failures_are_readable(db, server, error, message):
     draft = await elections.create_draft(ADMIN, form())
+    bot = bot_with(Channel(error=error))
     with pytest.raises(InvalidInputError, match=message):
-        await election_posts.post(bot_with(Channel(error=error)), draft["id"])
+        await election_posts.post(bot, draft["id"])
 
 
 # --- the Discord directory ----------------------------------------------------
@@ -595,10 +604,12 @@ def bot(monkeypatch):
 
 async def test_directory_lookups(bot):
     d = election_posts.DiscordDirectory(bot)
-    assert await d.is_owner(OWNER) and not await d.is_owner(ADMIN)
+    assert await d.is_owner(OWNER)
+    assert not await d.is_owner(ADMIN)
     assert [g.name for g in await d.admin_guilds(ADMIN)] == ["Community"]
     assert [g.name for g in await d.admin_guilds(ADMIN)] == ["Community"]  # cached
-    assert await d.is_admin(GUILD, ADMIN) and not await d.is_admin(OTHER_GUILD, ADMIN)
+    assert await d.is_admin(GUILD, ADMIN)
+    assert not await d.is_admin(OTHER_GUILD, ADMIN)
     assert await d.member_role_ids(GUILD, ADMIN) == [77]
     assert await d.member_role_ids(GUILD, OUTSIDER) is None
     assert await d.member_role_ids(999, ADMIN) is None

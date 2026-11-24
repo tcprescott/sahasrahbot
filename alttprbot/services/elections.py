@@ -213,9 +213,7 @@ class ElectionInput:
     show_vote_count: bool = True
 
 
-def _validate(data: ElectionInput, *, publishing: bool) -> list[str]:
-    """Check the form and return the cleaned candidate names. Drafts may be
-    incomplete; posting needs everything."""
+def _check_text(data: ElectionInput) -> None:
     title = (data.title or '').strip()
     if not title:
         raise InvalidInputError("Give the election a title.")
@@ -226,7 +224,9 @@ def _validate(data: ElectionInput, *, publishing: bool) -> list[str]:
     if data.method not in METHODS:
         raise InvalidInputError("Pick a voting method: ranked, approval or plurality.")
 
-    names = [n.strip() for n in data.candidates if n and n.strip()]
+
+def _clean_candidates(candidates: list[str], *, publishing: bool) -> list[str]:
+    names = [n.strip() for n in candidates if n and n.strip()]
     if any(len(n) > MAX_NAME for n in names):
         raise InvalidInputError(f"Keep each candidate's name to {MAX_NAME} characters.")
     lowered = [n.casefold() for n in names]
@@ -236,17 +236,28 @@ def _validate(data: ElectionInput, *, publishing: bool) -> list[str]:
         raise InvalidInputError(f"An election can have at most {MAX_CANDIDATES} candidates.")
     if publishing and len(names) < 2:
         raise InvalidInputError("Add at least two candidates.")
+    return names
 
+
+def _check_closing_time(closes_at: Optional[datetime], *, publishing: bool) -> None:
+    if closes_at is None:
+        return
+    if closes_at.tzinfo is None:
+        raise InvalidInputError("The closing time needs a time zone.")
+    if publishing and closes_at <= _now():
+        raise InvalidInputError("The closing time has already passed.")
+
+
+def _validate(data: ElectionInput, *, publishing: bool) -> list[str]:
+    """Check the form and return the cleaned candidate names. Drafts may be
+    incomplete; posting needs everything."""
+    _check_text(data)
+    names = _clean_candidates(data.candidates, publishing=publishing)
     seats = data.seats if data.method == STV else 1
     if seats < 1 or (names and seats >= len(names) and publishing):
         raise InvalidInputError("There must be fewer winners than candidates.")
     data.seats = seats
-
-    if data.closes_at is not None:
-        if data.closes_at.tzinfo is None:
-            raise InvalidInputError("The closing time needs a time zone.")
-        if publishing and data.closes_at <= _now():
-            raise InvalidInputError("The closing time has already passed.")
+    _check_closing_time(data.closes_at, publishing=publishing)
     return names
 
 
