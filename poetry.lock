@@ -3238,6 +3238,27 @@ pyjwt = "*"
 Quart = "*"
 
 [[package]]
+name = "quart-schema"
+version = "0.25.0"
+description = "A Quart extension to provide schema validation"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "quart_schema-0.25.0-py3-none-any.whl", hash = "sha256:c885ba69dedecb8a085073315998e2aaceb73a6e86e225987779e21ea13a4aa8"},
+    {file = "quart_schema-0.25.0.tar.gz", hash = "sha256:c34be5cb7e7a6e36631eb7cb195d378f975c375d45b509895b4f832f3b36bf95"},
+]
+
+[package.dependencies]
+pydantic = {version = ">=2", optional = true, markers = "extra == \"pydantic\""}
+quart = ">=0.19.0"
+
+[package.extras]
+docs = ["docutils (==0.21)", "pydata_sphinx_theme", "sphinx-tabs (>=3.4.4)"]
+msgspec = ["msgspec (>=0.18)"]
+pydantic = ["pydantic (>=2)"]
+
+[[package]]
 name = "racetime-bot"
 version = "2.3.0"
 description = "Foundation system for creating chat bots for racetime.gg"
@@ -3964,4 +3985,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "64af02ccad430042ee69f075eada51dc365daa6f83b2bce510e58f527f92e0ad"
+content-hash = "78e2d141ececca642424e95a0bb448eae91862b603a81fd1a046d3311980182f"
