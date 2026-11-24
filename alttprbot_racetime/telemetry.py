@@ -76,7 +76,7 @@ def _command_wrapper(method: str, func):
 def instrument_commands(cls: type) -> type:
     """Wrap the ``ex_*`` / ``ex2_*`` coroutines ``cls`` defines itself. Returns ``cls``."""
     for name, attr in list(vars(cls).items()):
-        if (name.startswith('ex_') or name.startswith('ex2_')) and inspect.iscoroutinefunction(attr) \
+        if name.startswith(('ex_', 'ex2_')) and inspect.iscoroutinefunction(attr) \
                 and not getattr(attr, _MARK, False):
             setattr(cls, name, _command_wrapper(name, attr))
     return cls

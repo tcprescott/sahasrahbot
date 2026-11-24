@@ -29,7 +29,7 @@ class BrowserSentry(BaseModel):
     """What the React app hands the Sentry browser SDK."""
     dsn: str
     environment: str
-    release: Optional[str]
+    release: Optional[str] = None
     sample_rate: float = Field(description="Share of browser errors sent, 0 to 1.")
     traces_sample_rate: float = Field(description="Share of page loads and navigations traced, 0 to 1.")
     replay: bool = Field(description="Record a session replay to send with an error.")

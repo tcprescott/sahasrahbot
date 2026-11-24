@@ -157,7 +157,7 @@ def _scrub_event(event: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(request, dict):
         headers = request.get('headers')
         if isinstance(headers, dict):
-            for name in list(headers):
+            for name in headers:
                 if name.lower() in _SENSITIVE_HEADERS:
                     headers[name] = '[Filtered]'
         request.pop('cookies', None)

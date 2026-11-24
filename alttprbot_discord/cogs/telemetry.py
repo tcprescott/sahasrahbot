@@ -10,6 +10,8 @@ from discord.ext import commands
 
 from alttprbot.observability import metrics
 
+GATEWAY = 'discord.gateway'
+
 
 class Telemetry(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -40,15 +42,15 @@ class Telemetry(commands.Cog):
 
     @commands.Cog.listener()
     async def on_connect(self) -> None:
-        metrics.count('discord.gateway', attributes={'event': 'connect'})
+        metrics.count(GATEWAY, attributes={'event': 'connect'})
 
     @commands.Cog.listener()
     async def on_disconnect(self) -> None:
-        metrics.count('discord.gateway', attributes={'event': 'disconnect'})
+        metrics.count(GATEWAY, attributes={'event': 'disconnect'})
 
     @commands.Cog.listener()
     async def on_resumed(self) -> None:
-        metrics.count('discord.gateway', attributes={'event': 'resumed'})
+        metrics.count(GATEWAY, attributes={'event': 'resumed'})
 
 
 async def setup(bot: commands.Bot):

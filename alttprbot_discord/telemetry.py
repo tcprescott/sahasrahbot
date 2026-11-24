@@ -15,6 +15,7 @@
   ``discord.guilds`` and ``discord.ready``.
 """
 
+import math
 import time
 
 import discord
@@ -81,7 +82,7 @@ def runtime_source(client: discord.Client):
         return [
             ('discord.ready', 1 if ready else 0, None),
             ('discord.guilds', len(client.guilds) if ready else None, None),
-            ('discord.latency', round(latency * 1000, 1) if ready and latency == latency and latency != float('inf') else None, None),
+            ('discord.latency', round(latency * 1000, 1) if ready and math.isfinite(latency) else None, None),
         ]
     return sample
 
