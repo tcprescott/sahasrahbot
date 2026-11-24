@@ -54,7 +54,7 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
                      description: str = None, authorized_voters_role: discord.Role = None,
                      show_vote_count: bool = True):
 
-        if interaction.user.guild_permissions.administrator is False and self.bot.is_owner(interaction.user) is False:
+        if not interaction.user.guild_permissions.administrator and not await self.bot.is_owner(interaction.user):
             await interaction.response.send_message("You are not authorized to use this command.", ephemeral=True)
             return
 
