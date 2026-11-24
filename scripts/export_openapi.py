@@ -55,7 +55,10 @@ def main() -> None:
     _install_example_config()
     _stub_google_clients()
     schema = asyncio.run(export())
-    Path(sys.argv[1]).write_text(json.dumps(schema, indent=2, sort_keys=True) + '\n')
+    out = Path(sys.argv[1]).resolve()
+    if not out.is_relative_to(ROOT):
+        sys.exit(f'{out} is outside the repository')
+    out.write_text(json.dumps(schema, indent=2, sort_keys=True) + '\n')
 
 
 if __name__ == '__main__':

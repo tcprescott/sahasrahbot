@@ -16,7 +16,7 @@ poetry run python -m pytest -q tests "$@"
 
 if command -v npm >/dev/null 2>&1; then
   echo "== web =="
-  (cd web && { [[ -d node_modules ]] || npm ci --no-audit --no-fund; } && npm run gen:api && npm run typecheck && npm test && npm run build)
+  (cd web && { [[ -d node_modules ]] || npm ci --ignore-scripts --no-audit --no-fund; } && npm run gen:api && npm run typecheck && npm test && npm run build)
 else
   echo "== web: skipped (Node.js isn't installed) =="
 fi

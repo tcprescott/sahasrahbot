@@ -137,7 +137,7 @@ Android app (Capacitor, as Wizzrobe plans), so no browser-only assumptions.
   `{"error": "..."}`, a sentence a person can read.
 - **Types:** `npm run gen:api` writes `web/openapi.json` (`scripts/export_openapi.py`) and
   `web/src/api/schema.d.ts` from it. Both are gitignored; CI generates them, so a route
-  change that breaks a screen fails the `web` job. Call the API with
+  change that breaks a screen fails the `pytest` CI job (which also checks `web/`). Call the API with
   `api.GET('/api/v1/…')` and `unwrap` (`web/src/api/client.ts`). Discord ids are strings.
 - **Sign-in:** the Discord OAuth session cookie (`/login/?next=<path>`). Requests that change
   something need `X-Requested-With: SahasrahBot` (the client adds it), which is the CSRF

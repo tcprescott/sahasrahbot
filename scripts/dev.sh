@@ -55,7 +55,7 @@ fi
 if [[ -n "$(find web/src web/index.html web/package.json -newer web/dist/index.html 2>/dev/null | head -1)" || ! -f web/dist/index.html ]]; then
   if command -v npm >/dev/null 2>&1; then
     echo "dev.sh: building the web app (web/)"
-    (cd web && { [[ -d node_modules ]] || npm ci --no-audit --no-fund; } && npm run gen:api && npm run build)
+    (cd web && { [[ -d node_modules ]] || npm ci --ignore-scripts --no-audit --no-fund; } && npm run gen:api && npm run build)
   else
     echo "dev.sh: Node.js isn't installed, so the web app (web/) can't be built; pages will say so." >&2
   fi
