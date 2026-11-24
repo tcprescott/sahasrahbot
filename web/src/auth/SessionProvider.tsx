@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, loginUrl, unwrap, type SessionUser } from '../api/client'
 import { Spinner } from '../components'
+import { setTelemetryUser } from '../telemetry'
 
 interface SessionState {
   /** undefined while loading, null when nobody is signed in. */
@@ -10,13 +11,14 @@ interface SessionState {
 
 const SessionContext = createContext<SessionState | null>(null)
 
-export function SessionProvider({ children }: { children: ReactNode }) {
+export function SessionProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<SessionUser | null>()
 
   const refresh = useCallback(async () => {
     try {
       const body = unwrap(await api.GET('/api/v1/session'))
       setUser(body.user ?? null)
+      setTelemetryUser(body.user ?? null)
     } catch {
       setUser(null)
     }
@@ -37,7 +39,7 @@ export function useSession(): SessionState {
 }
 
 /** Screens that need a Discord sign-in: send a signed-out visitor to Discord and back. */
-export function RequireSignIn({ children }: { children: (user: SessionUser) => ReactNode }) {
+export function RequireSignIn({ children }: Readonly<{ children: (user: SessionUser) => ReactNode }>) {
   const { user } = useSession()
   useEffect(() => {
     if (user === null) window.location.assign(loginUrl())

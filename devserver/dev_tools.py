@@ -153,6 +153,30 @@ LINKS = [
 ]
 
 
+def _membership_form(guild, user_id) -> str:
+    """One guild's member checkbox and role checkboxes for a user."""
+    member = guild._members.get(user_id)
+    have = {r.id for r in member.roles} if member else set()
+    boxes = "".join(
+        f'<label><input type="checkbox" name="role" value="{r.id}" {"checked" if r.id in have else ""}> '
+        f'{html.escape(r.name)}</label> ' for r in guild.roles[1:])
+    return (
+        f'<form method="post" action="/_dev/members/{user_id}" class="muted">'
+        f'<input type="hidden" name="guild_id" value="{guild.id}">'
+        f'<b>{html.escape(guild.name)}</b>: <label><input type="checkbox" name="member" '
+        f'{"checked" if member else ""}> member</label> {boxes}<button class="secondary">Save</button></form>')
+
+
+def _user_card(world, u, spec: dict) -> str:
+    forms = [_membership_form(g, u.id) for g in world.guilds.values()]
+    login = f"/_dev/login?user={spec.get('key', u.id)}&next=/_dev/"
+    return (
+        f'<div class="card" id="user-{u.id}" style="display:block"><div style="display:flex;justify-content:space-between">'
+        f'<div><b>{html.escape(u.name)}</b> <code>{html.escape(spec.get("key", ""))}</code> '
+        f'<span class="muted">{u.id}</span><div class="muted">{html.escape(spec.get("description", "Added at runtime."))}</div></div>'
+        f'<a class="button" href="{html.escape(login)}">Log in as</a></div>{"".join(forms)}</div>')
+
+
 @dev_tools.route("/")
 async def index():
     world = _world()
@@ -163,29 +187,7 @@ async def index():
     import testdata
 
     testdata_ids = {m["id"] for m in testdata.world()["members"]}
-    rows = []
-    for u in world.users.values():
-        if u.id in testdata_ids:
-            continue
-        spec = keys.get(u.id, {})
-        forms = []
-        for g in world.guilds.values():
-            member = g._members.get(u.id)
-            have = {r.id for r in member.roles} if member else set()
-            boxes = "".join(
-                f'<label><input type="checkbox" name="role" value="{r.id}" {"checked" if r.id in have else ""}> '
-                f'{html.escape(r.name)}</label> ' for r in g.roles[1:])
-            forms.append(
-                f'<form method="post" action="/_dev/members/{u.id}" class="muted">'
-                f'<input type="hidden" name="guild_id" value="{g.id}">'
-                f'<b>{html.escape(g.name)}</b>: <label><input type="checkbox" name="member" '
-                f'{"checked" if member else ""}> member</label> {boxes}<button class="secondary">Save</button></form>')
-        login = f"/_dev/login?user={spec.get('key', u.id)}&next=/_dev/"
-        rows.append(
-            f'<div class="card" id="user-{u.id}" style="display:block"><div style="display:flex;justify-content:space-between">'
-            f'<div><b>{html.escape(u.name)}</b> <code>{html.escape(spec.get("key", ""))}</code> '
-            f'<span class="muted">{u.id}</span><div class="muted">{html.escape(spec.get("description", "Added at runtime."))}</div></div>'
-            f'<a class="button" href="{html.escape(login)}">Log in as</a></div>{"".join(forms)}</div>')
+    rows = [_user_card(world, u, keys.get(u.id, {})) for u in world.users.values() if u.id not in testdata_ids]
 
     rows.append(
         f'<details class="card" style="display:block"><summary><b>{len(testdata_ids)} users from testdata/</b> '

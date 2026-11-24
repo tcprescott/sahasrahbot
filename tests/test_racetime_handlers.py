@@ -10,7 +10,7 @@ import asyncio
 import importlib
 import logging
 import pkgutil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
@@ -87,7 +87,8 @@ async def test_help_command_replies_where_defined(module):
     if module == "twwr":
         assert said(h) == []  # twwr deliberately silences !help, !lock and !unlock
         return
-    assert said(h) and "Command raised exception" not in said(h)[0]
+    assert said(h)
+    assert "Command raised exception" not in said(h)[0]
 
 
 # ---------------------------------------------------------------------------
@@ -153,7 +154,8 @@ async def test_intro_sent_once():
     h = make_handler()
     await h.intro()
     await h.intro()
-    assert len(said(h)) == 1 and "SahasrahBot" in said(h)[0]
+    assert len(said(h)) == 1
+    assert "SahasrahBot" in said(h)[0]
 
 
 async def test_core_cancel_resets_seed_state():
@@ -192,17 +194,26 @@ async def test_override_requires_unexpired_whitelist(db):
     h.override_stream.assert_awaited_once_with("ok")
 
 
-async def test_known_issue_override_with_expiry_date_crashes(db):
-    """KNOWN ISSUE, pinned not endorsed: with ``use_tz=True`` (Tortoise config)
-    ``expires`` comes back timezone-aware, and ``ex_override`` compares it with
-    naive ``datetime.utcnow()``. So any whitelist entry with an expiry date,
-    expired or not, makes !override fail with a TypeError instead of checking it."""
+async def test_override_with_expired_whitelist_is_refused(db):
+    """``expires`` comes back timezone-aware (``use_tz=True``), so the check
+    compares it with an aware "now". It used to compare with naive
+    ``utcnow()`` and crash with a TypeError."""
     h = make_handler()
     h.override_stream = mock.AsyncMock()
-    await models.RTGGOverrideWhitelist.create(racetime_id="old", category="alttpr", expires=datetime.utcnow() - timedelta(days=1))
+    await models.RTGGOverrideWhitelist.create(
+        racetime_id="old", category="alttpr", expires=datetime.now(timezone.utc) - timedelta(days=1))
     await chat(h, "!override", user_id="old")
-    assert said(h)[-1] == "Command raised exception: can't compare offset-naive and offset-aware datetimes"
+    assert said(h)[-1].startswith("Your streaming exemption has expired.")
     h.override_stream.assert_not_called()
+
+
+async def test_override_with_future_expiry_is_allowed(db):
+    h = make_handler()
+    h.override_stream = mock.AsyncMock()
+    await models.RTGGOverrideWhitelist.create(
+        racetime_id="soon", category="alttpr", expires=datetime.now(timezone.utc) + timedelta(days=1))
+    await chat(h, "!override", user_id="soon")
+    h.override_stream.assert_awaited_once_with("soon")
 
 
 async def test_override_stream_sends_websocket_action():

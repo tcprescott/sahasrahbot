@@ -1,4 +1,5 @@
-import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, useParams } from 'react-router-dom'
+import { SentryRoutes } from './telemetry'
 import { SessionProvider } from './auth/SessionProvider'
 import { TooltipProvider } from './components'
 import { NamespaceScreen } from './presets/NamespaceScreen'
@@ -29,7 +30,7 @@ export function App() {
       <TooltipProvider delayDuration={400}>
         <SessionProvider>
           <BrowserRouter>
-            <Routes>
+            <SentryRoutes>
               <Route element={<AppShell />}>
                 <Route index element={<HomeScreen />} />
                 <Route path="me" element={<MeScreen />} />
@@ -49,7 +50,7 @@ export function App() {
                 <Route path="presets/:namespace" element={<LegacyNamespaceRedirect />} />
                 <Route path="*" element={<NotFoundScreen />} />
               </Route>
-            </Routes>
+            </SentryRoutes>
           </BrowserRouter>
         </SessionProvider>
       </TooltipProvider>

@@ -10,15 +10,9 @@ import config
 from alttprbot.services import inquiries
 
 
-# TODO: make work with discord.py 2.0
-
-
 class ConfirmInquiryThread(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-
-    # async def on_error(self, error: Exception, item, interaction) -> None:
-    #     raise error
 
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬",
                        custom_id="sahasrahbot:open_inquiry")
@@ -168,7 +162,8 @@ class Inquiry(commands.Cog):
         await inquiries.register(original_message.id, role.id)
 
 
-def check_private_threads(interaction: discord.Interaction):
+# discord.py passes the interaction to every check, used or not.
+def check_private_threads(interaction: discord.Interaction):  # NOSONAR
     return True
 
 

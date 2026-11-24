@@ -1,7 +1,7 @@
 import random
 
 from alttprbot.alttprgen.randomizer.z1r import roll_z1r
-from .core import SahasrahBotCoreHandler
+from .core import MSG_ROLL_COMPLETE, SahasrahBotCoreHandler
 
 PRESETS = {
     'abns_swiss': 'J780EYa2ywOnCpVR1VGodM1jVyu!o5F',
@@ -84,7 +84,7 @@ class GameHandler(SahasrahBotCoreHandler):
         
         await self.send_message(f"{preset} - Flags: {flags} Seed: {seed_number}")
         await self.set_bot_raceinfo(f"Flags: {flags} Seed: {seed_number}")
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     async def ex_help(self, args, message):
@@ -99,5 +99,5 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"Seed: {seed} - Flags: {flags}")
         await self.send_message(f"Seed: {seed} - Flags: {flags}")
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True

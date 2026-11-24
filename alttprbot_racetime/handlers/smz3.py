@@ -1,7 +1,7 @@
 import random
 
 from alttprbot.alttprgen import generator, smz3multi
-from .core import SahasrahBotCoreHandler
+from .core import MSG_GENERATING, MSG_NO_PRESET, MSG_ROLL_COMPLETE, SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
@@ -13,7 +13,7 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
@@ -32,7 +32,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message("Teams are unequal in size.")
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
 
         try:
             teams = self.teams
@@ -68,11 +68,11 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
 
         smz3preset = generator.SMZ3Preset(preset_name)
         await smz3preset.generate(tournament=True, spoilers=False)
@@ -80,7 +80,7 @@ class GameHandler(SahasrahBotCoreHandler):
         race_info = f"{preset_name} - {smz3preset.seed.url} - ({smz3preset.seed.code})"
         await self.set_bot_raceinfo(race_info)
         await self.send_message(smz3preset.seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     async def ex_spoiler(self, args, message):
@@ -91,11 +91,11 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         smz3preset = generator.SMZ3Preset(preset_name)
         await smz3preset.generate(tournament=True, spoilers=True)
         spoiler_url = smz3preset.spoiler_url()

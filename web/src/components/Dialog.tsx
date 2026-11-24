@@ -1,4 +1,4 @@
-import * as RD from '@radix-ui/react-dialog'
+import * as RadixDialog from '@radix-ui/react-dialog'
 import type { ReactNode } from 'react'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -18,35 +18,35 @@ interface DialogProps {
  * Centred card on desktop, bottom sheet on phone. Close is a soft grey disc
  * on phone and a "Close" pill on desktop; CSS shows the right one.
  */
-export function Dialog({ open, onOpenChange, title, description, size = 'md', children, footer }: DialogProps) {
+export function Dialog({ open, onOpenChange, title, description, size = 'md', children, footer }: Readonly<DialogProps>) {
   return (
-    <RD.Root open={open} onOpenChange={onOpenChange}>
-      <RD.Portal>
-        <RD.Overlay className="dialog-scrim" />
-        <RD.Content className={`dialog dialog--${size}`}>
+    <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay className="dialog-scrim" />
+        <RadixDialog.Content className={`dialog dialog--${size}`}>
           <header className="dialog__head">
-            <RD.Title className="dialog__title">{title}</RD.Title>
-            <RD.Close asChild>
+            <RadixDialog.Title className="dialog__title">{title}</RadixDialog.Title>
+            <RadixDialog.Close asChild>
               <button type="button" className="dialog__close-disc" aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
-            </RD.Close>
-            <RD.Close asChild>
+            </RadixDialog.Close>
+            <RadixDialog.Close asChild>
               <button type="button" className="dialog__close-pill">
                 Close
               </button>
-            </RD.Close>
+            </RadixDialog.Close>
           </header>
           {description ? (
-            <RD.Description className="dialog__desc">{description}</RD.Description>
+            <RadixDialog.Description className="dialog__desc">{description}</RadixDialog.Description>
           ) : (
-            <RD.Description className="visually-hidden">{title}</RD.Description>
+            <RadixDialog.Description className="visually-hidden">{title}</RadixDialog.Description>
           )}
           <div className="dialog__body">{children}</div>
           {footer && <footer className="dialog__foot">{footer}</footer>}
-        </RD.Content>
-      </RD.Portal>
-    </RD.Root>
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   )
 }
 
@@ -71,7 +71,7 @@ export function FormDialog({
   extra,
   destructive,
   ...dialog
-}: FormDialogProps) {
+}: Readonly<FormDialogProps>) {
   return (
     <Dialog
       {...dialog}

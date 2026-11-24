@@ -8,7 +8,7 @@ const INVITE_URL =
   'https://discord.com/api/oauth2/authorize?client_id=572269659290861578&permissions=0&scope=bot%20applications.commands'
 const GITHUB_URL = 'https://github.com/tcprescott/sahasrahbot'
 
-function Tile({ icon, title, children, actions }: { icon: IconName; title: string; children: ReactNode; actions: ReactNode }) {
+function Tile({ icon, title, children, actions }: Readonly<{ icon: IconName; title: string; children: ReactNode; actions: ReactNode }>) {
   return (
     <section className="tile">
       <h2>

@@ -22,14 +22,28 @@ class SessionUser(BaseModel):
 
 
 class SessionInfo(BaseModel):
-    user: Optional[SessionUser]
+    user: Optional[SessionUser] = None
+
+
+class BrowserSentry(BaseModel):
+    """What the React app hands the Sentry browser SDK."""
+    dsn: str
+    environment: str
+    release: Optional[str] = None
+    sample_rate: float = Field(description="Share of browser errors sent, 0 to 1.")
+    traces_sample_rate: float = Field(description="Share of page loads and navigations traced, 0 to 1.")
+    replay: bool = Field(description="Record a session replay to send with an error.")
+
+
+class Telemetry(BaseModel):
+    sentry: Optional[BrowserSentry] = Field(description="Null when Sentry is off; the app then loads no SDK.")
 
 
 class Profile(BaseModel):
     user: SessionUser
     racetime_linked: bool
-    racetime_id: Optional[str]
-    preset_namespace: Optional[str]
+    racetime_id: Optional[str] = None
+    preset_namespace: Optional[str] = None
     moderated_triforce_pools: list[str]
 
 
@@ -54,7 +68,7 @@ class PresetSummary(BaseModel):
     namespace: str
     randomizer: str
     name: str
-    modified: Optional[datetime]
+    modified: Optional[datetime] = None
     generated_count: int
 
 
@@ -81,11 +95,11 @@ class Candidate(BaseModel):
 class Election(BaseModel):
     id: int
     title: str
-    description: Optional[str]
+    description: Optional[str] = None
     private: bool
     seats: int
     candidates: list[Candidate]
-    ballot: Optional[list[int]] = Field(description="Candidate ids the viewer ranked, most preferred first; null until they vote")
+    ballot: Optional[list[int]] = Field(default=None, description="Candidate ids the viewer ranked, most preferred first; null until they vote")
 
 
 class BallotIn(BaseModel):
@@ -99,7 +113,7 @@ class TriforceText(BaseModel):
     id: int
     lines: list[str]
     status: TextStatus
-    submitted: Optional[datetime]
+    submitted: Optional[datetime] = None
     author: Optional[str] = None
 
 

@@ -22,6 +22,8 @@ from quart import Blueprint, Response, current_app, jsonify, redirect, render_te
 
 from devserver import fixtures
 
+RACETIME_GG = "racetime.gg"
+
 fake_services = Blueprint("fake_services", __name__, url_prefix="/_fake")
 
 PAGE = """<!doctype html>
@@ -156,7 +158,7 @@ async def racetime_authorize():
         f'<div class="card"><div><b>{html.escape(u["name"])}</b> <span class="muted">{u["id"]}</span></div>'
         f'<a class="button" href="{html.escape(_with_params(request.url, rtgg_id=u["id"]))}">Authorize</a></div>'
         for u in fixtures.RACETIME_USERS)
-    return await page("racetime.gg", "racetime.gg authorization",
+    return await page(RACETIME_GG, "racetime.gg authorization",
                       f"<h2>Authorize SahasrahBot as which racetime.gg user?</h2>{cards}")
 
 
@@ -181,7 +183,7 @@ async def racetime_userinfo():
 
 @fake_services.route("/racetime/<path:path>")
 async def racetime_page(path):
-    return await page("racetime.gg", "racetime.gg",
+    return await page(RACETIME_GG, RACETIME_GG,
                       f"<h2>racetime.gg/{html.escape(path)}</h2><p>This would be a racetime.gg page.</p>")
 
 

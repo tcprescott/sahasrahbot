@@ -54,13 +54,13 @@ export function NamespacesScreen() {
                   key: 'name',
                   header: 'Namespace',
                   primary: true,
-                  cell: (ns) => <Link to={`/presets/manage/${encodeURIComponent(ns.name)}`}>{ns.name}</Link>,
+                  render: (ns) => <Link to={`/presets/manage/${encodeURIComponent(ns.name)}`}>{ns.name}</Link>,
                 },
                 {
                   key: 'count',
                   header: 'Presets',
                   align: 'end',
-                  cell: (ns) => ns.preset_count,
+                  render: (ns) => ns.preset_count,
                 },
               ]}
             />

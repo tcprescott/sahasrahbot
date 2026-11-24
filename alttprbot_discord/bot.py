@@ -3,9 +3,10 @@ import logging
 
 import discord
 from discord.ext import commands
-from discord_sentry_reporting import use_sentry
 
 import config
+from alttprbot_discord.telemetry import SentryCommandTree
+
 # No privileged intents: member lookups go through alttprbot/util/discord_members.py.
 intents = discord.Intents.default()
 
@@ -18,17 +19,17 @@ discordbot = commands.Bot(
     ),
     intents=intents,
     chunk_guilds_at_startup=False,
+    # Traces, tags and times every slash command for Sentry.
+    tree_cls=SentryCommandTree,
 )
 
 discordbot.logger = logging.getLogger('discord')
 discordbot.logger.setLevel(logging.INFO)
 
-if config.SENTRY_URL:
-    use_sentry(discordbot, dsn=config.SENTRY_URL)
-
 
 async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.errors")
+    await discordbot.load_extension("alttprbot_discord.cogs.telemetry")
     await discordbot.load_extension("alttprbot_discord.cogs.daily")
     await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
@@ -43,9 +44,6 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.racer_verification")
 
     await discordbot.load_extension('jishaku')
-
-    # if importlib.util.find_spec('sahasrahbot_private'):
-    #     await discordbot.load_extension('sahasrahbot_private.stupid_memes')
 
 
 # @discordbot.event

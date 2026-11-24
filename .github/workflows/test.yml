@@ -80,10 +80,10 @@ jobs:
           # Four locked packages ship only as source (html2markdown,
           # python-bps-continued, quart-discord, racetime-bot), so this install
           # has to run their build scripts. Everything else is a wheel.
-          poetry install --no-root --no-interaction
+          poetry install --no-root --no-interaction  # NOSONAR: the source-only packages above must build
           # pytest isn't in the Poetry dev group yet; install it into the venv
           # without changing the dependency files.
-          poetry run python -m pip install --only-binary=:all: pytest
+          poetry run python -m pip install --only-binary=:all: pytest  # NOSONAR: wheels only
       - name: Install test tooling
         # pytest-asyncio and pytest-cov (requirements-test.txt) aren't in the
         # Poetry dev group yet either. Wheels only, so no build scripts run.

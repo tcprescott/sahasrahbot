@@ -15,7 +15,7 @@ async def calculate_results(election: models.RankedChoiceElection):
     await election.fetch_related('candidates')
     await election.fetch_related('votes', 'votes__candidate')
     candidates = {candidate.name: pyrankvote.Candidate(candidate.name) for candidate in election.candidates}
-    voters = list(set([a.user_id for a in election.votes]))
+    voters = list({a.user_id for a in election.votes})
     ballots = []
     for voter in voters:
         votes: List[models.RankedChoiceVotes] = [v for v in election.votes if v.user_id == voter]
@@ -24,7 +24,7 @@ async def calculate_results(election: models.RankedChoiceElection):
         ballots.append(ballot)
 
     election_result = pyrankvote.single_transferable_vote(candidates=candidates.values(), ballots=ballots,
-                                                          number_of_seats=election.seats)  # TODO: make this a variable
+                                                          number_of_seats=election.seats)
 
     winners = election_result.get_winners()
 
@@ -36,8 +36,6 @@ async def calculate_results(election: models.RankedChoiceElection):
 
     election.results = str(election_result)
     await election.save()
-
-    return
 
 
 def create_embed(election: models.RankedChoiceElection):

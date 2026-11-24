@@ -1,6 +1,6 @@
 from alttprbot.alttprgen.randomizer.ffr import roll_ffr
 
-from .core import SahasrahBotCoreHandler
+from .core import MSG_ROLL_COMPLETE, SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
@@ -27,5 +27,5 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(seed_url)
         await self.send_message(seed_url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True

@@ -5,6 +5,66 @@ from discord import app_commands
 from discord.ext import commands
 
 
+def _missing_permissions(error) -> str:
+    return '` `'.join(error.missing_permissions)
+
+
+def _command_error_message(ctx: commands.Context, error: commands.CommandError):
+    """What to tell the user about a failed prefix or hybrid command, or None to say nothing more."""
+    if isinstance(error, commands.MissingRequiredArgument):
+        return f"Something is missing. `{ctx.clean_prefix}{ctx.command.name} <{'> <'.join(ctx.command.clean_params)}>`"
+    if isinstance(error, (commands.MemberNotFound, commands.UserNotFound)):
+        return f"Member `{str(error).split(' ')[1]}` not found ! Don't hesitate to ping the requested member."
+    if isinstance(error, commands.CommandNotFound):
+        return None
+    if isinstance(error, commands.BotMissingPermissions):
+        if "send_messages" in error.missing_permissions:
+            return None
+        return f"The bot require the following permissions: `{_missing_permissions(error)}`."
+    if isinstance(error, commands.MissingPermissions):
+        return f"Your account require the following permissions: `{_missing_permissions(error)}`."
+    if isinstance(error, commands.CommandInvokeError):
+        return str(error.original)
+    if isinstance(error, commands.CommandOnCooldown):
+        return f"Command is on cooldown, wait `{str(error).split(' ')[7]}` !"
+    if isinstance(error, commands.MaxConcurrencyReached):
+        return (f"Max concurrency reached. Maximum number of concurrent invokers allowed: `{error.number}`, "
+                f"per `{error.per}`.")
+    for error_type, message in _FIXED_COMMAND_ERROR_MESSAGES:
+        if isinstance(error, error_type):
+            return message
+    if isinstance(error, _SELF_EXPLAINING_COMMAND_ERRORS):
+        return str(error)
+    return _UNHANDLED
+
+
+# Returned by _command_error_message for errors the handler doesn't know.
+_UNHANDLED = object()
+
+_SELF_EXPLAINING_COMMAND_ERRORS = (
+    commands.ConversionError, commands.BadArgument, commands.BadUnionArgument, commands.BadLiteralArgument,
+    commands.ArgumentParsingError, commands.CheckAnyFailure, commands.MissingRole, commands.BotMissingRole,
+    commands.MissingAnyRole, commands.BotMissingAnyRole,
+)
+
+_FIXED_COMMAND_ERROR_MESSAGES = (
+    (commands.PrivateMessageOnly, "This command canno't be used in a guild, try in direct message."),
+    (commands.NoPrivateMessage, "This is not working as excpected."),
+    (commands.NotOwner, "You must own this bot to run this command."),
+    (commands.NSFWChannelRequired, "This command require an NSFW channel."),
+    (commands.DisabledCommand, "Sorry this command is disabled."),
+)
+
+
+def _invoke_error_message(original: Exception) -> str:
+    """What to tell the user when an app command raised."""
+    if isinstance(original, discord.errors.InteractionResponded):
+        return str(original)
+    if isinstance(original, discord.errors.Forbidden):
+        return f"`{type(original).__name__}` : {original.text}"
+    return f"`{type(original).__name__}` : {original}"
+
+
 class Errors(commands.Cog, name="errors"):
     """Errors handler."""
 
@@ -44,91 +104,27 @@ class Errors(commands.Cog, name="errors"):
 
         riplink = discord.utils.get(ctx.bot.emojis, name='RIPLink')
 
-        edit = None
-
         try:
             if ctx.interaction:  # HybridCommand Support
                 await self.__respond_to_interaction(ctx.interaction)
-                edit = ctx.interaction.edit_original_message
+                edit = ctx.interaction.edit_original_response
                 if isinstance(error, commands.HybridCommandError):
                     error = error.original  # Access to the original error
             else:
                 discord_message = await ctx.send(self.default_error_message)
                 edit = discord_message.edit
-
-            raise error
-
-        # ConversionError
-        except commands.ConversionError as d_error:
-            if edit is not None:
-                await edit(content=f"{riplink} {d_error}")  # pylint: disable=no-member
-        # UserInputError
-        except commands.MissingRequiredArgument:
-            if edit is not None:
-                await edit(
-                    content=f"{riplink} Something is missing. `{ctx.clean_prefix}{ctx.command.name} <{'> <'.join(ctx.command.clean_params)}>`")
-        # UserInputError -> BadArgument
-        except (commands.MemberNotFound, commands.UserNotFound) as d_error:
-            if edit is not None:
-                await edit(
-                    content=f"{riplink} Member `{str(d_error).split(' ')[1]}` not found ! Don't hesitate to ping the requested member.")
-        # UserInputError -> BadUnionArgument | BadLiteralArgument | ArgumentParsingError
-        except (commands.BadArgument, commands.BadUnionArgument, commands.BadLiteralArgument,
-                commands.ArgumentParsingError) as d_error:
-            if edit is not None:
-                await edit(content=f"{riplink} {d_error}")
-        # CommandNotFound
-        except commands.CommandNotFound as d_error:
-            # await edit(content=f"{riplink} Command `{str(d_error).split(' ')[1]}` not found !")
-            pass  # Ignore this error
-        # CheckFailure
-        except commands.PrivateMessageOnly:
-            if edit is not None:
-                await edit(content=f"{riplink} This command canno't be used in a guild, try in direct message.")
-        except commands.NoPrivateMessage:
-            if edit is not None:
-                await edit(content=f"{riplink} This is not working as excpected.")
-        except commands.NotOwner:
-            if edit is not None:
-                await edit(content=f"{riplink} You must own this bot to run this command.")
-        except commands.MissingPermissions as d_error:
-            if edit is not None:
-                await edit(
-                    content=f"{riplink} Your account require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
-        except commands.BotMissingPermissions as d_error:
-            if edit is not None:
-                if not "send_messages" in d_error.missing_permissions:
-                    await edit(
-                        content=f"{riplink} The bot require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
-        except (commands.CheckAnyFailure, commands.MissingRole, commands.BotMissingRole, commands.MissingAnyRole,
-                commands.BotMissingAnyRole) as d_error:
-            if edit is not None:
-                await edit(content=f"{riplink} {d_error}")
-        except commands.NSFWChannelRequired:
-            if edit is not None:
-                await edit(content=f"{riplink} This command require an NSFW channel.")
-        # DisabledCommand
-        except commands.DisabledCommand:
-            if edit is not None:
-                await edit(content=f"{riplink} Sorry this command is disabled.")
-        # CommandInvokeError
-        except commands.CommandInvokeError as d_error:
-            if edit is not None:
-                await edit(content=f"{riplink} {d_error.original}")
-        # CommandOnCooldown
-        except commands.CommandOnCooldown as d_error:
-            if edit is not None:
-                await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
-        # MaxConcurrencyReached
-        except commands.MaxConcurrencyReached as d_error:
-            if edit is not None:
-                await edit(
-                    content=f"{riplink} Max concurrency reached. Maximum number of concurrent invokers allowed: `{d_error.number}`, per `{d_error.per}`.")
-        # HybridCommandError
-        except commands.HybridCommandError as d_error:
-            await self.get_app_command_error(ctx.interaction, error)
         except Exception as e:
             self.trace_error("get_command_error", e)
+
+        if isinstance(error, commands.HybridCommandError):
+            await self.get_app_command_error(ctx.interaction, error)
+            return
+
+        content = _command_error_message(ctx, error)
+        if content is _UNHANDLED:
+            self.trace_error("get_command_error", error)
+        if content is not None:
+            await edit(content=f"{riplink} {content}")
 
     @commands.Cog.listener("on_app_command_error")
     async def get_app_command_error(self, interaction: discord.Interaction,
@@ -138,46 +134,28 @@ class Errors(commands.Cog, name="errors"):
         """
 
         riplink = discord.utils.get(self.bot.emojis, name='RIPLink')
-        edit = None
 
         try:
             await self.__respond_to_interaction(interaction)
             edit = interaction.edit_original_response
-
-            raise error
-        except app_commands.CommandInvokeError as d_error:
-            if isinstance(d_error.original, discord.errors.InteractionResponded):
-                if edit is not None:
-                    await edit(content=f"{riplink} {d_error.original}")
-                self.bot.logger.exception("Error during interaction")
-            elif isinstance(d_error.original, discord.errors.Forbidden):
-                if edit is not None:
-                    await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original.text}")
-                self.bot.logger.exception("Error during interaction")
-            else:
-                if edit is not None:
-                    await edit(content=f"{riplink} `{type(d_error.original).__name__}` : {d_error.original}")
-                self.bot.logger.exception("Error during interaction")
-        except app_commands.CheckFailure as d_error:
-            if isinstance(d_error, app_commands.errors.CommandOnCooldown):
-                if edit is not None:
-                    await edit(content=f"{riplink} Command is on cooldown, wait `{str(d_error).split(' ')[7]}` !")
-            else:
-                if edit is not None:
-                    await edit(content=f"{riplink} `{type(d_error).__name__}` : {d_error}")
-        except app_commands.CommandNotFound as d_error:
-            if edit is not None:
-                await edit(
-                    content=f"{riplink} Command was not found.. Seems to be a discord bug, probably due to desynchronization.\nTry again in a little bit, and if this still happens after an hour contact Synack for help.")
-            raise d_error
         except Exception as e:
-            # Caught here:
-            # app_commands.TransformerError
-            # app_commands.CommandLimitReached
-            # app_commands.CommandAlreadyRegistered
-            # app_commands.CommandSignatureMismatch
-
             self.trace_error("get_app_command_error", e)
+
+        if isinstance(error, app_commands.CommandInvokeError):
+            await edit(content=f"{riplink} {_invoke_error_message(error.original)}")
+            self.bot.logger.error("Error during interaction", exc_info=error)
+        elif isinstance(error, app_commands.errors.CommandOnCooldown):
+            await edit(content=f"{riplink} Command is on cooldown, wait `{str(error).split(' ')[7]}` !")
+        elif isinstance(error, app_commands.CheckFailure):
+            await edit(content=f"{riplink} `{type(error).__name__}` : {error}")
+        elif isinstance(error, app_commands.CommandNotFound):
+            await edit(
+                content=f"{riplink} Command was not found.. Seems to be a discord bug, probably due to desynchronization.\nTry again in a little bit, and if this still happens after an hour contact Synack for help.")
+            raise error
+        else:
+            # For example app_commands.TransformerError, CommandLimitReached,
+            # CommandAlreadyRegistered and CommandSignatureMismatch.
+            self.trace_error("get_app_command_error", error)
 
     @commands.Cog.listener("on_view_error")
     async def get_view_error(self, interaction: discord.Interaction, error: Exception, item: any):

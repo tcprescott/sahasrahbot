@@ -4,7 +4,7 @@ from pyz3r.exceptions import UnableToGenerate, UnableToRetrieve
 
 from alttprbot.alttprgen import generator, smz3multi, smvaria
 from alttprbot.alttprgen.randomizer import smdash
-from .core import SahasrahBotCoreHandler
+from .core import MSG_GENERATING, MSG_NO_PRESET, MSG_ROLL_COMPLETE, SahasrahBotCoreHandler
 
 
 class GameHandler(SahasrahBotCoreHandler):
@@ -28,7 +28,7 @@ class GameHandler(SahasrahBotCoreHandler):
         race_info = f"Super Metroid Choozo Randomizer - {seed.url} - {' '.join(args)}"
         await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         if args[4] == "RandomEscape":
             await self.send_message("Don't forget to disable screen shake during escape.")
         self.seed_rolled = True
@@ -41,7 +41,7 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
@@ -63,7 +63,7 @@ class GameHandler(SahasrahBotCoreHandler):
             await self.send_message("Teams are unequal in size.")
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
 
         try:
             teams = self.teams
@@ -89,11 +89,11 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
 
         try:
             seed = await smvaria.generate_league_playoff(args[0], args[1], args[2])
@@ -104,7 +104,7 @@ class GameHandler(SahasrahBotCoreHandler):
         race_info = f"Super Metroid League Playoffs - {preset_name} - {seed.url} - {', '.join(args)}"
         await self.set_bot_raceinfo(race_info)
         await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     async def ex_total(self, args, message):
@@ -118,18 +118,18 @@ class GameHandler(SahasrahBotCoreHandler):
             preset_name = args[0]
         except IndexError:
             await self.send_message(
-                'You must specify a preset!'
+                MSG_NO_PRESET
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         smpreset = generator.SMPreset(preset_name)
         await smpreset.generate(tournament=True, spoilers=False)
 
         race_info = f"SM Total Randomizer - {preset_name} - {smpreset.seed.url} - ({smpreset.seed.code})"
         await self.set_bot_raceinfo(race_info)
         await self.send_message(smpreset.seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     async def ex_smvaria(self, args, message):
@@ -151,7 +151,7 @@ class GameHandler(SahasrahBotCoreHandler):
             )
             return
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             seed = await smvaria.generate_preset(
                 settings=settings,
@@ -164,7 +164,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"{settings} / {skills} - {seed.url}")
         await self.send_message(seed.url)
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     async def ex_smdash(self, args, message):
@@ -192,14 +192,14 @@ class GameHandler(SahasrahBotCoreHandler):
             if args[0] != '--spoiler':
                 await self.send_message(
                     f'Invalid option: {args[0]}  ' +
-                    f'Supported options: --spoiler'
+                    'Supported options: --spoiler'
                 )
                 return
 
             spoiler = True
             preset = args[1]
 
-        await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+        await self.send_message(MSG_GENERATING)
         try:
             url = await smdash.create_smdash(mode=preset, spoiler=spoiler)
         except Exception as e:
@@ -208,7 +208,7 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.set_bot_raceinfo(f"SM Dash Randomizer - {url}")
         await self.send_message(f"{url}")
-        await self.send_message("Seed rolling complete.  See race info for details.")
+        await self.send_message(MSG_ROLL_COMPLETE)
         self.seed_rolled = True
 
     # async def ex_spoiler(self, args, message):
@@ -219,11 +219,11 @@ class GameHandler(SahasrahBotCoreHandler):
     #         preset_name = args[0]
     #     except IndexError:
     #         await self.send_message(
-    #             'You must specify a preset!'
+    #             MSG_NO_PRESET
     #         )
     #         return
 
-    #     await self.send_message("Generating game, please wait.  If nothing happens after a minute, contact Synack.")
+    #     await self.send_message(MSG_GENERATING)
     #     smpreset = generator.SMPreset(preset_name)
     #     await smpreset.generate(tournament=True, spoilers=True)
     #     spoiler_url = smpreset.spoiler_url()

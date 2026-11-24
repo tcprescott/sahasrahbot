@@ -1,0 +1,101 @@
+# Tournament and daily race settings, one entry per event slug.
+#
+# The key is the event slug that alttprbot/tournaments.py maps to a race class
+# (TOURNAMENT_DATA). alttprbot/tournament/event_settings.py turns an entry into the
+# TournamentConfig the race engine uses, resolving the Discord ids below with
+# the live bot. These are Discord ids, not secrets: change them here, in a
+# reviewed PR, when an event moves server or a season gets new channels/roles.
+#
+# Fields (all but guild, racetime_category and racetime_goal are optional):
+#   guild               Discord server id
+#   racetime_category   racetime.gg category slug
+#   racetime_goal       racetime.gg goal name
+#   channels            audit, commentary, mod, scheduling_needs: channel ids
+#   roles               admin, helper, commentator, mod: lists of role ids
+#   any other TournamentConfig field (stream_delay, room_open_time,
+#   create_scheduled_events, scheduling_needs_tracker, gsheet_id, ...)
+#   announcement        dailies only: what alttprbot_discord/notifications.py
+#                       posts when the room opens (channel, heading, mention
+#                       role, webhook_mention role, show_seed_time)
+
+alttpr:
+  guild: 334795604918272012
+  racetime_category: alttpr
+  racetime_goal: Beat the game - Tournament (Solo)
+  channels:
+    audit: 647966639266201620
+    commentary: 947095820673638400
+    scheduling_needs: 434560353461075969
+  roles:
+    helper:
+      - 334797023054397450
+      - 435200206552694794
+      - 482353483853332481
+      - 426487540829388805
+      - 613394561594687499
+      - 334796844750209024
+  scheduling_needs_tracker: true
+  create_scheduled_events: true
+  stream_delay: 10
+  gsheet_id: 1epZRDXfe-O4BBerzOEZbFMOVCFrVXU6TCDNjp66P7ZI
+
+invleague:
+  guild: 543577975032119296
+  racetime_category: alttpr
+  racetime_goal: Beat the game - Tournament (Solo)
+  channels:
+    audit: 546728638272241674
+    commentary: 1157407211094556703
+    # scheduling_needs: 878075812996337744  (scheduling_needs_tracker off)
+  roles:
+    helper: &league_helpers
+      - 543596853871116288
+      - 543597099649073162
+      - 676530377812082706
+      - 553295025190993930
+      - 674109759179194398
+  stream_delay: 10
+  create_scheduled_events: true
+
+alttprleague:
+  guild: 543577975032119296
+  racetime_category: alttpr
+  racetime_goal: Beat the game - Tournament (Solo)
+  channels:
+    audit: 546728638272241674
+    commentary: 1157407211094556703
+    # scheduling_needs: 878076083193389096  (scheduling_needs_tracker off)
+  roles:
+    helper: *league_helpers
+  stream_delay: 10
+  create_scheduled_events: true
+
+alttprdaily:
+  guild: 307860211333595146
+  racetime_category: alttpr
+  racetime_goal: Beat the game - Casual
+  room_open_time: 60
+  announcement:
+    channel: 307861467838021633
+    heading: SpeedGaming Daily Race Series
+    webhook_mention: 399038388964950016
+    show_seed_time: true
+
+smz3:
+  guild: 445948207638511616
+  racetime_category: smz3
+  racetime_goal: Beat the games
+  room_open_time: 60
+  announcement:
+    channel: 451977523123978260
+    heading: SMZ3 Weekly Race
+    mention: 449260882501959700
+    show_seed_time: false
+
+# Only used when config.DEBUG is on (alttprbot/tournaments.py).
+test:
+  guild: 508335685044928540
+  racetime_category: test
+  racetime_goal: Beat the game
+  channels:
+    audit: 537469084527230976

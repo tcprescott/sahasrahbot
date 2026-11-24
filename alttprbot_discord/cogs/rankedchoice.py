@@ -15,10 +15,6 @@ class RankedChoiceMessageView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    # @discord.ui.button(label="Vote", custom_id="vote", style=discord.ButtonStyle.primary)
-    # async def vote(self, button: discord.ui.Button, interaction: discord.Interaction):
-    #     await interaction.response.send_message(f"Vote at https://sahasrahbotapi.synack.live/ranked_choice/{self.election.id}", ephemeral=True)
-
     @discord.ui.button(label="End Election", custom_id="sahasrahbot:rankedchoice:end_election",
                        style=discord.ButtonStyle.danger)
     async def end_election(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -78,44 +74,6 @@ class RankedChoice(commands.GroupCog, name="rankedchoice"):
                                                 view=RankedChoiceMessageView(self.bot))
         message = await interaction.original_response()
         await ranked_choice.set_message_id(election.id, message.id)
-
-    # @app_commands.command(description="Refresh the .")
-    # @app_commands.describe(election_id="The ID of the election.")
-    # async def status(self, interaction: discord.Interaction, election_id: int):
-    #     election = await models.RankedChoiceElection.get(id=election_id)
-    #     await election.fetch_related('candidates')
-    #     await election.fetch_related('authorized_voters')
-    #     await election.fetch_related('votes')
-
-    #     await interaction.response.send_message(embed=rankedchoice.create_embed(election))
-
-    # @app_commands.command(description="Forcibly refresh the election post.")
-    # @app_commands.describe(election_id="The ID of the election.")
-    # async def refresh(self, interaction: discord.Interaction, election_id: int):
-    #     election = await models.RankedChoiceElection.get(id=election_id)
-    #     await election.fetch_related('candidates')
-    #     await election.fetch_related('authorized_voters')
-    #     await election.fetch_related('votes')
-
-    #     await rankedchoice.refresh_election_post(election, self.bot)
-    #     await interaction.response.send_message(f"Refreshed election post.", ephemeral=True)
-
-    # @app_commands.command(description="Temp command")
-    # @app_commands.describe(election_id="The ID of the election.")
-    # async def temp(self, interaction: discord.Interaction, election_id: int):
-    #     await interaction.response.defer()
-    #     election = await models.RankedChoiceElection.get(id=election_id)
-    #     await election.fetch_related('candidates')
-    #     await election.fetch_related('authorized_voters')
-    #     await election.fetch_related('votes')
-
-    #     await rankedchoice.calculate_results(election)
-
-    #     election.active = False
-    #     await election.save()
-
-    #     await rankedchoice.refresh_election_post(election, self.bot)
-    #     await interaction.followup.send("Successfully ended the election.", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

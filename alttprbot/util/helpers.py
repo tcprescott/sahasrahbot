@@ -13,7 +13,7 @@ def generate_random_string(length: int):
 
     # generate the random string of the desired length
     random_string = ''
-    for i in range(length):
+    for _ in range(length):
         random_string += random.choice(chars)
 
     return random_string
