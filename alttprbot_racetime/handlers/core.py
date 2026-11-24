@@ -237,7 +237,7 @@ class SahasrahBotCoreHandler(RaceHandler):
     @property
     def teams(self):
         if self.data.get('team_race', False) is False:
-            raise Exception('This is not a team race.')
+            raise RuntimeError('This is not a team race.')
 
         entrants = [(e['user']['name'], e['team']['name']) for e in self.data['entrants']]
         return {key: [v[0] for v in val] for key, val in

@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+from alttprbot.exceptions import SeedGenerationError
 
 class AVIANART():
     def __init__(self, preset=None, race=True):
@@ -33,7 +34,7 @@ class AVIANART():
                     return hash_id
                 
                 if self.status == 'failure':
-                    raise Exception("Failed to generate game: " + result['response'].get('message'))
+                    raise SeedGenerationError("Failed to generate game: " + result['response'].get('message'))
 
     @classmethod
     async def create(

@@ -139,7 +139,6 @@ export function PresetScreen() {
                 } catch (e) {
                   setError((e as Error).message)
                 }
-                return true
               }}
             >
               {p.namespace}/{p.name} stops working in Discord straight away. This can't be undone.

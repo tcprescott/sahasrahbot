@@ -22,7 +22,8 @@ class SahasrahBotRaceTimeBot(Bot):
         super().__init__(*args, **kwargs)
         self.handler_class = handler_class
         if self.racetime_secure:
-            self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            self.ssl_context = ssl.create_default_context()
+            self.ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
 
     def get_handler_kwargs(self, ws_conn, state):
         return {

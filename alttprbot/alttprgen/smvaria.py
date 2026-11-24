@@ -1,4 +1,5 @@
 from pyz3r.smvaria import SuperMetroidVaria
+from alttprbot.exceptions import InvalidInputError, SeedGenerationError
 
 
 async def generate_preset(settings, skills, race=False):
@@ -127,19 +128,19 @@ async def generate_choozo(ctx, race, split, area, boss, difficulty, escape, morp
         raise_for_status=False
     )
     if not hasattr(seed, 'guid'):
-        raise Exception("Error: %s" % seed.data)
+        raise SeedGenerationError("Error: %s" % seed.data)
     return seed
 
 
 async def generate_league_playoff(majors, area, bosses):
     if majors not in ['FullTraditional', 'FullRandom', 'Major', 'Chozo']:
-        raise Exception("Invalid major setting. Must be FullTraditional, FullRandom, Major, or Chozo.")
+        raise InvalidInputError("Invalid major setting. Must be FullTraditional, FullRandom, Major, or Chozo.")
 
     if area not in ['Off', 'Light', 'Full']:
-        raise Exception("Invalid area setting.  Must be Off, Light, or Full.")
+        raise InvalidInputError("Invalid area setting.  Must be Off, Light, or Full.")
 
     if bosses not in ['Off', 'On']:
-        raise Exception("Invalid bosses setting.  Must be Off, or On.")
+        raise InvalidInputError("Invalid bosses setting.  Must be Off, or On.")
 
     settings = {
         "majorsSplit": "Full" if majors in ['FullTraditional', 'FullRandom'] else majors,

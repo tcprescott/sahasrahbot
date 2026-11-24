@@ -7,6 +7,7 @@ from quart_discord import requires_authorization
 
 import config
 from alttprbot import models
+from alttprbot.exceptions import NotFoundError
 from alttprbot_api.api import discord
 from alttprbot.services import bots
 
@@ -34,7 +35,7 @@ async def bot_command():
 
     racetime_bot = bots.racetime_bots().get(category)
     if not racetime_bot:
-        raise Exception("Invalid game category")
+        raise NotFoundError("Invalid game category")
 
     racetime_handler = racetime_bot.handlers.get(f"{category}/{room}").handler
 

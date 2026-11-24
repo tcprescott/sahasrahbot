@@ -395,11 +395,11 @@ class SMPreset(SahasrahBotPresetCore):
     # I hate this, this should actually be a property of the seed
     def spoiler_url(self, use_yaml=True):
         if self.seed is None:
-            raise Exception("Seed has not been generated.")
+            raise RuntimeError("Seed has not been generated.")
         if self.spoiler_key is None:
             return None
         if self.hash_id is None:
-            raise Exception("Hash ID is not set.")
+            raise RuntimeError("Hash ID is not set.")
         return f"{self.seed.baseurl}/api/spoiler/{self.guid}?key={self.spoiler_key}&yaml={str(use_yaml)}"
 
 

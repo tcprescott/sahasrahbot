@@ -122,7 +122,7 @@ export function NamespaceScreen() {
               title={`Delete ${deleting?.name ?? ''}?`}
               action="Delete preset"
               onConfirm={async () => {
-                if (!deleting) return true
+                if (!deleting) return
                 try {
                   unwrap(
                     await api.DELETE(
@@ -135,7 +135,6 @@ export function NamespaceScreen() {
                 } catch (e) {
                   setError((e as Error).message)
                 }
-                return true
               }}
             >
               {ns.name}/{deleting?.name} ({deleting?.randomizer}) stops working in Discord straight away. This can't be

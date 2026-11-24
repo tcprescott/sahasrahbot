@@ -14,6 +14,7 @@ import aiofiles
 from tenacity import RetryError, AsyncRetrying, stop_after_attempt, retry_if_exception_type
 
 import config
+from alttprbot.exceptions import SeedGenerationError
 
 
 class AlttprDoor():
@@ -40,7 +41,7 @@ class AlttprDoor():
             self.settings['create_spoiler'] = True
             self.settings['calc_playthrough'] = False
             self.settings['rom'] = config.ALTTP_ROM
-            if not self.branch == "volatile":
+            if self.branch != "volatile":
                 self.settings['enemizercli'] = os.path.join(
                     os.getcwd(),
                     "utils",
@@ -55,8 +56,8 @@ class AlttprDoor():
             self.settings['names'] = ""
             self.settings['race'] = not self.spoilers
 
-            with open(settings_file_path, "w") as f:
-                json.dump(self.settings, f)
+            async with aiofiles.open(settings_file_path, "w") as f:
+                await f.write(json.dumps(self.settings))
 
             attempts = 0
             try:
@@ -78,10 +79,10 @@ class AlttprDoor():
                         except asyncio.TimeoutError as e:
                             proc.kill()
                             await proc.wait()
-                            raise Exception('DungeonRandomizer.py timed out after 2 minutes') from e
+                            raise SeedGenerationError('DungeonRandomizer.py timed out after 2 minutes') from e
                         logging.info(stdout.decode())
                         if proc.returncode > 0:
-                            raise Exception(f'Exception while generating game: {stderr.decode()}')
+                            raise SeedGenerationError(f'Exception while generating game: {stderr.decode()}')
 
             except RetryError as e:
                 raise e.last_attempt._exception from e
@@ -109,7 +110,7 @@ class AlttprDoor():
             stdout, stderr = await proc.communicate()
             logging.info(stdout.decode())
             if proc.returncode > 0:
-                raise Exception(f'Exception while while creating patch: {stderr.decode()}')
+                raise SeedGenerationError(f'Exception while creating patch: {stderr.decode()}')
 
             async with aiofiles.open(patch_path, "rb") as f:
                 patchfile = await f.read()
