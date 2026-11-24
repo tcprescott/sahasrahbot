@@ -1,5 +1,5 @@
 """Tests for the services behind the racetime.gg handlers, against the in-memory
-SQLite ``db``: alttprbot/services/spoiler_races.py, racetime_rooms.py and konot.py.
+SQLite ``db``: alttprbot/services/spoiler_races.py and racetime_rooms.py.
 
 The handler-level behaviour (chat replies, countdowns, room creation) is pinned in
 tests/test_racetime_handlers.py; these pin the data each service stores and returns.
@@ -8,10 +8,9 @@ tests/test_racetime_handlers.py; these pin the data each service stores and retu
 from datetime import datetime, timedelta
 
 import pytest
-import tortoise.exceptions
 
 from alttprbot import models
-from alttprbot.services import konot, racetime_rooms, spoiler_races
+from alttprbot.services import racetime_rooms, spoiler_races
 
 ROOM = "alttpr/cool-room-1234"
 
@@ -72,14 +71,3 @@ async def test_tournament_race(db):
     await models.TournamentResults.create(srl_id=ROOM, episode_id="42", event="alttpr")
     assert await racetime_rooms.tournament_race(ROOM) == ("alttpr", "42")
 
-
-async def test_konot_series(db):
-    with pytest.raises(tortoise.exceptions.DoesNotExist):
-        await konot.find_by_room(ROOM)
-
-    game, segment = await konot.start_game("alttpr", ROOM)
-    assert (game.category_slug, segment.racetime_room, segment.game_id, segment.segment_number) == ("alttpr", ROOM, game.id, 1)
-
-    nxt = await konot.add_segment(game.id, "alttpr/next-room-5678", 2)
-    found_game, found_segment = await konot.find_by_room("alttpr/next-room-5678")
-    assert (found_game.id, found_segment.id, found_segment.segment_number) == (game.id, nxt.id, 2)
