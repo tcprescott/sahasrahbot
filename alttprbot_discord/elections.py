@@ -215,11 +215,14 @@ class DiscordDirectory:
         return guild.name if guild else None
 
     async def text_channels(self, guild_id: int) -> list[Named]:
-        guild = await self._guild(guild_id)
+        # The gateway cache, not guild.fetch_channels(): the guilds intent keeps it
+        # complete, and it skips channel types discord.py doesn't know, which
+        # fetch_channels() raises InvalidData on (a server with one couldn't be picked).
+        guild = self.bot.get_guild(guild_id)
         if guild is None:
             return []
         me = guild.me
-        channels = [c for c in await guild.fetch_channels() if getattr(c, 'type', None) in POSTABLE_CHANNEL_TYPES]
+        channels = [c for c in guild.channels if getattr(c, 'type', None) in POSTABLE_CHANNEL_TYPES]
         if me is not None:
             channels = [c for c in channels
                         if c.permissions_for(me).send_messages and c.permissions_for(me).embed_links]
