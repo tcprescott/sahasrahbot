@@ -18,6 +18,8 @@ where things live. Read it before changing code.
   them. A hook (`check_privileged_intents.py`) enforces this.
 - **The audit bot was removed** (2026-11), along with other dead features (orphaned
   tournament classes, SG Live, `/cc2023`). Don't bring them back without asking.
+- **KONOT race series (`!konot`) were removed** (2026-11) at the user's request; the
+  `RacetimeKONOTGame` / `RaceTimeKONOTSegment` models and tables stay.
 - **The async tournament feature was removed** (2026-11) at the user's request, but its
   `AsyncTournament*` models and tables stay, along with the rows the racetime.gg
   account-merge in `alttprbot_api/blueprints/racetime.py` rewrites. Don't drop them
