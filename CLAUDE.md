@@ -38,7 +38,6 @@ where things live. Read it before changing code.
 | `alttprbot/models/` | Tortoise models (`models.py`, `schedule.py`), re-exported from `alttprbot.models` |
 | `alttprbot/services/` | Service layer: one module per domain, called by cogs, routes and racetime handlers. Services may use models directly and must not import any `alttprbot_*` package. `guild_config.py` is the only code that touches the `config` table (per-guild settings, cached) |
 | `alttprbot/integrations/` | One small HTTP client per external API (racetime.gg, ALTTPR Ladder, Door Randomizer multiworld server, holy images). Plain data in and out; no Discord, racetime-bot, web or model imports (a test enforces this). New outbound HTTP goes here, not in a cog or handler |
-| `alttprbot/database/` | Older data-access helpers, mostly raw SQL through `alttprbot/util/orm.py`. Prefer models for new code |
 | `alttprbot/alttprgen/` | Seed generation, with no Discord, racetime or web imports: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one API client per external randomizer, e.g. `alttpr.py`'s `ALTTPRClient`), `spoilers.py` |
 | `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`); Sheets result recording is `alttprbot/services/tournament_results.py` |
 | `alttprbot/events/` | The event bridge: `types.py` (one frozen dataclass per event, listed in `ALL_EVENTS`), `bus.py` (`publish`, `subscribe`). Imports no front end |
@@ -91,9 +90,8 @@ missing config keys. The unit tests are **characterization tests**: they pin wha
 code on master does today, so a refactor can be checked against them. Rules for them:
 
 - Async tests need no decorator (`asyncio_mode = auto` in `pytest.ini`).
-- `db` fixture: a fresh in-memory SQLite database with every model's table. `raw_sql`
-  also routes `alttprbot/util/orm.py` (MySQL `%s` SQL) to it. MySQL-only SQL
-  (`ON DUPLICATE KEY`, `TIMESTAMPADD`) can't run there; assert on the SQL instead.
+- `db` fixture: a fresh in-memory SQLite database with every model's table. MySQL-only
+  SQL (`ON DUPLICATE KEY`, `TIMESTAMPADD`) can't run there; assert on the SQL instead.
 - `fake_http` fixture: a real local HTTP server for code that opens its own aiohttp
   sessions. Point the code at it by monkeypatching the config value it builds URLs from
   (e.g. `config.SG_API_ENDPOINT`). aioresponses doesn't work with our aiohttp version.

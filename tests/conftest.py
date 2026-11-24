@@ -72,7 +72,6 @@ async def _clear_caches():
     yield
     for name in (
         "alttprbot.services.guild_config",
-        "alttprbot.database.role",
     ):
         module = sys.modules.get(name)
         if module is not None and hasattr(module, "CACHE"):
@@ -102,26 +101,6 @@ async def db():
         yield
     finally:
         await Tortoise.close_connections()
-
-
-@pytest.fixture
-def raw_sql(db, monkeypatch):
-    """Route ``alttprbot.util.orm`` (MySQL ``%s`` placeholders) to the SQLite test database."""
-    from tortoise import Tortoise
-
-    from alttprbot.util import orm
-
-    async def select(sql, args=None):
-        conn = Tortoise.get_connection("default")
-        return await conn.execute_query_dict(sql.replace("%s", "?"), args)
-
-    async def execute(sql, args=None):
-        conn = Tortoise.get_connection("default")
-        await conn.execute_query(sql.replace("%s", "?"), args)
-
-    monkeypatch.setattr(orm, "select", select)
-    monkeypatch.setattr(orm, "execute", execute)
-    return orm
 
 
 class FakeHTTPServer:
