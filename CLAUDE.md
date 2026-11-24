@@ -251,6 +251,12 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
   `check.sh`). `layer_allowlist.txt` is empty now; never add a line to it. When core needs
   a front end's live object, the front end registers it at startup instead: the bots via
   `alttprbot/services/bots.py`, other lookups via `alttprbot_discord/gateways.py`.
+- **Data access lives in services.** The front ends never query a model themselves:
+  `.claude/scripts/check_model_queries.py` rejects `models.X.filter(...)`, `.get_or_none`,
+  `.create`, `.update_or_create` and the other query methods in `alttprbot_discord/`,
+  `alttprbot_api/` and `alttprbot_racetime/`. Add a function to the domain's module in
+  `alttprbot/services/` that takes plain values (ids, names, never a `discord.Interaction`
+  or a request) and call it. Reading attributes of the models it returns is fine.
 - Leave unrelated code alone. This codebase has lots of old commented-out tournaments
   and unused imports; don't tidy them in a PR about something else.
 

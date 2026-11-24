@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.interactions import Interaction
 
 import config
-from alttprbot import models
+from alttprbot.services import inquiries
 
 
 # TODO: make work with discord.py 2.0
@@ -23,9 +23,9 @@ class ConfirmInquiryThread(discord.ui.View):
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬",
                        custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):
-        inquiry_message_config = await models.InquiryMessageConfig.get(message_id=interaction.message.id)
-        role = interaction.guild.get_role(inquiry_message_config.role_id)
-        view = OpenInquiryThread(inquiry_message_config)
+        role_id = await inquiries.role_for_message(interaction.message.id)
+        role = interaction.guild.get_role(role_id)
+        view = OpenInquiryThread(role_id)
 
         await interaction.response.send_message(
             (
@@ -37,13 +37,13 @@ class ConfirmInquiryThread(discord.ui.View):
 
 
 class OpenInquiryThread(discord.ui.View):
-    def __init__(self, inquiry_message_config):
+    def __init__(self, role_id: int):
         super().__init__(timeout=60)
-        self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
+        self.role_id = role_id
 
     @discord.ui.button(label="Yes!", style=discord.ButtonStyle.red, row=2)
     async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(OpenInquiryModal(inquiry_message_config=self.inquiry_message_config))
+        await interaction.response.send_modal(OpenInquiryModal(role_id=self.role_id))
 
 class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
     description = discord.ui.TextInput(
@@ -55,9 +55,9 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
         row=1,
     )
 
-    def __init__(self, inquiry_message_config):
+    def __init__(self, role_id: int):
         super().__init__()
-        self.inquiry_message_config: models.InquiryMessageConfig = inquiry_message_config
+        self.role_id = role_id
 
     async def on_submit(self, interaction: Interaction) -> None:
 #        if "PRIVATE_THREADS" not in interaction.channel.guild.features and not config.DEBUG:
@@ -77,7 +77,7 @@ class OpenInquiryModal(discord.ui.Modal, title="Open Inquiry"):
         thread: discord.Thread = await interaction.channel.create_thread(
             name=f"Inquiry {interaction.user.name} {random.randint(0, 999)}", message=msg,
             auto_archive_duration=duration)
-        role_ping = interaction.guild.get_role(self.inquiry_message_config.role_id)
+        role_ping = interaction.guild.get_role(self.role_id)
 
         await thread.add_user(interaction.user)
         await interaction.response.send_message(
@@ -165,7 +165,7 @@ class Inquiry(commands.Cog):
             allowed_mentions=discord.AllowedMentions(roles=False)
         )
         original_message = await interaction.original_response()
-        await models.InquiryMessageConfig.create(message_id=original_message.id, role_id=role.id)
+        await inquiries.register(original_message.id, role.id)
 
 
 def check_private_threads(interaction: discord.Interaction):

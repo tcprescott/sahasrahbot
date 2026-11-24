@@ -21,9 +21,9 @@ import discord
 from discord.ext import commands
 
 import config
-from alttprbot import events, models, tournaments
+from alttprbot import events, tournaments
 from alttprbot.integrations import racetime
-from alttprbot.services import guild_config
+from alttprbot.services import guild_config, ranked_choice, rtgg_watchers, scheduled_events
 from alttprbot.tournament import core
 from alttprbot.util import rankedchoice
 from alttprbot_discord.util.seed_embeds import seed_embed
@@ -217,8 +217,7 @@ class ScheduledJobDiscordOutput:
         episodes = list(event.episodes)
 
         # remove dead events
-        dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes],
-                                                          event_slug=event_slug)
+        dead_events = await scheduled_events.stale(event_slug, [e['id'] for e in episodes])
         for dead_event in dead_events:
             try:
                 guild_event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(
@@ -228,12 +227,12 @@ class ScheduledJobDiscordOutput:
                     await guild_event.delete()
             except discord.NotFound:
                 continue
-            await dead_event.delete()
+            await scheduled_events.forget(dead_event.scheduled_event_id)
 
         for episode in episodes:
             start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
             episode_id = int(episode['id'])
-            scheduled_event = await models.ScheduledEvents.get_or_none(episode_id=episode_id)
+            scheduled_event = await scheduled_events.for_episode(episode_id)
 
             try:
                 tournament_race = await tournaments.fetch_tournament_handler_v2(event_slug, episode)
@@ -286,9 +285,7 @@ class ScheduledJobDiscordOutput:
                             entity_type=discord.EntityType.external,
                             privacy_level=discord.PrivacyLevel.guild_only
                         )
-                        await models.ScheduledEvents.update_or_create(episode_id=episode_id,
-                                                                      defaults={'scheduled_event_id': guild_event.id,
-                                                                                'event_slug': event_slug})
+                        await scheduled_events.remember(episode_id, guild_event.id, event_slug)
                 else:
                     # create an event
                     guild_event = await event_data.guild.create_scheduled_event(
@@ -300,8 +297,7 @@ class ScheduledJobDiscordOutput:
                         entity_type=discord.EntityType.external,
                         privacy_level=discord.PrivacyLevel.guild_only
                     )
-                    await models.ScheduledEvents.create(scheduled_event_id=guild_event.id, episode_id=episode_id,
-                                                        event_slug=event_slug)
+                    await scheduled_events.remember(episode_id, guild_event.id, event_slug)
             except Exception:
                 logger.exception("Unable to create guild event.")
 
@@ -409,13 +405,9 @@ class DiscordNotifier:
         return await racetime.get_user(racetime_id, base_url=event.base_url)
 
     async def _watchlisted_players(self, event: events.RaceStatusChanged):
-        watchlisted_players = await models.RTGGWatcherPlayer.filter(
-            racetime_id__in=list(event.entrant_ids),
-            rtgg_watcher__category=event.category,
-        ).prefetch_related("rtgg_watcher")
-        for watchlisted_player in watchlisted_players:
-            channel = self.bot.get_channel(watchlisted_player.rtgg_watcher.channel_id)
-            user_data = await self._racetime_user(event, watchlisted_player.racetime_id)
+        for hit in await rtgg_watchers.watchlisted_entrants(event.category, event.entrant_ids):
+            channel = self.bot.get_channel(hit.channel_id)
+            user_data = await self._racetime_user(event, hit.racetime_id)
             player_profile_uri = f"{event.base_url}{user_data['url']}"
 
             embed = discord.Embed(
@@ -426,8 +418,8 @@ class DiscordNotifier:
             await channel.send(embed=embed)
 
     async def _new_players(self, event: events.RaceStatusChanged):
-        watchers = await models.RTGGWatcher.filter(category=event.category, notify_on_new_player=True)
-        if not watchers:
+        channel_ids = await rtgg_watchers.new_player_channels(event.category)
+        if not channel_ids:
             return
 
         new_players = []
@@ -436,8 +428,8 @@ class DiscordNotifier:
             if user_data['stats']['joined'] == 0:
                 new_players.append(user_data)
 
-        for watcher in watchers:
-            channel = self.bot.get_channel(watcher.channel_id)
+        for channel_id in channel_ids:
+            channel = self.bot.get_channel(channel_id)
             for user_data in new_players:
                 player_profile_uri = f"{event.base_url}{user_data['url']}"
                 embed = discord.Embed(
@@ -451,7 +443,7 @@ class DiscordNotifier:
 
     async def on_ranked_choice_ballot_cast(self, event: events.RankedChoiceBallotCast):
         await wait_until_ready(self.bot)
-        election = await models.RankedChoiceElection.get_or_none(id=event.election_id)
+        election = await ranked_choice.get_election(event.election_id)
         if election is None:
             return
         await rankedchoice.refresh_election_post(election, self.bot)

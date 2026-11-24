@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from tortoise.functions import Count
+from tortoise.query_utils import Prefetch
 
 from alttprbot import models
 from alttprbot.alttprgen import generator
@@ -107,3 +108,25 @@ def _summary(namespace: models.PresetNamespaces, preset: models.Presets) -> dict
         'modified': preset.modified,
         'generated_count': preset.generated_count,
     }
+
+
+# --- public downloads and JSON (alttprbot_api/blueprints/presets.py) -----------
+
+
+async def preset_content(namespace_name: str, randomizer: str, preset_name: str) -> Optional[str]:
+    """The YAML of a namespaced preset, or None if there's no such preset."""
+    preset = await models.Presets.get_or_none(preset_name=preset_name, randomizer=randomizer,
+                                              namespace__name=namespace_name)
+    return preset.content if preset else None
+
+
+async def namespace_preset_names(randomizer: str) -> list[dict]:
+    """``[{'name': namespace, 'presets': [preset names]}]`` for every namespace that has
+    at least one preset for this randomizer."""
+    namespaces = await models.PresetNamespaces.all().prefetch_related(
+        Prefetch('presets', queryset=models.Presets.filter(randomizer=randomizer)))
+    return [
+        {'name': namespace.name, 'presets': [p.preset_name for p in namespace.presets]}
+        for namespace in namespaces
+        if namespace.presets
+    ]

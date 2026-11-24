@@ -33,6 +33,7 @@ FILE_CHECKS = [
     "check_privileged_intents",
     "check_config_keys",
     "check_layers",
+    "check_model_queries",
 ]
 
 # Checks that also need a whole-tree pass, e.g. to notice an allowlist line whose

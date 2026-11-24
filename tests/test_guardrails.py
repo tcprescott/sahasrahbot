@@ -224,3 +224,56 @@ def test_layers_stale_allowlist_line_fails(fake_repo):
 def test_layers_real_tree_matches_allowlist():
     result = run_layers(ROOT, None, "--all")
     assert result.returncode == 0, result.stderr
+
+
+# --- check_model_queries -------------------------------------------------------
+
+MODEL_QUERIES = HOOKS / "check_model_queries.py"
+
+
+def run_model_queries(root, file_path=None, *args):
+    env = {**os.environ, "CLAUDE_PROJECT_DIR": str(root)}
+    payload = json.dumps({"tool_input": {"file_path": str(file_path)}}) if file_path else ""
+    return subprocess.run(
+        [sys.executable, str(MODEL_QUERIES), *args],
+        input=payload, capture_output=True, text=True, env=env, timeout=30,
+    )
+
+
+@pytest.mark.parametrize("rel, code", [
+    ("alttprbot_discord/a.py", "from alttprbot import models\nasync def f():\n    await models.Users.get_or_none(id=1)\n"),
+    ("alttprbot_api/a.py", "from alttprbot import models as m\nasync def f():\n    await m.Presets.filter(x=1).first()\n"),
+    ("alttprbot_racetime/a.py", "from alttprbot.models import Users\nasync def f():\n    await Users.create(id=1)\n"),
+    ("alttprbot_discord/a.py", "import alttprbot.models\nasync def f():\n    await alttprbot.models.Users.all()\n"),
+    ("alttprbot_discord/a.py", "from alttprbot.models import models\nasync def f():\n    await models.X.update_or_create(a=1)\n"),
+    ("alttprbot_api/a.py", "from alttprbot import models\nasync def f():\n    await models.X.bulk_create([])\n"),
+])
+def test_model_queries_flagged(fake_repo, rel, code):
+    path = fake_repo / rel
+    path.write_text(code)
+    result = run_model_queries(fake_repo, path)
+    assert result.returncode == 2
+    assert "MODEL QUERY" in result.stderr
+    assert run_model_queries(fake_repo, None, "--all").returncode == 2
+
+
+@pytest.mark.parametrize("rel, code", [
+    # Annotations and attribute reads on returned models.
+    ("alttprbot_racetime/a.py", "from alttprbot import models\nx: models.SpoilerRaces = None\n"),
+    ("alttprbot_discord/a.py", "from alttprbot.services import presets\nasync def f():\n    p = await presets.get('a')\n    return p.content\n"),
+    # A query method on something that isn't a model class.
+    ("alttprbot_api/a.py", "import re\nre.compile('x').match('y')\nd = {}\nd.get('a')\n"),
+    ("alttprbot_discord/a.py", "from alttprbot import models\nasync def f(e):\n    await e.candidates.all()\n"),
+    # The opt-out, and core code, which may query.
+    ("alttprbot_discord/a.py", "from alttprbot import models\nasync def f():\n    await models.X.get(a=1)  # model-query: ok\n"),
+    ("alttprbot/a.py", "from alttprbot import models\nasync def f():\n    await models.Users.get(id=1)\n"),
+])
+def test_model_queries_allowed(fake_repo, rel, code):
+    path = fake_repo / rel
+    path.write_text(code)
+    assert run_model_queries(fake_repo, path).returncode == 0
+
+
+def test_model_queries_real_tree_is_clean():
+    result = run_model_queries(ROOT, None, "--all")
+    assert result.returncode == 0, result.stderr
