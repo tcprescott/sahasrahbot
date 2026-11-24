@@ -1,10 +1,9 @@
-"""Characterization tests for the Quart web app (alttprbot_api/).
+"""Tests for the Quart web app (alttprbot_api/): the JSON API the React app uses
+(/api/v1), the server-side sign-in and download routes, and serving the app.
 
 Requests go through Quart's test client against the in-memory database.
 Discord OAuth is faked: the ``login`` fixture decides who ``discord.fetch_user()``
-returns (or raises Unauthorized), and the Discord bot is never connected, so
-guild role lookups find nobody and only the AsyncTournamentPermissions rows
-grant access.
+returns (or raises Unauthorized), and the Discord bot is never connected.
 """
 
 import json
@@ -14,10 +13,12 @@ from unittest import mock
 import pytest
 from quart_discord import Unauthorized
 
-from alttprbot import models
+from alttprbot import events, models
 from alttprbot_api import api
-from alttprbot_api.blueprints import ranked_choice
+from alttprbot_api.blueprints import app_api
 from alttprbot.services import bots
+
+CSRF = {app_api.CSRF_HEADER: app_api.CSRF_VALUE}
 
 
 @pytest.fixture
@@ -40,6 +41,7 @@ def login(monkeypatch):
 
     monkeypatch.setattr(type(api.discord), "authorized", property(lambda self: authorized()))
     monkeypatch.setattr(api.discord, "fetch_user", fetch_user)
+    monkeypatch.setattr(api.discord, "revoke", lambda: state.update(user=None))
 
     def set_user(discord_id, name="tester"):
         state["user"] = None if discord_id is None else SimpleNamespace(
@@ -48,6 +50,16 @@ def login(monkeypatch):
         return state["user"]
 
     return set_user
+
+
+async def get_json(client, path):
+    resp = await client.get(path)
+    return resp.status_code, await resp.get_json()
+
+
+async def send_json(client, method, path, body=None, headers=CSRF):
+    resp = await client.open(path, method=method, json=body, headers=headers)
+    return resp.status_code, await resp.get_json()
 
 
 # ---------------------------------------------------------------------------
@@ -61,21 +73,32 @@ async def test_robots_txt(client):
     assert await resp.get_data(as_text=True) == "User-agent: *\nDisallow: /\n"
 
 
-async def test_index_renders_signed_out(client, login):
-    resp = await client.get("/")
-    assert resp.status_code == 200
+async def test_page_paths_serve_the_app(client, monkeypatch, tmp_path):
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "index.html").write_text("<div id=root></div>")
+    (tmp_path / "assets" / "app-abc.js").write_text("console.log(1)")
+    monkeypatch.setattr(api, "WEB_DIST", tmp_path)
+
+    for path in ("/", "/presets/manage/synack", "/ranked_choice/4", "/definitely-not-a-page"):
+        resp = await client.get(path)
+        assert resp.status_code == 200, path
+        assert "id=root" in await resp.get_data(as_text=True)
+
+    asset = await client.get("/assets/app-abc.js")
+    assert await asset.get_data(as_text=True) == "console.log(1)"
+    assert asset.cache_control.immutable
 
 
-async def test_me_redirects_to_login_when_signed_out(client, login):
-    resp = await client.get("/me/")
-    assert resp.status_code == 302
-    assert resp.headers["Location"].endswith("/login/")
+async def test_page_paths_explain_an_unbuilt_app(client, monkeypatch, tmp_path):
+    monkeypatch.setattr(api, "WEB_DIST", tmp_path / "missing")
+    resp = await client.get("/presets")
+    assert "hasn't been built" in await resp.get_data(as_text=True)
 
 
-async def test_unknown_page_renders_not_found_page_with_status_200(client, login):
-    resp = await client.get("/definitely-not-a-page")
-    assert resp.status_code == 200  # the 404 handler doesn't set a status
-    assert "The page you are looking for does not exist." in await resp.get_data(as_text=True)
+async def test_unknown_api_path_is_json_404(client):
+    status, body = await get_json(client, "/api/v1/nope")
+    assert status == 404
+    assert "error" in body
 
 
 async def test_healthcheck(client, monkeypatch):
@@ -93,60 +116,153 @@ async def test_healthcheck(client, monkeypatch):
 async def test_healthcheck_when_discord_closed(client, login, monkeypatch):
     monkeypatch.setattr(bots, "_discord_client", SimpleNamespace(is_closed=lambda: True))
     resp = await client.get("/healthcheck")
-    assert "Something Bad Happened" in await resp.get_data(as_text=True)
+    assert resp.status_code == 500
+    assert "error" in await resp.get_json()
 
 
-async def test_purge_me_deletes_namespaces_and_verifications(client, login):
+async def test_login_remembers_a_same_site_next_path_only(client, monkeypatch):
+    seen = []
+
+    async def create_session(scope, data):
+        seen.append(data["redirect"])
+        return "redirected"
+
+    monkeypatch.setattr(api.discord, "create_session", create_session)
+    await client.get("/login/?next=/ranked_choice/4")
+    await client.get("/login/?next=//evil.example/")
+    await client.get("/login/?next=https://evil.example/")
+    assert seen == ["/ranked_choice/4", "/", "/"]
+
+
+async def test_openapi_schema_covers_only_the_app_api(client):
+    schema = await (await client.get("/api/v1/openapi.json")).get_json()
+    assert schema["paths"]
+    assert all(path.startswith("/api/v1/") for path in schema["paths"])
+    assert "/api/v1/presets/namespaces/{namespace}" in schema["paths"]
+    assert "/api/v1/triforce-texts/{pool}/moderation/{text_id}" in schema["paths"]
+
+
+# ---------------------------------------------------------------------------
+# Session, profile, purge
+# ---------------------------------------------------------------------------
+
+
+async def test_session_is_null_when_signed_out(client, login):
+    assert await get_json(client, "/api/v1/session") == (200, {"user": None})
+    login(123456789012345678, name="synack")
+    status, body = await get_json(client, "/api/v1/session")
+    assert body["user"] == {"id": "123456789012345678", "name": "synack", "avatar_url": None}
+
+
+async def test_me_needs_sign_in(client, login):
+    status, body = await get_json(client, "/api/v1/me")
+    assert status == 401
+
+
+async def test_me_reports_links(client, login):
+    login(42)
+    await models.Users.create(discord_user_id=42, rtgg_id="abc")
+    await models.PresetNamespaces.create(name="mine", discord_user_id=42)
+    await models.TriforceTextsConfig.create(pool_name="pool", key_name="moderator", value="42")
+    status, body = await get_json(client, "/api/v1/me")
+    assert status == 200
+    assert (body["racetime_linked"], body["racetime_id"], body["preset_namespace"]) == (True, "abc", "mine")
+    assert body["moderated_triforce_pools"] == ["pool"]
+
+
+async def test_changes_need_the_csrf_header(client, login):
+    login(42)
+    await models.PresetNamespaces.create(name="mine", discord_user_id=42)
+    status, _ = await send_json(client, "POST", "/api/v1/me/purge", headers={})
+    assert status == 403
+    assert await models.PresetNamespaces.exists(name="mine")
+
+
+async def test_purge_me_deletes_namespaces_and_signs_out(client, login):
     login(42)
     await models.PresetNamespaces.create(name="mine", discord_user_id=42)
     await models.PresetNamespaces.create(name="theirs", discord_user_id=43)
 
-    resp = await client.post("/purgeme", form={"confirmpurge": "no"})
-    assert resp.headers["Location"].endswith("/me/")
-    assert await models.PresetNamespaces.all().count() == 2
-
-    resp = await client.post("/purgeme", form={"confirmpurge": "yes"})
-    assert resp.headers["Location"].endswith("/logout/")
+    resp = await client.post("/api/v1/me/purge", headers=CSRF)
+    assert resp.status_code == 204
     assert await models.PresetNamespaces.all().values_list("name", flat=True) == ["theirs"]
+    assert await get_json(client, "/api/v1/session") == (200, {"user": None})
 
 
 # ---------------------------------------------------------------------------
-# Presets pages
+# Presets
 # ---------------------------------------------------------------------------
 
 
-async def test_presets_index_and_namespace_pages(client, login):
-    ns = await models.PresetNamespaces.create(name="synack", discord_user_id=1)
+async def make_namespace(name="synack", owner=1):
+    ns = await models.PresetNamespaces.create(name=name, discord_user_id=owner)
     await models.Presets.create(namespace=ns, preset_name="mine", randomizer="alttpr", content="settings: {}")
-    assert (await client.get("/presets")).status_code == 200
-    resp = await client.get("/presets/manage/synack")
-    assert resp.status_code == 200
-    assert "mine" in await resp.get_data(as_text=True)
+    return ns
 
 
-async def test_preset_create_requires_namespace_owner(client, login):
-    await models.PresetNamespaces.create(name="synack", discord_user_id=1)
-    login(2)
-    resp = await client.post(
-        "/presets/synack/create",
-        form={"preset_name": "x", "randomizer": "alttpr"},
-    )
-    assert "not authorized to create presets" in await resp.get_data(as_text=True)
-    assert not await models.Presets.exists()
+async def test_namespace_list_and_page(client, login):
+    await make_namespace()
+    await models.PresetNamespaces.create(name="empty", discord_user_id=2)
+    status, body = await get_json(client, "/api/v1/presets/namespaces")
+    assert body["namespaces"] == [{"name": "empty", "preset_count": 0}, {"name": "synack", "preset_count": 1}]
 
+    status, body = await get_json(client, "/api/v1/presets/namespaces/synack")
+    assert status == 200
+    assert body["can_edit"] is False
+    assert [(p["randomizer"], p["name"]) for p in body["presets"]] == [("alttpr", "mine")]
 
-async def test_preset_create_rejects_bad_names(client, login):
-    await models.PresetNamespaces.create(name="synack", discord_user_id=1)
     login(1)
-    resp = await client.post("/presets/synack/create", form={"preset_name": "bad name!", "randomizer": "alttpr"})
-    assert "Invalid preset name provided." in await resp.get_data(as_text=True)
+    assert (await get_json(client, "/api/v1/presets/namespaces/synack"))[1]["can_edit"] is True
+    assert (await get_json(client, "/api/v1/presets/namespaces/nobody"))[0] == 404
 
 
-async def test_my_presets_creates_namespace_and_redirects(client, login):
+async def test_preset_view_and_download(client, login):
+    await make_namespace()
+    status, body = await get_json(client, "/api/v1/presets/namespaces/synack/alttpr/mine")
+    assert (status, body["content"], body["can_edit"]) == (200, "settings: {}", False)
+
+    download = await client.get("/presets/download/synack/alttpr/mine")
+    assert await download.get_data(as_text=True) == "settings: {}"
+    assert (await client.get("/presets/download/synack/alttpr/nope")).status_code == 404
+
+
+async def test_preset_save_requires_namespace_owner(client, login):
+    await make_namespace()
+    path = "/api/v1/presets/namespaces/synack/alttpr/new"
+    assert (await send_json(client, "PUT", path, {"content": "x: 1"}))[0] == 401
+    login(2)
+    assert (await send_json(client, "PUT", path, {"content": "x: 1"}))[0] == 403
+    assert not await models.Presets.exists(preset_name="new")
+
+
+async def test_preset_save_creates_replaces_and_validates(client, login):
+    await make_namespace()
+    login(1)
+    status, body = await send_json(client, "PUT", "/api/v1/presets/namespaces/synack/alttpr/new", {"content": "x: 1"})
+    assert (status, body["content"]) == (200, "x: 1")
+    await send_json(client, "PUT", "/api/v1/presets/namespaces/synack/alttpr/new", {"content": "x: 2"})
+    assert (await models.Presets.get(preset_name="new")).content == "x: 2"
+
+    bad_name = await send_json(client, "PUT", "/api/v1/presets/namespaces/synack/alttpr/bad%20name", {"content": "x"})
+    bad_rando = await send_json(client, "PUT", "/api/v1/presets/namespaces/synack/zelda1/ok", {"content": "x"})
+    empty = await send_json(client, "PUT", "/api/v1/presets/namespaces/synack/alttpr/ok", {"content": "  "})
+    assert [r[0] for r in (bad_name, bad_rando, empty)] == [400, 400, 400]
+    assert "letters, numbers and underscores" in bad_name[1]["error"]
+
+
+async def test_preset_delete(client, login):
+    await make_namespace()
+    login(1)
+    resp = await client.delete("/api/v1/presets/namespaces/synack/alttpr/mine", headers=CSRF)
+    assert resp.status_code == 204
+    assert not await models.Presets.exists()
+    resp = await client.delete("/api/v1/presets/namespaces/synack/alttpr/mine", headers=CSRF)
+    assert resp.status_code == 404
+
+
+async def test_my_namespace_is_created_on_first_use(client, login):
     login(42, name="New User")
-    resp = await client.get("/presets/me")
-    assert resp.status_code == 302
-    assert resp.headers["Location"].endswith("/presets/manage/new-user")
+    assert await get_json(client, "/api/v1/presets/mine") == (200, {"namespace": "new-user"})
     assert await models.PresetNamespaces.get(discord_user_id=42)
 
 
@@ -157,36 +273,52 @@ async def test_my_presets_creates_namespace_and_redirects(client, login):
 
 async def test_triforce_text_submit_validates_lines(client, login):
     login(5)
-    ok = await client.post("/triforcetexts/pool/submit", form={"first_line": "HELLO", "second_line": "", "third_line": "BYE"})
-    assert ok.status_code == 200
+    status, body = await send_json(client, "POST", "/api/v1/triforce-texts/pool/submissions",
+                                   {"lines": ["HELLO", "", "BYE"]})
+    assert (status, body["status"], body["lines"]) == (201, "pending", ["HELLO", "", "BYE"])
     (text,) = await models.TriforceTexts.all()
     assert (text.text, text.discord_user_id, text.author, text.approved) == ("HELLO\n\nBYE", 5, "tester#0", None)
 
-    too_long = await client.post(
-        "/triforcetexts/pool/submit", form={"first_line": "x" * 20, "second_line": "", "third_line": ""}
-    )
-    assert "Invalid text entered for the first line." in await too_long.get_data(as_text=True)
+    too_long = await send_json(client, "POST", "/api/v1/triforce-texts/pool/submissions", {"lines": ["x" * 20, "", ""]})
+    assert too_long[0] == 400
+    assert "first line" in too_long[1]["error"]
+    blank = await send_json(client, "POST", "/api/v1/triforce-texts/pool/submissions", {"lines": ["", "", ""]})
+    two_lines = await send_json(client, "POST", "/api/v1/triforce-texts/pool/submissions", {"lines": ["A", "B"]})
+    assert (blank[0], two_lines[0]) == (400, 400)
     assert await models.TriforceTexts.all().count() == 1
+
+    status, body = await get_json(client, "/api/v1/triforce-texts/pool")
+    assert (body["is_moderator"], [t["lines"] for t in body["mine"]]) == (False, [["HELLO", "", "BYE"]])
+    assert "author" not in body["mine"][0] or body["mine"][0]["author"] is None
 
 
 async def test_triforce_text_moderation(client, login):
     await models.TriforceTextsConfig.create(pool_name="pool", key_name="moderator", value="7")
-    text = await models.TriforceTexts.create(pool_name="pool", text="hi", discord_user_id=1)
+    text = await models.TriforceTexts.create(pool_name="pool", text="hi", discord_user_id=1, author="a#0")
+    other_pool = await models.TriforceTexts.create(pool_name="other", text="no", discord_user_id=1)
 
     login(8)
-    denied = await client.get(f"/triforcetexts/pool/moderation/{text.id}/approve")
-    assert "You do not have permission" in await denied.get_data(as_text=True)
-    await text.refresh_from_db()
-    assert text.approved is None
+    assert (await get_json(client, "/api/v1/triforce-texts/pool/moderation"))[0] == 403
+    denied = await send_json(client, "POST", f"/api/v1/triforce-texts/pool/moderation/{text.id}", {"approved": True})
+    assert denied[0] == 403
 
     login(7)
-    assert (await client.get("/triforcetexts/pool/moderation")).status_code == 200
-    await client.get(f"/triforcetexts/pool/moderation/{text.id}/approve")
-    await text.refresh_from_db()
-    assert text.approved is True
-    await client.get(f"/triforcetexts/pool/moderation/{text.id}/reject")
+    status, body = await get_json(client, "/api/v1/triforce-texts/pool/moderation")
+    assert [(t["id"], t["author"]) for t in body["texts"]] == [(text.id, "a#0")]
+    status, body = await send_json(client, "POST", f"/api/v1/triforce-texts/pool/moderation/{text.id}",
+                                   {"approved": True})
+    assert (status, body["status"]) == (200, "approved")
+    assert (await get_json(client, "/api/v1/triforce-texts/pool/moderation"))[1]["texts"] == []
+    approved = await get_json(client, "/api/v1/triforce-texts/pool/moderation?status=approved")
+    assert [t["id"] for t in approved[1]["texts"]] == [text.id]
+    await send_json(client, "POST", f"/api/v1/triforce-texts/pool/moderation/{text.id}", {"approved": False})
     await text.refresh_from_db()
     assert text.approved is False
+
+    # A moderator of one pool can't touch another pool's texts through it.
+    cross = await send_json(client, "POST", f"/api/v1/triforce-texts/pool/moderation/{other_pool.id}",
+                            {"approved": True})
+    assert cross[0] == 404
 
 
 # ---------------------------------------------------------------------------
@@ -194,50 +326,118 @@ async def test_triforce_text_moderation(client, login):
 # ---------------------------------------------------------------------------
 
 
-def test_ranked_choice_helpers():
-    assert ranked_choice.remove_prefix("candidate_12", "candidate_") == "12"
-    assert ranked_choice.remove_prefix("other", "candidate_") == "other"
-    assert ranked_choice.dupcheck(["1", "1"]) is True
-    assert ranked_choice.dupcheck(["1", "2"]) is False
-
-
-def test_known_issue_dupcheck_only_checks_first_element():
-    """KNOWN ISSUE, pinned not endorsed: ``dupcheck`` returns inside the loop,
-    so only the first element is checked. Duplicate ranks after the first slip
-    through (the code comment says "this is broken and we're not sure why")."""
-    assert ranked_choice.dupcheck(["1", "2", "2"]) is False
-    assert ranked_choice.dupcheck([]) is None
+async def make_election(**kwargs):
+    election = await models.RankedChoiceElection.create(
+        owner_id=1, title="Best", seats=1, channel_id=1, message_id=1, **kwargs)
+    a = await models.RankedChoiceCandidate.create(election=election, name="A")
+    b = await models.RankedChoiceCandidate.create(election=election, name="B")
+    c = await models.RankedChoiceCandidate.create(election=election, name="C")
+    return election, a, b, c
 
 
 async def test_ranked_choice_ballot_submission(client, login, monkeypatch):
-    election = await models.RankedChoiceElection.create(owner_id=1, title="Best", seats=1, channel_id=1, message_id=1)
-    a = await models.RankedChoiceCandidate.create(election=election, name="A")
-    b = await models.RankedChoiceCandidate.create(election=election, name="B")
+    election, a, b, c = await make_election()
     published = []
-    monkeypatch.setattr(ranked_choice.events, "publish", published.append)
+    monkeypatch.setattr(events, "publish", published.append)
     login(9)
 
-    resp = await client.post(f"/ranked_choice/{election.id}", form={f"candidate_{a.id}": "2", f"candidate_{b.id}": "1"})
-    assert resp.status_code == 200
+    status, body = await get_json(client, f"/api/v1/ranked-choice/{election.id}")
+    assert (status, body["ballot"], [x["name"] for x in body["candidates"]]) == (200, None, ["A", "B", "C"])
+
+    status, body = await send_json(client, "POST", f"/api/v1/ranked-choice/{election.id}/ballot",
+                                   {"ranking": [b.id, a.id]})
+    assert (status, body["ballot"]) == (200, [b.id, a.id])
     # The Discord post refresh is a subscriber's job (alttprbot_discord/notifications.py).
-    assert published == [ranked_choice.events.RankedChoiceBallotCast(
-        election_id=election.id, occurred_at=published[0].occurred_at)]
+    assert published == [events.RankedChoiceBallotCast(election_id=election.id, occurred_at=published[0].occurred_at)]
     votes = await models.RankedChoiceVotes.filter(user_id=9).order_by("rank").prefetch_related("candidate")
     assert [(v.candidate.name, v.rank) for v in votes] == [("B", 1), ("A", 2)]
 
-    again = await client.post(f"/ranked_choice/{election.id}", form={f"candidate_{a.id}": "1"})
-    assert again.status_code == 403  # one ballot per voter
+    again = await send_json(client, "POST", f"/api/v1/ranked-choice/{election.id}/ballot", {"ranking": [a.id]})
+    assert again[0] == 403  # one ballot per voter
+
+
+async def test_ranked_choice_rejects_bad_ballots(client, login):
+    """The old form's duplicate check only looked at the first rank (``dupcheck``
+    returned inside its loop); a ranking is now a list of distinct candidate ids."""
+    election, a, b, c = await make_election()
+    other, x, *_ = await make_election()
+    login(9)
+    path = f"/api/v1/ranked-choice/{election.id}/ballot"
+    for ranking in ([a.id, b.id, b.id], [], [x.id]):
+        status, _ = await send_json(client, "POST", path, {"ranking": ranking})
+        assert status == 400, ranking
+    assert not await models.RankedChoiceVotes.exists()
 
 
 async def test_ranked_choice_inactive_or_missing(client, login):
-    """abort(404) goes through the app's 404 handler, which renders the error
-    page with status 200 (the handler returns no status code)."""
     login(9)
-    missing = await client.get("/ranked_choice/999")
-    assert missing.status_code == 200
-    assert "Not Found" in await missing.get_data(as_text=True)
+    assert (await get_json(client, "/api/v1/ranked-choice/999"))[0] == 404
     election = await models.RankedChoiceElection.create(owner_id=1, title="Old", active=False)
-    assert "Not Found" in await (await client.get(f"/ranked_choice/{election.id}")).get_data(as_text=True)
+    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 404
+
+
+async def test_private_election_needs_the_voter_role(client, login, monkeypatch):
+    election, *_ = await make_election(private=True, guild_id=5, voter_role_id=77)
+    guild = SimpleNamespace(id=5)
+    monkeypatch.setattr(bots, "_discord_client", SimpleNamespace(fetch_guild=mock.AsyncMock(return_value=guild)))
+    members = {9: SimpleNamespace(roles=[SimpleNamespace(id=77)]), 10: SimpleNamespace(roles=[SimpleNamespace(id=1)])}
+
+    async def get_member(g, user_id):
+        return members.get(user_id)
+
+    monkeypatch.setattr("alttprbot.util.discord_members.get_member", get_member)
+    login(9)
+    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 200
+    login(10)
+    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 403
+    login(11)
+    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 403
+
+
+# ---------------------------------------------------------------------------
+# Tournament settings submission
+# ---------------------------------------------------------------------------
+
+
+async def test_submission_form_for_unknown_event_is_404(client, login):
+    login(9)
+    assert (await get_json(client, "/api/v1/tournaments/nope/submission-form"))[0] == 404
+
+
+async def test_submission_form_and_submit(client, login, monkeypatch):
+    from alttprbot.services import tournament_submissions
+
+    processed = []
+
+    class FakeTournament:
+        submission_form = [{"key": "preset", "label": "Preset", "settings": {"open": "Open", "boots": "Boots"}}]
+        versus = "a vs b"
+
+        @classmethod
+        async def get_config(cls):
+            return cls()
+
+        async def process_submission_form(self, payload, submitted_by):
+            processed.append((payload, submitted_by))
+
+    async def fetch(event, episode_id):
+        return FakeTournament()
+
+    monkeypatch.setitem(tournament_submissions.TOURNAMENT_DATA, "fake", FakeTournament)
+    monkeypatch.setattr(tournament_submissions, "fetch_tournament_handler", fetch)
+    login(9)
+
+    status, body = await get_json(client, "/api/v1/tournaments/fake/submission-form")
+    assert body["fields"] == [{"key": "preset", "label": "Preset", "options": [
+        {"value": "open", "label": "Open"}, {"value": "boots", "label": "Boots"}]}]
+
+    bad = await send_json(client, "POST", "/api/v1/tournaments/fake/submissions",
+                          {"episode_id": 12, "settings": {"preset": "zzz"}})
+    assert bad[0] == 400
+    status, body = await send_json(client, "POST", "/api/v1/tournaments/fake/submissions",
+                                   {"episode_id": 12, "settings": {"preset": "boots"}})
+    assert (status, body["versus"]) == (200, "a vs b")
+    assert processed == [({"preset": "boots", "event": "fake", "episodeid": "12"}, "tester#0")]
 
 
 # ---------------------------------------------------------------------------
@@ -255,3 +455,33 @@ async def test_racetime_cmd_requires_key_for_category(client):
     payload = {"category": "smz3", "room": "r", "cmd": "!race open"}
     resp = await client.post("/api/racetime/cmd?auth_key=k", data=json.dumps(payload), headers={"Content-Type": "application/json"})
     assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# Triforce text characters
+# ---------------------------------------------------------------------------
+
+
+def test_triforce_lines_only_allow_the_games_characters():
+    """The hyphen used to sit between "," and "…" in the character class, making a
+    range that let almost anything through (é, ß, emoji)."""
+    from alttprbot.services import triforce_texts
+
+    for ok in ("HELLO-WORLD", "ゼルダ", "WHY? BECAUSE!", ""):
+        assert triforce_texts.LINE.match(ok), ok
+    for bad in ("café", "straße", "😀", "x" * 20):
+        assert not triforce_texts.LINE.match(bad), bad
+
+
+def test_triforce_characters_match_the_web_app():
+    """web/src/triforce/rules.ts checks lines as you type; it must allow exactly
+    what the server does."""
+    import re
+    from pathlib import Path
+
+    from alttprbot.services import triforce_texts
+
+    server = re.match(r"\^\[(.*)\]\{0,19\}\$", triforce_texts.LINE.pattern).group(1)
+    rules = (Path(__file__).resolve().parent.parent / "web/src/triforce/rules.ts").read_text(encoding="utf-8")
+    web = re.search(r"/\^\[(.*?)\]\*\$/u", rules).group(1)
+    assert web == server

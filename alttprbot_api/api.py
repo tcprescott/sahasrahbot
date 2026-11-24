@@ -1,17 +1,24 @@
 import os
+from pathlib import Path
+from urllib.parse import quote
 
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, TokenExpiredError
-from quart import (Quart, abort, jsonify, redirect, render_template, request,
-                   session, url_for, send_from_directory)
-from quart_discord import (AccessDenied, DiscordOAuth2Session, Unauthorized,
-                           requires_authorization)
+from quart import Quart, abort, jsonify, make_response, redirect, request, send_from_directory, session
+from quart_discord import AccessDenied, DiscordOAuth2Session, Unauthorized
+from quart_schema import Info, OpenAPIProvider, QuartSchema, RequestSchemaValidationError
+from werkzeug.exceptions import HTTPException
 
 import config
-from alttprbot import models
+from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 from alttprbot.services import bots
+
+# The React app (web/) is built into web/dist and served from here: its files by
+# name, and index.html for every other page path, so the app's router takes over.
+WEB_DIST = Path(__file__).resolve().parent.parent / 'web' / 'dist'
 
 sahasrahbotapi = Quart(__name__)
 sahasrahbotapi.secret_key = bytes(config.APP_SECRET_KEY, "utf-8")
+sahasrahbotapi.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 sahasrahbotapi.config["DISCORD_CLIENT_ID"] = int(config.DISCORD_CLIENT_ID)
 sahasrahbotapi.config["DISCORD_CLIENT_SECRET"] = config.DISCORD_CLIENT_SECRET
@@ -21,83 +28,142 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
 
+
+class AppApiOpenAPIProvider(OpenAPIProvider):
+    """Only the app's JSON API (/api/v1) goes in the schema the web/ client is generated from."""
+
+    def generate_rules(self):
+        for rule in super().generate_rules():
+            if rule.rule.startswith('/api/v1/'):
+                yield rule
+
+
+QuartSchema(
+    sahasrahbotapi,
+    info=Info(title="SahasrahBot web API", version="1"),
+    openapi_path="/api/v1/openapi.json",
+    redoc_ui_path=None,
+    scalar_ui_path=None,
+    swagger_ui_path="/api/v1/docs",
+    openapi_provider_class=AppApiOpenAPIProvider,
+)
+
 import alttprbot_api.blueprints as blueprints  # nopep8
 
+sahasrahbotapi.register_blueprint(blueprints.app_api_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.presets_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.racetime_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
-
-if config.DEBUG:
-    sahasrahbotapi.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
-@sahasrahbotapi.route("/")
-async def index():
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
+def _wants_json() -> bool:
+    return request.path.startswith('/api/') or request.path == '/healthcheck'
 
-    return await render_template('index.html', user=user)
+
+def _safe_next(path: str | None) -> str:
+    """A same-site path to return to after signing in, never another site."""
+    if not path or not path.startswith('/') or path.startswith('//') or '\\' in path:
+        return '/'
+    return path
+
+
+def _error(status: int, message: str):
+    if _wants_json():
+        return jsonify(error=message), status
+    # Only server-side flows (sign-in, racetime linking) land here; the app shows the message.
+    return redirect(f"/error?code={status}&message={quote(message)}")
+
+
+# --- Sign-in -----------------------------------------------------------------
 
 
 @sahasrahbotapi.route("/login/")
 async def login():
+    if 'next' in request.args:
+        session['login_original_path'] = _safe_next(request.args['next'])
     return await discord.create_session(
-        scope=[
-            'identify',
-        ],
-        data=dict(redirect=session.get("login_original_path", "/me"))
+        scope=['identify'],
+        data=dict(redirect=_safe_next(session.pop("login_original_path", "/me"))),
     )
 
 
 @sahasrahbotapi.route("/callback/discord/")
 async def callback():
     data = await discord.callback()
-    redirect_to = data.get("redirect", "/me/")
-    return redirect(redirect_to)
-
-
-@sahasrahbotapi.errorhandler(Unauthorized)
-async def redirect_unauthorized(e):
-    session['login_original_path'] = request.full_path
-    return redirect(url_for("login"))
-
-
-@sahasrahbotapi.errorhandler(AccessDenied)
-async def access_denied(e):
-    return await render_template(
-        'error.html',
-        title="Access Denied",
-        message="We were unable to access your Discord account.",
-        user=None
-    )
-
-
-@sahasrahbotapi.route("/me/")
-@requires_authorization
-async def me():
-    user = await discord.fetch_user()
-    return await render_template('me.html', user=user)
+    return redirect(_safe_next(data.get("redirect", "/me")))
 
 
 @sahasrahbotapi.route("/logout/")
 async def logout():
     discord.revoke()
-    return redirect(url_for("index"))
+    return redirect("/")
 
-if config.DEBUG:
-    @sahasrahbotapi.route('/throw_error', methods=['GET'])
-    async def throw_error():
-        try:
-            user = await discord.fetch_user()
-        except Unauthorized:
-            user = None
 
-        return await render_template('error.html', user=user, title="Example Error", message="This is just a test.")
+@sahasrahbotapi.errorhandler(Unauthorized)
+async def redirect_unauthorized(e):
+    if _wants_json():
+        return jsonify(error="Sign in with Discord first."), 401
+    session['login_original_path'] = _safe_next(request.full_path.rstrip('?'))
+    return redirect("/login/")
+
+
+@sahasrahbotapi.errorhandler(AccessDenied)
+async def access_denied(e):
+    return _error(403, "We couldn't access your Discord account.")
+
+
+@sahasrahbotapi.errorhandler(InvalidGrantError)
+@sahasrahbotapi.errorhandler(TokenExpiredError)
+async def session_expired(e):
+    discord.revoke()
+    if _wants_json():
+        return jsonify(error="Your Discord session expired. Sign in again."), 401
+    return redirect("/login/")
+
+
+# --- Errors ------------------------------------------------------------------
+
+
+@sahasrahbotapi.errorhandler(NotFoundError)
+async def not_found_error(e):
+    return _error(404, str(e))
+
+
+@sahasrahbotapi.errorhandler(PermissionDeniedError)
+async def permission_denied(e):
+    return _error(403, str(e))
+
+
+@sahasrahbotapi.errorhandler(InvalidInputError)
+async def invalid_input(e):
+    return _error(400, str(e))
+
+
+@sahasrahbotapi.errorhandler(RequestSchemaValidationError)
+async def invalid_request_body(e):
+    return jsonify(error="The request didn't match what this endpoint expects.", detail=str(e.validation_error)), 400
+
+
+@sahasrahbotapi.errorhandler(HTTPException)
+async def http_error(e: HTTPException):
+    if e.code == 500:
+        return await server_error(e)
+    if e.code == 404 and not _wants_json():
+        response = await app_page('')  # the app shows its own not-found page
+        response.status_code = 404
+        return response
+    return _error(e.code, e.description or e.name)
+
+
+@sahasrahbotapi.errorhandler(500)
+async def server_error(e):
+    # Registered for 500 rather than Exception so Sentry still sees unhandled errors.
+    return _error(500, "Something went wrong on our side. Try again later.")
+
+
+# --- Plain routes ------------------------------------------------------------
+
 
 @sahasrahbotapi.route('/healthcheck', methods=['GET'])
 async def healthcheck():
@@ -107,90 +173,35 @@ async def healthcheck():
     appinfo = await bots.discord().application_info()
     await bots.discord().fetch_user(appinfo.owner.id)
 
-    return jsonify(
-        success=True
-    )
-
-
-@sahasrahbotapi.route('/purgeme', methods=['GET'])
-async def purge_me():
-    user = await discord.fetch_user()
-
-    return await render_template('purge_me.html', user=user)
-
-
-@sahasrahbotapi.route('/purgeme', methods=['POST'])
-async def purge_me_action():
-    user = await discord.fetch_user()
-    payload = await request.form
-
-    if payload.get('confirmpurge', 'no') == 'yes':
-        await models.PresetNamespaces.filter(discord_user_id=user.id).delete()
-        await models.NickVerification.filter(discord_user_id=user.id).delete()
-        return redirect(url_for('logout'))
-
-    return redirect(url_for('me'))
+    return jsonify(success=True)
 
 
 @sahasrahbotapi.route('/robots.txt', methods=['GET'])
 async def robots():
     return 'User-agent: *\nDisallow: /\n'
 
-@sahasrahbotapi.route('/assets/<path:path>', methods=['GET'])
-async def assets(path):
-    return await send_from_directory('alttprbot_api/static/assets', path)
 
-@sahasrahbotapi.route('/theme-assets/<path:path>', methods=['GET'])
-async def theme_assets(path):
-    return await send_from_directory('alttprbot_api/static/theme-assets', path)
+# --- The React app -----------------------------------------------------------
 
-# @sahasrahbotapi.errorhandler(400)
-# def bad_request(e):
-#     return jsonify(success=False, error=repr(e))
+NOT_BUILT = (
+    "<!doctype html><meta charset=utf-8><title>SahasrahBot</title>"
+    "<p>The web app hasn't been built. Run <code>scripts/build_web.sh</code>.</p>"
+)
 
-@sahasrahbotapi.errorhandler(404)
-async def not_found(e):
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-    return await render_template(
-        'error.html',
-        title="Not Found",
-        message="The page you are looking for does not exist.",
-        user=user
-    )
 
-@sahasrahbotapi.errorhandler(InvalidGrantError)
-async def invalid_grant(e):
-    discord.revoke()
-    return await render_template(
-        'error.html',
-        title="Discord Session Expired",
-        message="Your Discord session has expired.  Please log in again.",
-        user=None
-    )
-
-@sahasrahbotapi.errorhandler(TokenExpiredError)
-async def token_expired(e):
-    discord.revoke()
-    return await render_template(
-        'error.html',
-        title="Discord Session Expired",
-        message="Your Discord session has expired.  Please log in again.",
-        user=None
-    )
-
-@sahasrahbotapi.errorhandler(500)
-async def something_bad_happened(e):
-    try:
-        user = await discord.fetch_user()
-    except Unauthorized:
-        user = None
-
-    return await render_template(
-        'error.html',
-        title="Something Bad Happened",
-        message="Something bad happened.  Please try again later.",
-        user=user
-    )
+@sahasrahbotapi.route('/', defaults={'path': ''})
+@sahasrahbotapi.route('/<path:path>')
+async def app_page(path: str):
+    if path.startswith('api/'):
+        return jsonify(error="No such API endpoint."), 404
+    if path and (WEB_DIST / path).is_file() and WEB_DIST in (WEB_DIST / path).resolve().parents:
+        response = await send_from_directory(WEB_DIST, path)
+        if path.startswith('assets/'):
+            response.cache_control.max_age = 31536000  # Vite puts a content hash in these names
+            response.cache_control.immutable = True
+        return response
+    if not (WEB_DIST / 'index.html').is_file():
+        return await make_response(NOT_BUILT, 200)
+    response = await send_from_directory(WEB_DIST, 'index.html')
+    response.cache_control.no_cache = True
+    return response

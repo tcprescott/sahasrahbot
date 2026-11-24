@@ -43,7 +43,7 @@ def _find_user(ref):
 @dev_tools.route("/login")
 async def login_as():
     ref = request.args.get("user")
-    next_path = request.args.get("next", "/me/")
+    next_path = request.args.get("next", "/me")
     world = _world()
 
     if ref == "new":
@@ -135,7 +135,9 @@ async def outbox_clear():
 
 LINKS = [
     ("Home", "/"),
-    ("My account", "/me/"),
+    ("My account", "/me"),
+    ("My presets", "/presets/me"),
+    ("Delete my data (confirm page)", "/purgeme"),
     ("Presets: dev-admin namespace", "/presets/manage/dev-admin"),
     ("Presets: all namespaces", "/presets"),
     ("Ranked choice: public election", "/ranked_choice/1"),
@@ -145,6 +147,8 @@ LINKS = [
     ("testdata: active role-gated election", "/ranked_choice/1004"),
     ("testdata: all preset namespaces", "/presets"),
     ("Racetime verification", "/racetime/verification/initiate"),
+    ("Error page", "/error?code=500&message=Example"),
+    ("API docs (OpenAPI)", "/api/v1/docs"),
     ("Healthcheck", "/healthcheck"),
 ]
 
@@ -202,7 +206,7 @@ async def index():
     body = f"""
 <h1>SahasrahBot dev tools</h1>
 <p>{who}</p>
-<p class="muted">New user: <code>/_dev/login?user=new&amp;name=alice&amp;roles=Admin,Voter&amp;next=/me/</code>.
+<p class="muted">New user: <code>/_dev/login?user=new&amp;name=alice&amp;roles=Admin,Voter&amp;next=/me</code>.
 API key for <code>Authorization</code> headers: <code>{fixtures.API_KEY}</code>.</p>
 <h2>Pages</h2><ul>{links}</ul>
 <h2>Users</h2>{"".join(rows)}

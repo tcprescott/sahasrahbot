@@ -1,0 +1,161 @@
+/* Layout helpers shared by the screens. Colour comes from tokens.css only. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+.tile h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+}
+.tile h2 .icon {
+  color: var(--link);
+}
+.tile p {
+  margin: 0;
+  color: var(--fg-secondary);
+}
+.tile .t-actions {
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+.prose p {
+  margin: 0 0 var(--space-2);
+}
+.prose p:last-child {
+  margin-bottom: 0;
+}
+.prose ul,
+.prose ol {
+  margin: 0 0 var(--space-2);
+  padding-left: 1.3em;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--surface-sunken);
+  padding: 1px 6px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+
+.yaml {
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  max-height: 70vh;
+  font: var(--text-sm) / 1.55 var(--font-mono);
+  background: var(--surface-alt);
+  color: var(--fg);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  tab-size: 2;
+}
+
+.yaml-editor {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  padding: 12px;
+  font: var(--text-sm) / 1.55 var(--font-mono);
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  tab-size: 2;
+}
+
+.mt-3 {
+  margin-top: var(--space-3);
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.panel__pad {
+  padding: 16px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 420px;
+  min-height: 44px;
+  padding: 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--fg-muted);
+}
+.search-box:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.search-box__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  outline: none;
+}
+
+.field__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.t-actions--end {
+  justify-content: flex-end;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 var(--space-2) -4px;
+  color: var(--link);
+  font-weight: 700;
+  text-decoration: none;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+p.panel__pad {
+  margin: 0;
+}

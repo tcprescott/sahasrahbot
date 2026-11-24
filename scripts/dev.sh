@@ -3,7 +3,7 @@
 # SpeedGaming, against a seeded local MariaDB. See CLAUDE.md, "Running the web
 # app standalone".
 #
-#   ./scripts/dev.sh             start (seeds the database the first time)
+#   ./scripts/dev.sh             start (seeds the database the first time, builds web/)
 #   ./scripts/dev.sh --reset     drop every table and reseed, then start
 #   ./scripts/dev.sh --port 5002 any other flag goes to `python -m devserver`
 #   ./scripts/dev.sh db-down     stop the database container (keeps its data)
@@ -47,6 +47,18 @@ if [[ -z "${DEV_DB_URL:-}" ]]; then
   fi
   echo "dev.sh: starting MariaDB (docker-compose.dev.yml)"
   "${COMPOSE[@]}" up -d --wait db
+fi
+
+# The pages are the React app in web/, which the Quart app serves from web/dist.
+# Build it when it's missing or older than its sources. For live reload while
+# working on it, also run `npm run dev` in web/ and open http://localhost:5173.
+if [[ -n "$(find web/src web/index.html web/package.json -newer web/dist/index.html 2>/dev/null | head -1)" || ! -f web/dist/index.html ]]; then
+  if command -v npm >/dev/null 2>&1; then
+    echo "dev.sh: building the web app (web/)"
+    (cd web && { [[ -d node_modules ]] || npm ci --ignore-scripts --no-audit --no-fund; } && npm run gen:api && npm run build)
+  else
+    echo "dev.sh: Node.js isn't installed, so the web app (web/) can't be built; pages will say so." >&2
+  fi
 fi
 
 exec poetry run python -m devserver "$@"

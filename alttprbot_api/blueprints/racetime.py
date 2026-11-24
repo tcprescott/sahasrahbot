@@ -2,7 +2,7 @@ import datetime
 from urllib.parse import quote
 
 import aiohttp
-from quart import Blueprint, abort, jsonify, redirect, render_template, request
+from quart import Blueprint, abort, jsonify, redirect, request
 from quart_discord import requires_authorization
 
 import config
@@ -130,8 +130,8 @@ async def return_racetime_verify():
                                             defaults={'discord_user_id': user.id, 'rtgg_access_token': token,
                                                       'display_name': user.name})
 
-    return await render_template('racetime_verified.html', user=user,
-                                 racetime_name=userinfo_data['name'])
+    # The app's Me page says which racetime.gg account was linked.
+    return redirect(f"/me?racetime={quote(userinfo_data['name'])}")
 
 
 async def merge_users(user_to_keep: models.Users, victim: models.Users):
