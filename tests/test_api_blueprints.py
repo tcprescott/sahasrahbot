@@ -177,6 +177,17 @@ async def test_presets_api_get(client):  # noqa: F811
     assert await (await client.get("/presets/api/alttpr?preset=nope")).get_json() == {}
 
 
+async def test_presets_api_get_broken_namespaced_preset(client):  # noqa: F811
+    namespace = await models.PresetNamespaces.create(name="synack", discord_user_id=1)
+    await models.Presets.create(namespace=namespace, randomizer="alttpr", preset_name="broken",
+                                content='goal_name: "x"\n  goal: ganon\n')
+
+    resp = await client.get("/presets/api/alttpr?preset=synack/broken")
+
+    assert resp.status_code == 422
+    assert "isn't valid YAML" in (await resp.get_json())["error"]
+
+
 # ---------------------------------------------------------------------------
 # /api/settingsgen/mystery
 # ---------------------------------------------------------------------------

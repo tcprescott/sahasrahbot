@@ -9,6 +9,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
+import yaml
 from tortoise.functions import Count
 from tortoise.query_utils import Prefetch
 
@@ -82,6 +83,12 @@ async def save_preset(namespace_name: str, randomizer: str, preset_name: str, co
         raise InvalidInputError("Preset names can only use letters, numbers and underscores (up to 50).")
     if not content.strip():
         raise InvalidInputError("The preset file is empty.")
+    try:
+        parsed = yaml.safe_load(content)
+    except yaml.YAMLError as err:
+        raise InvalidInputError(f"That isn't valid YAML: {generator.yaml_problem(err)}.") from err
+    if not isinstance(parsed, dict):
+        raise InvalidInputError("A preset file must be a YAML mapping of settings, like \"settings:\" followed by its options.")
 
     preset, _ = await models.Presets.update_or_create(
         namespace=namespace, randomizer=randomizer, preset_name=preset_name,

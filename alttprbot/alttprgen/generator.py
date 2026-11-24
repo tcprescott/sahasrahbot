@@ -46,6 +46,27 @@ class WeightsetNotFoundException(SahasrahBotException):
     pass
 
 
+class InvalidPresetError(SahasrahBotException):
+    """A preset's stored text isn't YAML SahasrahBot can read."""
+
+
+def yaml_problem(err: yaml.YAMLError) -> str:
+    """Say where and why YAML failed to parse, in a sentence a person can act on."""
+    mark = getattr(err, 'problem_mark', None)
+    problem = getattr(err, 'problem', None) or str(err)
+    where = f" (line {mark.line + 1}, column {mark.column + 1})" if mark is not None else ""
+    return f"{problem}{where}"
+
+
+def parse_preset_yaml(raw: str, label: str):
+    try:
+        return yaml.safe_load(raw)
+    except yaml.YAMLError as err:
+        raise InvalidPresetError(
+            f"The preset {label} isn't valid YAML, so it can't be used until it's fixed: {yaml_problem(err)}."
+        ) from err
+
+
 @aiocache.cached(ttl=60, cache=aiocache.SimpleMemoryCache)
 async def get_global_preset_list(path) -> List[str]:
     return [os.path.splitext(f)[0] for f in os.listdir(path) if f.endswith(".yaml")]
@@ -146,7 +167,7 @@ class SahasrahBotPresetCore():
         try:
             async with aiofiles.open(os.path.join(self.global_preset_path, basename)) as f:
                 self.raw = await f.read()
-                self.preset_data = yaml.safe_load(self.raw)
+            self.preset_data = parse_preset_yaml(self.raw, self.preset)
         except FileNotFoundError as err:
             raise PresetNotFoundException(
                 f'Could not find preset {self.preset}.  See a list of available presets at https://sahasrahbot.synack.live/presets.html') from err
@@ -159,7 +180,7 @@ class SahasrahBotPresetCore():
             raise PresetNotFoundException(f'Could not find preset {self.preset} in namespace {self.namespace}.')
 
         self.raw = data.content
-        self.preset_data = yaml.safe_load(self.raw)
+        self.preset_data = parse_preset_yaml(self.raw, f'{self.namespace}/{self.preset}')
 
 
 class ALTTPRPreset(SahasrahBotPresetCore):
