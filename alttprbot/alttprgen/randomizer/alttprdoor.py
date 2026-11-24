@@ -167,7 +167,7 @@ class AlttprDoor():
     # Pull the code from the spoiler file, and translate it to what SahasrahBot expects
     @property
     def code(self):
-        file_select_code = re.search("Hash:*\s(.*,.*,.*,.*,.*)", self.spoilerfile.decode()).groups()[0]
+        file_select_code = re.search(r"Hash:*\s([^,\n]*(?:,[^,\n]*){4,})", self.spoilerfile.decode()).groups()[0]
         code = list(file_select_code.split(', '))
         code_map = {
             'Bomb': 'Bombs',
@@ -181,13 +181,13 @@ class AlttprDoor():
             'Pearl': 'Moon Pearl',
             'Key': 'Big Key'
         }
-        p = list(map(lambda x: code_map.get(x, x), code))
+        p = [code_map.get(x, x) for x in code]
         return [p[0], p[1], p[2], p[3], p[4]]
 
     @property
     def version(self):
         return \
-        re.search("ALttP Dungeon Randomizer Version (.*)  -  Seed: ([0-9]*)", self.spoilerfile.decode()).groups()[0]
+        re.search(r"ALttP Dungeon Randomizer Version (.*) {2}- {2}Seed: (\d*)", self.spoilerfile.decode()).groups()[0]
 
     @property
     def doors(self):

@@ -49,7 +49,7 @@ def tracked_python_files() -> list[str]:
 
 # A ref name or commit id: no leading dash (so it can't be read as an option),
 # no whitespace, no range syntax of its own.
-_REF = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_./~^-]*$")
+_REF = re.compile(r"^\w[\w./~^-]*$", re.ASCII)
 
 
 def resolve_base(base: str) -> str:

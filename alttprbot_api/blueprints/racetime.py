@@ -118,7 +118,7 @@ async def return_racetime_verify():
     # this is really ugly and needs to be refactored
     rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
     discord_user = await models.Users.get_or_none(discord_user_id=user.id)
-    if not rtgg_user == discord_user and rtgg_user is not None and discord_user is not None:
+    if rtgg_user != discord_user and rtgg_user is not None and discord_user is not None:
         kept_user = await merge_users(rtgg_user, discord_user)
         kept_user.display_name = user.name
         await kept_user.save()

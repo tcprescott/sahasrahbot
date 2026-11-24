@@ -55,9 +55,9 @@ def generated_goal(data):
         'enemizer.enemy_shuffle': meta.get('enemizer.enemy_shuffle', 'none'),
     }
 
-    if not settings['item_pool'] in ['easy', 'normal'] or not settings['item_functionality'] in ['easy', 'normal']:
+    if settings['item_pool'] not in ['easy', 'normal'] or settings['item_functionality'] not in ['easy', 'normal']:
         settings_list.append('hard')
-    elif settings['dungeon_items'] == 'full' and not settings['goal'] == 'dungeons':
+    elif settings['dungeon_items'] == 'full' and settings['goal'] != 'dungeons':
         settings_list.append('normal')
 
     if is_enemizer(settings):
@@ -69,8 +69,8 @@ def generated_goal(data):
     if not (settings['dungeon_items'] == 'full' and settings['goal'] == 'dungeons'):
         if settings['mode'] == 'open':
             if settings['shuffle'] == 'none' and not is_enemizer(settings) and (
-                    settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal') and not \
-                    settings['weapons'] == 'swordless':
+                    settings['item_pool'] == 'normal' and settings['item_functionality'] == 'normal') and \
+                    settings['weapons'] != 'swordless':
                 settings_list.append('casual')
             settings_list.append('open')
         elif settings['mode'] == 'standard' and settings['weapons'] == 'randomized':
@@ -90,7 +90,7 @@ def generated_goal(data):
     elif settings['goal'] == 'NoLogic':
         settings_list.append("no logic")
 
-    if not settings['entry_crystals_tower'] == '7' or not settings['entry_crystals_ganon'] == '7':
+    if settings['entry_crystals_tower'] != '7' or settings['entry_crystals_ganon'] != '7':
         settings_list.append(
             f"{settings['entry_crystals_tower']}/{settings['entry_crystals_ganon']}")
 
@@ -112,7 +112,7 @@ def generated_goal(data):
     elif settings['dungeon_items'] == 'full':
         settings_list.append("keysanity")
 
-    if not settings['shuffle'] == 'none':
+    if settings['shuffle'] != 'none':
         settings_list.append("+ entrance shuffle")
 
     if meta.get('difficulty', None) == 'custom':

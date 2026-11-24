@@ -62,11 +62,7 @@ PROGRESSION_ITEMS = [
     'SilverArrowUpgrade',
     'ProgressiveGlove',
     'ProgressiveBow',
-    # 'TriforcePiece',
-    # 'PowerStar',
     'BugCatchingNet',
-    # 'MirrorShield',
-    # 'ProgressiveShield',
     'CaneOfByrna',
     # 'TenBombs',
     # 'HalfMagic',
@@ -75,7 +71,7 @@ PROGRESSION_ITEMS = [
 
 
 def create_progression_spoiler(seed):
-    if not seed.data['spoiler']['meta'].get('spoilers') in ['on', 'generate']:
+    if seed.data['spoiler']['meta'].get('spoilers') not in ['on', 'generate']:
         return None
 
     spoiler = seed.data['spoiler']

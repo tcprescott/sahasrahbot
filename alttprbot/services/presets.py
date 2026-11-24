@@ -15,7 +15,7 @@ from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 
-PRESET_NAME = re.compile(r"^[a-zA-Z0-9_]+$")
+PRESET_NAME = re.compile(r"^\w+$", re.ASCII)
 MAX_PRESET_NAME = 50
 
 

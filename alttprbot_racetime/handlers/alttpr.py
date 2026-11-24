@@ -84,17 +84,6 @@ class GameHandler(SahasrahBotCoreHandler):
 
         await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, branch=branch)
 
-    # async def ex_festive(self, args, message):
-    #     try:
-    #         preset_name = args[0]
-    #     except IndexError:
-    #         await self.send_message(
-    #             'You must specify a preset!'
-    #         )
-    #         return
-    #     await self.roll_game(preset_name=preset_name, message=message, allow_quickswap=True, endpoint_prefix="/festive")
-
-    # TODO: replace this with !newrace
     async def ex_noqsrace(self, args, message):
         try:
             preset_name = args[0]

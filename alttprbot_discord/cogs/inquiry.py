@@ -17,9 +17,6 @@ class ConfirmInquiryThread(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    # async def on_error(self, error: Exception, item, interaction) -> None:
-    #     raise error
-
     @discord.ui.button(label="Open New Inquiry", style=discord.ButtonStyle.blurple, emoji="📬",
                        custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):

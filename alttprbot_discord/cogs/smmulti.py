@@ -39,22 +39,6 @@ PRESET_OPTIONS = {
 }
 
 
-# class MultiworldPresetDropdown(discord.ui.Select):
-#     def __init__(self, randomizer, mwcreateview):
-#         self.mwcreateview = mwcreateview
-
-#         super().__init__(
-#             placeholder="Choose a preset...",
-#             min_values=1,
-#             max_values=1,
-#             options=PRESET_OPTIONS[randomizer],
-#             row=1
-#         )
-
-#     async def callback(self, interaction: discord.Interaction):
-#         self.mwcreateview.preset_name = self.values[0]
-
-
 class MultiworldSignupView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)

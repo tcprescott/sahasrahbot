@@ -44,9 +44,6 @@ async def load_extensions():
 
     await discordbot.load_extension('jishaku')
 
-    # if importlib.util.find_spec('sahasrahbot_private'):
-    #     await discordbot.load_extension('sahasrahbot_private.stupid_memes')
-
 
 # @discordbot.event
 # async def on_command_error(ctx, error):

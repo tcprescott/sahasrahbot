@@ -1,4 +1,3 @@
-# import pyz3r
 from alttprbot.alttprgen.preset import fetch_preset
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.randomizer.sm import SMClient, SMZ3Client

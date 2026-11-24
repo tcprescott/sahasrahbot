@@ -58,8 +58,7 @@ EMOJI_CODE_MAP = {
 def build_file_select_code(seed, emojis=None):
     """The seed's file select code, as emojis plus text when ``emojis`` is given."""
     if emojis:
-        emoji_list = list(map(lambda x: str(discord.utils.get(
-            emojis, name=EMOJI_CODE_MAP[x])), seed.code))
+        emoji_list = [str(discord.utils.get(emojis, name=EMOJI_CODE_MAP[x])) for x in seed.code]
         return ' '.join(emoji_list) + ' (' + '/'.join(seed.code) + ')'
     else:
         return '/'.join(seed.code)

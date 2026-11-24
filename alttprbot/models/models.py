@@ -331,7 +331,6 @@ class Users(Model):
             'async_tournament_audit_log'
         ]
         backward_relations = False
-    #     computed = ['racetime_profile']
 
 
 class TournamentGames(Model):
@@ -558,7 +557,6 @@ class AsyncTournamentPermalink(Model):
         return f"{hours:02}:{minutes:02}:{seconds:02}"
 
     class PydanticMeta:
-        # computed = ['par_time_formatted']
         backward_relations = False
         # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
         exclude = ['created', 'updated', 'races', 'live_races']
@@ -604,7 +602,6 @@ class AsyncTournamentLiveRace(Model):
         return f"{RACETIME_URL}/{self.racetime_slug}"
 
     class PydanticMeta:
-        # computed = ['racetime_url']
         backward_relations = False
         exclude = ['created', 'updated', 'races']
 
@@ -753,7 +750,6 @@ class AsyncTournamentRace(Model):
         return markdown.markdown(text)
 
     class PydanticMeta:
-        # computed = ['elapsed_time']
         backward_relations = False
         # Tortoise >= 1.1.6 only drops unannotated backward relations, so list the annotated ones.
         exclude = ['created', 'updated', 'tournament', 'review_notes']

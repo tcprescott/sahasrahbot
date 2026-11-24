@@ -35,12 +35,6 @@ class ALTTPRLeague(ALTTPRTournamentRace):
             await self.rtgg_handler.send_message(
                 "No active League mode!  This should not have happened.  Contact a league admin/mod for help.")
 
-    # async def roll(self):
-    #     if self.tournament_game.preset is None:
-    #         raise Exception('Missing preset.  Please submit!')
-
-    #     self.seed = await generator.ALTTPRPreset(self.tournament_game.preset).generate(allow_quickswap=True, tournament=True, hints=False, spoilers="off")
-
     async def update_data(self, update_episode=True):
         await super().update_data(update_episode=update_episode)
         await self.get_league_data()
@@ -49,10 +43,6 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         return event_settings.tournament_config("invleague")
 
     async def create_race_room(self):
-        # if self.tournament_game is None or self.tournament_game.preset is None:
-        #     await self.send_race_submission_form(warning=True)
-        #     raise Exception(f"Could not open `{self.episodeid}` because setttings were not submitted.")
-
         goal_type = 'Co-op' if self.league_data['coop'] or self.league_data['spoiler'] else 'Solo'
         self.rtgg_handler = await self.rtgg_bot.startrace(
             goal=f"Beat the game - Tournament ({goal_type})",
@@ -99,65 +89,6 @@ class ALTTPRLeague(ALTTPRTournamentRace):
     #         await player.send(msg)
 
     #     await models.TournamentGames.update_or_create(episode_id=self.episodeid, defaults={'event': self.event_slug, 'submitted': 1})
-
-    # @property
-    # def bracket_settings(self):
-    #     if self.tournament_game:
-    #         return self.tournament_game.settings
-
-    #     return None
-
-    # @property
-    # def submission_form(self):
-    #     return "submission_league.html"
-
-    # async def process_submission_form(self, payload, submitted_by):
-    #     embed = discord.Embed(
-    #         title=f"ALTTPR League - {self.versus}",
-    #         description='Thank you for submitting your settings for this race!  Below is what will be played.\nIf this is incorrect, please contact a tournament admin.',
-    #         color=discord.Colour.blue()
-    #     )
-
-    #     if payload['game'] == '1':
-    #         preset_name = 'casualboots'
-    #     elif payload['game'] == '2':
-    #         preset_name = 'crosskeys'
-    #     elif payload['game'] == '5':
-    #         preset_name = 'retrance'
-    #     else:
-    #         if payload['preset'] == 'default':
-    #             raise Exception('Must choose a preset for games 3 or 4.')
-    #         preset_name = payload['preset']
-
-    #     embed.add_field(name="Game Number", value=payload['game'], inline=False)
-    #     embed.add_field(name="Preset", value=preset_name, inline=False)
-
-    #     embed.add_field(name="Submitted by", value=submitted_by, inline=False)
-
-    #     await models.TournamentGames.update_or_create(
-    #         episode_id=self.episodeid,
-    #         defaults={
-    #             'event': self.event_slug,
-    #             'game_number': payload['game'],
-    #             'preset': preset_name
-    #         }
-    #     )
-
-    #     if self.audit_channel:
-    #         await self.audit_channel.send(embed=embed)
-
-    #     for name, player in self.player_discords:
-    #         if player is None:
-    #             logging.error(f"Could not send DM to {name}")
-    #             if self.audit_channel:
-    #                 await self.audit_channel.send(f"@here could not send DM to {name}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
-    #             continue
-    #         try:
-    #             await player.send(embed=embed)
-    #         except discord.HTTPException:
-    #             logging.exception(f"Could not send DM to {name}")
-    #             if self.audit_channel:
-    #                 await self.audit_channel.send(f"@here could not send DM to {player.name}#{player.discriminator}", allowed_mentions=discord.AllowedMentions(everyone=True), embed=embed)
 
 
 class ALTTPROpenLeague(ALTTPRLeague):

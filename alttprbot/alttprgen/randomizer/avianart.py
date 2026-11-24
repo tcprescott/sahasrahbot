@@ -73,7 +73,7 @@ class AVIANART():
             'Pearl': 'Moon Pearl',
             'Key': 'Big Key'
         }
-        p = list(map(lambda x: code_map.get(x, x), code))
+        p = [code_map.get(x, x) for x in code]
         return [p[0], p[1], p[2], p[3], p[4]]
 
     @property

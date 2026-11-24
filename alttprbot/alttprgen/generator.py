@@ -230,7 +230,7 @@ class ALTTPRPreset(SahasrahBotPresetCore):
             settings['tournament'] = tournament
             settings['spoilers'] = spoilers
 
-            if not 'allow_quickswap' in settings:
+            if 'allow_quickswap' not in settings:
                 settings['allow_quickswap'] = allow_quickswap
 
             if self.preset_data.get('customizer', False):
@@ -446,7 +446,6 @@ async def mystery_generate(weights, spoilers="mystery"):
         else:
             data = ALTTPRPreset(rolledpreset)
             await data.fetch()
-            # preset_dict = await fetch_preset(rolledpreset, randomizer='alttpr')
             settings = data.preset_data['settings']
             customizer = data.preset_data.get('customizer', False)
             doors = data.preset_data.get('doors', False)

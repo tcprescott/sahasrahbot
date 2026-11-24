@@ -86,7 +86,4 @@ async def get_episode(episodeid: int, complete=False):
     if 'error' in result:
         raise SGEpisodeNotFoundException(result["error"])
 
-    # if not result['event']['slug'] == 'alttpr':
-    #     raise SGEpisodeNotFoundException('Not an alttpr tournament race.')
-
     return result

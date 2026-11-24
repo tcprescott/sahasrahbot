@@ -278,7 +278,6 @@ def generate_doors_mystery(weights, tournament=True, spoilers="mystery"):
         customizer = False
         doors = True
         branch = weights.get('options', {}).get('branch', 'stable')
-        # return settings, False, True
     else:
         settings, customizer = generate_random_settings(weights, tournament=tournament, spoilers=spoilers)
         doors = False

@@ -192,7 +192,7 @@ class GameHandler(SahasrahBotCoreHandler):
             if args[0] != '--spoiler':
                 await self.send_message(
                     f'Invalid option: {args[0]}  ' +
-                    f'Supported options: --spoiler'
+                    'Supported options: --spoiler'
                 )
                 return
 

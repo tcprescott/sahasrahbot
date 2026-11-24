@@ -252,13 +252,13 @@ class TournamentRace(object):
             self.players.append(looked_up_player)
 
     async def make_tournament_player(self, player):
-        if not player['discordId'] == "":
+        if player['discordId'] != "":
             looked_up_player = await TournamentPlayer.construct(discord_id=player['discordId'], guild=self.guild)
         else:
             looked_up_player = None
 
         # then, if that doesn't work, try their discord tag kept by SG
-        if looked_up_player is None and not player['discordTag'] == '':
+        if looked_up_player is None and player['discordTag'] != '':
             looked_up_player = await TournamentPlayer.construct_discord_name(discord_name=player['discordTag'],
                                                                              guild=self.guild)
 
@@ -284,7 +284,7 @@ class TournamentRace(object):
         if not discord_user:
             return False
 
-        return any([True for x in self.data.helper_roles if x in discord_user.roles])
+        return any(x in discord_user.roles for x in self.data.helper_roles)
 
     @property
     def guild(self):
@@ -345,7 +345,7 @@ class TournamentRace(object):
 
     @property
     def broadcast_channels(self):
-        return [a['name'] for a in self.episode['channels'] if not " " in a['name']]
+        return [a['name'] for a in self.episode['channels'] if " " not in a['name']]
 
     @property
     def broadcast_channel_links(self):

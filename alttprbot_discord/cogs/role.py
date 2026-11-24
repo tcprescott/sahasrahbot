@@ -10,10 +10,6 @@ from alttprbot.exceptions import SahasrahBotException
 from ..util import embed_formatter
 
 
-# from emoji import is_emoji
-
-# this is a pile of shit and needs to be refactored
-
 class Role(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -151,7 +147,7 @@ class Role(commands.Cog):
                     await ctx.reply(f"Failed to find member identified by {i['member']}")
                     continue
 
-                if not mode == "dry":
+                if mode != "dry":
                     await member_obj.add_roles(role_obj)
         else:
             raise SahasrahBotException("You must supply a valid csv file.")

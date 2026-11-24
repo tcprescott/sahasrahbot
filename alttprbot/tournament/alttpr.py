@@ -21,7 +21,6 @@ class ALTTPRTournamentRace(TournamentRace):
     """
 
     async def roll(self):
-        # self.seed, self.preset_dict = await preset.get_preset('tournament', nohints=True, allow_quickswap=True)
         pass
 
     async def process_tournament_race(self, args, message):

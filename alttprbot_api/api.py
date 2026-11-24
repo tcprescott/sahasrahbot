@@ -84,7 +84,7 @@ async def login():
         session['login_original_path'] = _safe_next(request.args['next'])
     return await discord.create_session(
         scope=['identify'],
-        data=dict(redirect=_safe_next(session.pop("login_original_path", "/me"))),
+        data={"redirect": _safe_next(session.pop("login_original_path", "/me"))},
     )
 
 

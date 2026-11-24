@@ -267,7 +267,7 @@ class ScheduledJobDiscordOutput:
                             scheduled_event.scheduled_event_id)
 
                         # check if existing event requires an update
-                        if not guild_event.name == name or not guild_event.description == description or not guild_event.start_time == start_time or not guild_event.end_time == end_time or not guild_event.location == location:
+                        if guild_event.name != name or guild_event.description != description or guild_event.start_time != start_time or guild_event.end_time != end_time or guild_event.location != location:
                             await guild_event.edit(
                                 name=name,
                                 description=description,

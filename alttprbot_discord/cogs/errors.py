@@ -97,7 +97,7 @@ class Errors(commands.Cog, name="errors"):
                     content=f"{riplink} Your account require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
         except commands.BotMissingPermissions as d_error:
             if edit is not None:
-                if not "send_messages" in d_error.missing_permissions:
+                if "send_messages" not in d_error.missing_permissions:
                     await edit(
                         content=f"{riplink} The bot require the following permissions: `{'` `'.join(d_error.missing_permissions)}`.")
         except (commands.CheckAnyFailure, commands.MissingRole, commands.BotMissingRole, commands.MissingAnyRole,
