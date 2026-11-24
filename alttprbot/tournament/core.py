@@ -168,7 +168,7 @@ class TournamentRace(object):
         tournament_race.data = await tournament_race.configuration()
         return tournament_race
 
-    async def configuration(self) -> TournamentConfig:
+    async def configuration(self) -> TournamentConfig:  # NOSONAR: awaited hook that subclasses override with async work
         self.data = None
 
     def room_opened_event(self) -> events.TournamentRoomOpened:
@@ -191,7 +191,7 @@ class TournamentRace(object):
             player_discord_ids=tuple(player_discord_ids),
         )
 
-    async def send_player_room_info(self):
+    async def send_player_room_info(self):  # NOSONAR: awaited hook that subclasses override with async work
         # alttprbot_discord/notifications.py DMs the players (and posts the
         # announcement for open races such as the SG dailies).
         events.publish(self.room_opened_event())
@@ -402,7 +402,7 @@ class TournamentRace(object):
     async def process_submission_form(self, payload, submitted_by):
         """Hook: handle a settings submission from the web form. The default ignores it."""
 
-    async def send_audit_message(self, message=None, embed: discord.Embed = None):
+    async def send_audit_message(self, message=None, embed: discord.Embed = None):  # NOSONAR: awaited hook that subclasses override with async work
         # alttprbot_discord/notifications.py posts it to the audit channel.
         if self.audit_channel:
             events.publish(events.TournamentAuditRecorded(
@@ -413,7 +413,7 @@ class TournamentRace(object):
                 embed=embed.to_dict() if embed else None,
             ))
 
-    async def send_commentary_message(self, embed: discord.Embed):
+    async def send_commentary_message(self, embed: discord.Embed):  # NOSONAR: awaited hook that subclasses override with async work
         # alttprbot_discord/notifications.py posts it to the commentary channel.
         if self.commentary_channel and len(self.broadcast_channels) > 0:
             events.publish(events.TournamentCommentaryReady(

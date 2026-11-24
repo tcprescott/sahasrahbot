@@ -247,7 +247,7 @@ def set_embed_field(name: str, value: str, embed: discord.Embed) -> discord.Embe
     return embed
 
 
-def get_embed_field(name: str, embed: discord.Embed) -> str:
+def get_embed_field(name: str, embed: discord.Embed) -> str | None:
     for field in embed.fields:
         if field.name == name:
             return field.value

@@ -547,7 +547,7 @@ class Z2RGenerator(commands.GroupCog, name="z2r", description="Generate a seed f
         await interaction.response.send_message(f"**Seed**: {seed}\n**Flags:** {flags}\n**Description**: {description}")
 
 
-def get_embed_field(name: str, embed: discord.Embed) -> str:
+def get_embed_field(name: str, embed: discord.Embed) -> str | None:
     for field in embed.fields:
         if field.name == name:
             return field.value

@@ -171,7 +171,7 @@ async def refresh_bot_message(ctx, group_id):
     #                raise
 
     if group.bot_managed:
-        embed = embed_formatter.reaction_menu(ctx, group, roles)
+        embed = embed_formatter.reaction_menu(group, roles)
         await message.edit(content=None, embed=embed)
 
 

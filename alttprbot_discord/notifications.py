@@ -217,22 +217,9 @@ class ScheduledJobDiscordOutput:
         event_slug = event.event_slug
         episodes = list(event.episodes)
 
-        # remove dead events
-        dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes],
-                                                          event_slug=event_slug)
-        for dead_event in dead_events:
-            try:
-                guild_event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(
-                    dead_event.scheduled_event_id)
-
-                if guild_event.status == discord.EventStatus.scheduled:
-                    await guild_event.delete()
-            except discord.NotFound:
-                continue
-            await dead_event.delete()
+        await _remove_dead_scheduled_events(event_data.guild, event_slug, episodes)
 
         for episode in episodes:
-            start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
             episode_id = int(episode['id'])
             scheduled_event = await models.ScheduledEvents.get_or_none(episode_id=episode_id)
 
@@ -242,69 +229,90 @@ class ScheduledJobDiscordOutput:
                 logger.exception("Error while creating tournament race handler.")
                 continue
 
-            name = tournament_race.event_slug.upper()
-            if tournament_race.friendly_name:
-                name += f" - {tournament_race.friendly_name}"
-            if tournament_race.versus:
-                name += f" - {tournament_race.versus}"
-
-            name = name[:100]
-
-            description = f"Start Time: {discord.utils.format_dt(start_time, 'f')}"
-            end_time = start_time + datetime.timedelta(hours=2)
-
-            if tournament_race.broadcast_channels:
-                location = f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
-            elif tournament_race.player_twitch_names:
-                location = f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
-            else:
-                location = "TBD"
+            details = _scheduled_event_details(tournament_race, episode)
 
             try:
-                if scheduled_event:
-                    try:
-                        guild_event: discord.ScheduledEvent = await event_data.guild.fetch_scheduled_event(
-                            scheduled_event.scheduled_event_id)
-
-                        # check if existing event requires an update
-                        if guild_event.name != name or guild_event.description != description or guild_event.start_time != start_time or guild_event.end_time != end_time or guild_event.location != location:
-                            await guild_event.edit(
-                                name=name,
-                                description=description,
-                                start_time=start_time,
-                                end_time=end_time,
-                                location=location,
-                                entity_type=discord.EntityType.external,
-                                privacy_level=discord.PrivacyLevel.guild_only
-                            )
-                    except discord.NotFound:
-                        guild_event = await event_data.guild.create_scheduled_event(
-                            name=name,
-                            description=description,
-                            start_time=start_time,
-                            end_time=end_time,
-                            location=location,
-                            entity_type=discord.EntityType.external,
-                            privacy_level=discord.PrivacyLevel.guild_only
-                        )
-                        await models.ScheduledEvents.update_or_create(episode_id=episode_id,
-                                                                      defaults={'scheduled_event_id': guild_event.id,
-                                                                                'event_slug': event_slug})
-                else:
-                    # create an event
-                    guild_event = await event_data.guild.create_scheduled_event(
-                        name=name,
-                        description=description,
-                        start_time=start_time,
-                        end_time=end_time,
-                        location=location,
-                        entity_type=discord.EntityType.external,
-                        privacy_level=discord.PrivacyLevel.guild_only
-                    )
-                    await models.ScheduledEvents.create(scheduled_event_id=guild_event.id, episode_id=episode_id,
-                                                        event_slug=event_slug)
+                await _sync_scheduled_event(event_data.guild, event_slug, episode_id, scheduled_event, details)
             except Exception:
                 logger.exception("Unable to create guild event.")
+
+
+async def _remove_dead_scheduled_events(guild, event_slug, episodes):
+    """Delete the guild events (and our rows) for episodes SpeedGaming no longer lists."""
+    dead_events = await models.ScheduledEvents.filter(episode_id__not_in=[e['id'] for e in episodes],
+                                                      event_slug=event_slug)
+    for dead_event in dead_events:
+        try:
+            guild_event: discord.ScheduledEvent = await guild.fetch_scheduled_event(
+                dead_event.scheduled_event_id)
+
+            if guild_event.status == discord.EventStatus.scheduled:
+                await guild_event.delete()
+        except discord.NotFound:
+            continue
+        await dead_event.delete()
+
+
+def _scheduled_event_details(tournament_race, episode) -> dict:
+    """The name, description, times and location a guild event for this episode should have."""
+    start_time = datetime.datetime.strptime(episode['when'], "%Y-%m-%dT%H:%M:%S%z")
+
+    name = tournament_race.event_slug.upper()
+    if tournament_race.friendly_name:
+        name += f" - {tournament_race.friendly_name}"
+    if tournament_race.versus:
+        name += f" - {tournament_race.versus}"
+
+    if tournament_race.broadcast_channels:
+        location = f"https://twitch.tv/{tournament_race.broadcast_channels[0]}"
+    elif tournament_race.player_twitch_names:
+        location = f"https://multistre.am/{'/'.join(tournament_race.player_twitch_names)}/layout3/"
+    else:
+        location = "TBD"
+
+    return {
+        'name': name[:100],
+        'description': f"Start Time: {discord.utils.format_dt(start_time, 'f')}",
+        'start_time': start_time,
+        'end_time': start_time + datetime.timedelta(hours=2),
+        'location': location,
+    }
+
+
+def _needs_update(guild_event: discord.ScheduledEvent, details: dict) -> bool:
+    return any(getattr(guild_event, key) != value for key, value in details.items())
+
+
+async def _create_scheduled_event(guild, details: dict) -> discord.ScheduledEvent:
+    return await guild.create_scheduled_event(
+        **details,
+        entity_type=discord.EntityType.external,
+        privacy_level=discord.PrivacyLevel.guild_only
+    )
+
+
+async def _sync_scheduled_event(guild, event_slug, episode_id, scheduled_event, details: dict):
+    """Create the guild event for an episode, or bring an existing one up to date."""
+    if not scheduled_event:
+        guild_event = await _create_scheduled_event(guild, details)
+        await models.ScheduledEvents.create(scheduled_event_id=guild_event.id, episode_id=episode_id,
+                                            event_slug=event_slug)
+        return
+
+    try:
+        guild_event: discord.ScheduledEvent = await guild.fetch_scheduled_event(scheduled_event.scheduled_event_id)
+        if _needs_update(guild_event, details):
+            await guild_event.edit(
+                **details,
+                entity_type=discord.EntityType.external,
+                privacy_level=discord.PrivacyLevel.guild_only
+            )
+    except discord.NotFound:
+        # The guild event was deleted by hand: make a new one.
+        guild_event = await _create_scheduled_event(guild, details)
+        await models.ScheduledEvents.update_or_create(episode_id=episode_id,
+                                                      defaults={'scheduled_event_id': guild_event.id,
+                                                                'event_slug': event_slug})
 
 
 # --- everything else ------------------------------------------------------------
