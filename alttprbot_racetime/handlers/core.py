@@ -214,6 +214,7 @@ class SahasrahBotCoreHandler(RaceHandler):
         pass
 
     async def status_finished(self):
+        # Hook for category handlers; the core handler does nothing when a race finishes.
         pass
 
     async def race_data_hook(self):

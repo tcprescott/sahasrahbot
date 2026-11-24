@@ -6,7 +6,7 @@ by the racetime.gg room name (``srl_id``, e.g. ``alttpr/cool-room-1234``). The r
 handlers keep the chat messages and the countdown; this module only stores the row.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from alttprbot import models
@@ -30,8 +30,8 @@ async def schedule(room_name: str, spoiler_url: str, studytime: int) -> models.S
 
 
 async def mark_started(spoiler_race: models.SpoilerRaces) -> None:
-    """Record that the spoiler log was sent (naive UTC, as before)."""
-    spoiler_race.started = datetime.utcnow()
+    """Record when the spoiler log was sent."""
+    spoiler_race.started = datetime.now(timezone.utc)
     await spoiler_race.save(update_fields=['started'])
 
 
