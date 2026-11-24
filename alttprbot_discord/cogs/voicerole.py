@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from alttprbot.database import voicerole  # TODO switch to ORM
+from alttprbot.services import voice_roles
 
 
 class VoiceRole(commands.Cog):
@@ -10,22 +10,22 @@ class VoiceRole(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        vc_roles = await voicerole.get_voice_roles_by_guild(member.guild.id)
+        vc_roles = await voice_roles.for_guild(member.guild.id)
 
         if after.channel is not None and before.channel is not None:
             if after.channel.id == before.channel.id:
                 return
         if after.channel is not None:
             for vc_role in vc_roles:
-                if after.channel.id == vc_role['voice_channel_id']:
+                if after.channel.id == vc_role.voice_channel_id:
                     role = discord.utils.get(
-                        member.guild.roles, id=vc_role['role_id'])
+                        member.guild.roles, id=vc_role.role_id)
                     await member.add_roles(role, reason='Joined voice channel.')
         if before.channel is not None:
             for vc_role in vc_roles:
-                if before.channel.id == vc_role['voice_channel_id']:
+                if before.channel.id == vc_role.voice_channel_id:
                     role = discord.utils.get(
-                        member.guild.roles, id=vc_role['role_id'])
+                        member.guild.roles, id=vc_role.role_id)
                     await member.remove_roles(role, reason='Left voice channel.')
         return
 
