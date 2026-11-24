@@ -6,7 +6,6 @@ from discord.ext import commands
 import config
 from alttprbot.util import speedgaming
 
-# TODO: make work with discord.py 2.0
 
 
 ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))

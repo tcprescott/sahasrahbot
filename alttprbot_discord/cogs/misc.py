@@ -12,9 +12,8 @@ from pytz import UnknownTimeZoneError
 import config
 from alttprbot.integrations import holyimage as holyimage_api
 from alttprbot.services import guild_config
-from alttprbot.util.holyimage import HolyImage
+from alttprbot_discord.util.holyimage import HolyImage
 
-# TODO: make work with discord.py 2.0
 
 ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))
 
