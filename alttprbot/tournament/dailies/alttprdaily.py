@@ -1,17 +1,10 @@
-from alttprbot.tournament.dailies.core import SGDailyRaceCore, TournamentConfig
-from alttprbot.services import bots
+from alttprbot.tournament.dailies.core import SGDailyRaceCore
+from alttprbot.tournament import settings
 
 
 class AlttprSGDailyRace(SGDailyRaceCore):
     async def configuration(self):
-        guild = bots.discord().get_guild(307860211333595146)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Casual',
-            event_slug="alttprdaily",
-            room_open_time=60
-        )
+        return settings.tournament_config("alttprdaily")
 
     @property
     def race_info(self):

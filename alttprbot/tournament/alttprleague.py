@@ -6,8 +6,7 @@ from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen import spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.tournament.core import TournamentConfig
-from alttprbot.services import bots
+from alttprbot.tournament import settings
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):
@@ -47,26 +46,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         await self.get_league_data()
 
     async def configuration(self):
-        guild = bots.discord().get_guild(543577975032119296)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Tournament (Solo)',
-            event_slug="invleague",
-            audit_channel=bots.discord().get_channel(546728638272241674),
-            commentary_channel=bots.discord().get_channel(1157407211094556703),
-            # scheduling_needs_channel=bots.discord().get_channel(878075812996337744),
-            # scheduling_needs_tracker=True,
-            helper_roles=[
-                guild.get_role(543596853871116288),
-                guild.get_role(543597099649073162),
-                guild.get_role(676530377812082706),
-                guild.get_role(553295025190993930),
-                guild.get_role(674109759179194398),
-            ],
-            stream_delay=10,
-            create_scheduled_events=True,
-        )
+        return settings.tournament_config("invleague")
 
     async def create_race_room(self):
         # if self.tournament_game is None or self.tournament_game.preset is None:
@@ -182,23 +162,4 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
 class ALTTPROpenLeague(ALTTPRLeague):
     async def configuration(self):
-        guild = bots.discord().get_guild(543577975032119296)
-        return TournamentConfig(
-            guild=guild,
-            racetime_category='alttpr',
-            racetime_goal='Beat the game - Tournament (Solo)',
-            event_slug="alttprleague",
-            audit_channel=bots.discord().get_channel(546728638272241674),
-            commentary_channel=bots.discord().get_channel(1157407211094556703),
-            # scheduling_needs_channel=bots.discord().get_channel(878076083193389096),
-            # scheduling_needs_tracker=True,
-            helper_roles=[
-                guild.get_role(543596853871116288),
-                guild.get_role(543597099649073162),
-                guild.get_role(676530377812082706),
-                guild.get_role(553295025190993930),
-                guild.get_role(674109759179194398),
-            ],
-            stream_delay=10,
-            create_scheduled_events=True,
-        )
+        return settings.tournament_config("alttprleague")

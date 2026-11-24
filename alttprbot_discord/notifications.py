@@ -25,28 +25,29 @@ from alttprbot import events, models, tournaments
 from alttprbot.integrations import racetime
 from alttprbot.services import guild_config
 from alttprbot.tournament import core
+from alttprbot.tournament import settings as tournament_settings
 from alttprbot.util import rankedchoice
 from alttprbot_discord.util.seed_embeds import seed_embed
 
 logger = logging.getLogger(__name__)
 
-# Open races that announce in a channel when their room opens, by SG event slug.
-# The SpeedGaming daily (and its webhook) shows when the seed is distributed.
+# Open races that announce in a channel when their room opens, by SG event slug,
+# from the ``announcement`` blocks in tournaments.yaml. The SpeedGaming daily
+# (and its webhook) shows when the seed is distributed.
+def _role_mention(role_id):
+    return f"<@&{role_id}>" if role_id else None
+
+
 DAILY_ANNOUNCEMENTS = {
-    'alttprdaily': {
-        'channel_id': 307861467838021633,
-        'heading': "SpeedGaming Daily Race Series",
-        'mention': None,
-        'webhook_mention': "<@&399038388964950016>",
-        'show_seed_time': True,
-    },
-    'smz3': {
-        'channel_id': 451977523123978260,
-        'heading': "SMZ3 Weekly Race",
-        'mention': "<@&449260882501959700>",
-        'webhook_mention': None,
-        'show_seed_time': False,
-    },
+    slug: {
+        'channel_id': entry['announcement']['channel'],
+        'heading': entry['announcement']['heading'],
+        'mention': _role_mention(entry['announcement'].get('mention')),
+        'webhook_mention': _role_mention(entry['announcement'].get('webhook_mention')),
+        'show_seed_time': entry['announcement'].get('show_seed_time', False),
+    }
+    for slug, entry in tournament_settings.SETTINGS.items()
+    if entry.get('announcement')
 }
 
 
