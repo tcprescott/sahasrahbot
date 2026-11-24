@@ -7,7 +7,9 @@ They do the work and publish events; Discord output is done by the subscribers i
 import datetime
 import logging
 
-from alttprbot import events, tournaments
+from alttprbot import events, models, tournaments
+from alttprbot.integrations import racetime
+from alttprbot.services import bots, tournament_results
 from alttprbot.tournament import core
 from alttprbot.util import discord_members, speedgaming
 
@@ -18,6 +20,25 @@ IGNORED_SG_CHANNEL_IDS = [0, 31, 36, 62, 63, 64, 65]
 # Restream channels that need a broadcaster signed up.
 BROADCASTER_CHANNELS = ['ALTTPRandomizer', 'ALTTPRandomizer2', 'ALTTPRandomizer3', 'ALTTPRandomizer4',
                         'ALTTPRandomizer5', 'ALTTPRandomizer6']
+
+
+async def create_tournament_race_room(event, episodeid):
+    """Open the racetime room for an episode, unless one is already open.
+
+    A recorded room that was cancelled is forgotten and replaced.
+    """
+    event_data = await tournaments.TOURNAMENT_DATA[event].get_config()
+    rtgg_bot = bots.racetime_bots()[event_data.data.racetime_category]
+    race = await models.TournamentResults.get_or_none(episode_id=episodeid)
+    if race:
+        race_data = await racetime.get_race(race.srl_id, base_url=rtgg_bot.http_uri(""))
+        status = race_data.get('status', {}).get('value')
+        if not status == 'cancelled':
+            return
+        await race.delete()
+
+    handler = await tournaments.TOURNAMENT_DATA[event].construct_race_room(episodeid)
+    return handler
 
 
 async def create_races() -> None:
@@ -34,7 +55,7 @@ async def create_races() -> None:
         for episode in episodes:
             logger.info(episode['id'])
             try:
-                await tournaments.create_tournament_race_room(event_slug, episode['id'])
+                await create_tournament_race_room(event_slug, episode['id'])
             except Exception as e:
                 logger.exception("Encountered a problem when attempting to create RT.gg race room.")
                 events.publish(events.TournamentRoomCreationFailed(
@@ -121,7 +142,7 @@ def scheduling_needs(event_slug: str, episodes: list[dict], lang: str = 'en',
 async def record_races() -> None:
     """Write finished tournament results to the events' Google Sheets."""
     logger.info("recording tournament races")
-    await tournaments.race_recording_task()
+    await tournament_results.record_results()
     logger.info("done recording")
 
 
