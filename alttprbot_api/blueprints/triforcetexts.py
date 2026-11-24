@@ -8,6 +8,8 @@ from alttprbot_api.api import discord
 
 triforcetexts_blueprint = Blueprint('triforcetexts', __name__)
 
+ERROR_TEMPLATE = 'error.html'
+
 
 @triforcetexts_blueprint.route('/triforcetexts/<string:pool_name>', methods=['GET'])
 @requires_authorization
@@ -28,13 +30,13 @@ async def submit(pool_name):
         r"^[A-Za-z0-9 ?!,-….~～''↑↓→←あいうえおやゆよかきくけこわをんさしすせそがぎぐたちつてとげござなにぬねのじずぜはひふへほぞだぢまみむめもづでどらりるれろばびぶべぼぱぴぷぺぽゃゅょっぁぃぅぇぉアイウエオヤユヨカキクケコワヲンサシスセソガギグタチツテトゲゴザナニヌネノジズゼハヒフヘホゾダマミムメモヅデドラリルレロバビブベボパピプペポャュョッァィゥェォ]{0,19}$")
 
     if not regex.match(payload['first_line']):
-        return await render_template('error.html', user=user, title="Invalid input.",
+        return await render_template(ERROR_TEMPLATE, user=user, title="Invalid input.",
                                      message="Invalid text entered for the first line.")
     if not regex.match(payload['second_line']):
-        return await render_template('error.html', user=user, title="Invalid input.",
+        return await render_template(ERROR_TEMPLATE, user=user, title="Invalid input.",
                                      message="Invalid text entered for the second line.")
     if not regex.match(payload['third_line']):
-        return await render_template('error.html', user=user, title="Invalid input.",
+        return await render_template(ERROR_TEMPLATE, user=user, title="Invalid input.",
                                      message="Invalid text entered for the third line.")
 
     text = f"{payload['first_line']}\n{payload['second_line']}\n{payload['third_line']}"
@@ -55,7 +57,7 @@ async def moderation(pool_name):
     moderators = [int(x.value) for x in triforce_texts_config]
 
     if user.id not in moderators:
-        return await render_template('error.html', user=user, title="Access Denied",
+        return await render_template(ERROR_TEMPLATE, user=user, title="Access Denied",
                                      message="You do not have permission to access this page.")
 
     filt = {
@@ -87,7 +89,7 @@ async def moderation_action(pool_name, text_id, action):
     moderators = [int(x.value) for x in triforce_texts_config]
 
     if user.id not in moderators:
-        return await render_template('error.html', user=user, title="Access Denied",
+        return await render_template(ERROR_TEMPLATE, user=user, title="Access Denied",
                                      message="You do not have permission to access this page.")
 
     text = await models.TriforceTexts.get(id=text_id)
