@@ -108,6 +108,11 @@ code on master does today, so a refactor can be checked against them. Rules for 
   `bots.racetime_bot(category)`), which nothing registers in tests. Give it a fake with
   `monkeypatch.setattr(bots, "_discord_client", fake)` or
   `monkeypatch.setattr(bots, "_racetime_bots", {"alttpr": fake_bot})`.
+- Cogs are tested by calling a command's body with fakes from `tests/discord_fakes.py`:
+  `await call(cog.rom, cog, FakeInteraction())`, then `interaction.sent()` for what it
+  replied. Buttons and selects: `await view.<item>.callback(interaction)`.
+- Coverage has a floor (`fail_under` in `.coveragerc`), enforced by CI's `--cov` run.
+  Raise it when coverage goes up; never lower it to get a PR through.
 - `testdata` gives realistic data: `await testdata.load("ranked_choice")` (inside the `db`
   fixture) inserts fake users plus that feature's rows, ids from 1001. Regenerate the files
   with `scripts/scrub_prod_dump.py`; never hand-edit them, and never commit a raw dump.
