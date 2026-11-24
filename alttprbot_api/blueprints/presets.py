@@ -69,3 +69,5 @@ async def api_get_preset(randomizer):
         return jsonify(
             {}
         )
+    except generator.InvalidPresetError as err:
+        return jsonify({'error': str(err)}), 422
