@@ -585,22 +585,17 @@ async def test_racerverification_create_posts_requirements(db):
     assert (saved.guild_id, saved.message_id, saved.channel_id, saved.minimum_races) == (1, 4242, 300, 5)
 
 
-async def test_known_issue_racerverification_admin_check_never_refuses(db):
-    """KNOWN ISSUE, pinned not endorsed: the admin check compares the un-awaited
-    coroutine ``bot.is_owner(user)`` with ``False``, which is never true, so any
-    member can set up racer verification (and hand out any role through it)."""
+async def test_racerverification_refuses_a_non_admin(db):
+    """Only server admins and the bot owner may set up racer verification (see also
+    tests/test_admin_checks.py)."""
     bot = FakeBot()
     cog = rv_cog.RacerVerification(bot)
     interaction = FakeInteraction(user=FakeUser(administrator=False), guild=FakeGuild(guild_id=1))
-    interaction.original.channel = SimpleNamespace(id=300)
 
-    with pytest.warns(RuntimeWarning, match="never awaited"):
-        await call(cog.create_or_update, cog, interaction, FakeRole(501), minimum_races=1, time_period_days=1)
-        import gc
-        gc.collect()
+    await call(cog.create_or_update, cog, interaction, FakeRole(501), minimum_races=1, time_period_days=1)
 
-    assert "at least 1 race played in the last 1 day" in interaction.sent().content
-    assert await models.RacerVerification.exists(role_id=501)
+    assert interaction.sent().content == "You are not authorized to use this command."
+    assert not await models.RacerVerification.exists(role_id=501)
 
 
 @pytest.fixture
@@ -663,16 +658,16 @@ async def test_rankedchoice_create(db):
     assert isinstance(sent.view, rc_cog.RankedChoiceMessageView)
 
 
-async def test_known_issue_rankedchoice_admin_check_never_refuses(db):
-    """KNOWN ISSUE, pinned not endorsed: like /racerverification, the un-awaited
-    ``bot.is_owner`` coroutine makes the admin check pass for everyone."""
-    cog = rc_cog.RankedChoice(FakeBot())
+async def test_rankedchoice_create_refuses_a_non_admin(db):
+    """Only server admins and the bot owner may create an election."""
+    bot = FakeBot()
+    cog = rc_cog.RankedChoice(bot)
     interaction = FakeInteraction(user=FakeUser(administrator=False), guild=FakeGuild(guild_id=1))
-    with pytest.warns(RuntimeWarning, match="never awaited"):
-        await call(cog.create, cog, interaction, "Anyone's election", "A,B")
-        import gc
-        gc.collect()
-    assert await models.RankedChoiceElection.exists(title="Anyone's election")
+
+    await call(cog.create, cog, interaction, "Anyone's election", "A,B")
+
+    assert interaction.sent().content == "You are not authorized to use this command."
+    assert not await models.RankedChoiceElection.exists(title="Anyone's election")
 
 
 @pytest.fixture
