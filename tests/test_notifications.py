@@ -321,11 +321,9 @@ async def test_known_issue_dead_episode_row_kept_when_guild_event_is_gone(db, mo
     assert await models.ScheduledEvents.exists(episode_id=104)
 
 
-async def test_known_issue_recreated_guild_event_is_not_recorded(db, monkeypatch):
-    """KNOWN ISSUE, pinned not endorsed: when a guild event was deleted by hand, a new
-    one is made, but ``update_or_create`` can't change the row's primary key
-    (``scheduled_event_id``), so the row keeps the dead id and every refresh makes
-    yet another guild event for the episode."""
+async def test_recreated_guild_event_is_recorded(db, monkeypatch):
+    """When a guild event was deleted by hand, a new one is made and its id replaces
+    the dead one, so the next refresh finds it instead of making another."""
     await models.ScheduledEvents.create(scheduled_event_id=6, episode_id=106, event_slug="alttpr")
     monkeypatch.setattr(notifications.tournaments, "fetch_tournament_handler_v2", mock.AsyncMock(return_value=race()))
     guild = GuildEvents()
@@ -335,8 +333,9 @@ async def test_known_issue_recreated_guild_event_is_not_recorded(db, monkeypatch
     await jobs.update_scheduled_events(refresh)
     await jobs.update_scheduled_events(refresh)
 
-    assert len(guild.created) == 2
-    assert [r.scheduled_event_id for r in await models.ScheduledEvents.filter(episode_id=106)] == [6]
+    assert len(guild.created) == 1
+    [row] = await models.ScheduledEvents.filter(episode_id=106)
+    assert row.scheduled_event_id != 6
 
 
 async def test_sync_leaves_an_up_to_date_event_alone(db):

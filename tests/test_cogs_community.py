@@ -522,7 +522,7 @@ async def test_inquiry_buttons_lead_to_the_modal(db):
     await sent.view.yes.callback(yes)
     modal = yes.response.send_modal.await_args.args[0]
     assert isinstance(modal, inquiry_cog.OpenInquiryModal)
-    assert modal.inquiry_message_config.role_id == 500
+    assert modal.role_id == 500
 
 
 @pytest.mark.parametrize("mentionable, expected_ping", [(True, "<@&500>"), (False, "Unable to add <@&500>")])
@@ -536,7 +536,7 @@ async def test_inquiry_modal_opens_thread(monkeypatch, mentionable, expected_pin
     user = FakeUser(name="alice")
     interaction = FakeInteraction(user=user, guild=guild)
     interaction.channel.create_thread.return_value = thread
-    modal = inquiry_cog.OpenInquiryModal(SimpleNamespace(role_id=500))
+    modal = inquiry_cog.OpenInquiryModal(500)
     modal.description._value = "My summary of things"
 
     await modal.on_submit(interaction)

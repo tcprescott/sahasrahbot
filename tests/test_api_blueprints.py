@@ -16,6 +16,7 @@ import pytest
 import testdata
 from alttprbot import models
 from alttprbot.alttprgen import generator
+from alttprbot.services import accounts
 from alttprbot.services import bots
 from alttprbot_api import api  # noqa: F401  (import the app before its blueprints, as production does)
 from alttprbot_api.blueprints import racetime as racetime_bp
@@ -143,7 +144,7 @@ async def test_merge_users_moves_async_tournament_rows(db):
     keeper = await models.Users.create(display_name="keeper", rtgg_id=None)
     keeper_races_before = await models.AsyncTournamentRace.filter(user=keeper).count()
 
-    kept = await racetime_bp.merge_users(keeper, victim)
+    kept = await accounts.merge_users(keeper, victim)
 
     assert kept.discord_user_id == victim.discord_user_id
     assert not await models.Users.exists(id=victim.id)
