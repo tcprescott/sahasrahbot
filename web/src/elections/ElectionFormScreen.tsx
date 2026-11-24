@@ -250,12 +250,11 @@ function Form({
     }
   }
 
-  const menu: MenuItem[] = []
-  if (election?.status === 'open') {
-    menu.push({ label: 'Open the ballot', icon: 'how_to_vote', onSelect: () => navigate(votePath(election.id)) })
-    menu.push({ label: 'Close and count now', icon: 'check_circle', onSelect: () => setConfirm('close') })
-  }
-  if (election) menu.push({ label: 'Delete', icon: 'delete', destructive: true, onSelect: () => setConfirm('delete') })
+  const menu = actionsFor(election, {
+    vote: () => election && navigate(votePath(election.id)),
+    close: () => setConfirm('close'),
+    remove: () => setConfirm('delete'),
+  })
 
   const names = draft.candidates
   const setName = (key: number, name: string) => set({ candidates: names.map((c) => (c.key === key ? { ...c, name } : c)) })
@@ -541,6 +540,22 @@ function Form({
       </ConfirmDialog>
     </>
   )
+}
+
+/** The page's Actions menu: none for a new election. */
+function actionsFor(
+  election: ElectionDetail | undefined,
+  on: { vote: () => void; close: () => void; remove: () => void },
+): MenuItem[] {
+  if (!election) return []
+  const open: MenuItem[] =
+    election.status === 'open'
+      ? [
+          { label: 'Open the ballot', icon: 'how_to_vote', onSelect: on.vote },
+          { label: 'Close and count now', icon: 'check_circle', onSelect: on.close },
+        ]
+      : []
+  return [...open, { label: 'Delete', icon: 'delete', destructive: true, onSelect: on.remove }]
 }
 
 function PasteList({

@@ -63,8 +63,10 @@ function Elections() {
           const items: MenuItem[] = []
           if (e.status !== 'closed') items.push({ label: 'Edit', icon: 'edit', onSelect: () => navigate(editPath(e.id)) })
           if (e.status === 'open') {
-            items.push({ label: 'Open the ballot', icon: 'how_to_vote', onSelect: () => navigate(votePath(e.id)) })
-            items.push({ label: 'Close and count now', icon: 'check_circle', onSelect: () => setPending({ kind: 'close', election: e }) })
+            items.push(
+              { label: 'Open the ballot', icon: 'how_to_vote', onSelect: () => navigate(votePath(e.id)) },
+              { label: 'Close and count now', icon: 'check_circle', onSelect: () => setPending({ kind: 'close', election: e }) },
+            )
           }
           if (e.status === 'closed') items.push({ label: 'View results', icon: 'bar_chart', onSelect: () => navigate(resultsPath(e.id)) })
           items.push({ label: 'Delete', icon: 'delete', destructive: true, onSelect: () => setPending({ kind: 'delete', election: e }) })

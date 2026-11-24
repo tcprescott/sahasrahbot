@@ -110,7 +110,8 @@ function Vote({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
   const changing = election.ballot != null
-  const plurality = election.method === 'plurality'
+  let submitLabel = election.method === 'plurality' ? 'Submit vote' : 'Submit ballot'
+  if (changing) submitLabel = 'Update ballot'
 
   const submit = async () => {
     setBusy(true)
@@ -150,7 +151,7 @@ function Vote({
           </Button>
         )}
         <Button icon="how_to_vote" disabled={choices.length === 0} busy={busy} busyLabel="Submitting" onClick={submit}>
-          {changing ? 'Update ballot' : plurality ? 'Submit vote' : 'Submit ballot'}
+          {submitLabel}
         </Button>
       </div>
     </>

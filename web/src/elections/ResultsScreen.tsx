@@ -25,6 +25,10 @@ export function ResultsScreen() {
   )
 }
 
+const BAR_CLASS: Record<Status, string> = { elected: 'round-bar__fill--won', eliminated: 'round-bar__fill--out', hopeful: '' }
+const STATUS_LABEL: Record<Status, string> = { elected: 'elected', eliminated: 'out', hopeful: 'still in' }
+const NAME_CLASS: Record<Status, string | undefined> = { elected: 'is-won', eliminated: 'is-out', hopeful: undefined }
+
 /** Each candidate's status in a round, and whether it changed in that round. */
 function statusIn(rounds: Round[], index: number, id: number): { status: Status; now: boolean } {
   const find = (r: Round | undefined) => r?.candidates.find((c) => c.id === id)?.status ?? 'hopeful'
@@ -32,18 +36,24 @@ function statusIn(rounds: Round[], index: number, id: number): { status: Status;
   return { status, now: index === 0 ? status !== 'hopeful' : find(rounds[index - 1]) !== status }
 }
 
-function Results({ results }: Readonly<{ results: ElectionResults }>) {
-  const { tally, candidates } = results
-  const names = new Map(candidates.map((c) => [c.id, c.name]))
-  const rounds = tally.rounds
-  const lede = [
+/** "Ranked (STV), 3 seats · 42 ballots · Closed … · Server". */
+function ledeFor(results: ElectionResults): string {
+  const ballots = results.tally.ballots
+  return [
     methodText(results.method, results.seats),
-    `${tally.ballots} ${tally.ballots === 1 ? 'ballot' : 'ballots'}`,
+    `${ballots} ${ballots === 1 ? 'ballot' : 'ballots'}`,
     results.closed_at && `Closed ${fullDate(results.closed_at)}`,
     results.guild_name,
   ]
     .filter(Boolean)
     .join(' · ')
+}
+
+function Results({ results }: Readonly<{ results: ElectionResults }>) {
+  const { tally, candidates } = results
+  const names = new Map(candidates.map((c) => [c.id, c.name]))
+  const rounds = tally.rounds
+  const lede = ledeFor(results)
 
   return (
     <>
@@ -117,8 +127,8 @@ function Bars({ results }: Readonly<{ results: ElectionResults }>) {
           const status = row?.status ?? 'eliminated'
           const value = row?.votes ?? 0
           const out = status === 'eliminated'
-          const fill = out ? 'round-bar__fill round-bar__fill--out' : status === 'elected' ? 'round-bar__fill round-bar__fill--won' : 'round-bar__fill'
-          const label = out ? 'out' : status === 'elected' ? 'elected' : 'still in'
+          const fill = `round-bar__fill ${BAR_CLASS[status]}`
+          const label = STATUS_LABEL[status]
           return (
             <li className="round-bar" key={c.id} aria-label={`${c.name}: ${votes(value)} votes, ${label}`}>
               <span className={out ? 'round-bar__name is-out' : 'round-bar__name'}>{c.name}</span>
@@ -168,7 +178,7 @@ function RoundTable({ results }: Readonly<{ results: ElectionResults }>) {
           <tbody>
             {results.candidates.map((c) => (
               <tr key={c.id}>
-                <th scope="row" className={final(c.id) === 'elected' ? 'is-won' : final(c.id) === 'eliminated' ? 'is-out' : undefined}>
+                <th scope="row" className={NAME_CLASS[final(c.id)]}>
                   {c.name}
                 </th>
                 {rounds.map((_, i) => (
