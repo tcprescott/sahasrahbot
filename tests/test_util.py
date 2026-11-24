@@ -1,5 +1,5 @@
 """Characterization tests for shared helpers: alttprbot/util/, SpeedGaming,
-spoiler log upload and the tournament recording helpers in alttprbot/tournaments.py.
+spoiler log upload and the tournament registry in alttprbot/tournaments.py.
 
 HTTP goes to a local fake server (the ``fake_http`` fixture); Discord objects are mocks.
 """
@@ -17,7 +17,6 @@ import pytest
 
 import config
 from alttprbot import models, tournaments
-from alttprbot.services import bots
 from alttprbot.alttprgen import generator, spoilers
 from alttprbot.util import discord_members, helpers, rankedchoice, speedgaming, triforce_text
 
@@ -285,57 +284,9 @@ async def test_generate_spoiler_game_requests_spoiler_generation(db, monkeypatch
 
 
 # ---------------------------------------------------------------------------
-# alttprbot.tournaments (racetime recording helpers)
+# alttprbot.tournaments (the registry; recording is in tests/test_integrations.py)
 # ---------------------------------------------------------------------------
 
 
 def test_tournament_data_in_debug_is_test_only():
     assert set(tournaments.TOURNAMENT_DATA) == {"test"}  # config.example.py has DEBUG = True
-
-
-@pytest.fixture
-def racetime_site(fake_http, monkeypatch):
-    monkeypatch.setattr(tournaments, "RACETIME_URL", fake_http.url())
-    return fake_http
-
-
-@pytest.mark.parametrize(
-    "race_data",
-    [{"url": "/r", "recorded": True, "recordable": True}, {"url": "/r", "recorded": False, "recordable": False}, {"url": "/r"}],
-)
-async def test_racetime_auto_record_skips_recorded_or_unrecordable(racetime_site, race_data):
-    await tournaments.racetime_auto_record(race_data)
-    assert racetime_site.requests == []
-
-
-async def test_racetime_auto_record_posts_with_csrf_token(racetime_site):
-    racetime_site.add("GET", "/alttpr/room", body='<form><input name="csrfmiddlewaretoken" value="tok"></form>', content_type="text/html")
-    racetime_site.add("POST", "/alttpr/room/monitor/record")
-    await tournaments.racetime_auto_record({"url": "/alttpr/room", "recorded": False, "recordable": True})
-    assert [(r.method, r.path) for r in racetime_site.requests] == [("GET", "/alttpr/room"), ("POST", "/alttpr/room/monitor/record")]
-    assert racetime_site.requests[1].body == "csrfmiddlewaretoken=tok"
-
-
-async def test_racetime_auto_record_without_token_page_raises(racetime_site):
-    racetime_site.add("GET", "/alttpr/room", status=403)
-    with pytest.raises(Exception, match="Unable to acquire CSRF token"):
-        await tournaments.racetime_auto_record({"url": "/alttpr/room", "recorded": False, "recordable": True})
-
-
-async def test_create_tournament_race_room_skips_existing_live_room(db, fake_http, monkeypatch):
-    bot = mock.Mock(http_uri=fake_http.url)
-    event = mock.Mock()
-    event.get_config = mock.AsyncMock(return_value=SimpleNamespace(data=SimpleNamespace(racetime_category="test")))
-    event.construct_race_room = mock.AsyncMock(return_value={"name": "new"})
-    monkeypatch.setitem(tournaments.TOURNAMENT_DATA, "evt", event)
-    monkeypatch.setattr(bots, "_racetime_bots", {"test": bot})
-    await models.TournamentResults.create(srl_id="test/old", episode_id="9", event="evt")
-
-    fake_http.add("GET", "/test/old/data", body=json.dumps({"status": {"value": "open"}}))
-    fake_http.add("GET", "/test/old/data", body=json.dumps({"status": {"value": "cancelled"}}))
-
-    assert await tournaments.create_tournament_race_room("evt", 9) is None  # room still open: leave it
-    event.construct_race_room.assert_not_called()
-
-    assert await tournaments.create_tournament_race_room("evt", 9) == {"name": "new"}  # cancelled: replace it
-    assert not await models.TournamentResults.filter(srl_id="test/old").exists()

@@ -1,11 +1,10 @@
-import json
 from urllib.parse import urljoin
 
-import aiohttp
 import discord
 import html2markdown
 
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.integrations import holyimage as holyimage_api
 
 
 async def holy(slug, game='z3r'):
@@ -28,7 +27,7 @@ class HolyImage():
             raise HolyImageNotFound(
                 'You must specify a holy image.  Check out <http://alttp.mymm1.com/holyimage/>')
 
-        images = await get_json('http://alttp.mymm1.com/holyimage/holyimages.json')
+        images = await holyimage_api.get_holy_images()
         i = images[self.game]
 
         try:
@@ -69,10 +68,3 @@ class HolyImage():
 
         return embed
 
-
-async def get_json(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            text = await resp.read()
-
-    return json.loads(text)

@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import random
 
-import aiohttp
 import discord
 import pytz
 from aiocache import cached, Cache
@@ -11,6 +10,7 @@ from discord.ext import commands
 from pytz import UnknownTimeZoneError
 
 import config
+from alttprbot.integrations import holyimage as holyimage_api
 from alttprbot.services import guild_config
 from alttprbot.util.holyimage import HolyImage
 
@@ -55,9 +55,7 @@ async def holy_game_default(guild: discord.Guild):
 
 @cached(ttl=300, cache=Cache.MEMORY, key="holyimages")
 async def get_holy_images() -> dict:
-    async with aiohttp.ClientSession() as session:
-        async with session.get('http://alttp.mymm1.com/holyimage/holyimages.json') as resp:
-            return await resp.json()
+    return await holyimage_api.get_holy_images()
 
 
 class Misc(commands.Cog):

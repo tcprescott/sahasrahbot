@@ -14,7 +14,6 @@ publisher.
 
 import asyncio
 import datetime
-import json
 import logging
 
 import aiohttp
@@ -23,6 +22,7 @@ from discord.ext import commands
 
 import config
 from alttprbot import events, models, tournaments
+from alttprbot.integrations import racetime
 from alttprbot.services import guild_config
 from alttprbot.tournament import core
 from alttprbot.util import rankedchoice
@@ -406,9 +406,7 @@ class DiscordNotifier:
         await self._new_players(event)
 
     async def _racetime_user(self, event: events.RaceStatusChanged, racetime_id: str) -> dict:
-        async with aiohttp.request(method='get', url=f"{event.base_url}/user/{racetime_id}/data",
-                                   raise_for_status=True) as resp:
-            return json.loads(await resp.read())
+        return await racetime.get_user(racetime_id, base_url=event.base_url)
 
     async def _watchlisted_players(self, event: events.RaceStatusChanged):
         watchlisted_players = await models.RTGGWatcherPlayer.filter(
