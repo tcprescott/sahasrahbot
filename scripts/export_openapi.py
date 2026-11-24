@@ -8,14 +8,37 @@ no database or network.
 """
 
 import asyncio
+import importlib.util
 import json
 import sys
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from tests.conftest import _install_example_config, _stub_google_clients  # noqa: E402
+
+# The same set-up as tests/conftest.py, copied so this script needs no pytest
+# (CI's web job and a production build install only the app's dependencies).
+def _install_example_config() -> None:
+    if (ROOT / 'config.py').exists() or 'config' in sys.modules:
+        return
+    spec = importlib.util.spec_from_file_location('config', ROOT / 'config.example.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    sys.modules['config'] = module
+
+
+def _stub_google_clients() -> None:
+    try:
+        import googleapiclient.discovery
+        import oauth2client.service_account
+    except ImportError:
+        return
+    mock.patch.object(
+        oauth2client.service_account.ServiceAccountCredentials, 'from_json_keyfile_dict', return_value=None
+    ).start()
+    mock.patch.object(googleapiclient.discovery, 'build', return_value=mock.MagicMock()).start()
 
 
 async def export() -> dict:
