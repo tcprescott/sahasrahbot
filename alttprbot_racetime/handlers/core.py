@@ -8,6 +8,7 @@ from racetime_bot import RaceHandler, can_monitor, monitor_cmd
 from alttprbot import events, models
 from alttprbot import tournaments
 from alttprbot.services import racetime_rooms, spoiler_races
+from alttprbot_racetime import telemetry
 
 
 def _countdown_message(timeleft: int) -> str:
@@ -34,9 +35,19 @@ class SahasrahBotCoreHandler(RaceHandler):
     unlisted = False
     spoiler_race: models.SpoilerRaces = None
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        # Every category's chat commands are traced and timed for Sentry.
+        telemetry.instrument_commands(cls)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.seed_rolled = False
+
+    async def consume(self, data):
+        # Tag whatever this message raises or logs with the room and category.
+        with telemetry.room_scope(self, data.get('type')):
+            await super().consume(data)
 
     async def begin(self):
         self.state['locked'] = False
@@ -337,3 +348,6 @@ class SahasrahBotCoreHandler(RaceHandler):
             return
 
         await self.override_stream(racetime_id)
+
+
+telemetry.instrument_commands(SahasrahBotCoreHandler)

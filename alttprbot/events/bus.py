@@ -18,14 +18,25 @@ The contract, borrowed from Wizzrobe's bus:
 
 This module imports nothing from the Discord, racetime or web packages, so any
 layer can publish.
+
+Sentry: ``events.published`` counts each event by ``event``; every delivery emits
+``event.calls`` / ``event.duration`` with ``event``, ``subscriber`` and ``outcome``,
+is a child span of whatever published it (when that is traced), and tags a
+failure with the event and subscriber. ``pending_count()`` feeds the
+``events.pending`` gauge.
 """
 
 import asyncio
 import itertools
 import logging
+import time
 from typing import Awaitable, Callable, Iterable, Type, Union
 
+import sentry_sdk
+
 from alttprbot.events.event import Event
+from alttprbot.observability import metrics
+from alttprbot.observability.sentry import sentry_tags
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +79,7 @@ def publish(event: Event) -> None:
     except RuntimeError:
         logger.warning("Dropped %s: published with no running event loop", event.name)
         return
+    metrics.count('events.published', attributes={'event': event.name})
 
     for classes, handler in _subscribers.values():
         if not isinstance(event, classes):
@@ -81,11 +93,34 @@ def publish(event: Event) -> None:
         task.add_done_callback(_pending.discard)
 
 
+def _subscriber_name(handler: Handler) -> str:
+    return str(getattr(handler, "__qualname__", None) or getattr(handler, "__name__", None) or handler)
+
+
 async def _deliver(handler: Handler, event: Event) -> None:
-    try:
-        await handler(event)
-    except Exception:
-        logger.exception("Event subscriber %s failed for %s", getattr(handler, "__qualname__", handler), event)
+    subscriber = _subscriber_name(handler)
+    started = time.perf_counter()
+    error = None
+    with sentry_tags(event=event.name, event_subscriber=subscriber):
+        try:
+            if sentry_sdk.get_current_span() is None:
+                await handler(event)
+            else:
+                with sentry_sdk.start_span(name=f"{event.name} -> {subscriber}", attributes={'sentry.op': 'event'}):
+                    await handler(event)
+        except Exception as e:
+            error = e
+            logger.exception("Event subscriber %s failed for %s", subscriber, event)
+        except asyncio.CancelledError as e:
+            error = e
+            raise
+        finally:
+            metrics.record_call('event', started, error, {'event': event.name, 'subscriber': subscriber})
+
+
+def pending_count() -> int:
+    """Deliveries scheduled and not yet finished."""
+    return len(_pending)
 
 
 async def drain() -> None:

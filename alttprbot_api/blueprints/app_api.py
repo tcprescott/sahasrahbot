@@ -14,6 +14,7 @@ from quart import Blueprint, abort, request
 from quart_discord import Unauthorized
 from quart_schema import tag, validate_querystring, validate_request, validate_response
 
+from alttprbot.observability import sentry as observability
 from alttprbot.services import accounts, presets, ranked_choice, tournament_submissions, triforce_texts
 from alttprbot_api import schemas
 from alttprbot_api.api import discord
@@ -65,6 +66,15 @@ async def get_session():
     """Who is signed in. Never 401: ``user`` is null when nobody is."""
     user = await signed_in_user()
     return schemas.SessionInfo(user=_session_user(user) if user else None)
+
+
+@app_api_blueprint.get('/telemetry')
+@tag(['session'])
+@validate_response(schemas.Telemetry)
+async def get_telemetry():
+    """Where the app reports its errors: the Sentry browser settings, or null when Sentry is off."""
+    config = observability.browser_config()
+    return schemas.Telemetry(sentry=schemas.BrowserSentry(**config) if config else None)
 
 
 @app_api_blueprint.get('/me')
