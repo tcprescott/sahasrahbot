@@ -5,12 +5,14 @@ import type { FC, SVGProps } from 'react'
 import AddIcon from '@material-symbols/svg-400/outlined/add.svg?react'
 import ArrowDownwardIcon from '@material-symbols/svg-400/outlined/arrow_downward.svg?react'
 import ArrowUpwardIcon from '@material-symbols/svg-400/outlined/arrow_upward.svg?react'
+import BarChartIcon from '@material-symbols/svg-400/outlined/bar_chart.svg?react'
 import BrightnessAutoIcon from '@material-symbols/svg-400/outlined/brightness_auto.svg?react'
 import CancelIcon from '@material-symbols/svg-400/outlined/cancel.svg?react'
 import ChangeHistoryIcon from '@material-symbols/svg-400/outlined/change_history.svg?react'
 import ChangeHistoryFillIcon from '@material-symbols/svg-400/outlined/change_history-fill.svg?react'
 import CheckCircleIcon from '@material-symbols/svg-400/outlined/check_circle.svg?react'
 import ChevronLeftIcon from '@material-symbols/svg-400/outlined/chevron_left.svg?react'
+import ChevronRightIcon from '@material-symbols/svg-400/outlined/chevron_right.svg?react'
 import CloseIcon from '@material-symbols/svg-400/outlined/close.svg?react'
 import DarkModeIcon from '@material-symbols/svg-400/outlined/dark_mode.svg?react'
 import DeleteIcon from '@material-symbols/svg-400/outlined/delete.svg?react'
@@ -24,6 +26,7 @@ import GavelIcon from '@material-symbols/svg-400/outlined/gavel.svg?react'
 import HomeIcon from '@material-symbols/svg-400/outlined/home.svg?react'
 import HomeFillIcon from '@material-symbols/svg-400/outlined/home-fill.svg?react'
 import HowToVoteIcon from '@material-symbols/svg-400/outlined/how_to_vote.svg?react'
+import HowToVoteFillIcon from '@material-symbols/svg-400/outlined/how_to_vote-fill.svg?react'
 import InfoIcon from '@material-symbols/svg-400/outlined/info.svg?react'
 import KeyboardArrowDownIcon from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?react'
 import LightModeIcon from '@material-symbols/svg-400/outlined/light_mode.svg?react'
@@ -49,11 +52,13 @@ export const ICONS = {
   add: AddIcon,
   arrow_downward: ArrowDownwardIcon,
   arrow_upward: ArrowUpwardIcon,
+  bar_chart: BarChartIcon,
   brightness_auto: BrightnessAutoIcon,
   cancel: CancelIcon,
   change_history: ChangeHistoryIcon,
   check_circle: CheckCircleIcon,
   chevron_left: ChevronLeftIcon,
+  chevron_right: ChevronRightIcon,
   close: CloseIcon,
   dark_mode: DarkModeIcon,
   delete: DeleteIcon,
@@ -91,5 +96,6 @@ export const FILLED: Partial<Record<IconName, Svg>> = {
   change_history: ChangeHistoryFillIcon,
   folder: FolderFillIcon,
   home: HomeFillIcon,
+  how_to_vote: HowToVoteFillIcon,
   person: PersonFillIcon,
 }

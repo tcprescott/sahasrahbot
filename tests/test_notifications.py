@@ -407,22 +407,25 @@ async def test_race_status_other_than_start_is_ignored(db, racetime_users):
 
 
 # ---------------------------------------------------------------------------
-# Ranked choice
+# Elections
 # ---------------------------------------------------------------------------
 
 
-async def test_ballot_cast_refreshes_the_post(db, monkeypatch):
+async def test_election_events_refresh_or_delete_the_post(monkeypatch):
     refresh = mock.AsyncMock()
-    monkeypatch.setattr(notifications.rankedchoice, "refresh_election_post", refresh)
-    election = await models.RankedChoiceElection.create(title="Vote", owner_id=1)
+    delete_post = mock.AsyncMock()
+    monkeypatch.setattr(notifications.election_posts, "refresh", refresh)
+    monkeypatch.setattr(notifications.election_posts, "delete_post", delete_post)
     bot = Bot()
     notifier = notifications.DiscordNotifier(bot)
 
-    await notifier.on_ranked_choice_ballot_cast(events.RankedChoiceBallotCast(election_id=election.id))
-    await notifier.on_ranked_choice_ballot_cast(events.RankedChoiceBallotCast(election_id=9999))
+    for event in (events.ElectionBallotCast(election_id=4), events.ElectionUpdated(election_id=4),
+                  events.ElectionClosed(election_id=4)):
+        await notifier.on_election_changed(event)
+    await notifier.on_election_deleted(events.ElectionDeleted(election_id=4, channel_id=300, message_id=700))
 
-    refresh.assert_awaited_once()
-    assert refresh.await_args.args[0].id == election.id and refresh.await_args.args[1] is bot
+    assert [c.args for c in refresh.await_args_list] == [(bot, 4)] * 3
+    delete_post.assert_awaited_once_with(bot, 300, 700)
 
 
 # ---------------------------------------------------------------------------

@@ -123,6 +123,7 @@ def test_register_jobs_registers_every_job():
     scheduled_jobs.register_jobs(scheduler)
     assert set(scheduler.jobs) == {
         'daily.check_for_new_daily',
+        'elections.close_due',
         'tournament.create_races',
         'tournament.week_races',
         'tournament.record_races',

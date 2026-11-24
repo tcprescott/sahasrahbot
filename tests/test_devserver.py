@@ -62,6 +62,15 @@ async def main():
     assert fixtures.ROLE_ASYNC_MOD in [r.id for r in member.roles]
     assert await discord_members.get_member(guild, fixtures.user("outsider")["id"]) is None
 
+    # The election directory (alttprbot_discord/elections.py) runs for real on the fakes.
+    from alttprbot.services import discord_directory
+    directory = discord_directory.get()
+    assert [g.id for g in await directory.admin_guilds(admin["id"])] == [fixtures.GUILD_ID]
+    assert await directory.admin_guilds(fixtures.user("mod")["id"]) == []
+    assert await directory.is_owner(admin["id"])
+    assert "#elections" in [c.name for c in await directory.text_channels(fixtures.GUILD_ID)]
+    assert "@Voter" in [r.name for r in await directory.roles(fixtures.GUILD_ID)]
+
     # Roles can be changed at runtime.
     r = await client.post(f"/_dev/members/{{fixtures.user('outsider')['id']}}",
                           json={{"guild_id": fixtures.GUILD_ID, "roles": ["Voter"]}})

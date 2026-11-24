@@ -18,7 +18,7 @@ import pytest
 import config
 from alttprbot import models, tournaments
 from alttprbot.alttprgen import generator, spoilers
-from alttprbot.util import discord_members, helpers, rankedchoice, speedgaming, triforce_text
+from alttprbot.util import discord_members, helpers, speedgaming, triforce_text
 
 # ---------------------------------------------------------------------------
 # helpers
@@ -155,42 +155,6 @@ async def test_generate_with_triforce_text(db, monkeypatch):
         "spoilers": "off",
         "branch": "tournament",
     }
-
-
-# ---------------------------------------------------------------------------
-# rankedchoice
-# ---------------------------------------------------------------------------
-
-
-async def test_ranked_choice_calculate_results(db):
-    election = await models.RankedChoiceElection.create(owner_id=1, title="Best", seats=1)
-    a, b, c = [await models.RankedChoiceCandidate.create(election=election, name=n) for n in "ABC"]
-    ballots = {10: [a, b], 11: [a], 12: [b, a], 13: [c, b], 14: [b]}
-    for voter, ranking in ballots.items():
-        for rank, candidate in enumerate(ranking, start=1):
-            await models.RankedChoiceVotes.create(election=election, user_id=voter, candidate=candidate, rank=rank)
-
-    await rankedchoice.calculate_results(election)
-
-    await election.refresh_from_db()
-    winners = await models.RankedChoiceCandidate.filter(election=election, winner=True).values_list("name", flat=True)
-    assert winners == ["B"]  # C is eliminated, its ballot moves to B: B 3 vs A 2
-    assert "B" in election.results
-
-
-async def test_ranked_choice_embed(db):
-    election = await models.RankedChoiceElection.create(
-        id=7, owner_id=1, title="Best", description="d", seats=2, private=True, voter_role_id=55, active=False
-    )
-    await models.RankedChoiceCandidate.create(election=election, name="A", winner=True)
-    await models.RankedChoiceCandidate.create(election=election, name="B")
-    await election.fetch_related("candidates")
-
-    fields = {f.name: f.value for f in rankedchoice.create_embed(election).fields}
-    assert fields["Candidates"] == "1. A ✅\n2. B "
-    assert fields["Authorized Voters Role"] == "<@&55>"
-    assert fields["Vote URL"] == f"{config.APP_URL}/ranked_choice/7"
-    assert fields["Status"] == "Closed"
 
 
 # ---------------------------------------------------------------------------

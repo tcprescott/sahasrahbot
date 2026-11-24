@@ -48,7 +48,7 @@ def test_event_names_are_unique_object_verb():
 
 
 def test_events_are_frozen():
-    event = events.RankedChoiceBallotCast(election_id=1)
+    event = events.ElectionBallotCast(election_id=1)
     with pytest.raises(dataclasses.FrozenInstanceError):
         event.election_id = 2
     assert event.occurred_at.tzinfo is not None
@@ -82,16 +82,16 @@ def test_publish_delivers_to_matching_subscribers_only():
     async def on_anything(event):
         received.append(("any", event.name))
 
-    events.subscribe(events.RankedChoiceBallotCast, on_ballot)
+    events.subscribe(events.ElectionBallotCast, on_ballot)
     events.subscribe(events.DailyChallengeAvailable, on_daily)
     events.subscribe(events.Event, on_anything)
 
     async def main():
-        events.publish(events.RankedChoiceBallotCast(election_id=7))
+        events.publish(events.ElectionBallotCast(election_id=7))
         await events.drain()
 
     run(main())
-    assert sorted(received) == [("any", "ranked_choice.ballot_cast"), ("ballot", 7)]
+    assert sorted(received) == [("any", "election.ballot_cast"), ("ballot", 7)]
 
 
 def test_subscribe_accepts_a_tuple_of_classes_and_unsubscribe_stops_delivery():
@@ -100,7 +100,7 @@ def test_subscribe_accepts_a_tuple_of_classes_and_unsubscribe_stops_delivery():
     async def handler(event):
         received.append(event.name)
 
-    token = events.subscribe((events.RankedChoiceBallotCast, events.DailyChallengeAvailable), handler)
+    token = events.subscribe((events.ElectionBallotCast, events.DailyChallengeAvailable), handler)
 
     async def main():
         events.publish(events.DailyChallengeAvailable(hash_id="abc"))
@@ -120,10 +120,10 @@ def test_publish_does_not_wait_for_subscribers():
         await asyncio.sleep(0)
         order.append("subscriber")
 
-    events.subscribe(events.RankedChoiceBallotCast, slow)
+    events.subscribe(events.ElectionBallotCast, slow)
 
     async def main():
-        events.publish(events.RankedChoiceBallotCast(election_id=1))
+        events.publish(events.ElectionBallotCast(election_id=1))
         order.append("publisher")
         await events.drain()
 
@@ -140,11 +140,11 @@ def test_a_failing_subscriber_does_not_reach_the_publisher_or_others(caplog):
     async def fine(event):
         received.append(event.election_id)
 
-    events.subscribe(events.RankedChoiceBallotCast, broken)
-    events.subscribe(events.RankedChoiceBallotCast, fine)
+    events.subscribe(events.ElectionBallotCast, broken)
+    events.subscribe(events.ElectionBallotCast, fine)
 
     async def main():
-        events.publish(events.RankedChoiceBallotCast(election_id=3))
+        events.publish(events.ElectionBallotCast(election_id=3))
         await events.drain()
 
     run(main())
@@ -156,14 +156,14 @@ def test_publish_without_a_loop_is_dropped_not_raised(caplog):
     async def handler(event):
         raise AssertionError("should not run")
 
-    events.subscribe(events.RankedChoiceBallotCast, handler)
-    events.publish(events.RankedChoiceBallotCast(election_id=1))
+    events.subscribe(events.ElectionBallotCast, handler)
+    events.publish(events.ElectionBallotCast(election_id=1))
     assert "no running event loop" in caplog.text
 
 
 def test_subscribe_rejects_sync_handlers_and_non_events():
     with pytest.raises(TypeError):
-        events.subscribe(events.RankedChoiceBallotCast, lambda e: None)
+        events.subscribe(events.ElectionBallotCast, lambda e: None)
 
     async def handler(event):
         pass

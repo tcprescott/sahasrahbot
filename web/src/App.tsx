@@ -7,6 +7,9 @@ import { NamespacesScreen } from './presets/NamespacesScreen'
 import { MyPresetsScreen } from './presets/MyPresetsScreen'
 import { NewPresetScreen } from './presets/NewPresetScreen'
 import { PresetScreen } from './presets/PresetScreen'
+import { ElectionFormScreen } from './elections/ElectionFormScreen'
+import { ElectionsScreen } from './elections/ElectionsScreen'
+import { ResultsScreen } from './elections/ResultsScreen'
 import { BallotScreen } from './ranked/BallotScreen'
 import { ErrorScreen } from './screens/ErrorScreen'
 import { HomeScreen } from './screens/HomeScreen'
@@ -42,6 +45,10 @@ export function App() {
                 <Route path="presets/manage/:namespace/:randomizer/:preset" element={<PresetScreen />} />
                 <Route path="presets/:namespace/create" element={<NewPresetScreen />} />
                 <Route path="ranked_choice/:electionId" element={<BallotScreen />} />
+                <Route path="elections" element={<ElectionsScreen />} />
+                <Route path="elections/new" element={<ElectionFormScreen />} />
+                <Route path="elections/:electionId/edit" element={<ElectionFormScreen />} />
+                <Route path="elections/:electionId/results" element={<ResultsScreen />} />
                 <Route path="triforcetexts/:pool" element={<TriforcePoolScreen />} />
                 <Route path="triforcetexts/:pool/moderation" element={<ModerationScreen />} />
                 <Route path="submit/:event" element={<SubmissionScreen />} />

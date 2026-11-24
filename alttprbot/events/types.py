@@ -106,14 +106,40 @@ class TournamentSettingsSubmitted(Event):
     players: tuple[TournamentPlayerRef, ...] = ()
 
 
-# --- ranked choice elections ------------------------------------------------
+# --- elections ----------------------------------------------------------------
 
 @_frozen
-class RankedChoiceBallotCast(Event):
-    """Someone submitted a ballot in a ranked choice election."""
-    name = "ranked_choice.ballot_cast"
+class ElectionBallotCast(Event):
+    """Someone cast or changed their ballot in an open election."""
+    name = "election.ballot_cast"
 
     election_id: int
+
+
+@_frozen
+class ElectionUpdated(Event):
+    """An admin edited an election that is already posted."""
+    name = "election.updated"
+
+    election_id: int
+
+
+@_frozen
+class ElectionClosed(Event):
+    """An election closed (by an admin, or at its closing time) and was counted."""
+    name = "election.closed"
+
+    election_id: int
+
+
+@_frozen
+class ElectionDeleted(Event):
+    """An admin deleted an election. ``message_id`` is its Discord post, if it had one."""
+    name = "election.deleted"
+
+    election_id: int
+    channel_id: Optional[int] = None
+    message_id: Optional[int] = None
 
 
 # --- scheduled jobs (published by the scheduler service) --------------------
@@ -189,7 +215,10 @@ ALL_EVENTS: tuple[type[Event], ...] = (
     TournamentAuditRecorded,
     TournamentCommentaryReady,
     TournamentSettingsSubmitted,
-    RankedChoiceBallotCast,
+    ElectionBallotCast,
+    ElectionUpdated,
+    ElectionClosed,
+    ElectionDeleted,
     DailyChallengeAvailable,
     TournamentRoomCreationFailed,
     RaceSubmissionReminderFailed,

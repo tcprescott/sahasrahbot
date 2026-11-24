@@ -7,7 +7,7 @@ the job does the work and publishes events, and a subscriber does any Discord ou
 from typing import Optional
 
 import config
-from alttprbot.services import daily, tournament_jobs
+from alttprbot.services import daily, elections, tournament_jobs
 from alttprbot.services.scheduler import Gate, Scheduler
 
 MINUTE = 60
@@ -27,6 +27,8 @@ def register_jobs(scheduler: Scheduler, discord_ready: Optional[Gate] = None) ->
     holds the Discord guild and channels. ``sahasrahbot.py`` passes that wait.
     """
     scheduler.add_interval_job('daily.check_for_new_daily', daily.check_for_new_daily, seconds=5 * MINUTE)
+    # Elections with a closing time are closed and counted within a minute of it.
+    scheduler.add_interval_job('elections.close_due', elections.close_due, seconds=MINUTE)
 
     scheduler.add_interval_job('tournament.create_races', tournament_jobs.create_races,
                                seconds=_tournament_interval(5 * MINUTE), wait_for=discord_ready)

@@ -21,7 +21,8 @@ from alttprbot_discord.cogs import discord_servers as servers_cog
 from alttprbot_discord.cogs import inquiry as inquiry_cog
 from alttprbot_discord.cogs import misc as misc_cog
 from alttprbot_discord.cogs import racer_verification as rv_cog
-from alttprbot_discord.cogs import rankedchoice as rc_cog
+from alttprbot_discord.cogs import elections as elections_cog
+from alttprbot_discord.elections import ElectionView
 from alttprbot_discord.cogs import role as role_cog
 from alttprbot_discord.cogs import sgdailies as sg_cog
 from alttprbot_discord.cogs import voicerole as voice_cog
@@ -565,7 +566,7 @@ async def test_persistent_views_are_added_once():
     for module, cog_class, view_class in [
         (inquiry_cog, "Inquiry", inquiry_cog.ConfirmInquiryThread),
         (rv_cog, "RacerVerification", rv_cog.RacerVerificationView),
-        (rc_cog, "RankedChoice", rc_cog.RankedChoiceMessageView),
+        (elections_cog, "Elections", ElectionView),
     ]:
         bot = FakeBot()
         cog = getattr(module, cog_class)(bot)
@@ -649,73 +650,3 @@ async def test_verify_button_checks_eligibility(monkeypatch, verification, eligi
         assert not await models.VerifiedRacer.exists()
 
 
-# ---------------------------------------------------------------------------
-# /rankedchoice and its End Election button
-# ---------------------------------------------------------------------------
-
-
-async def test_rankedchoice_create(db):
-    cog = rc_cog.RankedChoice(FakeBot())
-    interaction = FakeInteraction(user=FakeUser(user_id=7, administrator=True), guild=FakeGuild(guild_id=1))
-
-    await call(cog.create, cog, interaction, "Best game", " ALTTPR, SM ,SMZ3", seats=2,
-               authorized_voters_role=FakeRole(600))
-
-    election = await models.RankedChoiceElection.get().prefetch_related("candidates")
-    assert (election.owner_id, election.message_id, election.private, election.voter_role_id) == (7, 4242, True, 600)
-    assert [c.name for c in election.candidates] == ["ALTTPR", "SM", "SMZ3"]
-    sent = interaction.sent()
-    assert sent.embed.title == "Best game"
-    assert isinstance(sent.view, rc_cog.RankedChoiceMessageView)
-
-
-async def test_rankedchoice_create_refuses_a_non_admin(db):
-    """Only server admins and the bot owner may create an election."""
-    bot = FakeBot()
-    cog = rc_cog.RankedChoice(bot)
-    interaction = FakeInteraction(user=FakeUser(administrator=False), guild=FakeGuild(guild_id=1))
-
-    await call(cog.create, cog, interaction, "Anyone's election", "A,B")
-
-    assert interaction.sent().content == "You are not authorized to use this command."
-    assert not await models.RankedChoiceElection.exists(title="Anyone's election")
-
-
-@pytest.fixture
-async def election(db):
-    election = await models.RankedChoiceElection.create(
-        title="Vote", guild_id=1, channel_id=300, message_id=700, owner_id=7, seats=1,
-    )
-    await models.RankedChoiceCandidate.create(election=election, name="A")
-    return election
-
-
-async def test_end_election_refuses_non_owner_and_closed(election):
-    view = rc_cog.RankedChoiceMessageView(FakeBot())
-
-    stranger = FakeInteraction(user=FakeUser(user_id=8), message=FakeMessage(message_id=700))
-    await view.end_election.callback(stranger)
-    assert stranger.sent().content == "You are not the owner of this election."
-
-    election.active = False
-    await election.save()
-    owner = FakeInteraction(user=FakeUser(user_id=7), message=FakeMessage(message_id=700))
-    await view.end_election.callback(owner)
-    assert owner.sent().content == "This election is already closed."
-
-
-async def test_end_election_closes_and_refreshes(monkeypatch, election):
-    calculate = mock.AsyncMock()
-    refresh = mock.AsyncMock()
-    monkeypatch.setattr(rc_cog.rankedchoice, "calculate_results", calculate)
-    monkeypatch.setattr(rc_cog.rankedchoice, "refresh_election_post", refresh)
-    bot = FakeBot()
-    view = rc_cog.RankedChoiceMessageView(bot)
-    owner = FakeInteraction(user=FakeUser(user_id=7), message=FakeMessage(message_id=700))
-
-    await view.end_election.callback(owner)
-
-    assert owner.sent().content == "Successfully ended the election."
-    assert (await models.RankedChoiceElection.get(id=election.id)).active is False
-    calculate.assert_awaited_once()
-    assert refresh.await_args.args[1] is bot

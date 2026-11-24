@@ -102,18 +102,25 @@ async def test_all_features_load_together(db):
     assert counts["Users"] == len(testdata.rows(testdata.USERS, "Users"))
 
 
-async def test_ranked_choice_results_match_a_recount(db):
+async def test_ranked_choice_results_match_a_recount(db, directory):
+    """Elections closed before counts were stored are recounted on their results
+    page; the recount picks the winners production picked."""
     need("ranked_choice")
-    from alttprbot.util import rankedchoice
+    from alttprbot.services import elections
 
     await testdata.load("ranked_choice")
-    finished = [e for e in testdata.rows("ranked_choice", "RankedChoiceElection") if e["results"]]
+    finished = [e for e in testdata.rows("ranked_choice", "RankedChoiceElection") if e["results"] and not e["active"]]
     assert finished
+    won = collections.defaultdict(set)
+    for c in testdata.rows("ranked_choice", "RankedChoiceCandidate"):
+        if c["winner"]:
+            won[c["election_id"]].add(c["id"])
     for row in finished:
         election = await models.RankedChoiceElection.get(id=row["id"])
-        await rankedchoice.calculate_results(election)
-        await election.refresh_from_db()
-        assert election.results == row["results"]
+        election.status = "closed"
+        await election.save()
+        results = await elections.results(row["id"])
+        assert set(results["tally"]["winners"]) == won[row["id"]], row["title"]
 
 
 async def test_namespaced_presets_resolve(db):

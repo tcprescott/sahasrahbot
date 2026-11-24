@@ -92,18 +92,119 @@ class Candidate(BaseModel):
     name: str
 
 
+ElectionMethod = Literal['stv', 'approval', 'plurality']
+ElectionStatus = Literal['draft', 'open', 'closed']
+
+
 class Election(BaseModel):
+    """An open election, as a voter sees it."""
     id: int
     title: str
     description: Optional[str] = None
     private: bool
+    method: ElectionMethod = 'stv'
     seats: int
+    closes_at: Optional[datetime] = None
+    guild_name: Optional[str] = None
     candidates: list[Candidate]
-    ballot: Optional[list[int]] = Field(default=None, description="Candidate ids the viewer ranked, most preferred first; null until they vote")
+    ballot: Optional[list[int]] = Field(default=None, description="The viewer's ballot: candidate ids, most preferred first (approval: every one ticked); null until they vote")
+    voted_at: Optional[datetime] = None
 
 
 class BallotIn(BaseModel):
     ranking: list[int] = Field(description="Candidate ids, most preferred first. Candidates left out are unranked.")
+
+
+class ElectionBallotIn(BaseModel):
+    choices: list[int] = Field(description="Candidate ids: the ranking, most preferred first (stv); every candidate approved of (approval); or the one picked (plurality).")
+
+
+class ServerOption(BaseModel):
+    id: str
+    name: str
+
+
+class ServerList(BaseModel):
+    servers: list[ServerOption] = Field(description="Servers the viewer can run elections in; empty for everyone else")
+
+
+class ServerOptions(BaseModel):
+    channels: list[ServerOption]
+    roles: list[ServerOption]
+
+
+class ElectionSummary(BaseModel):
+    id: int
+    title: str
+    guild_id: Optional[str] = None
+    guild_name: Optional[str] = None
+    method: ElectionMethod
+    seats: int
+    status: ElectionStatus
+    closes_at: Optional[datetime] = None
+    closed_at: Optional[datetime] = None
+    ballots: int
+
+
+class ElectionList(BaseModel):
+    elections: list[ElectionSummary]
+
+
+class ElectionDetail(ElectionSummary):
+    """An election as its admins edit it."""
+    description: Optional[str] = None
+    channel_id: Optional[str] = None
+    message_id: Optional[str] = None
+    voter_role_id: Optional[str] = None
+    show_vote_count: bool
+    candidates: list[Candidate]
+    locked: bool = Field(description="Ballots are in (or it closed): candidates, method and winners can't change")
+
+
+class ElectionIn(BaseModel):
+    guild_id: str
+    channel_id: str
+    title: str = Field(max_length=200)
+    description: Optional[str] = Field(default=None, max_length=2000)
+    candidates: list[str] = Field(description="Candidate names in ballot order")
+    method: ElectionMethod = 'stv'
+    seats: int = Field(default=1, ge=1, description="Winners; only ranked (stv) elections can have more than one")
+    voter_role_id: Optional[str] = None
+    closes_at: Optional[datetime] = Field(default=None, description="When it closes by itself, with a time zone; null to close by hand")
+    show_vote_count: bool = True
+
+
+class TallyRow(BaseModel):
+    id: int
+    votes: float
+    status: Literal['elected', 'hopeful', 'eliminated']
+
+
+class TallyRound(BaseModel):
+    candidates: list[TallyRow]
+    exhausted: float = 0.0
+
+
+class Tally(BaseModel):
+    method: ElectionMethod
+    seats: int
+    ballots: int
+    quota: Optional[float] = None
+    rounds: list[TallyRound]
+    winners: list[int]
+    tie_broken: bool
+
+
+class ElectionResults(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    method: ElectionMethod
+    seats: int
+    closed_at: Optional[datetime] = None
+    guild_name: Optional[str] = None
+    candidates: list[Candidate]
+    tally: Tally
 
 
 TextStatus = Literal['pending', 'approved', 'rejected']

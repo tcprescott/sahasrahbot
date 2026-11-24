@@ -322,76 +322,148 @@ async def test_triforce_text_moderation(client, login):
 
 
 # ---------------------------------------------------------------------------
-# Ranked choice voting
+# Elections (the service itself is tested in tests/test_elections.py)
 # ---------------------------------------------------------------------------
 
+ADMIN, VOTER, OUTSIDER = 7, 9, 11
+GUILD = 5
 
-async def make_election(**kwargs):
+
+async def make_election(directory, status="open", method="stv", **kwargs):
+    directory.add_guild(GUILD, name="Community", admins=[ADMIN], members={VOTER: [77], 10: []})
     election = await models.RankedChoiceElection.create(
-        owner_id=1, title="Best", seats=1, channel_id=1, message_id=1, **kwargs)
-    a = await models.RankedChoiceCandidate.create(election=election, name="A")
-    b = await models.RankedChoiceCandidate.create(election=election, name="B")
-    c = await models.RankedChoiceCandidate.create(election=election, name="C")
+        owner_id=ADMIN, title="Best", seats=1, guild_id=GUILD, channel_id=300, message_id=1,
+        status=status, active=status == "open", method=method, **kwargs)
+    a = await models.RankedChoiceCandidate.create(election=election, name="A", position=0)
+    b = await models.RankedChoiceCandidate.create(election=election, name="B", position=1)
+    c = await models.RankedChoiceCandidate.create(election=election, name="C", position=2)
     return election, a, b, c
 
 
-async def test_ranked_choice_ballot_submission(client, login, monkeypatch):
-    election, a, b, c = await make_election()
+async def test_ballot_can_be_cast_and_changed(client, login, monkeypatch, directory):
+    election, a, b, c = await make_election(directory)
     published = []
     monkeypatch.setattr(events, "publish", published.append)
-    login(9)
+    login(VOTER)
 
-    status, body = await get_json(client, f"/api/v1/ranked-choice/{election.id}")
-    assert (status, body["ballot"], [x["name"] for x in body["candidates"]]) == (200, None, ["A", "B", "C"])
+    status, body = await get_json(client, f"/api/v1/elections/{election.id}/ballot")
+    assert (status, body["ballot"], body["guild_name"]) == (200, None, "Community")
+    assert [x["name"] for x in body["candidates"]] == ["A", "B", "C"]
 
+    status, body = await send_json(client, "PUT", f"/api/v1/elections/{election.id}/ballot", {"choices": [b.id, a.id]})
+    assert (status, body["ballot"]) == (200, [b.id, a.id])
+    assert body["voted_at"]
+    # The Discord post refresh is a subscriber's job (alttprbot_discord/notifications.py).
+    assert published == [events.ElectionBallotCast(election_id=election.id, occurred_at=published[0].occurred_at)]
+
+    status, body = await send_json(client, "PUT", f"/api/v1/elections/{election.id}/ballot", {"choices": [c.id]})
+    assert (status, body["ballot"]) == (200, [c.id])
+    votes = await models.RankedChoiceVotes.filter(user_id=VOTER)
+    assert [(v.candidate_id, v.rank) for v in votes] == [(c.id, 1)]
+
+
+async def test_old_ranked_choice_routes_still_work(client, login, directory):
+    election, a, b, c = await make_election(directory)
+    login(VOTER)
+    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 200
     status, body = await send_json(client, "POST", f"/api/v1/ranked-choice/{election.id}/ballot",
                                    {"ranking": [b.id, a.id]})
     assert (status, body["ballot"]) == (200, [b.id, a.id])
-    # The Discord post refresh is a subscriber's job (alttprbot_discord/notifications.py).
-    assert published == [events.RankedChoiceBallotCast(election_id=election.id, occurred_at=published[0].occurred_at)]
-    votes = await models.RankedChoiceVotes.filter(user_id=9).order_by("rank").prefetch_related("candidate")
-    assert [(v.candidate.name, v.rank) for v in votes] == [("B", 1), ("A", 2)]
-
-    again = await send_json(client, "POST", f"/api/v1/ranked-choice/{election.id}/ballot", {"ranking": [a.id]})
-    assert again[0] == 403  # one ballot per voter
 
 
-async def test_ranked_choice_rejects_bad_ballots(client, login):
-    """The old form's duplicate check only looked at the first rank (``dupcheck``
-    returned inside its loop); a ranking is now a list of distinct candidate ids."""
-    election, a, b, c = await make_election()
-    other, x, *_ = await make_election()
-    login(9)
-    path = f"/api/v1/ranked-choice/{election.id}/ballot"
-    for ranking in ([a.id, b.id, b.id], [], [x.id]):
-        status, _ = await send_json(client, "POST", path, {"ranking": ranking})
-        assert status == 400, ranking
+async def test_bad_ballots_are_refused(client, login, directory):
+    election, a, b, c = await make_election(directory)
+    other, x, *_ = await make_election(directory)
+    login(VOTER)
+    path = f"/api/v1/elections/{election.id}/ballot"
+    for choices in ([a.id, b.id, b.id], [], [x.id]):
+        status, _ = await send_json(client, "PUT", path, {"choices": choices})
+        assert status == 400, choices
     assert not await models.RankedChoiceVotes.exists()
 
 
-async def test_ranked_choice_inactive_or_missing(client, login):
-    login(9)
-    assert (await get_json(client, "/api/v1/ranked-choice/999"))[0] == 404
-    election = await models.RankedChoiceElection.create(owner_id=1, title="Old", active=False)
-    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 404
+async def test_closed_draft_or_missing_elections_take_no_ballots(client, login, directory):
+    login(VOTER)
+    assert (await get_json(client, "/api/v1/elections/999/ballot"))[0] == 404
+    closed, *_ = await make_election(directory, status="closed")
+    draft, *_ = await make_election(directory, status="draft")
+    assert (await get_json(client, f"/api/v1/elections/{closed.id}/ballot"))[0] == 404
+    assert (await get_json(client, f"/api/v1/elections/{draft.id}/ballot"))[0] == 404
 
 
-async def test_private_election_needs_the_voter_role(client, login, monkeypatch):
-    election, *_ = await make_election(private=True, guild_id=5, voter_role_id=77)
-    guild = SimpleNamespace(id=5)
-    monkeypatch.setattr(bots, "_discord_client", SimpleNamespace(fetch_guild=mock.AsyncMock(return_value=guild)))
-    members = {9: SimpleNamespace(roles=[SimpleNamespace(id=77)]), 10: SimpleNamespace(roles=[SimpleNamespace(id=1)])}
+async def test_only_server_members_with_the_role_vote(client, login, directory):
+    election, *_ = await make_election(directory, private=True, voter_role_id=77)
+    login(VOTER)
+    assert (await get_json(client, f"/api/v1/elections/{election.id}/ballot"))[0] == 200
+    login(10)  # a member without the role
+    assert (await get_json(client, f"/api/v1/elections/{election.id}/ballot"))[0] == 403
+    login(OUTSIDER)
+    assert (await get_json(client, f"/api/v1/elections/{election.id}/ballot"))[0] == 403
 
-    async def get_member(g, user_id):
-        return members.get(user_id)
 
-    monkeypatch.setattr("alttprbot.util.discord_members.get_member", get_member)
-    login(9)
-    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 200
-    login(10)
-    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 403
-    login(11)
-    assert (await get_json(client, f"/api/v1/ranked-choice/{election.id}"))[0] == 403
+async def test_admin_creates_posts_edits_and_closes(client, login, directory):
+    directory.add_guild(GUILD, name="Community", admins=[ADMIN], channels=[(300, "#votes")], roles=[(77, "@Voters")])
+    login(ADMIN)
+
+    status, body = await get_json(client, "/api/v1/elections/servers")
+    assert (status, body) == (200, {"servers": [{"id": str(GUILD), "name": "Community"}]})
+    status, body = await get_json(client, f"/api/v1/elections/servers/{GUILD}")
+    assert body == {"channels": [{"id": "300", "name": "#votes"}], "roles": [{"id": "77", "name": "@Voters"}]}
+
+    form = {"guild_id": str(GUILD), "channel_id": "300", "title": "Committee", "candidates": ["A", "B", "C"],
+            "method": "stv", "seats": 2, "voter_role_id": "77",
+            "closes_at": "2099-01-01T20:00:00+00:00"}
+    status, draft = await send_json(client, "POST", "/api/v1/elections", form)
+    assert status == 201
+    assert (draft["status"], draft["voter_role_id"], draft["guild_id"], draft["seats"]) == ("draft", "77", "5", 2)
+    assert [c["name"] for c in draft["candidates"]] == ["A", "B", "C"]
+
+    status, edited = await send_json(client, "PUT", f"/api/v1/elections/{draft['id']}", {**form, "title": "Committee 2027"})
+    assert (status, edited["title"]) == (200, "Committee 2027")
+
+    status, posted = await send_json(client, "POST", f"/api/v1/elections/{draft['id']}/publish", {})
+    assert (status, posted["status"], posted["message_id"]) == (200, "open", "9001")
+
+    status, body = await get_json(client, "/api/v1/elections")
+    assert [(e["id"], e["status"], e["ballots"]) for e in body["elections"]] == [(draft["id"], "open", 0)]
+
+    status, closed = await send_json(client, "POST", f"/api/v1/elections/{draft['id']}/close", {})
+    assert (status, closed["status"], closed["locked"]) == (200, "closed", True)
+
+    status, results = await get_json(client, f"/api/v1/elections/{draft['id']}/results")
+    assert (status, results["tally"]["ballots"], results["tally"]["winners"]) == (200, 0, [])
+
+    assert (await send_json(client, "DELETE", f"/api/v1/elections/{draft['id']}", None))[0] == 204
+    assert (await get_json(client, f"/api/v1/elections/{draft['id']}"))[0] == 404
+
+
+async def test_non_admins_cant_manage(client, login, directory):
+    election, *_ = await make_election(directory)
+    login(VOTER)
+    assert (await get_json(client, "/api/v1/elections/servers"))[1] == {"servers": []}
+    assert (await get_json(client, "/api/v1/elections"))[1] == {"elections": []}
+    assert (await get_json(client, f"/api/v1/elections/{election.id}"))[0] == 403
+    assert (await get_json(client, f"/api/v1/elections/servers/{GUILD}"))[0] == 403
+    assert (await send_json(client, "POST", f"/api/v1/elections/{election.id}/close", {}))[0] == 403
+    form = {"guild_id": str(GUILD), "channel_id": "300", "title": "Mine", "candidates": ["A", "B"]}
+    assert (await send_json(client, "POST", "/api/v1/elections", form))[0] == 403
+
+
+async def test_bad_ids_in_the_form_are_refused(client, login, directory):
+    directory.add_guild(GUILD, admins=[ADMIN])
+    login(ADMIN)
+    form = {"guild_id": "five", "channel_id": "300", "title": "X", "candidates": ["A", "B"]}
+    status, body = await send_json(client, "POST", "/api/v1/elections", form)
+    assert (status, body["error"]) == (400, "That server isn't a Discord id.")
+
+
+async def test_results_are_public_but_only_after_close(client, directory):
+    election, *_ = await make_election(directory)
+    assert (await get_json(client, f"/api/v1/elections/{election.id}/results"))[0] == 403
+    election.status, election.active = "closed", False
+    await election.save()
+    status, body = await get_json(client, f"/api/v1/elections/{election.id}/results")
+    assert (status, body["tally"]["method"]) == (200, "stv")
 
 
 # ---------------------------------------------------------------------------

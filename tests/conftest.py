@@ -103,6 +103,18 @@ async def db():
         await Tortoise.close_connections()
 
 
+@pytest.fixture
+def directory(monkeypatch):
+    """A fake Discord directory (tests/discord_fakes.py FakeDirectory) registered for
+    the election service. Add servers with ``directory.add_guild(...)``."""
+    from alttprbot.services import discord_directory
+    from tests.discord_fakes import FakeDirectory
+
+    fake = FakeDirectory()
+    monkeypatch.setattr(discord_directory, "_directory", fake)
+    return fake
+
+
 class FakeHTTPServer:
     """A real local HTTP server for code that builds its own aiohttp sessions.
 
