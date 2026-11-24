@@ -1,10 +1,10 @@
 from alttprbot.tournament.dailies.core import SGDailyRaceCore
-from alttprbot.tournament import settings
+from alttprbot.tournament import event_settings
 
 
 class SMZ3DailyRace(SGDailyRaceCore):
     async def configuration(self):
-        return settings.tournament_config("smz3")
+        return event_settings.tournament_config("smz3")
 
     @property
     def race_info(self):

@@ -12,7 +12,7 @@ from alttprbot.tournament.core import TournamentRace
 from alttprbot.util import triforce_text
 from alttprbot.util.seed_presenter import seed_embed, seed_tournament_embed
 from alttprbot.services import bots
-from alttprbot.tournament import settings
+from alttprbot.tournament import event_settings
 
 
 class ALTTPRTournamentRace(TournamentRace):
@@ -137,4 +137,4 @@ class ALTTPRTournamentRace(TournamentRace):
 
 class ALTTPR2024Race(TournamentRace):
     async def configuration(self):
-        return settings.tournament_config("alttpr")
+        return event_settings.tournament_config("alttpr")

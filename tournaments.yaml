@@ -1,7 +1,7 @@
 # Tournament and daily race settings, one entry per event slug.
 #
 # The key is the event slug that alttprbot/tournaments.py maps to a race class
-# (TOURNAMENT_DATA). alttprbot/tournament/settings.py turns an entry into the
+# (TOURNAMENT_DATA). alttprbot/tournament/event_settings.py turns an entry into the
 # TournamentConfig the race engine uses, resolving the Discord ids below with
 # the live bot. These are Discord ids, not secrets: change them here, in a
 # reviewed PR, when an event moves server or a season gets new channels/roles.

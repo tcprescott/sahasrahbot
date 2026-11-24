@@ -25,7 +25,7 @@ from alttprbot import events, models, tournaments
 from alttprbot.integrations import racetime
 from alttprbot.services import guild_config
 from alttprbot.tournament import core
-from alttprbot.tournament import settings as tournament_settings
+from alttprbot.tournament import event_settings as tournament_settings
 from alttprbot.util import rankedchoice
 from alttprbot_discord.util.seed_embeds import seed_embed
 

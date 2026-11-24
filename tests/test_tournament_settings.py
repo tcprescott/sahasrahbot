@@ -1,4 +1,4 @@
-"""tournaments.yaml and its loader (alttprbot/tournament/settings.py).
+"""tournaments.yaml and its loader (alttprbot/tournament/event_settings.py).
 
 The expected values below are the ones the tournament classes hardcoded before
 the ids moved to tournaments.yaml, so these tests pin that each event still
@@ -10,7 +10,7 @@ import pytest
 
 import config
 from alttprbot.services import bots
-from alttprbot.tournament import alttpr, alttprleague, dailies, settings, test as test_tournament
+from alttprbot.tournament import alttpr, alttprleague, dailies, event_settings as settings, test as test_tournament
 
 
 class FakeGuild:

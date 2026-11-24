@@ -6,7 +6,7 @@ from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.alttprgen import spoilers
 from alttprbot.tournament.alttpr import ALTTPRTournamentRace
-from alttprbot.tournament import settings
+from alttprbot.tournament import event_settings
 
 
 class ALTTPRLeague(ALTTPRTournamentRace):
@@ -46,7 +46,7 @@ class ALTTPRLeague(ALTTPRTournamentRace):
         await self.get_league_data()
 
     async def configuration(self):
-        return settings.tournament_config("invleague")
+        return event_settings.tournament_config("invleague")
 
     async def create_race_room(self):
         # if self.tournament_game is None or self.tournament_game.preset is None:
@@ -162,4 +162,4 @@ class ALTTPRLeague(ALTTPRTournamentRace):
 
 class ALTTPROpenLeague(ALTTPRLeague):
     async def configuration(self):
-        return settings.tournament_config("alttprleague")
+        return event_settings.tournament_config("alttprleague")
