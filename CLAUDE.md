@@ -1,8 +1,7 @@
 # SahasrahBot - Claude Development Guide
 
 SahasrahBot is a Discord and racetime.gg bot for the ALTTPR, SMZ3 and related randomizer
-communities. It rolls seeds, runs tournament and daily races, manages async tournaments,
-and serves a small Quart web app. One process (`sahasrahbot.py`) starts everything on a
+communities. It rolls seeds, runs tournament and daily races, and serves a small Quart web app. One process (`sahasrahbot.py`) starts everything on a
 single asyncio loop. It uses Tortoise ORM on MySQL, with Aerich migrations.
 
 This file is the always-loaded guide: the rules to follow on every task, and a map of
@@ -19,10 +18,10 @@ where things live. Read it before changing code.
   them. A hook (`check_privileged_intents.py`) enforces this.
 - **The audit bot was removed** (2026-11), along with other dead features (orphaned
   tournament classes, SG Live, `/cc2023`). Don't bring them back without asking.
-- **The async tournament feature stays.** Its code spans
-  `alttprbot_discord/cogs/asynctournament.py`, `alttprbot/util/asynctournament.py`,
-  `alttprbot_api/blueprints/asynctournament.py` and the `AsyncTournament*` models. Don't
-  remove or "clean up" any of it.
+- **The async tournament feature was removed** (2026-11) at the user's request, but its
+  `AsyncTournament*` models and tables stay, along with the rows the racetime.gg
+  account-merge in `alttprbot_api/blueprints/racetime.py` rewrites. Don't drop them
+  without asking.
 - **`master` is the base branch.** Branch from `master`, open PRs to `master`. The
   branch `master-backup` holds an abandoned three-tier rewrite (`alttprbot/presentation/`
   and so on); that code is not on master, so ignore any docs that describe it.
@@ -40,7 +39,7 @@ where things live. Read it before changing code.
 | `alttprbot/alttprgen/` | Seed generation, with no Discord, racetime or web imports: `generator.py` (preset classes per randomizer), `preset.py`, `randomizer/` (one API client per external randomizer, e.g. `alttpr.py`'s `ALTTPRClient`), `spoilers.py` |
 | `alttprbot/tournament/` | Tournament race logic, one class per event, built on `core.py`. `alttprbot/tournaments.py` maps racetime category goals to them (`TOURNAMENT_DATA`) |
 | `alttprbot/events/` | The event bridge: `types.py` (one frozen dataclass per event, listed in `ALL_EVENTS`), `bus.py` (`publish`, `subscribe`). Imports no front end |
-| `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `asynctournament.py`, `gsheet.py`, `triforce_text.py`, … |
+| `alttprbot/util/` | Shared helpers: `discord_members.py`, `speedgaming.py`, `gsheet.py`, `triforce_text.py`, … |
 | `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
 | `alttprbot_api/` | Quart web app on 127.0.0.1:5001: `api.py`, `auth.py` (Discord OAuth), `blueprints/`, `templates/`, `static/` |
@@ -103,7 +102,7 @@ code on master does today, so a refactor can be checked against them. Rules for 
   `bots.racetime_bot(category)`), which nothing registers in tests. Give it a fake with
   `monkeypatch.setattr(bots, "_discord_client", fake)` or
   `monkeypatch.setattr(bots, "_racetime_bots", {"alttpr": fake_bot})`.
-- `testdata` gives realistic data: `await testdata.load("asynctournament")` (inside the `db`
+- `testdata` gives realistic data: `await testdata.load("ranked_choice")` (inside the `db`
   fixture) inserts fake users plus that feature's rows, ids from 1001. Regenerate the files
   with `scripts/scrub_prod_dump.py`; never hand-edit them, and never commit a raw dump.
 - When today's behaviour looks wrong, still pin it, but name the test
@@ -154,8 +153,7 @@ a web change in a real browser (Playwright, or the `run` skill).
   stub. Add a fake under `devserver/fake_services.py` and point the setting at it in
   `devserver/bootstrap.py`.
 - **testdata:** after its hand-made rows the dev server also loads `testdata/` (ids from
-  1001, guilds "Prod-like Community N"), and gives the `admin` dev user access to those
-  tournaments and roles. Log in as a testdata user with `/_dev/login?user=<discord id>`.
+  1001, guilds "Prod-like Community N"). Log in as a testdata user with `/_dev/login?user=<discord id>`.
 - **Adding fixtures:** new pages usually need rows. Add them to `seed_database()` in
   `devserver/fixtures.py` with fixed ids, and add the page to `LINKS` in
   `devserver/dev_tools.py`. `tests/test_devserver.py` checks the fakes without a database.
@@ -199,8 +197,8 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
   registered in `alttprbot/services/scheduled_jobs.py`, never as `discord.ext.tasks`
   loops in a cog (a test enforces this). A job does the work and publishes an event;
   Discord output is a subscriber in `alttprbot_discord/notifications.py` (see the event bridge above).
-  When the job needs Discord's answer (the async race timeouts only forfeit once the
-  runner was told), it calls a function registered in `alttprbot_discord/gateways.py`.
+  When the job needs Discord's answer, it calls a function registered in
+  `alttprbot_discord/gateways.py`.
 - New racetime categories: add a handler in `alttprbot_racetime/handlers/`, an entry in
   `alttprbot_racetime/config.py`, and its `RACETIME_CLIENT_ID_<SLUG>` /
   `RACETIME_CLIENT_SECRET_<SLUG>` to the loop in `config.example.py`.

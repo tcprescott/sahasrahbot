@@ -158,10 +158,6 @@ def test_discord_gateways_register_seed_embeds(monkeypatch):
     from alttprbot_discord import gateways
     from alttprbot_discord.util import seed_embeds
 
-    # Leave the async tournament service's hooks alone; only the seed hook is under test.
-    monkeypatch.setattr(gateways.asynctournament_service, "set_member_role_lookup", lambda fn: None)
-    monkeypatch.setattr(gateways.asynctournament_jobs, "set_timeout_notifier", lambda fn: None)
-
     saved = (seed_presenter._embed_builder, seed_presenter._tournament_embed_builder)
     try:
         gateways.register()

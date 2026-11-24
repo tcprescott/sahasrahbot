@@ -21,12 +21,10 @@ app = create_app("http://localhost:5001")
 
 import alttprbot_discord.bot as bot_module
 from alttprbot_discord import gateways
-from alttprbot.services import asynctournament as asynctournament_service
 from alttprbot.util import discord_members
 from devserver.fake_discord import FakeDiscordBot
 assert isinstance(bot_module.discordbot, FakeDiscordBot)
 assert gateways.discordbot is bot_module.discordbot, "services must see the fake bot"
-assert asynctournament_service._member_role_lookup is gateways.member_role_ids, "gateways must be registered"
 
 async def main():
     client = app.test_client()

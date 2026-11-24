@@ -1,7 +1,7 @@
 # Agent guide
 
 **[CLAUDE.md](CLAUDE.md) is canonical.** Read it before writing code. It has the standing
-facts (no privileged intents, audit bot removed, async tournaments kept), the layout map,
+facts (no privileged intents, audit bot and async tournaments removed), the layout map,
 setup, the check command, and the coding conventions.
 
 - `./scripts/check.sh` runs what CI runs: ruff, the guardrail checks, and pytest.

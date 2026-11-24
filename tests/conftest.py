@@ -71,7 +71,6 @@ async def _clear_caches():
     """aiocache memory caches are module globals; don't let one test's entries leak into the next."""
     yield
     for name in (
-        "alttprbot.util.asynctournament",
         "alttprbot.services.guild_config",
         "alttprbot.database.role",
     ):

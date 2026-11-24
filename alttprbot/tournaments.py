@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 import config
 from alttprbot import models
-from alttprbot.tournament import test, dailies, alttprleague, alttpr_quals
+from alttprbot.tournament import test, dailies, alttprleague
 from alttprbot.util import gsheet
 from alttprbot.services import bots
 
@@ -26,9 +26,6 @@ if config.DEBUG:
     }
 else:
     TOURNAMENT_DATA = {
-        # Async tournament live qualifier races
-        'alttpr': alttpr_quals.ALTTPRQualifierRace,
-
         # Dailies/Weeklies
         'alttprdaily': dailies.AlttprSGDailyRace,
         'smz3': dailies.SMZ3DailyRace,

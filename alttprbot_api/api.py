@@ -29,7 +29,6 @@ sahasrahbotapi.register_blueprint(blueprints.ranked_choice_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.settingsgen_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.tournament_blueprint)
 sahasrahbotapi.register_blueprint(blueprints.triforcetexts_blueprint)
-sahasrahbotapi.register_blueprint(blueprints.asynctournament_blueprint, url_prefix="/async")
 
 if config.DEBUG:
     sahasrahbotapi.config['TEMPLATES_AUTO_RELOAD'] = True
