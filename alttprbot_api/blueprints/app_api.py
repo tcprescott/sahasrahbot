@@ -10,12 +10,15 @@ cross-site form can't set that header, which keeps the session cookie from being
 used against the user (CSRF).
 """
 
+from typing import Optional
+
 from quart import Blueprint, abort, request
 from quart_discord import Unauthorized
 from quart_schema import tag, validate_querystring, validate_request, validate_response
 
+from alttprbot.exceptions import InvalidInputError
 from alttprbot.observability import sentry as observability
-from alttprbot.services import accounts, presets, ranked_choice, tournament_submissions, triforce_texts
+from alttprbot.services import accounts, elections, presets, tournament_submissions, triforce_texts
 from alttprbot_api import schemas
 from alttprbot_api.api import discord
 
@@ -157,24 +160,178 @@ async def delete_preset(namespace: str, randomizer: str, preset: str):
     return '', 204
 
 
-# --- Ranked-choice voting ----------------------------------------------------
+# --- Elections ---------------------------------------------------------------
 
+
+def _id(value) -> Optional[str]:
+    return None if value is None else str(value)
+
+
+def _int_id(value: Optional[str], what: str) -> Optional[int]:
+    if value in (None, ''):
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        raise InvalidInputError(f"That {what} isn't a Discord id.") from None
+
+
+def _summary(data: dict) -> dict:
+    return {**data, 'guild_id': _id(data['guild_id'])}
+
+
+def _detail(data: dict) -> schemas.ElectionDetail:
+    return schemas.ElectionDetail(**{
+        **_summary(data),
+        'channel_id': _id(data['channel_id']),
+        'message_id': _id(data['message_id']),
+        'voter_role_id': _id(data['voter_role_id']),
+    })
+
+
+def _election_input(data: schemas.ElectionIn) -> elections.ElectionInput:
+    return elections.ElectionInput(
+        guild_id=_int_id(data.guild_id, 'server'),
+        channel_id=_int_id(data.channel_id, 'channel'),
+        title=data.title,
+        description=data.description,
+        candidates=data.candidates,
+        method=data.method,
+        seats=data.seats,
+        voter_role_id=_int_id(data.voter_role_id, 'role'),
+        closes_at=data.closes_at,
+        show_vote_count=data.show_vote_count,
+    )
+
+
+@app_api_blueprint.get('/elections/servers')
+@tag(['elections'])
+@validate_response(schemas.ServerList)
+async def election_servers():
+    """Servers the viewer can run elections in. Empty means they can't run any (the web app hides the Elections tab)."""
+    user = await require_user()
+    return schemas.ServerList(servers=[schemas.ServerOption(id=str(s['id']), name=s['name'])
+                                       for s in await elections.servers(user.id)])
+
+
+@app_api_blueprint.get('/elections/servers/<int:guild_id>')
+@tag(['elections'])
+@validate_response(schemas.ServerOptions)
+async def election_server_options(guild_id: int):
+    """The channels the bot can post in and the roles, for the create form."""
+    user = await require_user()
+    options = await elections.server_options(guild_id, user.id)
+    return schemas.ServerOptions(
+        channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in options['channels']],
+        roles=[schemas.ServerOption(id=str(r['id']), name=r['name']) for r in options['roles']],
+    )
+
+
+@app_api_blueprint.get('/elections')
+@tag(['elections'])
+@validate_response(schemas.ElectionList)
+async def list_elections():
+    user = await require_user()
+    return schemas.ElectionList(elections=[schemas.ElectionSummary(**_summary(e))
+                                           for e in await elections.list_elections(user.id)])
+
+
+@app_api_blueprint.post('/elections')
+@tag(['elections'])
+@validate_request(schemas.ElectionIn)
+@validate_response(schemas.ElectionDetail, 201)
+async def create_election(data: schemas.ElectionIn):
+    """Save a new election as a draft. Post it with ``POST /elections/{id}/publish``."""
+    user = await require_user()
+    return _detail(await elections.create_draft(user.id, _election_input(data))), 201
+
+
+@app_api_blueprint.get('/elections/<int:election_id>')
+@tag(['elections'])
+@validate_response(schemas.ElectionDetail)
+async def get_election_detail(election_id: int):
+    user = await require_user()
+    return _detail(await elections.get_for_admin(election_id, user.id))
+
+
+@app_api_blueprint.put('/elections/<int:election_id>')
+@tag(['elections'])
+@validate_request(schemas.ElectionIn)
+@validate_response(schemas.ElectionDetail)
+async def update_election(election_id: int, data: schemas.ElectionIn):
+    user = await require_user()
+    return _detail(await elections.update(election_id, user.id, _election_input(data)))
+
+
+@app_api_blueprint.delete('/elections/<int:election_id>')
+@tag(['elections'])
+async def delete_election(election_id: int):
+    user = await require_user()
+    await elections.delete(election_id, user.id)
+    return '', 204
+
+
+@app_api_blueprint.post('/elections/<int:election_id>/publish')
+@tag(['elections'])
+@validate_response(schemas.ElectionDetail)
+async def publish_election(election_id: int):
+    """Post a draft in its Discord channel and open voting."""
+    user = await require_user()
+    return _detail(await elections.publish(election_id, user.id))
+
+
+@app_api_blueprint.post('/elections/<int:election_id>/close')
+@tag(['elections'])
+@validate_response(schemas.ElectionDetail)
+async def close_election(election_id: int):
+    """End voting now and count the ballots."""
+    user = await require_user()
+    return _detail(await elections.close(election_id, user.id))
+
+
+@app_api_blueprint.get('/elections/<int:election_id>/ballot')
+@tag(['elections'])
+@validate_response(schemas.Election)
+async def get_election_ballot(election_id: int):
+    user = await require_user()
+    return schemas.Election(**await elections.get_ballot(election_id, user.id))
+
+
+@app_api_blueprint.put('/elections/<int:election_id>/ballot')
+@tag(['elections'])
+@validate_request(schemas.ElectionBallotIn)
+@validate_response(schemas.Election)
+async def put_election_ballot(election_id: int, data: schemas.ElectionBallotIn):
+    """Cast or replace the viewer's ballot; the latest one counts."""
+    user = await require_user()
+    return schemas.Election(**await elections.cast_ballot(election_id, user.id, data.choices))
+
+
+@app_api_blueprint.get('/elections/<int:election_id>/results')
+@tag(['elections'])
+@validate_response(schemas.ElectionResults)
+async def election_results(election_id: int):
+    """The count, public once the election has closed. No sign-in needed."""
+    return schemas.ElectionResults(**await elections.results(election_id))
+
+
+# The ballot routes the web app used before /elections; kept until it switches.
 
 @app_api_blueprint.get('/ranked-choice/<int:election_id>')
-@tag(['ranked choice'])
+@tag(['elections'])
 @validate_response(schemas.Election)
 async def get_election(election_id: int):
     user = await require_user()
-    return schemas.Election(**await ranked_choice.get_ballot(election_id, user.id))
+    return schemas.Election(**await elections.get_ballot(election_id, user.id))
 
 
 @app_api_blueprint.post('/ranked-choice/<int:election_id>/ballot')
-@tag(['ranked choice'])
+@tag(['elections'])
 @validate_request(schemas.BallotIn)
 @validate_response(schemas.Election)
 async def cast_ballot(election_id: int, data: schemas.BallotIn):
     user = await require_user()
-    return schemas.Election(**await ranked_choice.cast_ballot(election_id, user.id, data.ranking))
+    return schemas.Election(**await elections.cast_ballot(election_id, user.id, data.ranking))
 
 
 # --- Triforce texts ----------------------------------------------------------

@@ -12,7 +12,7 @@ from tortoise.exceptions import DoesNotExist
 import testdata
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
-from alttprbot.services import (accounts, api_keys, generated_games, inquiries, presets, ranked_choice,
+from alttprbot.services import (accounts, api_keys, generated_games, inquiries, presets,
                                 rtgg_watchers, scheduled_events, tournament_games)
 
 DISCORD_ID = 4242
@@ -101,58 +101,6 @@ async def test_racetime_command_key(db):
     assert await api_keys.can_run_racetime_command("secret", "alttpr") is True
     assert await api_keys.can_run_racetime_command("secret", "smz3") is False
     assert await api_keys.can_run_racetime_command("wrong", "alttpr") is False
-
-
-# ---------------------------------------------------------------------------
-# ranked choice elections from Discord
-# ---------------------------------------------------------------------------
-
-
-async def _election(**overrides):
-    kwargs = dict(title="Vote", description=None, candidates=[" Alex", "Blair ", "Casey"], seats=1,
-                  guild_id=1, channel_id=2, owner_id=OWNER, voter_role_id=None, show_vote_count=True)
-    return await ranked_choice.create_election(**{**kwargs, **overrides})
-
-
-async def test_create_election(db):
-    election = await _election()
-    assert (election.active, election.private, election.message_id) == (True, False, None)
-    assert [c.name for c in election.candidates] == ["Alex", "Blair", "Casey"]
-    assert list(election.votes) == []
-
-    private = await _election(voter_role_id=99)
-    assert (private.private, private.voter_role_id) == (True, 99)
-
-
-async def test_set_message_id_and_get_election(db):
-    election = await _election()
-    await ranked_choice.set_message_id(election.id, 5555)
-    assert (await ranked_choice.get_election(election.id)).message_id == 5555
-    assert await ranked_choice.get_election(987654) is None
-
-
-async def test_end_election(db):
-    election = await _election()
-    await ranked_choice.set_message_id(election.id, 5555)
-    blair = next(c for c in election.candidates if c.name == "Blair")
-    alex = next(c for c in election.candidates if c.name == "Alex")
-    await models.RankedChoiceVotes.create(election=election, candidate=blair, user_id=1, rank=1)
-    await models.RankedChoiceVotes.create(election=election, candidate=blair, user_id=2, rank=1)
-    await models.RankedChoiceVotes.create(election=election, candidate=alex, user_id=3, rank=1)
-
-    with pytest.raises(PermissionDeniedError, match="not the owner"):
-        await ranked_choice.end_election(5555, OTHER)
-    assert (await ranked_choice.get_election(election.id)).active is True
-
-    closed = await ranked_choice.end_election(5555, OWNER)
-    assert closed.active is False
-    assert closed.results
-    assert {c.name for c in await models.RankedChoiceCandidate.filter(election=election, winner=True)} == {"Blair"}
-
-    with pytest.raises(InvalidInputError, match="already closed"):
-        await ranked_choice.end_election(5555, OWNER)
-    with pytest.raises(DoesNotExist):
-        await ranked_choice.end_election(1, OWNER)
 
 
 # ---------------------------------------------------------------------------

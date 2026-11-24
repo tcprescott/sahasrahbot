@@ -447,7 +447,16 @@ class RankedChoiceElection(Model):
     seats = fields.SmallIntField(null=False, default=1)
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
+    # pyrankvote's text report, for elections closed before the counts were stored in `tally`.
     results = fields.TextField(null=True)
+    # How ballots are counted: 'stv' (ranked; instant runoff for one seat), 'approval' or 'plurality'.
+    method = fields.CharField(16, null=False, default='stv')
+    # 'draft' (not posted yet), 'open' or 'closed'. `active` is kept in step (True only while open).
+    status = fields.CharField(16, null=False, default='open')
+    closes_at = fields.DatetimeField(null=True)
+    closed_at = fields.DatetimeField(null=True)
+    # The stored count (alttprbot/services/election_count.py), set when it closes.
+    tally = fields.JSONField(null=True)
 
 
 class RankedChoiceAuthorizedVoters(Model):
@@ -469,6 +478,8 @@ class RankedChoiceCandidate(Model):
     created = fields.DatetimeField(auto_now_add=True)
     updated = fields.DatetimeField(auto_now=True)
     winner = fields.BooleanField(null=True)
+    # Ballot order; candidates from before this column all have 0 and fall back to id order.
+    position = fields.IntField(null=False, default=0)
 
 
 class RankedChoiceVotes(Model):

@@ -273,7 +273,7 @@ optional and documented in `config.example.py`. The SDK is **sentry-sdk 3.x**
 - **Notifications go through the event bridge.** When domain or service code (tournaments,
   racetime handlers, web blueprints, scheduled jobs) needs to tell someone something
   happened, it publishes an event instead of calling Discord:
-  `events.publish(events.RankedChoiceBallotCast(election_id=...))` with
+  `events.publish(events.ElectionBallotCast(election_id=...))` with
   `from alttprbot import events`. `publish` is synchronous, never blocks and never raises.
   Define the event in `alttprbot/events/types.py` (frozen dataclass, `name = "object.verb"`,
   plain data only, add it to `ALL_EVENTS`) and handle it in
@@ -313,7 +313,8 @@ optional and documented in `config.example.py`. The SDK is **sentry-sdk 3.x**
   core but not each other. `.claude/scripts/check_layers.py` enforces this (hook, CI and
   `check.sh`). `layer_allowlist.txt` is empty now; never add a line to it. When core needs
   a front end's live object, the front end registers it at startup instead: the bots via
-  `alttprbot/services/bots.py`, other lookups via `alttprbot_discord/gateways.py`.
+  `alttprbot/services/bots.py`, other lookups via `alttprbot_discord/gateways.py`
+  (elections use `alttprbot/services/discord_directory.py`, registered there too).
 - **Data access lives in services.** The front ends never query a model themselves:
   `.claude/scripts/check_model_queries.py` rejects `models.X.filter(...)`, `.get_or_none`,
   `.create`, `.update_or_create` and the other query methods in `alttprbot_discord/`,

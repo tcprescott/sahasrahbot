@@ -14,7 +14,10 @@ parameters they ignore, because the app awaits them and passes those arguments.
 import datetime
 import itertools
 import logging
+from types import SimpleNamespace
 from typing import Dict, List, Optional
+
+import discord
 
 logger = logging.getLogger("devserver.discord")
 
@@ -71,6 +74,15 @@ class FakeRole:
         self.name = name
         self.color = color
         self.mention = f"<@&{self.id}>"
+        self.managed = False
+
+    @property
+    def position(self) -> int:
+        roles = self.guild.roles
+        return roles.index(self) if self in roles else 0
+
+    def is_default(self) -> bool:
+        return self.id == self.guild.id
 
     def __eq__(self, other):
         return isinstance(other, FakeRole) and other.id == self.id
@@ -144,6 +156,11 @@ class FakeMember(FakeUser):
         roles += [r for r in (self.guild.get_role(rid) for rid in self._role_ids) if r is not None]
         return roles
 
+    @property
+    def guild_permissions(self):
+        # Anyone holding a role named "Admin" counts as a server Administrator.
+        return SimpleNamespace(administrator=any(r.name == "Admin" for r in self.roles))
+
     async def add_roles(self, *roles, **kwargs):  # NOSONAR
         for role in roles:
             if role.id not in self._role_ids:
@@ -164,6 +181,8 @@ class FakeChannel:
         self.id = int(id)
         self.name = name
         self.mention = f"<#{self.id}>"
+        self.type = discord.ChannelType.text
+        self.position = int(id)
         self.jump_url = f"https://discord.com/channels/{guild.id if guild else '@me'}/{self.id}"
 
     async def send(self, content=None, **kwargs):  # NOSONAR
@@ -195,6 +214,13 @@ class FakeGuild:
         self._channels: Dict[int, FakeChannel] = {}
         self._members: Dict[int, FakeMember] = {}
         self.emojis = []
+        self.me = None  # the bot may post anywhere
+
+    async def fetch_roles(self) -> List[FakeRole]:  # NOSONAR
+        return self.roles
+
+    async def fetch_channels(self) -> List["FakeChannel"]:  # NOSONAR
+        return self.channels
 
     # roles
     @property
@@ -363,6 +389,9 @@ class FakeDiscordBot:
         if user is None:
             raise _not_found(f"Unknown User {user_id}")
         return user
+
+    async def is_owner(self, user) -> bool:  # NOSONAR
+        return user.id == self.world.owner_id
 
     async def application_info(self):  # NOSONAR
         return _AppInfo(self.get_user(self.world.owner_id) or self.user)

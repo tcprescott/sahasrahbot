@@ -191,3 +191,55 @@ async def call(command, cog, *args, **kwargs):
     if callback is not None:
         return await callback(cog, *args, **kwargs)
     return await command(*args, **kwargs)
+
+
+class FakeDirectory:
+    """A stand-in for ``alttprbot.services.discord_directory``: who owns the bot,
+    which servers exist, who's in them with which roles, and who administers them.
+    Register it with the ``directory`` fixture (tests/conftest.py)."""
+
+    def __init__(self, owner=None):
+        from alttprbot.services.discord_directory import Named
+        self._named = Named
+        self.owner = owner
+        self.guilds = {}
+        self.posted = []
+        self.post_error = None
+
+    def add_guild(self, guild_id, name="Test Server", admins=(), members=None, channels=((300, "#general"),),
+                  roles=((77, "@Voters"),)):
+        self.guilds[guild_id] = {
+            "name": name, "admins": set(admins), "members": dict(members or {}),
+            "channels": list(channels), "roles": list(roles),
+        }
+        for admin in admins:
+            self.guilds[guild_id]["members"].setdefault(admin, [])
+        return self
+
+    async def is_owner(self, user_id):
+        return user_id == self.owner
+
+    async def admin_guilds(self, user_id):
+        return [self._named(gid, g["name"]) for gid, g in self.guilds.items() if user_id in g["admins"]]
+
+    async def is_admin(self, guild_id, user_id):
+        return user_id in self.guilds.get(guild_id, {}).get("admins", set())
+
+    async def member_role_ids(self, guild_id, user_id):
+        members = self.guilds.get(guild_id, {}).get("members", {})
+        return list(members[user_id]) if user_id in members else None
+
+    async def guild_name(self, guild_id):
+        return self.guilds.get(guild_id, {}).get("name")
+
+    async def text_channels(self, guild_id):
+        return [self._named(i, n) for i, n in self.guilds.get(guild_id, {}).get("channels", [])]
+
+    async def roles(self, guild_id):
+        return [self._named(i, n) for i, n in self.guilds.get(guild_id, {}).get("roles", [])]
+
+    async def post_election(self, election_id):
+        if self.post_error:
+            raise self.post_error
+        self.posted.append(election_id)
+        return 9000 + len(self.posted)

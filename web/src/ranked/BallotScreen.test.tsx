@@ -13,6 +13,10 @@ const election = (overrides: Partial<Election> = {}): Election => ({
   description: null,
   private: false,
   seats: 1,
+  method: 'stv',
+  closes_at: null,
+  guild_name: null,
+  voted_at: null,
   candidates: [
     { id: 1, name: 'Agahnim' },
     { id: 2, name: 'Moldorm' },

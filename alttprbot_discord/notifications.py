@@ -23,10 +23,10 @@ from discord.ext import commands
 import config
 from alttprbot import events, tournaments
 from alttprbot.integrations import racetime
-from alttprbot.services import guild_config, ranked_choice, rtgg_watchers, scheduled_events
+from alttprbot.services import guild_config, rtgg_watchers, scheduled_events
 from alttprbot.tournament import core
 from alttprbot.tournament import event_settings as tournament_settings
-from alttprbot.util import rankedchoice
+from alttprbot_discord import elections as election_posts
 from alttprbot_discord.util.seed_embeds import seed_embed
 
 logger = logging.getLogger(__name__)
@@ -448,14 +448,16 @@ class DiscordNotifier:
                 )
                 await channel.send(embed=embed)
 
-    # --- ranked choice elections ----------------------------------------------
+    # --- elections ------------------------------------------------------------
 
-    async def on_ranked_choice_ballot_cast(self, event: events.RankedChoiceBallotCast):
+    async def on_election_changed(self, event):
+        """A ballot was cast, the election was edited, or it closed: redraw its post."""
         await wait_until_ready(self.bot)
-        election = await ranked_choice.get_election(event.election_id)
-        if election is None:
-            return
-        await rankedchoice.refresh_election_post(election, self.bot)
+        await election_posts.refresh(self.bot, event.election_id)
+
+    async def on_election_deleted(self, event: events.ElectionDeleted):
+        await wait_until_ready(self.bot)
+        await election_posts.delete_post(self.bot, event.channel_id, event.message_id)
 
 
 _tokens: list[int] = []
@@ -472,7 +474,9 @@ def register(bot: commands.Bot) -> DiscordNotifier:
         events.subscribe(events.TournamentCommentaryReady, notifier.on_tournament_commentary_ready),
         events.subscribe(events.TournamentSettingsSubmitted, notifier.on_tournament_settings_submitted),
         events.subscribe(events.RaceStatusChanged, notifier.on_race_status_changed),
-        events.subscribe(events.RankedChoiceBallotCast, notifier.on_ranked_choice_ballot_cast),
+        events.subscribe((events.ElectionBallotCast, events.ElectionUpdated, events.ElectionClosed),
+                         notifier.on_election_changed),
+        events.subscribe(events.ElectionDeleted, notifier.on_election_deleted),
         events.subscribe(events.DailyChallengeAvailable, jobs.announce_daily),
         events.subscribe(events.TournamentRoomCreationFailed, jobs.report_room_creation_failed),
         events.subscribe(events.RaceSubmissionReminderFailed, jobs.report_submission_reminder_failed),

@@ -3,11 +3,11 @@
 Publish from any layer, without importing the Discord bot::
 
     from alttprbot import events
-    events.publish(events.RankedChoiceBallotCast(election_id=election.id))
+    events.publish(events.ElectionBallotCast(election_id=election.id))
 
 Subscribe at startup with an async handler::
 
-    events.subscribe(events.RankedChoiceBallotCast, handler)
+    events.subscribe(events.ElectionBallotCast, handler)
 
 Discord subscribers live in ``alttprbot_discord/notifications.py`` and are
 registered by ``sahasrahbot.py``. See ``bus.py`` for the delivery contract.
@@ -23,7 +23,10 @@ from alttprbot.events.types import (
     TournamentCommentaryReady,
     TournamentPlayerRef,
     TournamentSettingsSubmitted,
-    RankedChoiceBallotCast,
+    ElectionBallotCast,
+    ElectionUpdated,
+    ElectionClosed,
+    ElectionDeleted,
     DailyChallengeAvailable,
     TournamentRoomCreationFailed,
     RaceSubmissionReminderFailed,
@@ -47,7 +50,10 @@ __all__ = [
     "TournamentCommentaryReady",
     "TournamentPlayerRef",
     "TournamentSettingsSubmitted",
-    "RankedChoiceBallotCast",
+    "ElectionBallotCast",
+    "ElectionUpdated",
+    "ElectionClosed",
+    "ElectionDeleted",
     "DailyChallengeAvailable",
     "TournamentRoomCreationFailed",
     "RaceSubmissionReminderFailed",

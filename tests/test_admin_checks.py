@@ -1,5 +1,6 @@
-"""/racerverification create_or_update and /rankedchoice create are for server
-admins and the bot's owner only. They used to compare the un-awaited
+"""/racerverification create_or_update is for server admins and the bot's owner
+only. (Elections, which shared the bug, are now run from the website; their admin
+check is in tests/test_elections.py.) It used to compare the un-awaited
 ``bot.is_owner()`` coroutine with False, which never matched, so anyone could
 run them (and, through racer verification, have the bot hand out any role).
 """
@@ -10,9 +11,7 @@ from unittest import mock
 import pytest
 
 from alttprbot.services import racer_verification as verification
-from alttprbot.services import ranked_choice
 from alttprbot_discord.cogs import racer_verification as rv_cog
-from alttprbot_discord.cogs import rankedchoice as rc_cog
 
 
 def interaction(administrator):
@@ -31,7 +30,6 @@ def bot(owner):
 COMMANDS = [
     (rv_cog.RacerVerification, "create_or_update", verification, "create_or_update",
      lambda: (SimpleNamespace(id=501),)),
-    (rc_cog.RankedChoice, "create", ranked_choice, "create_election", lambda: ("Title", "A,B")),
 ]
 
 
