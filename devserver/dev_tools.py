@@ -147,6 +147,10 @@ LINKS = [
     ("Ranked choice: Voter-only election", "/ranked_choice/2"),
     ("Triforce texts: submit", "/triforcetexts/dev"),
     ("Triforce texts: moderation (admin)", "/triforcetexts/dev/moderation"),
+    ("testdata: active async tournament (prod-shaped)", "/async/races/1001/leaderboard"),
+    ("testdata: big qualifier leaderboard", "/async/races/1003/leaderboard"),
+    ("testdata: active role-gated election", "/ranked_choice/1004"),
+    ("testdata: all preset namespaces", "/presets"),
     ("Racetime verification", "/racetime/verification/initiate"),
     ("Schedule (DEBUG)", "/schedule/devevent"),
     ("SG Live", "/sglive/"),
@@ -162,8 +166,13 @@ async def index():
     current = world.users.get(int(current_id)) if current_id else None
     keys = {u["id"]: u for u in fixtures.USERS}
 
+    import testdata
+
+    testdata_ids = {m["id"] for m in testdata.world()["members"]}
     rows = []
     for u in world.users.values():
+        if u.id in testdata_ids:
+            continue
         spec = keys.get(u.id, {})
         forms = []
         for g in world.guilds.values():
@@ -184,6 +193,12 @@ async def index():
             f'<span class="muted">{u.id}</span><div class="muted">{html.escape(spec.get("description", "Added at runtime."))}</div></div>'
             f'<a class="button" href="{html.escape(login)}">Log in as</a></div>{"".join(forms)}</div>')
 
+    rows.append(
+        f'<details class="card" style="display:block"><summary><b>{len(testdata_ids)} users from testdata/</b> '
+        '<span class="muted">anonymized, production-shaped; log in with ?user=&lt;id&gt;</span></summary>'
+        + " ".join(f'<a href="/_dev/login?user={uid}&amp;next=/_dev/">{html.escape(world.users[uid].name)}</a>'
+                   for uid in sorted(testdata_ids) if uid in world.users)
+        + '</details>')
     links = "".join(f'<li><a href="{href}">{html.escape(name)}</a></li>' for name, href in LINKS)
     outbox = "".join(
         f'<div class="card" style="display:block"><b>{html.escape(m["target"])}</b> '

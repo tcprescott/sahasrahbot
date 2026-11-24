@@ -129,7 +129,32 @@ def build_world() -> FakeWorld:
         world.guilds[guild.id] = guild
     for spec in USERS:
         add_user(world, spec["id"], spec["name"], spec["memberships"])
+    add_testdata_world(world)
     return world
+
+
+def add_testdata_world(world: FakeWorld) -> None:
+    """Add the guilds and members that the anonymized ``testdata/`` rows refer to.
+
+    Their users are members of every testdata guild, holding the roles they held in
+    the original data (the voter role of a role-gated election they voted in). Log in
+    as one with ``/_dev/login?user=<discord id>``.
+    """
+    import testdata
+
+    spec = testdata.world()
+    for g in spec["guilds"]:
+        guild = FakeGuild(world, g["id"], g["name"])
+        for role_id, name in g["roles"]:
+            guild._roles[role_id] = FakeRole(guild, role_id, name)
+        for channel_id, name in g["channels"]:
+            guild._channels[channel_id] = FakeChannel(guild, channel_id, name)
+        world.guilds[guild.id] = guild
+    for m in spec["members"]:
+        add_user(world, m["id"], m["name"], {int(g): roles for g, roles in m["memberships"].items()})
+    # The dev admin is in every testdata guild with every role, to see role-gated pages.
+    for g in spec["guilds"]:
+        world.set_roles(g["id"], OWNER_ID, [role_id for role_id, _ in g["roles"]])
 
 
 def add_user(world: FakeWorld, user_id: int, name: str, memberships: dict) -> FakeUser:
@@ -140,7 +165,24 @@ def add_user(world: FakeWorld, user_id: int, name: str, memberships: dict) -> Fa
 
 
 async def seed_database():
-    """Insert the fixture rows. Expects empty tables (see ``devserver.db.reset``)."""
+    """Insert the fixture rows. Expects empty tables (see ``devserver.db.reset``).
+
+    First the hand-made rows below, then the anonymized production-shaped slices in
+    ``testdata/`` (ids from 1001 up, so they don't collide).
+    """
+    from alttprbot import models
+
+    users = await _seed_handmade()
+    import testdata
+
+    await testdata.load()
+    # Let the dev admin into the testdata tournaments, whose admins are fake users.
+    if "asynctournament" in testdata.features():
+        for row in testdata.rows("asynctournament", "AsyncTournament"):
+            await models.AsyncTournamentPermissions.create(tournament_id=row["id"], user=users["admin"], role="admin")
+
+
+async def _seed_handmade():
     from alttprbot import models
 
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -305,3 +347,5 @@ async def seed_database():
         )
         for key_ in players:
             await models.ScheduleEpisodePlayer.create(episode=episode, user=users[key_])
+
+    return users

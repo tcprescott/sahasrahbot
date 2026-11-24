@@ -27,3 +27,11 @@ tests/_scratch/
 .coverage.*
 htmlcov/
 coverage.xml
+
+# Raw database dumps: never commit them. testdata/ holds only scrub_prod_dump.py output.
+/*.sql
+/*.sql.gz
+/*.zip
+Dump*/
+Dump*.zip
+testdata/*.sql

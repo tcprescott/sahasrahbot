@@ -1,0 +1,522 @@
+{
+ "feature": "presets",
+ "description": "Preset namespaces (including every namespace with collaborators) with presets copied from this repo's presets/ files, because the dump has no presets table.",
+ "tables": [
+  [
+   "PresetNamespaces",
+   [
+    {
+     "id": 1001,
+     "name": "ns-russetquail210",
+     "discord_user_id": 910000000000000210
+    },
+    {
+     "id": 1002,
+     "name": "ns-sablequail211",
+     "discord_user_id": 910000000000000211
+    },
+    {
+     "id": 1003,
+     "name": "ns-tidalquail212",
+     "discord_user_id": 910000000000000212
+    },
+    {
+     "id": 1004,
+     "name": "ns-vividquail214",
+     "discord_user_id": 910000000000000214
+    },
+    {
+     "id": 1005,
+     "name": "ns-wilyquail215",
+     "discord_user_id": 910000000000000215
+    },
+    {
+     "id": 1006,
+     "name": "ns-zestyquail216",
+     "discord_user_id": 910000000000000216
+    },
+    {
+     "id": 1007,
+     "name": "ns-cobaltotter051",
+     "discord_user_id": 910000000000000051
+    },
+    {
+     "id": 1008,
+     "name": "ns-amberraven217",
+     "discord_user_id": 910000000000000217
+    },
+    {
+     "id": 1009,
+     "name": "ns-duskyraven220",
+     "discord_user_id": 910000000000000220
+    },
+    {
+     "id": 1010,
+     "name": "ns-fableraven222",
+     "discord_user_id": 910000000000000222
+    },
+    {
+     "id": 1011,
+     "name": "ns-gildedraven223",
+     "discord_user_id": 910000000000000223
+    },
+    {
+     "id": 1012,
+     "name": "ns-hollowraven224",
+     "discord_user_id": 910000000000000224
+    }
+   ]
+  ],
+  [
+   "PresetNamespaceCollaborators",
+   [
+    {
+     "id": 1001,
+     "namespace_id": 1003,
+     "discord_user_id": 910000000000000213
+    },
+    {
+     "id": 1002,
+     "namespace_id": 1008,
+     "discord_user_id": 910000000000000218
+    },
+    {
+     "id": 1003,
+     "namespace_id": 1008,
+     "discord_user_id": 910000000000000219
+    },
+    {
+     "id": 1004,
+     "namespace_id": 1009,
+     "discord_user_id": 910000000000000102
+    },
+    {
+     "id": 1005,
+     "namespace_id": 1009,
+     "discord_user_id": 910000000000000221
+    }
+   ]
+  ],
+  [
+   "Presets",
+   [
+    {
+     "id": 1001,
+     "namespace_id": 1001,
+     "randomizer": "sm",
+     "preset_name": "tournament_split",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Casual logic and a major/minor item split.\"\nsettings:\n    logic: Tournament\n    goal: defeatmb\n    placement: \"split\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 59
+    },
+    {
+     "id": 1002,
+     "namespace_id": 1001,
+     "randomizer": "sm",
+     "preset_name": "casual_split",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Casual logic and a major/minor item split.\"\nsettings:\n    logic: casual\n    goal: defeatmb\n    placement: \"split\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 162
+    },
+    {
+     "id": 1003,
+     "namespace_id": 1001,
+     "randomizer": "sm",
+     "preset_name": "casual_full",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Casual logic and full item placement.\"\nsettings:\n    logic: casual\n    goal: defeatmb\n    placement: \"full\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 38
+    },
+    {
+     "id": 1004,
+     "namespace_id": 1002,
+     "randomizer": "sm",
+     "preset_name": "casual_split",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Casual logic and a major/minor item split.\"\nsettings:\n    logic: casual\n    goal: defeatmb\n    placement: \"split\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 194
+    },
+    {
+     "id": 1005,
+     "namespace_id": 1002,
+     "randomizer": "alttpr",
+     "preset_name": "2025_open_logicalenemizer",
+     "content": "goal_name: open_logicalenemizer\navianart: true\ndescription: \"AVIANART Crosshunt\"\nsettings:\n  preset: kaesden/open_logicalenemizer",
+     "generated_count": 7
+    },
+    {
+     "id": 1006,
+     "namespace_id": 1002,
+     "randomizer": "alttpr",
+     "preset_name": "expert",
+     "content": "---\ngoal_name: expert open\ndescription: \"Expert item pool.\"\ncustomizer: false\nsettings:\n  goal: ganon\n  item:\n    pool: expert\n    functionality: normal\n  lang: en\n  mode: open\n  hints: \"off\"\n  weapons: randomized\n  crystals:\n    ganon: \"7\"\n    tower: \"7\"\n  enemizer:\n    boss_shuffle: none\n    enemy_damage: default\n    enemy_health: default\n    enemy_shuffle: none\n  glitches: none\n  spoilers: false\n  entrances: none\n  tournament: true\n  accessibility: items\n  dungeon_items: standard\n  item_placement: advanced\n",
+     "generated_count": 210
+    },
+    {
+     "id": 1007,
+     "namespace_id": 1002,
+     "randomizer": "alttpr",
+     "preset_name": "shopsanity_crosskeys",
+     "content": "---\ndoors: true\ndescription: \"Crosskeys shopsanity.\"\nsettings:\n    accessibility: items\n    algorithm: balanced\n    beemizer: 0\n    bigkeyshuffle: true\n    compassshuffle: true\n    crystals_ganon: \"7\"\n    crystals_gt: \"7\"\n    difficulty: normal\n    door_shuffle: vanilla\n    dungeon_counters: default\n    enemy_damage: default\n    enemy_health: default\n    experimental: false\n    goal: crystals\n    hints: false\n    intensity: 3\n    item_functionality: normal\n    keydropshuffle: false\n    keysanity: true\n    keyshuffle: true\n    logic: noglitches\n    mapshuffle: true\n    mixed_travel: prevent\n    mode: open\n    no_hints: true\n    openpyramid: false\n    progressive: \"on\"\n    retro: false\n    shopsanity: true\n    shuffle: crossed\n    shufflebosses: none\n    shuffleenemies: none\n    shuffleganon: true\n    shufflepots: false\n    startinventory: \"\"\n    swords: random\n    timer: none\n    usestartinventory: false\n    customitemarray:\n        bow: 0\n        progressivebow: 2\n        boomerang: 1\n        redmerang: 1\n        hookshot: 1\n        mushroom: 1\n        powder: 1\n        firerod: 1\n        icerod: 1\n        bombos: 1\n        ether: 1\n        quake: 1\n        lamp: 1\n        hammer: 1\n        shovel: 1\n        flute: 1\n        bugnet: 1\n        book: 1\n        bottle: 4\n        somaria: 1\n        byrna: 1\n        cape: 1\n        mirror: 1\n        boots: 1\n        powerglove: 0\n        titansmitt: 0\n        progressiveglove: 2\n        flippers: 1\n        pearl: 1\n        heartpiece: 24\n        heartcontainer: 10\n        sancheart: 1\n        sword1: 0\n        sword2: 0\n        sword3: 0\n        sword4: 0\n        progressivesword: 4\n        shield1: 0\n        shield2: 0\n        shield3: 0\n        progressiveshield: 3\n        mail2: 0\n        mail3: 0\n        progressivemail: 2\n        halfmagic: 1\n        quartermagic: 0\n        bombsplus5: 0\n        bombsplus10: 0\n        arrowsplus5: 0\n        arrowsplus10: 0\n        arrow1: 1\n        arrow10: 12\n        bomb1: 0\n        bomb3: 16\n        bomb10: 1\n        rupee1: 2\n        rupee5: 4\n        rupee20: 28\n        rupee50: 7\n        rupee100: 1\n        rupee300: 5\n        blueclock: 0\n        greenclock: 0\n        redclock: 0\n        silversupgrade: 0\n        generickeys: 0\n        triforcepieces: 0\n        triforcepiecesgoal: 0\n        triforce: 0\n        rupoor: 0\n        rupoorcost: 10\n    startinventoryarray: {}\n\n    disablemusic: false\n    fastmenu: normal\n    heartbeep: half\n    heartcolor: red\n    quickswap: true\n    ow_palettes: default\n    uw_palettes: default\n    standardize_palettes: standardize\n",
+     "generated_count": 221
+    },
+    {
+     "id": 1008,
+     "namespace_id": 1002,
+     "randomizer": "ctjets",
+     "preset_name": "race",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Race\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 182
+    },
+    {
+     "id": 1009,
+     "namespace_id": 1002,
+     "randomizer": "ctjets",
+     "preset_name": "sglive",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: SpeedGaming Live\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  boss_rando: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 201
+    },
+    {
+     "id": 1010,
+     "namespace_id": 1003,
+     "randomizer": "sm",
+     "preset_name": "tournament_full",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Tournament logic and full item placement.\"\nsettings:\n    logic: tournament\n    goal: defeatmb\n    placement: \"full\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 24
+    },
+    {
+     "id": 1011,
+     "namespace_id": 1003,
+     "randomizer": "smz3",
+     "preset_name": "dungeons",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, all dungeons + SM bosses.\"\nsettings:\n    smlogic: normal\n    goal: alldungeonsdefeatmotherbrain\n    ganonvulnerable: sevencrystals\n    opentower: sevencrystals\n    opentourian: fourbosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 126
+    },
+    {
+     "id": 1012,
+     "namespace_id": 1004,
+     "randomizer": "ctjets",
+     "preset_name": "race",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Race\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 129
+    },
+    {
+     "id": 1013,
+     "namespace_id": 1004,
+     "randomizer": "ctjets",
+     "preset_name": "newplayers",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: New Players\nsettings:\n  difficulty: easy\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  unlocked_magic: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 213
+    },
+    {
+     "id": 1014,
+     "namespace_id": 1004,
+     "randomizer": "ctjets",
+     "preset_name": "lostworlds",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Lost Worlds\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  lost_worlds: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 98
+    },
+    {
+     "id": 1015,
+     "namespace_id": 1005,
+     "randomizer": "ctjets",
+     "preset_name": "newplayers",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: New Players\nsettings:\n  difficulty: easy\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  unlocked_magic: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 174
+    },
+    {
+     "id": 1016,
+     "namespace_id": 1005,
+     "randomizer": "sm",
+     "preset_name": "tournament_full",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Tournament logic and full item placement.\"\nsettings:\n    logic: tournament\n    goal: defeatmb\n    placement: \"full\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 155
+    },
+    {
+     "id": 1017,
+     "namespace_id": 1005,
+     "randomizer": "smz3",
+     "preset_name": "hardquick",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Hard logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.\"\nsettings:\n    smlogic: hard\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: nocrystals\n    opentower: nocrystals\n    opentourian: nobosses\n    swordlocation: uncle\n    morphlocation: original\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 83
+    },
+    {
+     "id": 1018,
+     "namespace_id": 1005,
+     "randomizer": "smz3",
+     "preset_name": "fast",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, 7/7/4 crystal/boss requirements, pyramid hole open.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: sevencrystals\n    opentower: sevencrystals\n    opentourian: fourbosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"",
+     "generated_count": 246
+    },
+    {
+     "id": 1019,
+     "namespace_id": 1005,
+     "randomizer": "smz3",
+     "preset_name": "quick",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: nocrystals\n    opentower: nocrystals\n    opentourian: nobosses\n    swordlocation: uncle\n    morphlocation: original\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 138
+    },
+    {
+     "id": 1020,
+     "namespace_id": 1006,
+     "randomizer": "smz3",
+     "preset_name": "fast553",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, 5/5/3 crystal/boss requirements, pyramid hole open.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: fivecrystals\n    opentower: fivecrystals\n    opentourian: threebosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"",
+     "generated_count": 146
+    },
+    {
+     "id": 1021,
+     "namespace_id": 1006,
+     "randomizer": "smz3",
+     "preset_name": "hardfastrandom",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Hard logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.\"\nsettings:\n    smlogic: hard\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: random\n    opentower: random\n    opentourian: random\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 68
+    },
+    {
+     "id": 1022,
+     "namespace_id": 1006,
+     "randomizer": "smz3",
+     "preset_name": "normalkeys",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Keysanity.  Normal logic, sword and morph are fully randomized.\"\nsettings:\n    smlogic: normal\n    goal: defeatboth\n    ganonvulnerable: sevencrystals\n    opentower: sevencrystals\n    opentourian: fourbosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: keysanity\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 72
+    },
+    {
+     "id": 1023,
+     "namespace_id": 1006,
+     "randomizer": "alttpr",
+     "preset_name": "adkeys",
+     "content": "---\ngoal_name: all dungeons keysanity\ncustomizer: false\ndescription: \"All dungeon items are shuffled and all dungeons, including Castle Tower, are required.\"\nsettings:\n  goal: dungeons\n  item:\n    pool: normal\n    functionality: normal\n  lang: en\n  mode: open\n  hints: \"off\"\n  weapons: randomized\n  crystals:\n    ganon: \"7\"\n    tower: \"7\"\n  enemizer:\n    boss_shuffle: none\n    enemy_damage: default\n    enemy_health: default\n    enemy_shuffle: none\n  glitches: none\n  spoilers: false\n  entrances: none\n  tournament: true\n  accessibility: items\n  dungeon_items: full\n  item_placement: advanced\n",
+     "generated_count": 123
+    },
+    {
+     "id": 1024,
+     "namespace_id": 1006,
+     "randomizer": "ctjets",
+     "preset_name": "race",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Race\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 204
+    },
+    {
+     "id": 1025,
+     "namespace_id": 1006,
+     "randomizer": "ctjets",
+     "preset_name": "hard",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Hard\nsettings:\n  difficulty: hard\n  disable_glitches: \"on\"\n  boss_scaling: \"on\"\n  locked_chars: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Balanced Random\n",
+     "generated_count": 17
+    },
+    {
+     "id": 1026,
+     "namespace_id": 1006,
+     "randomizer": "ctjets",
+     "preset_name": "lostworlds",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Lost Worlds\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  lost_worlds: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 105
+    },
+    {
+     "id": 1027,
+     "namespace_id": 1007,
+     "randomizer": "alttpr",
+     "preset_name": "keydropsanity",
+     "content": "---\ngoal_name: keydrop shuffle + keysanity\ndoors: true\ndescription: \"Key drop items are shuffled.\"\nsettings:\n    accessibility: items\n    algorithm: balanced\n    beemizer: 0\n    bigkeyshuffle: true\n    compassshuffle: true\n    crystals_ganon: \"7\"\n    crystals_gt: \"7\"\n    difficulty: normal\n    door_shuffle: vanilla\n    dungeon_counters: default\n    enemy_damage: default\n    enemy_health: default\n    experimental: false\n    goal: ganon\n    hints: false\n    intensity: 3\n    item_functionality: normal\n    keydropshuffle: true\n    keysanity: true\n    keyshuffle: true\n    logic: noglitches\n    mapshuffle: true\n    mixed_travel: prevent\n    mode: open\n    no_hints: true\n    openpyramid: false\n    progressive: \"on\"\n    retro: false\n    shuffle: vanilla\n    shufflebosses: none\n    shuffleenemies: none\n    shuffleganon: true\n    shufflepots: false\n    startinventory: \"\"\n    swords: random\n    timer: none\n    usestartinventory: false\n    customitemarray:\n        bow: 0\n        progressivebow: 2\n        boomerang: 1\n        redmerang: 1\n        hookshot: 1\n        mushroom: 1\n        powder: 1\n        firerod: 1\n        icerod: 1\n        bombos: 1\n        ether: 1\n        quake: 1\n        lamp: 1\n        hammer: 1\n        shovel: 1\n        flute: 1\n        bugnet: 1\n        book: 1\n        bottle: 4\n        somaria: 1\n        byrna: 1\n        cape: 1\n        mirror: 1\n        boots: 1\n        powerglove: 0\n        titansmitt: 0\n        progressiveglove: 2\n        flippers: 1\n        pearl: 1\n        heartpiece: 24\n        heartcontainer: 10\n        sancheart: 1\n        sword1: 0\n        sword2: 0\n        sword3: 0\n        sword4: 0\n        progressivesword: 4\n        shield1: 0\n        shield2: 0\n        shield3: 0\n        progressiveshield: 3\n        mail2: 0\n        mail3: 0\n        progressivemail: 2\n        halfmagic: 1\n        quartermagic: 0\n        bombsplus5: 0\n        bombsplus10: 0\n        arrowsplus5: 0\n        arrowsplus10: 0\n        arrow1: 1\n        arrow10: 12\n        bomb1: 0\n        bomb3: 16\n        bomb10: 1\n        rupee1: 2\n        rupee5: 4\n        rupee20: 28\n        rupee50: 7\n        rupee100: 1\n        rupee300: 5\n        blueclock: 0\n        greenclock: 0\n        redclock: 0\n        silversupgrade: 0\n        generickeys: 0\n        triforcepieces: 0\n        triforcepiecesgoal: 0\n        triforce: 0\n        rupoor: 0\n        rupoorcost: 10\n    startinventoryarray: {}\n\n    disablemusic: false\n    fastmenu: normal\n    heartbeep: half\n    heartcolor: red\n    quickswap: true\n    ow_palettes: default\n    uw_palettes: default\n    standardize_palettes: standardize\n",
+     "generated_count": 106
+    },
+    {
+     "id": 1028,
+     "namespace_id": 1007,
+     "randomizer": "alttpr",
+     "preset_name": "shopsanity_crisscrosskeys",
+     "content": "---\ndoors: true\ndescription: \"Criss-cross keysanity w/ shopsanity.\"\nsettings:\n    accessibility: items\n    algorithm: balanced\n    beemizer: 0\n    bigkeyshuffle: false\n    compassshuffle: false\n    crystals_ganon: \"7\"\n    crystals_gt: \"7\"\n    difficulty: normal\n    door_shuffle: crossed\n    dungeon_counters: default\n    enemy_damage: default\n    enemy_health: default\n    experimental: false\n    goal: crystals\n    hints: false\n    intensity: 3\n    item_functionality: normal\n    keydropshuffle: false\n    keysanity: true\n    keyshuffle: false\n    logic: noglitches\n    mapshuffle: false\n    mixed_travel: prevent\n    mode: open\n    no_hints: true\n    openpyramid: false\n    progressive: \"on\"\n    retro: false\n    shopsanity: true\n    shuffle: crossed\n    shufflebosses: none\n    shuffleenemies: none\n    shuffleganon: true\n    shufflepots: false\n    startinventory: \"\"\n    swords: random\n    timer: none\n    usestartinventory: false\n    customitemarray:\n        bow: 0\n        progressivebow: 2\n        boomerang: 1\n        redmerang: 1\n        hookshot: 1\n        mushroom: 1\n        powder: 1\n        firerod: 1\n        icerod: 1\n        bombos: 1\n        ether: 1\n        quake: 1\n        lamp: 1\n        hammer: 1\n        shovel: 1\n        flute: 1\n        bugnet: 1\n        book: 1\n        bottle: 4\n        somaria: 1\n        byrna: 1\n        cape: 1\n        mirror: 1\n        boots: 1\n        powerglove: 0\n        titansmitt: 0\n        progressiveglove: 2\n        flippers: 1\n        pearl: 1\n        heartpiece: 24\n        heartcontainer: 10\n        sancheart: 1\n        sword1: 0\n        sword2: 0\n        sword3: 0\n        sword4: 0\n        progressivesword: 4\n        shield1: 0\n        shield2: 0\n        shield3: 0\n        progressiveshield: 3\n        mail2: 0\n        mail3: 0\n        progressivemail: 2\n        halfmagic: 1\n        quartermagic: 0\n        bombsplus5: 0\n        bombsplus10: 0\n        arrowsplus5: 0\n        arrowsplus10: 0\n        arrow1: 1\n        arrow10: 12\n        bomb1: 0\n        bomb3: 16\n        bomb10: 1\n        rupee1: 2\n        rupee5: 4\n        rupee20: 28\n        rupee50: 7\n        rupee100: 1\n        rupee300: 5\n        blueclock: 0\n        greenclock: 0\n        redclock: 0\n        silversupgrade: 0\n        generickeys: 0\n        triforcepieces: 0\n        triforcepiecesgoal: 0\n        triforce: 0\n        rupoor: 0\n        rupoorcost: 10\n    startinventoryarray: {}\n\n    disablemusic: false\n    fastmenu: normal\n    heartbeep: half\n    heartcolor: red\n    quickswap: true\n    ow_palettes: default\n    uw_palettes: default\n    standardize_palettes: standardize\n",
+     "generated_count": 223
+    },
+    {
+     "id": 1029,
+     "namespace_id": 1008,
+     "randomizer": "alttpr",
+     "preset_name": "openflute",
+     "content": "---\ngoal_name: \"open w/ pre-activated flute\"\ncustomizer: true\ndescription: \"You get to start with.. an activated flute?  Sky's the limit!\"\nsettings:\n  l: {}\n  eq:\n    - OcarinaActive\n    - BossHeartContainer\n    - BossHeartContainer\n    - BossHeartContainer\n  goal: ganon\n  item:\n    pool: normal\n    functionality: normal\n  lang: en\n  mode: open\n  name: \"open flute\"\n  drops:\n    \"0\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    \"1\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    \"2\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    \"3\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    \"4\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    \"5\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    \"6\":\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    crab:\n      - auto_fill\n      - auto_fill\n    fish:\n      - auto_fill\n    pull:\n      - auto_fill\n      - auto_fill\n      - auto_fill\n    stun:\n      - auto_fill\n  notes: Open w/ Pre-activated Flute\n  custom:\n    customPrizePacks: false\n    drop:\n      count:\n        Bee: 0\n        Fairy: 1\n        Heart: 13\n        BeeGood: 0\n        RupeeRed: 6\n        RupeeBlue: 7\n        RupeeGreen: 9\n        BombRefill1: 7\n        BombRefill4: 1\n        BombRefill8: 2\n        ArrowRefill5: 5\n        ArrowRefill10: 3\n        MagicRefillFull: 3\n        MagicRefillSmall: 6\n    item:\n      count:\n        Bow: 0\n        Bomb: 0\n        Cape: 1\n        Lamp: 1\n        Arrow: 1\n        Ether: 1\n        Heart: 0\n        KeyA1: 2\n        KeyA2: 4\n        KeyD1: 6\n        KeyD2: 1\n        KeyD3: 3\n        KeyD4: 1\n        KeyD5: 2\n        KeyD6: 3\n        KeyD7: 4\n        KeyH1: 0\n        KeyH2: 1\n        KeyP1: 0\n        KeyP2: 1\n        KeyP3: 1\n        MapA1: 0\n        MapA2: 1\n        MapD1: 1\n        MapD2: 1\n        MapD3: 1\n        MapD4: 1\n        MapD5: 1\n        MapD6: 1\n        MapD7: 1\n        MapH1: 0\n        MapH2: 1\n        MapP1: 1\n        MapP2: 1\n        MapP3: 1\n        Quake: 1\n        Bombos: 1\n        Bottle: 0\n        Hammer: 1\n        IceRod: 1\n        Powder: 1\n        Rupoor: 0\n        Shovel: 1\n        FireRod: 1\n        L1Sword: 0\n        L3Sword: 0\n        L4Sword: 0\n        TwentyRupees2: 1\n        RedMail: 0\n        BigKeyA1: 0\n        BigKeyA2: 1\n        BigKeyD1: 1\n        BigKeyD2: 1\n        BigKeyD3: 1\n        BigKeyD4: 1\n        BigKeyD5: 1\n        BigKeyD6: 1\n        BigKeyD7: 1\n        BigKeyH1: 0\n        BigKeyH2: 0\n        BigKeyP1: 1\n        BigKeyP2: 1\n        BigKeyP3: 1\n        BlueMail: 0\n        Flippers: 1\n        Hookshot: 1\n        Mushroom: 1\n        OneRupee: 2\n        RedClock: 0\n        TenBombs: 1\n        Triforce: 0\n        BlueClock: 0\n        Boomerang: 1\n        CompassA1: 0\n        CompassA2: 1\n        CompassD1: 1\n        CompassD2: 1\n        CompassD3: 1\n        CompassD4: 1\n        CompassD5: 1\n        CompassD6: 1\n        CompassD7: 1\n        CompassH1: 0\n        CompassH2: 0\n        CompassP1: 1\n        CompassP2: 1\n        CompassP3: 1\n        HalfMagic: 1\n        MoonPearl: 1\n        RedShield: 0\n        TenArrows: 12\n        BlueShield: 0\n        FiveRupees: 4\n        GreenClock: 0\n        PowerGlove: 0\n        SmallMagic: 0\n        ThreeBombs: 16\n        TitansMitt: 0\n        CaneOfByrna: 1\n        FiftyRupees: 7\n        MagicMirror: 1\n        MasterSword: 0\n        BombUpgrade5: 0\n        BookOfMudora: 1\n        BowAndArrows: 0\n        MirrorShield: 0\n        PegasusBoots: 1\n        PieceOfHeart: 24\n        QuarterMagic: 0\n        RedBoomerang: 1\n        TwentyRupees: 28\n        ArrowUpgrade5: 0\n        BombUpgrade10: 0\n        BottleWithBee: 0\n        CaneOfSomaria: 1\n        OcarinaActive: 0\n        TriforcePiece: 0\n        ArrowUpgrade10: 0\n        BugCatchingNet: 1\n        HeartContainer: 1\n        ProgressiveBow: 2\n        BottleWithFairy: 0\n        OcarinaInactive: 0\n        BottleWithRandom: 4\n        L1SwordAndShield: 0\n        OneHundredRupees: 1\n        ProgressiveArmor: 2\n        ProgressiveGlove: 2\n        ProgressiveSword: 4\n        BottleWithGoldBee: 0\n        ProgressiveShield: 3\n        BossHeartContainer: 10\n        BowAndSilverArrows: 0\n        SilverArrowUpgrade: 0\n        ThreeHundredRupees: 5\n        BottleWithRedPotion: 0\n        BottleWithBluePotion: 0\n        BottleWithGreenPotion: 0\n    canOWYBA: false\n    canBombJump: false\n    canBootsClip: false\n    canBunnySurf: false\n    canWaterWalk: false\n    rom.rupeeBow: false\n    canMirrorClip: false\n    canMirrorWrap: false\n    canSuperBunny: false\n    canSuperSpeed: false\n    rom.timerMode: \"off\"\n    canBunnyRevive: false\n    canFakeFlipper: false\n    rom.timerStart: \"\"\n    region.wildKeys: false\n    region.wildMaps: false\n    rom.genericKeys: false\n    rom.mapOnPickup: false\n    canDungeonRevive: false\n    prize.crossWorld: true\n    rom.dungeonCount: \"off\"\n    rom.freeItemMenu: false\n    rom.freeItemText: false\n    canOneFrameClipOW: false\n    item.require.Lamp: false\n    item.value.Rupoor: \"\"\n    item.Goal.Required: \"\"\n    region.wildBigKeys: false\n    canWaterFairyRevive: false\n    item.value.RedClock: \"\"\n    spoil.BootsLocation: false\n    item.value.BlueClock: \"\"\n    region.wildCompasses: false\n    item.value.GreenClock: \"\"\n    prize.shuffleCrystals: true\n    prize.shufflePendants: true\n    region.bossNormalLocation: true\n  weapons: randomized\n  crystals:\n    ganon: \"7\"\n    tower: \"7\"\n  glitches: none\n  tournament: true\n  accessibility: items\n  dungeon_items: standard\n  item_placement: advanced\n  spoilers: \"off\"\n  hints: \"off\"\n",
+     "generated_count": 96
+    },
+    {
+     "id": 1030,
+     "namespace_id": 1008,
+     "randomizer": "alttpr",
+     "preset_name": "shopsanity_crisscrosskeydropsanity",
+     "content": "---\ndoors: true\ndescription: \"Shopsanity, crossed doors, crossed entrance, keydrop and keysanity\"\nsettings:\n    accessibility: items\n    algorithm: balanced\n    beemizer: 0\n    bigkeyshuffle: true\n    compassshuffle: true\n    crystals_ganon: \"7\"\n    crystals_gt: \"7\"\n    difficulty: normal\n    door_shuffle: crossed\n    dungeon_counters: default\n    enemy_damage: default\n    enemy_health: default\n    experimental: false\n    goal: crystals\n    hints: false\n    intensity: 3\n    item_functionality: normal\n    keydropshuffle: true\n    keysanity: true\n    keyshuffle: true\n    logic: noglitches\n    mapshuffle: true\n    mixed_travel: prevent\n    mode: open\n    no_hints: true\n    openpyramid: false\n    progressive: \"on\"\n    retro: false\n    shopsanity: true\n    shuffle: crossed\n    shufflebosses: none\n    shuffleenemies: none\n    shuffleganon: true\n    shufflepots: false\n    startinventory: \"\"\n    swords: random\n    timer: none\n    usestartinventory: false\n    customitemarray:\n        bow: 0\n        progressivebow: 2\n        boomerang: 1\n        redmerang: 1\n        hookshot: 1\n        mushroom: 1\n        powder: 1\n        firerod: 1\n        icerod: 1\n        bombos: 1\n        ether: 1\n        quake: 1\n        lamp: 1\n        hammer: 1\n        shovel: 1\n        flute: 1\n        bugnet: 1\n        book: 1\n        bottle: 4\n        somaria: 1\n        byrna: 1\n        cape: 1\n        mirror: 1\n        boots: 1\n        powerglove: 0\n        titansmitt: 0\n        progressiveglove: 2\n        flippers: 1\n        pearl: 1\n        heartpiece: 24\n        heartcontainer: 10\n        sancheart: 1\n        sword1: 0\n        sword2: 0\n        sword3: 0\n        sword4: 0\n        progressivesword: 4\n        shield1: 0\n        shield2: 0\n        shield3: 0\n        progressiveshield: 3\n        mail2: 0\n        mail3: 0\n        progressivemail: 2\n        halfmagic: 1\n        quartermagic: 0\n        bombsplus5: 0\n        bombsplus10: 0\n        arrowsplus5: 0\n        arrowsplus10: 0\n        arrow1: 1\n        arrow10: 12\n        bomb1: 0\n        bomb3: 16\n        bomb10: 1\n        rupee1: 2\n        rupee5: 4\n        rupee20: 28\n        rupee50: 7\n        rupee100: 1\n        rupee300: 5\n        blueclock: 0\n        greenclock: 0\n        redclock: 0\n        silversupgrade: 0\n        generickeys: 0\n        triforcepieces: 0\n        triforcepiecesgoal: 0\n        triforce: 0\n        rupoor: 0\n        rupoorcost: 10\n    startinventoryarray: {}\n\n    disablemusic: false\n    fastmenu: normal\n    heartbeep: half\n    heartcolor: red\n    quickswap: true\n    ow_palettes: default\n    uw_palettes: default\n    standardize_palettes: standardize\n",
+     "generated_count": 183
+    },
+    {
+     "id": 1031,
+     "namespace_id": 1008,
+     "randomizer": "alttpr",
+     "preset_name": "2025_open_logicalenemizer",
+     "content": "goal_name: open_logicalenemizer\navianart: true\ndescription: \"AVIANART Crosshunt\"\nsettings:\n  preset: kaesden/open_logicalenemizer",
+     "generated_count": 150
+    },
+    {
+     "id": 1032,
+     "namespace_id": 1009,
+     "randomizer": "smz3",
+     "preset_name": "fastkeys",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic keysanity, 7/7/4 crystal/boss requirements, pyramid hole open.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: sevencrystals\n    opentower: sevencrystals\n    opentourian: fourbosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: keysanity\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"",
+     "generated_count": 1
+    },
+    {
+     "id": 1033,
+     "namespace_id": 1009,
+     "randomizer": "smz3",
+     "preset_name": "blitzkeys",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, keysanity, 0/0/0 crystal/boss requirements, pyramid hole open.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: nocrystals\n    opentower: nocrystals\n    opentourian: nobosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: keysanity\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"",
+     "generated_count": 19
+    },
+    {
+     "id": 1034,
+     "namespace_id": 1009,
+     "randomizer": "smz3",
+     "preset_name": "fastrandom",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: random\n    opentower: random\n    opentourian: random\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 27
+    },
+    {
+     "id": 1035,
+     "namespace_id": 1009,
+     "randomizer": "ctjets",
+     "preset_name": "sglive",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: SpeedGaming Live\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  boss_rando: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 248
+    },
+    {
+     "id": 1036,
+     "namespace_id": 1009,
+     "randomizer": "ctjets",
+     "preset_name": "hard",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Hard\nsettings:\n  difficulty: hard\n  disable_glitches: \"on\"\n  boss_scaling: \"on\"\n  locked_chars: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Balanced Random\n",
+     "generated_count": 104
+    },
+    {
+     "id": 1037,
+     "namespace_id": 1009,
+     "randomizer": "ctjets",
+     "preset_name": "race",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Race\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 74
+    },
+    {
+     "id": 1038,
+     "namespace_id": 1010,
+     "randomizer": "ctjets",
+     "preset_name": "newplayers",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: New Players\nsettings:\n  difficulty: easy\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  unlocked_magic: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 80
+    },
+    {
+     "id": 1039,
+     "namespace_id": 1010,
+     "randomizer": "alttprmystery",
+     "preset_name": "funweighted",
+     "content": "description: Unweighted except no chance of triforce hunts or insanity entrance shuffles.\nglitches_required:\n  none: 100\n  overworld_glitches: 0\n  major_glitches: 0\n  no_logic: 0\nitem_placement:\n  basic: 1\n  advanced: 1\ndungeon_items:\n  standard: 1\n  mc: 1\n  mcs: 1\n  full: 1\naccessibility:\n  items: 1\n  locations: 1\n  none: 1\ngoals:\n  ganon: 1\n  fast_ganon: 1\n  dungeons: 1\n  pedestal: 1\n  triforce-hunt: 0\ntower_open:\n  \"0\": 1\n  \"1\": 1\n  \"2\": 1\n  \"3\": 1\n  \"4\": 1\n  \"5\": 1\n  \"6\": 1\n  \"7\": 1\n  random: 1\nganon_open:\n  \"0\": 1\n  \"1\": 1\n  \"2\": 1\n  \"3\": 1\n  \"4\": 1\n  \"5\": 1\n  \"6\": 1\n  \"7\": 1\n  random: 1\nworld_state:\n  standard: 1\n  open: 1\n  inverted: 1\n  retro: 1\nentrance_shuffle:\n  none: 1\n  simple: 1\n  restricted: 1\n  full: 1\n  crossed: 1\n  insanity: 0\nboss_shuffle:\n  none: 1\n  simple: 1\n  full: 1\n  random: 1\nenemy_shuffle:\n  none: 1\n  shuffled: 1\n  random: 1\nhints:\n  \"on\": 1\n  \"off\": 1\nweapons:\n  randomized: 1\n  assured: 1\n  vanilla: 1\n  swordless: 1\nitem_pool:\n  normal: 1\n  hard: 1\n  expert: 1\n  crowd_control: 0\nitem_functionality:\n  normal: 1\n  hard: 1\n  expert: 1\nenemy_damage:\n  default: 1\n  shuffled: 1\n  random: 1\nenemy_health:\n  default: 1\n  easy: 1\n  hard: 1\n  expert: 1\n",
+     "generated_count": 96
+    },
+    {
+     "id": 1040,
+     "namespace_id": 1010,
+     "randomizer": "alttprmystery",
+     "preset_name": "league_season2",
+     "content": "description: \"Season Two weights for [ALTTPR League](https://alttprleague.com)\"\nglitches_required:\n  none: 100\n  overworld_glitches: 0\n  major_glitches: 0\n  no_logic: 0\nitem_placement:\n  basic: 0\n  advanced: 100\ndungeon_items:\n  standard: 45\n  mc: 15\n  mcs: 10\n  full: 30\naccessibility:\n  items: 90\n  locations: 10\n  none: 0\ngoals:\n  ganon: 35\n  fast_ganon: 25\n  dungeons: 20\n  pedestal: 20\n  triforce-hunt: 0\ntower_open:\n  \"0\": 0\n  \"1\": 0\n  \"2\": 0\n  \"3\": 15\n  \"4\": 15\n  \"5\": 20\n  \"6\": 25\n  \"7\": 25\n  random: 0\nganon_open:\n  \"0\": 0\n  \"1\": 0\n  \"2\": 0\n  \"3\": 10\n  \"4\": 10\n  \"5\": 20\n  \"6\": 20\n  \"7\": 40\n  random: 0\nworld_state:\n  standard: 45\n  open: 45\n  inverted: 10\n  retro: 0\nentrance_shuffle:\n  none: 70\n  simple: 10\n  restricted: 0\n  full: 10\n  crossed: 10\n  insanity: 0\nboss_shuffle:\n  none: 70\n  simple: 10\n  full: 10\n  random: 10\nenemy_shuffle:\n  none: 85\n  shuffled: 5\n  random: 10\nhints:\n  \"on\": 00\n  \"off\": 100\nweapons:\n  randomized: 45\n  assured: 45\n  vanilla: 5\n  swordless: 5\nitem_pool:\n  normal: 85\n  hard: 10\n  expert: 5\n  crowd_control: 0\nitem_functionality:\n  normal: 100\n  hard: 0\n  expert: 0\nenemy_damage:\n  default: 100\n  shuffled: 0\n  random: 0\nenemy_health:\n  default: 100\n  easy: 0\n  hard: 0\n  expert: 0\n",
+     "generated_count": 117
+    },
+    {
+     "id": 1041,
+     "namespace_id": 1010,
+     "randomizer": "smz3",
+     "preset_name": "hard553",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Hard logic, Ganon's Tower and Ganon require 5 crystals, Tourian requires 3 boss tokens, morph and sword randomized.\"\nsettings:\n    smlogic: hard\n    goal: defeatboth\n    ganonvulnerable: fivecrystals\n    opentower: fivecrystals\n    opentourian: threebosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 152
+    },
+    {
+     "id": 1042,
+     "namespace_id": 1010,
+     "randomizer": "smz3",
+     "preset_name": "hardfastrandom",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Hard logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.\"\nsettings:\n    smlogic: hard\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: random\n    opentower: random\n    opentourian: random\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 174
+    },
+    {
+     "id": 1043,
+     "namespace_id": 1010,
+     "randomizer": "smz3",
+     "preset_name": "quick",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic, ganon and mother brain open immediately, sword at uncle and morph is vanilla.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: nocrystals\n    opentower: nocrystals\n    opentourian: nobosses\n    swordlocation: uncle\n    morphlocation: original\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 143
+    },
+    {
+     "id": 1044,
+     "namespace_id": 1011,
+     "randomizer": "smz3",
+     "preset_name": "fastkeysrandom",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Normal logic Keysanity, Pyramid open, randomized GT, Ganon, and Tourian requirements.\"\nsettings:\n    smlogic: normal\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: random\n    opentower: random\n    opentourian: random\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: keysanity\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 184
+    },
+    {
+     "id": 1045,
+     "namespace_id": 1011,
+     "randomizer": "smz3",
+     "preset_name": "hardblitz",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Hard logic, 0/0/0 crystal/boss requirements, pyramid hole open.\"\nsettings:\n    smlogic: hard\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: nocrystals\n    opentower: nocrystals\n    opentourian: nobosses\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"",
+     "generated_count": 183
+    },
+    {
+     "id": 1046,
+     "namespace_id": 1011,
+     "randomizer": "smz3",
+     "preset_name": "hardfastrandom",
+     "content": "randomizer: \"smz3\"\ngoal_name: beat the games\ndescription: \"Hard logic, Pyramid open, randomized GT, Ganon, and Tourian requirements.\"\nsettings:\n    smlogic: hard\n    goal: fastganondefeatmotherbrain\n    ganonvulnerable: random\n    opentower: random\n    opentourian: random\n    swordlocation: randomized\n    morphlocation: randomized\n    keyshuffle: none\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 60
+    },
+    {
+     "id": 1047,
+     "namespace_id": 1012,
+     "randomizer": "sm",
+     "preset_name": "tournament_full",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Tournament logic and full item placement.\"\nsettings:\n    logic: tournament\n    goal: defeatmb\n    placement: \"full\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 2
+    },
+    {
+     "id": 1048,
+     "namespace_id": 1012,
+     "randomizer": "sm",
+     "preset_name": "tournament_split",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Casual logic and a major/minor item split.\"\nsettings:\n    logic: Tournament\n    goal: defeatmb\n    placement: \"split\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 201
+    },
+    {
+     "id": 1049,
+     "namespace_id": 1012,
+     "randomizer": "sm",
+     "preset_name": "casual_split",
+     "content": "randomizer: \"sm\"\ngoal_name: beat the game\ndescription: \"Casual logic and a major/minor item split.\"\nsettings:\n    logic: casual\n    goal: defeatmb\n    placement: \"split\"\n    seed: \"\"\n    race: \"true\"\n    gamemode: normal\n    players: \"1\"\n",
+     "generated_count": 106
+    },
+    {
+     "id": 1050,
+     "namespace_id": 1012,
+     "randomizer": "ctjets",
+     "preset_name": "newplayers",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: New Players\nsettings:\n  difficulty: easy\n  disable_glitches: \"on\"\n  early_pendant: \"on\"\n  unlocked_magic: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 157
+    },
+    {
+     "id": 1051,
+     "namespace_id": 1012,
+     "randomizer": "ctjets",
+     "preset_name": "hard",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Hard\nsettings:\n  difficulty: hard\n  disable_glitches: \"on\"\n  boss_scaling: \"on\"\n  locked_chars: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Balanced Random\n",
+     "generated_count": 150
+    },
+    {
+     "id": 1052,
+     "namespace_id": 1012,
+     "randomizer": "ctjets",
+     "preset_name": "lostworlds",
+     "content": "randomizer: ctjets\nversion: 3.1.0\ndescription: Lost Worlds\nsettings:\n  difficulty: normal\n  disable_glitches: \"on\"\n  lost_worlds: \"on\"\n  zeal: \"on\"\n  duplicate_char_assignments: 7f7f7f7f7f7f7f\n  shop_prices: Normal\n  tech_rando: Fully Random\n",
+     "generated_count": 161
+    }
+   ]
+  ]
+ ]
+}
