@@ -59,10 +59,11 @@ async def test_admins_and_the_owner_manage(db, server):
     assert await elections.is_admin(None, OWNER)
     assert not await elections.is_admin(GUILD, VOTER)
     assert not await elections.is_admin(None, ADMIN)
-    assert await elections.can_manage_elections(ADMIN)
-    assert await elections.can_manage_elections(OWNER)
-    assert not await elections.can_manage_elections(VOTER)
-    assert await elections.servers(ADMIN) == [{"id": GUILD, "name": "Community"}]
+    assert await elections.can_manage_elections(ADMIN, [GUILD])
+    assert await elections.can_manage_elections(OWNER, [])
+    assert not await elections.can_manage_elections(VOTER, [])
+    assert not await elections.can_manage_elections(VOTER, [999])  # a server the bot isn't in
+    assert await elections.servers(ADMIN, [GUILD, 999]) == [{"id": GUILD, "name": "Community"}]
 
 
 async def test_server_options(db, server):
@@ -218,9 +219,9 @@ async def test_missing_election_and_strangers(db, server):
 async def test_list_elections(db, server):
     mine = await elections.create_draft(ADMIN, form())
     other = await models.RankedChoiceElection.create(owner_id=2, title="Theirs", guild_id=OTHER_GUILD, status="open")
-    assert [e["id"] for e in await elections.list_elections(ADMIN)] == [mine["id"]]
-    assert [e["id"] for e in await elections.list_elections(OWNER)] == [other.id, mine["id"]]
-    assert await elections.list_elections(VOTER) == []
+    assert [e["id"] for e in await elections.list_elections(ADMIN, [GUILD])] == [mine["id"]]
+    assert [e["id"] for e in await elections.list_elections(OWNER, [])] == [other.id, mine["id"]]
+    assert await elections.list_elections(VOTER, []) == []
 
 
 async def test_delete_removes_ballots_and_the_post(db, server, published):
@@ -598,7 +599,6 @@ def bot(monkeypatch):
         raise discord.NotFound(response(404), "no guild")
 
     monkeypatch.setattr(election_posts.discord_members, "get_member", get_member)
-    election_posts.ADMIN_CACHE._cache.clear()
     return SimpleNamespace(
         guilds=list(guilds.values()), get_guild=lambda gid: None if gid == OTHER_GUILD else guilds.get(gid),
         fetch_guild=fetch_guild, is_owner=mock.AsyncMock(side_effect=lambda user: user.id == OWNER),
@@ -609,10 +609,11 @@ async def test_directory_lookups(bot):
     d = election_posts.DiscordDirectory(bot)
     assert await d.is_owner(OWNER)
     assert not await d.is_owner(ADMIN)
-    assert [g.name for g in await d.admin_guilds(ADMIN)] == ["Community"]
-    assert [g.name for g in await d.admin_guilds(ADMIN)] == ["Community"]  # cached
+    assert [g.name for g in await d.bot_guilds([GUILD, OTHER_GUILD, 999])] == ["Community"]  # cached servers only
     assert await d.is_admin(GUILD, ADMIN)
-    assert not await d.is_admin(OTHER_GUILD, ADMIN)
+    assert not await d.is_admin(GUILD, OUTSIDER)
+    assert not await d.is_admin(OTHER_GUILD, ADMIN)  # a member, not an admin
+    assert not await d.is_admin(999, ADMIN)
     assert await d.member_role_ids(GUILD, ADMIN) == [77]
     assert await d.member_role_ids(GUILD, OUTSIDER) is None
     assert await d.member_role_ids(999, ADMIN) is None

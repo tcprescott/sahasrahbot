@@ -31,6 +31,10 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 discord = DiscordOAuth2Session(sahasrahbotapi)
 
+# ``guilds`` lets the app ask Discord which servers you're in, with your permissions
+# there, in one request (elections use it to find the servers you administer).
+SIGN_IN_SCOPES = ['identify', 'guilds']
+
 
 class AppApiOpenAPIProvider(OpenAPIProvider):
     """Only the app's JSON API (/api/v1) goes in the schema the web/ client is generated from."""
@@ -84,12 +88,13 @@ def _error(status: int, message: str):
 # --- Sign-in -----------------------------------------------------------------
 
 
+
 @sahasrahbotapi.route("/login/")
 async def login():
     if 'next' in request.args:
         session['login_original_path'] = _safe_next(request.args['next'])
     return await discord.create_session(
-        scope=['identify'],
+        scope=SIGN_IN_SCOPES,
         data={"redirect": _safe_next(session.pop("login_original_path", "/me"))},
     )
 

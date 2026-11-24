@@ -39,16 +39,33 @@ def login(monkeypatch):
             raise Unauthorized()
         return state["user"]
 
+    async def token():
+        return {"scope": state["scope"]}
+
+    async def my_guilds():
+        # What Discord's /users/@me/guilds says: the fake directory's servers they administer.
+        from alttprbot.services import discord_directory
+        directory = discord_directory._directory
+        ids = directory.admin_guild_ids(state["user"].id) if hasattr(directory, "admin_guild_ids") else set()
+        state["guild_calls"] += 1
+        return [{"id": str(gid), "owner": False, "permissions": "8"} for gid in ids]
+
     monkeypatch.setattr(type(api.discord), "authorized", property(lambda self: authorized()))
     monkeypatch.setattr(api.discord, "fetch_user", fetch_user)
+    monkeypatch.setattr(api.discord, "get_authorization_token", token)
     monkeypatch.setattr(api.discord, "revoke", lambda: state.update(user=None))
+    monkeypatch.setattr(app_api, "_fetch_discord_guilds", my_guilds)
+    monkeypatch.setattr(app_api, "_admin_guilds", {})
 
-    def set_user(discord_id, name="tester"):
+    def set_user(discord_id, name="tester", scope="identify guilds"):
+        state["scope"] = scope
+        state["guild_calls"] = 0
         state["user"] = None if discord_id is None else SimpleNamespace(
             id=discord_id, name=name, username=name, display_name=name, discriminator="0", avatar_url=""
         )
         return state["user"]
 
+    set_user.state = state
     return set_user
 
 
@@ -435,6 +452,48 @@ async def test_admin_creates_posts_edits_and_closes(client, login, directory):
 
     assert (await send_json(client, "DELETE", f"/api/v1/elections/{draft['id']}", None))[0] == 204
     assert (await get_json(client, f"/api/v1/elections/{draft['id']}"))[0] == 404
+
+
+async def test_session_without_guilds_scope_is_signed_out(client, login):
+    # Sessions from before sign-in asked for "guilds" sign in again once.
+    login(ADMIN, scope="identify")
+    assert (await get_json(client, "/api/v1/session"))[1] == {"user": None}
+    assert login.state["user"] is None  # revoked
+    login(ADMIN, scope=["identify", "guilds"])  # oauthlib may store it as a list
+    assert (await get_json(client, "/api/v1/session"))[1]["user"]["id"] == str(ADMIN)
+
+
+async def test_admin_servers_are_asked_of_discord_once(client, login, directory):
+    directory.add_guild(GUILD, name="Community", admins=[ADMIN])
+    login(ADMIN)
+    for _ in range(3):
+        assert (await get_json(client, "/api/v1/elections/servers"))[1] == {"servers": [{"id": str(GUILD), "name": "Community"}]}
+    assert (await get_json(client, "/api/v1/elections"))[0] == 200
+    assert login.state["guild_calls"] == 1  # cached for a minute
+
+
+async def test_fetch_discord_guilds_pages_and_waits_out_a_rate_limit(monkeypatch):
+    from quart_discord import RateLimited
+    pages = {0: [{"id": str(i)} for i in range(1, app_api.GUILD_PAGE + 1)], app_api.GUILD_PAGE: [{"id": "999"}]}
+    calls = []
+
+    async def request(route):
+        calls.append(route)
+        if len(calls) == 1:
+            raise RateLimited({"retry_after": 0, "message": "slow down", "global": False}, {})
+        return pages[int(route.rsplit("after=", 1)[1])]
+
+    monkeypatch.setattr(api.discord, "request", request)
+    guilds = await app_api._fetch_discord_guilds()
+    assert len(guilds) == app_api.GUILD_PAGE + 1
+    assert calls[-1].endswith(f"after={app_api.GUILD_PAGE}")
+
+
+def test_admin_means_owner_or_the_administrator_permission():
+    assert app_api._is_admin({"owner": True, "permissions": "0"})
+    assert app_api._is_admin({"owner": False, "permissions": str(0x8 | 0x400)})
+    assert not app_api._is_admin({"owner": False, "permissions": str(0x20)})
+    assert not app_api._is_admin({})
 
 
 async def test_non_admins_cant_manage(client, login, directory):

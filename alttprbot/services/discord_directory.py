@@ -10,7 +10,7 @@ channels and roles the create form offers, and to post an election's message.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Protocol
+from typing import Iterable, Optional, Protocol
 
 
 @dataclass(frozen=True)
@@ -23,8 +23,8 @@ class Directory(Protocol):
     async def is_owner(self, user_id: int) -> bool:
         """Whether ``user_id`` owns the bot."""
 
-    async def admin_guilds(self, user_id: int) -> list[Named]:
-        """Servers the bot is in where ``user_id`` has Administrator."""
+    async def bot_guilds(self, guild_ids: Iterable[int]) -> list[Named]:
+        """Those of ``guild_ids`` that the bot is in, sorted by name."""
 
     async def member_role_ids(self, guild_id: int, user_id: int) -> Optional[list[int]]:
         """The member's role ids, or None when they aren't in the server."""

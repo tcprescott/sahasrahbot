@@ -219,8 +219,14 @@ class FakeDirectory:
     async def is_owner(self, user_id):
         return user_id == self.owner
 
-    async def admin_guilds(self, user_id):
-        return [self._named(gid, g["name"]) for gid, g in self.guilds.items() if user_id in g["admins"]]
+    def admin_guild_ids(self, user_id):
+        """What Discord's /users/@me/guilds would say ``user_id`` administers."""
+        return {gid for gid, g in self.guilds.items() if user_id in g["admins"]}
+
+    async def bot_guilds(self, guild_ids):
+        ids = set(guild_ids)
+        return sorted((self._named(gid, g["name"]) for gid, g in self.guilds.items() if gid in ids),
+                      key=lambda g: g.name.casefold())
 
     async def is_admin(self, guild_id, user_id):
         return user_id in self.guilds.get(guild_id, {}).get("admins", set())
