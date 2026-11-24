@@ -39,7 +39,7 @@ async def get(message_id: int) -> models.Multiworld:
 
 async def _get_owned(message_id: int, user_id: int) -> models.Multiworld:
     multiworld = await get(message_id)
-    if not multiworld.owner_id == user_id:
+    if multiworld.owner_id != user_id:
         raise MultiworldNotAuthorized()
     return multiworld
 

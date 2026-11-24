@@ -95,7 +95,7 @@ async def server_list_layout(guild_id: int) -> ServerListLayout:
     has no servers (it is still cleared). A category with no servers gets no page.
     """
     categories = await models.DiscordServerCategories.filter(guild_id=guild_id).prefetch_related('server_list')
-    channel_ids = list(set([c.channel_id for c in categories]))
+    channel_ids = list({c.channel_id for c in categories})
 
     pages = []
     for category in categories:
