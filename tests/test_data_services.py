@@ -174,16 +174,18 @@ async def test_scheduled_events(db):
     assert await models.ScheduledEvents.all().count() == 2
 
 
-async def test_known_issue_remember_cannot_replace_a_guild_event_id(db):
+async def test_remember_replaces_a_recreated_guild_event(db):
     """When a mirrored guild event was deleted in Discord, notifications.py creates a new
-    one and calls ``remember`` with its id. ``scheduled_event_id`` is the primary key, and
-    Tortoise's ``update_or_create`` can't change a primary key: the UPDATE matches no row,
-    so the old id stays. The next refresh can't find the old event either and creates
-    another, so the guild collects duplicates. Same behaviour as before the move."""
+    one and calls ``remember`` with its id. The row must then point at the new event, or
+    every later refresh creates yet another duplicate."""
     await scheduled_events.remember(2, 200, "alttpr")
     await scheduled_events.remember(2, 201, "alttpr")
-    assert (await scheduled_events.for_episode(2)).scheduled_event_id == 200
+    assert (await scheduled_events.for_episode(2)).scheduled_event_id == 201
     assert await models.ScheduledEvents.all().count() == 1
+
+    # Remembering the same event again changes nothing.
+    await scheduled_events.remember(2, 201, "alttpr")
+    assert [(e.scheduled_event_id, e.episode_id) for e in await models.ScheduledEvents.all()] == [(201, 2)]
 
 
 # ---------------------------------------------------------------------------

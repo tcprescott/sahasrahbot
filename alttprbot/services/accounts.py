@@ -31,7 +31,7 @@ async def link_racetime(discord_user_id: int, discord_name: str, rtgg_id: str, r
     """
     rtgg_user = await models.Users.get_or_none(rtgg_id=rtgg_id)
     discord_user = await models.Users.get_or_none(discord_user_id=discord_user_id)
-    if not rtgg_user == discord_user and rtgg_user is not None and discord_user is not None:
+    if rtgg_user != discord_user and rtgg_user is not None and discord_user is not None:
         kept_user = await merge_users(rtgg_user, discord_user)
         kept_user.display_name = discord_name
         await kept_user.save()

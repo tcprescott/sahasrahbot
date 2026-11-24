@@ -7,6 +7,8 @@ events; this module only remembers their ids.
 
 from typing import Iterable, List, Optional
 
+from tortoise.transactions import in_transaction
+
 from alttprbot import models
 
 
@@ -21,9 +23,16 @@ async def for_episode(episode_id: int) -> Optional[models.ScheduledEvents]:
 
 
 async def remember(episode_id: int, scheduled_event_id: int, event_slug: str) -> None:
-    """Record (or replace) the guild event that mirrors this episode."""
-    await models.ScheduledEvents.update_or_create(
-        episode_id=episode_id, defaults={'scheduled_event_id': scheduled_event_id, 'event_slug': event_slug})
+    """Record (or replace) the guild event that mirrors this episode.
+
+    ``scheduled_event_id`` is the primary key, which ``update_or_create`` can't change,
+    so a replaced guild event's row is deleted and created again.
+    """
+    async with in_transaction():
+        await models.ScheduledEvents.filter(episode_id=episode_id).exclude(
+            scheduled_event_id=scheduled_event_id).delete()
+        await models.ScheduledEvents.update_or_create(
+            scheduled_event_id=scheduled_event_id, defaults={'episode_id': episode_id, 'event_slug': event_slug})
 
 
 async def forget(scheduled_event_id: int) -> None:
