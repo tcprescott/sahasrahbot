@@ -74,8 +74,6 @@ async def _clear_caches():
         "alttprbot.util.asynctournament",
         "alttprbot.services.guild_config",
         "alttprbot.database.role",
-        "alttprbot.database.smz3_multiworld",
-        "alttprbot.database.tournament_results",
     ):
         module = sys.modules.get(name)
         if module is not None and hasattr(module, "CACHE"):

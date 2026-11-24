@@ -153,8 +153,6 @@ LINKS = [
     ("testdata: all preset namespaces", "/presets"),
     ("Racetime verification", "/racetime/verification/initiate"),
     ("Schedule (DEBUG)", "/schedule/devevent"),
-    ("SG Live", "/sglive/"),
-    ("SG Live capacity report (fake SpeedGaming)", "/sglive/reports/capacity"),
     ("Healthcheck", "/healthcheck"),
 ]
 

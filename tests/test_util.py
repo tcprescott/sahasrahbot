@@ -19,7 +19,7 @@ import config
 from alttprbot import models, tournaments
 from alttprbot.services import bots
 from alttprbot.alttprgen import generator, spoilers
-from alttprbot.util import discord_members, helpers, http, rankedchoice, speedgaming, triforce_text
+from alttprbot.util import discord_members, helpers, rankedchoice, speedgaming, triforce_text
 
 # ---------------------------------------------------------------------------
 # helpers
@@ -195,38 +195,6 @@ async def test_ranked_choice_embed(db):
 
 
 # ---------------------------------------------------------------------------
-# http
-# ---------------------------------------------------------------------------
-
-
-async def test_request_generic_return_types(fake_http):
-    fake_http.add("GET", "/x", body='{"a": 1}')
-    url = fake_http.url("/x")
-    assert await http.request_generic(url) == '{"a": 1}'
-    assert await http.request_generic(url, returntype="json") == {"a": 1}
-    assert await http.request_generic(url, returntype="binary") == b'{"a": 1}'
-    assert await http.request_generic(url, returntype="yaml") == {"a": 1}
-    await http.request_generic(url, reqparams={"q": "1"})
-    assert fake_http.requests[-1].query == {"q": "1"}
-
-
-async def test_request_json_post_and_put(fake_http):
-    fake_http.add("POST", "/p", body='{"ok": true}')
-    fake_http.add("PUT", "/p", body="done")
-    assert await http.request_json_post(fake_http.url("/p"), {"x": 1}, returntype="json") == {"ok": True}
-    assert await http.request_json_put(fake_http.url("/p"), {"x": 1}) == "done"
-    assert [json.loads(r.body) for r in fake_http.requests] == [{"x": 1}, {"x": 1}]
-
-
-async def test_request_generic_raises_for_status(fake_http):
-    import aiohttp
-
-    fake_http.add("GET", "/x", status=500)
-    with pytest.raises(aiohttp.ClientResponseError):
-        await http.request_generic(fake_http.url("/x"))
-
-
-# ---------------------------------------------------------------------------
 # SpeedGaming
 # ---------------------------------------------------------------------------
 
@@ -275,20 +243,6 @@ async def test_get_episode_debug_fixture_zero_is_not_found(monkeypatch):
     monkeypatch.setattr(config, "DEBUG", True)
     with pytest.raises(speedgaming.SGEpisodeNotFoundException):
         await speedgaming.get_episode(0)
-
-
-def test_known_issue_legacy_speedgaming_module_cannot_be_imported():
-    """KNOWN ISSUE, pinned not endorsed: ``alttprbot/speedgaming.py`` (the older
-    dataclass client) does ``from dataclasses_json import config`` and then
-    ``import config``, so the field metadata calls the settings module and the
-    import fails. Nothing imports it; ``alttprbot/util/speedgaming.py`` is the live one."""
-    import importlib
-    import sys
-
-    sys.modules.pop("alttprbot.speedgaming", None)
-    with pytest.raises(TypeError, match="not callable"):
-        importlib.import_module("alttprbot.speedgaming")
-    sys.modules.pop("alttprbot.speedgaming", None)
 
 
 # ---------------------------------------------------------------------------

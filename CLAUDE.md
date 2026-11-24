@@ -10,16 +10,15 @@ where things live. Read it before changing code.
 
 ## Standing facts (don't undo these)
 
-- **Privileged intents are permanently off.** Both Discord clients use
+- **Privileged intents are permanently off.** The Discord client uses
   `discord.Intents.default()`; requesting members, presences or message_content makes
   Discord refuse the login (close code 4014) and the bot never comes online. Look up
   members with `alttprbot/util/discord_members.py` (`get_member`, `get_member_named`),
   never the member cache, `guild.chunk()`, `guild.members` or `role.members`.
   [docs/privileged_intents.md](docs/privileged_intents.md) lists what can't work without
   them. A hook (`check_privileged_intents.py`) enforces this.
-- **The audit bot is disabled by default.** `alttprbot_audit/` only starts when
-  `config.AUDIT_BOT_ENABLED = True`. Most of it needs intents it no longer has, so don't
-  turn it on or build on it without asking.
+- **The audit bot was removed** (2026-11), along with other dead features (orphaned
+  tournament classes, SG Live, `/cc2023`). Don't bring them back without asking.
 - **The async tournament feature stays.** Its code spans
   `alttprbot_discord/cogs/asynctournament.py`, `alttprbot/util/asynctournament.py`,
   `alttprbot_api/blueprints/asynctournament.py` and the `AsyncTournament*` models. Don't
@@ -32,7 +31,7 @@ where things live. Read it before changing code.
 
 | Path | What it is |
 |---|---|
-| `sahasrahbot.py` | Entry point: Sentry, `Tortoise.init`, then starts the Discord bot, the optional audit bot, the racetime bots and the API on one loop |
+| `sahasrahbot.py` | Entry point: Sentry, `Tortoise.init`, then starts the Discord bot, the racetime bots and the API on one loop |
 | `config.py` | **Gitignored, holds production secrets.** Never print, edit or commit it |
 | `config.example.py` | Every setting the code reads, with placeholders. Tests load it when `config.py` is absent |
 | `alttprbot/models/` | Tortoise models (`models.py`, `schedule.py`), re-exported from `alttprbot.models` |
@@ -45,7 +44,6 @@ where things live. Read it before changing code.
 | `alttprbot_discord/` | Main Discord bot: `bot.py` (client and extension list), `cogs/` (commands), `notifications.py` (event bridge subscribers), `util/` (`seed_embeds.py` builds every seed embed, checks) |
 | `alttprbot_racetime/` | racetime.gg bots: `config.py` (category → handler map), `core.py`, `handlers/` (one per category) |
 | `alttprbot_api/` | Quart web app on 127.0.0.1:5001: `api.py`, `auth.py` (Discord OAuth), `blueprints/`, `templates/`, `static/` |
-| `alttprbot_audit/` | Second Discord bot for moderation/audit logs. Disabled by default (see above) |
 | `presets/` | YAML presets per randomizer (`alttpr/`, `sm/`, `smz3/`, `alttprmystery/`, `ctjets/`). The file name is the preset name |
 | `migrations/` | Aerich migrations (generated; don't hand-edit old ones) and `tortoise_config.py` |
 | `docs/` | **The public user site** (GitHub Pages, Jekyll, sahasrahbot.synack.live). User-facing command and preset docs only; developer notes belong in this file |
@@ -152,7 +150,7 @@ a web change in a real browser (Playwright, or the `run` skill).
   (`/_fake/racetime/`) and SpeedGaming's `/schedule` and `/episode` (`/_fake/speedgaming/`)
   are faked too.
 - **Not faked yet:** seed generation (alttpr.com, OoTR, SMZ3 and the other randomizer
-  APIs), so SG Live "generate" buttons and preset rolling fail; Google Sheets is a no-op
+  APIs), so preset rolling fails; Google Sheets is a no-op
   stub. Add a fake under `devserver/fake_services.py` and point the setting at it in
   `devserver/bootstrap.py`.
 - **testdata:** after its hand-made rows the dev server also loads `testdata/` (ids from
@@ -211,7 +209,7 @@ Production code doesn't know about the dev server: nothing in `alttprbot*/` impo
 - Dependencies are managed with Poetry. Use `poetry add`, never bare `pip install`.
   Never add `py-cord`: it installs into the same `discord` package as discord.py.
 - **Layers.** `alttprbot/` is core and must not import `alttprbot_discord`,
-  `alttprbot_api`, `alttprbot_racetime` or `alttprbot_audit`; those front ends may import
+  `alttprbot_api` or `alttprbot_racetime`; those front ends may import
   core but not each other. `.claude/scripts/check_layers.py` enforces this (hook, CI and
   `check.sh`). `layer_allowlist.txt` is empty now; never add a line to it. When core needs
   a front end's live object, the front end registers it at startup instead: the bots via

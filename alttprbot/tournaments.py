@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 import config
 from alttprbot import models
-from alttprbot.tournament import test, boots, dailies, smwde, smrl_playoff, nologic, alttprhmg, alttprleague, alttprmini, alttprde, alttpr_quals, alttpr
+from alttprbot.tournament import test, dailies, alttprleague, alttpr_quals
 from alttprbot.util import gsheet
 from alttprbot.services import bots
 
@@ -26,22 +26,8 @@ if config.DEBUG:
     }
 else:
     TOURNAMENT_DATA = {
-        # REGULAR TOURNEMNTS
-
-        # 'alttprcd': alttprcd.ALTTPRCDTournament,
-        # 'alttprde': alttprde.ALTTPRDETournament,
-        # 'alttprmini': alttprmini.ALTTPRMiniTournament,
+        # Async tournament live qualifier races
         'alttpr': alttpr_quals.ALTTPRQualifierRace,
-        # 'boots': boots.ALTTPRCASBootsTournamentRace,
-        # 'nologic': nologic.ALTTPRNoLogicRace,
-        # 'smwde': smwde.SMWDETournament,
-        # 'alttprfr': alttprfr.ALTTPRFRTournament,
-        # 'alttprhmg': alttprhmg.ALTTPRHMGTournament,
-        # 'alttpres': alttpres.ALTTPRESTournament,
-        # 'smz3coop': smz3coop.SMZ3CoopTournament,
-        # 'smbingo': smbingo.SMBingoTournament,
-        # 'smrl': smrl_playoff.SMRLPlayoffs,
-        # 'sgl24alttpr': alttprsglive.ALTTPRSGLive,
 
         # Dailies/Weeklies
         'alttprdaily': dailies.AlttprSGDailyRace,

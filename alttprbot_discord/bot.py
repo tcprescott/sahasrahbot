@@ -29,14 +29,11 @@ if config.SENTRY_URL:
 
 async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.errors")
-    # await discordbot.load_extension("alttprbot_discord.cogs.bontamw")
     await discordbot.load_extension("alttprbot_discord.cogs.daily")
     await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
-    await discordbot.load_extension("alttprbot_discord.cogs.nickname")
     await discordbot.load_extension("alttprbot_discord.cogs.role")
     await discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
-    await discordbot.load_extension("alttprbot_discord.cogs.tournament")
     await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
     await discordbot.load_extension("alttprbot_discord.cogs.smmulti")
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
@@ -44,11 +41,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.rankedchoice")
     await discordbot.load_extension("alttprbot_discord.cogs.asynctournament")
     await discordbot.load_extension("alttprbot_discord.cogs.doorsmw")
-    # await discordbot.load_extension("alttprbot_discord.cogs.admin")
     await discordbot.load_extension("alttprbot_discord.cogs.racer_verification")
-
-    if config.DEBUG:
-        await discordbot.load_extension("alttprbot_discord.cogs.test")
 
     await discordbot.load_extension('jishaku')
 

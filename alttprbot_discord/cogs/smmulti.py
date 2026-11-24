@@ -255,11 +255,6 @@ class SMMulti(commands.Cog):
             self.bot.add_view(MultiworldSignupView())
             self.persistent_views_added = True
 
-    @app_commands.command(
-        description="Stub for the old multiworld command.  This command has been replaced by `/smmulti`.")
-    async def multiworld(self, interaction: discord.Interaction):
-        await interaction.response.send_message("This command has been replaced by `/smmulti`.", ephemeral=True)
-
     @app_commands.command(description="Creates a multiworld session for SM and SMZ3.")
     async def smmulti(self, interaction: discord.Interaction):
         embed = discord.Embed(
