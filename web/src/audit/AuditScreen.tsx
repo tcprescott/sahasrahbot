@@ -298,7 +298,7 @@ function EntrySheet({
   entry,
   onClose,
   onMoreBy,
-}: Readonly<{ entry: AuditEntry | undefined; onClose: () => void; onMoreBy: (e: AuditEntry) => void }>) {
+}: Readonly<{ entry?: AuditEntry; onClose: () => void; onMoreBy: (e: AuditEntry) => void }>) {
   const { changes, facts } = describeDetails((entry?.details ?? {}) as Record<string, unknown>)
   return (
     <Dialog

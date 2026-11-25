@@ -41,7 +41,8 @@ def audited(detail: str):
     return decorator
 
 
-async def bind_prefix_command(ctx) -> None:  # NOSONAR: discord.py awaits before_invoke hooks
+# discord.py requires before_invoke hooks to be coroutines, so this stays async.
+async def bind_prefix_command(ctx) -> None:  # NOSONAR
     """``before_invoke`` hook: runs in the command's own task, so the source holds for
     the command body."""
     audit.set_source(context_source(ctx))
