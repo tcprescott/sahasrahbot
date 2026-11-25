@@ -1,5 +1,5 @@
 """Chat commands of the smaller racetime.gg category handlers (SMR, Z1R, Z2R, FF1R,
-SMB3R, the test category) and the ALTTPR spoiler commands.
+the test category) and the ALTTPR spoiler commands.
 
 Built on the helpers in ``tests/test_racetime_handlers.py``: a handler with its
 outgoing actions mocked, fed chat messages the way racetime.gg sends them.
@@ -12,7 +12,7 @@ import pytest
 
 from alttprbot import models
 from alttprbot.alttprgen import generator
-from alttprbot_racetime.handlers import alttpr, ff1r, smb3r, smr, smz3, z1r, z2r
+from alttprbot_racetime.handlers import alttpr, ff1r, smr, smz3, z1r, z2r
 from alttprbot_racetime.handlers import test as test_category
 from alttprbot_racetime.handlers.core import MSG_GENERATING, MSG_NO_PRESET, MSG_ROLL_COMPLETE
 from tests.test_racetime_handlers import chat, fake_seed, make_handler, said
@@ -186,15 +186,13 @@ async def test_smr_dash_usage_and_errors(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# Zelda 1 (z1r), Zelda 2 (z2r), FF1R, SMB3R
+# Zelda 1 (z1r), Zelda 2 (z2r), FF1R
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture
 def fixed_seed(monkeypatch):
-    for module in (z1r, smb3r):
-        name = "roll_z1r" if module is z1r else "roll_smb3r"
-        monkeypatch.setattr(module, name, lambda flags: (123, flags))
+    monkeypatch.setattr(z1r, "roll_z1r", lambda flags: (123, flags))
 
 
 async def test_z1r_flags_and_presets(fixed_seed):
@@ -287,18 +285,9 @@ def test_roll_ffr_replaces_the_seed(monkeypatch):
     assert url == "https://ff1r.test/?f=FLAGS&s=0000BEEF"
 
 
-async def test_smb3r_flags(fixed_seed):
-    h = make_handler(smb3r.GameHandler)
-    await chat(h, "!flags 17BCA")
-    h.set_bot_raceinfo.assert_awaited_once_with("Seed: 123 - Flags: 17BCA")
-    h = make_handler(smb3r.GameHandler)
-    await chat(h, "!flags")
-    assert said(h) == ["You must specify a set of flags!"]
-
-
 async def test_locked_rooms_refuse_to_roll(fixed_seed):
     for cls, text in [(z1r.GameHandler, "!flags X"), (z1r.GameHandler, "!race power"), (z2r.GameHandler, "!mrb"),
-                      (z2r.GameHandler, "!flags X"), (z2r.GameHandler, "!nit"), (smb3r.GameHandler, "!flags X"),
+                      (z2r.GameHandler, "!flags X"), (z2r.GameHandler, "!nit"),
                       (ff1r.GameHandler, "!ff1url https://x.test/"), (smr.GameHandler, "!varia a b"),
                       (smr.GameHandler, "!dash a"), (smr.GameHandler, "!choozorace a b c d e f g"),
                       (smr.GameHandler, "!multiworld a"), (smr.GameHandler, "!smleagueplayoff a"),

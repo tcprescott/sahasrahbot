@@ -67,7 +67,7 @@ RACETIME_CLIENT_SECRET_OAUTH = ""
 # RACETIME_CLIENT_ID_ALTTPR. These are placeholders for every category in
 # alttprbot_racetime/config.py; alttprbot_racetime/bot.py refuses to start
 # unless every category has both, so a real config.py must set them all.
-for _slug in ("test", "alttpr", "ct-jets", "ff1r", "smb3r", "smr", "smz3", "twwr",
+for _slug in ("test", "alttpr", "ct-jets", "ff1r", "smr", "smz3", "twwr",
               "z1r", "z2r"):
     _key = _slug.upper().replace("-", "")
     globals()[f"RACETIME_CLIENT_ID_{_key}"] = "placeholder"
