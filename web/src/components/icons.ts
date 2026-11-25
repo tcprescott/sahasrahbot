@@ -25,6 +25,8 @@ import FlagIcon from '@material-symbols/svg-400/outlined/flag.svg?react'
 import FolderIcon from '@material-symbols/svg-400/outlined/folder.svg?react'
 import FolderFillIcon from '@material-symbols/svg-400/outlined/folder-fill.svg?react'
 import ForumIcon from '@material-symbols/svg-400/outlined/forum.svg?react'
+import FullscreenIcon from '@material-symbols/svg-400/outlined/fullscreen.svg?react'
+import FullscreenExitIcon from '@material-symbols/svg-400/outlined/fullscreen_exit.svg?react'
 import GavelIcon from '@material-symbols/svg-400/outlined/gavel.svg?react'
 import HistoryIcon from '@material-symbols/svg-400/outlined/history.svg?react'
 import HomeIcon from '@material-symbols/svg-400/outlined/home.svg?react'
@@ -49,9 +51,12 @@ import RefreshIcon from '@material-symbols/svg-400/outlined/refresh.svg?react'
 import SearchIcon from '@material-symbols/svg-400/outlined/search.svg?react'
 import SmartToyIcon from '@material-symbols/svg-400/outlined/smart_toy.svg?react'
 import UndoIcon from '@material-symbols/svg-400/outlined/undo.svg?react'
+import UnfoldLessIcon from '@material-symbols/svg-400/outlined/unfold_less.svg?react'
+import UnfoldMoreIcon from '@material-symbols/svg-400/outlined/unfold_more.svg?react'
 import UploadIcon from '@material-symbols/svg-400/outlined/upload.svg?react'
 import VisibilityIcon from '@material-symbols/svg-400/outlined/visibility.svg?react'
 import WarningIcon from '@material-symbols/svg-400/outlined/warning.svg?react'
+import WrapTextIcon from '@material-symbols/svg-400/outlined/wrap_text.svg?react'
 
 type Svg = FC<SVGProps<SVGSVGElement>>
 
@@ -77,6 +82,8 @@ export const ICONS = {
   flag: FlagIcon,
   folder: FolderIcon,
   forum: ForumIcon,
+  fullscreen: FullscreenIcon,
+  fullscreen_exit: FullscreenExitIcon,
   gavel: GavelIcon,
   history: HistoryIcon,
   home: HomeIcon,
@@ -98,9 +105,12 @@ export const ICONS = {
   search: SearchIcon,
   smart_toy: SmartToyIcon,
   undo: UndoIcon,
+  unfold_less: UnfoldLessIcon,
+  unfold_more: UnfoldMoreIcon,
   upload: UploadIcon,
   visibility: VisibilityIcon,
   warning: WarningIcon,
+  wrap_text: WrapTextIcon,
 } satisfies Record<string, Svg>
 
 export type IconName = keyof typeof ICONS

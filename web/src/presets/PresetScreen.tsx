@@ -7,7 +7,7 @@ import { ActionsMenu, Banner, Button, ConfirmDialog, Icon, PageHeader, Panel } f
 import { browser } from '../lib/browser'
 import { fullDate } from '../lib/time'
 import { downloadPath, namespacePath, presetParams } from './paths'
-import { YamlField } from './YamlField'
+import { YamlCode, YamlField } from './YamlField'
 
 /** /presets/manage/:namespace/:randomizer/:preset — read it, and edit it if it's yours (?edit=1). */
 export function PresetScreen() {
@@ -21,6 +21,7 @@ export function PresetScreen() {
     ),
   )
   const [draft, setDraft] = useState<string | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
   const [deleting, setDeleting] = useState(false)
@@ -84,7 +85,7 @@ export function PresetScreen() {
             {editing && p.can_edit ? (
               <Panel title="Edit">
                 <div className="panel__pad stack">
-                  <YamlField value={text} onChange={setDraft} />
+                  <YamlField value={text} onChange={setDraft} onProblem={setProblem} randomizer={p.randomizer} />
                   <div className="t-actions t-actions--end">
                     <Button variant="ghost" onClick={() => setEditing(false)}>
                       Cancel
@@ -92,7 +93,7 @@ export function PresetScreen() {
                     <Button
                       busy={busy}
                       busyLabel="Saving"
-                      disabled={draft === null || draft === p.content}
+                      disabled={draft === null || draft === p.content || problem !== null}
                       onClick={async () => {
                         setBusy(true)
                         try {
@@ -118,9 +119,7 @@ export function PresetScreen() {
               </Panel>
             ) : (
               <Panel title="YAML">
-                <pre className="yaml">
-                  <code>{p.content}</code>
-                </pre>
+                <YamlCode value={p.content} />
               </Panel>
             )}
             <ConfirmDialog

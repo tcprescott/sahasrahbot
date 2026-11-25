@@ -51,6 +51,12 @@
   --count-bg: var(--status-cancelled);
   --count-fg: var(--n-0);
 
+  /* Syntax colours in the preset YAML editor. Each is 5:1 or better on --surface. */
+  --code-key: var(--purple);
+  --code-string: #2F6F3E;
+  --code-literal: #A6461A;
+  --code-comment: var(--n-500);
+
   --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
   --text-xs: 0.75rem;
@@ -113,6 +119,11 @@
   --status-info: #7FB0DC;
   --count-bg: var(--status-cancelled);
   --count-fg: var(--n-900);
+
+  --code-key: #C7B0FA;
+  --code-string: #A8C46B;
+  --code-literal: #F0A848;
+  --code-comment: #A8A59E;
 
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
