@@ -9,6 +9,7 @@ import re
 
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
+from alttprbot.services import audit
 
 MAX_LINE = 19
 # The hyphen is last on purpose: the old form had it between "," and "…", which made a
@@ -73,6 +74,8 @@ async def submit(pool_name: str, user_id: int, author: str, lines: list[str]) ->
 
     row = await models.TriforceTexts.create(
         pool_name=pool_name, text='\n'.join(lines), discord_user_id=user_id, author=author)
+    await audit.record(audit.TRIFORCE_TEXT_SUBMITTED, target=f"Pool {pool_name}, text #{row.id}",
+                       details={'pool': pool_name, 'text_id': row.id})
     return _text(row, with_author=False)
 
 
@@ -95,6 +98,11 @@ async def moderate(pool_name: str, text_id: int, user_id: int, approved: bool) -
     row = await models.TriforceTexts.get_or_none(id=text_id, pool_name=pool_name)
     if row is None:
         raise NotFoundError("That text isn't in this pool.")
+    previous = row.approved
     row.approved = approved
     await row.save()
+    if previous != approved:
+        await audit.record(audit.TRIFORCE_TEXT_APPROVED if approved else audit.TRIFORCE_TEXT_REJECTED,
+                           target=f"Pool {pool_name}, text #{row.id}",
+                           details={'pool': pool_name, 'text_id': row.id, 'author_discord_id': row.discord_user_id})
     return _text(row, with_author=True)

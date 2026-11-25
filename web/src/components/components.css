@@ -311,6 +311,18 @@
 }
 .dialog--sm { width: min(420px, calc(100vw - 32px)); }
 .dialog--lg { width: min(820px, calc(100vw - 32px)); }
+@media (min-width: 768px) {
+  .dialog--side {
+    left: auto;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    transform: none;
+    width: min(440px, 100vw);
+    max-height: none;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  }
+}
 .dialog__head {
   display: flex;
   align-items: center;

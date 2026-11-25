@@ -8,7 +8,7 @@ from quart_discord import requires_authorization
 import config
 from alttprbot.exceptions import NotFoundError
 from alttprbot_api.api import discord
-from alttprbot.services import accounts, api_keys, bots
+from alttprbot.services import accounts, api_keys, audit, bots
 
 racetime_blueprint = Blueprint('racetime', __name__)
 
@@ -111,6 +111,7 @@ async def return_racetime_verify():
 
     rtgg_id = userinfo_data['id']
 
+    audit.set_source(audit.Source(via=audit.VIA_WEBSITE, actor_discord_id=user.id, actor_name=user.name))
     await accounts.link_racetime(user.id, user.name, rtgg_id, token)
 
     # The app's Me page says which racetime.gg account was linked.

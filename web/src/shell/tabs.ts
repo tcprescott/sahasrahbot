@@ -43,5 +43,6 @@ export function titleFor(pathname: string): string {
   if (pathname.startsWith('/elections')) return 'Elections'
   if (pathname.startsWith('/triforcetexts')) return 'Triforce texts'
   if (pathname.startsWith('/submit')) return 'Race settings'
+  if (pathname.startsWith('/audit')) return 'Audit log'
   return TABS.find((tab) => tab.match(pathname))?.label ?? 'SahasrahBot'
 }

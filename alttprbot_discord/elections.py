@@ -17,6 +17,7 @@ import config
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 from alttprbot.services import discord_directory, elections
 from alttprbot.services.discord_directory import Named
+from alttprbot_discord.audit import audited
 from alttprbot.util import discord_members
 
 logger = logging.getLogger(__name__)
@@ -89,6 +90,7 @@ class ElectionView(discord.ui.View):
         self.add_item(self.end_election)
 
     @discord.ui.button(label="End election", custom_id=END_BUTTON_ID, style=discord.ButtonStyle.danger)
+    @audited('End election button')
     async def end_election(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
         try:

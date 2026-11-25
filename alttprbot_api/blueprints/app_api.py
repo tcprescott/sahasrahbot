@@ -20,12 +20,15 @@ isn't sent by a browser on its own, so it needs no such header.
 """
 
 import asyncio
+import csv
+import io
+import json
 import time
 from dataclasses import dataclass
 from typing import Optional
 
 import discord as discord_py
-from quart import Blueprint, abort, g, request
+from quart import Blueprint, Response, abort, g, request
 from quart_discord import RateLimited, Unauthorized
 from quart_schema import tag, validate_querystring, validate_request, validate_response
 
@@ -33,8 +36,8 @@ import config
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
-from alttprbot.services import (accounts, api_tokens, elections, mcp_auth, presets, seeds, tournament_submissions,
-                                triforce_texts)
+from alttprbot.services import (accounts, api_tokens, audit, elections, mcp_auth, presets, seeds,
+                                tournament_submissions, triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -102,13 +105,17 @@ async def _session_user():
 
 
 async def signed_in_user() -> Optional[Caller]:
-    """Who's calling, or None."""
+    """Who's calling, or None. Also tells the audit log who is acting in this request."""
     token = g.get('api_token')
     if token is not None:
-        return Caller(id=token.discord_user_id, name=token.user_name, token=token)
+        caller = Caller(id=token.discord_user_id, name=token.user_name, token=token)
+        audit.set_source(audit.Source(via=audit.VIA_API, detail=token.name, actor_discord_id=caller.id,
+                                      actor_name=caller.name))
+        return caller
     user = await _session_user()
     if user is None:
         return None
+    audit.set_source(audit.Source(via=audit.VIA_WEBSITE, actor_discord_id=user.id, actor_name=user.name))
     return Caller(id=user.id, name=user.name, discriminator=str(getattr(user, 'discriminator', '0')),
                   avatar_url=getattr(user, 'avatar_url', None) or None)
 
@@ -546,6 +553,74 @@ async def lookup_seed(hash_id: str):
     """What SahasrahBot recorded about a seed it rolled: randomizer, preset and link."""
     await require_user()
     return schemas.SeedLookup(**await seeds.lookup(hash_id))
+
+
+# --- Audit log ---------------------------------------------------------------
+
+
+def audit_entry(data: dict) -> schemas.AuditEntry:
+    return schemas.AuditEntry(**{**data, 'actor_id': _id(data['actor_id']), 'guild_id': _id(data['guild_id'])})
+
+
+def audit_filters(query: schemas.AuditQuery) -> audit.Filters:
+    return audit.Filters(scope=query.scope, area=query.area or None, query=query.q,
+                         actor_discord_id=_int_id(query.actor, 'person'), before_id=query.before, limit=query.limit)
+
+
+@app_api_blueprint.get('/audit/options')
+@tag(['audit'])
+@validate_response(schemas.AuditOptions)
+async def audit_options():
+    """What you can filter the audit log by: your own activity, each server you
+    administer, and everything if you own the bot; and the areas."""
+    user = await require_user()
+    return schemas.AuditOptions(
+        scopes=[schemas.AuditScope(**s) for s in await audit.scopes(user.id, await admin_guild_ids(user))],
+        areas=[schemas.AuditArea(**a) for a in audit.areas()],
+    )
+
+
+@app_api_blueprint.get('/audit')
+@tag(['audit'])
+@validate_querystring(schemas.AuditQuery)
+@validate_response(schemas.AuditPage)
+async def list_audit(query_args: schemas.AuditQuery):
+    """Changes made through SahasrahBot, newest first: yours (`scope=mine`), a server you
+    administer's (`scope=<server id>`), or everyone's (`scope=all`, the bot's owners)."""
+    user = await require_user()
+    page = await audit.list_entries(user.id, await admin_guild_ids(user), audit_filters(query_args))
+    return schemas.AuditPage(entries=[audit_entry(e) for e in page['entries']], next_before=page['next_before'])
+
+
+CSV_COLUMNS = ('id', 'created_at', 'label', 'action', 'actor_name', 'actor_id', 'guild_name', 'guild_id', 'target',
+               'via_label', 'via_detail', 'details')
+
+
+def _csv_cell(value) -> str:
+    if value is None:
+        text = ''
+    elif isinstance(value, dict):
+        text = json.dumps(value)
+    else:
+        text = str(value)
+    # A leading =, +, - or @ would run as a formula in a spreadsheet.
+    return "'" + text if text[:1] in ('=', '+', '-', '@') else text
+
+
+@app_api_blueprint.get('/audit/export')
+@tag(['audit'])
+@validate_querystring(schemas.AuditQuery)
+async def export_audit(query_args: schemas.AuditQuery):
+    """The same entries as `/audit`, every page (up to 10,000), as a CSV file."""
+    user = await require_user()
+    rows = await audit.export_entries(user.id, await admin_guild_ids(user), audit_filters(query_args))
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(CSV_COLUMNS)
+    for row in rows:
+        writer.writerow([_csv_cell(row[c].isoformat() if c == 'created_at' else row[c]) for c in CSV_COLUMNS])
+    return Response(out.getvalue(), mimetype='text/csv',
+                    headers={'Content-Disposition': 'attachment; filename="sahasrahbot-audit-log.csv"'})
 
 
 # --- API tokens --------------------------------------------------------------

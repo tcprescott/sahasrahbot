@@ -10,6 +10,7 @@ import isodate
 
 from alttprbot import models
 from alttprbot.integrations import alttprladder, racetime
+from alttprbot.services import audit
 
 
 async def get_for_message(message_id: int, guild_id: int):
@@ -26,11 +27,14 @@ async def get_linked_user(discord_user_id: int):
 
 
 async def create_or_update(guild_id: int, role_id: int, **settings) -> models.RacerVerification:
-    racer_verification, _ = await models.RacerVerification.update_or_create(
+    racer_verification, created = await models.RacerVerification.update_or_create(
         role_id=role_id,
         guild_id=guild_id,
         defaults=settings,
     )
+    await audit.record(audit.RACER_VERIFICATION_CONFIGURED, target=f'Role {role_id}', guild_id=guild_id,
+                       details={'racer_verification_id': racer_verification.id, 'role_id': role_id,
+                                'created': created, 'settings': settings})
     return racer_verification
 
 
@@ -46,12 +50,16 @@ async def record_verified(user: models.Users, racer_verification: models.RacerVe
     now = now or datetime.now(timezone.utc)
     racer = await models.VerifiedRacer.get_or_none(user=user, racer_verification=racer_verification)
     if racer is None:
-        return await models.VerifiedRacer.create(
+        racer = await models.VerifiedRacer.create(
             user=user,
             racer_verification=racer_verification,
             last_verified=now,
             estimated_count=count
         )
+        await audit.record(audit.RACER_VERIFICATION_VERIFIED, target=f'Role {racer_verification.role_id}',
+                           guild_id=racer_verification.guild_id, actor_discord_id=user.discord_user_id,
+                           details={'racer_verification_id': racer_verification.id, 'race_count': count})
+        return racer
     racer.last_verified = now
     racer.estimated_count = count
     await racer.save()

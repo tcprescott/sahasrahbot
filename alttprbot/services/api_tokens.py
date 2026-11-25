@@ -17,6 +17,7 @@ from typing import Optional
 
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, NotFoundError
+from alttprbot.services import audit
 
 PAT = 'pat'
 OAUTH = 'oauth'
@@ -87,6 +88,9 @@ async def create_personal_token(discord_user_id: int, user_name: str, name: str,
         read_only=read_only,
         expires_at=None if expires_in_days is None else created + timedelta(days=expires_in_days),
     )
+    await audit.record(audit.API_TOKEN_CREATED, target=name, actor_discord_id=discord_user_id, actor_name=user_name,
+                       details={'token_id': token.id, 'read_only': read_only, 'expires_in_days': expires_in_days,
+                                'prefix': token.token_prefix})
     return raw, _row(token)
 
 
@@ -103,6 +107,9 @@ async def revoke(token_id: int, discord_user_id: int) -> None:
     if token is None:
         raise NotFoundError("That token doesn't exist, or it's already revoked.")
     await models.ApiToken.filter(id=token.id).update(revoked_at=now())
+    action = audit.AI_CLIENT_DISCONNECTED if token.origin == OAUTH else audit.API_TOKEN_REVOKED
+    await audit.record(action, target=token.name, actor_discord_id=discord_user_id,
+                       details={'token_id': token.id})
 
 
 async def revoke_all_for_user(discord_user_id: int) -> None:

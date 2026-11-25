@@ -2,7 +2,7 @@
 linked to it, and deleting it on request."""
 
 from alttprbot import models
-from alttprbot.services import triforce_texts
+from alttprbot.services import audit, triforce_texts
 
 
 async def profile(discord_user_id: int) -> dict:
@@ -18,11 +18,15 @@ async def profile(discord_user_id: int) -> dict:
 
 async def purge(discord_user_id: int) -> None:
     """Delete the user's preset namespace (and its presets), nickname verifications,
-    API tokens and connected AI clients."""
+    API tokens and connected AI clients. Their audit log entries stay, no longer
+    naming them; the purge itself is recorded the same way."""
     await models.PresetNamespaces.filter(discord_user_id=discord_user_id).delete()
     await models.NickVerification.filter(discord_user_id=discord_user_id).delete()
     await models.ApiToken.filter(discord_user_id=discord_user_id).delete()
     await models.McpAuthorizationCode.filter(discord_user_id=discord_user_id).delete()
+    await audit.forget_actor(discord_user_id)
+    with audit.acting(audit.Source(via=audit.current_source().via)):
+        await audit.record(audit.ACCOUNT_PURGED)
 
 
 async def link_racetime(discord_user_id: int, discord_name: str, rtgg_id: str, rtgg_access_token: str) -> None:
@@ -47,6 +51,8 @@ async def link_racetime(discord_user_id: int, discord_name: str, rtgg_id: str, r
                                             defaults={'discord_user_id': discord_user_id,
                                                       'rtgg_access_token': rtgg_access_token,
                                                       'display_name': discord_name})
+    await audit.record(audit.ACCOUNT_RACETIME_LINKED, target=rtgg_id, actor_discord_id=discord_user_id,
+                       actor_name=discord_name, details={'racetime_id': rtgg_id})
 
 
 async def merge_users(user_to_keep: models.Users, victim: models.Users) -> models.Users:

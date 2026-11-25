@@ -140,6 +140,7 @@ class FakeInteraction:
     def __init__(self, user=None, guild=None, channel=None, message=None, namespace=None):
         self.user = user or FakeUser()
         self.guild = guild
+        self.guild_id = getattr(guild, 'id', None)
         self.channel = channel or FakeChannel(guild=guild)
         self.message = message
         self.namespace = SimpleNamespace(**(namespace or {}))
