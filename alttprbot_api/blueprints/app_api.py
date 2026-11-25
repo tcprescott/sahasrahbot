@@ -597,7 +597,12 @@ CSV_COLUMNS = ('id', 'created_at', 'label', 'action', 'actor_name', 'actor_id', 
 
 
 def _csv_cell(value) -> str:
-    text = '' if value is None else (json.dumps(value) if isinstance(value, dict) else str(value))
+    if value is None:
+        text = ''
+    elif isinstance(value, dict):
+        text = json.dumps(value)
+    else:
+        text = str(value)
     # A leading =, +, - or @ would run as a formula in a spreadsheet.
     return "'" + text if text[:1] in ('=', '+', '-', '@') else text
 

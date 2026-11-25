@@ -103,7 +103,8 @@ async def test_long_text_is_clipped(db):
     with as_(ALICE, detail="d" * 500):
         await audit.record(audit.PRESET_DELETED, target="t" * 500)
     row = (await rows())[0]
-    assert len(row.target) == 300 and row.target.endswith('…')
+    assert len(row.target) == 300
+    assert row.target.endswith('…')
     assert len(row.via_detail) == 200
 
 
@@ -158,7 +159,8 @@ async def test_api_tokens_and_ai_clients(db):
     await api_tokens.revoke(token.id, ALICE)
     created, revoked, disconnected = await rows()
     assert (created.action, created.target, created.details['read_only']) == ("api_token.created", "script", True)
-    assert "sb_pat_" in created.details['prefix'] and len(created.details['prefix']) < 15
+    assert "sb_pat_" in created.details['prefix']
+    assert len(created.details['prefix']) < 15
     assert revoked.action == "api_token.revoked"
     assert disconnected.action == "ai_client.disconnected"
 
@@ -300,9 +302,11 @@ async def test_area_search_actor_and_paging(db, directory):
     assert [e['target'] for e in (await find(query='BOB'))['entries']] == ["Pool p", "X"]
     assert len((await find(actor_discord_id=ALICE))['entries']) == 2
     first = await find(limit=3)
-    assert len(first['entries']) == 3 and first['next_before'] == first['entries'][-1]['id']
+    assert len(first['entries']) == 3
+    assert first['next_before'] == first['entries'][-1]['id']
     rest = await find(limit=3, before_id=first['next_before'])
-    assert [e['target'] for e in rest['entries']] == ["alice/p"] and rest['next_before'] is None
+    assert [e['target'] for e in rest['entries']] == ["alice/p"]
+    assert rest['next_before'] is None
     with pytest.raises(InvalidInputError):
         await find(area='nope')
     assert len(await audit.export_entries(OWNER, [], audit.Filters(scope='all', limit=1))) == 4

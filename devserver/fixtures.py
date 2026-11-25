@@ -261,7 +261,15 @@ async def _seed_handmade():
             episode_id=episode_id, event="alttpr", game_number=game, preset="open", submitted=1,
         )
 
-    # --- Audit log (/audit) -------------------------------------------------------
+    await _seed_audit_log()
+
+    return users
+
+
+async def _seed_audit_log():
+    """Audit log entries (/audit), newest last so their ids follow their times."""
+    from alttprbot import models
+
     now = datetime.datetime.now(datetime.timezone.utc)
     audit_rows = [
         (5, "admin", "election.closed", "website", None, GUILD_ID, "Season 5 rules vote",
@@ -288,5 +296,3 @@ async def _seed_handmade():
             created_at=now - datetime.timedelta(minutes=minutes), action=action,
             actor_discord_id=user(who)["id"] if who else None, actor_name=user(who)["name"] if who else None,
             via=via, via_detail=detail, guild_id=guild, target=target, details=details)
-
-    return users

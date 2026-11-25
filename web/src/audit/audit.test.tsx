@@ -113,7 +113,7 @@ describe('Audit log page', () => {
     const { user, api } = open({ 'GET /api/v1/audit': fail(403, 'You can only see the audit log of servers you administer.') })
     expect(await screen.findByText('You can only see the audit log of servers you administer.')).toBeTruthy()
     await user.click(screen.getByRole('button', { name: 'Try again' }))
-    await waitFor(() => expect(api.callsTo('GET /api/v1/audit').length).toBe(2))
+    await waitFor(() => expect(api.callsTo('GET /api/v1/audit')).toHaveLength(2))
   })
 
   it('is linked from the Me page', async () => {

@@ -269,11 +269,12 @@ function plain(value: unknown): string {
   if (Array.isArray(value)) return value.map(plain).join(', ')
   if (typeof value === 'object') return JSON.stringify(value)
   if (typeof value === 'boolean') return value ? 'yes' : 'no'
-  return String(value)
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint') return String(value)
+  return JSON.stringify(value) ?? ''
 }
 
 function words(key: string): string {
-  const text = key.replace(/_/g, ' ')
+  const text = key.replaceAll('_', ' ')
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
@@ -283,7 +284,7 @@ export function describeDetails(details: Record<string, unknown>): { changes: [s
   const changes: [string, string, string][] =
     raw && typeof raw === 'object' && !Array.isArray(raw)
       ? Object.entries(raw as Record<string, unknown>).map(([field, pair]) => {
-          const [before, after] = Array.isArray(pair) ? pair : [undefined, pair]
+          const [before, after]: unknown[] = Array.isArray(pair) ? pair : [null, pair]
           return [words(field), plain(before), plain(after)]
         })
       : []
