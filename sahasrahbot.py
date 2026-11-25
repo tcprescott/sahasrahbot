@@ -1,4 +1,5 @@
 import asyncio
+import signal
 import urllib.parse
 
 import config
@@ -35,6 +36,17 @@ async def database():
     )
 
 
+def shutdown(loop: asyncio.AbstractEventLoop) -> None:
+    """Cancel what's still running, then close the loop (what Quart's run() did for us)."""
+    tasks = [task for task in asyncio.all_tasks(loop) if not task.done()]
+    for task in tasks:
+        task.cancel()
+    if tasks:
+        loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+    loop.run_until_complete(loop.shutdown_asyncgens())
+    loop.close()
+
+
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -60,7 +72,13 @@ if __name__ == '__main__':
 
     loop.create_task(start_discord_bot())
     start_racetime(loop)
-    loop.create_task(sahasrahbotapi.run(host='127.0.0.1', port=5001, use_reloader=False, loop=loop))
+    # SIGINT/SIGTERM stop the web server gracefully, and then everything else.
+    # (Quart's app.run() would block here until shutdown and close the loop itself,
+    # so nothing below it ever ran: use run_task and own the loop instead.)
+    stop = asyncio.Event()
+    for signum in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(signum, stop.set)
+    api_task = loop.create_task(sahasrahbotapi.run_task(host='127.0.0.1', port=5001, shutdown_trigger=stop.wait))
 
     # Event-loop lag, process and bot gauges for Sentry, and the blocked-loop watchdog.
     loop.call_soon(observability_runtime.start)
@@ -68,6 +86,10 @@ if __name__ == '__main__':
         loop.call_soon(observability_watchdog.start)
 
     try:
-        loop.run_forever()
+        # Ends after a signal, or raises if the web server dies (e.g. port in use).
+        loop.run_until_complete(api_task)
     finally:
-        observability.flush()
+        try:
+            shutdown(loop)
+        finally:
+            observability.flush()
