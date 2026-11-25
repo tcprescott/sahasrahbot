@@ -9,9 +9,10 @@ from typing import Literal, Optional
 from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel
 
-from alttprbot.services import elections, presets, seeds, tournament_submissions, triforce_texts
+from alttprbot.services import audit, elections, presets, seeds, tournament_submissions, triforce_texts
 from alttprbot_api import schemas
-from alttprbot_api.blueprints.app_api import election_detail, election_input, election_summary
+from alttprbot_api.blueprints.app_api import (_int_id, audit_entry, election_detail, election_input,
+                                               election_summary)
 from alttprbot_api.mcp.auth import current_actor
 from alttprbot_api.mcp.registry import register
 
@@ -207,6 +208,30 @@ async def submit_tournament_settings(event: str, episode_id: int, settings: dict
     return schemas.SubmissionDone(**done)
 
 
+# --- Audit log --------------------------------------------------------------------
+
+
+async def list_audit_log(scope: str = 'mine', area: Optional[str] = None, search: Optional[str] = None,
+                         actor_id: Optional[str] = None, before: Optional[int] = None,
+                         limit: int = 50) -> schemas.AuditPage:
+    """Changes made through SahasrahBot, newest first: who did what, when, in which server,
+    and through what (website, API token, AI client, Discord or racetime.gg).
+
+    `scope` is `mine` (your own actions), a Discord server id you administer, or `all`
+    (the bot's owners only). `area` is one of `elections`, `presets`, `triforce_texts`,
+    `server`, `tokens`, `accounts`, `tournaments`, `multiworld`. `search` matches the
+    action, the person, the thing changed or the token/command. For the next page, pass
+    the `next_before` you got as `before`. Slow for a server scope: it checks which
+    servers you administer."""
+    actor = current_actor()
+    admin = await elections.administered_guild_ids(actor.discord_user_id) if scope != audit.SCOPE_MINE else frozenset()
+    filters = audit.Filters(scope=scope, area=area, query=search,
+                            actor_discord_id=_int_id(actor_id, 'person'), before_id=before,
+                            limit=max(1, min(limit, audit.MAX_PAGE_SIZE)))
+    page = await audit.list_entries(actor.discord_user_id, admin, filters)
+    return schemas.AuditPage(entries=[audit_entry(e) for e in page['entries']], next_before=page['next_before'])
+
+
 def register_all(mcp: MCPServer) -> None:
     register(mcp, whoami, title='Who am I')
     register(mcp, list_randomizers, title='List randomizers')
@@ -233,3 +258,4 @@ def register_all(mcp: MCPServer) -> None:
     register(mcp, moderate_triforce_text, title='Moderate a triforce text', write=True)
     register(mcp, get_tournament_submission_form, title='Get a tournament settings form')
     register(mcp, submit_tournament_settings, title='Submit tournament settings', write=True)
+    register(mcp, list_audit_log, title='List the audit log')

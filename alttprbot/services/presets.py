@@ -16,6 +16,7 @@ from tortoise.query_utils import Prefetch
 from alttprbot import models
 from alttprbot.alttprgen import generator
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
+from alttprbot.services import audit
 
 PRESET_NAME = re.compile(r"^\w+$", re.ASCII)
 MAX_PRESET_NAME = 50
@@ -90,10 +91,15 @@ async def save_preset(namespace_name: str, randomizer: str, preset_name: str, co
     if not isinstance(parsed, dict):
         raise InvalidInputError("A preset file must be a YAML mapping of settings, like \"settings:\" followed by its options.")
 
-    preset, _ = await models.Presets.update_or_create(
+    existing = await models.Presets.get_or_none(namespace=namespace, randomizer=randomizer, preset_name=preset_name)
+    preset, created = await models.Presets.update_or_create(
         namespace=namespace, randomizer=randomizer, preset_name=preset_name,
         defaults={'content': content},
     )
+    if created or existing is None or existing.content != content:
+        await audit.record(audit.PRESET_CREATED if created else audit.PRESET_UPDATED,
+                           target=f"{namespace.name}/{preset_name}",
+                           details={'randomizer': randomizer, 'namespace': namespace.name, 'preset': preset_name})
     return {**_summary(namespace, preset), 'content': preset.content, 'can_edit': True}
 
 
@@ -105,6 +111,8 @@ async def delete_preset(namespace_name: str, randomizer: str, preset_name: str, 
         namespace=namespace, randomizer=randomizer, preset_name=preset_name).delete()
     if not deleted:
         raise NotFoundError(f"{namespace_name}/{preset_name} doesn't exist for {randomizer}.")
+    await audit.record(audit.PRESET_DELETED, target=f"{namespace.name}/{preset_name}",
+                       details={'randomizer': randomizer, 'namespace': namespace.name, 'preset': preset_name})
 
 
 def _summary(namespace: models.PresetNamespaces, preset: models.Presets) -> dict:

@@ -16,6 +16,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
 from alttprbot.observability import metrics
+from alttprbot.services import audit
 from alttprbot.observability.sentry import sentry_tags
 from alttprbot_api.mcp.auth import current_actor
 from alttprbot_api.mcp.errors import map_service_error
@@ -47,8 +48,10 @@ def register(mcp: MCPServer, fn: Callable, *, title: str, write: bool = False, d
         actor = current_actor()
         if write and actor.read_only:
             raise ToolError(READ_ONLY_REFUSAL)
+        source = audit.Source(via=audit.VIA_MCP, detail=actor.client_name, actor_discord_id=actor.discord_user_id,
+                              actor_name=actor.user_name)
         with sentry_tags(mcp_tool=name, discord_user_id=actor.discord_user_id), \
-                metrics.timed('mcp.tools', {'tool': name}):
+                metrics.timed('mcp.tools', {'tool': name}), audit.acting(source):
             try:
                 return await fn(*args, **kwargs)
             except Exception as exc:

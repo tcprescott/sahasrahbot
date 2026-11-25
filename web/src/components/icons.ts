@@ -21,9 +21,12 @@ import DescriptionIcon from '@material-symbols/svg-400/outlined/description.svg?
 import DownloadIcon from '@material-symbols/svg-400/outlined/download.svg?react'
 import EditIcon from '@material-symbols/svg-400/outlined/edit.svg?react'
 import ErrorIcon from '@material-symbols/svg-400/outlined/error.svg?react'
+import FlagIcon from '@material-symbols/svg-400/outlined/flag.svg?react'
 import FolderIcon from '@material-symbols/svg-400/outlined/folder.svg?react'
 import FolderFillIcon from '@material-symbols/svg-400/outlined/folder-fill.svg?react'
+import ForumIcon from '@material-symbols/svg-400/outlined/forum.svg?react'
 import GavelIcon from '@material-symbols/svg-400/outlined/gavel.svg?react'
+import HistoryIcon from '@material-symbols/svg-400/outlined/history.svg?react'
 import HomeIcon from '@material-symbols/svg-400/outlined/home.svg?react'
 import HomeFillIcon from '@material-symbols/svg-400/outlined/home-fill.svg?react'
 import HowToVoteIcon from '@material-symbols/svg-400/outlined/how_to_vote.svg?react'
@@ -31,6 +34,7 @@ import HowToVoteFillIcon from '@material-symbols/svg-400/outlined/how_to_vote-fi
 import InfoIcon from '@material-symbols/svg-400/outlined/info.svg?react'
 import KeyIcon from '@material-symbols/svg-400/outlined/key.svg?react'
 import KeyboardArrowDownIcon from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?react'
+import LanguageIcon from '@material-symbols/svg-400/outlined/language.svg?react'
 import LightModeIcon from '@material-symbols/svg-400/outlined/light_mode.svg?react'
 import LinkIcon from '@material-symbols/svg-400/outlined/link.svg?react'
 import LoginIcon from '@material-symbols/svg-400/outlined/login.svg?react'
@@ -70,13 +74,17 @@ export const ICONS = {
   download: DownloadIcon,
   edit: EditIcon,
   error: ErrorIcon,
+  flag: FlagIcon,
   folder: FolderIcon,
+  forum: ForumIcon,
   gavel: GavelIcon,
+  history: HistoryIcon,
   home: HomeIcon,
   how_to_vote: HowToVoteIcon,
   info: InfoIcon,
   key: KeyIcon,
   keyboard_arrow_down: KeyboardArrowDownIcon,
+  language: LanguageIcon,
   light_mode: LightModeIcon,
   link: LinkIcon,
   login: LoginIcon,

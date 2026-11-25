@@ -48,6 +48,9 @@ export type SubmissionForm = GetBody<'/api/v1/tournaments/{event}/submission-for
 export type ApiTokenList = GetBody<'/api/v1/tokens'>
 export type ApiTokenRow = ApiTokenList['tokens'][number]
 export type OAuthRequest = GetBody<'/api/v1/oauth/requests/{txn}'>
+export type AuditOptions = GetBody<'/api/v1/audit/options'>
+export type AuditPage = GetBody<'/api/v1/audit'>
+export type AuditEntry = AuditPage['entries'][number]
 
 export class ApiError extends Error {
   constructor(

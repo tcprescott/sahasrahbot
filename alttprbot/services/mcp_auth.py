@@ -22,6 +22,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, NotFoundError
+from alttprbot.services import audit
 from alttprbot.services.api_tokens import OAUTH, OAUTH_PREFIX, REFRESH_PREFIX, hash_token, now
 
 logger = logging.getLogger(__name__)
@@ -170,6 +171,8 @@ async def approve(txn: str, discord_user_id: int, user_name: str, allow_changes:
         expires_at=now() + CODE_TTL,
     )
     logger.info('MCP connection approved: user=%s client=%s changes=%s', discord_user_id, client.client_id, allow_changes)
+    await audit.record(audit.AI_CLIENT_CONNECTED, target=client.client_name, actor_discord_id=discord_user_id,
+                       actor_name=user_name, details={'client_id': client.client_id, 'can_make_changes': allow_changes})
     return _with_query(pending.redirect_uri, code=raw_code, state=pending.state)
 
 
@@ -263,4 +266,8 @@ async def load_access_token(raw: str) -> Optional[models.ApiToken]:
 
 
 async def revoke(token: models.ApiToken) -> None:
+    """The AI client revoked its own grant (OAuth ``/revoke``)."""
     await models.ApiToken.filter(id=token.id).update(revoked_at=now())
+    with audit.acting(audit.Source(via=audit.VIA_MCP, detail=token.name, actor_discord_id=token.discord_user_id,
+                                   actor_name=token.user_name)):
+        await audit.record(audit.AI_CLIENT_DISCONNECTED, target=token.name, details={'token_id': token.id})

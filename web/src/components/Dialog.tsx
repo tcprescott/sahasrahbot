@@ -9,7 +9,8 @@ interface DialogProps {
   onOpenChange: (open: boolean) => void
   title: string
   description?: ReactNode
-  size?: 'sm' | 'md' | 'lg'
+  /** `side`: a panel down the right edge on desktop (a bottom sheet on phone, like the rest). */
+  size?: 'sm' | 'md' | 'lg' | 'side'
   children: ReactNode
   footer?: ReactNode
 }

@@ -7,6 +7,7 @@ from slugify import slugify
 
 from alttprbot.services import multiworld as multiworld_service
 from alttprbot.services.multiworld import MultiworldNotAuthorized, MultiworldNotReady
+from alttprbot_discord.audit import audited
 
 NOT_YET_CHOSEN = "Not yet chosen"
 
@@ -112,6 +113,7 @@ class MultiworldSignupView(discord.ui.View):
         await interaction.response.send_message("You have been removed from the multiworld.", ephemeral=True)
 
     @discord.ui.button(label="Start", style=discord.ButtonStyle.green, custom_id="sahabot:multiworld:start", row=4)
+    @audited('Start button')
     async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
         message = interaction.message
         embed = message.embeds[0]
@@ -162,6 +164,7 @@ class MultiworldSignupView(discord.ui.View):
         await interaction.message.edit(embed=embed, view=self)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id="sahabot:multiworld:cancel", row=4)
+    @audited('Cancel button')
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         message = interaction.message
         try:

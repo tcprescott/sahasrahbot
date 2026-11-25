@@ -15,6 +15,7 @@ no row does not hit the database on every message.
 import aiocache
 
 from alttprbot import models
+from alttprbot.services import audit
 
 CACHE_TTL = 300
 
@@ -68,15 +69,22 @@ async def get_list(guild_id: int, parameter: str) -> list[str] | None:
 
 
 async def set_value(guild_id: int, parameter: str, value: str) -> None:
+    before = await models.Config.get_or_none(guild_id=guild_id, parameter=parameter)
     await models.Config.update_or_create(
         guild_id=guild_id, parameter=parameter, defaults={'value': value}
     )
     await _invalidate(guild_id, parameter)
+    old = before.value if before else None
+    if old != value:
+        await audit.record(audit.SERVER_SETTING_CHANGED, target=parameter, guild_id=guild_id,
+                           details={'changes': {parameter: [old, value]}})
 
 
 async def delete_value(guild_id: int, parameter: str) -> None:
-    await models.Config.filter(guild_id=guild_id, parameter=parameter).delete()
+    deleted = await models.Config.filter(guild_id=guild_id, parameter=parameter).delete()
     await _invalidate(guild_id, parameter)
+    if deleted:
+        await audit.record(audit.SERVER_SETTING_REMOVED, target=parameter, guild_id=guild_id)
 
 
 async def for_guild(guild_id: int) -> dict[str, str | None]:

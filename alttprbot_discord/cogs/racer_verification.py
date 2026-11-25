@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from alttprbot.services import racer_verification as verification
+from alttprbot_discord.audit import audited
 
 
 class RacerVerificationView(discord.ui.View):
@@ -12,6 +13,7 @@ class RacerVerificationView(discord.ui.View):
 
     @discord.ui.button(label="Verify your status", custom_id="racerverify:verifystatus",
                        style=discord.ButtonStyle.primary)
+    @audited('Verify your status button')
     async def verify_status(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
         racer_verification = await verification.get_for_message(interaction.message.id, interaction.guild.id)

@@ -13,6 +13,7 @@ from typing import List
 from alttprbot import models
 from alttprbot.alttprgen.smz3multi import generate_multiworld
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.services import audit
 
 MIN_PLAYERS = 2
 
@@ -30,7 +31,10 @@ class MultiworldNotReady(SahasrahBotException):
 
 
 async def create(message_id: int, owner_id: int) -> models.Multiworld:
-    return await models.Multiworld.create(message_id=message_id, owner_id=owner_id, status=STATUS_OPEN)
+    multiworld = await models.Multiworld.create(message_id=message_id, owner_id=owner_id, status=STATUS_OPEN)
+    await audit.record(audit.MULTIWORLD_CREATED, target=f'Multiworld {message_id}', actor_discord_id=owner_id,
+                       details={'message_id': message_id})
+    return multiworld
 
 
 async def get(message_id: int) -> models.Multiworld:
@@ -105,6 +109,10 @@ async def start(multiworld: models.Multiworld, player_names: List[str]):
                                      randomizer=multiworld.randomizer)
     multiworld.status = STATUS_CLOSED
     await multiworld.save()
+    await audit.record(audit.MULTIWORLD_STARTED, target=f'Multiworld {multiworld.message_id}',
+                       actor_discord_id=multiworld.owner_id,
+                       details={'message_id': multiworld.message_id, 'randomizer': multiworld.randomizer,
+                                'preset': multiworld.preset, 'players': len(player_names)})
     return seed
 
 
@@ -112,4 +120,6 @@ async def cancel(message_id: int, user_id: int) -> models.Multiworld:
     multiworld = await _get_owned(message_id, user_id)
     multiworld.status = STATUS_CANCELLED
     await multiworld.save()
+    await audit.record(audit.MULTIWORLD_CANCELLED, target=f'Multiworld {multiworld.message_id}', actor_discord_id=user_id,
+                       details={'message_id': multiworld.message_id})
     return multiworld
