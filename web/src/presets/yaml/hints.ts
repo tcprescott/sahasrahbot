@@ -51,7 +51,7 @@ export function spotAt(text: string, pos: number): Spot | null {
   if (key[2]) {
     const path = parentPath(text, lineStart, key[1]!.length, true)
     if (!path.length) return null
-    return { kind: 'item', path: path.slice(0, -1), key: path[path.length - 1]!, from }
+    return { kind: 'item', path: path.slice(0, -1), key: path.at(-1)!, from }
   }
   return { kind: 'key', path: parentPath(text, lineStart, key[1]!.length, false), from }
 }
@@ -65,30 +65,35 @@ function parentPath(text: string, lineStart: number, column: number, item: boole
   const path: string[] = []
   let limit = column
   let sameIndentParent = item
-  const lines = text.slice(0, Math.max(0, lineStart - 1)).split('\n')
-  for (let i = lineStart === 0 ? -1 : lines.length - 1; i >= 0 && limit > 0; i--) {
+  const lines = lineStart === 0 ? [] : text.slice(0, lineStart - 1).split('\n')
+  for (let i = lines.length - 1; i >= 0 && limit > 0; i--) {
     const line = lines[i]!
     const trimmed = line.trimStart()
-    if (!trimmed || trimmed.startsWith('#')) continue
     const indent = line.length - trimmed.length
-    if (indent > limit || (indent === limit && !(sameIndentParent && KEY_LINE.test(trimmed)))) continue
+    if (!holdsLine(trimmed, indent, limit, sameIndentParent)) continue
     sameIndentParent = false
-    const dash = /^-\s+/.exec(trimmed)
-    if (dash) {
-      // A list item: its own key sits after the dash. If that's where we are, it's a
-      // sibling in the same mapping, so look further up from the dash.
-      const rest = trimmed.slice(dash[0].length)
-      const restColumn = indent + dash[0].length
-      const parent = restColumn < limit ? KEY_LINE.exec(rest) : null
-      if (parent) path.unshift(parent[2]!)
-      limit = indent
-      continue
-    }
-    const parent = KEY_LINE.exec(trimmed)
-    if (parent) path.unshift(parent[2]!)
+    const key = parentKey(trimmed, indent, limit)
+    if (key) path.unshift(key)
     limit = indent
   }
   return path
+}
+
+/** Whether a line above, indented by `indent`, can hold a line at `limit`: it's less indented (or a "key:" level with a list item). */
+function holdsLine(trimmed: string, indent: number, limit: number, sameIndentParent: boolean): boolean {
+  if (!trimmed || trimmed.startsWith('#') || indent > limit) return false
+  return indent < limit || (sameIndentParent && KEY_LINE.test(trimmed))
+}
+
+/**
+ * The key a holding line opens, if it opens one ("key:" with nothing after it).
+ * A list item's own key sits after its dash; when that's at our indent it's a sibling
+ * in the same mapping, not a parent.
+ */
+function parentKey(trimmed: string, indent: number, limit: number): string | undefined {
+  const dash = /^-\s+/.exec(trimmed)
+  if (!dash) return KEY_LINE.exec(trimmed)?.[2]
+  return indent + dash[0].length < limit ? KEY_LINE.exec(trimmed.slice(dash[0].length))?.[2] : undefined
 }
 
 function same(a: string[], b: string[]): boolean {

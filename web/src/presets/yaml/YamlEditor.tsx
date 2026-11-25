@@ -9,7 +9,7 @@ import { Button, Icon, type IconName } from '../../components'
 import { LoadYamlButton, type YamlFieldProps } from '../YamlField'
 import { loadHints } from './hintsCache'
 import { spotAt, suggestionsFor, type Hint } from './hints'
-import { findYamlProblem } from './problem'
+import { findYamlProblem, type YamlProblem } from './problem'
 import { yamlBasics } from './setup'
 
 /**
@@ -140,7 +140,7 @@ export default function YamlEditor({ value, onChange, onProblem, randomizer, lab
   }
 
   return (
-    <div className={full ? 'yaml-box yaml-box--full' : 'yaml-box'} role={full ? 'dialog' : undefined} aria-labelledby={full ? labelId : undefined}>
+    <div className={full ? 'yaml-box yaml-box--full' : 'yaml-box'}>
       <div className="yaml-box__bar">
         <span className="field__label grow" id={labelId}>
           Preset YAML
@@ -164,21 +164,7 @@ export default function YamlEditor({ value, onChange, onProblem, randomizer, lab
       <div ref={host} className="yaml-box__editor" />
       <div className={problem ? 'yaml-box__status yaml-box__status--bad' : 'yaml-box__status'}>
         <span className="yaml-box__message" aria-live="polite">
-          {problem ? (
-            <>
-              <Icon name="error" size={18} />
-              <span>
-                <b>Line {problem.line}:</b> {problem.message}.
-              </span>
-            </>
-          ) : value.trim() ? (
-            <>
-              <Icon name="check_circle" size={18} />
-              <span>Valid YAML</span>
-            </>
-          ) : (
-            <span className="muted">Type or paste the preset, or load a file.</span>
-          )}
+          <StatusMessage problem={problem} empty={!value.trim()} />
         </span>
         {problem && (
           <button type="button" className="yaml-box__goto" onClick={goToProblem}>
@@ -190,6 +176,26 @@ export default function YamlEditor({ value, onChange, onProblem, randomizer, lab
         </span>
       </div>
     </div>
+  )
+}
+
+function StatusMessage({ problem, empty }: Readonly<{ problem: YamlProblem | null; empty: boolean }>) {
+  if (problem) {
+    return (
+      <>
+        <Icon name="error" size={18} />
+        <span>
+          <b>Line {problem.line}:</b> {problem.message}.
+        </span>
+      </>
+    )
+  }
+  if (empty) return <span className="muted">Type or paste the preset, or load a file.</span>
+  return (
+    <>
+      <Icon name="check_circle" size={18} />
+      <span>Valid YAML</span>
+    </>
   )
 }
 

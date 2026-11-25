@@ -297,7 +297,8 @@ async def test_preset_hints_come_from_the_shipped_presets(client, monkeypatch):
     status, body = await get_json(client, "/api/v1/presets/randomizers/alttpr/hints")
     assert status == 200
     goal = next(h for h in body["hints"] if h["path"] == ["settings"] and h["key"] == "goal")
-    assert goal["count"] > 50 and "ganon" in goal["values"]
+    assert goal["count"] > 50
+    assert "ganon" in goal["values"]
     assert (await get_json(client, "/api/v1/presets/randomizers/zelda1/hints"))[0] == 404
 
 

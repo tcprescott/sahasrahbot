@@ -78,15 +78,16 @@ describe('YamlField', () => {
     expect(screen.getByRole('button', { name: 'Fold all' })).toBeTruthy()
 
     await user.click(screen.getByRole('button', { name: 'Full screen' }))
-    expect(screen.getByRole('dialog', { name: 'Preset YAML' })).toBeTruthy()
+    const box = () => document.querySelector('.yaml-box')!
+    expect(box().classList.contains('yaml-box--full')).toBe(true)
     expect(document.body.classList.contains('yaml-full-open')).toBe(true)
     fireEvent.keyDown(window, { key: 'Escape' })
-    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(box().classList.contains('yaml-box--full')).toBe(false)
     expect(document.body.classList.contains('yaml-full-open')).toBe(false)
 
     await user.click(screen.getByRole('button', { name: 'Full screen' }))
     await user.click(screen.getByRole('button', { name: 'Exit full screen' }))
-    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(box().classList.contains('yaml-box--full')).toBe(false)
   })
 
   it('loads a file into the editor', async () => {

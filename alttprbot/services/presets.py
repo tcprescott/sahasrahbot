@@ -35,9 +35,12 @@ def randomizers() -> list[str]:
     return list(generator.PRESET_CLASS_MAPPING.keys())
 
 
+# The shipped presets' folder for each randomizer, so a name from a request is only
+# ever looked up here and never becomes part of a path.
+_PRESET_FOLDERS = {name: os.path.join("presets", name) for name in generator.PRESET_CLASS_MAPPING}
 MAX_HINT_VALUES = 12
 MAX_HINT_DISTINCT_VALUES = 100
-_key_hints: dict[str, list[dict]] = {}
+_key_hints: dict[str, list[dict]] = {}  # by folder
 
 
 async def key_hints(randomizer: str) -> list[dict]:
@@ -50,11 +53,12 @@ async def key_hints(randomizer: str) -> list[dict]:
     out when there are several presets, and so are free text values (descriptions, names),
     so the list stays small. Read once per randomizer, then cached.
     """
-    if randomizer not in generator.PRESET_CLASS_MAPPING:
+    folder = _PRESET_FOLDERS.get(randomizer)
+    if folder is None:
         raise NotFoundError(f"There's no randomizer called {randomizer}.")
-    if randomizer not in _key_hints:
-        _key_hints[randomizer] = await _read_key_hints(os.path.join("presets", randomizer))
-    return _key_hints[randomizer]
+    if folder not in _key_hints:
+        _key_hints[folder] = await _read_key_hints(folder)
+    return _key_hints[folder]
 
 
 async def _read_key_hints(folder: str) -> list[dict]:
