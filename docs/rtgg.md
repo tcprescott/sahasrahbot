@@ -59,15 +59,6 @@ Example: `!multiworld normal`
 
 Here is a [list of currently supported presets](presets.md).  The preset name will be the name of the file without the .yaml extension.
 
-## Super Mario Bros 3 Randomizer (SMB3R)
-
-### !flags
-Use this command to roll a seed number and put the seed and flags in the race info and chat.
-
-Example `!flags 17BAS2LNJ4`
-
-Please be aware that the flag string is not validated.
-
 ## The Legend of Zelda Randomizer (Z1R)
 
 ### !flags

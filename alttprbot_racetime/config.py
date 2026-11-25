@@ -42,10 +42,6 @@ else:
             category_slug='ff1r',
             handler_class=handlers.ff1r.GameHandler,
         ),
-        'smb3r': RacetimeBotConfig(
-            category_slug='smb3r',
-            handler_class=handlers.smb3r.GameHandler,
-        ),
         'smr': RacetimeBotConfig(
             category_slug='smr',
             handler_class=handlers.smr.GameHandler,

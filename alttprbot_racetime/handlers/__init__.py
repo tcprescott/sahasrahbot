@@ -1,1 +1,1 @@
-from . import core, alttpr, ff1r, smb3r, smz3, z1r, smr, z2r, test, twwr, ctjets
+from . import core, alttpr, ff1r, smz3, z1r, smr, z2r, test, twwr, ctjets
