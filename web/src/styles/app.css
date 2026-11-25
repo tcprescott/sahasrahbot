@@ -77,14 +77,139 @@
   display: block;
   width: 100%;
   min-height: 320px;
+  height: var(--yaml-height);
   padding: 12px;
-  font: var(--text-sm) / 1.55 var(--font-mono);
+  font: var(--text-sm) / 1.6 var(--font-mono);
   color: var(--fg);
   background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
+  border: 0;
   resize: vertical;
   tab-size: 2;
+}
+
+/* The preset YAML editor (presets/yaml/YamlEditor.tsx): toolbar, CodeMirror, status line. */
+.yaml-box {
+  --yaml-height: min(460px, 65vh);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.yaml-box:focus-within {
+  border-color: var(--accent);
+}
+
+.yaml-box__bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 4px 6px 4px 12px;
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.yaml-box__tool[aria-pressed='true'] {
+  background: var(--accent-soft);
+  color: var(--link);
+}
+
+.yaml-box__editor .cm-editor {
+  height: var(--yaml-height);
+}
+
+.yaml-box__status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 6px 12px;
+  font-size: var(--text-sm);
+  background: var(--surface-alt);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.yaml-box__status--bad {
+  background: color-mix(in srgb, var(--status-cancelled) 8%, var(--surface));
+}
+
+.yaml-box__message {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yaml-box__message > .icon,
+.yaml-box__message > svg {
+  flex: none;
+  color: var(--status-ok);
+}
+
+.yaml-box__status--bad .yaml-box__message > .icon,
+.yaml-box__status--bad .yaml-box__message > svg {
+  color: var(--status-cancelled);
+}
+
+.yaml-box__goto {
+  flex: none;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.yaml-box__pos {
+  flex: none;
+  color: var(--fg-muted);
+  font: var(--text-xs) var(--font-mono);
+}
+
+.yaml-box--full {
+  --yaml-height: auto;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  border: 0;
+  border-radius: 0;
+}
+
+.yaml-box--full .yaml-box__editor {
+  flex: 1;
+  min-height: 0;
+}
+
+.yaml-box--full .yaml-box__editor .cm-editor {
+  height: 100%;
+}
+
+body.yaml-full-open {
+  overflow: hidden;
+}
+
+.yaml-view .cm-editor {
+  max-height: 70vh;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.yaml-box__bar .field__label {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .yaml-box__load-more,
+  .yaml-box__tool-label,
+  .yaml-box__pos {
+    display: none;
+  }
 }
 
 .mt-3 {

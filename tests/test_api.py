@@ -16,7 +16,7 @@ from quart_discord import Unauthorized
 from alttprbot import events, models
 from alttprbot_api import api
 from alttprbot_api.blueprints import app_api
-from alttprbot.services import bots
+from alttprbot.services import bots, presets
 
 CSRF = {app_api.CSRF_HEADER: app_api.CSRF_VALUE}
 
@@ -290,6 +290,45 @@ async def test_my_namespace_is_created_on_first_use(client, login):
     login(42, name="New User")
     assert await get_json(client, "/api/v1/presets/mine") == (200, {"namespace": "new-user"})
     assert await models.PresetNamespaces.get(discord_user_id=42)
+
+
+async def test_preset_hints_come_from_the_shipped_presets(client, monkeypatch):
+    monkeypatch.setattr(presets, "_key_hints", {})
+    status, body = await get_json(client, "/api/v1/presets/randomizers/alttpr/hints")
+    assert status == 200
+    goal = next(h for h in body["hints"] if h["path"] == ["settings"] and h["key"] == "goal")
+    assert goal["count"] > 50
+    assert "ganon" in goal["values"]
+    assert (await get_json(client, "/api/v1/presets/randomizers/zelda1/hints"))[0] == 404
+
+
+async def test_preset_hints_count_keys_and_values(tmp_path, monkeypatch):
+    folder = tmp_path / "presets" / "alttpr"
+    folder.mkdir(parents=True)
+    (folder / "a.yaml").write_text(
+        'description: "Two words"\nsettings:\n  goal: ganon\n  crystals: {ganon: "7"}\n'
+        '  eq: [Boots, Boots]\n  rare: 1\n  list: [{x: 1}]\n'
+    )
+    (folder / "b.yaml").write_text('description: "More words"\nsettings:\n  goal: dungeons\n  crystals: {ganon: "7"}\n  eq: [Boots]\n  list: [{x: 2}]\n')
+    (folder / "c.yaml").write_text("settings: {goal: ganon}\n")
+    (folder / "broken.yaml").write_text("a: [[\n")
+    (folder / "notes.txt").write_text("ignored")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(presets, "_key_hints", {})
+
+    hints = {(tuple(h["path"]), h["key"]): (h["count"], h["values"]) for h in await presets.key_hints("alttpr")}
+    assert hints == {
+        ((), "settings"): (3, []),
+        ((), "description"): (2, []),  # free text: no values offered
+        (("settings",), "goal"): (3, ["ganon", "dungeons"]),
+        (("settings",), "crystals"): (2, []),
+        (("settings",), "eq"): (2, ["Boots"]),
+        (("settings",), "list"): (2, []),
+        (("settings", "crystals"), "ganon"): (2, ["'7'"]),  # quoted, as it has to be written
+        (("settings", "list"), "x"): (2, ["1", "2"]),
+    }  # "rare" is in one preset of several, so it's left out
+    (folder / "c.yaml").write_text("settings: {brand_new: 1}\n")
+    assert len(await presets.key_hints("alttpr")) == len(hints)  # read once, then cached
 
 
 # ---------------------------------------------------------------------------

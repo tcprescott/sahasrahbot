@@ -191,6 +191,14 @@ async def get_randomizers():
     return schemas.Randomizers(randomizers=presets.randomizers())
 
 
+@app_api_blueprint.get('/presets/randomizers/<randomizer>/hints')
+@tag(['presets'])
+@validate_response(schemas.PresetHints)
+async def get_preset_hints(randomizer: str):
+    """The keys and values SahasrahBot's own presets use, for the YAML editor's suggestions."""
+    return schemas.PresetHints(hints=await presets.key_hints(randomizer))
+
+
 @app_api_blueprint.get('/presets/namespaces')
 @tag(['presets'])
 @validate_response(schemas.NamespaceList)

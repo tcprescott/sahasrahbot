@@ -51,6 +51,17 @@ class Randomizers(BaseModel):
     randomizers: list[str]
 
 
+class PresetHint(BaseModel):
+    path: list[str]
+    key: str
+    count: int
+    values: list[str]
+
+
+class PresetHints(BaseModel):
+    hints: list[PresetHint]
+
+
 class NamespaceSummary(BaseModel):
     name: str
     preset_count: int

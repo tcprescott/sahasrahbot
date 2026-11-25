@@ -12,6 +12,10 @@ globalThis.ResizeObserver ??= NoopResizeObserver as unknown as typeof ResizeObse
 Element.prototype.scrollIntoView ??= function scrollIntoView() {}
 Element.prototype.hasPointerCapture ??= () => false
 Element.prototype.releasePointerCapture ??= () => {}
+// CodeMirror (the preset YAML editor) measures text with Range, which jsdom can't lay out.
+const noRect = () => new DOMRect(0, 0, 0, 0)
+Range.prototype.getBoundingClientRect ??= noRect
+Range.prototype.getClientRects ??= () => Object.assign([], { item: () => null }) as unknown as DOMRectList
 // jsdom's Blob has no text() (the YAML field reads a chosen file with it).
 Blob.prototype.text ??= function text(this: Blob) {
   return new Promise<string>((resolve, reject) => {

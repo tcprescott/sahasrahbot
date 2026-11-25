@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { Namespace, Preset } from '../api/client'
 import { fail, USERS } from '../test/fakeApi'
 import { currentPath, main, renderApp } from '../test/renderApp'
+import { findYamlEditor } from '../test/yamlEditor'
 
 const NS = '/api/v1/presets/namespaces/alice'
 const PRESET = `${NS}/alttpr/open_fast`
@@ -187,43 +188,43 @@ describe('one preset', () => {
     const save = screen.getByRole('button', { name: 'Save' })
     expect(save.hasAttribute('disabled')).toBe(true) // nothing changed yet
 
-    const editor = screen.getByRole('textbox', { name: 'Preset YAML' })
-    await user.clear(editor)
-    await user.type(editor, 'settings:{Enter}  mode: inverted{Enter}')
+    const editor = await findYamlEditor()
+    editor.replace('settings:\n  mode: inverted\n')
     api.on(`GET ${PRESET}`, preset({ content: 'settings:\n  mode: inverted\n' }))
     await user.click(save)
 
     await waitFor(() => expect(currentPath()).toBe(path))
     expect(api.callsTo(`PUT ${PRESET}`)[0]?.body).toEqual({ content: 'settings:\n  mode: inverted\n' })
-    await waitFor(() => expect(main().querySelector('pre')?.textContent).toBe('settings:\n  mode: inverted\n'))
+    await waitFor(async () => expect((await findYamlEditor()).text()).toBe('settings:\n  mode: inverted\n'))
   })
 
   it('keeps the draft and shows the error when saving fails', async () => {
     const { user } = renderApp(`${path}?edit=1`, {
       routes: { [`GET ${PRESET}`]: preset(), [`PUT ${PRESET}`]: fail(400, 'That YAML has a syntax error on line 2.') },
     })
-    const editor = await screen.findByRole('textbox', { name: 'Preset YAML' })
-    await user.type(editor, 'oops: [[')
+    const editor = await findYamlEditor()
+    editor.moveTo()
+    editor.type('oops: 1')
     await user.click(screen.getByRole('button', { name: 'Save' }))
     expect((await screen.findByRole('alert')).textContent).toContain('syntax error on line 2')
-    expect((editor as HTMLTextAreaElement).value).toBe('settings:\n  mode: open\noops: [')
+    expect(editor.text()).toBe('settings:\n  mode: open\noops: 1')
     expect(currentPath()).toBe(`${path}?edit=1`)
   })
 
   it('throws the draft away on Cancel', async () => {
     const { user } = renderApp(`${path}?edit=1`, { routes: { [`GET ${PRESET}`]: preset() } })
-    await user.type(await screen.findByRole('textbox', { name: 'Preset YAML' }), 'junk')
+    ;(await findYamlEditor()).type('junk')
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(currentPath()).toBe(path)
-    expect(main().querySelector('pre')?.textContent).toBe('settings:\n  mode: open\n')
+    expect((await findYamlEditor()).text()).toBe('settings:\n  mode: open\n')
   })
 
   it('loads the YAML from a file', async () => {
     const { user } = renderApp(`${path}?edit=1`, { routes: { [`GET ${PRESET}`]: preset() } })
-    const editor = await screen.findByRole('textbox', { name: 'Preset YAML' })
+    const editor = await findYamlEditor()
     const input = main().querySelector<HTMLInputElement>('input[type=file]')!
     await user.upload(input, new File(['from: file\n'], 'mine.yaml', { type: 'text/yaml' }))
-    await waitFor(() => expect((editor as HTMLTextAreaElement).value).toBe('from: file\n'))
+    await waitFor(() => expect(editor.text()).toBe('from: file\n'))
   })
 
   it('downloads from the Actions menu', async () => {
@@ -249,7 +250,7 @@ describe('one preset', () => {
     // shows for can_edit, so a non-owner with an old edit link gets the YAML and no Download.
     renderApp(`${path}?edit=1`, { routes: { [`GET ${PRESET}`]: preset({ can_edit: false }) } })
     await screen.findByRole('heading', { level: 1 })
-    expect(main().querySelector('pre')).not.toBeNull()
+    expect((await findYamlEditor()).view.state.readOnly).toBe(true)
     expect(screen.queryByRole('link', { name: 'Download' })).toBeNull()
   })
 })
@@ -297,7 +298,7 @@ describe('new preset', () => {
     ])
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'mine')
     await user.selectOptions(screen.getByRole('combobox', { name: 'Randomizer' }), 'smz3')
-    await user.type(screen.getByRole('textbox', { name: 'Preset YAML' }), 'a: 1')
+    ;(await findYamlEditor()).type('a: 1')
     await user.click(screen.getByRole('button', { name: 'Save preset' }))
 
     await waitFor(() => expect(currentPath()).toBe('/presets/manage/alice/smz3/mine'))

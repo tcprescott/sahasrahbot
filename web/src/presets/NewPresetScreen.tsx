@@ -27,6 +27,7 @@ function NewPreset() {
   const [name, setName] = useState('')
   const [randomizer, setRandomizer] = useState('alttpr')
   const [content, setContent] = useState('')
+  const [problem, setProblem] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
   const nameOk = NAME.test(name)
@@ -107,12 +108,12 @@ function NewPreset() {
                     </select>
                   </div>
                 </div>
-                <YamlField value={content} onChange={setContent} />
+                <YamlField value={content} onChange={setContent} onProblem={setProblem} randomizer={randomizer} />
                 <div className="t-actions t-actions--end">
                   <Button variant="ghost" onClick={() => navigate(namespacePath(ns.name))}>
                     Cancel
                   </Button>
-                  <Button type="submit" busy={busy} busyLabel="Saving" disabled={!nameOk || !content.trim()}>
+                  <Button type="submit" busy={busy} busyLabel="Saving" disabled={!nameOk || !content.trim() || problem !== null}>
                     Save preset
                   </Button>
                 </div>

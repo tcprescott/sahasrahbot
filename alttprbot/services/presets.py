@@ -5,10 +5,13 @@ edit it too (``generator.is_namespace_owner``). Presets in a namespace are rolle
 Discord as ``<namespace>/<preset>``.
 """
 
+import os
 import re
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from typing import Optional
 
+import aiofiles
 import yaml
 from tortoise.functions import Count
 from tortoise.query_utils import Prefetch
@@ -30,6 +33,83 @@ class Viewer:
 
 def randomizers() -> list[str]:
     return list(generator.PRESET_CLASS_MAPPING.keys())
+
+
+# The shipped presets' folder for each randomizer, so a name from a request is only
+# ever looked up here and never becomes part of a path.
+_PRESET_FOLDERS = {name: os.path.join("presets", name) for name in generator.PRESET_CLASS_MAPPING}
+MAX_HINT_VALUES = 12
+MAX_HINT_DISTINCT_VALUES = 100
+_key_hints: dict[str, list[dict]] = {}  # by folder
+
+
+async def key_hints(randomizer: str) -> list[dict]:
+    """The keys and values the presets that ship with SahasrahBot use, for the editor's autocomplete.
+
+    One entry per key under each parent path (``[]`` is the top level, ``["settings"]``
+    is under ``settings:``), with how many shipped presets use it and its most common
+    scalar values written as YAML. Items of a list count as values of the list's key,
+    and mappings inside a list share that key's path. Keys only one preset uses are left
+    out when there are several presets, and so are free text values (descriptions, names),
+    so the list stays small. Read once per randomizer, then cached.
+    """
+    folder = _PRESET_FOLDERS.get(randomizer)
+    if folder is None:
+        raise NotFoundError(f"There's no randomizer called {randomizer}.")
+    if folder not in _key_hints:
+        _key_hints[folder] = await _read_key_hints(folder)
+    return _key_hints[folder]
+
+
+async def _read_key_hints(folder: str) -> list[dict]:
+    uses: Counter = Counter()
+    values: dict[tuple, Counter] = defaultdict(Counter)
+    names = sorted(f for f in os.listdir(folder) if f.endswith(".yaml")) if os.path.isdir(folder) else []
+    for name in names:
+        async with aiofiles.open(os.path.join(folder, name), encoding="utf-8") as f:
+            try:
+                data = yaml.safe_load(await f.read())
+            except yaml.YAMLError:
+                continue
+        seen: set[tuple] = set()
+        _walk(data, (), None, seen, values)
+        uses.update(seen)
+    least = 2 if len(names) > 2 else 1
+    return [
+        {
+            "path": list(path),
+            "key": key,
+            "count": count,
+            "values": _common_values(values[(path, key)]),
+        }
+        for (path, key), count in sorted(uses.items(), key=lambda item: (item[0][0], -item[1], item[0][1]))
+        if count >= least
+    ]
+
+
+def _common_values(seen: Counter) -> list[str]:
+    if len(seen) > MAX_HINT_DISTINCT_VALUES:
+        return []
+    return [v for v, _ in seen.most_common(MAX_HINT_VALUES) if " " not in v]
+
+
+def _walk(node, path: tuple, key: Optional[str], seen: set, values: dict) -> None:
+    if isinstance(node, dict):
+        inner = path if key is None else path + (key,)
+        for k, v in node.items():
+            k = str(k)
+            seen.add((inner, k))
+            _walk(v, inner, k, seen, values)
+    elif isinstance(node, list):
+        for item in node:
+            _walk(item, path, key, seen, values)
+    elif key is not None and node is not None:
+        values[(path, key)][_yaml_scalar(node)] += 1
+
+
+def _yaml_scalar(value) -> str:
+    """A scalar as it would be written in YAML: quoted only when it has to be."""
+    return yaml.safe_dump(value, default_flow_style=True, width=1000).strip().removesuffix("...").strip()
 
 
 async def list_namespaces() -> list[dict]:
