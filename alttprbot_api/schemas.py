@@ -338,3 +338,53 @@ class OAuthAnswerIn(BaseModel):
 
 class OAuthRedirect(BaseModel):
     redirect_url: str
+
+
+# --- Audit log ------------------------------------------------------------------
+
+
+class AuditScope(BaseModel):
+    key: str = Field(description="`mine`, a server's Discord id, or `all` (the bot's owners only).")
+    label: str
+
+
+class AuditArea(BaseModel):
+    key: str
+    label: str
+
+
+class AuditOptions(BaseModel):
+    """What the audit log's filters offer this viewer."""
+    scopes: list[AuditScope]
+    areas: list[AuditArea]
+
+
+class AuditQuery(BaseModel):
+    scope: str = Field('mine', description="`mine`, a server's Discord id you administer, or `all`.")
+    area: Optional[str] = Field(None, description="An area key from `/audit/options`.")
+    q: Optional[str] = Field(None, description="Matches the action, the person, the thing changed or the token/command.")
+    actor: Optional[str] = Field(None, description="Only this Discord user's actions.")
+    before: Optional[int] = Field(None, description="The `next_before` of the previous page.")
+    limit: int = Field(50, ge=1, le=200)
+
+
+class AuditEntry(BaseModel):
+    id: int
+    created_at: datetime
+    action: str = Field(description="`object.verb`, like `election.closed`.")
+    label: str = Field(description="The action in words, like \"Closed an election\".")
+    area: Optional[str] = None
+    actor_id: Optional[str] = Field(None, description="Discord id of who did it. Null for SahasrahBot itself or a deleted account.")
+    actor_name: Optional[str] = None
+    via: Literal['website', 'api', 'mcp', 'discord', 'racetime', 'system']
+    via_label: str
+    via_detail: Optional[str] = Field(None, description="The token, AI client or command it came through.")
+    guild_id: Optional[str] = None
+    guild_name: Optional[str] = None
+    target: Optional[str] = Field(None, description="What was changed, in words.")
+    details: dict = Field(default_factory=dict)
+
+
+class AuditPage(BaseModel):
+    entries: list[AuditEntry]
+    next_before: Optional[int] = Field(None, description="Pass as `before` for the next page; null on the last.")

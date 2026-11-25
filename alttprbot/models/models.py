@@ -18,6 +18,29 @@ RANKED_CHOICE_ELECTION_MODEL = 'models.RankedChoiceElection'
 RACETIME_URL = config.RACETIME_URL
 
 
+class AuditLog(Model):
+    """One change someone made through SahasrahBot: who, what, when, where and through what.
+
+    Append-only and kept forever. The actor is a Discord user id plus their name at the
+    time (not a foreign key), so the entry outlives them; purging an account clears
+    both on their entries (``alttprbot/services/audit.py``).
+    """
+
+    class Meta:
+        table = "audit_log"
+
+    id = fields.IntField(primary_key=True)
+    created_at = fields.DatetimeField(auto_now_add=True, db_index=True)
+    action = fields.CharField(64, db_index=True)
+    actor_discord_id = fields.BigIntField(null=True, db_index=True)
+    actor_name = fields.CharField(100, null=True)
+    via = fields.CharField(16)
+    via_detail = fields.CharField(200, null=True)
+    guild_id = fields.BigIntField(null=True, db_index=True)
+    target = fields.CharField(300, null=True)
+    details = fields.JSONField(null=True)
+
+
 class AuditGeneratedGames(Model):
     class Meta:
         table = "audit_generated_games"

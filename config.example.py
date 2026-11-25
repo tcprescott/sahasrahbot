@@ -18,6 +18,9 @@ APP_URL = "http://localhost:5001"
 # The MCP server at APP_URL/mcp, for AI clients like Claude. False turns it off.
 MCP_ENABLED = True
 APP_SECRET_KEY = "dev-secret-key"
+# Discord user ids who may read the whole audit log, besides the bot's owner (who always can).
+# Optional: may be left out of config.py.
+AUDIT_LOG_VIEWER_IDS = []
 
 # --- Sentry (alttprbot/observability/) ----------------------------------------
 # Only SENTRY_URL is needed in production; every other setting here may be left

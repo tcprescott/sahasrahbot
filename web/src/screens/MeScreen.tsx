@@ -80,6 +80,16 @@ function Me() {
               </Button>
             </PanelRow>
           </Panel>
+          <Panel title="Audit log">
+            <PanelRow>
+              <span className="grow muted">
+                Every change made through SahasrahBot: yours, and everyone's in the servers you run.
+              </span>
+              <Button asChild variant="outline">
+                <Link to="/audit">Audit log</Link>
+              </Button>
+            </PanelRow>
+          </Panel>
           <Panel title="Your data">
             <PanelRow>
               <span className="grow muted">

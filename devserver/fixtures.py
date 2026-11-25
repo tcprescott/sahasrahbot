@@ -261,4 +261,38 @@ async def _seed_handmade():
             episode_id=episode_id, event="alttpr", game_number=game, preset="open", submitted=1,
         )
 
+    await _seed_audit_log()
+
     return users
+
+
+async def _seed_audit_log():
+    """Audit log entries (/audit), newest last so their ids follow their times."""
+    from alttprbot import models
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+    audit_rows = [
+        (5, "admin", "election.closed", "website", None, GUILD_ID, "Season 5 rules vote",
+         {"election_id": 3, "winners": ["Ganon"]}),
+        (40, "mod", "server_setting.changed", "discord", "/config set", GUILD_ID, "DailyChannel",
+         {"changes": {"DailyChannel": ["#races", "#daily-races"]}}),
+        (95, "admin", "triforce_text.approved", "website", None, None, "Pool dev, text #2",
+         {"pool": "dev", "text_id": 2}),
+        (180, "admin", "preset.updated", "api", "Preset sync", None, "dev-admin/fastrom",
+         {"randomizer": "alttpr", "namespace": "dev-admin", "preset": "fastrom"}),
+        (60 * 22, "runner1", "election.voted", "mcp", "Claude", GUILD_ID, "Season 5 rules vote",
+         {"election_id": 1}),
+        (60 * 24, "mod", "reaction_role.created", "discord", "$reactionrole create", GUILD_ID, "Pronouns: they/them",
+         {"group_id": 1, "role_id": 1}),
+        (60 * 26, "admin", "ai_client.connected", "website", None, None, "Claude",
+         {"client_id": "dev-client", "can_make_changes": True}),
+        (60 * 30, None, "election.closed", "system", None, GUILD_ID, "Best dungeon",
+         {"election_id": 3}),
+        (60 * 50, "runner2", "racer_verification.verified", "discord", "Verify your status button", OTHER_GUILD_ID,
+         "Role 1", {"race_count": 12}),
+    ]
+    for minutes, who, action, via, detail, guild, target, details in reversed(audit_rows):
+        await models.AuditLog.create(
+            created_at=now - datetime.timedelta(minutes=minutes), action=action,
+            actor_discord_id=user(who)["id"] if who else None, actor_name=user(who)["name"] if who else None,
+            via=via, via_detail=detail, guild_id=guild, target=target, details=details)

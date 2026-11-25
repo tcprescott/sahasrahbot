@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, useParams } from 'react-router-dom'
 import { SentryRoutes } from './telemetry'
 import { ApiAccessScreen } from './apiaccess/ApiAccessScreen'
 import { ConsentScreen } from './apiaccess/ConsentScreen'
+import { AuditScreen } from './audit/AuditScreen'
 import { SessionProvider } from './auth/SessionProvider'
 import { TooltipProvider } from './components'
 import { NamespaceScreen } from './presets/NamespaceScreen'
@@ -41,6 +42,7 @@ export function App() {
                 <Route index element={<HomeScreen />} />
                 <Route path="me" element={<MeScreen />} />
                 <Route path="me/api" element={<ApiAccessScreen />} />
+                <Route path="audit" element={<AuditScreen />} />
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />
                 <Route path="presets/me" element={<MyPresetsScreen />} />

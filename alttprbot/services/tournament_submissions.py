@@ -5,7 +5,10 @@ A tournament class offers a form by returning a list from ``submission_form``:
 ``[{'key': 'preset', 'label': 'Preset', 'settings': {'open': 'Open', ...}}, ...]``.
 """
 
+from typing import Optional
+
 from alttprbot.exceptions import InvalidInputError, NotFoundError
+from alttprbot.services import audit
 from alttprbot.tournaments import TOURNAMENT_DATA, fetch_tournament_handler
 
 
@@ -34,6 +37,15 @@ async def get_form(event: str) -> dict:
     }
 
 
+def _guild_id(tournament_race) -> Optional[int]:
+    """The event's Discord server, when its handler knows it."""
+    try:
+        guild_id = tournament_race.guild.id
+    except Exception:  # an event with no server configured raises from its config
+        return None
+    return guild_id if isinstance(guild_id, int) else None
+
+
 async def submit(event: str, episode_id: int, settings: dict[str, str], submitted_by: str) -> dict:
     form = await _form(event)
     for field in form:
@@ -47,4 +59,7 @@ async def submit(event: str, episode_id: int, settings: dict[str, str], submitte
         await tournament_race.process_submission_form(payload, submitted_by=submitted_by)
     except Exception as e:
         raise InvalidInputError(f"We couldn't save those settings: {e}") from e
+    await audit.record(audit.TOURNAMENT_SETTINGS_SUBMITTED, target=f'{event}, episode {episode_id}',
+                       guild_id=_guild_id(tournament_race),
+                       details={'event': event, 'episode_id': episode_id, 'settings': payload})
     return {'event': event, 'episode_id': episode_id, 'versus': tournament_race.versus}

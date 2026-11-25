@@ -324,6 +324,18 @@ optional and documented in `config.example.py`. The SDK is **sentry-sdk 3.x**
   with embeds as `embed.to_dict()`. Its seed DMs (`send_player_message`) and settings
   reminders stay direct: a failed seed DM is reported in the race room, and a failed
   reminder is retried on the next run.
+- **Every change gets an audit entry.** A service that changes data calls
+  `await audit.record(audit.SOME_ACTION, target=..., guild_id=..., details=...)`
+  (`alttprbot/services/audit.py`) after the change succeeds. Add the action as a constant
+  with a label in `ACTIONS` (its prefix needs an area in `AREAS`; `tests/test_audit.py`
+  checks). Who did it and through what come from the source the front end binds: `/api/v1`
+  in `signed_in_user()`, MCP tools in `mcp/registry.py`, slash commands in
+  `SentryCommandTree`, prefix commands via `before_invoke`, racetime commands in
+  `alttprbot_racetime/telemetry.py`; a Discord button or select callback that changes data
+  needs `@audited("<button name>")` from `alttprbot_discord/audit.py`. Never put secrets,
+  ballot choices or message text in `details`. Entries are kept forever; `accounts.purge`
+  unlinks the person. The page is `/audit` (`web/src/audit/`), also `GET /api/v1/audit` and
+  the `list_audit_log` MCP tool.
 - Raise `SahasrahBotException` (`alttprbot/exceptions.py`) for user-facing errors; Sentry
   drops them on purpose.
 - Model changes: edit `alttprbot/models/`, then `poetry run aerich migrate --name <topic>`

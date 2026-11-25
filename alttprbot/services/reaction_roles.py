@@ -8,6 +8,7 @@ from typing import List, Optional
 
 from alttprbot import models
 from alttprbot.exceptions import SahasrahBotException
+from alttprbot.services import audit
 
 MAX_ROLES_PER_GROUP = 20
 
@@ -54,7 +55,7 @@ async def create_group(guild_id: int, channel_id: int, message_id: int, name: st
     if await models.ReactionGroup.exists(channel_id=channel_id, message_id=message_id, guild_id=guild_id):
         raise SahasrahBotException('Group already exists for specified message.')
 
-    return await models.ReactionGroup.create(
+    group = await models.ReactionGroup.create(
         guild_id=guild_id,
         channel_id=channel_id,
         message_id=message_id,
@@ -62,15 +63,28 @@ async def create_group(guild_id: int, channel_id: int, message_id: int, name: st
         description=description,
         bot_managed=int(bot_managed),
     )
+    await audit.record(audit.REACTION_GROUP_CREATED, target=name, guild_id=guild_id,
+                       details={'group_id': group.id, 'channel_id': channel_id, 'message_id': message_id})
+    return group
 
 
 async def update_group(guild_id: int, group_id: int, name: str, description: Optional[str]) -> None:
+    before = await models.ReactionGroup.get_or_none(guild_id=guild_id, id=group_id)
     await models.ReactionGroup.filter(guild_id=guild_id, id=group_id).update(name=name, description=description)
+    if before is not None:
+        changed = audit.changes({'name': before.name, 'description': before.description},
+                                {'name': name, 'description': description})
+        await audit.record(audit.REACTION_GROUP_UPDATED, target=name, guild_id=guild_id,
+                           details={'group_id': group_id, 'changes': changed})
 
 
 async def delete_group(guild_id: int, group_id: int) -> None:
     """Delete the group; its roles go with it (the foreign key cascades)."""
+    group = await models.ReactionGroup.get_or_none(guild_id=guild_id, id=group_id)
     await models.ReactionGroup.filter(guild_id=guild_id, id=group_id).delete()
+    if group is not None:
+        await audit.record(audit.REACTION_GROUP_DELETED, target=group.name, guild_id=guild_id,
+                           details={'group_id': group_id})
 
 
 async def create_role(guild_id: int, group_id: int, role_id: int, name: str, emoji: str,
@@ -84,7 +98,7 @@ async def create_role(guild_id: int, group_id: int, role_id: int, name: str, emo
     if await models.ReactionRole.exists(emoji=emoji, reaction_group_id=group.id):
         raise SahasrahBotException('Emoji already exists on group.')
 
-    return await models.ReactionRole.create(
+    role = await models.ReactionRole.create(
         guild_id=guild_id,
         reaction_group_id=group.id,
         role_id=role_id,
@@ -93,13 +107,28 @@ async def create_role(guild_id: int, group_id: int, role_id: int, name: str, emo
         description=description,
         protect_mentions=int(protect_mentions),
     )
+    await audit.record(audit.REACTION_ROLE_CREATED, target=f'{group.name}: {name}', guild_id=guild_id,
+                       details={'group_id': group.id, 'reaction_role_id': role.id, 'role_id': role_id,
+                                'emoji': emoji})
+    return role
 
 
 async def update_role(guild_id: int, role_id: int, name: str, description: Optional[str],
                       protect_mentions: bool) -> None:
+    before = await models.ReactionRole.get_or_none(guild_id=guild_id, id=role_id)
     await models.ReactionRole.filter(guild_id=guild_id, id=role_id).update(
         name=name, description=description, protect_mentions=int(protect_mentions))
+    if before is not None:
+        changed = audit.changes(
+            {'name': before.name, 'description': before.description, 'protect_mentions': bool(before.protect_mentions)},
+            {'name': name, 'description': description, 'protect_mentions': bool(protect_mentions)})
+        await audit.record(audit.REACTION_ROLE_UPDATED, target=name, guild_id=guild_id,
+                           details={'reaction_role_id': role_id, 'changes': changed})
 
 
 async def delete_role(guild_id: int, role_id: int) -> None:
+    role = await models.ReactionRole.get_or_none(guild_id=guild_id, id=role_id)
     await models.ReactionRole.filter(guild_id=guild_id, id=role_id).delete()
+    if role is not None:
+        await audit.record(audit.REACTION_ROLE_DELETED, target=role.name, guild_id=guild_id,
+                           details={'reaction_role_id': role_id, 'role_id': role.role_id})

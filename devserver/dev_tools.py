@@ -148,6 +148,7 @@ LINKS = [
     ("Elections: results of a closed election", "/elections/3/results"),
     ("Triforce texts: submit", "/triforcetexts/dev"),
     ("Triforce texts: moderation (admin)", "/triforcetexts/dev/moderation"),
+    ("Audit log (log in as admin)", "/audit"),
     ("testdata: active role-gated election", "/ranked_choice/1004"),
     ("testdata: all preset namespaces", "/presets"),
     ("Racetime verification", "/racetime/verification/initiate"),

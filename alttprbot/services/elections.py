@@ -23,7 +23,7 @@ from tortoise.transactions import in_transaction
 
 from alttprbot import events, models
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
-from alttprbot.services import discord_directory, election_count
+from alttprbot.services import audit, discord_directory, election_count
 from alttprbot.services.election_count import METHODS, STV
 
 logger = logging.getLogger(__name__)
@@ -289,6 +289,19 @@ async def _replace_candidates(election: models.RankedChoiceElection, names: list
     ])
 
 
+def _audit_fields(election: models.RankedChoiceElection, candidates: list[str]) -> dict:
+    return {
+        'title': election.title, 'description': election.description, 'channel_id': election.channel_id,
+        'method': election.method, 'seats': election.seats, 'voter_role_id': election.voter_role_id,
+        'closes_at': election.closes_at, 'show_vote_count': election.show_vote_count, 'candidates': candidates,
+    }
+
+
+async def _audit(action: str, election: models.RankedChoiceElection, **details) -> None:
+    await audit.record(action, target=election.title, guild_id=election.guild_id,
+                       details={'election_id': election.id, **details})
+
+
 def _apply(election: models.RankedChoiceElection, data: ElectionInput) -> None:
     election.guild_id = data.guild_id
     election.channel_id = data.channel_id
@@ -312,6 +325,7 @@ async def create_draft(user_id: int, data: ElectionInput) -> dict:
     async with in_transaction():
         await election.save()
         await _replace_candidates(election, names)
+    await _audit(audit.ELECTION_CREATED, election, method=election.method, candidates=names)
     return await get_for_admin(election.id, user_id)
 
 
@@ -336,11 +350,15 @@ async def update(election_id: int, user_id: int, data: ElectionInput) -> dict:
     if locked and (names != current or data.method != election.method or data.seats != election.seats):
         raise InvalidInputError("People have already voted, so the candidates, method and winners can't change.")
 
+    before = _audit_fields(election, current)
     _apply(election, data)
     async with in_transaction():
         await election.save()
         if names != current:
             await _replace_candidates(election, names)
+    changed = audit.changes(before, _audit_fields(election, names))
+    if changed:
+        await _audit(audit.ELECTION_UPDATED, election, changes=changed)
     if status == OPEN:
         events.publish(events.ElectionUpdated(election_id=election.id))
     return await get_for_admin(election.id, user_id)
@@ -371,6 +389,7 @@ async def publish(election_id: int, user_id: int) -> dict:
         raise
     election.message_id = message_id
     await election.save()
+    await _audit(audit.ELECTION_PUBLISHED, election, channel_id=election.channel_id)
     return await get_for_admin(election.id, user_id)
 
 
@@ -388,6 +407,8 @@ async def delete(election_id: int, user_id: int) -> None:
         await models.RankedChoiceCandidate.filter(election_id=election.id).delete()
         await models.RankedChoiceAuthorizedVoters.filter(election_id=election.id).delete()
         await election.delete()
+    await audit.record(audit.ELECTION_DELETED, target=election.title, guild_id=election.guild_id,
+                       details={'election_id': election_id})
     events.publish(events.ElectionDeleted(election_id=election_id, channel_id=channel_id, message_id=message_id))
 
 
@@ -450,6 +471,9 @@ async def cast_ballot(election_id: int, user_id: int, choices: list[int]) -> dic
             for rank, cid in enumerate(choices, start=1)
         ])
 
+    # Who voted is recorded; what they chose never is.
+    await audit.record(audit.ELECTION_VOTED, target=election.title, guild_id=election.guild_id,
+                       details={'election_id': election.id}, actor_discord_id=user_id)
     events.publish(events.ElectionBallotCast(election_id=election.id))
     return await get_ballot(election_id, user_id)
 
@@ -482,6 +506,7 @@ async def _close(election: models.RankedChoiceElection) -> models.RankedChoiceEl
         election.active = False
         election.closed_at = _now()
         await election.save()
+    await _audit(audit.ELECTION_CLOSED, election, winners=[c.name for c in candidates if c.winner])
     events.publish(events.ElectionClosed(election_id=election.id))
     return election
 

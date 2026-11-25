@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 
 import config
+from alttprbot_discord.audit import bind_prefix_command
 from alttprbot_discord.telemetry import SentryCommandTree
 
 # No privileged intents: member lookups go through alttprbot/util/discord_members.py.
@@ -22,6 +23,9 @@ discordbot = commands.Bot(
     # Traces, tags and times every slash command for Sentry.
     tree_cls=SentryCommandTree,
 )
+
+# Tells the audit log who ran a prefix command.
+discordbot.before_invoke(bind_prefix_command)
 
 discordbot.logger = logging.getLogger('discord')
 discordbot.logger.setLevel(logging.INFO)

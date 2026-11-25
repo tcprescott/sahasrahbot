@@ -159,7 +159,7 @@ class Inquiry(commands.Cog):
             allowed_mentions=discord.AllowedMentions(roles=False)
         )
         original_message = await interaction.original_response()
-        await inquiries.register(original_message.id, role.id)
+        await inquiries.register(original_message.id, role.id, interaction.guild_id)
 
 
 # discord.py passes the interaction to every check, used or not.

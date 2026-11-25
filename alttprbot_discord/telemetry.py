@@ -24,6 +24,8 @@ from discord import app_commands
 
 from alttprbot.observability import metrics
 from alttprbot.observability.sentry import sentry_tags
+from alttprbot_discord.audit import interaction_source
+from alttprbot.services import audit
 
 
 def _command_name(interaction: discord.Interaction) -> str:
@@ -58,7 +60,8 @@ class SentryCommandTree(app_commands.CommandTree):
             sentry_sdk.new_trace()
             if interaction.user is not None:
                 sentry_sdk.set_user({'id': str(interaction.user.id), 'username': str(interaction.user)})
-            with sentry_sdk.start_span(name=f'/{name}', attributes={'sentry.op': 'discord.command'}):
+            with sentry_sdk.start_span(name=f'/{name}', attributes={'sentry.op': 'discord.command'}), \
+                    audit.acting(interaction_source(interaction, f'/{name}')):
                 try:
                     await super()._call(interaction)
                 except BaseException as e:

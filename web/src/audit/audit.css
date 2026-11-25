@@ -1,0 +1,87 @@
+/* The audit log page (/audit). */
+.audit-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+.audit-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--fg-muted);
+}
+.audit-select .input {
+  min-height: 40px;
+  width: auto;
+  font-weight: 400;
+}
+.audit-search {
+  flex: 1;
+  min-width: 220px;
+}
+.audit-when {
+  white-space: nowrap;
+  color: var(--fg-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.audit-what {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.audit-target {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.audit-via {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+}
+.audit-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-3);
+}
+.audit-dl {
+  display: grid;
+  grid-template-columns: minmax(80px, auto) 1fr;
+  gap: 10px 16px;
+  margin: 0;
+}
+.audit-dl dt {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.audit-dl dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.audit-change del {
+  color: var(--fg-muted);
+}
+.audit-change ins {
+  text-decoration: none;
+  font-weight: 700;
+}
+.audit-fact {
+  color: var(--fg-secondary);
+}
+@media (max-width: 767.98px) {
+  .audit-select {
+    flex: 1 1 100%;
+  }
+  .audit-select .input {
+    flex: 1;
+  }
+}

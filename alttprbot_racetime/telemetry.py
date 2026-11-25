@@ -23,6 +23,7 @@ import sentry_sdk
 
 from alttprbot.observability import metrics
 from alttprbot.observability.sentry import sentry_tags
+from alttprbot.services import audit
 
 _MARK = '__sahasrahbot_racetime_command__'
 
@@ -48,6 +49,17 @@ def room_scope(handler: Any, msg_type: Any) -> Iterator[None]:
         yield
 
 
+def command_source(handler: Any, command: str, args: tuple, kwargs: dict) -> audit.Source:
+    """Who sent a chat command, for the audit log: the racetime.gg user (linked to their
+    Discord account when they've linked one) in that room."""
+    message = kwargs.get('message', args[1] if len(args) > 1 else None)
+    user = (message.get('user') if isinstance(message, dict) else None) or {}
+    room = room_of(handler)
+    detail = f'!{command} in {room}' if room else f'!{command}'
+    return audit.Source(via=audit.VIA_RACETIME, detail=detail, actor_name=user.get('name'),
+                        racetime_id=user.get('id'))
+
+
 def _command_wrapper(method: str, func):
     command = method.split('_', 1)[1]
 
@@ -59,7 +71,8 @@ def _command_wrapper(method: str, func):
         with sentry_sdk.isolation_scope(), sentry_tags(
                 racetime_room=room_of(self), racetime_category=category, racetime_command=command):
             sentry_sdk.new_trace()
-            with sentry_sdk.start_span(name=f'!{command}', attributes={'sentry.op': 'racetime.command'}):
+            with sentry_sdk.start_span(name=f'!{command}', attributes={'sentry.op': 'racetime.command'}), \
+                    audit.acting(command_source(self, command, args, kwargs)):
                 try:
                     return await func(self, *args, **kwargs)
                 except BaseException as e:
