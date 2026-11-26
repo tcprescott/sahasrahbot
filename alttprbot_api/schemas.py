@@ -399,3 +399,67 @@ class AuditEntry(BaseModel):
 class AuditPage(BaseModel):
     entries: list[AuditEntry]
     next_before: Optional[int] = Field(None, description="Pass as `before` for the next page; null on the last.")
+
+
+# --- Racer verification -------------------------------------------------------------
+
+RacerStatus = Literal['verified', 'due', 'not_qualified']
+
+
+class RacerVerification(BaseModel):
+    """A verified-racer role in a server: who qualifies, and how it stays current."""
+    id: int
+    guild_id: str
+    role_id: str
+    role_name: Optional[str] = Field(default=None, description="Null when the role was deleted")
+    channel_id: Optional[str] = None
+    channel_name: Optional[str] = None
+    message_id: Optional[str] = Field(default=None, description="The message with the Verify button; null if never posted")
+    racetime_categories: list[str]
+    use_alttpr_ladder: bool
+    minimum_races: int
+    time_period_days: int
+    reverify_period_days: Optional[int] = Field(default=None, description="Recheck verified racers this often; null never")
+    revoke_ineligible: bool = Field(description="A recheck takes the role from anyone who no longer qualifies")
+    audit_channel_id: Optional[str] = None
+    audit_channel_name: Optional[str] = None
+    requirement: str = Field(description='For people, e.g. "5 races in 365 days"')
+    verified_count: int
+
+
+class RacerVerificationList(BaseModel):
+    verifications: list[RacerVerification]
+    racetime_categories: list[str] = Field(description="The racetime.gg categories the settings form offers")
+
+
+class RacerVerificationIn(BaseModel):
+    role_id: str
+    channel_id: str = Field(description="Where the message with the Verify button is posted")
+    racetime_categories: list[str] = Field(default_factory=list, description="racetime.gg category slugs whose finished races count")
+    use_alttpr_ladder: bool = False
+    minimum_races: int = Field(default=1, ge=1, le=1000)
+    time_period_days: int = Field(default=365, ge=1, le=3650)
+    reverify_period_days: Optional[int] = Field(default=None, ge=1, le=3650)
+    revoke_ineligible: bool = False
+    audit_channel_id: Optional[str] = Field(default=None, description="Where rechecks report who lost or would lose the role")
+
+
+class VerifiedRacer(BaseModel):
+    id: int
+    discord_user_id: Optional[str] = None
+    name: Optional[str] = None
+    racetime_id: Optional[str] = None
+    racetime_url: Optional[str] = None
+    race_count: Optional[int] = Field(default=None, description="Races counted at the last check (at least this many)")
+    verified_at: datetime
+    last_checked: Optional[datetime] = None
+    next_check: Optional[datetime] = Field(default=None, description="When the scheduled recheck is due; null if rechecks are off")
+    status: RacerStatus
+
+
+class VerifiedRacerList(BaseModel):
+    racers: list[VerifiedRacer]
+
+
+class RecheckResult(BaseModel):
+    racer: Optional[VerifiedRacer] = Field(default=None, description="Null when the recheck removed them (they left, or lost the role)")

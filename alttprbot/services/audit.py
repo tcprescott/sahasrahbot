@@ -133,6 +133,10 @@ SERVER_LIST_SERVER_UPDATED = 'server_list.server_updated'
 SERVER_LIST_SERVER_REMOVED = 'server_list.server_removed'
 RACER_VERIFICATION_CONFIGURED = 'racer_verification.configured'
 RACER_VERIFICATION_VERIFIED = 'racer_verification.verified'
+RACER_VERIFICATION_UPDATED = 'racer_verification.updated'
+RACER_VERIFICATION_REPOSTED = 'racer_verification.reposted'
+RACER_VERIFICATION_DELETED = 'racer_verification.deleted'
+RACER_VERIFICATION_REVOKED = 'racer_verification.revoked'
 INQUIRY_CREATED = 'inquiry.created'
 API_TOKEN_CREATED = 'api_token.created'
 API_TOKEN_REVOKED = 'api_token.revoked'
@@ -177,6 +181,10 @@ ACTIONS: dict[str, str] = {
     SERVER_LIST_SERVER_REMOVED: 'Removed a server from a server list',
     RACER_VERIFICATION_CONFIGURED: 'Set up racer verification',
     RACER_VERIFICATION_VERIFIED: 'Was verified as a racer',
+    RACER_VERIFICATION_UPDATED: 'Edited racer verification',
+    RACER_VERIFICATION_REPOSTED: 'Reposted a racer verification message',
+    RACER_VERIFICATION_DELETED: 'Deleted racer verification',
+    RACER_VERIFICATION_REVOKED: 'Removed a verified racer',
     INQUIRY_CREATED: 'Set up an inquiry message',
     API_TOKEN_CREATED: 'Made an API token',
     API_TOKEN_REVOKED: 'Revoked an API token',

@@ -140,6 +140,33 @@ def build_scheduling_needs_embed(needs: events.SchedulingNeedsUpdated, include_t
     return embed
 
 
+RECHECK_HEADINGS = (
+    ('revoked', "lost the {role} role: they no longer meet the requirements"),
+    ('not_qualified', "no longer meet the requirements for {role} but kept it (removing the role is off)"),
+    ('left', "left the server, so their {role} verification was removed"),
+)
+
+
+def racer_recheck_messages(event: events.RacerVerificationRechecked, limit: int = 1900) -> list[str]:
+    """The report of a recheck, split into messages under Discord's length limit."""
+    role = f"<@&{event.role_id}>"
+    messages: list[str] = []
+    for attr, heading in RECHECK_HEADINGS:
+        names = getattr(event, attr)
+        if not names:
+            continue
+        text = f"**{len(names)}** {'person' if len(names) == 1 else 'people'} {heading.format(role=role)}:"
+        for name in names:
+            line = f"\n- {discord.utils.escape_markdown(name)}"
+            if len(text) + len(line) > limit:
+                messages.append(text)
+                text = line.lstrip('\n')
+            else:
+                text += line
+        messages.append(text)
+    return messages
+
+
 class ScheduledJobDiscordOutput:
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -189,6 +216,17 @@ class ScheduledJobDiscordOutput:
                 f"There was an error while sending a submission reminder for episode `{event.episode_id}`.\n\n{event.error}",
                 allowed_mentions=discord.AllowedMentions(everyone=True)
             )
+
+    async def report_racer_recheck(self, event: events.RacerVerificationRechecked):
+        """Tell the verification's report channel who a recheck changed."""
+        if not event.audit_channel_id:
+            return
+        await wait_until_ready(self.bot)
+        channel = self.bot.get_channel(event.audit_channel_id)
+        if channel is None:
+            channel = await self.bot.fetch_channel(event.audit_channel_id)
+        for text in racer_recheck_messages(event):
+            await channel.send(text, allowed_mentions=discord.AllowedMentions.none())
 
     async def report_unmatched_players(self, event: events.UnmatchedPlayersFound):
         event_data = await self._event_config(event.event_slug)
@@ -484,6 +522,7 @@ def register(bot: commands.Bot) -> DiscordNotifier:
         events.subscribe(events.TournamentEpisodesRefreshed, jobs.update_scheduled_events),
         events.subscribe(events.SchedulingNeedsUpdated, jobs.update_scheduling_needs),
         events.subscribe(events.UnmatchedPlayersFound, jobs.report_unmatched_players),
+        events.subscribe(events.RacerVerificationRechecked, jobs.report_racer_recheck),
     ])
     return notifier
 

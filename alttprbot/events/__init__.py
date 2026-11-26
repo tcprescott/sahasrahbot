@@ -34,6 +34,7 @@ from alttprbot.events.types import (
     StaffNeed,
     TournamentEpisodesRefreshed,
     UnmatchedPlayersFound,
+    RacerVerificationRechecked,
 )
 
 __all__ = [
@@ -61,4 +62,5 @@ __all__ = [
     "StaffNeed",
     "TournamentEpisodesRefreshed",
     "UnmatchedPlayersFound",
+    "RacerVerificationRechecked",
 ]
