@@ -7,6 +7,8 @@ cover a new page; ``python -m devserver --reset`` reseeds from scratch.
 
 import datetime
 
+import discord
+
 from devserver.fake_discord import FakeChannel, FakeGuild, FakeRole, FakeUser, FakeWorld
 
 GUILD_ID = 100000000000000001
@@ -23,6 +25,9 @@ CHANNEL_ASYNC_REPORTS = 120000000000000003
 CHANNEL_ELECTIONS = 120000000000000004
 CHANNEL_OLD_ASYNC = 120000000000000005
 CHANNEL_OTHER_GENERAL = 120000000000000101
+VOICE_RACE_1 = 120000000000000201
+VOICE_RACE_2 = 120000000000000202
+VOICE_DELETED = 120000000000000299  # a voice role still points at it
 
 GUILDS = [
     {
@@ -41,6 +46,7 @@ GUILDS = [
             (CHANNEL_ELECTIONS, "elections"),
             (CHANNEL_OLD_ASYNC, "old-async"),
         ],
+        "voice_channels": [(VOICE_RACE_1, "Race 1"), (VOICE_RACE_2, "Race 2")],
     },
     {
         "id": OTHER_GUILD_ID,
@@ -127,6 +133,8 @@ def build_world() -> FakeWorld:
             guild._roles[role_id] = FakeRole(guild, role_id, name)
         for channel_id, name in spec["channels"]:
             guild._channels[channel_id] = FakeChannel(guild, channel_id, name)
+        for channel_id, name in spec.get("voice_channels", []):
+            guild._channels[channel_id] = FakeChannel(guild, channel_id, name, discord.ChannelType.voice)
         world.guilds[guild.id] = guild
     for spec in USERS:
         add_user(world, spec["id"], spec["name"], spec["memberships"])
@@ -150,6 +158,8 @@ def add_testdata_world(world: FakeWorld) -> None:
             guild._roles[role_id] = FakeRole(guild, role_id, name)
         for channel_id, name in g["channels"]:
             guild._channels[channel_id] = FakeChannel(guild, channel_id, name)
+        for channel_id, name in spec.get("voice_channels", []):
+            guild._channels[channel_id] = FakeChannel(guild, channel_id, name, discord.ChannelType.voice)
         world.guilds[guild.id] = guild
     for m in spec["members"]:
         add_user(world, m["id"], m["name"], {int(g): roles for g, roles in m["memberships"].items()})
@@ -254,6 +264,10 @@ async def _seed_handmade():
     )
     for position, name in enumerate(["Classic", "Chaos", "Friendly"]):
         await models.RankedChoiceCandidate.create(election=draft, name=name, position=position)
+
+    # --- Voice roles (/servers/<id>/voice-roles) ---------------------------------
+    await models.VoiceRole.create(id=1, guild_id=GUILD_ID, voice_channel_id=VOICE_RACE_1, role_id=ROLE_RACER)
+    await models.VoiceRole.create(id=2, guild_id=GUILD_ID, voice_channel_id=VOICE_DELETED, role_id=ROLE_VOTER)
 
     # --- Tournament games (/api/tournament/games) ---------------------------------
     for episode_id, game in [(1001, 1), (1002, 2)]:

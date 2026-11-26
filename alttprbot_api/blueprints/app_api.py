@@ -37,7 +37,7 @@ from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
 from alttprbot.services import (accounts, api_tokens, audit, elections, mcp_auth, presets, seeds, servers,
-                                tournament_submissions, triforce_texts)
+                                tournament_submissions, triforce_texts, voice_roles)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -743,3 +743,48 @@ async def deny_oauth_request(txn: str):
     """Turn the AI client away. Website only."""
     await require_session_user()
     return schemas.OAuthRedirect(redirect_url=mcp_auth.deny(txn))
+
+
+# --- Voice roles ---------------------------------------------------------------
+
+
+def voice_role_out(data: dict) -> schemas.VoiceRole:
+    return schemas.VoiceRole(**{**data, 'voice_channel_id': str(data['voice_channel_id']),
+                                'role_id': str(data['role_id'])})
+
+
+def voice_roles_out(data: dict) -> schemas.VoiceRoles:
+    return schemas.VoiceRoles(
+        voice_roles=[voice_role_out(v) for v in data['voice_roles']],
+        voice_channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in data['voice_channels']],
+        roles=[schemas.VoiceRoleRoleOption(id=str(r['id']), name=r['name'], assignable=r['assignable'])
+               for r in data['roles']],
+    )
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>/voice-roles')
+@tag(['servers'])
+@validate_response(schemas.VoiceRoles)
+async def list_voice_roles(guild_id: int):
+    """The server's voice roles (people in the voice channel get the role while they're in it),
+    and the voice channels and roles a new one can use. Server administrators only."""
+    user = await require_user()
+    return voice_roles_out(await voice_roles.overview(guild_id, user.id))
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/voice-roles')
+@tag(['servers'])
+@validate_request(schemas.VoiceRoleIn)
+@validate_response(schemas.VoiceRole, 201)
+async def add_voice_role(guild_id: int, data: schemas.VoiceRoleIn):
+    user = await require_user()
+    return voice_role_out(await voice_roles.add(guild_id, user.id, _int_id(data.voice_channel_id, 'voice channel'),
+                                                _int_id(data.role_id, 'role'))), 201
+
+
+@app_api_blueprint.delete('/servers/<int:guild_id>/voice-roles/<int:voice_role_id>')
+@tag(['servers'])
+async def remove_voice_role(guild_id: int, voice_role_id: int):
+    user = await require_user()
+    await voice_roles.remove(guild_id, user.id, voice_role_id)
+    return '', 204

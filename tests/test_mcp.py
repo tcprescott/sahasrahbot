@@ -23,7 +23,7 @@ REDIRECT = "https://claude.ai/api/mcp/auth_callback"
 WRITE_TOOLS = {
     "save_preset", "delete_preset", "cast_ballot", "create_election", "update_election", "publish_election",
     "close_election", "delete_election", "submit_triforce_text", "moderate_triforce_text",
-    "submit_tournament_settings",
+    "submit_tournament_settings", "add_voice_role", "remove_voice_role",
 }
 
 
@@ -298,3 +298,21 @@ async def test_website_only_routes_refuse_tokens(rest, method, path, body):
     assert resp.status_code == 403
     assert "not with a token" in (await resp.get_json())["error"]
 
+
+
+async def test_voice_role_tools(db, directory):
+    from alttprbot.exceptions import InvalidInputError
+    from alttprbot_api.mcp import auth as mcp_actor, tools
+    directory.add_guild(5, admins=[7], voice_channels=[(10, "Race 1")], roles=[(21, "@In Race 1")])
+    token = mcp_actor.set_actor(mcp_actor.McpActor(discord_user_id=7, user_name="admin", read_only=False,
+                                                   client_name="Claude"))
+    try:
+        added = await tools.add_voice_role("5", "10", "21")
+        assert (added.voice_channel_name, added.role_name) == ("Race 1", "@In Race 1")
+        listed = await tools.list_voice_roles("5")
+        assert [v.id for v in listed.voice_roles] == [added.id]
+        assert await tools.remove_voice_role("5", added.id) == f"Removed voice role {added.id}."
+        with pytest.raises(InvalidInputError):
+            await tools.list_voice_roles("")
+    finally:
+        mcp_actor.reset_actor(token)

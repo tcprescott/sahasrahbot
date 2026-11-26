@@ -9,10 +9,11 @@ from typing import Literal, Optional
 from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel
 
-from alttprbot.services import audit, elections, presets, seeds, tournament_submissions, triforce_texts
+from alttprbot.exceptions import InvalidInputError
+from alttprbot.services import audit, elections, presets, seeds, tournament_submissions, triforce_texts, voice_roles
 from alttprbot_api import schemas
 from alttprbot_api.blueprints.app_api import (_int_id, audit_entry, election_detail, election_input,
-                                               election_summary)
+                                               election_summary, voice_role_out, voice_roles_out)
 from alttprbot_api.mcp.auth import current_actor
 from alttprbot_api.mcp.registry import register
 
@@ -232,6 +233,36 @@ async def list_audit_log(scope: str = 'mine', area: Optional[str] = None, search
     return schemas.AuditPage(entries=[audit_entry(e) for e in page['entries']], next_before=page['next_before'])
 
 
+# --- Voice roles ----------------------------------------------------------------
+
+
+def _guild_id(guild_id: str) -> int:
+    value = _int_id(guild_id, 'server')
+    if value is None:
+        raise InvalidInputError("Give the server's Discord id.")
+    return value
+
+
+async def list_voice_roles(guild_id: str) -> schemas.VoiceRoles:
+    """A server's voice roles: people in the voice channel get the role while they're in it.
+    Also lists the server's voice channels and roles (`assignable`: SahasrahBot can give it),
+    for `add_voice_role`. Server administrators only."""
+    return voice_roles_out(await voice_roles.overview(_guild_id(guild_id), current_actor().discord_user_id))
+
+
+async def add_voice_role(guild_id: str, voice_channel_id: str, role_id: str) -> schemas.VoiceRole:
+    """Give `role_id` to everyone in the voice channel while they're in it. Ids are Discord ids,
+    as strings, from `list_voice_roles`. People already in the channel get it when they next join."""
+    return voice_role_out(await voice_roles.add(_guild_id(guild_id), current_actor().discord_user_id,
+                                                _int_id(voice_channel_id, 'voice channel'), _int_id(role_id, 'role')))
+
+
+async def remove_voice_role(guild_id: str, voice_role_id: int) -> str:
+    """Stop giving a voice role (its `id` from `list_voice_roles`)."""
+    await voice_roles.remove(_guild_id(guild_id), current_actor().discord_user_id, voice_role_id)
+    return f"Removed voice role {voice_role_id}."
+
+
 def register_all(mcp: MCPServer) -> None:
     register(mcp, whoami, title='Who am I')
     register(mcp, list_randomizers, title='List randomizers')
@@ -259,3 +290,6 @@ def register_all(mcp: MCPServer) -> None:
     register(mcp, get_tournament_submission_form, title='Get a tournament settings form')
     register(mcp, submit_tournament_settings, title='Submit tournament settings', write=True)
     register(mcp, list_audit_log, title='List the audit log')
+    register(mcp, list_voice_roles, title="List a server's voice roles")
+    register(mcp, add_voice_role, title='Add a voice role', write=True)
+    register(mcp, remove_voice_role, title='Remove a voice role', write=True, destructive=True)

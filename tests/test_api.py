@@ -728,3 +728,31 @@ async def test_consent_screen_routes(client, login, monkeypatch):
     assert status == 200
     assert "error=access_denied" in body["redirect_url"]
     assert await api_tokens.list_for_user(91000000000000001) == []
+
+
+async def test_voice_roles_api(client, login, directory):
+    directory.add_guild(GUILD, name="Community", admins=[ADMIN], voice_channels=[(10, "Race 1")],
+                        roles=[(20, "@Staff"), (21, "@In Race 1")], unassignable={20})
+    login(ADMIN)
+    status, body = await send_json(client, "POST", f"/api/v1/servers/{GUILD}/voice-roles",
+                                   {"voice_channel_id": "10", "role_id": "21"})
+    assert status == 201
+    assert body == {"id": body["id"], "voice_channel_id": "10", "voice_channel_name": "Race 1", "role_id": "21",
+                    "role_name": "@In Race 1", "problem": None}
+    status, listed = await get_json(client, f"/api/v1/servers/{GUILD}/voice-roles")
+    assert status == 200
+    assert listed["voice_roles"] == [body]
+    assert listed["voice_channels"] == [{"id": "10", "name": "Race 1"}]
+    assert listed["roles"] == [{"id": "20", "name": "@Staff", "assignable": False},
+                               {"id": "21", "name": "@In Race 1", "assignable": True}]
+
+    status, error = await send_json(client, "POST", f"/api/v1/servers/{GUILD}/voice-roles",
+                                    {"voice_channel_id": "10", "role_id": "20"})
+    assert status == 400 and "can't give @Staff" in error["error"]
+    assert (await send_json(client, "POST", f"/api/v1/servers/{GUILD}/voice-roles",
+                            {"voice_channel_id": "x", "role_id": "20"}))[0] == 400
+    assert (await send_json(client, "DELETE", f"/api/v1/servers/{GUILD}/voice-roles/{body['id']}"))[0] == 204
+    assert (await send_json(client, "DELETE", f"/api/v1/servers/{GUILD}/voice-roles/{body['id']}"))[0] == 404
+
+    login(VOTER)
+    assert (await get_json(client, f"/api/v1/servers/{GUILD}/voice-roles"))[0] == 403

@@ -16,8 +16,8 @@ INSTRUCTIONS = """\
 Access to SahasrahBot, the Discord and racetime.gg bot of the A Link to the Past \
 Randomizer community. You can list and read seed presets, roll seeds from them \
 (ALTTPR, ALTTPR mystery, Super Metroid and SMZ3), look up a seed by its hash, \
-vote in and run Discord elections, submit and moderate triforce texts, and submit \
-tournament race settings.
+vote in and run Discord elections, submit and moderate triforce texts, submit \
+tournament race settings, and manage the voice roles of servers you administer.
 
 Everything acts as the Discord user who connected you. Start with `whoami`: it \
 says who that is and whether this connection may make changes. A read-only \
