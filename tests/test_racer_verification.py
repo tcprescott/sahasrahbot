@@ -114,35 +114,35 @@ async def test_create_posts_the_message_and_records_it(db, server, gateway):
     assert await audit_actions() == ['racer_verification.configured']
 
 
-async def test_create_refuses_what_it_should(db, server, gateway):
-    with pytest.raises(PermissionDeniedError):
-        await rv.create(GUILD, OUTSIDER, form())
-    with pytest.raises(InvalidInputError, match="role isn't in this server"):
-        await rv.create(GUILD, ADMIN, form(role_id=79))
-    with pytest.raises(InvalidInputError, match="can't post in that channel"):
-        await rv.create(GUILD, ADMIN, form(channel_id=400))
-    with pytest.raises(InvalidInputError, match="channel for reports"):
-        await rv.create(GUILD, ADMIN, form(audit_channel_id=400))
-    with pytest.raises(InvalidInputError, match="at least one racetime.gg category"):
-        await rv.create(GUILD, ADMIN, form(racetime_categories=[]))
-    with pytest.raises(InvalidInputError, match="isn't a racetime.gg category"):
-        await rv.create(GUILD, ADMIN, form(racetime_categories=["al ttpr"]))
-    with pytest.raises(InvalidInputError, match="Races needed"):
-        await rv.create(GUILD, ADMIN, form(minimum_races=0))
-    with pytest.raises(InvalidInputError, match="counting period"):
-        await rv.create(GUILD, ADMIN, form(time_period_days=0))
-    with pytest.raises(InvalidInputError, match="Recheck every"):
-        await rv.create(GUILD, ADMIN, form(reverify_period_days=0))
+@pytest.mark.parametrize("user, overrides, error, match", [
+    (OUTSIDER, {}, PermissionDeniedError, "administrators"),
+    (ADMIN, {"role_id": 79}, InvalidInputError, "role isn't in this server"),
+    (ADMIN, {"channel_id": 400}, InvalidInputError, "can't post in that channel"),
+    (ADMIN, {"audit_channel_id": 400}, InvalidInputError, "channel for reports"),
+    (ADMIN, {"racetime_categories": []}, InvalidInputError, "at least one racetime.gg category"),
+    (ADMIN, {"racetime_categories": ["al ttpr"]}, InvalidInputError, "isn't a racetime.gg category"),
+    (ADMIN, {"minimum_races": 0}, InvalidInputError, "Races needed"),
+    (ADMIN, {"time_period_days": 0}, InvalidInputError, "counting period"),
+    (ADMIN, {"reverify_period_days": 0}, InvalidInputError, "Recheck every"),
+])
+async def test_create_refuses_what_it_should(db, server, gateway, user, overrides, error, match):
+    data = form(**overrides)
+    with pytest.raises(error, match=match):
+        await rv.create(GUILD, user, data)
 
+
+async def test_create_refuses_a_second_verification_for_a_role(db, server, gateway):
     await rv.create(GUILD, ADMIN, form())
+    data = form()
     with pytest.raises(InvalidInputError, match="already has racer verification"):
-        await rv.create(GUILD, OWNER, form())
+        await rv.create(GUILD, OWNER, data)
 
 
 async def test_create_keeps_nothing_when_discord_refuses_the_post(db, server, gateway):
     gateway.post_error = InvalidInputError("SahasrahBot isn't allowed to post in that channel.")
+    data = form()
     with pytest.raises(InvalidInputError):
-        await rv.create(GUILD, ADMIN, form())
+        await rv.create(GUILD, ADMIN, data)
     assert not await models.RacerVerification.exists()
 
 
@@ -188,15 +188,17 @@ async def test_update_reposts_a_deleted_message_or_a_moved_one(db, server, gatew
     assert again["message_id"] == 9002
 
     moved = await rv.update(created["id"], ADMIN, form(channel_id=NEW_CHANNEL))
-    assert moved["channel_id"] == NEW_CHANNEL and moved["message_id"] == 9003
+    assert moved["channel_id"] == NEW_CHANNEL
+    assert moved["message_id"] == 9003
     assert gateway.deleted == [(CHANNEL, 9002)]
 
 
 async def test_update_refuses_a_role_already_set_up(db, server, gateway):
     created = await rv.create(GUILD, ADMIN, form())
     await rv.create(GUILD, ADMIN, form(role_id=OTHER_ROLE))
+    data = form(role_id=OTHER_ROLE)
     with pytest.raises(InvalidInputError, match="already has racer verification"):
-        await rv.update(created["id"], ADMIN, form(role_id=OTHER_ROLE))
+        await rv.update(created["id"], ADMIN, data)
 
 
 async def test_repost_and_delete(db, server, gateway):
