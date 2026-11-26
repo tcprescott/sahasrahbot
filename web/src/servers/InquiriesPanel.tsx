@@ -61,7 +61,7 @@ export function InquiriesPanel() {
           inquiries.length === 0 ? (
             <p className="server-settings__pad server-muted">
               No inquiry buttons yet. Members press one to open a private thread with a role, for questions they'd
-              rather not ask in public. Buttons posted before November 2026 still work but aren't listed here.
+              rather not ask in public.
             </p>
           ) : (
             <ul className="inquiry-rows" aria-label="Inquiry buttons">

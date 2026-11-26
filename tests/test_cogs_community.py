@@ -552,6 +552,9 @@ async def test_inquiry_buttons_lead_to_the_modal(db):
     sent = interaction.sent()
     assert sent.content.startswith("This will open a private thread to <@&500>")
     assert sent.ephemeral is True
+    # An older message learns where it is when pressed, so the website can list it.
+    saved = await models.InquiryMessageConfig.get(message_id=700)
+    assert (saved.guild_id, saved.channel_id) == (guild.id, interaction.channel.id)
 
     yes = FakeInteraction(guild=guild)
     await sent.view.yes.callback(yes)

@@ -77,6 +77,27 @@ class DiscordInquiryPoster:
         except discord.Forbidden as e:
             raise InvalidInputError("SahasrahBot isn't allowed to delete that message. Delete it in Discord.") from e
 
+    async def locate(self, message_id: int, role_id: int):
+        guild = next((g for g in self.bot.guilds if g.get_role(role_id) is not None), None)
+        if guild is None:
+            return None
+        # A channel made after the message can't hold it (ids grow with time).
+        for channel in guild.text_channels:
+            if channel.id > message_id:
+                continue
+            perms = channel.permissions_for(guild.me)
+            if not (perms.read_messages and perms.read_message_history):
+                continue
+            try:
+                await channel.fetch_message(message_id)
+            except (discord.NotFound, discord.Forbidden):
+                continue
+            except discord.HTTPException:
+                logger.warning("Couldn't look for inquiry message %s in %s", message_id, channel.id)
+                continue
+            return guild.id, channel.id
+        return None
+
 
 def register(bot: discord.Client) -> None:
     inquiries.register_poster(DiscordInquiryPoster(bot))

@@ -26,6 +26,7 @@ class FakePoster:
         self.checks_result = [Check(True, "fine")]
         self.posted = []
         self.deleted = []
+        self.located = []
 
     async def checks(self, guild_id, channel_id, role_id):
         return self.checks_result
@@ -36,6 +37,10 @@ class FakePoster:
 
     async def delete(self, channel_id, message_id):
         self.deleted.append((channel_id, message_id))
+
+    async def locate(self, message_id, role_id):
+        self.located.append(message_id)
+        return (GUILD, 301) if message_id == 1 else None
 
 
 @pytest.fixture
@@ -107,6 +112,25 @@ async def test_only_admins(db, poster):
         await inquiries.post(GUILD, MEMBER, 300, 77)
     with pytest.raises(PermissionDeniedError):
         await inquiries.remove(GUILD, MEMBER, 1)
+
+
+async def test_older_messages_are_located_once(db, poster, monkeypatch):
+    monkeypatch.setattr(inquiries, "_not_found", set())
+    await inquiries.register(1, 77)
+    await inquiries.register(2, 77)
+    assert await inquiries.locate_older_messages() == 1
+    assert [i["channel_name"] for i in await inquiries.list_for_guild(GUILD, ADMIN)] == ["#help"]
+    # Message 2 isn't searched for again in this process; message 1 is done.
+    assert await inquiries.locate_older_messages() == 0
+    assert poster.located == [1, 2]
+    actions = [e.action for e in await models.AuditLog.filter(guild_id=GUILD)]
+    assert actions == ["inquiry.located"]
+
+    # Pressing the button fills it in too, but never overwrites a known place.
+    await inquiries.note_location(2, GUILD, 300)
+    await inquiries.note_location(2, GUILD, 999)
+    row = await models.InquiryMessageConfig.get(message_id=2)
+    assert (row.guild_id, row.channel_id) == (GUILD, 300)
 
 
 # --- the Discord side --------------------------------------------------------
@@ -188,6 +212,30 @@ async def test_discord_poster_delete_tolerates_a_gone_message_but_not_a_refusal(
     channel.get_partial_message = lambda mid: SimpleNamespace(delete=mock.AsyncMock(side_effect=refused))
     with pytest.raises(InvalidInputError, match="Delete it in Discord"):
         await poster.delete(channel.id, 1)
+
+
+async def test_discord_poster_locates_an_older_message():
+    role = FakeRole(500)
+    readable = permissions(read_messages=True, read_message_history=True)
+    guild = FakeGuild(guild_id=10, roles=[role])
+    hidden = FakeChannel(channel_id=20, name="hidden", guild=guild)  # bot can't read it
+    other = FakeChannel(channel_id=30, name="other", guild=guild, perms={guild.me.id: readable})
+    other.fetch_message = mock.AsyncMock(side_effect=discord.NotFound(SimpleNamespace(status=404, reason="x"), "no"))
+    broken = FakeChannel(channel_id=35, name="broken", guild=guild, perms={guild.me.id: readable})
+    broken.fetch_message = mock.AsyncMock(
+        side_effect=discord.HTTPException(SimpleNamespace(status=500, reason="x"), "boom"))
+    home = FakeChannel(channel_id=40, name="home", guild=guild, perms={guild.me.id: readable})
+    newer = FakeChannel(channel_id=9000, name="newer", guild=guild, perms={guild.me.id: readable})
+    guild.text_channels = [hidden, other, broken, newer, home]
+    bot = SimpleNamespace(guilds=[FakeGuild(guild_id=11), guild])
+    poster = discord_inquiries.DiscordInquiryPoster(bot)
+
+    assert await poster.locate(800, 500) == (10, 40)
+    hidden.fetch_message.assert_not_awaited()
+    newer.fetch_message.assert_not_awaited()  # made after the message
+    assert await poster.locate(800, 999) is None  # role in no server
+    home.fetch_message = other.fetch_message
+    assert await poster.locate(800, 500) is None
 
 
 def test_register_hands_the_service_a_poster(monkeypatch):

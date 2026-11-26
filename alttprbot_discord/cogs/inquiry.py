@@ -28,6 +28,7 @@ class ConfirmInquiryThread(discord.ui.View):
                        custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):
         role_id = await inquiries.role_for_message(interaction.message.id)
+        await inquiries.note_location(interaction.message.id, interaction.guild_id, interaction.channel_id)
         role = interaction.guild.get_role(role_id)
         view = OpenInquiryThread(role_id)
 

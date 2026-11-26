@@ -33,6 +33,10 @@ class Poster(Protocol):
     async def delete(self, channel_id: int, message_id: int) -> None:
         """Delete the message; one that's already gone is fine."""
 
+    async def locate(self, message_id: int, role_id: int) -> Optional[tuple[int, int]]:
+        """The (server id, channel id) an older message was posted in, found from its
+        role's server, or None when it can't be found."""
+
 
 _poster: Optional[Poster] = None
 
@@ -61,6 +65,38 @@ async def role_for_message(message_id: int) -> int:
     message that isn't one, as the button always has."""
     config = await models.InquiryMessageConfig.get(message_id=message_id)
     return config.role_id
+
+
+async def note_location(message_id: int, guild_id: int, channel_id: int) -> None:
+    """Record where an inquiry message is, if it didn't know yet. The button calls this
+    when pressed, so older messages fill themselves in."""
+    updated = await models.InquiryMessageConfig.filter(message_id=message_id, guild_id=None).update(
+        guild_id=guild_id, channel_id=channel_id)
+    if updated:
+        await audit.record(audit.INQUIRY_LOCATED, target=f'Message {message_id}', guild_id=guild_id,
+                           details={'message_id': message_id, 'channel_id': channel_id})
+
+
+# Messages already searched for in this process and not found, so each restart looks
+# for them once rather than every run.
+_not_found: set[int] = set()
+
+
+async def locate_older_messages() -> int:
+    """Find the server and channel of inquiry messages posted before they were stored
+    (migration 103), so they show up on the website. Returns how many were found."""
+    poster = _get_poster()
+    found = 0
+    for row in await models.InquiryMessageConfig.filter(guild_id=None).order_by('message_id'):
+        if row.message_id in _not_found:
+            continue
+        where = await poster.locate(row.message_id, row.role_id)
+        if where is None:
+            _not_found.add(row.message_id)
+            continue
+        await note_location(row.message_id, *where)
+        found += 1
+    return found
 
 
 # --- the website -------------------------------------------------------------
