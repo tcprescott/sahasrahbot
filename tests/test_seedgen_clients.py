@@ -374,8 +374,9 @@ async def test_alttpr_generate_returns_seed(fake_http):
 
 async def test_alttpr_rejected_settings_tell_the_user_why_without_retrying(fake_http):
     fake_http.add("POST", "/api/randomizer", body=VALIDATION_ERROR, status=422)
+    generate = alttpr_client.ALTTPRClient.generate({"glitches": "lots"}, baseurl=fake_http.url())
     with pytest.raises(InvalidInputError) as raised:
-        await alttpr_client.ALTTPRClient.generate({"glitches": "lots"}, baseurl=fake_http.url())
+        await generate
     assert str(raised.value) == (
         "alttpr.com could not generate this game: "
         "glitches: The selected glitches is invalid.; goal: The goal field is required."
@@ -385,8 +386,9 @@ async def test_alttpr_rejected_settings_tell_the_user_why_without_retrying(fake_
 
 async def test_alttpr_server_errors_are_still_retried(fake_http):
     fake_http.add("POST", "/api/randomizer", body="oops", status=500, content_type="text/plain")
+    generate = alttpr_client.ALTTPRClient.generate({}, baseurl=fake_http.url())
     with pytest.raises(AlttprFailedToGenerate):
-        await alttpr_client.ALTTPRClient.generate({}, baseurl=fake_http.url())
+        await generate
     assert len(fake_http.requests) == 5
 
 

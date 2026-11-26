@@ -97,7 +97,8 @@ async def test_embed_without_external_emoji_permission_shows_text_code():
 
 async def test_embed_without_footer_emoji_has_no_icon():
     embed = await seed_embeds.seed_embed(alttpr_seed(), emojis=[])
-    assert embed.footer.text == "Generated" and embed.footer.icon_url is None
+    assert embed.footer.text == "Generated"
+    assert embed.footer.icon_url is None
 
 
 async def test_alttpr_embed_settings():

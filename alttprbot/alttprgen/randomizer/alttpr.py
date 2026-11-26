@@ -65,29 +65,29 @@ def rejection_reason(body: str) -> str:
     Laravel's validation errors look like ``{"message": ..., "errors": {"field": ["..."]}}``;
     anything else is passed on as text.
     """
-    try:
-        data = json.loads(body)
-    except ValueError:
-        data = None
-    if isinstance(data, dict):
-        errors = data.get('errors')
-        if isinstance(errors, dict) and errors:
-            parts = []
-            for field, messages in errors.items():
-                if isinstance(messages, list):
-                    messages = ' '.join(str(m) for m in messages)
-                parts.append(f"{field}: {messages}")
-            reason = '; '.join(parts)
-        elif data.get('message'):
-            reason = str(data['message'])
-        else:
-            reason = body
-    else:
-        reason = body
-    reason = reason.strip() or "no reason given"
+    reason = (_json_reason(body) or body).strip() or "no reason given"
     if len(reason) > MAX_REJECTION_LENGTH:
         reason = reason[:MAX_REJECTION_LENGTH] + "…"
     return reason
+
+
+def _json_reason(body: str):
+    try:
+        data = json.loads(body)
+    except ValueError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    errors = data.get('errors')
+    if isinstance(errors, dict) and errors:
+        return '; '.join(f"{field}: {_joined(messages)}" for field, messages in errors.items())
+    return str(data['message']) if data.get('message') else None
+
+
+def _joined(messages):
+    if isinstance(messages, list):
+        return ' '.join(str(m) for m in messages)
+    return messages
 
 
 ENEMY_SHUFFLE = 'enemizer.enemy_shuffle'
