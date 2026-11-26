@@ -160,6 +160,11 @@ Android app (Capacitor, as Wizzrobe plans), so no browser-only assumptions.
   desktop, cards on a phone). One main button plus an Actions menu per page; one button
   plus a ⋮ per row; destructive actions confirm first. Check phone (390px) and desktop,
   light and dark. Icons: add the name to `web/src/components/icons.ts`, in order.
+- **Servers area:** server-admin pages live under one Servers tab (`web/src/servers/`):
+  `/servers`, then `/servers/:guildId/<section>` with the sections as tabs. A new section
+  adds an entry to `SECTIONS` in `web/src/servers/sections.ts` and a child route of
+  `servers/:guildId` in `App.tsx`, reads the server with `useServer()`, and checks access
+  in its service with `servers.require_admin()` (`alttprbot/services/servers.py`).
 - **Checks:** `npm run typecheck`, `npm test` (Vitest, `src/**/*.test.{ts,tsx}`) and
   `npm run build`, all run by `check.sh` and CI. Node 22. CI runs `npm run test:coverage`,
   which fails below the floor in `vite.config.ts` (`coverage.thresholds`); raise it when
