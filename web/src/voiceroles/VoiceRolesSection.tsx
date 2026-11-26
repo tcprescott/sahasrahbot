@@ -1,15 +1,15 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { api, unwrap, type VoiceRole, type VoiceRoles } from '../api/client'
 import { Loaded } from '../api/Loaded'
 import { useQuery } from '../api/useQuery'
 import { Banner, Button, ConfirmDialog, FormDialog, Icon } from '../components'
 import { DataTable } from '../kit/DataTable'
+import { useServer } from '../servers/ServerContext'
 import './voiceroles.css'
 
 /** /servers/:guildId/voice-roles — the server page's Voice roles tab. */
 export function VoiceRolesSection() {
-  const guildId = useParams().guildId ?? ''
+  const guildId = useServer().server.id
   const query = useQuery(`voice-roles:${guildId}`, async () =>
     unwrap(await api.GET('/api/v1/servers/{guild_id}/voice-roles', { params: { path: { guild_id: guildId } } })),
   )

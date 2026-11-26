@@ -22,13 +22,25 @@ const DATA: VoiceRoles = {
   ],
 }
 
+const SERVER = { id: '5', name: 'Community', text_channels: [], voice_channels: [], roles: [] }
+
 function open(routes: Record<string, unknown> = {}) {
-  return renderApp('/servers/5/voice-roles', { signedIn: USERS.alice, routes: { [LIST]: DATA, ...routes } })
+  return renderApp('/servers/5/voice-roles', {
+    signedIn: USERS.alice,
+    routes: {
+      'GET /api/v1/servers': { servers: [{ id: '5', name: 'Community' }] },
+      'GET /api/v1/elections/servers': { servers: [{ id: '5', name: 'Community' }] },
+      'GET /api/v1/servers/5': SERVER,
+      [LIST]: DATA,
+      ...routes,
+    },
+  })
 }
 
 describe('Voice roles tab', () => {
-  it('lists the voice roles and flags the broken ones', async () => {
+  it('is a tab of the server page, listing the voice roles and flagging the broken ones', async () => {
     open()
+    expect(await screen.findByRole('link', { name: 'Voice roles' })).toBeTruthy()
     const page = main()
     expect(await within(page).findByText('Race 1')).toBeTruthy()
     expect(within(page).getByText('Deleted channel')).toBeTruthy()

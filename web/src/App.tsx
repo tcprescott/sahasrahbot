@@ -52,6 +52,7 @@ export function App() {
                 <Route path="servers/:guildId" element={<ServerScreen />}>
                   <Route index element={<Navigate to="settings" replace />} />
                   <Route path="settings" element={<SettingsSection />} />
+                  <Route path="voice-roles" element={<VoiceRolesSection />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />
@@ -68,7 +69,6 @@ export function App() {
                 <Route path="triforcetexts/:pool" element={<TriforcePoolScreen />} />
                 <Route path="triforcetexts/:pool/moderation" element={<ModerationScreen />} />
                 <Route path="submit/:event" element={<SubmissionScreen />} />
-                <Route path="servers/:guildId/voice-roles" element={<VoiceRolesSection />} />
                 <Route path="error" element={<ErrorScreen />} />
                 <Route path="logout" element={<Navigate to="/" replace />} />
                 <Route path="presets/:namespace" element={<LegacyNamespaceRedirect />} />
