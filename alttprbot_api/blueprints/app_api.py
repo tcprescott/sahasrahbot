@@ -47,7 +47,7 @@ CSRF_HEADER = 'X-Requested-With'
 CSRF_VALUE = 'SahasrahBot'
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 # POSTs a read-only token may make: they change nothing that's the caller's.
-READ_ONLY_POSTS = frozenset({'app_api.roll_seed'})
+READ_ONLY_POSTS = frozenset({'app_api.roll_seed', 'app_api.convert_customizer'})
 
 
 @dataclass(frozen=True)
@@ -197,6 +197,15 @@ async def get_randomizers():
 async def get_preset_hints(randomizer: str):
     """The keys and values SahasrahBot's own presets use, for the YAML editor's suggestions."""
     return schemas.PresetHints(hints=await presets.key_hints(randomizer))
+
+
+@app_api_blueprint.post('/presets/customizer')
+@tag(['presets'])
+@validate_request(schemas.CustomizerSave)
+@validate_response(schemas.PresetContent)
+async def convert_customizer(data: schemas.CustomizerSave):
+    """Convert an alttpr.com customizer save file to preset YAML. Saves nothing."""
+    return schemas.PresetContent(content=await presets.convert_customizer(data.content))
 
 
 @app_api_blueprint.get('/presets/namespaces')

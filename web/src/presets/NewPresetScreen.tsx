@@ -108,7 +108,13 @@ function NewPreset() {
                     </select>
                   </div>
                 </div>
-                <YamlField value={content} onChange={setContent} onProblem={setProblem} randomizer={randomizer} />
+                <YamlField
+                  value={content}
+                  onChange={setContent}
+                  onProblem={setProblem}
+                  randomizer={randomizer}
+                  onCustomizerImported={() => setRandomizer('alttpr')}
+                />
                 <div className="t-actions t-actions--end">
                   <Button variant="ghost" onClick={() => navigate(namespacePath(ns.name))}>
                     Cancel
