@@ -243,7 +243,7 @@ class DiscordDirectory:
         return [RoleInfo(r.id, f"@{r.name}", r.position, can_manage and (top is None or r.position < top))
                 for r in sorted(roles, key=lambda r: -r.position) if not r.is_default() and not r.managed]
 
-    async def voice_channels(self, guild_id: int) -> list[Named]:  # NOSONAR: async for the Directory protocol
+    async def voice_channels(self, guild_id: int) -> list[Named]:  # NOSONAR
         # The gateway cache, like text_channels.
         guild = self.bot.get_guild(guild_id)
         if guild is None:
