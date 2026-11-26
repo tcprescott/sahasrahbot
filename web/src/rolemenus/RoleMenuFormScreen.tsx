@@ -131,6 +131,11 @@ function useServerOptions(guildId: string) {
   )
 }
 
+function channelHintFor(menu: RoleMenu | undefined, legacy: boolean): string | undefined {
+  if (legacy) return 'Repost it to move it.'
+  return menu ? 'Moving it posts a new message there.' : undefined
+}
+
 function Form({ guildId, menu, onSaved }: Readonly<{ guildId: string; menu: RoleMenu | undefined; onSaved: () => void }>) {
   const navigate = useNavigate()
   const notice = (useLocation().state as { notice?: string } | null)?.notice
@@ -146,6 +151,7 @@ function Form({ guildId, menu, onSaved }: Readonly<{ guildId: string; menu: Role
   const errorRef = useRef<HTMLDivElement>(null)
 
   const legacy = menu !== undefined && !menu.posted_by_bot
+  const channelHint = channelHintFor(menu, legacy)
   const set = (patch: Partial<Draft>) => {
     setDraft((d) => ({ ...d, ...patch }))
     setSaved(undefined)
@@ -291,7 +297,7 @@ function Form({ guildId, menu, onSaved }: Readonly<{ guildId: string; menu: Role
                   <Field
                     id="rm-channel"
                     label="Channel"
-                    hint={legacy ? 'Repost it to move it.' : menu ? 'Moving it posts a new message there.' : undefined}
+                    hint={channelHint}
                   >
                     <select
                       id="rm-channel"
@@ -533,13 +539,14 @@ function OptionDialog({
           </div>
         </Field>
         {emojis.length > 0 && (
-          <div className="rm-emoji-picker" role="group" aria-label="This server's emoji">
+          <fieldset className="rm-emoji-picker">
+            <legend className="visually-hidden">This server's emoji</legend>
             {emojis.slice(0, 60).map((e) => (
               <button key={e.id} type="button" className="rm-emoji-pick" aria-label={e.name} onClick={() => patch({ emoji: e.name })}>
                 <Emoji text={e.name} size={22} />
               </button>
             ))}
-          </div>
+          </fieldset>
         )}
         <Field id="rm-opt-description" label="Description (optional)" hint="Shown in the dropdown and the reactions list. Up to 100 characters.">
           <input

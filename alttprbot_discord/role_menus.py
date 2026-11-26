@@ -267,15 +267,8 @@ class RoleMenuGateway:
                 await message.remove_reaction(reaction.emoji, self.bot.user)
         have = {role_menus.emoji_key(str(r.emoji)) for r in reactions if r.me}
         for emoji in wanted:
-            if role_menus.emoji_key(emoji) in have:
-                continue
-            try:
-                await message.add_reaction(discord.PartialEmoji.from_str(emoji))
-            except discord.HTTPException as e:
-                if e.code == UNKNOWN_EMOJI or e.status == 400:
-                    raise InvalidInputError(f"SahasrahBot can't use the emoji {emoji}. Custom emoji have to come "
-                                            "from a server SahasrahBot is in.") from e
-                raise
+            if role_menus.emoji_key(emoji) not in have:
+                await _add_reaction(message, emoji)
 
     async def remove(self, menu: dict) -> None:
         if not menu['message_id']:
@@ -291,6 +284,16 @@ class RoleMenuGateway:
                         await message.remove_reaction(discord.PartialEmoji.from_str(option['emoji']), self.bot.user)
         except discord.HTTPException as e:
             logger.info("Couldn't take role menu %s off Discord: %s", menu['id'], e)
+
+
+async def _add_reaction(message: discord.Message, emoji: str) -> None:
+    try:
+        await message.add_reaction(discord.PartialEmoji.from_str(emoji))
+    except discord.HTTPException as e:
+        if e.code == UNKNOWN_EMOJI or e.status == 400:
+            raise InvalidInputError(f"SahasrahBot can't use the emoji {emoji}. Custom emoji have to come "
+                                    "from a server SahasrahBot is in.") from e
+        raise
 
 
 def _can_give(me: Optional[discord.Member], role) -> bool:

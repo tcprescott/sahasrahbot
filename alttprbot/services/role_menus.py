@@ -267,11 +267,9 @@ class MenuInput:
     options: list[OptionInput] = field(default_factory=list)
 
 
-def _clean(data: MenuInput, *, posted_by_bot: bool) -> MenuInput:
-    """Checked and tidied input. Raises ``InvalidInputError`` with every problem."""
+def _menu_errors(title: str, description: Optional[str], data: MenuInput, posted_by_bot: bool) -> list[str]:
+    """What's wrong with the menu itself (not its roles)."""
     errors = []
-    title = (data.title or '').strip()
-    description = (data.description or '').strip() or None
     if not title:
         errors.append("Give the menu a title.")
     elif len(title) > MAX_TITLE:
@@ -288,35 +286,53 @@ def _clean(data: MenuInput, *, posted_by_bot: bool) -> MenuInput:
     limit = MAX_OPTIONS.get(data.style, 25)
     if len(data.options) > limit:
         errors.append(f"A {STYLE_LABELS.get(data.style, '').lower()} menu can have at most {limit} roles.")
+    return errors
 
-    options, seen_roles, seen_emoji = [], set(), set()
-    for n, option in enumerate(data.options, start=1):
-        label = (option.label or '').strip()
-        name = f"“{label}”" if label else f"Role {n}"
-        try:
-            emoji = clean_emoji(option.emoji)
-        except InvalidInputError as e:
-            errors.append(f"{name}: {e}")
-            emoji = None
-        option_description = (option.description or '').strip() or None
-        if not label:
-            errors.append(f"Role {n} needs a label.")
-        elif len(label) > MAX_LABEL:
-            errors.append(f"{name}: a label can be at most {MAX_LABEL} characters.")
-        if option_description and len(option_description) > MAX_OPTION_DESCRIPTION:
-            errors.append(f"{name}: a description can be at most {MAX_OPTION_DESCRIPTION} characters.")
-        if data.style == REACTIONS and not emoji and not option.emoji:
-            errors.append(f"{name} needs an emoji: people react with it.")
+
+def _clean_option(n: int, option: OptionInput, style: str, errors: list[str]) -> OptionInput:
+    """One role, tidied; its problems are added to ``errors``."""
+    label = (option.label or '').strip()
+    name = f"“{label}”" if label else f"Role {n}"
+    try:
+        emoji = clean_emoji(option.emoji)
+    except InvalidInputError as e:
+        errors.append(f"{name}: {e}")
+        emoji = None
+    description = (option.description or '').strip() or None
+    if not label:
+        errors.append(f"Role {n} needs a label.")
+    elif len(label) > MAX_LABEL:
+        errors.append(f"{name}: a label can be at most {MAX_LABEL} characters.")
+    if description and len(description) > MAX_OPTION_DESCRIPTION:
+        errors.append(f"{name}: a description can be at most {MAX_OPTION_DESCRIPTION} characters.")
+    if style == REACTIONS and not emoji and not option.emoji:
+        errors.append(f"{name} needs an emoji: people react with it.")
+    return OptionInput(role_id=option.role_id, label=label, emoji=emoji, description=description, id=option.id)
+
+
+def _duplicate_errors(options: list[OptionInput]) -> list[str]:
+    """A role or an emoji that's on the menu twice."""
+    errors, seen_roles, seen_emoji = [], set(), set()
+    for n, option in enumerate(options, start=1):
+        name = f"“{option.label}”" if option.label else f"Role {n}"
         if option.role_id in seen_roles:
             errors.append(f"{name}: that role is already on this menu.")
         seen_roles.add(option.role_id)
-        key = emoji_key(emoji)
+        key = emoji_key(option.emoji)
         if key and key in seen_emoji:
             errors.append(f"{name}: that emoji is already on this menu.")
         if key:
             seen_emoji.add(key)
-        options.append(OptionInput(role_id=option.role_id, label=label, emoji=emoji,
-                                   description=option_description, id=option.id))
+    return errors
+
+
+def _clean(data: MenuInput, *, posted_by_bot: bool) -> MenuInput:
+    """Checked and tidied input. Raises ``InvalidInputError`` with every problem."""
+    title = (data.title or '').strip()
+    description = (data.description or '').strip() or None
+    errors = _menu_errors(title, description, data, posted_by_bot)
+    options = [_clean_option(n, option, data.style, errors) for n, option in enumerate(data.options, start=1)]
+    errors += _duplicate_errors(options)
     if errors:
         raise InvalidInputError(' '.join(errors))
     return MenuInput(guild_id=data.guild_id, channel_id=data.channel_id, title=title, description=description,
