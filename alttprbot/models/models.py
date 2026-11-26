@@ -99,6 +99,7 @@ class DiscordServerLists(Model):
     server_description = fields.CharField(200, null=False)
     invite_id = fields.CharField(45, null=False)
     category = fields.ForeignKeyField('models.DiscordServerCategories', related_name='server_list')
+    order = fields.IntField(null=False, default=0)
 
 
 class DiscordServerCategories(Model):
