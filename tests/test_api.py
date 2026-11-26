@@ -302,6 +302,14 @@ async def test_preset_hints_come_from_the_shipped_presets(client, monkeypatch):
     assert (await get_json(client, "/api/v1/presets/randomizers/zelda1/hints"))[0] == 404
 
 
+async def test_seed_presets_need_no_sign_in(client):
+    status, body = await get_json(client, "/api/v1/seeds/presets/smz3")
+    assert status == 200
+    assert body["randomizer"] == "smz3"
+    assert "normal" in body["presets"]
+    assert (await get_json(client, "/api/v1/seeds/presets/ctjets"))[0] == 400
+
+
 async def test_preset_hints_count_keys_and_values(tmp_path, monkeypatch):
     folder = tmp_path / "presets" / "alttpr"
     folder.mkdir(parents=True)

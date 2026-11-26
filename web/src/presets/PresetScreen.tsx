@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { api, unwrap } from '../api/client'
+import { api, loginUrl, unwrap } from '../api/client'
 import { Loaded } from '../api/Loaded'
 import { useQuery } from '../api/useQuery'
+import { useSession } from '../auth/SessionProvider'
 import { ActionsMenu, Banner, Button, ConfirmDialog, Icon, PageHeader, Panel } from '../components'
 import { browser } from '../lib/browser'
 import { fullDate } from '../lib/time'
+import { RollDialog } from '../seeds/RollDialog'
+import { isRollable } from '../seeds/rolling'
+import '../seeds/seeds.css'
 import { downloadPath, namespacePath, presetParams } from './paths'
 import { YamlCode, YamlField } from './YamlField'
 
@@ -25,6 +29,8 @@ export function PresetScreen() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
   const [deleting, setDeleting] = useState(false)
+  const [rolling, setRolling] = useState(false)
+  const { user } = useSession()
 
   const setEditing = (on: boolean) => {
     setDraft(null)
@@ -51,7 +57,27 @@ export function PresetScreen() {
                 </>
               }
               actions={
-                !editing && (
+                !editing &&
+                (isRollable(p.randomizer) ? (
+                  <>
+                    <Button icon="refresh" onClick={() => (user === null ? browser.assign(loginUrl()) : setRolling(true))}>
+                      Roll a seed
+                    </Button>
+                    <ActionsMenu
+                      items={[
+                        ...(p.can_edit ? [{ label: 'Edit', icon: 'edit' as const, onSelect: () => setEditing(true) }] : []),
+                        {
+                          label: 'Download',
+                          icon: 'download',
+                          onSelect: () => browser.assign(downloadPath(p.namespace, p.randomizer, p.name)),
+                        },
+                        ...(p.can_edit
+                          ? [{ label: 'Delete', icon: 'delete' as const, destructive: true, onSelect: () => setDeleting(true) }]
+                          : []),
+                      ]}
+                    />
+                  </>
+                ) : (
                   <>
                     {p.can_edit && (
                       <Button icon="edit" onClick={() => setEditing(true)}>
@@ -78,7 +104,7 @@ export function PresetScreen() {
                       </Button>
                     )}
                   </>
-                )
+                ))
               }
             />
             {error && <Banner tone="error">{error}</Banner>}
@@ -121,6 +147,15 @@ export function PresetScreen() {
               <Panel title="YAML">
                 <YamlCode value={p.content} />
               </Panel>
+            )}
+            {isRollable(p.randomizer) && (
+              <RollDialog
+                open={rolling}
+                onOpenChange={setRolling}
+                randomizer={p.randomizer}
+                preset={`${p.namespace}/${p.name}`}
+                onRolled={query.reload}
+              />
             )}
             <ConfirmDialog
               open={deleting}

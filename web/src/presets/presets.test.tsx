@@ -165,12 +165,28 @@ describe('one preset', () => {
   const path = '/presets/manage/alice/alttpr/open_fast'
 
   it('shows the YAML and how often it was rolled', async () => {
-    renderApp(path, { routes: { [`GET ${PRESET}`]: preset({ can_edit: false }) } })
+    const { user } = renderApp(path, { routes: { [`GET ${PRESET}`]: preset({ can_edit: false }) } })
     expect(await screen.findByRole('heading', { level: 1, name: 'alice/open_fast' })).toBeTruthy()
     expect(main().textContent).toContain('rolled 1 time')
     expect(main().querySelector('pre')?.textContent).toBe('settings:\n  mode: open\n')
-    expect(screen.getByRole('link', { name: 'Download' }).getAttribute('href')).toBe('/presets/download/alice/alttpr/open_fast')
-    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Roll a seed' })).toBeTruthy()
+    await user.click(screen.getByRole('button', { name: 'Actions' }))
+    expect(screen.getByRole('menuitem', { name: 'Download' })).toBeTruthy()
+    expect(screen.queryByRole('menuitem', { name: 'Edit' })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Delete' })).toBeNull()
+  })
+
+  it("keeps Edit as the main button for a preset the website can't roll", async () => {
+    const ct = '/api/v1/presets/namespaces/alice/ctjets/open_fast'
+    renderApp('/presets/manage/alice/ctjets/open_fast', { routes: { [`GET ${ct}`]: preset({ randomizer: 'ctjets' }) } })
+    expect(await screen.findByRole('button', { name: 'Edit' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Roll a seed' })).toBeNull()
+  })
+
+  it("links Download for someone else's preset the website can't roll", async () => {
+    const ct = '/api/v1/presets/namespaces/alice/ctjets/open_fast'
+    renderApp('/presets/manage/alice/ctjets/open_fast', { routes: { [`GET ${ct}`]: preset({ randomizer: 'ctjets', can_edit: false }) } })
+    expect((await screen.findByRole('link', { name: 'Download' })).getAttribute('href')).toBe('/presets/download/alice/ctjets/open_fast')
   })
 
   it('says "times" for any count but one', async () => {
@@ -183,7 +199,8 @@ describe('one preset', () => {
     const { user, api } = renderApp(path, {
       routes: { [`GET ${PRESET}`]: preset(), [`PUT ${PRESET}`]: preset({ content: 'settings:\n  mode: inverted\n' }) },
     })
-    await user.click(await screen.findByRole('button', { name: 'Edit' }))
+    await user.click(await screen.findByRole('button', { name: 'Actions' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
     expect(currentPath()).toBe(`${path}?edit=1`)
     const save = screen.getByRole('button', { name: 'Save' })
     expect(save.hasAttribute('disabled')).toBe(true) // nothing changed yet
