@@ -377,7 +377,8 @@ async def test_rolemenus_command_lists_and_links(world):
     sent = interaction.sent()
     assert "Pronouns" in sent.content and "Buttons" in sent.content
     assert f"/channels/{GUILD}/300/5001" in sent.content
-    assert sent.view.children[0].url.endswith(f"/role-menus/new?server={GUILD}&channel=300")
+    assert sent.view.children[0].url.endswith(f"/servers/{GUILD}/role-menus/new?channel=300")
+    assert f"/servers/{GUILD}/role-menus/" in sent.content
 
     empty = FakeInteraction(guild=FakeGuild(guild_id=6))
     await call(cog.rolemenus, cog, empty)
@@ -523,6 +524,8 @@ async def test_api_round_trip(client, login, world):  # noqa: F811
 
     status, listed = await get_json(client, "/api/v1/role-menus")
     assert [m['title'] for m in listed['menus']] == ["Pronouns"]
+    assert (await get_json(client, "/api/v1/role-menus?guild_id=5"))[1]['menus'][0]['title'] == "Pronouns"
+    assert (await get_json(client, "/api/v1/role-menus?guild_id=6"))[1] == {"menus": []}
     assert (await send_json(client, "POST", f"/api/v1/role-menus/{menu['id']}/repost", {}))[0] == 200
     status, body = await send_json(client, "POST", "/api/v1/role-menus", {**form, "options": []})
     assert (status, body) == (400, {"error": "Add at least one role."})

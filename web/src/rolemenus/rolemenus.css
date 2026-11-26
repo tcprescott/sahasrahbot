@@ -1,0 +1,223 @@
+/* Role menus: the list, the editor and its Discord preview. */
+
+.rm-emojis {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.rm-emoji {
+  line-height: 1;
+}
+.rm-emoji--custom {
+  object-fit: contain;
+  vertical-align: middle;
+}
+.rm-labels,
+.rm-muted {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+}
+.rm-problem {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 2px;
+  color: var(--status-pending);
+  font-size: var(--text-sm);
+}
+.rm-problems {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.rm-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .rm-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.rm-preview {
+  position: sticky;
+  top: 16px;
+}
+.rm-preview__title {
+  margin: 0 0 6px;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+
+.rm-opts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rm-opts li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+.rm-opts li:first-child {
+  border-top: 0;
+}
+.rm-opt__emoji {
+  width: 32px;
+  flex: none;
+  display: inline-flex;
+  justify-content: center;
+  color: var(--fg-muted);
+}
+.rm-opt__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+.rm-role {
+  color: var(--link);
+  font-weight: 700;
+}
+.rm-emoji-preview {
+  min-width: 32px;
+  display: inline-flex;
+  justify-content: center;
+}
+.rm-emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.rm-emoji-pick {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+}
+.rm-emoji-pick:hover {
+  border-color: var(--accent);
+}
+
+/* The Discord preview, in Discord's own dark theme (--discord-* tokens). */
+.dc {
+  margin: 0;
+  background: var(--discord-bg);
+  color: var(--discord-fg);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.dc__msg {
+  display: flex;
+  gap: 14px;
+}
+.dc__av {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--purple);
+  object-fit: contain;
+  padding: 6px;
+  flex: none;
+  image-rendering: pixelated;
+}
+.dc__body {
+  flex: 1;
+  min-width: 0;
+}
+.dc__name {
+  font-weight: 600;
+  color: var(--discord-name);
+}
+.dc__app {
+  background: var(--discord-blurple);
+  color: var(--discord-strong);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: 2px;
+}
+.dc__embed {
+  margin-top: 6px;
+  background: var(--discord-embed);
+  border-left: 4px solid var(--purple);
+  border-radius: 4px;
+  padding: 10px 14px 12px 12px;
+}
+.dc__title {
+  font-weight: 600;
+  color: var(--discord-strong);
+  font-size: 16px;
+  margin: 2px 0 6px;
+}
+.dc__desc {
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+.dc__list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.dc__list b,
+.dc__field {
+  color: var(--discord-strong);
+  font-weight: 600;
+}
+.dc__foot {
+  margin-top: 8px;
+  color: var(--discord-muted);
+  font-size: 12px;
+}
+.dc__row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.dc__react {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  background: var(--discord-embed);
+  border: 1px solid var(--discord-border);
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 14px;
+}
+.dc__btn {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  background: var(--discord-button);
+  color: var(--discord-strong);
+  border-radius: 4px;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.dc__select {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  background: var(--discord-input);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--discord-muted);
+  max-width: 400px;
+}

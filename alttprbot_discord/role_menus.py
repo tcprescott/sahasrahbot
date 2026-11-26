@@ -214,9 +214,7 @@ class RoleMenuGateway:
         channels = [c for c in guild.channels if getattr(c, 'type', None) in POSTABLE_CHANNEL_TYPES]
         if me is not None:
             channels = [c for c in channels if _can_post(c.permissions_for(me))]
-        can_manage = me is not None and me.guild_permissions.manage_roles
-        top = me.top_role if me is not None else None
-        roles = [ServerRole(r.id, f"@{r.name}", bool(can_manage and top is not None and r < top))
+        roles = [ServerRole(r.id, f"@{r.name}", _can_give(me, r))
                  for r in sorted(guild.roles, key=lambda r: -r.position) if not r.is_default() and not r.managed]
         return ServerDetails(
             channels=[Named(c.id, f"#{c.name}") for c in sorted(channels, key=lambda c: c.position)],
@@ -238,7 +236,7 @@ class RoleMenuGateway:
                 message = await self._post_or_edit(channel, menu)
             else:
                 message = await channel.fetch_message(menu['message_id'])
-            await self._sync_reactions(message, menu)
+            await self._sync_reactions(channel, message, menu)
         except discord.NotFound as e:
             raise InvalidInputError("The message this menu is on was deleted. Repost the menu to put it back.") from e
         except discord.Forbidden as e:
@@ -258,15 +256,16 @@ class RoleMenuGateway:
                 logger.info("Role menu %s's message is gone; posting a new one", menu['id'])
         return await channel.send(**parts)
 
-    async def _sync_reactions(self, message: discord.Message, menu: dict) -> None:
+    async def _sync_reactions(self, channel, message: discord.Message, menu: dict) -> None:
         wanted = [o['emoji'] for o in menu['options'] if o['emoji']] if menu['style'] == REACTIONS else []
         wanted_keys = {role_menus.emoji_key(e) for e in wanted}
-        if not message.reactions:
-            message = await message.channel.fetch_message(message.id)
-        for reaction in message.reactions:
+        if not getattr(message, 'reactions', None):
+            message = await channel.fetch_message(message.id)
+        reactions = getattr(message, 'reactions', None) or []
+        for reaction in reactions:
             if reaction.me and role_menus.emoji_key(str(reaction.emoji)) not in wanted_keys:
                 await message.remove_reaction(reaction.emoji, self.bot.user)
-        have = {role_menus.emoji_key(str(r.emoji)) for r in message.reactions if r.me}
+        have = {role_menus.emoji_key(str(r.emoji)) for r in reactions if r.me}
         for emoji in wanted:
             if role_menus.emoji_key(emoji) in have:
                 continue
@@ -292,6 +291,14 @@ class RoleMenuGateway:
                         await message.remove_reaction(discord.PartialEmoji.from_str(option['emoji']), self.bot.user)
         except discord.HTTPException as e:
             logger.info("Couldn't take role menu %s off Discord: %s", menu['id'], e)
+
+
+def _can_give(me: Optional[discord.Member], role) -> bool:
+    """Whether the bot can give ``role``: it has Manage Roles and a higher role.
+    Without the bot's member (not cached yet) it can't tell, so it says yes."""
+    if me is None:
+        return True
+    return bool(me.guild_permissions.manage_roles and role < me.top_role)
 
 
 def _can_post(perms: discord.Permissions) -> bool:

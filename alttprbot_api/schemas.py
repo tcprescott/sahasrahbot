@@ -261,6 +261,10 @@ class RoleMenu(BaseModel):
     problems: list[str] = Field(description="What will stop it working, as sentences")
 
 
+class RoleMenuQuery(BaseModel):
+    guild_id: Optional[str] = Field(None, description="Only this server's menus.")
+
+
 class RoleMenuList(BaseModel):
     menus: list[RoleMenu]
 

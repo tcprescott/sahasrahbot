@@ -530,12 +530,16 @@ async def role_menu_server_options(guild_id: int):
 
 @app_api_blueprint.get('/role-menus')
 @tag(['role menus'])
+@validate_querystring(schemas.RoleMenuQuery)
 @validate_response(schemas.RoleMenuList)
-async def list_role_menus():
-    """Role menus in the servers the viewer administers."""
+async def list_role_menus(query_args: schemas.RoleMenuQuery):
+    """Role menus in the servers the viewer administers, or in one of them."""
     user = await require_user()
-    return schemas.RoleMenuList(menus=[role_menu_out(m)
-                                       for m in await role_menus.list_menus(await admin_guild_ids(user))])
+    admin = await admin_guild_ids(user)
+    guild_id = _int_id(query_args.guild_id, 'server')
+    if guild_id is not None:
+        admin = admin & {guild_id}
+    return schemas.RoleMenuList(menus=[role_menu_out(m) for m in await role_menus.list_menus(admin)])
 
 
 @app_api_blueprint.post('/role-menus')

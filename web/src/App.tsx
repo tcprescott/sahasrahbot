@@ -11,6 +11,7 @@ import { MyPresetsScreen } from './presets/MyPresetsScreen'
 import { NewPresetScreen } from './presets/NewPresetScreen'
 import { PresetScreen } from './presets/PresetScreen'
 import { ElectionFormScreen } from './elections/ElectionFormScreen'
+import { RoleMenuEditorRoute, RoleMenusRoute } from './rolemenus/routes'
 import { ElectionsScreen } from './elections/ElectionsScreen'
 import { ResultsScreen } from './elections/ResultsScreen'
 import { BallotScreen } from './ranked/BallotScreen'
@@ -55,6 +56,10 @@ export function App() {
                 <Route path="elections/new" element={<ElectionFormScreen />} />
                 <Route path="elections/:electionId/edit" element={<ElectionFormScreen />} />
                 <Route path="elections/:electionId/results" element={<ResultsScreen />} />
+                {/* Until the server page lands: its Role menus section on its own. */}
+                <Route path="servers/:guildId/role-menus" element={<RoleMenusRoute />} />
+                <Route path="servers/:guildId/role-menus/new" element={<RoleMenuEditorRoute />} />
+                <Route path="servers/:guildId/role-menus/:menuId" element={<RoleMenuEditorRoute />} />
                 <Route path="triforcetexts/:pool" element={<TriforcePoolScreen />} />
                 <Route path="triforcetexts/:pool/moderation" element={<ModerationScreen />} />
                 <Route path="submit/:event" element={<SubmissionScreen />} />

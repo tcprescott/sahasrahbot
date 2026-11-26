@@ -13,12 +13,17 @@ from alttprbot.services import role_menus
 from alttprbot_discord.role_menus import RoleMenuButton, RoleMenuSelect, reaction_changed
 
 
-def edit_url(menu_id: int) -> str:
-    return f"{config.APP_URL}/role-menus/{menu_id}"
+def list_url(guild_id: int) -> str:
+    """The server's role menus on the website (the Role menus section of its server page)."""
+    return f"{config.APP_URL}/servers/{guild_id}/role-menus"
+
+
+def edit_url(guild_id: int, menu_id: int) -> str:
+    return f"{list_url(guild_id)}/{menu_id}"
 
 
 def new_url(guild_id: int, channel_id: int) -> str:
-    return f"{config.APP_URL}/role-menus/new?{urlencode({'server': guild_id, 'channel': channel_id})}"
+    return f"{list_url(guild_id)}/new?{urlencode({'channel': channel_id})}"
 
 
 def menu_line(menu: dict, guild_id: int) -> str:
@@ -26,7 +31,7 @@ def menu_line(menu: dict, guild_id: int) -> str:
     where = (f"https://discord.com/channels/{guild_id}/{menu['channel_id']}/{menu['message_id']}"
              if menu['message_id'] else f"<#{menu['channel_id']}>")
     style = role_menus.STYLE_LABELS.get(menu['style'], menu['style'])
-    return f"[{menu['title']}]({edit_url(menu['id'])}) · {style} · {where} {emoji}".strip()
+    return f"[{menu['title']}]({edit_url(guild_id, menu['id'])}) · {style} · {where} {emoji}".strip()
 
 
 class RoleMenus(commands.Cog):
@@ -61,7 +66,7 @@ class RoleMenus(commands.Cog):
             text = "This server has no role menus yet."
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="New role menu", url=new_url(interaction.guild.id, channel_id)))
-        view.add_item(discord.ui.Button(label="All role menus", url=f"{config.APP_URL}/role-menus"))
+        view.add_item(discord.ui.Button(label="All role menus", url=list_url(interaction.guild.id)))
         await interaction.response.send_message(text, view=view, ephemeral=True, suppress_embeds=True)
 
 

@@ -93,6 +93,20 @@
   --content-max: 1100px;
 
   color-scheme: light;
+
+  /* Discord's own dark theme, for previews of what a message will look like there.
+     The same in both modes: Discord shows it this way for most people. */
+  --discord-bg: #313338;
+  --discord-embed: #2B2D31;
+  --discord-fg: #DBDEE1;
+  --discord-strong: #FFFFFF;
+  --discord-muted: #949BA4;
+  --discord-name: #C9B6F5;
+  --discord-blurple: #5865F2;
+  --discord-button: #4E5058;
+  --discord-input: #1E1F22;
+  --discord-border: #3F4147;
+  --discord-mention: color-mix(in srgb, var(--discord-blurple) 30%, transparent);
 }
 
 :root[data-theme='dark'] {

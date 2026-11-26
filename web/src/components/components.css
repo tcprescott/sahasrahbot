@@ -343,9 +343,10 @@
   overflow-y: auto;
   min-height: 0;
 }
+/* Not sticky: it sits below the scrolling body already, and sticky pulled it up over the
+   body when the page behind was scrolled. */
 .dialog__foot {
-  position: sticky;
-  bottom: 0;
+  flex: none;
   display: flex;
   align-items: center;
   gap: var(--space-2);
