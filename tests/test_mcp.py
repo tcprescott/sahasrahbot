@@ -23,7 +23,7 @@ REDIRECT = "https://claude.ai/api/mcp/auth_callback"
 WRITE_TOOLS = {
     "save_preset", "delete_preset", "cast_ballot", "create_election", "update_election", "publish_election",
     "close_election", "delete_election", "submit_triforce_text", "moderate_triforce_text",
-    "submit_tournament_settings",
+    "submit_tournament_settings", "create_role_menu", "update_role_menu", "delete_role_menu",
 }
 
 

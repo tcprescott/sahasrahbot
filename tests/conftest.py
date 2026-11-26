@@ -115,6 +115,19 @@ def directory(monkeypatch):
     return fake
 
 
+@pytest.fixture
+def role_menu_discord(monkeypatch):
+    """A fake role menu gateway (tests/discord_fakes.py FakeRoleMenuDiscord) registered
+    for the role menu service. Add servers with ``role_menu_discord.add_server(...)``."""
+    from alttprbot.services import role_menus
+    from tests.discord_fakes import FakeRoleMenuDiscord
+
+    fake = FakeRoleMenuDiscord()
+    monkeypatch.setattr(role_menus, "_discord", fake)
+    monkeypatch.setattr(role_menus, "_reaction_messages", None)
+    return fake
+
+
 class FakeHTTPServer:
     """A real local HTTP server for code that builds its own aiohttp sessions.
 

@@ -16,7 +16,7 @@ import config
 from alttprbot import models
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.services import discord_servers as servers_service
-from alttprbot.services import guild_config, reaction_roles
+from alttprbot.services import guild_config
 from alttprbot_discord.cogs import discord_servers as servers_cog
 from alttprbot_discord.cogs import inquiry as inquiry_cog
 from alttprbot_discord.cogs import misc as misc_cog
@@ -321,108 +321,8 @@ async def test_sgdaily_schedule_and_empty(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# reaction roles ($reactionrole / $reactiongroup)
+# $importroles
 # ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-async def role_world(db):
-    """A guild with a bot-managed reaction group on message 700 in channel 300."""
-    channel = FakeChannel(channel_id=300)
-    message = FakeMessage(message_id=700, channel=channel)
-    channel.fetch_message = mock.AsyncMock(return_value=message)
-    role = FakeRole(501, name="Runner")
-    guild = FakeGuild(guild_id=1, roles=[role], channels=[channel])
-    group = await reaction_roles.create_group(1, 300, 700, "Roles", "Pick some", True)
-    ctx = FakeContext(guild=guild)
-    return SimpleNamespace(channel=channel, message=message, role=role, guild=guild, group=group, ctx=ctx)
-
-
-async def test_reaction_role_description_fits_production_column(role_world):
-    """Production's reaction_role.description is VARCHAR(400), so the model must
-    refuse anything longer before MySQL does."""
-    from tortoise.exceptions import ValidationError
-
-    assert models.ReactionRole._meta.fields_map["description"].max_length == 400
-    await reaction_roles.create_role(1, role_world.group.id, 501, "runner", "🏃", "x" * 400, True)
-    with pytest.raises(ValidationError):
-        await reaction_roles.create_role(1, role_world.group.id, 502, "racer", "🏁", "x" * 401, True)
-
-
-async def test_reaction_role_create_update_delete(role_world):
-    w = role_world
-    cog = role_cog.Role(w.ctx.bot)
-
-    await call(cog.role_create, cog, w.ctx, w.group.id, w.role, "runner", "Racers", "<:custom:123>")
-    w.message.add_reaction.assert_awaited_with(":custom:123")
-    embed = w.message.edit.await_args.kwargs["embed"]
-    assert embed.fields[0].value == "<:custom:123> `runner`: Racers\n"
-
-    [rr] = await reaction_roles.group_roles(w.group.id, 1)
-    await call(cog.role_update, cog, w.ctx, rr.id, "racer", "Racers!")
-    assert (await models.ReactionRole.get(id=rr.id)).name == "racer"
-
-    await call(cog.role_list, cog, w.ctx, w.group.id)
-    listed = w.ctx.reply.await_args.kwargs["embed"]
-    assert listed.fields[0].name == f"{rr.id}: racer"
-
-    await call(cog.role_delete, cog, w.ctx, rr.id)
-    w.message.remove_reaction.assert_awaited_once_with(":custom:123", w.ctx.bot.user)
-    assert await reaction_roles.group_roles(w.group.id, 1) == []
-
-
-async def test_reaction_group_commands(role_world):
-    w = role_world
-    cog = role_cog.Role(w.ctx.bot)
-
-    other = FakeChannel(channel_id=301, guild=w.guild)
-    w.guild.channels.append(other)
-    await call(cog.group_create, cog, w.ctx, other, "New group", "desc")
-    assert other.sent[0].content == "temp message"
-    await call(cog.group_create, cog, w.ctx, other, "Existing", None, False, 777)
-    groups = await reaction_roles.list_groups(1)
-    assert [(g.name, g.message_id, bool(g.bot_managed)) for g in groups[1:]] == [
-        ("New group", 800, True), ("Existing", 777, False),
-    ]
-
-    await call(cog.group_update, cog, w.ctx, w.group.id, "Renamed", "d")
-    assert w.message.edit.await_args.kwargs["embed"].title == "Renamed"
-
-    await call(cog.group_list, cog, w.ctx)
-    assert len(w.ctx.reply.await_args.kwargs["embed"].fields) == 3
-    await call(cog.group_list, cog, w.ctx, w.group.id)
-    assert [f.name for f in w.ctx.reply.await_args.kwargs["embed"].fields] == [f"{w.group.id}: Renamed"]
-    await call(cog.group_list, cog, w.ctx, 12345)
-    assert w.ctx.reply.await_args.kwargs["embed"].fields == []
-
-    w.message.edit.reset_mock()
-    await call(cog.group_refresh, cog, w.ctx, w.group.id)
-    w.message.edit.assert_awaited_once()
-
-    await call(cog.group_delete, cog, w.ctx, w.group.id)
-    assert await reaction_roles.get_group(w.group.id, 1) is None
-
-
-async def test_reaction_listeners_add_and_remove_roles(role_world):
-    w = role_world
-    await reaction_roles.create_role(1, w.group.id, 501, "runner", "🏃", "Racers", True)
-    # a second mapping for the same emoji whose role was since deleted from the guild
-    await models.ReactionRole.create(guild_id=1, reaction_group=w.group, role_id=999, name="gone", emoji="🏃")
-    member = FakeUser(user_id=55)
-    w.guild.members[55] = member
-    bot = FakeBot()
-    bot.fetch_guild.return_value = w.guild
-    cog = role_cog.Role(bot)
-    payload = SimpleNamespace(emoji="🏃", guild_id=1, channel_id=300, message_id=700, user_id=55)
-
-    await cog.on_raw_reaction_add(payload)
-    await cog.on_raw_reaction_remove(payload)
-    await cog.on_raw_reaction_add(SimpleNamespace(**{**vars(payload), "emoji": "🎉"}))
-
-    member.add_roles.assert_awaited_once_with(w.role, reason="Added by message reaction.")
-    member.remove_roles.assert_awaited_once_with(w.role, reason="Removed by message reaction.")
-    bot.fetch_guild.assert_awaited_with(1)
-    assert bot.fetch_guild.await_count == 2  # the unmapped emoji stops before fetching
 
 
 async def test_importroles(monkeypatch):
@@ -458,11 +358,6 @@ async def test_importroles(monkeypatch):
     with pytest.raises(SahasrahBotException, match="valid csv"):
         await call(cog.importroles, cog, FakeContext())
 
-
-def test_strip_custom_emoji():
-    assert role_cog.strip_custom_emoji("<:name:123>") == ":name:123"
-    assert role_cog.strip_custom_emoji("<a:name:123>") == "a:name:123"
-    assert role_cog.strip_custom_emoji("🏃") == "🏃"
 
 
 # ---------------------------------------------------------------------------
