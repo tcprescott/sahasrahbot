@@ -68,7 +68,8 @@ function RollPanel({ disabled }: Readonly<{ disabled: boolean }>) {
       <Panel title="Roll a seed">
         <form onSubmit={(e) => void roll(e)}>
           <div className="seed-form">
-            <div className="filter-chips" role="group" aria-label="Randomizer">
+            <fieldset className="filter-chips">
+              <legend className="visually-hidden">Randomizer</legend>
               {ROLLABLE.map((r) => (
                 <button
                   key={r.id}
@@ -80,7 +81,7 @@ function RollPanel({ disabled }: Readonly<{ disabled: boolean }>) {
                   {r.label}
                 </button>
               ))}
-            </div>
+            </fieldset>
             <div className="field">
               <label className="field__label" htmlFor="seed-preset">
                 Preset
