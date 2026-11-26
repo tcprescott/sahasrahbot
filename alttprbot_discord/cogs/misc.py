@@ -46,8 +46,8 @@ WELCOME_MESSAGES = {
 }
 
 
-@cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
+    # guild_config caches per server and forgets on change (the Servers page sets it).
     return await guild_config.get(guild.id, "HolyImageDefaultGame", "z3r")
 
 
