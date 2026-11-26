@@ -79,7 +79,8 @@ async def test_settings_read_and_save(db, guilds, games):
     await servers.update_settings(GUILD, ADMIN, ["races", "old-dailies"], "smz3")
     assert await models.AuditLog.filter(guild_id=GUILD).count() == 3
     got = await servers.update_settings(GUILD, ADMIN, [], "")
-    assert got["daily_channels"] == [] and got["holy_image_game"] is None
+    assert got["daily_channels"] == []
+    assert got["holy_image_game"] is None
     assert await guild_config.get(GUILD, servers.DAILY_ANNOUNCER_CHANNEL) is None
     assert await guild_config.get(GUILD, servers.HOLY_IMAGE_DEFAULT_GAME) is None
 
@@ -90,7 +91,8 @@ async def test_settings_read_and_save(db, guilds, games):
 async def test_settings_survive_the_holy_image_site_being_down(db, guilds, games):
     games.side_effect = OSError("down")
     got = await servers.update_settings(GUILD, ADMIN, [], "anything")  # can't check, so it's taken
-    assert got["holy_image_games"] == [] and got["holy_image_game"] == "anything"
+    assert got["holy_image_games"] == []
+    assert got["holy_image_game"] == "anything"
 
 
 async def test_commas_are_refused(db, guilds, games):
@@ -113,10 +115,12 @@ async def test_api(client, login, guilds, games):
 
     status, body = await send_json(client, "PUT", f"/api/v1/servers/{GUILD}/settings",
                                    {"daily_channels": ["daily"], "holy_image_game": "smz3"})
-    assert status == 200 and body["daily_channels"] == [{"name": "daily", "usable": True}]
+    assert status == 200
+    assert body["daily_channels"] == [{"name": "daily", "usable": True}]
     assert (await get_json(client, f"/api/v1/servers/{GUILD}/settings"))[1]["holy_image_game"] == "smz3"
     status, body = await send_json(client, "PUT", f"/api/v1/servers/{GUILD}/settings", {"daily_channels": ["nope"]})
-    assert status == 400 and "#nope" in body["error"]
+    assert status == 400
+    assert "#nope" in body["error"]
 
     login(MEMBER)
     assert (await get_json(client, "/api/v1/servers"))[1] == {"servers": [{"id": str(OTHER), "name": "Another"}]}
