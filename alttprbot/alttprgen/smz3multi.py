@@ -1,4 +1,4 @@
-from alttprbot.alttprgen.preset import fetch_preset
+from alttprbot.alttprgen import generator
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.randomizer.sm import SMClient, SMZ3Client
 
@@ -8,9 +8,10 @@ class PresetNotFoundException(SahasrahBotException):
 
 
 async def generate_multiworld(preset, players, tournament=False, randomizer='smz3', seed_number=None):
-    preset_dict = await fetch_preset(preset, randomizer=randomizer)
+    preset_data = generator.PRESET_CLASS_MAPPING[randomizer](preset)
+    await preset_data.fetch()
 
-    settings = preset_dict['settings']
+    settings = preset_data.preset_data['settings']
 
     settings['race'] = "true" if tournament else "false"
     settings['gamemode'] = "multiworld"
@@ -26,10 +27,13 @@ async def generate_multiworld(preset, players, tournament=False, randomizer='smz
     if randomizer == 'sm':
         seed = await SMClient.create(
             settings=settings,
+            # The preset's own host (sm.samus.link for SM); pyz3r's default is samus.link (#63).
+            baseurl=preset_data.baseurl,
         )
     elif randomizer == 'smz3':
         seed = await SMZ3Client.create(
             settings=settings,
+            baseurl=preset_data.baseurl,
         )
 
     return seed

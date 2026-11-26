@@ -209,6 +209,8 @@ async def test_announce_daily_posts_in_configured_channels(db, monkeypatch, capl
     assert good.send.await_args.kwargs["embed"].title == "daily"
     posted.create_thread.assert_awaited_once_with(name="Daily Challenge: Hard", auto_archive_duration=1440)
     assert notifications.seed_embed.await_args.kwargs["notes"] == notifications.DAILY_NOTES
+    # The channels grant the bot nothing, so no external emojis are offered (#52).
+    assert notifications.seed_embed.await_args.kwargs["emojis"] == []
     assert "Daily announcer guild 11 is not available." in caplog.text
     assert "Daily announcer channel missing not found in guild 10." in caplog.text
     assert "Unable to announce the daily in 10/broken." in caplog.text

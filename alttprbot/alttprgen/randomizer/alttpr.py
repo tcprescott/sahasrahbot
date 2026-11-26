@@ -3,10 +3,20 @@
 Pure seed-generation code: no Discord or racetime imports. Discord embeds for
 these seeds are built in ``alttprbot_discord/util/seed_embeds.py``.
 """
+import json
+import logging
+
 import aiohttp
 from pyz3r import ALTTPR
+from pyz3r.exceptions import AlttprFailedToGenerate
 
 import config
+from alttprbot.exceptions import InvalidInputError
+
+logger = logging.getLogger(__name__)
+
+# Longest alttpr.com error text passed on to the person (a Discord message holds 2000).
+MAX_REJECTION_LENGTH = 1500
 
 
 class ALTTPRClient(ALTTPR):
@@ -23,6 +33,61 @@ class ALTTPRClient(ALTTPR):
     @property
     def generated_goal(self):
         return generated_goal(self.data)
+
+    async def generate_game(self, settings, endpoint):
+        """pyz3r's generate_game, but a 4xx from alttpr.com is reported, not retried.
+
+        pyz3r retries every failed request five times and then raises a bare "failed to
+        generate game", so someone whose custom preset has a bad setting never learns which
+        one (#65). alttpr.com answers bad settings with a 4xx whose body says what's wrong;
+        that becomes an InvalidInputError carrying the message. Server errors and dropped
+        connections are still retried.
+        """
+        self.settings = settings
+        for _ in range(0, 5):
+            try:
+                async with aiohttp.request(method='post', url=self.uri(endpoint), json=settings, auth=self.auth) as resp:
+                    if 400 <= resp.status < 500:
+                        raise InvalidInputError(
+                            f"alttpr.com could not generate this game: {rejection_reason(await resp.text())}")
+                    resp.raise_for_status()
+                    self.data = await resp.json()
+                return self.data
+            except (aiohttp.client_exceptions.ServerDisconnectedError, aiohttp.ClientResponseError):
+                logger.warning("Unable to generate game, retrying.", exc_info=True)
+
+        raise AlttprFailedToGenerate('failed to generate game')
+
+
+def rejection_reason(body: str) -> str:
+    """The readable part of an alttpr.com error response.
+
+    Laravel's validation errors look like ``{"message": ..., "errors": {"field": ["..."]}}``;
+    anything else is passed on as text.
+    """
+    try:
+        data = json.loads(body)
+    except ValueError:
+        data = None
+    if isinstance(data, dict):
+        errors = data.get('errors')
+        if isinstance(errors, dict) and errors:
+            parts = []
+            for field, messages in errors.items():
+                if isinstance(messages, list):
+                    messages = ' '.join(str(m) for m in messages)
+                parts.append(f"{field}: {messages}")
+            reason = '; '.join(parts)
+        elif data.get('message'):
+            reason = str(data['message'])
+        else:
+            reason = body
+    else:
+        reason = body
+    reason = reason.strip() or "no reason given"
+    if len(reason) > MAX_REJECTION_LENGTH:
+        reason = reason[:MAX_REJECTION_LENGTH] + "…"
+    return reason
 
 
 ENEMY_SHUFFLE = 'enemizer.enemy_shuffle'

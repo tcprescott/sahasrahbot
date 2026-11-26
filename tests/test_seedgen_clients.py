@@ -1,5 +1,5 @@
 """Outbound clients that weren't covered elsewhere: SM DASH, VARIA (Choozo and
-league playoffs), SM/SMZ3 multiworld, the alttpr.com daily, Sheets result
+league playoffs), SM/SMZ3 multiworld, alttpr.com generation errors, the alttpr.com daily, Sheets result
 recording and the racetime.gg bot's start-up.
 
 HTTP goes to the ``fake_http`` server; the pyz3r and gspread clients are mocks.
@@ -12,9 +12,11 @@ from unittest import mock
 import aiohttp
 import gspread
 import pytest
+from pyz3r.exceptions import AlttprFailedToGenerate
 
 from alttprbot import models
 from alttprbot.alttprgen import smvaria, smz3multi
+from alttprbot.alttprgen.randomizer import alttpr as alttpr_client
 from alttprbot.alttprgen.randomizer import smdash
 from alttprbot.exceptions import InvalidInputError, SeedGenerationError
 from alttprbot.services import daily, tournament_results
@@ -150,8 +152,11 @@ async def test_league_playoff_validation(args, message):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("randomizer, client, preset", [("sm", "SMClient", "casual_full"), ("smz3", "SMZ3Client", "normal")])
-async def test_generate_multiworld_settings(monkeypatch, randomizer, client, preset):
+@pytest.mark.parametrize("randomizer, client, preset, baseurl", [
+    ("sm", "SMClient", "casual_full", "https://sm.samus.link"),
+    ("smz3", "SMZ3Client", "normal", "https://samus.link"),
+])
+async def test_generate_multiworld_settings(monkeypatch, randomizer, client, preset, baseurl):
     create = mock.AsyncMock(return_value="SEED")
     monkeypatch.setattr(getattr(smz3multi, client), "create", create)
 
@@ -162,6 +167,8 @@ async def test_generate_multiworld_settings(monkeypatch, randomizer, client, pre
     settings = create.await_args.kwargs["settings"]
     assert (settings["race"], settings["gamemode"], settings["players"], settings["seed"]) == ("true", "multiworld", 2, "42")
     assert (settings["player-0"], settings["player-1"]) == ("alice", "bob")
+    # SM multiworld rooms live on sm.samus.link, not pyz3r's samus.link default (#63).
+    assert create.await_args.kwargs["baseurl"] == baseurl
 
 
 # ---------------------------------------------------------------------------
@@ -346,3 +353,59 @@ async def test_racetime_bot_start_stops_when_unauthorized(rt_bot):
     await rt_bot.start()
     await rt_bot.http.close()
     rt_bot.loop.create_task.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# alttpr.com generation errors (#65)
+# ---------------------------------------------------------------------------
+
+VALIDATION_ERROR = (
+    '{"message": "The given data was invalid.", '
+    '"errors": {"glitches": ["The selected glitches is invalid."], "goal": ["The goal field is required."]}}'
+)
+
+
+async def test_alttpr_generate_returns_seed(fake_http):
+    fake_http.add("POST", "/api/randomizer", body='{"hash": "abc123"}')
+    seed = await alttpr_client.ALTTPRClient.generate({"glitches": "none"}, baseurl=fake_http.url())
+    assert seed.hash == "abc123"
+    assert fake_http.requests[0].body == '{"glitches": "none"}'
+
+
+async def test_alttpr_rejected_settings_tell_the_user_why_without_retrying(fake_http):
+    fake_http.add("POST", "/api/randomizer", body=VALIDATION_ERROR, status=422)
+    with pytest.raises(InvalidInputError) as raised:
+        await alttpr_client.ALTTPRClient.generate({"glitches": "lots"}, baseurl=fake_http.url())
+    assert str(raised.value) == (
+        "alttpr.com could not generate this game: "
+        "glitches: The selected glitches is invalid.; goal: The goal field is required."
+    )
+    assert len(fake_http.requests) == 1
+
+
+async def test_alttpr_server_errors_are_still_retried(fake_http):
+    fake_http.add("POST", "/api/randomizer", body="oops", status=500, content_type="text/plain")
+    with pytest.raises(AlttprFailedToGenerate):
+        await alttpr_client.ALTTPRClient.generate({}, baseurl=fake_http.url())
+    assert len(fake_http.requests) == 5
+
+
+async def test_alttpr_retry_then_success(fake_http):
+    fake_http.add("POST", "/api/randomizer", body="busy", status=503, content_type="text/plain")
+    fake_http.add("POST", "/api/randomizer", body='{"hash": "ok"}')
+    seed = await alttpr_client.ALTTPRClient.generate({}, baseurl=fake_http.url())
+    assert seed.hash == "ok"
+
+
+@pytest.mark.parametrize("body, reason", [
+    (VALIDATION_ERROR, "glitches: The selected glitches is invalid.; goal: The goal field is required."),
+    ('{"errors": {"mode": "bad mode"}}', "mode: bad mode"),
+    ('{"message": "Too many requests"}', "Too many requests"),
+    ('{"other": 1}', '{"other": 1}'),
+    ('["a"]', '["a"]'),
+    ("Not allowed", "Not allowed"),
+    ("   ", "no reason given"),
+    ("x" * 2000, "x" * alttpr_client.MAX_REJECTION_LENGTH + "…"),
+])
+def test_rejection_reason(body, reason):
+    assert alttpr_client.rejection_reason(body) == reason

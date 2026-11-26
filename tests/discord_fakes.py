@@ -137,8 +137,10 @@ class FakeInteraction:
     ``content`` plus any keyword arguments (``embed``, ``ephemeral``, ``view``...).
     """
 
-    def __init__(self, user=None, guild=None, channel=None, message=None, namespace=None):
+    def __init__(self, user=None, guild=None, channel=None, message=None, namespace=None, app_permissions=None):
         self.user = user or FakeUser()
+        # The bot's permissions in the channel; every permission unless a test says otherwise.
+        self.app_permissions = app_permissions if app_permissions is not None else discord.Permissions.all()
         self.guild = guild
         self.guild_id = getattr(guild, 'id', None)
         self.channel = channel or FakeChannel(guild=guild)

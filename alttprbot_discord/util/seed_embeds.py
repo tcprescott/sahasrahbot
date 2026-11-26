@@ -60,17 +60,35 @@ EMOJI_CODE_MAP = {
 }
 
 
+FOOTER_EMOJI = "SahasrahBot"
+
+
+def usable_emojis(emojis, permissions: discord.Permissions | None):
+    """The emojis an embed may show where the bot has ``permissions``.
+
+    The file select code emojis live on SahasrahBot's own server, so they're external
+    everywhere else: without "Use External Emojis" Discord shows them as ``:Bow:`` text
+    (#52). Then only the footer emoji is kept (an icon is a plain image URL, which needs
+    no permission), and the code falls back to text. ``None`` means no restriction.
+    """
+    if permissions is None or permissions.use_external_emojis:
+        return emojis
+    return [emoji for emoji in emojis or [] if emoji.name == FOOTER_EMOJI]
+
+
 def build_file_select_code(seed, emojis=None):
-    """The seed's file select code, as emojis plus text when ``emojis`` is given."""
+    """The seed's file select code, as emojis plus text when ``emojis`` has every one of them."""
+    text = '/'.join(seed.code)
     if emojis:
-        emoji_list = [str(discord.utils.get(emojis, name=EMOJI_CODE_MAP[x])) for x in seed.code]
-        return ' '.join(emoji_list) + ' (' + '/'.join(seed.code) + ')'
-    else:
-        return '/'.join(seed.code)
+        found = [discord.utils.get(emojis, name=EMOJI_CODE_MAP[x]) for x in seed.code]
+        if all(found):
+            return ' '.join(str(emoji) for emoji in found) + ' (' + text + ')'
+    return text
 
 
 def _footer_icon(emojis):
-    return discord.utils.get(emojis, name="SahasrahBot").url
+    emoji = discord.utils.get(emojis or [], name=FOOTER_EMOJI)
+    return emoji.url if emoji else None
 
 
 # --- ALTTPR (alttpr.com) ---
