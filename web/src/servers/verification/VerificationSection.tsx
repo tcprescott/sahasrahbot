@@ -31,7 +31,7 @@ export const sectionPath = (guildId: string) => `/servers/${guildId}/verificatio
 export const verificationPath = (guildId: string, id: number) => `${sectionPath(guildId)}/${id}`
 
 export function roleText(v: Pick<RacerVerification, 'role_name'>) {
-  return v.role_name ? `@${v.role_name}` : '@deleted role'
+  return v.role_name ?? '@deleted role'
 }
 
 export function countsText(v: Pick<RacerVerification, 'racetime_categories' | 'use_alttpr_ladder'>) {
@@ -129,7 +129,7 @@ function VerificationList() {
                     </span>
                   ),
                 },
-                { key: 'channel', header: 'Button in', desktopOnly: true, render: (v) => (v.channel_name ? `#${v.channel_name}` : '–') },
+                { key: 'channel', header: 'Button in', desktopOnly: true, render: (v) => (v.channel_name ?? '–') },
                 { key: 'verified', header: 'Verified', align: 'end', render: (v) => v.verified_count },
                 {
                   key: 'recheck',

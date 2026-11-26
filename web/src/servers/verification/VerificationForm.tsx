@@ -159,11 +159,11 @@ export function VerificationForm({
               <select id="rv-role" className="input" value={draft.roleId} onChange={(e) => set({ roleId: e.target.value })}>
                 <option value="">Pick a role</option>
                 {verification && !roles.some((r) => r.id === draft.roleId) && draft.roleId && (
-                  <option value={draft.roleId}>{verification.role_name ? `@${verification.role_name}` : '@deleted role'}</option>
+                  <option value={draft.roleId}>{verification.role_name ?? '@deleted role'}</option>
                 )}
                 {roles.map((r) => (
                   <option key={r.id} value={r.id}>
-                    @{r.name}
+                    {r.name}
                   </option>
                 ))}
               </select>
@@ -173,7 +173,7 @@ export function VerificationForm({
                 <option value="">Pick a channel</option>
                 {server.text_channels.map((c) => (
                   <option key={c.id} value={c.id}>
-                    #{c.name}
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -215,7 +215,7 @@ export function VerificationForm({
                 <option value="">Don't report</option>
                 {server.text_channels.map((c) => (
                   <option key={c.id} value={c.id}>
-                    #{c.name}
+                    {c.name}
                   </option>
                 ))}
               </select>
