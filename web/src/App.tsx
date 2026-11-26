@@ -19,6 +19,9 @@ import { HomeScreen } from './screens/HomeScreen'
 import { MeScreen } from './screens/MeScreen'
 import { NotFoundScreen } from './screens/NotFoundScreen'
 import { PurgeScreen } from './screens/PurgeScreen'
+import { ServerScreen } from './servers/ServerScreen'
+import { ServersScreen } from './servers/ServersScreen'
+import { SettingsSection } from './servers/SettingsSection'
 import { AppShell } from './shell/AppShell'
 import { ThemeProvider } from './theme/ThemeProvider'
 import { SubmissionScreen } from './tournament/SubmissionScreen'
@@ -43,6 +46,12 @@ export function App() {
                 <Route path="me" element={<MeScreen />} />
                 <Route path="me/api" element={<ApiAccessScreen />} />
                 <Route path="audit" element={<AuditScreen />} />
+                <Route path="servers" element={<ServersScreen />} />
+                {/* A server's sections (servers/sections.ts): each is a child route here. */}
+                <Route path="servers/:guildId" element={<ServerScreen />}>
+                  <Route index element={<Navigate to="settings" replace />} />
+                  <Route path="settings" element={<SettingsSection />} />
+                </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />
                 <Route path="presets/me" element={<MyPresetsScreen />} />

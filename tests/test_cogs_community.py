@@ -162,10 +162,8 @@ async def holy(monkeypatch):
 
     monkeypatch.setattr(api, "get_holy_images", mock.AsyncMock(return_value=HOLY_IMAGES))
     await misc_cog.get_holy_images.cache.clear()
-    await misc_cog.holy_game_default.cache.clear()
     yield
     await misc_cog.get_holy_images.cache.clear()
-    await misc_cog.holy_game_default.cache.clear()
 
 
 async def test_holyimage_uses_guild_default_game(db, holy):
@@ -196,13 +194,16 @@ async def test_holyimage_autocomplete(db, holy):
     assert [c.value for c in smz3] == ["samus"]
 
 
-async def test_known_issue_holy_game_default_is_cached_for_every_guild(db, holy):
-    """KNOWN ISSUE, pinned not endorsed: ``holy_game_default`` caches under one fixed
-    key, so the first guild's default game is used for every guild for five minutes."""
+async def test_holy_game_default_is_per_guild_and_follows_changes(db, holy):
+    """Each server gets its own default game, and a change on the Servers page applies
+    straight away (it used to be cached under one key for every server)."""
     await guild_config.set_value(1, "HolyImageDefaultGame", "smz3")
     await guild_config.set_value(2, "HolyImageDefaultGame", "z3r")
     assert await misc_cog.holy_game_default(FakeGuild(guild_id=1)) == "smz3"
+    assert await misc_cog.holy_game_default(FakeGuild(guild_id=2)) == "z3r"
+    await guild_config.set_value(2, "HolyImageDefaultGame", "smz3")
     assert await misc_cog.holy_game_default(FakeGuild(guild_id=2)) == "smz3"
+    assert await misc_cog.holy_game_default(FakeGuild(guild_id=3)) == "z3r"
 
 
 async def test_datetime_markdown():

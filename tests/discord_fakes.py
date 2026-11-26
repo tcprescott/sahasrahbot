@@ -202,18 +202,20 @@ class FakeDirectory:
     Register it with the ``directory`` fixture (tests/conftest.py)."""
 
     def __init__(self, owner=None):
-        from alttprbot.services.discord_directory import Named
+        from alttprbot.services.discord_directory import Named, RoleInfo
         self._named = Named
+        self._role_info = RoleInfo
         self.owner = owner
         self.guilds = {}
         self.posted = []
         self.post_error = None
 
     def add_guild(self, guild_id, name="Test Server", admins=(), members=None, channels=((300, "#general"),),
-                  roles=((77, "@Voters"),)):
+                  roles=((77, "@Voters"),), voice_channels=(), unassignable=()):
         self.guilds[guild_id] = {
             "name": name, "admins": set(admins), "members": dict(members or {}),
-            "channels": list(channels), "roles": list(roles),
+            "channels": list(channels), "roles": list(roles), "voice": list(voice_channels),
+            "unassignable": set(unassignable),
         }
         for admin in admins:
             self.guilds[guild_id]["members"].setdefault(admin, [])
@@ -249,6 +251,15 @@ class FakeDirectory:
 
     async def roles(self, guild_id):
         return [self._named(i, n) for i, n in self.guilds.get(guild_id, {}).get("roles", [])]
+
+    async def role_details(self, guild_id):
+        guild = self.guilds.get(guild_id, {})
+        roles = guild.get("roles", [])
+        return [self._role_info(i, n, len(roles) - pos, i not in guild.get("unassignable", ()))
+                for pos, (i, n) in enumerate(roles)]
+
+    async def voice_channels(self, guild_id):
+        return [self._named(i, n) for i, n in self.guilds.get(guild_id, {}).get("voice", [])]
 
     async def post_election(self, election_id):
         if self.post_error:

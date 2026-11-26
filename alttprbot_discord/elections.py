@@ -16,7 +16,7 @@ from discord.ext import commands
 import config
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 from alttprbot.services import discord_directory, elections
-from alttprbot.services.discord_directory import Named
+from alttprbot.services.discord_directory import Named, RoleInfo
 from alttprbot_discord.audit import audited
 from alttprbot.util import discord_members
 
@@ -27,6 +27,7 @@ OPEN_COLOUR = discord.Colour(0x6D3FC0)
 CLOSED_COLOUR = discord.Colour.green()
 
 POSTABLE_CHANNEL_TYPES = (discord.ChannelType.text, discord.ChannelType.news)
+VOICE_CHANNEL_TYPES = (discord.ChannelType.voice, discord.ChannelType.stage_voice)
 
 
 def vote_url(election_id: int) -> str:
@@ -230,6 +231,25 @@ class DiscordDirectory:
         roles = await guild.fetch_roles()
         return [Named(r.id, f"@{r.name}") for r in sorted(roles, key=lambda r: -r.position)
                 if not r.is_default() and not r.managed]
+
+    async def role_details(self, guild_id: int) -> list[RoleInfo]:
+        guild = await self._guild(guild_id)
+        if guild is None:
+            return []
+        me = guild.me
+        can_manage = me is None or me.guild_permissions.manage_roles
+        top = None if me is None else me.top_role.position
+        roles = await guild.fetch_roles()
+        return [RoleInfo(r.id, f"@{r.name}", r.position, can_manage and (top is None or r.position < top))
+                for r in sorted(roles, key=lambda r: -r.position) if not r.is_default() and not r.managed]
+
+    async def voice_channels(self, guild_id: int) -> list[Named]:
+        # The gateway cache, like text_channels.
+        guild = self.bot.get_guild(guild_id)
+        if guild is None:
+            return []
+        channels = [c for c in guild.channels if getattr(c, 'type', None) in VOICE_CHANNEL_TYPES]
+        return [Named(c.id, c.name) for c in sorted(channels, key=lambda c: c.position)]
 
     async def post_election(self, election_id: int) -> int:
         return await post(self.bot, election_id)
