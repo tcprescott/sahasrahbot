@@ -754,5 +754,6 @@ async def test_voice_roles_api(client, login, directory):
     assert (await send_json(client, "DELETE", f"/api/v1/servers/{GUILD}/voice-roles/{body['id']}"))[0] == 204
     assert (await send_json(client, "DELETE", f"/api/v1/servers/{GUILD}/voice-roles/{body['id']}"))[0] == 404
 
+    assert (await get_json(client, "/api/v1/servers/abc/voice-roles"))[0] == 404
     login(VOTER)
     assert (await get_json(client, f"/api/v1/servers/{GUILD}/voice-roles"))[0] == 403

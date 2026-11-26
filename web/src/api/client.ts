@@ -54,6 +54,8 @@ export type OAuthRequest = GetBody<'/api/v1/oauth/requests/{txn}'>
 export type AuditOptions = GetBody<'/api/v1/audit/options'>
 export type AuditPage = GetBody<'/api/v1/audit'>
 export type AuditEntry = AuditPage['entries'][number]
+export type VoiceRoles = GetBody<'/api/v1/servers/{guild_id}/voice-roles'>
+export type VoiceRole = VoiceRoles['voice_roles'][number]
 
 export class ApiError extends Error {
   constructor(

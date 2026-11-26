@@ -1,0 +1,6 @@
+.vr-head { display: flex; gap: var(--space-3); align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.vr-head__lede { margin: 0; color: var(--fg-muted); flex: 1 1 280px; }
+.vr-channel { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; }
+.vr-channel .icon { color: var(--fg-muted); }
+.vr-role { color: var(--link); font-weight: 700; }
+.vr-problem { display: flex; gap: 4px; align-items: center; color: var(--status-pending); font-size: var(--text-sm); margin-top: 2px; }

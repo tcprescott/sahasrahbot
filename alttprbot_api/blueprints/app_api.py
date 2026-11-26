@@ -753,6 +753,14 @@ def voice_role_out(data: dict) -> schemas.VoiceRole:
                                 'role_id': str(data['role_id'])})
 
 
+def _guild_path_id(guild_id: str) -> int:
+    """A server id from the URL. Taken as a string: Discord ids don't fit in a JavaScript
+    number, so the OpenAPI type must not be integer."""
+    if not guild_id.isdigit():
+        abort(404)
+    return int(guild_id)
+
+
 def voice_roles_out(data: dict) -> schemas.VoiceRoles:
     return schemas.VoiceRoles(
         voice_roles=[voice_role_out(v) for v in data['voice_roles']],
@@ -762,29 +770,30 @@ def voice_roles_out(data: dict) -> schemas.VoiceRoles:
     )
 
 
-@app_api_blueprint.get('/servers/<int:guild_id>/voice-roles')
+@app_api_blueprint.get('/servers/<string:guild_id>/voice-roles')
 @tag(['servers'])
 @validate_response(schemas.VoiceRoles)
-async def list_voice_roles(guild_id: int):
+async def list_voice_roles(guild_id: str):
     """The server's voice roles (people in the voice channel get the role while they're in it),
     and the voice channels and roles a new one can use. Server administrators only."""
     user = await require_user()
-    return voice_roles_out(await voice_roles.overview(guild_id, user.id))
+    return voice_roles_out(await voice_roles.overview(_guild_path_id(guild_id), user.id))
 
 
-@app_api_blueprint.post('/servers/<int:guild_id>/voice-roles')
+@app_api_blueprint.post('/servers/<string:guild_id>/voice-roles')
 @tag(['servers'])
 @validate_request(schemas.VoiceRoleIn)
 @validate_response(schemas.VoiceRole, 201)
-async def add_voice_role(guild_id: int, data: schemas.VoiceRoleIn):
+async def add_voice_role(guild_id: str, data: schemas.VoiceRoleIn):
     user = await require_user()
-    return voice_role_out(await voice_roles.add(guild_id, user.id, _int_id(data.voice_channel_id, 'voice channel'),
+    return voice_role_out(await voice_roles.add(_guild_path_id(guild_id), user.id,
+                                                _int_id(data.voice_channel_id, 'voice channel'),
                                                 _int_id(data.role_id, 'role'))), 201
 
 
-@app_api_blueprint.delete('/servers/<int:guild_id>/voice-roles/<int:voice_role_id>')
+@app_api_blueprint.delete('/servers/<string:guild_id>/voice-roles/<int:voice_role_id>')
 @tag(['servers'])
-async def remove_voice_role(guild_id: int, voice_role_id: int):
+async def remove_voice_role(guild_id: str, voice_role_id: int):
     user = await require_user()
-    await voice_roles.remove(guild_id, user.id, voice_role_id)
+    await voice_roles.remove(_guild_path_id(guild_id), user.id, voice_role_id)
     return '', 204

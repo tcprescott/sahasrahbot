@@ -27,6 +27,7 @@ import { ThemeProvider } from './theme/ThemeProvider'
 import { SubmissionScreen } from './tournament/SubmissionScreen'
 import { ModerationScreen } from './triforce/ModerationScreen'
 import { TriforcePoolScreen } from './triforce/TriforcePoolScreen'
+import { VoiceRolesSection } from './voiceroles/VoiceRolesSection'
 
 /**
  * Page URLs are the ones the old server-rendered pages had, because Discord
@@ -67,6 +68,7 @@ export function App() {
                 <Route path="triforcetexts/:pool" element={<TriforcePoolScreen />} />
                 <Route path="triforcetexts/:pool/moderation" element={<ModerationScreen />} />
                 <Route path="submit/:event" element={<SubmissionScreen />} />
+                <Route path="servers/:guildId/voice-roles" element={<VoiceRolesSection />} />
                 <Route path="error" element={<ErrorScreen />} />
                 <Route path="logout" element={<Navigate to="/" replace />} />
                 <Route path="presets/:namespace" element={<LegacyNamespaceRedirect />} />
