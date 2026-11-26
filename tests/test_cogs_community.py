@@ -146,6 +146,20 @@ async def test_mention_reacts_with_sahasrahbot_emoji(monkeypatch):
     ignored.add_reaction.assert_not_awaited()
 
 
+async def test_mention_reaction_refused_is_ignored(monkeypatch):
+    """Where the bot can't use its own server's emoji, Discord answers 10014 Unknown Emoji."""
+    monkeypatch.setattr(misc_cog.asyncio, "sleep", mock.AsyncMock())
+    bot = FakeBot(emojis=[emoji("SahasrahBot")])
+    cog = misc_cog.Misc(bot)
+    mentioned = FakeMessage()
+    mentioned.mentions = [bot.user]
+    mentioned.add_reaction.side_effect = discord.HTTPException(mock.Mock(status=400), "Unknown Emoji")
+
+    await cog.on_message(mentioned)
+
+    mentioned.add_reaction.assert_awaited_once()
+
+
 HOLY_IMAGES = {
     "z3r": [
         {"slug": "fairy", "idx": 1, "title": "Fairy", "url": "images/fairy.png", "desc": "<b>Heal</b>",
