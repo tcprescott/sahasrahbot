@@ -98,6 +98,11 @@ class PresetContent(BaseModel):
     content: str = Field(max_length=200_000)
 
 
+class CustomizerSave(BaseModel):
+    """The text of an alttpr.com customizer save file (JSON)."""
+    content: str = Field(max_length=2_000_000)
+
+
 class Candidate(BaseModel):
     id: int
     name: str
