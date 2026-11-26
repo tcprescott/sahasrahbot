@@ -74,6 +74,33 @@ def test_file_select_code_with_and_without_emojis():
     assert "<:BigKey:" in with_emojis and "<:ALotOfLove:" in with_emojis
 
 
+def test_file_select_code_falls_back_to_text_when_an_emoji_is_missing():
+    partial = [e for e in EMOJIS if e.name != "BigKey"]
+    assert seed_embeds.build_file_select_code(alttpr_seed(), partial) == "Bow/Hookshot/Big Key/Heart/Map"
+
+
+def test_usable_emojis_follows_the_external_emoji_permission():
+    allowed = discord.Permissions(use_external_emojis=True)
+    assert seed_embeds.usable_emojis(EMOJIS, allowed) is EMOJIS
+    assert seed_embeds.usable_emojis(EMOJIS, None) is EMOJIS
+    # Without it only the footer icon is kept (#52).
+    assert seed_embeds.usable_emojis(EMOJIS, discord.Permissions.none()) == [EMOJIS[0]]
+    assert seed_embeds.usable_emojis(None, discord.Permissions.none()) == []
+
+
+async def test_embed_without_external_emoji_permission_shows_text_code():
+    emojis = seed_embeds.usable_emojis(EMOJIS, discord.Permissions.none())
+    embed = await seed_embeds.seed_embed(alttpr_seed(), emojis=emojis)
+    assert values(embed)["File Select Code"] == "Bow/Hookshot/Big Key/Heart/Map"
+    assert embed.footer.icon_url == EMOJIS[0].url
+
+
+async def test_embed_without_footer_emoji_has_no_icon():
+    embed = await seed_embeds.seed_embed(alttpr_seed(), emojis=[])
+    assert embed.footer.text == "Generated"
+    assert embed.footer.icon_url is None
+
+
 async def test_alttpr_embed_settings():
     embed = await seed_embeds.seed_embed(alttpr_seed(shuffle="crossed", **{"enemizer.pot_shuffle": "on"}),
                                          emojis=EMOJIS)

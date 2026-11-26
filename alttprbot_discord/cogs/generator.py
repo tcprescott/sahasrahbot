@@ -15,7 +15,7 @@ from alttprbot.alttprgen.spoilers import (generate_spoiler_game,
                                           generate_spoiler_game_custom)
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.alttprgen.randomizer.alttpr import ALTTPRClient
-from alttprbot_discord.util.seed_embeds import build_file_select_code, seed_embed, smvaria_embed
+from alttprbot_discord.util.seed_embeds import build_file_select_code, seed_embed, smvaria_embed, usable_emojis
 
 
 YES_NO_CHOICE = [
@@ -67,7 +67,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         )
         if not seed:
             raise SahasrahBotException('Could not generate game.  Maybe preset does not exist?')
-        embed = await seed_embed(seed, emojis=self.bot.emojis)
+        embed = await seed_embed(seed, emojis=usable_emojis(self.bot.emojis, interaction.app_permissions))
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
 
         await interaction.followup.send(embed=embed)
@@ -114,7 +114,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             branch=branch,
         )
 
-        embed: discord.Embed = await seed_embed(seed, emojis=self.bot.emojis)
+        embed: discord.Embed = await seed_embed(seed, emojis=usable_emojis(self.bot.emojis, interaction.app_permissions))
         embed.add_field(name="Saved as preset!",
                         value=f"You can generate this preset again by using the preset name of `{namespace.name}/latest`",
                         inline=False)
@@ -140,7 +140,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             branch=branch
         )
 
-        embed = await seed_embed(spoiler.seed, emojis=self.bot.emojis)
+        embed = await seed_embed(spoiler.seed, emojis=usable_emojis(self.bot.emojis, interaction.app_permissions))
         embed.insert_field_at(0, name="Preset", value=preset, inline=False)
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
 
@@ -174,7 +174,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         content = await yamlfile.read()
         spoiler = await generate_spoiler_game_custom(content, branch=branch)
 
-        embed = await seed_embed(spoiler.seed, emojis=self.bot.emojis)
+        embed = await seed_embed(spoiler.seed, emojis=usable_emojis(self.bot.emojis, interaction.app_permissions))
         embed.insert_field_at(0, name="Spoiler Log URL", value=spoiler.spoiler_log_url, inline=False)
 
         await interaction.followup.send(embed=embed)
@@ -199,7 +199,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
             tournament=race == "yes"
         )
 
-        embed = await seed_embed(mystery.seed, emojis=self.bot.emojis, name="Mystery Game")
+        embed = await seed_embed(mystery.seed, emojis=usable_emojis(self.bot.emojis, interaction.app_permissions), name="Mystery Game")
 
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
@@ -231,7 +231,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
 
         mystery = await data.generate(spoilers="mystery" if mask_settings else "off", tournament=race == "yes")
 
-        embed = await seed_embed(mystery.seed, emojis=self.bot.emojis, name="Mystery Game")
+        embed = await seed_embed(mystery.seed, emojis=usable_emojis(self.bot.emojis, interaction.app_permissions), name="Mystery Game")
 
         if mystery.custom_instructions:
             embed.insert_field_at(0, name="Custom Instructions", value=mystery.custom_instructions, inline=False)
@@ -266,7 +266,7 @@ class AlttprGenerator(commands.GroupCog, name="alttpr"):
         for idx, seed in enumerate(seeds):
             embed.add_field(
                 name=seed.data['spoiler']['meta'].get('name', f"Game {idx}"),
-                value=f"{seed.url}\n{build_file_select_code(seed, self.bot.emojis)}",
+                value=f"{seed.url}\n{build_file_select_code(seed, usable_emojis(self.bot.emojis, interaction.app_permissions))}",
                 inline=False
             )
         await interaction.followup.send(embed=embed)

@@ -17,7 +17,7 @@ from alttprbot.alttprgen import generator as gen
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot_discord.cogs import daily as daily_cog
 from alttprbot_discord.cogs import generator as cog_module
-from tests.discord_fakes import FakeBot, FakeInteraction, FakeUser, call
+from tests.discord_fakes import FakeBot, FakeInteraction, FakeUser, call, emoji
 
 
 @pytest.fixture
@@ -76,6 +76,18 @@ async def test_alttpr_preset_options(monkeypatch, embeds, bot, options, expected
     embed = interaction.sent().embed
     assert embeds[0].seed == "SEED"
     assert (embed.fields[0].name, embed.fields[0].value) == ("Preset", "open")
+
+
+async def test_alttpr_preset_without_external_emojis_uses_text_code(monkeypatch, embeds):
+    bot = FakeBot(emojis=[emoji("SahasrahBot", 1), emoji("Bow", 2)])
+    monkeypatch.setattr(gen.ALTTPRPreset, "generate", mock.AsyncMock(return_value="SEED"))
+    cog = cog_module.AlttprGenerator(bot)
+
+    await call(cog.preset, cog, FakeInteraction(), "open")
+    assert [e.name for e in embeds[0].emojis] == ["SahasrahBot", "Bow"]
+
+    await call(cog.preset, cog, FakeInteraction(app_permissions=discord.Permissions.none()), "open")
+    assert [e.name for e in embeds[1].emojis] == ["SahasrahBot"]
 
 
 async def test_alttpr_preset_without_seed_raises(monkeypatch, embeds, bot):

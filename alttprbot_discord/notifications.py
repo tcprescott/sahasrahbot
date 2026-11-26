@@ -27,7 +27,7 @@ from alttprbot.services import guild_config, rtgg_watchers, scheduled_events
 from alttprbot.tournament import core
 from alttprbot.tournament import event_settings as tournament_settings
 from alttprbot_discord import elections as election_posts
-from alttprbot_discord.util.seed_embeds import seed_embed
+from alttprbot_discord.util.seed_embeds import seed_embed, usable_emojis
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +154,6 @@ class ScheduledJobDiscordOutput:
 
         await wait_until_ready(self.bot)
         seed = await get_daily_seed(event.hash_id)
-        embed = await seed_embed(seed, emojis=self.bot.emojis, notes=DAILY_NOTES)
         daily_announcer_channels = await guild_config.guilds_with('DailyAnnouncerChannel')
         for guild_id, value in daily_announcer_channels.items():
             guild = self.bot.get_guild(guild_id)
@@ -167,6 +166,8 @@ class ScheduledJobDiscordOutput:
                     logger.warning("Daily announcer channel %s not found in guild %s.", channel_name, guild.id)
                     continue
                 try:
+                    emojis = usable_emojis(self.bot.emojis, channel.permissions_for(guild.me))
+                    embed = await seed_embed(seed, emojis=emojis, notes=DAILY_NOTES)
                     message: discord.Message = await channel.send(embed=embed)
                     await message.create_thread(name=seed.data['spoiler']['meta'].get('name'),
                                                 auto_archive_duration=1440)
