@@ -36,8 +36,8 @@ import config
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
-from alttprbot.services import (accounts, api_tokens, audit, discord_directory, discord_servers, elections, mcp_auth,
-                                presets, seeds, tournament_submissions, triforce_texts)
+from alttprbot.services import (accounts, api_tokens, audit, discord_servers, elections, mcp_auth, presets, seeds,
+                                servers, tournament_submissions, triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -368,6 +368,51 @@ async def election_server_options(guild_id: int):
         channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in options['channels']],
         roles=[schemas.ServerOption(id=str(r['id']), name=r['name']) for r in options['roles']],
     )
+
+
+@app_api_blueprint.get('/servers')
+@tag(['servers'])
+@validate_response(schemas.AdminServerList)
+async def admin_servers():
+    """Servers the viewer administers that SahasrahBot is in. Empty means the web app hides the Servers tab."""
+    user = await require_user()
+    return schemas.AdminServerList(servers=[schemas.ServerOption(id=str(s['id']), name=s['name'])
+                                            for s in await servers.servers(await admin_guild_ids(user))])
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>')
+@tag(['servers'])
+@validate_response(schemas.ServerDetail)
+async def server_detail(guild_id: int):
+    """The server's name, channels and roles, for the Servers pages."""
+    user = await require_user()
+    d = await servers.detail(guild_id, user.id)
+    return schemas.ServerDetail(
+        id=str(d['id']), name=d['name'],
+        text_channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in d['text_channels']],
+        voice_channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in d['voice_channels']],
+        roles=[schemas.ServerRole(id=str(r['id']), name=r['name'], position=r['position'], assignable=r['assignable'])
+               for r in d['roles']],
+    )
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>/settings')
+@tag(['servers'])
+@validate_response(schemas.ServerSettings)
+async def get_server_settings(guild_id: int):
+    user = await require_user()
+    return schemas.ServerSettings(**await servers.settings(guild_id, user.id))
+
+
+@app_api_blueprint.put('/servers/<int:guild_id>/settings')
+@tag(['servers'])
+@validate_request(schemas.ServerSettingsIn)
+@validate_response(schemas.ServerSettings)
+async def put_server_settings(guild_id: int, data: schemas.ServerSettingsIn):
+    """Replace the server's settings."""
+    user = await require_user()
+    return schemas.ServerSettings(**await servers.update_settings(guild_id, user.id, data.daily_channels,
+                                                                  data.holy_image_game))
 
 
 @app_api_blueprint.get('/elections')
@@ -706,9 +751,7 @@ async def deny_oauth_request(txn: str):
 
 async def _directory_admin(guild_id: int) -> Caller:
     user = await require_user()
-    directory = discord_directory.get()
-    if not (await directory.is_owner(user.id) or await directory.is_admin(guild_id, user.id)):
-        raise PermissionDeniedError("Only the server's Administrators can change its server directory.")
+    await servers.require_admin(guild_id, user.id)
     return user
 
 

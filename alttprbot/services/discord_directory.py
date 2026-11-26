@@ -4,7 +4,7 @@ The Discord front end registers its implementation at startup
 (``alttprbot_discord.gateways.register()``); tests and the dev server register
 fakes. Every lookup works without privileged gateway intents.
 
-Elections use it to decide who may run an election (server Administrators and the
+Elections and the server admin pages (``alttprbot/services/servers.py``) use it to decide who may run an election (server Administrators and the
 bot owner), who may vote (server members, holding a role if one is set), which
 channels and roles the create form offers, and to post an election's message.
 """
@@ -17,6 +17,15 @@ from typing import Iterable, Optional, Protocol
 class Named:
     id: int
     name: str
+
+
+@dataclass(frozen=True)
+class RoleInfo:
+    id: int
+    name: str
+    position: int
+    #: Whether the bot can give the role: it has Manage Roles and the role is below its top role.
+    assignable: bool
 
 
 class Directory(Protocol):
@@ -45,6 +54,12 @@ class Directory(Protocol):
 
     async def roles(self, guild_id: int) -> list[Named]:
         """The server's roles, except @everyone and bot-managed ones."""
+
+    async def role_details(self, guild_id: int) -> list[RoleInfo]:
+        """Like ``roles``, with each role's position and whether the bot can assign it."""
+
+    async def voice_channels(self, guild_id: int) -> list[Named]:
+        """Voice and stage channels in the server."""
 
     async def post_election(self, election_id: int) -> int:
         """Post the election's message in its channel and return the message id.

@@ -144,6 +144,42 @@ class ServerOptions(BaseModel):
     roles: list[ServerOption]
 
 
+class AdminServerList(BaseModel):
+    servers: list[ServerOption] = Field(description="Servers the viewer administers that SahasrahBot is in")
+
+
+class ServerRole(BaseModel):
+    id: str
+    name: str
+    position: int = Field(description="Higher is above")
+    assignable: bool = Field(description="Whether SahasrahBot can give the role: it has Manage Roles and the role is below its top role")
+
+
+class ServerDetail(BaseModel):
+    id: str
+    name: str
+    text_channels: list[ServerOption] = Field(description="Text channels SahasrahBot can post in")
+    voice_channels: list[ServerOption]
+    roles: list[ServerRole] = Field(description="Every role except @everyone and bot-managed ones, highest first")
+
+
+class DailyChannel(BaseModel):
+    name: str = Field(description="Channel name, without #")
+    usable: bool = Field(description="False when the channel is gone or SahasrahBot can't post in it")
+
+
+class ServerSettings(BaseModel):
+    daily_channels: list[DailyChannel] = Field(description="Channels the ALTTPR daily challenge is announced in")
+    holy_image_game: Optional[str] = Field(description="The game /holyimage uses here when none is given; null for the default")
+    holy_image_fallback: str = Field(description="The game used when holy_image_game is null")
+    holy_image_games: list[str] = Field(description="Games with holy images; empty when the holy image site can't be reached")
+
+
+class ServerSettingsIn(BaseModel):
+    daily_channels: list[str] = Field(description="Channel names; empty turns the daily announcement off")
+    holy_image_game: Optional[str] = None
+
+
 class ElectionSummary(BaseModel):
     id: int
     title: str

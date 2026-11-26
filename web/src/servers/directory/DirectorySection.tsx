@@ -15,6 +15,7 @@ import {
   RowMenu,
 } from '../../components'
 import { ago } from '../../lib/time'
+import { useServer } from '../ServerContext'
 import './directory.css'
 
 export type ServerDirectory = GetBody<'/api/v1/servers/{guild_id}/directory'>
@@ -32,6 +33,12 @@ type Editing =
   | { kind: 'delete-category'; category: DirectoryCategory }
   | { kind: 'delete-server'; server: DirectoryServer }
   | { kind: 'post' }
+
+/** The section's route under `servers/:guildId`: the server comes from ServerScreen. */
+export function DirectoryRoute() {
+  const { server } = useServer()
+  return <DirectorySection guildId={server.id} channels={server.text_channels} />
+}
 
 /**
  * The "Server directory" section of a server's page: the partner servers
