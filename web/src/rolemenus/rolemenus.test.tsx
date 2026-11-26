@@ -47,6 +47,8 @@ function open(path: string, routes: Record<string, unknown> = {}) {
   return renderApp(path, {
     signedIn: USERS.alice,
     routes: {
+      'GET /api/v1/servers': { servers: [{ id: GUILD, name: 'ALTTPR Racing' }] },
+      [`GET /api/v1/servers/${GUILD}`]: { id: GUILD, name: 'ALTTPR Racing', text_channels: [], voice_channels: [], roles: [] },
       'GET /api/v1/role-menus': { menus: [menu(), LEGACY] },
       [`GET /api/v1/role-menus/servers/${GUILD}`]: SERVER,
       'GET /api/v1/role-menus/1': menu(),
@@ -124,7 +126,7 @@ describe('Role menu editor', () => {
       'POST /api/v1/role-menus': menu({ id: 5, title: 'Pronouns' }),
       'GET /api/v1/role-menus/5': menu({ id: 5, title: 'Pronouns' }),
     })
-    expect(await screen.findByRole('heading', { level: 1, name: 'New role menu' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 2, name: 'New role menu' })).toBeTruthy()
     await waitFor(() => expect((screen.getByLabelText('Channel') as HTMLSelectElement).value).toBe('701'))
     await user.type(screen.getByLabelText('Title'), 'Pronouns')
     await user.click(screen.getByLabelText(/^Dropdown/))
@@ -163,7 +165,7 @@ describe('Role menu editor', () => {
 
   it('needs an emoji for every role on a reactions menu', async () => {
     const { user } = open(`${LIST}/new`)
-    await screen.findByRole('heading', { level: 1, name: 'New role menu' })
+    await screen.findByRole('heading', { level: 2, name: 'New role menu' })
     await user.click(screen.getByLabelText(/^Reactions/))
     await user.click(screen.getByRole('button', { name: 'Add role' }))
     const dialog = await screen.findByRole('dialog')
@@ -174,7 +176,7 @@ describe('Role menu editor', () => {
 
   it('shows what the server says is wrong when posting fails', async () => {
     const { user } = open(`${LIST}/new`, { 'POST /api/v1/role-menus': fail(400, 'Give the menu at least one role.') })
-    await screen.findByRole('heading', { level: 1, name: 'New role menu' })
+    await screen.findByRole('heading', { level: 2, name: 'New role menu' })
     await waitFor(() => expect((screen.getByLabelText('Channel') as HTMLSelectElement).value).toBe('700'))
     await user.click(screen.getByRole('button', { name: 'Create and post' }))
     expect(await screen.findByText('Give the menu at least one role.')).toBeTruthy()
@@ -182,7 +184,7 @@ describe('Role menu editor', () => {
 
   it('edits, reorders and removes roles, then saves', async () => {
     const { api, user } = open(`${LIST}/1`, { 'PUT /api/v1/role-menus/1': menu() })
-    expect(await screen.findByRole('heading', { level: 1, name: 'Pings' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 2, name: 'Pings' })).toBeTruthy()
     expect(screen.getByText('Roles (2 of 25)')).toBeTruthy()
     await user.click(screen.getByRole('button', { name: 'Move Votes up' }))
     await user.click(screen.getByRole('button', { name: 'More for Races' }))
@@ -209,7 +211,7 @@ describe('Role menu editor', () => {
 
   it('keeps a menu on someone else’s message to reactions, and offers a repost', async () => {
     const { api, user } = open(`${LIST}/2`, { 'POST /api/v1/role-menus/2/repost': { ...LEGACY, posted_by_bot: true } })
-    expect(await screen.findByRole('heading', { level: 1, name: 'Racer role' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 2, name: 'Racer role' })).toBeTruthy()
     expect(screen.getByText(/didn't post, so it can only use reactions/)).toBeTruthy()
     expect((screen.getByLabelText(/^Buttons/) as HTMLInputElement).disabled).toBe(true)
     expect((screen.getByLabelText('Channel') as HTMLSelectElement).disabled).toBe(true)
@@ -240,9 +242,13 @@ describe('Role menu editor', () => {
   })
 })
 
-describe('Role menus signed out', () => {
-  it('sends the visitor to sign in', async () => {
-    const { assigned } = renderApp(`${LIST}/1`, { routes: {} })
-    await waitFor(() => expect(assigned[0]).toContain('/login/'))
+describe('Role menus in the Servers area', () => {
+  it('is a tab of the server page, kept active on its sub-pages', async () => {
+    open(`${LIST}/1`)
+    const tabs = await screen.findByRole('navigation', { name: 'Server sections' })
+    const tab = within(tabs).getByRole('link', { name: 'Role menus' })
+    expect(tab.getAttribute('href')).toBe(LIST)
+    expect(tab.getAttribute('aria-current')).toBe('page')
+    expect(await screen.findByRole('heading', { level: 1, name: 'ALTTPR Racing' })).toBeTruthy()
   })
 })

@@ -25,6 +25,7 @@ import FlagIcon from '@material-symbols/svg-400/outlined/flag.svg?react'
 import FolderIcon from '@material-symbols/svg-400/outlined/folder.svg?react'
 import FolderFillIcon from '@material-symbols/svg-400/outlined/folder-fill.svg?react'
 import ForumIcon from '@material-symbols/svg-400/outlined/forum.svg?react'
+import ForumFillIcon from '@material-symbols/svg-400/outlined/forum-fill.svg?react'
 import FullscreenIcon from '@material-symbols/svg-400/outlined/fullscreen.svg?react'
 import FullscreenExitIcon from '@material-symbols/svg-400/outlined/fullscreen_exit.svg?react'
 import GavelIcon from '@material-symbols/svg-400/outlined/gavel.svg?react'
@@ -121,6 +122,7 @@ export type IconName = keyof typeof ICONS
 export const FILLED: Partial<Record<IconName, Svg>> = {
   change_history: ChangeHistoryFillIcon,
   folder: FolderFillIcon,
+  forum: ForumFillIcon,
   home: HomeFillIcon,
   how_to_vote: HowToVoteFillIcon,
   person: PersonFillIcon,

@@ -28,10 +28,18 @@ export const ELECTIONS_TAB: Tab = {
   match: (p) => p.startsWith('/elections') && !p.endsWith('/results'),
 }
 
-/** The tabs a visitor sees: Elections only for someone who can run one. */
-export function tabsFor(canRunElections: boolean): Tab[] {
-  if (!canRunElections) return TABS
-  return [...TABS.slice(0, 2), ELECTIONS_TAB, ...TABS.slice(2)]
+/** Shown to server admins only, after Elections: the Servers area (web/src/servers/). */
+export const SERVERS_TAB: Tab = {
+  path: '/servers',
+  label: 'Servers',
+  icon: 'forum',
+  match: (p) => p.startsWith('/servers'),
+}
+
+/** The tabs a visitor sees: Elections and Servers only for someone who administers a server. */
+export function tabsFor(serverAdmin: boolean): Tab[] {
+  if (!serverAdmin) return TABS
+  return [...TABS.slice(0, 2), ELECTIONS_TAB, SERVERS_TAB, ...TABS.slice(2)]
 }
 
 export const DOCS_URL = 'https://sahasrahbot.synack.live/'
@@ -44,5 +52,6 @@ export function titleFor(pathname: string): string {
   if (pathname.startsWith('/triforcetexts')) return 'Triforce texts'
   if (pathname.startsWith('/submit')) return 'Race settings'
   if (pathname.startsWith('/audit')) return 'Audit log'
+  if (pathname.startsWith('/servers')) return 'Servers'
   return TABS.find((tab) => tab.match(pathname))?.label ?? 'SahasrahBot'
 }

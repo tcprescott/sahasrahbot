@@ -4,7 +4,7 @@ import { useSession } from '../auth/SessionProvider'
 
 /**
  * Whether the signed-in person administers a server SahasrahBot is in, so the
- * Elections tab is theirs to see. The shell asks once and hands the answer to
+ * Elections and Servers tabs are theirs to see. The shell asks once and hands the answer to
  * both copies of the nav.
  */
 export function useCanRunElections(): boolean {

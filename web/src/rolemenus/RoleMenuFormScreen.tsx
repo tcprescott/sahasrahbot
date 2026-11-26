@@ -230,6 +230,7 @@ function Form({ guildId, menu, onSaved }: Readonly<{ guildId: string; menu: Role
         Role menus
       </Link>
       <PageHeader
+        level={2}
         title={menu ? menu.title : 'New role menu'}
         lede={
           menu ? (

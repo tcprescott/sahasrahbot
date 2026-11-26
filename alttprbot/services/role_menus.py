@@ -30,6 +30,7 @@ from tortoise.transactions import in_transaction
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
 from alttprbot.services import audit, discord_directory
+from alttprbot.services import servers as server_access
 from alttprbot.services.discord_directory import Named
 
 logger = logging.getLogger(__name__)
@@ -129,13 +130,11 @@ def emoji_key(text: Optional[str]) -> Optional[str]:
 
 
 async def is_admin(guild_id: int, user_id: int) -> bool:
-    directory = discord_directory.get()
-    return await directory.is_owner(user_id) or await directory.is_admin(guild_id, user_id)
+    return await server_access.is_admin(guild_id, user_id)
 
 
 async def _require_admin(guild_id: int, user_id: int) -> None:
-    if not await is_admin(guild_id, user_id):
-        raise PermissionDeniedError("Only administrators of that server can manage its role menus.")
+    await server_access.require_admin(guild_id, user_id)
 
 
 async def _admin_menu(menu_id: int, user_id: int) -> models.RoleMenu:
