@@ -149,6 +149,7 @@ LINKS = [
     ("Triforce texts: submit", "/triforcetexts/dev"),
     ("Triforce texts: moderation (admin)", "/triforcetexts/dev/moderation"),
     ("Audit log (log in as admin)", "/audit"),
+    ("Server directory (log in as admin)", "/servers/100000000000000001/directory"),
     ("testdata: active role-gated election", "/ranked_choice/1004"),
     ("testdata: all preset namespaces", "/presets"),
     ("Racetime verification", "/racetime/verification/initiate"),

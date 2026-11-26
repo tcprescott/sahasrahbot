@@ -9,7 +9,10 @@ export interface ServerSection {
   label: string
 }
 
-export const SECTIONS: ServerSection[] = [{ key: 'settings', label: 'Settings' }]
+export const SECTIONS: ServerSection[] = [
+  { key: 'settings', label: 'Settings' },
+  { key: 'directory', label: 'Server directory' },
+]
 
 /** The section a server's page opens on. */
 export const FIRST_SECTION = 'settings'

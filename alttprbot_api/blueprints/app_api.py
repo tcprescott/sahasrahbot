@@ -36,8 +36,8 @@ import config
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
-from alttprbot.services import (accounts, api_tokens, audit, elections, mcp_auth, presets, seeds, servers,
-                                tournament_submissions, triforce_texts)
+from alttprbot.services import (accounts, api_tokens, audit, discord_servers, elections, mcp_auth, presets, seeds,
+                                servers, tournament_submissions, triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -752,3 +752,151 @@ async def deny_oauth_request(txn: str):
     """Turn the AI client away. Website only."""
     await require_session_user()
     return schemas.OAuthRedirect(redirect_url=mcp_auth.deny(txn))
+
+
+# --- Server directory ------------------------------------------------------------
+# The partner servers a server posts to its channels. Its Administrators edit it.
+
+
+async def _directory_admin(guild_id: int) -> Caller:
+    user = await require_user()
+    await servers.require_admin(guild_id, user.id)
+    return user
+
+
+async def _directory(guild_id: int) -> schemas.ServerDirectory:
+    directory = await discord_servers.get_directory(guild_id)
+    return schemas.ServerDirectory(
+        guild_id=str(guild_id),
+        categories=[schemas.DirectoryCategory(
+            id=entry.category.id,
+            title=entry.category.category_title,
+            description=entry.category.category_description,
+            channel_id=str(entry.category.channel_id),
+            servers=[schemas.DirectoryServer(id=s.id, invite_code=s.invite_id, description=s.server_description)
+                     for s in entry.servers],
+        ) for entry in directory.categories],
+        last_posted_at=directory.last_posted_at,
+        unposted_changes=directory.unposted_changes,
+        servers_per_message=discord_servers.SERVERS_PER_MESSAGE,
+    )
+
+
+def _channel_id(value: str) -> int:
+    if not value.isdigit():
+        raise InvalidInputError("Pick a channel.")
+    return int(value)
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>/directory')
+@tag(['servers'])
+@validate_response(schemas.ServerDirectory)
+async def get_server_directory(guild_id: int):
+    await _directory_admin(guild_id)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/directory/categories')
+@tag(['servers'])
+@validate_request(schemas.DirectoryCategoryIn)
+@validate_response(schemas.ServerDirectory, 201)
+async def create_directory_category(guild_id: int, data: schemas.DirectoryCategoryIn):
+    """Add a category at the end."""
+    await _directory_admin(guild_id)
+    await discord_servers.create_category(guild_id, _channel_id(data.channel_id), data.title, data.description)
+    return await _directory(guild_id), 201
+
+
+@app_api_blueprint.put('/servers/<int:guild_id>/directory/categories/<int:category_id>')
+@tag(['servers'])
+@validate_request(schemas.DirectoryCategoryIn)
+@validate_response(schemas.ServerDirectory)
+async def update_directory_category(guild_id: int, category_id: int, data: schemas.DirectoryCategoryIn):
+    await _directory_admin(guild_id)
+    await discord_servers.edit_category(guild_id, category_id, _channel_id(data.channel_id), data.title,
+                                        data.description)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.delete('/servers/<int:guild_id>/directory/categories/<int:category_id>')
+@tag(['servers'])
+@validate_response(schemas.ServerDirectory)
+async def delete_directory_category(guild_id: int, category_id: int):
+    """Delete a category and every server in it."""
+    await _directory_admin(guild_id)
+    await discord_servers.remove_category(guild_id, category_id)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.put('/servers/<int:guild_id>/directory/order')
+@tag(['servers'])
+@validate_request(schemas.DirectoryOrderIn)
+@validate_response(schemas.ServerDirectory)
+async def order_directory_categories(guild_id: int, data: schemas.DirectoryOrderIn):
+    """Put the categories in a new order."""
+    await _directory_admin(guild_id)
+    await discord_servers.reorder_categories(guild_id, data.ids)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.put('/servers/<int:guild_id>/directory/categories/<int:category_id>/order')
+@tag(['servers'])
+@validate_request(schemas.DirectoryOrderIn)
+@validate_response(schemas.ServerDirectory)
+async def order_directory_servers(guild_id: int, category_id: int, data: schemas.DirectoryOrderIn):
+    """Put a category's servers in a new order."""
+    await _directory_admin(guild_id)
+    await discord_servers.reorder_servers(guild_id, category_id, data.ids)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/directory/categories/<int:category_id>/servers')
+@tag(['servers'])
+@validate_request(schemas.DirectoryServerIn)
+@validate_response(schemas.ServerDirectory, 201)
+async def add_directory_server(guild_id: int, category_id: int, data: schemas.DirectoryServerIn):
+    """Check the invite with Discord and add the server at the end of the category."""
+    await _directory_admin(guild_id)
+    await discord_servers.add_server_from_invite(guild_id, category_id, data.invite, data.description)
+    return await _directory(guild_id), 201
+
+
+@app_api_blueprint.put('/servers/<int:guild_id>/directory/servers/<int:server_id>')
+@tag(['servers'])
+@validate_request(schemas.DirectoryServerUpdateIn)
+@validate_response(schemas.ServerDirectory)
+async def update_directory_server(guild_id: int, server_id: int, data: schemas.DirectoryServerUpdateIn):
+    await _directory_admin(guild_id)
+    await discord_servers.edit_server(guild_id, server_id, data.category_id, data.invite, data.description)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.delete('/servers/<int:guild_id>/directory/servers/<int:server_id>')
+@tag(['servers'])
+@validate_response(schemas.ServerDirectory)
+async def delete_directory_server(guild_id: int, server_id: int):
+    await _directory_admin(guild_id)
+    await discord_servers.remove_server(guild_id, server_id)
+    return await _directory(guild_id)
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>/directory/invite')
+@tag(['servers'])
+@validate_querystring(schemas.InviteQuery)
+@validate_response(schemas.DirectoryInvite)
+async def check_directory_invite(guild_id: int, query_args: schemas.InviteQuery):
+    """What Discord says about an invite, for the add-server form."""
+    await _directory_admin(guild_id)
+    info = await discord_servers.lookup_invite(query_args.invite)
+    return schemas.DirectoryInvite(code=info.code, server_name=info.server_name, member_count=info.member_count,
+                                   expires_at=info.expires_at)
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/directory/post')
+@tag(['servers'])
+@validate_response(schemas.DirectoryPosted)
+async def post_server_directory(guild_id: int):
+    """Delete SahasrahBot's messages in the directory's channels and post the list again."""
+    await _directory_admin(guild_id)
+    layout = await discord_servers.post(guild_id)
+    return schemas.DirectoryPosted(messages=len(layout.pages), channel_ids=[str(c) for c in layout.channel_ids])
