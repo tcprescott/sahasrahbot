@@ -165,12 +165,27 @@ def _scrub_event(event: Dict[str, Any]) -> Dict[str, Any]:
     return event
 
 
+def _is_user_facing(exc: Optional[BaseException], user_facing: type) -> bool:
+    """Whether ``exc``, or what it wraps, is a user-facing error.
+
+    discord.py wraps a command's exception in ``CommandInvokeError`` (and
+    ``HybridCommandError``), with the original as ``.original`` and ``__cause__``.
+    """
+    seen = set()
+    while exc is not None and id(exc) not in seen:
+        if isinstance(exc, user_facing):
+            return True
+        seen.add(id(exc))
+        exc = getattr(exc, 'original', None) or exc.__cause__
+    return False
+
+
 def before_send(event: Dict[str, Any], hint: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     """Drop user-facing errors, tag the surface, scrub what's left."""
     from alttprbot.exceptions import SahasrahBotException
 
     exc_info = (hint or {}).get('exc_info')
-    if exc_info and isinstance(exc_info[1], SahasrahBotException):
+    if exc_info and _is_user_facing(exc_info[1], SahasrahBotException):
         return None
     tags = event.setdefault('tags', {})
     if isinstance(tags, dict):
