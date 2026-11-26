@@ -22,9 +22,9 @@ from typing import Optional, Protocol
 import isodate
 
 from alttprbot import events, models
-from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError
+from alttprbot.exceptions import InvalidInputError, NotFoundError
 from alttprbot.integrations import alttprladder, racetime
-from alttprbot.services import audit, discord_directory
+from alttprbot.services import audit, discord_directory, servers
 
 logger = logging.getLogger(__name__)
 
@@ -222,18 +222,11 @@ class VerificationInput:
     audit_channel_id: Optional[int] = None
 
 
-async def _require_admin(guild_id: int, user_id: int) -> None:
-    directory = discord_directory.get()
-    if await directory.is_owner(user_id) or await directory.is_admin(guild_id, user_id):
-        return
-    raise PermissionDeniedError("Only administrators of that server can manage its racer verification.")
-
-
 async def _admin_verification(verification_id: int, user_id: int) -> models.RacerVerification:
     rv = await models.RacerVerification.get_or_none(id=verification_id)
     if rv is None:
         raise NotFoundError("That racer verification doesn't exist.")
-    await _require_admin(rv.guild_id, user_id)
+    await servers.require_admin(rv.guild_id, user_id)
     return rv
 
 
@@ -353,7 +346,7 @@ async def _names(guild_id: int) -> dict:
 
 async def list_for_guild(guild_id: int, user_id: int) -> list[dict]:
     """The server's verifications, for its Verification section."""
-    await _require_admin(guild_id, user_id)
+    await servers.require_admin(guild_id, user_id)
     names = await _names(guild_id)
     return [await _summary(rv, names)
             for rv in await models.RacerVerification.filter(guild_id=guild_id).order_by('id')]
@@ -370,7 +363,7 @@ async def _post(rv: models.RacerVerification) -> None:
 
 async def create(guild_id: int, user_id: int, data: VerificationInput) -> dict:
     """Save a new verification and post its button message."""
-    await _require_admin(guild_id, user_id)
+    await servers.require_admin(guild_id, user_id)
     _validate(data)
     await _check_ids(guild_id, data)
     if await models.RacerVerification.exists(guild_id=guild_id, role_id=data.role_id):

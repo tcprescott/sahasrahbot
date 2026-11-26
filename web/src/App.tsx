@@ -22,6 +22,7 @@ import { PurgeScreen } from './screens/PurgeScreen'
 import { ServerScreen } from './servers/ServerScreen'
 import { ServersScreen } from './servers/ServersScreen'
 import { SettingsSection } from './servers/SettingsSection'
+import { VerificationSection } from './servers/verification/VerificationSection'
 import { AppShell } from './shell/AppShell'
 import { ThemeProvider } from './theme/ThemeProvider'
 import { SubmissionScreen } from './tournament/SubmissionScreen'
@@ -51,6 +52,7 @@ export function App() {
                 <Route path="servers/:guildId" element={<ServerScreen />}>
                   <Route index element={<Navigate to="settings" replace />} />
                   <Route path="settings" element={<SettingsSection />} />
+                  <Route path="verification/*" element={<VerificationSection />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />
