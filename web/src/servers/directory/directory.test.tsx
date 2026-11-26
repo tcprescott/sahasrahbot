@@ -87,7 +87,7 @@ describe('server directory', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Add a server to Speedrunning' })
     await user.type(within(dialog).getByLabelText('Invite link'), 'https://discord.gg/zelda')
     await user.click(within(dialog).getByLabelText('Text shown in Discord'))
-    expect((await within(dialog).findByRole('status')).textContent).toContain('Invite works · never expires · 4,210 members')
+    expect((await within(dialog).findByText(/Invite works/)).textContent).toContain('Invite works · never expires · 4,210 members')
     expect(api.callsTo(`GET ${BASE}/invite`)[0]?.query.get('invite')).toBe('https://discord.gg/zelda')
     expect((within(dialog).getByLabelText('Text shown in Discord') as HTMLInputElement | HTMLSelectElement).value).toBe('Zelda Randomizer')
 

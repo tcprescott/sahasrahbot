@@ -96,7 +96,8 @@ async def test_directory_order_edits_and_unposted_changes(db, discord_side):
     assert [discord_servers.page_text(p) for p in layout.pages] == [
         "**__Randomizers__**\nSMZ3: https://discord.gg/smz3\nALTTPR: https://discord.gg/alttpr"]
     directory = await discord_servers.get_directory(GUILD)
-    assert directory.last_posted_at is not None and directory.unposted_changes is False
+    assert directory.last_posted_at is not None
+    assert directory.unposted_changes is False
 
     # Moving a server: it goes last in the other category, and only a new invite is checked.
     await discord_servers.edit_server(GUILD, alttpr.id, speed.id, "discord.gg/alttpr", "ALTTPR main")
@@ -247,7 +248,8 @@ async def test_api_edits_the_directory(client, login, directory, discord_side):
     status, body = await send_json(client, "POST", f"{BASE}/post", {})
     assert (status, body) == (200, {"messages": 1, "channel_ids": ["100"]})
     body = (await get_json(client, BASE))[1]
-    assert body["unposted_changes"] is False and body["last_posted_at"]
+    assert body["unposted_changes"] is False
+    assert body["last_posted_at"]
 
     assert (await send_json(client, "DELETE", f"{BASE}/servers/{b['id']}"))[0] == 200
     status, body = await send_json(client, "DELETE", f"{BASE}/categories/{cat['id']}")

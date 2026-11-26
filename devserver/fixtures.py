@@ -259,22 +259,7 @@ async def _seed_handmade():
     for position, name in enumerate(["Classic", "Chaos", "Friendly"]):
         await models.RankedChoiceCandidate.create(election=draft, name=name, position=position)
 
-    # --- Server directory (/servers/<id>/directory) -------------------------------
-    directory = [
-        (CHANNEL_PARTNERS, "Randomizer communities", "Main hubs for each randomizer.", [
-            ("alttprandomizer", "ALTTPR, the main community"), ("smz3", "Super Metroid + ALTTP combo randomizer"),
-            ("ootrandomizer", "OoTR"), ("smrando", "VARIA and Total randomizers")]),
-        (CHANNEL_PARTNERS, "Tournaments and leagues", None, [
-            ("speedgaming", "Restreams for most ALTTPR tournaments"), ("alttprleague", "Team league, seasons twice a year")]),
-        (CHANNEL_OTHER_SERVERS, "Speedrunning", "Non-randomized runs of the same games.", [
-            ("alttp", "Any%, 100% and the rest")]),
-    ]
-    for order, (channel_id, title, note, servers) in enumerate(directory):
-        category = await models.DiscordServerCategories.create(
-            guild_id=GUILD_ID, channel_id=channel_id, category_title=title, category_description=note, order=order)
-        for position, (invite, text) in enumerate(servers):
-            await models.DiscordServerLists.create(category=category, invite_id=invite, server_description=text,
-                                                   order=position)
+    await _seed_server_directory()
 
     # --- Tournament games (/api/tournament/games) ---------------------------------
     for episode_id, game in [(1001, 1), (1002, 2)]:
@@ -317,3 +302,24 @@ async def _seed_audit_log():
             created_at=now - datetime.timedelta(minutes=minutes), action=action,
             actor_discord_id=user(who)["id"] if who else None, actor_name=user(who)["name"] if who else None,
             via=via, via_detail=detail, guild_id=guild, target=target, details=details)
+
+
+async def _seed_server_directory():
+    """The dev server's partner-server directory (/servers/<id>/directory)."""
+    from alttprbot import models
+
+    directory = [
+        (CHANNEL_PARTNERS, "Randomizer communities", "Main hubs for each randomizer.", [
+            ("alttprandomizer", "ALTTPR, the main community"), ("smz3", "Super Metroid + ALTTP combo randomizer"),
+            ("ootrandomizer", "OoTR"), ("smrando", "VARIA and Total randomizers")]),
+        (CHANNEL_PARTNERS, "Tournaments and leagues", None, [
+            ("speedgaming", "Restreams for most ALTTPR tournaments"), ("alttprleague", "Team league, seasons twice a year")]),
+        (CHANNEL_OTHER_SERVERS, "Speedrunning", "Non-randomized runs of the same games.", [
+            ("alttp", "Any%, 100% and the rest")]),
+    ]
+    for order, (channel_id, title, note, servers) in enumerate(directory):
+        category = await models.DiscordServerCategories.create(
+            guild_id=GUILD_ID, channel_id=channel_id, category_title=title, category_description=note, order=order)
+        for position, (invite, text) in enumerate(servers):
+            await models.DiscordServerLists.create(category=category, invite_id=invite, server_description=text,
+                                                   order=position)

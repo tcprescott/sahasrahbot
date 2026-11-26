@@ -552,7 +552,7 @@ function ServerDialog({
         </Field>
         {checking && <p className="muted">Checking the invite with Discord…</p>}
         {!checking && checked?.invite && checked.text === invite.trim() && (
-          <div className="dir-found" role="status">
+          <output className="dir-found">
             <span className="dir-av" aria-hidden>
               {initials(checked.invite.server_name)}
             </span>
@@ -565,7 +565,7 @@ function ServerDialog({
               </span>
             </span>
             <Icon name="check_circle" />
-          </div>
+          </output>
         )}
         {!checking && checked?.error && checked.text === invite.trim() && <Banner tone="error">{checked.error}</Banner>}
         <Field label="Text shown in Discord" hint={`Posted as “${description.trim() || 'Text'}: https://discord.gg/${shownCode}”.`}>
