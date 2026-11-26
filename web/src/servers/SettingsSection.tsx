@@ -34,12 +34,12 @@ const same = (a: Draft, b: Draft) => a.game === b.game && a.daily.join(',') === 
 function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
   const { server } = useServer()
   const [saved, setSaved] = useState(initial)
-  const [draft, setDraftState] = useState(() => draftOf(initial))
+  const [draft, setDraft] = useState(() => draftOf(initial))
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ tone: 'accent' | 'error'; text: string }>()
   // An edit clears the last save's message.
-  const setDraft = (next: Draft) => {
-    setDraftState(next)
+  const edit = (next: Draft) => {
+    setDraft(next)
     setNotice(undefined)
   }
 
@@ -61,7 +61,7 @@ function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
         }),
       )
       setSaved(next)
-      setDraftState(draftOf(next))
+      setDraft(draftOf(next))
       setNotice({ tone: 'accent', text: 'Settings saved.' })
     } catch (e) {
       setNotice({ tone: 'error', text: (e as Error).message })
@@ -88,7 +88,7 @@ function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
                       <button
                         type="button"
                         aria-label={`Remove #${name}`}
-                        onClick={() => setDraft({ ...draft, daily: draft.daily.filter((n) => n !== name) })}
+                        onClick={() => edit({ ...draft, daily: draft.daily.filter((n) => n !== name) })}
                       >
                         <Icon name="close" size={16} />
                       </button>
@@ -103,7 +103,7 @@ function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
               value=""
               disabled={addable.length === 0}
               aria-describedby="daily-hint"
-              onChange={(e) => e.target.value && setDraft({ ...draft, daily: [...draft.daily, e.target.value] })}
+              onChange={(e) => e.target.value && edit({ ...draft, daily: [...draft.daily, e.target.value] })}
             >
               <option value="">{addable.length ? 'Add a channel…' : 'No other channels SahasrahBot can post in'}</option>
               {addable.map((name) => (
@@ -137,7 +137,7 @@ function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
               className="input"
               value={draft.game}
               aria-describedby="holy-hint"
-              onChange={(e) => setDraft({ ...draft, game: e.target.value })}
+              onChange={(e) => edit({ ...draft, game: e.target.value })}
             >
               <option value="">{saved.holy_image_fallback} (the default)</option>
               {games
@@ -159,7 +159,7 @@ function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
       <div className="server-settings__save">
         {dirty && <span>Unsaved changes</span>}
         {dirty && (
-          <Button variant="outline" onClick={() => setDraft(draftOf(saved))} disabled={busy}>
+          <Button variant="outline" onClick={() => edit(draftOf(saved))} disabled={busy}>
             Discard
           </Button>
         )}

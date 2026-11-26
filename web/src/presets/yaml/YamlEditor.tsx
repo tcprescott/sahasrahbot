@@ -6,7 +6,7 @@ import { Compartment, EditorState } from '@codemirror/state'
 import { drawSelection, EditorView, highlightActiveLine, highlightActiveLineGutter, keymap } from '@codemirror/view'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Icon, type IconName } from '../../components'
-import { LoadYamlButton, type YamlFieldProps } from '../YamlField'
+import { LoadYamlButton, type LoadFile, type YamlFieldProps } from '../YamlField'
 import { loadHints } from './hintsCache'
 import { spotAt, suggestionsFor, type Hint } from './hints'
 import { findYamlProblem, type YamlProblem } from './problem'
@@ -18,7 +18,7 @@ import { yamlBasics } from './setup'
  * thing that doesn't parse, and suggestions from SahasrahBot's own presets.
  * YamlField loads it lazily, so the rest of the app doesn't carry CodeMirror.
  */
-export default function YamlEditor({ value, onChange, onProblem, randomizer, labelId }: Readonly<YamlFieldProps & { labelId: string }>) {
+export default function YamlEditor({ value, onChange, onProblem, randomizer, labelId, loadFile }: Readonly<YamlFieldProps & { labelId: string; loadFile: LoadFile }>) {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const hints = useRef<readonly Hint[]>([])
@@ -145,7 +145,7 @@ export default function YamlEditor({ value, onChange, onProblem, randomizer, lab
         <span className="field__label grow" id={labelId}>
           Preset YAML
         </span>
-        <LoadYamlButton onLoad={onChange} />
+        <LoadYamlButton onLoad={loadFile} />
         <ToolButton icon="wrap_text" label="Wrap lines" pressed={wrap} onClick={() => setWrap(!wrap)} />
         <ToolButton
           icon={folded ? 'unfold_more' : 'unfold_less'}

@@ -22,6 +22,7 @@ import { NotFoundScreen } from './screens/NotFoundScreen'
 import { PurgeScreen } from './screens/PurgeScreen'
 import { ServerScreen } from './servers/ServerScreen'
 import { ServersScreen } from './servers/ServersScreen'
+import { DirectoryRoute } from './servers/directory/DirectorySection'
 import { SettingsSection } from './servers/SettingsSection'
 import { AppShell } from './shell/AppShell'
 import { ThemeProvider } from './theme/ThemeProvider'
@@ -55,6 +56,7 @@ export function App() {
                   <Route path="role-menus" element={<RoleMenusRoute />} />
                   <Route path="role-menus/new" element={<RoleMenuEditorRoute />} />
                   <Route path="role-menus/:menuId" element={<RoleMenuEditorRoute />} />
+                  <Route path="directory" element={<DirectoryRoute />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />

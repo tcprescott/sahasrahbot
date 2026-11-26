@@ -98,6 +98,11 @@ class PresetContent(BaseModel):
     content: str = Field(max_length=200_000)
 
 
+class CustomizerSave(BaseModel):
+    """The text of an alttpr.com customizer save file (JSON)."""
+    content: str = Field(max_length=2_000_000)
+
+
 class Candidate(BaseModel):
     id: int
     name: str
@@ -501,3 +506,64 @@ class AuditEntry(BaseModel):
 class AuditPage(BaseModel):
     entries: list[AuditEntry]
     next_before: Optional[int] = Field(None, description="Pass as `before` for the next page; null on the last.")
+
+
+# --- Server directory ------------------------------------------------------------
+
+
+class DirectoryServer(BaseModel):
+    id: int
+    invite_code: str = Field(description="The invite code; the link is https://discord.gg/<code>.")
+    description: str = Field(description="The text posted beside the link.")
+
+
+class DirectoryCategory(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = Field(default=None, description="A note shown only on the website.")
+    channel_id: str = Field(description="The channel the category is posted in.")
+    servers: list[DirectoryServer]
+
+
+class ServerDirectory(BaseModel):
+    """A server's directory of partner servers, in the order it's posted."""
+    guild_id: str
+    categories: list[DirectoryCategory]
+    last_posted_at: Optional[datetime] = None
+    unposted_changes: bool = Field(description="Changed since it was last posted, so Discord shows an older list.")
+    servers_per_message: int
+
+
+class DirectoryCategoryIn(BaseModel):
+    title: str
+    description: Optional[str] = None
+    channel_id: str
+
+
+class DirectoryServerIn(BaseModel):
+    invite: str = Field(description="An invite link or code. It's checked with Discord.")
+    description: str
+
+
+class DirectoryServerUpdateIn(DirectoryServerIn):
+    category_id: int = Field(description="Another category of the same server moves it there, at the end.")
+
+
+class DirectoryOrderIn(BaseModel):
+    ids: list[int] = Field(description="Every category (or every server in the category), in the new order.")
+
+
+class DirectoryInvite(BaseModel):
+    code: str
+    server_name: str
+    member_count: Optional[int] = None
+    expires_at: Optional[datetime] = None
+
+
+class InviteQuery(BaseModel):
+    invite: str
+
+
+class DirectoryPosted(BaseModel):
+    messages: int
+    channel_ids: list[str]

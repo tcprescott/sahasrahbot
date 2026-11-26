@@ -1,3 +1,4 @@
+import { useMemo, type ReactNode } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { api, unwrap } from '../api/client'
 import { Loaded } from '../api/Loaded'
@@ -6,6 +7,7 @@ import { RequireSignIn } from '../auth/SessionProvider'
 import { Icon } from '../components'
 import { initials } from './initials'
 import { ServerContext } from './ServerContext'
+import type { ServerDetail } from '../api/client'
 import { SECTIONS, serverPath } from './sections'
 import './servers.css'
 
@@ -35,7 +37,7 @@ function Server() {
       </nav>
       <Loaded query={query} label="Loading the server" notFound="SahasrahBot isn't in that server.">
         {(server) => (
-          <ServerContext.Provider value={{ server, reload: query.reload }}>
+          <ServerProvider server={server} reload={query.reload}>
             <header className="server-head">
               <span className="server-badge" aria-hidden="true">
                 {initials(server.name)}
@@ -65,9 +67,14 @@ function Server() {
               ))}
             </nav>
             <Outlet />
-          </ServerContext.Provider>
+          </ServerProvider>
         )}
       </Loaded>
     </>
   )
+}
+
+function ServerProvider({ server, reload, children }: Readonly<{ server: ServerDetail; reload: () => void; children: ReactNode }>) {
+  const value = useMemo(() => ({ server, reload }), [server, reload])
+  return <ServerContext.Provider value={value}>{children}</ServerContext.Provider>
 }

@@ -17,6 +17,7 @@ from alttprbot import models
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.services import discord_servers as servers_service
 from alttprbot.services import guild_config
+from alttprbot_discord import server_directory
 from alttprbot_discord.cogs import discord_servers as servers_cog
 from alttprbot_discord.cogs import inquiry as inquiry_cog
 from alttprbot_discord.cogs import misc as misc_cog
@@ -79,7 +80,7 @@ async def test_discordservers_servers(db, guild):
 
     listed = FakeInteraction(guild=guild)
     await call(cog.list_servers, cog, listed, cat.id)
-    [server] = await servers_service.list_servers(cat.id)
+    [server] = await servers_service.list_servers(1, cat.id)
     assert [(f.name, f.value) for f in listed.sent().embed.fields] == [("The ALTTPR server", f"_*Id:*_ {server.id}")]
 
     bot.fetch_invite.return_value = SimpleNamespace(id="xyz", guild=SimpleNamespace(name="ALTTPR"))
@@ -92,8 +93,12 @@ async def test_discordservers_servers(db, guild):
     assert empty.sent().content == f"No servers found for category {cat.id}"
 
 
-async def test_discordservers_refresh_posts_each_page(db, guild):
+async def test_discordservers_refresh_posts_each_page(db, guild, monkeypatch):
     bot = FakeBot()
+    bot.get_guild = lambda gid: guild
+    monkeypatch.setattr(servers_service, "_lookup_invite", None)
+    monkeypatch.setattr(servers_service, "_poster", None)
+    server_directory.register(bot)
     cog = servers_cog.DiscordServers(bot)
     big = await servers_service.add_category(1, 100, "Big")
     small = await servers_service.add_category(1, 101, "Small")

@@ -298,3 +298,11 @@ async def test_website_only_routes_refuse_tokens(rest, method, path, body):
     assert resp.status_code == 403
     assert "not with a token" in (await resp.get_json())["error"]
 
+
+
+async def test_read_only_token_can_convert_a_customizer_save(rest):
+    raw, _ = await api_tokens.create_personal_token(ALICE, "alice", "script", True, None)
+    resp = await rest.post("/api/v1/presets/customizer", json={"content": '{"randomizer.goal": "ganon"}'},
+                           headers=bearer(raw))
+    assert resp.status_code == 200, await resp.get_data()
+    assert "customizer: true" in (await resp.get_json())["content"]
