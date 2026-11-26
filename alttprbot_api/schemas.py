@@ -185,6 +185,34 @@ class ServerSettingsIn(BaseModel):
     holy_image_game: Optional[str] = None
 
 
+class Inquiry(BaseModel):
+    message_id: str
+    channel_id: Optional[str]
+    channel_name: Optional[str] = Field(description="Null when the channel is gone or SahasrahBot can't post there")
+    role_id: str
+    role_name: Optional[str] = Field(description="Null when the role is gone")
+    created: Optional[datetime]
+    jump_url: Optional[str] = Field(description="The message in Discord")
+
+
+class InquiryList(BaseModel):
+    inquiries: list[Inquiry]
+
+
+class InquiryIn(BaseModel):
+    channel_id: str
+    role_id: str
+
+
+class InquiryCheck(BaseModel):
+    ok: bool
+    text: str = Field(description="What passes, or what to fix")
+
+
+class InquiryChecks(BaseModel):
+    checks: list[InquiryCheck]
+
+
 class ElectionSummary(BaseModel):
     id: int
     title: str

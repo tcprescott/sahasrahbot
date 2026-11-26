@@ -136,6 +136,7 @@ SERVER_LIST_POSTED = 'server_list.posted'
 RACER_VERIFICATION_CONFIGURED = 'racer_verification.configured'
 RACER_VERIFICATION_VERIFIED = 'racer_verification.verified'
 INQUIRY_CREATED = 'inquiry.created'
+INQUIRY_REMOVED = 'inquiry.removed'
 API_TOKEN_CREATED = 'api_token.created'
 API_TOKEN_REVOKED = 'api_token.revoked'
 AI_CLIENT_CONNECTED = 'ai_client.connected'
@@ -182,6 +183,7 @@ ACTIONS: dict[str, str] = {
     RACER_VERIFICATION_CONFIGURED: 'Set up racer verification',
     RACER_VERIFICATION_VERIFIED: 'Was verified as a racer',
     INQUIRY_CREATED: 'Set up an inquiry message',
+    INQUIRY_REMOVED: 'Removed an inquiry message',
     API_TOKEN_CREATED: 'Made an API token',
     API_TOKEN_REVOKED: 'Revoked an API token',
     AI_CLIENT_CONNECTED: 'Connected an AI client',

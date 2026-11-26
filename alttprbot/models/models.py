@@ -117,6 +117,11 @@ class DiscordServerCategories(Model):
 class InquiryMessageConfig(Model):
     message_id = fields.BigIntField(primary_key=True, generated=False)
     role_id = fields.BigIntField(null=False)
+    # Unknown (null) for buttons posted before 2026-11: they still work, but the
+    # website can't list them.
+    guild_id = fields.BigIntField(null=True)
+    channel_id = fields.BigIntField(null=True)
+    created = fields.DatetimeField(auto_now_add=True, null=True)
 
 
 class PatchDistribution(Model):

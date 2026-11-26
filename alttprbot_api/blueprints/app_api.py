@@ -36,8 +36,8 @@ import config
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
-from alttprbot.services import (accounts, api_tokens, audit, discord_servers, elections, mcp_auth, presets, seeds,
-                                servers, tournament_submissions, triforce_texts)
+from alttprbot.services import (accounts, api_tokens, audit, discord_servers, elections, inquiries, mcp_auth, presets,
+                                seeds, servers, tournament_submissions, triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -47,7 +47,7 @@ CSRF_HEADER = 'X-Requested-With'
 CSRF_VALUE = 'SahasrahBot'
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 # POSTs a read-only token may make: they change nothing that's the caller's.
-READ_ONLY_POSTS = frozenset({'app_api.roll_seed', 'app_api.convert_customizer'})
+READ_ONLY_POSTS = frozenset({'app_api.roll_seed', 'app_api.convert_customizer', 'app_api.check_inquiry'})
 
 
 @dataclass(frozen=True)
@@ -422,6 +422,61 @@ async def put_server_settings(guild_id: int, data: schemas.ServerSettingsIn):
     user = await require_user()
     return schemas.ServerSettings(**await servers.update_settings(guild_id, user.id, data.daily_channels,
                                                                   data.holy_image_game))
+
+
+def _inquiry(guild_id: int, i: dict) -> schemas.Inquiry:
+    return schemas.Inquiry(
+        message_id=str(i['message_id']), channel_id=str(i['channel_id']) if i['channel_id'] else None,
+        channel_name=i['channel_name'], role_id=str(i['role_id']), role_name=i['role_name'], created=i['created'],
+        jump_url=(f"https://discord.com/channels/{guild_id}/{i['channel_id']}/{i['message_id']}"
+                  if i['channel_id'] else None),
+    )
+
+
+def _discord_id(value: str) -> int:
+    if not value.isdigit():
+        raise InvalidInputError("Pick a channel and a role from the lists.")
+    return int(value)
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>/inquiries')
+@tag(['servers'])
+@validate_response(schemas.InquiryList)
+async def list_inquiries(guild_id: int):
+    """The server's inquiry buttons (those posted since SahasrahBot started remembering their server)."""
+    user = await require_user()
+    return schemas.InquiryList(inquiries=[_inquiry(guild_id, i) for i in await inquiries.list_for_guild(guild_id, user.id)])
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/inquiries/check')
+@tag(['servers'])
+@validate_request(schemas.InquiryIn)
+@validate_response(schemas.InquiryChecks)
+async def check_inquiry(guild_id: int, data: schemas.InquiryIn):
+    """Whether an inquiry button would work in that channel for that role. Changes nothing."""
+    user = await require_user()
+    checks = await inquiries.check(guild_id, user.id, _discord_id(data.channel_id), _discord_id(data.role_id))
+    return schemas.InquiryChecks(checks=[schemas.InquiryCheck(ok=c.ok, text=c.text) for c in checks])
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/inquiries')
+@tag(['servers'])
+@validate_request(schemas.InquiryIn)
+@validate_response(schemas.Inquiry, 201)
+async def post_inquiry(guild_id: int, data: schemas.InquiryIn):
+    """Post an inquiry button in the channel. Refused unless every check passes."""
+    user = await require_user()
+    posted = await inquiries.post(guild_id, user.id, _discord_id(data.channel_id), _discord_id(data.role_id))
+    return _inquiry(guild_id, posted), 201
+
+
+@app_api_blueprint.delete('/servers/<int:guild_id>/inquiries/<int:message_id>')
+@tag(['servers'])
+async def delete_inquiry(guild_id: int, message_id: int):
+    """Delete the inquiry button's message. Threads it opened stay."""
+    user = await require_user()
+    await inquiries.remove(guild_id, user.id, message_id)
+    return '', 204
 
 
 @app_api_blueprint.get('/elections')

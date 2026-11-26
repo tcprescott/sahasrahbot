@@ -188,6 +188,16 @@ class FakeChannel:
     async def send(self, content=None, **kwargs):  # NOSONAR
         return record(f"#{self.name}", content=content, **kwargs)
 
+    #: Channels where @everyone can read but not post, so inquiry checks show both outcomes.
+    READ_ONLY = ("async-reports", "elections")
+
+    def permissions_for(self, who):
+        # The bot and every role may do anything, except @everyone posting in READ_ONLY.
+        if self.guild is not None and who is self.guild.default_role:
+            return discord.Permissions(view_channel=True, send_messages_in_threads=True,
+                                       send_messages=self.name not in self.READ_ONLY)
+        return discord.Permissions.all()
+
     async def fetch_message(self, message_id):  # NOSONAR
         return FakeMessage({"id": int(message_id), "content": None, "target": f"#{self.name}"})
 
