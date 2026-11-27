@@ -86,7 +86,6 @@ ALTTPR_BASEURL = "https://alttpr.com"
 ALTTPR_USERNAME = ""
 ALTTPR_PASSWORD = ""
 ALTTP_ROM = ""  # Path to a JP 1.0 ROM, needed by the door randomizer.
-MULTIWORLDHOSTBASE = ""
 SPOILERLOGURLBASE = ""
 SAHASRAHBOT_BUCKET = ""
 AWS_SPOILER_BUCKET_NAME = ""
