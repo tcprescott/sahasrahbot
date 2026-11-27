@@ -21,6 +21,7 @@ import { NotFoundScreen } from './screens/NotFoundScreen'
 import { PurgeScreen } from './screens/PurgeScreen'
 import { ServerScreen } from './servers/ServerScreen'
 import { ServersScreen } from './servers/ServersScreen'
+import { DirectoryRoute } from './servers/directory/DirectorySection'
 import { SettingsSection } from './servers/SettingsSection'
 import { VerificationSection } from './servers/verification/VerificationSection'
 import { AppShell } from './shell/AppShell'
@@ -53,6 +54,7 @@ export function App() {
                   <Route index element={<Navigate to="settings" replace />} />
                   <Route path="settings" element={<SettingsSection />} />
                   <Route path="verification/*" element={<VerificationSection />} />
+                  <Route path="directory" element={<DirectoryRoute />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />

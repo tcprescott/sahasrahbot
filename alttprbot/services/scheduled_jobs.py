@@ -7,7 +7,7 @@ the job does the work and publishes events, and a subscriber does any Discord ou
 from typing import Optional
 
 import config
-from alttprbot.services import daily, elections, racer_verification, tournament_jobs
+from alttprbot.services import daily, elections, inquiries, racer_verification, tournament_jobs
 from alttprbot.services.scheduler import Gate, Scheduler
 
 MINUTE = 60
@@ -32,6 +32,10 @@ def register_jobs(scheduler: Scheduler, discord_ready: Optional[Gate] = None) ->
     # Verified racers whose "recheck every N days" has come round, a batch per server per hour.
     scheduler.add_interval_job('racer_verification.recheck_due', racer_verification.recheck_due,
                                seconds=HOUR, wait_for=discord_ready)
+
+    # Inquiry messages from before migration 103 don't know their channel; find it.
+    scheduler.add_interval_job('inquiries.locate_older_messages', inquiries.locate_older_messages,
+                               seconds=12 * HOUR, wait_for=discord_ready)
 
     scheduler.add_interval_job('tournament.create_races', tournament_jobs.create_races,
                                seconds=_tournament_interval(5 * MINUTE), wait_for=discord_ready)

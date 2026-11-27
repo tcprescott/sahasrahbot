@@ -125,6 +125,7 @@ def test_register_jobs_registers_every_job():
         'daily.check_for_new_daily',
         'elections.close_due',
         'racer_verification.recheck_due',
+        'inquiries.locate_older_messages',
         'tournament.create_races',
         'tournament.week_races',
         'tournament.record_races',

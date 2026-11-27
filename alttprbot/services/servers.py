@@ -89,39 +89,53 @@ async def settings(guild_id: int, user_id: int) -> dict:
     }
 
 
+async def _checked_daily_channels(guild_id: int, daily_channels: list[str], current: list[str]) -> list[str]:
+    """The daily channel names to save, without ``#`` or repeats. A channel that's
+    already set may stay even if the bot can't post there now; a new one has to be
+    somewhere it can."""
+    names = list(dict.fromkeys(name.strip().lstrip('#') for name in daily_channels if name.strip().lstrip('#')))
+    if any(',' in name for name in names):
+        raise InvalidInputError("Channel names can't contain commas.")
+    usable = {c.name.lstrip('#') for c in await discord_directory.get().text_channels(guild_id)}
+    unknown = [name for name in names if name not in usable and name not in current]
+    if unknown:
+        raise InvalidInputError(f"SahasrahBot can't post in #{unknown[0]}. Pick a channel from the list.")
+    return names
+
+
+async def _checked_holy_image_game(holy_image_game: Optional[str]) -> Optional[str]:
+    """The game to save, or None for the default. Any game is taken while the holy
+    image site can't be reached to check it."""
+    game = (holy_image_game or '').strip()
+    if not game:
+        return None
+    games = await holy_image_games()
+    if games and game not in games:
+        raise InvalidInputError(f"There are no holy images for “{game}”.")
+    return game
+
+
+async def _save(guild_id: int, parameter: str, value: Optional[str]) -> None:
+    """Store ``value``, or remove the setting for None; nothing when it's unchanged."""
+    if value == await guild_config.get(guild_id, parameter):
+        return
+    if value is None:
+        await guild_config.delete_value(guild_id, parameter)
+    else:
+        await guild_config.set_value(guild_id, parameter, value)
+
+
 async def update_settings(guild_id: int, user_id: int, daily_channels: list[str],
                           holy_image_game: Optional[str]) -> dict:
     """Replace the server's settings. ``daily_channels`` are channel names (with or
     without ``#``); an empty list turns the daily announcement off. A ``None`` or empty
-    ``holy_image_game`` goes back to the default."""
+    ``holy_image_game`` goes back to the default. Nothing is saved unless both are valid."""
     await require_admin(guild_id, user_id)
-
-    names = list(dict.fromkeys(name.strip().lstrip('#') for name in daily_channels if name.strip().lstrip('#')))
-    if any(',' in name for name in names):
-        raise InvalidInputError("Channel names can't contain commas.")
     current = _split(await guild_config.get(guild_id, DAILY_ANNOUNCER_CHANNEL))
-    usable = {c.name.lstrip('#') for c in await discord_directory.get().text_channels(guild_id)}
-    # A channel that's already set may stay even if the bot can't post there now;
-    # a new one has to be somewhere it can.
-    unknown = [name for name in names if name not in usable and name not in current]
-    if unknown:
-        raise InvalidInputError(f"SahasrahBot can't post in #{unknown[0]}. Pick a channel from the list.")
-    game = (holy_image_game or '').strip()
-    if game:
-        games = await holy_image_games()
-        if games and game not in games:
-            raise InvalidInputError(f"There are no holy images for “{game}”.")
+    names = await _checked_daily_channels(guild_id, daily_channels, current)
+    game = await _checked_holy_image_game(holy_image_game)
 
-    # Everything checks out: save.
     if names != current:
-        if names:
-            await guild_config.set_value(guild_id, DAILY_ANNOUNCER_CHANNEL, ','.join(names))
-        else:
-            await guild_config.delete_value(guild_id, DAILY_ANNOUNCER_CHANNEL)
-    if game:
-        if game != await guild_config.get(guild_id, HOLY_IMAGE_DEFAULT_GAME):
-            await guild_config.set_value(guild_id, HOLY_IMAGE_DEFAULT_GAME, game)
-    elif await guild_config.get(guild_id, HOLY_IMAGE_DEFAULT_GAME) is not None:
-        await guild_config.delete_value(guild_id, HOLY_IMAGE_DEFAULT_GAME)
-
+        await _save(guild_id, DAILY_ANNOUNCER_CHANNEL, ','.join(names) or None)
+    await _save(guild_id, HOLY_IMAGE_DEFAULT_GAME, game)
     return await settings(guild_id, user_id)

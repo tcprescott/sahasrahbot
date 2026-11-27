@@ -8,6 +8,16 @@ from discord.interactions import Interaction
 
 import config
 from alttprbot.services import inquiries
+from alttprbot_discord.inquiries import channel_checks
+
+
+def inquiry_message(role) -> str:
+    """The text of an inquiry button's message (/inquiry and the website)."""
+    return (
+        "To **submit an inquiry**, click the 📬 button below, then click \"Yes!\" button in the next message to confirm.\n\n"
+        f"This will open an inquiry visible to members of {role.mention}\n\n"
+        "Thanks!"
+    )
 
 
 class ConfirmInquiryThread(discord.ui.View):
@@ -18,6 +28,7 @@ class ConfirmInquiryThread(discord.ui.View):
                        custom_id="sahasrahbot:open_inquiry")
     async def openthread(self, interaction: discord.Interaction, button: discord.ui.Button):
         role_id = await inquiries.role_for_message(interaction.message.id)
+        await inquiries.note_location(interaction.message.id, interaction.guild_id, interaction.channel_id)
         role = interaction.guild.get_role(role_id)
         view = OpenInquiryThread(role_id)
 
@@ -128,38 +139,20 @@ class Inquiry(commands.Cog):
                                                     ephemeral=True)
             return
 
-        if not interaction.channel.permissions_for(interaction.guild.me).create_private_threads:
-            await interaction.response.send_message(
-                "This bot needs permission to create private threads in this channel.", ephemeral=True)
-            return
-
-        if interaction.channel.permissions_for(interaction.guild.default_role).send_messages:
-            await interaction.response.send_message(
-                "`@everyone` should not be allowed to send messages in this channel.", ephemeral=True)
-            return
-
-        if not interaction.channel.permissions_for(interaction.guild.default_role).send_messages_in_threads:
-            await interaction.response.send_message("`@everyone` needs to be able to send messages in threads.",
-                                                    ephemeral=True)
-            return
-
-        if not interaction.channel.permissions_for(role).read_messages:
-            await interaction.response.send_message(f"{role.mention} is not allowed to see this channel.",
-                                                    ephemeral=True,
+        failing = [c for c in channel_checks(interaction.channel, role, interaction.guild.me,
+                                             interaction.guild.default_role) if not c.ok]
+        if failing:
+            await interaction.response.send_message(failing[0].text, ephemeral=True,
                                                     allowed_mentions=discord.AllowedMentions(roles=False))
             return
 
         await interaction.response.send_message(
-            content=(
-                "To **submit an inquiry**, click the 📬 button below, then click \"Yes!\" button in the next message to confirm.\n\n"
-                f"This will open an inquiry visible to members of {role.mention}\n\n"
-                "Thanks!"
-            ),
+            content=inquiry_message(role),
             view=ConfirmInquiryThread(),
             allowed_mentions=discord.AllowedMentions(roles=False)
         )
         original_message = await interaction.original_response()
-        await inquiries.register(original_message.id, role.id, interaction.guild_id)
+        await inquiries.register(original_message.id, role.id, interaction.guild_id, interaction.channel.id)
 
 
 # discord.py passes the interaction to every check, used or not.

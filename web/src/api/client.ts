@@ -45,6 +45,12 @@ export type ServerOption = GetBody<'/api/v1/elections/servers'>['servers'][numbe
 export type ServerDetail = GetBody<'/api/v1/servers/{guild_id}'>
 export type ServerRole = ServerDetail['roles'][number]
 export type ServerSettings = GetBody<'/api/v1/servers/{guild_id}/settings'>
+export type Inquiry = GetBody<'/api/v1/servers/{guild_id}/inquiries'>['inquiries'][number]
+/** One line of POST /servers/{guild_id}/inquiries/check. */
+export interface InquiryCheck {
+  ok: boolean
+  text: string
+}
 export type TriforcePool = GetBody<'/api/v1/triforce-texts/{pool}'>
 export type TriforceText = TriforcePool['mine'][number]
 export type SubmissionForm = GetBody<'/api/v1/tournaments/{event}/submission-form'>

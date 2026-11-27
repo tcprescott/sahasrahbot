@@ -34,6 +34,7 @@ export function renderApp(path: string, { signedIn = null, routes = {}, phone = 
   // jsdom can't leave the page; record where the app sends the browser instead.
   const assigned: string[] = []
   vi.spyOn(browser, 'assign').mockImplementation((url) => void assigned.push(url))
+  vi.spyOn(browser, 'openTab').mockImplementation((url) => void assigned.push(url))
   const api = fakeApi(routes, signedIn)
   const result = render(<App />)
   return { ...result, api, assigned, user: userEvent.setup() }

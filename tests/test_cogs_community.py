@@ -17,6 +17,7 @@ from alttprbot import models
 from alttprbot.exceptions import SahasrahBotException
 from alttprbot.services import discord_servers as servers_service
 from alttprbot.services import guild_config, reaction_roles
+from alttprbot_discord import server_directory
 from alttprbot_discord.cogs import discord_servers as servers_cog
 from alttprbot_discord.cogs import inquiry as inquiry_cog
 from alttprbot_discord.cogs import misc as misc_cog
@@ -79,7 +80,7 @@ async def test_discordservers_servers(db, guild):
 
     listed = FakeInteraction(guild=guild)
     await call(cog.list_servers, cog, listed, cat.id)
-    [server] = await servers_service.list_servers(cat.id)
+    [server] = await servers_service.list_servers(1, cat.id)
     assert [(f.name, f.value) for f in listed.sent().embed.fields] == [("The ALTTPR server", f"_*Id:*_ {server.id}")]
 
     bot.fetch_invite.return_value = SimpleNamespace(id="xyz", guild=SimpleNamespace(name="ALTTPR"))
@@ -92,8 +93,12 @@ async def test_discordservers_servers(db, guild):
     assert empty.sent().content == f"No servers found for category {cat.id}"
 
 
-async def test_discordservers_refresh_posts_each_page(db, guild):
+async def test_discordservers_refresh_posts_each_page(db, guild, monkeypatch):
     bot = FakeBot()
+    bot.get_guild = lambda gid: guild
+    monkeypatch.setattr(servers_service, "_lookup_invite", None)
+    monkeypatch.setattr(servers_service, "_poster", None)
+    server_directory.register(bot)
     cog = servers_cog.DiscordServers(bot)
     big = await servers_service.add_category(1, 100, "Big")
     small = await servers_service.add_category(1, 101, "Small")
@@ -144,6 +149,20 @@ async def test_mention_reacts_with_sahasrahbot_emoji(monkeypatch):
 
     mentioned.add_reaction.assert_awaited_once_with(bot.emojis[0])
     ignored.add_reaction.assert_not_awaited()
+
+
+async def test_mention_reaction_refused_is_ignored(monkeypatch):
+    """Where the bot can't use its own server's emoji, Discord answers 10014 Unknown Emoji."""
+    monkeypatch.setattr(misc_cog.asyncio, "sleep", mock.AsyncMock())
+    bot = FakeBot(emojis=[emoji("SahasrahBot")])
+    cog = misc_cog.Misc(bot)
+    mentioned = FakeMessage()
+    mentioned.mentions = [bot.user]
+    mentioned.add_reaction.side_effect = discord.HTTPException(mock.Mock(status=400), "Unknown Emoji")
+
+    await cog.on_message(mentioned)
+
+    mentioned.add_reaction.assert_awaited_once()
 
 
 HOLY_IMAGES = {
@@ -486,10 +505,11 @@ def inquiry_channel(guild, user, role):
     "who, perms, message",
     [
         ("user", permissions(), "You must have manage threads permission"),
-        ("me", permissions(), "This bot needs permission to create private threads"),
-        ("everyone", permissions(send_messages=True, send_messages_in_threads=True), "should not be allowed to send"),
-        ("everyone", permissions(), "needs to be able to send messages in threads"),
-        ("role", permissions(), "<@&500> is not allowed to see this channel."),
+        ("me", permissions(), "SahasrahBot needs permission to create private threads in #general."),
+        ("everyone", permissions(send_messages=True, send_messages_in_threads=True),
+         "@everyone can send messages in #general. Turn that off"),
+        ("everyone", permissions(), "@everyone needs to be able to send messages in threads"),
+        ("role", permissions(), "@Role can't see #general, so nobody would be there to answer."),
     ],
 )
 async def test_inquiry_permission_checks(db, who, perms, message):
@@ -518,6 +538,8 @@ async def test_inquiry_posts_message_and_saves_role(db):
     assert isinstance(sent.view, inquiry_cog.ConfirmInquiryThread)
     saved = await models.InquiryMessageConfig.get(message_id=interaction.original.id)
     assert saved.role_id == 500
+    assert saved.guild_id == guild.id
+    assert saved.channel_id == interaction.channel.id  # so the website can list it
 
 
 async def test_inquiry_buttons_lead_to_the_modal(db):
@@ -530,6 +552,9 @@ async def test_inquiry_buttons_lead_to_the_modal(db):
     sent = interaction.sent()
     assert sent.content.startswith("This will open a private thread to <@&500>")
     assert sent.ephemeral is True
+    # An older message learns where it is when pressed, so the website can list it.
+    saved = await models.InquiryMessageConfig.get(message_id=700)
+    assert (saved.guild_id, saved.channel_id) == (guild.id, interaction.channel.id)
 
     yes = FakeInteraction(guild=guild)
     await sent.view.yes.callback(yes)

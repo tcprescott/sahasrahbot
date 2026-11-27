@@ -5,7 +5,7 @@ from discord.ext import commands
 from alttprbot.services import discord_servers
 
 
-class DiscordServers(commands.GroupCog, name="discordservers", description="Manage catagories."):
+class DiscordServers(commands.GroupCog, name="discordservers", description="Manage the server directory (also on the website, under Servers)."):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
@@ -46,7 +46,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.guild_only()
     @app_commands.checks.has_permissions(administrator=True)
     async def remove_category(self, interaction: discord.Interaction, category_id: int):
-        await discord_servers.remove_category(category_id)
+        await discord_servers.remove_category(interaction.guild.id, category_id)
         await interaction.response.send_message(f"Removed category {category_id}", ephemeral=True)
 
     @app_commands.command()
@@ -54,7 +54,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
     @app_commands.checks.has_permissions(administrator=True)
     async def update_category(self, interaction: discord.Interaction, category_id: int, category_title: str,
                               category_description: str, order: int = 0):
-        await discord_servers.update_category(category_id, category_title, category_description, order)
+        await discord_servers.update_category(interaction.guild.id, category_id, category_title, category_description, order)
         await interaction.response.send_message(f"Updated category {category_id}", ephemeral=True)
 
     @app_commands.command()
@@ -77,7 +77,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         """
         List all servers in a category.
         """
-        results = await discord_servers.list_servers(category_id)
+        results = await discord_servers.list_servers(interaction.guild.id, category_id)
 
         if results:
             embed = discord.Embed(
@@ -101,7 +101,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         """
         Remove a server from the discord server list.
         """
-        await discord_servers.remove_server(server_id)
+        await discord_servers.remove_server(interaction.guild.id, server_id)
         await interaction.response.send_message(f"Removed server {server_id}", ephemeral=True)
 
     @app_commands.command()
@@ -113,7 +113,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         Update a server in the discord server list.
         """
         invite = await self.bot.fetch_invite(invite_url)
-        await discord_servers.update_server(server_id, invite.id, category_id, server_description)
+        await discord_servers.update_server(interaction.guild.id, server_id, invite.id, category_id, server_description)
         await interaction.response.send_message(f"Updated server {server_id}", ephemeral=True)
 
     @app_commands.command()
@@ -124,25 +124,7 @@ class DiscordServers(commands.GroupCog, name="discordservers", description="Mana
         Refresh the discord server list.
         """
         await interaction.response.defer()
-
-        def is_me(m):
-            return m.author == self.bot.user
-
-        layout = await discord_servers.server_list_layout(interaction.guild.id)
-
-        for c in layout.channel_ids:
-            channel = discord.utils.get(interaction.guild.channels, id=c)
-            await channel.purge(limit=100, check=is_me)
-
-        for page in layout.pages:
-            channel = discord.utils.get(interaction.guild.channels, id=page.channel_id)
-            msgs = [
-                f"**__{page.category_title}__**" if page.part_count == 1
-                else f"**__{page.category_title} - Part {page.part}__**"
-            ]
-            msgs += [f"{s.server_description}: https://discord.gg/{s.invite_id}" for s in page.servers]
-            await channel.send('\n'.join(msgs))
-
+        await discord_servers.post(interaction.guild.id)
         await interaction.followup.send(f"Refreshed server list for {interaction.guild.name}", ephemeral=True)
 
 
