@@ -102,7 +102,7 @@ describe('Role menu list', () => {
   })
 
   it('jumps to the message in Discord', async () => {
-    const opened = vi.spyOn(browser, 'open').mockImplementation(() => {})
+    const opened = vi.spyOn(browser, 'openTab').mockImplementation(() => {})
     const { user } = open(LIST)
     await screen.findByRole('link', { name: 'Pings' })
     await user.click(screen.getAllByRole('button', { name: 'More for Pings' })[0]!)

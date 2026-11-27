@@ -63,7 +63,7 @@ export function RoleMenusSection({ guildId }: Readonly<{ guildId: string }>) {
           const url = messageUrl(m)
           return [
             { label: 'Edit', icon: 'edit', onSelect: () => navigate(editPath(guildId, m.id)) },
-            ...(url ? [{ label: 'Jump to the message', icon: 'open_in_new' as const, onSelect: () => browser.open(url) }] : []),
+            ...(url ? [{ label: 'Jump to the message', icon: 'open_in_new' as const, onSelect: () => browser.openTab(url) }] : []),
             { label: 'Repost in Discord', icon: 'refresh', onSelect: () => setPending({ kind: 'repost', menu: m }) },
             { label: 'Delete', icon: 'delete', destructive: true, onSelect: () => setPending({ kind: 'delete', menu: m }) },
           ]

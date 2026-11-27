@@ -541,7 +541,7 @@ async def test_api_round_trip(client, login, world):  # noqa: F811
 
 async def test_migration_copies_reaction_roles_with_their_ids():
     """The SQL is MySQL's; check what it copies and skips by reading it."""
-    migration = importlib.import_module("migrations.models.101_20261126170000_role_menus")
+    migration = importlib.import_module("migrations.models.104_20261127150000_role_menus")
     sql = await migration.upgrade(None)
     assert "INSERT INTO `role_menu` (`id`," in sql and "FROM `reaction_group`" in sql
     assert "'reactions'" in sql and "COALESCE(`bot_managed`, 0) <> 0" in sql

@@ -213,7 +213,7 @@ function Form({ guildId, menu, onSaved }: Readonly<{ guildId: string; menu: Role
   const url = menu ? messageUrl(menu) : undefined
   const actions: MenuItem[] = menu
     ? [
-        ...(url ? [{ label: 'Jump to the message', icon: 'open_in_new' as const, onSelect: () => browser.open(url) }] : []),
+        ...(url ? [{ label: 'Jump to the message', icon: 'open_in_new' as const, onSelect: () => browser.openTab(url) }] : []),
         { label: 'Repost in Discord', icon: 'refresh', onSelect: () => setConfirm('repost') },
         { label: 'Delete menu', icon: 'delete', destructive: true, onSelect: () => setConfirm('delete') },
       ]
