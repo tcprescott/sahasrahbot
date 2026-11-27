@@ -11,7 +11,10 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from typing import Optional
 
+import json
+
 import aiofiles
+import pyz3r.customizer
 import yaml
 from tortoise.functions import Count
 from tortoise.query_utils import Prefetch
@@ -181,6 +184,27 @@ async def save_preset(namespace_name: str, randomizer: str, preset_name: str, co
                            target=f"{namespace.name}/{preset_name}",
                            details={'randomizer': randomizer, 'namespace': namespace.name, 'preset': preset_name})
     return {**_summary(namespace, preset), 'content': preset.content, 'can_edit': True}
+
+
+CUSTOMIZER_KEY_PREFIXES = ('randomizer.', 'vt.custom.')
+
+
+async def convert_customizer(text: str) -> str:
+    """Turn an alttpr.com customizer save file (JSON) into SahasrahBot preset YAML.
+
+    The same conversion as Discord's ``/alttprutils convertcustomizer``. Saves nothing.
+    """
+    try:
+        save = json.loads(text)
+    except ValueError as err:
+        raise InvalidInputError("That file isn't valid JSON, so it can't be a customizer save.") from err
+    if not isinstance(save, dict) or not any(str(key).startswith(CUSTOMIZER_KEY_PREFIXES) for key in save):
+        raise InvalidInputError("That file isn't an ALTTPR customizer save. Save one from the customizer on alttpr.com.")
+    try:
+        settings = pyz3r.customizer.convert2settings(save)
+    except (AttributeError, TypeError, ValueError, KeyError) as err:
+        raise InvalidInputError("That customizer save has settings SahasrahBot can't read.") from err
+    return yaml.dump({'customizer': True, 'randomizer': 'alttpr', 'settings': settings})
 
 
 async def delete_preset(namespace_name: str, randomizer: str, preset_name: str, viewer: Viewer) -> None:

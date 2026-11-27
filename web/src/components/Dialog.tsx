@@ -56,6 +56,8 @@ interface FormDialogProps extends Omit<DialogProps, 'footer'> {
   onPrimary: () => void
   busy?: boolean
   busyLabel?: string
+  /** The primary can't be pressed yet (say why in the dialog). */
+  primaryDisabled?: boolean
   cancelLabel?: string
   /** Anything beyond Cancel and the primary goes in a ⋮ at the far left. */
   extra?: MenuItem[]
@@ -68,6 +70,7 @@ export function FormDialog({
   onPrimary,
   busy,
   busyLabel,
+  primaryDisabled = false,
   cancelLabel = 'Cancel',
   extra,
   destructive,
@@ -83,7 +86,13 @@ export function FormDialog({
           <Button variant="ghost" onClick={() => dialog.onOpenChange(false)}>
             {cancelLabel}
           </Button>
-          <Button variant={destructive ? 'danger' : 'primary'} onClick={onPrimary} busy={busy} busyLabel={busyLabel}>
+          <Button
+            variant={destructive ? 'danger' : 'primary'}
+            onClick={onPrimary}
+            busy={busy}
+            busyLabel={busyLabel}
+            disabled={primaryDisabled}
+          >
             {primaryLabel}
           </Button>
         </>

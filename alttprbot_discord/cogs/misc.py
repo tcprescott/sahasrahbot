@@ -3,6 +3,8 @@ import datetime
 import random
 import zoneinfo
 
+import logging
+
 import discord
 from aiocache import cached, Cache
 from discord import app_commands
@@ -12,6 +14,8 @@ import config
 from alttprbot.integrations import holyimage as holyimage_api
 from alttprbot.services import guild_config
 from alttprbot_discord.util.holyimage import HolyImage
+
+logger = logging.getLogger(__name__)
 
 
 ALTTP_RANDOMIZER_SERVERS = list(map(int, config.ALTTP_RANDOMIZER_SERVERS.split(',')))
@@ -46,8 +50,8 @@ WELCOME_MESSAGES = {
 }
 
 
-@cached(ttl=300, cache=Cache.MEMORY, key="holygamedefault")
 async def holy_game_default(guild: discord.Guild):
+    # guild_config caches per server and forgets on change (the Servers page sets it).
     return await guild_config.get(guild.id, "HolyImageDefaultGame", "z3r")
 
 
@@ -66,7 +70,14 @@ class Misc(commands.Cog):
             emoji = discord.utils.get(self.bot.emojis, name='SahasrahBot')
             if emoji:
                 await asyncio.sleep(random.random() * 5)
-                await message.add_reaction(emoji)
+                try:
+                    await message.add_reaction(emoji)
+                except discord.HTTPException as e:
+                    # The emoji lives on SahasrahBot's own server. Where the bot lacks
+                    # "Use External Emojis" (or "Add Reactions"), or the author blocked
+                    # it, Discord refuses with 10014 Unknown Emoji or 403. The reaction
+                    # is only a flourish, so skip it.
+                    logger.debug("Could not react to a mention: %s", e)
 
     @app_commands.command(description="Welcome messages for various languages.")
     @app_commands.describe(language="Choose a language for the welcome message.")

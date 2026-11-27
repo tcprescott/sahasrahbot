@@ -20,6 +20,10 @@ import { MeScreen } from './screens/MeScreen'
 import { NotFoundScreen } from './screens/NotFoundScreen'
 import { PurgeScreen } from './screens/PurgeScreen'
 import { SeedsScreen } from './seeds/SeedsScreen'
+import { ServerScreen } from './servers/ServerScreen'
+import { ServersScreen } from './servers/ServersScreen'
+import { DirectoryRoute } from './servers/directory/DirectorySection'
+import { SettingsSection } from './servers/SettingsSection'
 import { AppShell } from './shell/AppShell'
 import { ThemeProvider } from './theme/ThemeProvider'
 import { SubmissionScreen } from './tournament/SubmissionScreen'
@@ -44,6 +48,13 @@ export function App() {
                 <Route path="me" element={<MeScreen />} />
                 <Route path="me/api" element={<ApiAccessScreen />} />
                 <Route path="audit" element={<AuditScreen />} />
+                <Route path="servers" element={<ServersScreen />} />
+                {/* A server's sections (servers/sections.ts): each is a child route here. */}
+                <Route path="servers/:guildId" element={<ServerScreen />}>
+                  <Route index element={<Navigate to="settings" replace />} />
+                  <Route path="settings" element={<SettingsSection />} />
+                  <Route path="directory" element={<DirectoryRoute />} />
+                </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
                 <Route path="seeds" element={<SeedsScreen />} />
                 <Route path="seeds/:hash" element={<SeedsScreen />} />

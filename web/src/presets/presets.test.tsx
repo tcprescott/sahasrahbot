@@ -244,6 +244,31 @@ describe('one preset', () => {
     await waitFor(() => expect(editor.text()).toBe('from: file\n'))
   })
 
+  it('converts a customizer save loaded into an alttpr preset', async () => {
+    const { user, api } = renderApp(`${path}?edit=1`, {
+      routes: { [`GET ${PRESET}`]: preset(), 'POST /api/v1/presets/customizer': { content: 'customizer: true\n' } },
+    })
+    const editor = await findYamlEditor()
+    const input = main().querySelector<HTMLInputElement>('input[type=file]')!
+    await user.upload(input, new File(['{"randomizer.goal": "ganon"}'], 'save.json', { type: 'application/json' }))
+    await waitFor(() => expect(editor.text()).toBe('customizer: true\n'))
+    expect(api.callsTo('POST /api/v1/presets/customizer')[0]?.body).toEqual({ content: '{"randomizer.goal": "ganon"}' })
+    expect(main().textContent).toContain('Converted save.json from an ALTTPR customizer save. Check the YAML, then save.')
+  })
+
+  it("won't put a customizer save into another randomizer's preset", async () => {
+    const smz3 = `${NS}/smz3/normal`
+    const { user, api } = renderApp('/presets/manage/alice/smz3/normal?edit=1', {
+      routes: { [`GET ${smz3}`]: preset({ randomizer: 'smz3', name: 'normal' }) },
+    })
+    const editor = await findYamlEditor()
+    const input = main().querySelector<HTMLInputElement>('input[type=file]')!
+    await user.upload(input, new File(['{}'], 'save.json', { type: 'application/json' }))
+    expect((await screen.findByRole('alert')).textContent).toContain('save.json is an ALTTPR customizer save, and this preset is for smz3.')
+    expect(editor.text()).toBe('settings:\n  mode: open\n')
+    expect(api.callsTo('POST /api/v1/presets/customizer')).toEqual([])
+  })
+
   it('downloads from the Actions menu', async () => {
     const { user, assigned } = renderApp(path, { routes: { [`GET ${PRESET}`]: preset() } })
     await user.click(await screen.findByRole('button', { name: 'Actions' }))
@@ -332,6 +357,43 @@ describe('new preset', () => {
     await user.click(screen.getByRole('button', { name: 'Save preset' }))
     expect((await screen.findByRole('alert')).textContent).toContain("That isn't valid YAML.")
     expect(screen.getByRole('button', { name: 'Save preset' }).hasAttribute('disabled')).toBe(false)
+  })
+
+  it('converts a customizer save and switches the randomizer to alttpr', async () => {
+    const { user } = renderApp('/presets/alice/create', {
+      signedIn: USERS.alice,
+      routes: { ...routes, 'POST /api/v1/presets/customizer': { content: 'customizer: true\nrandomizer: alttpr\n' } },
+    })
+    const randomizer = await screen.findByRole('combobox', { name: 'Randomizer' })
+    await user.selectOptions(randomizer, 'smz3')
+    const editor = await findYamlEditor()
+    const input = main().querySelector<HTMLInputElement>('input[type=file]')!
+    // No .json name: recognised by its customizer keys.
+    await user.upload(input, new File(['{"vt.custom.name": "x"}'], 'customizer-settings', { type: 'application/json' }))
+    await waitFor(() => expect(editor.text()).toBe('customizer: true\nrandomizer: alttpr\n'))
+    expect((randomizer as HTMLSelectElement).value).toBe('alttpr')
+    expect(main().textContent).toContain('Randomizer is set to alttpr; check the YAML, then save.')
+  })
+
+  it('shows why a customizer save could not be converted', async () => {
+    const { user } = renderApp('/presets/alice/create', {
+      signedIn: USERS.alice,
+      routes: { ...routes, 'POST /api/v1/presets/customizer': fail(400, "That file isn't an ALTTPR customizer save.") },
+    })
+    const editor = await findYamlEditor()
+    const input = main().querySelector<HTMLInputElement>('input[type=file]')!
+    await user.upload(input, new File(['[]'], 'list.json', { type: 'application/json' }))
+    expect((await screen.findByRole('alert')).textContent).toContain("That file isn't an ALTTPR customizer save.")
+    expect(editor.text()).toBe('')
+  })
+
+  it('loads a YAML file that starts with a brace as YAML', async () => {
+    const { user, api } = renderApp('/presets/alice/create', { signedIn: USERS.alice, routes })
+    const editor = await findYamlEditor()
+    const input = main().querySelector<HTMLInputElement>('input[type=file]')!
+    await user.upload(input, new File(['{settings: {mode: open}}'], 'flow.yaml', { type: 'text/yaml' }))
+    await waitFor(() => expect(editor.text()).toBe('{settings: {mode: open}}'))
+    expect(api.callsTo('POST /api/v1/presets/customizer')).toEqual([])
   })
 
   it('goes back to the namespace on Cancel', async () => {

@@ -569,13 +569,15 @@ class TextChannel:
 class Guild:
     def __init__(self, guild_id, name, members, me=True):
         self.id, self.name, self._members = guild_id, name, members
-        self.me = object() if me else None
+        # The bot's member: Manage Roles, top role at position 4.
+        self.me = SimpleNamespace(guild_permissions=SimpleNamespace(manage_roles=True),
+                                  top_role=SimpleNamespace(position=4)) if me else None
 
     @property
     def channels(self):
         # The gateway cache: channel types discord.py doesn't know are left out of it.
         return [TextChannel(2, "second", 2), TextChannel(1, "first", 1), TextChannel(3, "locked", 3, can_post=False),
-                SimpleNamespace(id=4, name="voice", type=discord.ChannelType.voice)]
+                SimpleNamespace(id=4, name="voice", type=discord.ChannelType.voice, position=4)]
 
     async def fetch_roles(self):
         return [Role(1, "@everyone", 0, default=True), Role(2, "Mods", 5), Role(3, "Voters", 2), Role(4, "Bot", 3,
@@ -625,6 +627,13 @@ async def test_directory_lookups(bot):
     assert await d.text_channels(999) == []
     assert [r.name for r in await d.roles(GUILD)] == ["@Mods", "@Voters"]
     assert await d.roles(999) == []
+    # Mods is above the bot's top role (4), so the bot can't give it.
+    assert [(r.name, r.position, r.assignable) for r in await d.role_details(GUILD)] == [
+        ("@Mods", 5, False), ("@Voters", 2, True)]
+    assert all(r.assignable for r in await d.role_details(THIRD_GUILD))  # no bot member: nothing to compare
+    assert await d.role_details(999) == []
+    assert [c.name for c in await d.voice_channels(GUILD)] == ["voice"]
+    assert await d.voice_channels(OTHER_GUILD) == []
 
 
 async def test_directory_posts_and_registers(db, bot, monkeypatch):
