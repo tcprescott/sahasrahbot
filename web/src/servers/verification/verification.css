@@ -1,0 +1,71 @@
+/* Racer verification section (servers/verification). */
+.rv-intro {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.rv-intro p {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--fg-muted);
+}
+.rv-role {
+  font-weight: 700;
+}
+.rv-sub {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+}
+.rv-problem {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 2px;
+  color: var(--status-pending);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.rv-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.rv-title {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+.rv-head p {
+  margin: 0;
+}
+.rv-tabs {
+  display: flex;
+  gap: 4px;
+  margin: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+.rv-tab {
+  padding: 10px 14px;
+  border-bottom: 3px solid transparent;
+  color: var(--fg-secondary);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rv-tab.active {
+  border-bottom-color: var(--accent);
+  color: var(--link);
+}
+.rv-toolbar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.rv-search {
+  max-width: 280px;
+}

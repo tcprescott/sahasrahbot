@@ -63,6 +63,8 @@ export type OAuthRequest = GetBody<'/api/v1/oauth/requests/{txn}'>
 export type AuditOptions = GetBody<'/api/v1/audit/options'>
 export type AuditPage = GetBody<'/api/v1/audit'>
 export type AuditEntry = AuditPage['entries'][number]
+export type RacerVerification = GetBody<'/api/v1/racer-verifications/{verification_id}'>
+export type VerifiedRacer = GetBody<'/api/v1/racer-verifications/{verification_id}/racers'>['racers'][number]
 
 export class ApiError extends Error {
   constructor(

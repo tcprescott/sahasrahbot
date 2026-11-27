@@ -37,8 +37,7 @@ from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
 from alttprbot.services import (accounts, api_tokens, audit, discord_servers, elections, inquiries, mcp_auth, presets,
-                                role_menus,
-                                seeds, servers, tournament_submissions, triforce_texts)
+                                racer_verification, role_menus, seeds, servers, tournament_submissions, triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -1075,3 +1074,127 @@ async def post_server_directory(guild_id: int):
     await _directory_admin(guild_id)
     layout = await discord_servers.post(guild_id)
     return schemas.DirectoryPosted(messages=len(layout.pages), channel_ids=[str(c) for c in layout.channel_ids])
+
+
+# --- Racer verification ---------------------------------------------------------------
+
+def _str_id(value) -> Optional[str]:
+    return None if value is None else str(value)
+
+
+def racer_verification_out(data: dict) -> schemas.RacerVerification:
+    return schemas.RacerVerification(**{
+        **data,
+        'guild_id': str(data['guild_id']),
+        'role_id': str(data['role_id']),
+        'channel_id': _str_id(data['channel_id']),
+        'message_id': _str_id(data['message_id']),
+        'audit_channel_id': _str_id(data['audit_channel_id']),
+    })
+
+
+def verified_racer_out(data: dict) -> schemas.VerifiedRacer:
+    return schemas.VerifiedRacer(**{**data, 'discord_user_id': _str_id(data['discord_user_id'])})
+
+
+def racer_verification_input(data: schemas.RacerVerificationIn) -> racer_verification.VerificationInput:
+    return racer_verification.VerificationInput(
+        role_id=_int_id(data.role_id, 'role'),
+        channel_id=_int_id(data.channel_id, 'channel'),
+        racetime_categories=data.racetime_categories,
+        use_alttpr_ladder=data.use_alttpr_ladder,
+        minimum_races=data.minimum_races,
+        time_period_days=data.time_period_days,
+        reverify_period_days=data.reverify_period_days,
+        revoke_ineligible=data.revoke_ineligible,
+        audit_channel_id=_int_id(data.audit_channel_id, 'channel'),
+    )
+
+
+@app_api_blueprint.get('/servers/<int:guild_id>/racer-verifications')
+@tag(['racer verification'])
+@validate_response(schemas.RacerVerificationList)
+async def list_racer_verifications(guild_id: int):
+    """The server's verified-racer roles. Server Administrators only."""
+    user = await require_user()
+    return schemas.RacerVerificationList(
+        verifications=[racer_verification_out(v) for v in await racer_verification.list_for_guild(guild_id, user.id)],
+        racetime_categories=list(racer_verification.RACETIME_CATEGORIES),
+    )
+
+
+@app_api_blueprint.post('/servers/<int:guild_id>/racer-verifications')
+@tag(['racer verification'])
+@validate_request(schemas.RacerVerificationIn)
+@validate_response(schemas.RacerVerification, 201)
+async def create_racer_verification(guild_id: int, data: schemas.RacerVerificationIn):
+    """Set up racer verification for a role and post its Verify button in the channel."""
+    user = await require_user()
+    return racer_verification_out(
+        await racer_verification.create(guild_id, user.id, racer_verification_input(data))), 201
+
+
+@app_api_blueprint.get('/racer-verifications/<int:verification_id>')
+@tag(['racer verification'])
+@validate_response(schemas.RacerVerification)
+async def get_racer_verification(verification_id: int):
+    user = await require_user()
+    return racer_verification_out(await racer_verification.get_for_admin(verification_id, user.id))
+
+
+@app_api_blueprint.put('/racer-verifications/<int:verification_id>')
+@tag(['racer verification'])
+@validate_request(schemas.RacerVerificationIn)
+@validate_response(schemas.RacerVerification)
+async def update_racer_verification(verification_id: int, data: schemas.RacerVerificationIn):
+    """Change the settings. The Discord message is updated (or posted anew in a new channel)."""
+    user = await require_user()
+    return racer_verification_out(
+        await racer_verification.update(verification_id, user.id, racer_verification_input(data)))
+
+
+@app_api_blueprint.delete('/racer-verifications/<int:verification_id>')
+@tag(['racer verification'])
+async def delete_racer_verification(verification_id: int):
+    """Delete it, its Discord message and its list of verified racers. Nobody loses the role."""
+    user = await require_user()
+    await racer_verification.delete(verification_id, user.id)
+    return '', 204
+
+
+@app_api_blueprint.post('/racer-verifications/<int:verification_id>/repost')
+@tag(['racer verification'])
+@validate_response(schemas.RacerVerification)
+async def repost_racer_verification(verification_id: int):
+    """Post the Verify button message again and delete the old one."""
+    user = await require_user()
+    return racer_verification_out(await racer_verification.repost(verification_id, user.id))
+
+
+@app_api_blueprint.get('/racer-verifications/<int:verification_id>/racers')
+@tag(['racer verification'])
+@validate_response(schemas.VerifiedRacerList)
+async def list_verified_racers(verification_id: int):
+    """Everyone verified with the button, most recently checked first."""
+    user = await require_user()
+    return schemas.VerifiedRacerList(
+        racers=[verified_racer_out(r) for r in await racer_verification.list_racers(verification_id, user.id)])
+
+
+@app_api_blueprint.post('/racer-verifications/<int:verification_id>/racers/<int:racer_id>/recheck')
+@tag(['racer verification'])
+@validate_response(schemas.RecheckResult)
+async def recheck_verified_racer(verification_id: int, racer_id: int):
+    """Count the racer's races now, as the scheduled recheck would (it may remove them)."""
+    user = await require_user()
+    racer = await racer_verification.recheck_racer(verification_id, racer_id, user.id)
+    return schemas.RecheckResult(racer=verified_racer_out(racer) if racer else None)
+
+
+@app_api_blueprint.delete('/racer-verifications/<int:verification_id>/racers/<int:racer_id>')
+@tag(['racer verification'])
+async def remove_verified_racer(verification_id: int, racer_id: int):
+    """Take the role from the racer and forget their verification."""
+    user = await require_user()
+    await racer_verification.remove_racer(verification_id, racer_id, user.id)
+    return '', 204

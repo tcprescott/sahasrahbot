@@ -267,6 +267,19 @@ async def _seed_handmade():
             episode_id=episode_id, event="alttpr", game_number=game, preset="open", submitted=1,
         )
 
+    # --- Racer verification (/servers/<id>/verification) --------------------------
+    racer_verification = await models.RacerVerification.create(
+        id=1, guild_id=GUILD_ID, channel_id=CHANNEL_GENERAL, message_id=150000000000000001, role_id=ROLE_RACER,
+        racetime_categories="alttpr,smz3", use_alttpr_ladder=True, minimum_races=5, time_period_days=365,
+        reverify_period_days=90, revoke_ineligible=True, audit_channel_id=CHANNEL_ASYNC_REPORTS,
+    )
+    now = datetime.datetime.now(datetime.timezone.utc)
+    for key, days_ago, count in (("runner1", 10, 37), ("runner2", 120, 8), ("runner3", 30, 2)):
+        await models.VerifiedRacer.create(
+            user=users[key], racer_verification=racer_verification, estimated_count=count,
+            last_verified=now - datetime.timedelta(days=days_ago),
+        )
+
     await _seed_role_menus()
     await _seed_audit_log()
 

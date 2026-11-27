@@ -209,6 +209,28 @@ class UnmatchedPlayersFound(Event):
     messages: tuple[str, ...] = ()
 
 
+
+# --- racer verification -----------------------------------------------------
+
+@_frozen
+class RacerVerificationRechecked(Event):
+    """A recheck of verified racers changed something worth reporting.
+
+    ``revoked`` lost the role, ``not_qualified`` no longer qualify but kept it
+    (revoke is off), ``left`` left the server. Names are SahasrahBot display names.
+    The subscriber posts them in ``audit_channel_id`` when one is set.
+    """
+    name = "racer_verification.rechecked"
+
+    racer_verification_id: int
+    guild_id: int
+    role_id: int
+    audit_channel_id: Optional[int] = None
+    revoked: tuple[str, ...] = ()
+    not_qualified: tuple[str, ...] = ()
+    left: tuple[str, ...] = ()
+
+
 ALL_EVENTS: tuple[type[Event], ...] = (
     RaceStatusChanged,
     TournamentRoomOpened,
@@ -225,4 +247,5 @@ ALL_EVENTS: tuple[type[Event], ...] = (
     SchedulingNeedsUpdated,
     TournamentEpisodesRefreshed,
     UnmatchedPlayersFound,
+    RacerVerificationRechecked,
 )
