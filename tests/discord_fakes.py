@@ -267,3 +267,42 @@ class FakeDirectory:
             raise self.post_error
         self.posted.append(election_id)
         return 9000 + len(self.posted)
+
+
+class FakeRoleMenuDiscord:
+    """A stand-in for the role menu gateway (``alttprbot.services.role_menus``): servers
+    with channels, roles and emoji, and a record of what was posted or removed. Register
+    it with the ``role_menu_discord`` fixture (tests/conftest.py)."""
+
+    def __init__(self):
+        self.servers = {}
+        self.published = []
+        self.removed = []
+        self.publish_error = None
+        self._next_message = 5000
+
+    def add_server(self, guild_id, channels=((300, "#roles"),), roles=((501, "@she/her", True), (502, "@he/him", True)),
+                   emojis=((9001, "<:triforce:9001>"),)):
+        from alttprbot.services.discord_directory import Named
+        from alttprbot.services.role_menus import ServerDetails, ServerRole
+        self.servers[guild_id] = ServerDetails(
+            channels=[Named(i, n) for i, n in channels],
+            roles=[ServerRole(i, n, a) for i, n, a in roles],
+            emojis=[Named(i, n) for i, n in emojis],
+        )
+        return self
+
+    async def server(self, guild_id):
+        return self.servers.get(guild_id)
+
+    async def publish(self, menu):
+        if self.publish_error:
+            raise self.publish_error
+        self.published.append(menu)
+        if menu['message_id']:
+            return menu['message_id']
+        self._next_message += 1
+        return self._next_message
+
+    async def remove(self, menu):
+        self.removed.append(menu)

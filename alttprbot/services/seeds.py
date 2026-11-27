@@ -91,6 +91,21 @@ async def roll(randomizer: str, preset: str, options: RollOptions = RollOptions(
         raise NotFoundError(f"There's no {randomizer} preset called {preset}.") from e
 
 
+_PRESET_CLASSES = {
+    'alttpr': generator.ALTTPRPreset,
+    'alttprmystery': generator.ALTTPRMystery,
+    'sm': generator.SMPreset,
+    'smz3': generator.SMZ3Preset,
+}
+
+
+async def builtin_presets(randomizer: str) -> list[str]:
+    """The presets that ship with SahasrahBot for ``randomizer``, sorted by name."""
+    if randomizer not in RANDOMIZERS:
+        raise InvalidInputError(f"SahasrahBot can roll {', '.join(RANDOMIZERS)} seeds, not {randomizer}.")
+    return sorted(await _PRESET_CLASSES[randomizer]().get_presets())
+
+
 async def lookup(hash_id: str) -> dict:
     """What SahasrahBot recorded about a seed it rolled, without its settings."""
     game = await generated_games.find_by_hash(hash_id)

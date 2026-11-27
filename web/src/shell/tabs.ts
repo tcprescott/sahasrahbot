@@ -11,6 +11,7 @@ export interface Tab {
 /** Shell A: the same tabs as a left rail on desktop and a bottom bar on phone. */
 export const TABS: Tab[] = [
   { path: '/', label: 'Home', icon: 'home', match: (p) => p === '/' },
+  { path: '/seeds', label: 'Seeds', icon: 'change_history', match: (p) => p.startsWith('/seeds') },
   { path: '/presets', label: 'Presets', icon: 'folder', match: (p) => p.startsWith('/presets') },
   {
     path: '/me',
@@ -39,7 +40,8 @@ export const SERVERS_TAB: Tab = {
 /** The tabs a visitor sees: Elections and Servers only for someone who administers a server. */
 export function tabsFor(serverAdmin: boolean): Tab[] {
   if (!serverAdmin) return TABS
-  return [...TABS.slice(0, 2), ELECTIONS_TAB, SERVERS_TAB, ...TABS.slice(2)]
+  const me = TABS.findIndex((tab) => tab.path === '/me')
+  return [...TABS.slice(0, me), ELECTIONS_TAB, SERVERS_TAB, ...TABS.slice(me)]
 }
 
 export const DOCS_URL = 'https://sahasrahbot.synack.live/'

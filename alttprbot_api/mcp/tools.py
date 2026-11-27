@@ -10,10 +10,12 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel
 
 from alttprbot.exceptions import InvalidInputError
-from alttprbot.services import audit, elections, presets, seeds, tournament_submissions, triforce_texts, voice_roles
+from alttprbot.services import (audit, elections, presets, role_menus, seeds, tournament_submissions, triforce_texts,
+                                voice_roles)
 from alttprbot_api import schemas
 from alttprbot_api.blueprints.app_api import (_int_id, audit_entry, election_detail, election_input,
-                                               election_summary, voice_role_out, voice_roles_out)
+                                               election_summary, role_menu_input, role_menu_out, voice_role_out,
+                                               voice_roles_out)
 from alttprbot_api.mcp.auth import current_actor
 from alttprbot_api.mcp.registry import register
 
@@ -209,6 +211,54 @@ async def submit_tournament_settings(event: str, episode_id: int, settings: dict
     return schemas.SubmissionDone(**done)
 
 
+# --- Role menus -------------------------------------------------------------------
+
+
+async def list_role_menus() -> schemas.RoleMenuList:
+    """The role menus in the Discord servers you administer: messages people use to give
+    themselves roles. Each lists its roles and any `problems` stopping it working.
+    Slow: it checks which servers you administer."""
+    actor = current_actor()
+    admin = await elections.administered_guild_ids(actor.discord_user_id)
+    return schemas.RoleMenuList(menus=[role_menu_out(m) for m in await role_menus.list_menus(admin)])
+
+
+async def get_role_menu(menu_id: int) -> schemas.RoleMenu:
+    """One role menu in a server you administer."""
+    return role_menu_out(await role_menus.get_menu(menu_id, current_actor().discord_user_id))
+
+
+async def get_role_menu_server(guild_id: str) -> schemas.RoleMenuServerOptions:
+    """The channels SahasrahBot can post a role menu in, the server's roles (and whether
+    SahasrahBot can give each) and its custom emoji. Read it before making or changing a menu."""
+    options = await role_menus.server_options(_int_id(guild_id, 'server'), current_actor().discord_user_id)
+    return schemas.RoleMenuServerOptions(
+        channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in options['channels']],
+        roles=[schemas.RoleMenuRole(id=str(r['id']), name=r['name'], assignable=r['assignable'])
+               for r in options['roles']],
+        emojis=[schemas.ServerOption(id=str(e['id']), name=e['name']) for e in options['emojis']],
+    )
+
+
+async def create_role_menu(menu: schemas.RoleMenuIn) -> schemas.RoleMenu:
+    """Make a role menu and post it in its channel, where everyone can see it. `style` is
+    `buttons`, `dropdown` or `reactions` (reactions need an emoji on every role)."""
+    return role_menu_out(await role_menus.create_menu(current_actor().discord_user_id, role_menu_input(menu)))
+
+
+async def update_role_menu(menu_id: int, menu: schemas.RoleMenuIn) -> schemas.RoleMenu:
+    """Replace a role menu's settings and roles and redraw it in Discord. Read it with
+    `get_role_menu` first and send every field back; keep each existing role's `id`."""
+    return role_menu_out(await role_menus.update_menu(menu_id, current_actor().discord_user_id,
+                                                      role_menu_input(menu)))
+
+
+async def delete_role_menu(menu_id: int) -> str:
+    """Delete a role menu and its Discord message. Roles people already picked stay."""
+    await role_menus.delete_menu(menu_id, current_actor().discord_user_id)
+    return f"Deleted role menu {menu_id}."
+
+
 # --- Audit log --------------------------------------------------------------------
 
 
@@ -289,6 +339,12 @@ def register_all(mcp: MCPServer) -> None:
     register(mcp, moderate_triforce_text, title='Moderate a triforce text', write=True)
     register(mcp, get_tournament_submission_form, title='Get a tournament settings form')
     register(mcp, submit_tournament_settings, title='Submit tournament settings', write=True)
+    register(mcp, list_role_menus, title='List role menus')
+    register(mcp, get_role_menu, title='Get a role menu')
+    register(mcp, get_role_menu_server, title='Get role menu options for a server')
+    register(mcp, create_role_menu, title='Create a role menu', write=True)
+    register(mcp, update_role_menu, title='Update a role menu', write=True)
+    register(mcp, delete_role_menu, title='Delete a role menu', write=True, destructive=True)
     register(mcp, list_audit_log, title='List the audit log')
     register(mcp, list_voice_roles, title="List a server's voice roles")
     register(mcp, add_voice_role, title='Add a voice role', write=True)

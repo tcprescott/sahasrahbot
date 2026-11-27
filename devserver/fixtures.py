@@ -279,9 +279,27 @@ async def _seed_handmade():
             episode_id=episode_id, event="alttpr", game_number=game, preset="open", submitted=1,
         )
 
+    await _seed_role_menus()
     await _seed_audit_log()
 
     return users
+
+
+async def _seed_role_menus():
+    """Role menus (/servers/<dev server>/role-menus): one with buttons, and one copied from
+    the old reaction roles on someone else's message, so it can only use reactions."""
+    from alttprbot import models
+
+    buttons = await models.RoleMenu.create(
+        id=1, guild_id=GUILD_ID, channel_id=CHANNEL_GENERAL, message_id=130000000000000001, title="Pings",
+        description="Pick what you'd like to be pinged for. Press again to remove it.", style="buttons")
+    for position, (role, label, emoji) in enumerate([(ROLE_RACER, "Races", "🏁"), (ROLE_VOTER, "Votes", "🗳️")]):
+        await models.RoleMenuOption.create(menu=buttons, role_id=role, label=label, emoji=emoji, position=position)
+    legacy = await models.RoleMenu.create(
+        id=2, guild_id=GUILD_ID, channel_id=CHANNEL_GENERAL, message_id=130000000000000002, title="Racer role",
+        description="React to get the Racer role.", style="reactions", posted_by_bot=False)
+    await models.RoleMenuOption.create(menu=legacy, role_id=ROLE_RACER, label="Racer", emoji="🏃",
+                                       description="Pinged for races")
 
 
 async def _seed_audit_log():

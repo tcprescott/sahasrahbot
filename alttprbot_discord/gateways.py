@@ -8,7 +8,7 @@ from alttprbot.observability import runtime
 from alttprbot.services import bots
 from alttprbot.util import seed_presenter
 from alttprbot_discord.bot import discordbot
-from alttprbot_discord import elections, inquiries, server_directory, telemetry
+from alttprbot_discord import elections, inquiries, role_menus, server_directory, telemetry
 from alttprbot_discord.util import seed_embeds
 
 
@@ -17,6 +17,8 @@ def register() -> None:
     bots.set_discord_client(discordbot)
     # Elections: who administers which server, channels and roles, and posting.
     elections.register(discordbot)
+    # Role menus: posting and redrawing menus, and the channels, roles and emoji they offer.
+    role_menus.register(discordbot)
     # The server directory: checking invites and posting the list.
     server_directory.register(discordbot)
     # Inquiry buttons posted from the website, and their channel checks.
