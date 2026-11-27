@@ -12,6 +12,7 @@ export interface ServerSection {
 export const SECTIONS: ServerSection[] = [
   { key: 'settings', label: 'Settings' },
   { key: 'voice-roles', label: 'Voice roles' },
+  { key: 'directory', label: 'Server directory' },
 ]
 
 /** The section a server's page opens on. */

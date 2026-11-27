@@ -24,6 +24,8 @@ CHANNEL_ASYNC = 120000000000000002
 CHANNEL_ASYNC_REPORTS = 120000000000000003
 CHANNEL_ELECTIONS = 120000000000000004
 CHANNEL_OLD_ASYNC = 120000000000000005
+CHANNEL_PARTNERS = 120000000000000006
+CHANNEL_OTHER_SERVERS = 120000000000000007
 CHANNEL_OTHER_GENERAL = 120000000000000101
 VOICE_RACE_1 = 120000000000000201
 VOICE_RACE_2 = 120000000000000202
@@ -45,6 +47,8 @@ GUILDS = [
             (CHANNEL_ASYNC_REPORTS, "async-reports"),
             (CHANNEL_ELECTIONS, "elections"),
             (CHANNEL_OLD_ASYNC, "old-async"),
+            (CHANNEL_PARTNERS, "partner-servers"),
+            (CHANNEL_OTHER_SERVERS, "other-servers"),
         ],
         "voice_channels": [(VOICE_RACE_1, "Race 1"), (VOICE_RACE_2, "Race 2")],
     },
@@ -158,8 +162,6 @@ def add_testdata_world(world: FakeWorld) -> None:
             guild._roles[role_id] = FakeRole(guild, role_id, name)
         for channel_id, name in g["channels"]:
             guild._channels[channel_id] = FakeChannel(guild, channel_id, name)
-        for channel_id, name in spec.get("voice_channels", []):
-            guild._channels[channel_id] = FakeChannel(guild, channel_id, name, discord.ChannelType.voice)
         world.guilds[guild.id] = guild
     for m in spec["members"]:
         add_user(world, m["id"], m["name"], {int(g): roles for g, roles in m["memberships"].items()})
@@ -269,6 +271,8 @@ async def _seed_handmade():
     await models.VoiceRole.create(id=1, guild_id=GUILD_ID, voice_channel_id=VOICE_RACE_1, role_id=ROLE_RACER)
     await models.VoiceRole.create(id=2, guild_id=GUILD_ID, voice_channel_id=VOICE_DELETED, role_id=ROLE_VOTER)
 
+    await _seed_server_directory()
+
     # --- Tournament games (/api/tournament/games) ---------------------------------
     for episode_id, game in [(1001, 1), (1002, 2)]:
         await models.TournamentGames.create(
@@ -310,3 +314,24 @@ async def _seed_audit_log():
             created_at=now - datetime.timedelta(minutes=minutes), action=action,
             actor_discord_id=user(who)["id"] if who else None, actor_name=user(who)["name"] if who else None,
             via=via, via_detail=detail, guild_id=guild, target=target, details=details)
+
+
+async def _seed_server_directory():
+    """The dev server's partner-server directory (/servers/<id>/directory)."""
+    from alttprbot import models
+
+    directory = [
+        (CHANNEL_PARTNERS, "Randomizer communities", "Main hubs for each randomizer.", [
+            ("alttprandomizer", "ALTTPR, the main community"), ("smz3", "Super Metroid + ALTTP combo randomizer"),
+            ("ootrandomizer", "OoTR"), ("smrando", "VARIA and Total randomizers")]),
+        (CHANNEL_PARTNERS, "Tournaments and leagues", None, [
+            ("speedgaming", "Restreams for most ALTTPR tournaments"), ("alttprleague", "Team league, seasons twice a year")]),
+        (CHANNEL_OTHER_SERVERS, "Speedrunning", "Non-randomized runs of the same games.", [
+            ("alttp", "Any%, 100% and the rest")]),
+    ]
+    for order, (channel_id, title, note, servers) in enumerate(directory):
+        category = await models.DiscordServerCategories.create(
+            guild_id=GUILD_ID, channel_id=channel_id, category_title=title, category_description=note, order=order)
+        for position, (invite, text) in enumerate(servers):
+            await models.DiscordServerLists.create(category=category, invite_id=invite, server_description=text,
+                                                   order=position)

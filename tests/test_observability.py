@@ -238,6 +238,22 @@ def test_before_send_drops_user_facing_errors_and_scrubs():
     assert 'cookies' not in out['request'] and 'data' not in out['request']
 
 
+def test_before_send_drops_user_facing_errors_wrapped_by_discord():
+    from discord import app_commands
+    from discord.ext import commands
+
+    original = SahasrahBotException('Could not find preset')
+    command = mock.Mock(qualified_name='alttpr mystery')
+    wrapped = app_commands.CommandInvokeError(command, original)
+    wrapped.__cause__ = original
+    assert obs.before_send({}, {'exc_info': (type(wrapped), wrapped, None)}) is None
+    prefix = commands.CommandInvokeError(original)
+    assert obs.before_send({}, {'exc_info': (type(prefix), prefix, None)}) is None
+
+    bug = app_commands.CommandInvokeError(command, KeyError('x'))
+    assert obs.before_send({}, {'exc_info': (type(bug), bug, None)}) is not None
+
+
 def test_traces_sampler():
     sampler = obs._sampler(0.1, 1.0)
 

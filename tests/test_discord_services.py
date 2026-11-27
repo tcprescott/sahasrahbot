@@ -130,25 +130,33 @@ async def test_discord_server_categories(db):
     await discord_servers.add_category(2, 200, "Other guild")
     assert [c.category_title for c in await discord_servers.list_categories(1)] == ["Randomizers"]
 
-    await discord_servers.update_category(cat.id, "Renamed", None, order=5)
+    await discord_servers.update_category(1, cat.id, "Renamed", None, order=5)
     cat = await models.DiscordServerCategories.get(id=cat.id)
-    assert (cat.category_title, cat.category_description, cat.order) == ("Renamed", None, 5)
+    assert (cat.category_title, cat.category_description, cat.order, cat.channel_id) == ("Renamed", None, 5, 100)
 
-    await discord_servers.remove_category(cat.id)
+    await discord_servers.remove_category(1, cat.id)
     assert await discord_servers.list_categories(1) == []
 
 
-async def test_known_issue_category_and_server_ids_are_not_scoped_to_guild(db):
-    """KNOWN ISSUE, pinned not endorsed: remove/update by id don't check the guild, so an
-    admin of one guild can change another guild's categories and servers by guessing ids."""
+async def test_category_and_server_ids_are_scoped_to_guild(db):
+    """An admin of guild 2 can't change guild 1's categories or servers by guessing ids
+    (this was a known issue until the website editor)."""
     cat = await discord_servers.add_category(1, 100, "Guild one's")
     server = await discord_servers.add_server(1, cat.id, "abc", "A server")
-    # the cog calls these from guild 2, but the guild is never passed
-    await discord_servers.update_server(server.id, "xyz", cat.id, "changed")
-    await discord_servers.update_category(cat.id, "changed", None)
-    assert (await models.DiscordServerLists.get(id=server.id)).invite_id == "xyz"
-    await discord_servers.remove_category(cat.id)
-    assert await discord_servers.list_categories(1) == []
+    with pytest.raises(NotFoundError):
+        await discord_servers.update_server(2, server.id, "xyz", cat.id, "changed")
+    with pytest.raises(NotFoundError):
+        await discord_servers.update_category(2, cat.id, "changed", None)
+    with pytest.raises(NotFoundError):
+        await discord_servers.remove_category(2, cat.id)
+    with pytest.raises(NotFoundError):
+        await discord_servers.remove_server(2, server.id)
+    with pytest.raises(NotFoundError):
+        await discord_servers.add_server(2, cat.id, "def", "Sneaky")
+    with pytest.raises(NotFoundError):
+        await discord_servers.list_servers(2, cat.id)
+    assert (await models.DiscordServerLists.get(id=server.id)).invite_id == "abc"
+    assert [c.category_title for c in await discord_servers.list_categories(1)] == ["Guild one's"]
 
 
 async def test_discord_servers_in_category(db):
@@ -156,25 +164,25 @@ async def test_discord_servers_in_category(db):
     other = await discord_servers.add_category(1, 100, "Other")
     server = await discord_servers.add_server(1, cat.id, "abc", "ALTTPR")
     await discord_servers.add_server(1, other.id, "def", "SM")
-    assert [s.invite_id for s in await discord_servers.list_servers(cat.id)] == ["abc"]
+    assert [s.invite_id for s in await discord_servers.list_servers(1, cat.id)] == ["abc"]
 
-    await discord_servers.update_server(server.id, "xyz", other.id, "ALTTPR 2")
+    await discord_servers.update_server(1, server.id, "xyz", other.id, "ALTTPR 2")
     server = await models.DiscordServerLists.get(id=server.id)
     assert (server.invite_id, server.category_id, server.server_description) == ("xyz", other.id, "ALTTPR 2")
+    assert [s.invite_id for s in await discord_servers.list_servers(1, other.id)] == ["def", "xyz"]  # moved to the end
 
-    await discord_servers.remove_server(server.id)
-    assert [s.invite_id for s in await discord_servers.list_servers(other.id)] == ["def"]
+    await discord_servers.remove_server(1, server.id)
+    assert [s.invite_id for s in await discord_servers.list_servers(1, other.id)] == ["def"]
 
 
-async def test_known_issue_update_server_without_description_fails(db):
-    """KNOWN ISSUE, pinned not endorsed: ``/discordservers update_server`` makes the
-    description optional, but the column is NOT NULL, so leaving it out fails."""
-    from tortoise.exceptions import ValidationError
-
+async def test_update_server_without_description_keeps_it(db):
+    """``/discordservers update_server`` makes the description optional; leaving it out
+    keeps the old one (it used to fail on the NOT NULL column)."""
     cat = await discord_servers.add_category(1, 100, "Randomizers")
     server = await discord_servers.add_server(1, cat.id, "abc", "ALTTPR")
-    with pytest.raises(ValidationError, match="server_description"):
-        await discord_servers.update_server(server.id, "xyz", cat.id)
+    await discord_servers.update_server(1, server.id, "xyz", cat.id)
+    server = await models.DiscordServerLists.get(id=server.id)
+    assert (server.invite_id, server.server_description) == ("xyz", "ALTTPR")
 
 
 async def test_server_list_layout_pages_of_ten(db):

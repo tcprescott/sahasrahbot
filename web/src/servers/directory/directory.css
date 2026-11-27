@@ -1,0 +1,34 @@
+.dir-bar { display: flex; gap: var(--space-3); align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.dir-bar__lede { margin: 0; flex: 1 1 280px; }
+.dir-bar__actions { display: flex; gap: var(--space-2); }
+.dir-split { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--space-4, 20px); align-items: start; }
+@media (max-width: 900px) { .dir-split { grid-template-columns: minmax(0, 1fr); } }
+.dir-where { margin: 0; padding-bottom: 0; font-size: var(--text-sm); }
+.dir-rows { list-style: none; margin: 0; padding: 0; }
+.dir-rows li { display: flex; gap: var(--space-3); align-items: center; padding: 10px 16px; border-top: 1px solid var(--border-subtle); }
+.dir-rows li:first-child { border-top: 0; }
+.dir-av { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--link); display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
+.dir-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dir-text b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dir-sub { color: var(--fg-muted); font-size: var(--text-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.dir-sub:hover { color: var(--link); }
+.dir-move { display: inline-flex; gap: 0; flex: none; }
+.dir-found { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); background: var(--surface-sunken); }
+.dir-list { margin: 0; padding-left: 20px; }
+.dir-list li { margin: 4px 0; }
+.dir-preview { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.dir-h { font-size: var(--text-sm); text-transform: uppercase; letter-spacing: .04em; color: var(--fg-muted); margin: 0; }
+.dir-chips { margin: 0; }
+
+/* A Discord message (preview only). */
+.dc { background: var(--discord-bg); color: var(--discord-fg); border-radius: var(--radius-md); padding: 16px; font-size: 15px; display: flex; flex-direction: column; gap: 14px; }
+.dc__msg { display: flex; gap: 14px; }
+.dc__av { width: 40px; height: 40px; border-radius: 50%; background: var(--purple) url(/sahasrahbot.png) center/28px no-repeat; flex: none; }
+.dc__body { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.dc__name { font-weight: 600; color: var(--discord-name); }
+.dc__app { background: var(--discord-tag); color: var(--discord-strong); font-size: 10px; font-weight: 600; padding: 1px 4px; border-radius: 3px; margin-left: 4px; vertical-align: 2px; }
+.dc__line { line-height: 1.45; margin: 0; }
+.dc__head { font-weight: 700; text-decoration: underline; color: var(--discord-strong); }
+.dc__link { color: var(--discord-link); }
+/* On a phone the category's arrows move into its ⋮ menu, so the header fits. */
+@media (max-width: 600px) { .dir-move--category { display: none; } }

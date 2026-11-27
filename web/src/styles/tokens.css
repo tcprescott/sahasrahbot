@@ -92,6 +92,15 @@
   --tabbar-h: 64px;
   --content-max: 1100px;
 
+  /* A Discord message, for previews of what SahasrahBot posts. Discord's own dark
+     theme in both modes, so it reads as Discord. Not for anything else. */
+  --discord-bg: #313338;
+  --discord-fg: #DBDEE1;
+  --discord-strong: #FFFFFF;
+  --discord-name: #C9B6F5;
+  --discord-link: #00A8FC;
+  --discord-tag: #5865F2;
+
   color-scheme: light;
 }
 

@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 import pytest
+import yaml
 from quart_discord import Unauthorized
 
 from alttprbot import events, models
@@ -290,6 +291,37 @@ async def test_my_namespace_is_created_on_first_use(client, login):
     login(42, name="New User")
     assert await get_json(client, "/api/v1/presets/mine") == (200, {"namespace": "new-user"})
     assert await models.PresetNamespaces.get(discord_user_id=42)
+
+
+async def test_convert_customizer_save(client):
+    save = {
+        "randomizer.goal": "fast_ganon",
+        "randomizer.world_state": "inverted",
+        "vt.custom.name": "Boots start",
+        "vt.custom.locations": {"Link's House": "L1Sword:1"},
+        "vt.custom.equipment": {"PegasusBoots": True},
+    }
+    status, body = await send_json(client, "POST", "/api/v1/presets/customizer", {"content": json.dumps(save)})
+    assert status == 200
+    preset = yaml.safe_load(body["content"])
+    assert (preset["customizer"], preset["randomizer"]) == (True, "alttpr")
+    settings = preset["settings"]
+    assert (settings["goal"], settings["mode"], settings["name"]) == ("fast_ganon", "inverted", "Boots start")
+    assert settings["l"] == {"Link's House": "L1Sword:1"}
+    assert "PegasusBoots" in settings["eq"]
+
+
+async def test_convert_customizer_refuses_other_files(client):
+    not_json = await send_json(client, "POST", "/api/v1/presets/customizer", {"content": "settings:\n  goal: ganon\n"})
+    not_customizer = await send_json(client, "POST", "/api/v1/presets/customizer", {"content": '{"settings": {}}'})
+    a_list = await send_json(client, "POST", "/api/v1/presets/customizer", {"content": "[1, 2]"})
+    unreadable = await send_json(client, "POST", "/api/v1/presets/customizer",
+                                 {"content": '{"vt.custom.equipment": ["not", "a", "mapping"]}'})
+    assert [r[0] for r in (not_json, not_customizer, a_list, unreadable)] == [400, 400, 400, 400]
+    assert "isn't valid JSON" in not_json[1]["error"]
+    assert "isn't an ALTTPR customizer save" in not_customizer[1]["error"]
+    assert "isn't an ALTTPR customizer save" in a_list[1]["error"]
+    assert "can't read" in unreadable[1]["error"]
 
 
 async def test_preset_hints_come_from_the_shipped_presets(client, monkeypatch):

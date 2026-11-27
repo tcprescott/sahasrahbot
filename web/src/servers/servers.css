@@ -147,3 +147,58 @@
   color: var(--fg-muted);
   font-size: var(--text-sm);
 }
+
+/* Inquiry buttons */
+.inquiry-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.inquiry-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+.inquiry-row:first-child {
+  border-top: 0;
+}
+.inquiry-row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+.inquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.inquiry-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.inquiry-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: var(--text-sm);
+}
+.inquiry-check svg {
+  color: var(--status-ok);
+  flex: none;
+}
+.inquiry-check--bad svg {
+  color: var(--status-cancelled);
+}
+.server-muted {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  margin: 0;
+}

@@ -189,11 +189,26 @@ class FakeChannel:
     async def send(self, content=None, **kwargs):  # NOSONAR
         return record(f"#{self.name}", content=content, **kwargs)
 
+    #: Channels where @everyone can read but not post, so inquiry checks show both outcomes.
+    READ_ONLY = ("async-reports", "elections")
+
+    def permissions_for(self, who):
+        # The bot and every role may do anything, except @everyone posting in READ_ONLY.
+        if self.guild is not None and who is self.guild.default_role:
+            return discord.Permissions(view_channel=True, send_messages_in_threads=True,
+                                       send_messages=self.name not in self.READ_ONLY)
+        return discord.Permissions.all()
+
     async def fetch_message(self, message_id):  # NOSONAR
         return FakeMessage({"id": int(message_id), "content": None, "target": f"#{self.name}"})
 
     def get_partial_message(self, message_id):
         return FakeMessage({"id": int(message_id), "content": None, "target": f"#{self.name}"})
+
+    async def purge(self, limit=100, check=None, **kwargs):  # NOSONAR
+        # The outbox only records; nothing to delete. Logged so posting can be followed.
+        logger.info("Fake Discord: purge #%s (limit %s)", self.name, limit)
+        return []
 
     async def create_thread(self, name=None, **kwargs):  # NOSONAR
         thread = FakeChannel(self.guild, next(_message_ids), f"{self.name}/{name}")
@@ -390,6 +405,15 @@ class FakeDiscordBot:
         if user is None:
             raise _not_found(f"Unknown User {user_id}")
         return user
+
+    async def fetch_invite(self, url, **kwargs):  # NOSONAR
+        """Any invite works except codes starting with "expired". The server's name is made
+        from the code, so the website's invite check can be tried with anything."""
+        code = str(url).rstrip('/').rsplit('/', 1)[-1]
+        if code.lower().startswith('expired'):
+            raise _not_found("Unknown Invite")
+        guild = SimpleNamespace(id=hash(code) & 0xFFFFFFFF, name=code.replace('-', ' ').title())
+        return SimpleNamespace(code=code, id=code, guild=guild, approximate_member_count=1234, expires_at=None)
 
     async def is_owner(self, user) -> bool:  # NOSONAR
         return user.id == self.world.owner_id

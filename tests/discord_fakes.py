@@ -144,6 +144,7 @@ class FakeInteraction:
         self.guild = guild
         self.guild_id = getattr(guild, 'id', None)
         self.channel = channel or FakeChannel(guild=guild)
+        self.channel_id = self.channel.id
         self.message = message
         self.namespace = SimpleNamespace(**(namespace or {}))
         self.response = FakeResponse()

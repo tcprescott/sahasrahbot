@@ -299,7 +299,6 @@ async def test_website_only_routes_refuse_tokens(rest, method, path, body):
     assert "not with a token" in (await resp.get_json())["error"]
 
 
-
 async def test_voice_role_tools(db, directory):
     from alttprbot.exceptions import InvalidInputError
     from alttprbot_api.mcp import auth as mcp_actor, tools
@@ -316,3 +315,11 @@ async def test_voice_role_tools(db, directory):
             await tools.list_voice_roles("")
     finally:
         mcp_actor.reset_actor(token)
+
+
+async def test_read_only_token_can_convert_a_customizer_save(rest):
+    raw, _ = await api_tokens.create_personal_token(ALICE, "alice", "script", True, None)
+    resp = await rest.post("/api/v1/presets/customizer", json={"content": '{"randomizer.goal": "ganon"}'},
+                           headers=bearer(raw))
+    assert resp.status_code == 200, await resp.get_data()
+    assert "customizer: true" in (await resp.get_json())["content"]
