@@ -65,6 +65,8 @@ export type AuditPage = GetBody<'/api/v1/audit'>
 export type AuditEntry = AuditPage['entries'][number]
 export type VoiceRoles = GetBody<'/api/v1/servers/{guild_id}/voice-roles'>
 export type VoiceRole = VoiceRoles['voice_roles'][number]
+export type RacerVerification = GetBody<'/api/v1/racer-verifications/{verification_id}'>
+export type VerifiedRacer = GetBody<'/api/v1/racer-verifications/{verification_id}/racers'>['racers'][number]
 
 export class ApiError extends Error {
   constructor(

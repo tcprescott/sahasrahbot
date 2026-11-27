@@ -25,6 +25,7 @@ import { ServerScreen } from './servers/ServerScreen'
 import { ServersScreen } from './servers/ServersScreen'
 import { DirectoryRoute } from './servers/directory/DirectorySection'
 import { SettingsSection } from './servers/SettingsSection'
+import { VerificationSection } from './servers/verification/VerificationSection'
 import { AppShell } from './shell/AppShell'
 import { ThemeProvider } from './theme/ThemeProvider'
 import { SubmissionScreen } from './tournament/SubmissionScreen'
@@ -55,6 +56,7 @@ export function App() {
                 <Route path="servers/:guildId" element={<ServerScreen />}>
                   <Route index element={<Navigate to="settings" replace />} />
                   <Route path="settings" element={<SettingsSection />} />
+                  <Route path="verification/*" element={<VerificationSection />} />
                   <Route path="role-menus" element={<RoleMenusRoute />} />
                   <Route path="role-menus/new" element={<RoleMenuEditorRoute />} />
                   <Route path="role-menus/:menuId" element={<RoleMenuEditorRoute />} />

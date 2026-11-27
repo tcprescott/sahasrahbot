@@ -140,6 +140,10 @@ SERVER_LIST_REORDERED = 'server_list.reordered'
 SERVER_LIST_POSTED = 'server_list.posted'
 RACER_VERIFICATION_CONFIGURED = 'racer_verification.configured'
 RACER_VERIFICATION_VERIFIED = 'racer_verification.verified'
+RACER_VERIFICATION_UPDATED = 'racer_verification.updated'
+RACER_VERIFICATION_REPOSTED = 'racer_verification.reposted'
+RACER_VERIFICATION_DELETED = 'racer_verification.deleted'
+RACER_VERIFICATION_REVOKED = 'racer_verification.revoked'
 INQUIRY_CREATED = 'inquiry.created'
 INQUIRY_REMOVED = 'inquiry.removed'
 INQUIRY_LOCATED = 'inquiry.located'
@@ -192,6 +196,10 @@ ACTIONS: dict[str, str] = {
     SERVER_LIST_POSTED: 'Posted a server list to Discord',
     RACER_VERIFICATION_CONFIGURED: 'Set up racer verification',
     RACER_VERIFICATION_VERIFIED: 'Was verified as a racer',
+    RACER_VERIFICATION_UPDATED: 'Edited racer verification',
+    RACER_VERIFICATION_REPOSTED: 'Reposted a racer verification message',
+    RACER_VERIFICATION_DELETED: 'Deleted racer verification',
+    RACER_VERIFICATION_REVOKED: 'Removed a verified racer',
     INQUIRY_CREATED: 'Set up an inquiry message',
     INQUIRY_REMOVED: 'Removed an inquiry message',
     INQUIRY_LOCATED: 'Found where an older inquiry message is',

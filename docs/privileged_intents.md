@@ -29,7 +29,8 @@ role.
 
 | Feature | Behaviour | Workaround |
 |---|---|---|
-| Bulk racetime.gg link reminders and racer reverification | Removed (`/rtggadmin blast`, `/rtggadmin report`, `/racerverification reverify`): they walked every member of a role. New verifications through the button still work. | Filter by role in Server Settings > Members and contact people by hand, or post the verification link in an announcement that pings the role. |
+| Bulk racetime.gg link reminders | Removed (`/rtggadmin blast`, `/rtggadmin report`): they walked every member of a role. | Filter by role in Server Settings > Members and contact people by hand. |
+| Racer reverification | `/racerverification reverify` is gone: it walked every member of the role. Automatic rechecks (set "Recheck every" on the website's Servers > Racer verification page) cover only people who verified with the button, not anyone given the role by hand. | Ask people given the role by hand to press the Verify button once. |
 | Inquiry (mod mail) threads | The bot mentions the support role in the new private thread. Discord adds members of that role who can view the thread, **if the role has fewer than 100 members**. The mention only counts if the role is mentionable or the bot has "Mention @everyone, @here, and All Roles" in the channel. Otherwise the bot posts a note asking a moderator to join by hand. | Keep the mod-mail role under 100 members and give the bot Mention All Roles in the inquiry channel. |
 
 The main bot's `$` prefix commands only work as `@SahasrahBot command`, because

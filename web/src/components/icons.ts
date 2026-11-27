@@ -56,6 +56,7 @@ import UndoIcon from '@material-symbols/svg-400/outlined/undo.svg?react'
 import UnfoldLessIcon from '@material-symbols/svg-400/outlined/unfold_less.svg?react'
 import UnfoldMoreIcon from '@material-symbols/svg-400/outlined/unfold_more.svg?react'
 import UploadIcon from '@material-symbols/svg-400/outlined/upload.svg?react'
+import VerifiedIcon from '@material-symbols/svg-400/outlined/verified.svg?react'
 import VisibilityIcon from '@material-symbols/svg-400/outlined/visibility.svg?react'
 import VolumeUpIcon from '@material-symbols/svg-400/outlined/volume_up.svg?react'
 import WarningIcon from '@material-symbols/svg-400/outlined/warning.svg?react'
@@ -112,6 +113,7 @@ export const ICONS = {
   unfold_less: UnfoldLessIcon,
   unfold_more: UnfoldMoreIcon,
   upload: UploadIcon,
+  verified: VerifiedIcon,
   visibility: VisibilityIcon,
   volume_up: VolumeUpIcon,
   warning: WarningIcon,
