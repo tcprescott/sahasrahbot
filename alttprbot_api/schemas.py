@@ -541,6 +541,35 @@ class AuditPage(BaseModel):
     next_before: Optional[int] = Field(None, description="Pass as `before` for the next page; null on the last.")
 
 
+# --- Voice roles ----------------------------------------------------------------
+
+
+class VoiceRole(BaseModel):
+    id: int
+    voice_channel_id: str
+    voice_channel_name: Optional[str] = Field(None, description="Null when the voice channel was deleted.")
+    role_id: str
+    role_name: Optional[str] = Field(None, description="Null when the role was deleted.")
+    problem: Optional[str] = Field(None, description="Why this voice role doesn't work right now, in words; null when it does.")
+
+
+class VoiceRoleRoleOption(BaseModel):
+    id: str
+    name: str
+    assignable: bool = Field(description="Whether SahasrahBot can give it (below its own role, with Manage Roles).")
+
+
+class VoiceRoles(BaseModel):
+    voice_roles: list[VoiceRole]
+    voice_channels: list[ServerOption]
+    roles: list[VoiceRoleRoleOption]
+
+
+class VoiceRoleIn(BaseModel):
+    voice_channel_id: str
+    role_id: str
+
+
 # --- Server directory ------------------------------------------------------------
 
 

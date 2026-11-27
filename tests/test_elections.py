@@ -645,3 +645,4 @@ async def test_directory_posts_and_registers(db, bot, monkeypatch):
     monkeypatch.setattr(discord_directory, "_directory", None)
     election_posts.register(bot)
     assert isinstance(discord_directory.get(), election_posts.DiscordDirectory)
+

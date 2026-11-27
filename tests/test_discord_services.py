@@ -10,7 +10,7 @@ from unittest import mock
 import pytest
 
 from alttprbot import models
-from alttprbot.exceptions import NotFoundError, SahasrahBotException
+from alttprbot.exceptions import InvalidInputError, NotFoundError, PermissionDeniedError, SahasrahBotException
 from alttprbot.services import discord_servers, multiworld, voice_roles
 
 OWNER = 111
@@ -221,3 +221,75 @@ async def test_voice_roles(db):
     assert len(await voice_roles.for_guild(1)) == 1
     await voice_roles.delete(1, vr.id)
     assert await voice_roles.for_guild(1) == []
+
+
+# managing voice roles (web, API, MCP)
+
+VR_GUILD, VR_ADMIN, VR_OWNER = 5, 7, 1
+
+
+@pytest.fixture
+def vr_server(directory):
+    directory.owner = VR_OWNER
+    directory.add_guild(VR_GUILD, name="Community", admins=[VR_ADMIN],
+                        voice_channels=[(10, "Race 1"), (11, "Race 2")],
+                        roles=[(20, "@Staff"), (21, "@In Race 1"), (22, "@In Race 2")], unassignable={20})
+    return directory
+
+
+async def test_voice_roles_overview_names_and_flags_problems(db, vr_server):
+    await models.VoiceRole.create(guild_id=VR_GUILD, voice_channel_id=11, role_id=22)
+    await models.VoiceRole.create(guild_id=VR_GUILD, voice_channel_id=10, role_id=21)
+    await models.VoiceRole.create(guild_id=VR_GUILD, voice_channel_id=10, role_id=20)  # above the bot
+    await models.VoiceRole.create(guild_id=VR_GUILD, voice_channel_id=99, role_id=21)  # channel deleted
+    await models.VoiceRole.create(guild_id=VR_GUILD, voice_channel_id=11, role_id=98)  # role deleted
+    await models.VoiceRole.create(guild_id=6, voice_channel_id=10, role_id=21)  # another server's
+
+    data = await voice_roles.overview(VR_GUILD, VR_ADMIN)
+    assert [(v["voice_channel_name"], v["role_name"], v["problem"]) for v in data["voice_roles"]] == [
+        ("Race 1", "@In Race 1", None),
+        ("Race 1", "@Staff", voice_roles.ROLE_UNASSIGNABLE),
+        ("Race 2", None, voice_roles.ROLE_GONE),
+        ("Race 2", "@In Race 2", None),
+        (None, "@In Race 1", voice_roles.CHANNEL_GONE),
+    ]
+    assert data["voice_channels"] == [{"id": 10, "name": "Race 1"}, {"id": 11, "name": "Race 2"}]
+    assert [(r["name"], r["assignable"]) for r in data["roles"]] == [
+        ("@Staff", False), ("@In Race 1", True), ("@In Race 2", True)]
+    assert (await voice_roles.overview(VR_GUILD, VR_OWNER))["voice_roles"]  # the bot owner may too
+
+
+async def test_voice_roles_are_admin_only(db, vr_server):
+    for call in (voice_roles.overview(VR_GUILD, 42), voice_roles.add(VR_GUILD, 42, 10, 21),
+                 voice_roles.remove(VR_GUILD, 42, 1)):
+        with pytest.raises(PermissionDeniedError):
+            await call
+    with pytest.raises(NotFoundError):
+        await voice_roles.overview(999, VR_ADMIN)  # the bot isn't in it
+
+
+async def test_add_voice_role_checks_and_audits(db, vr_server):
+    added = await voice_roles.add(VR_GUILD, VR_ADMIN, 10, 21)
+    assert (added["voice_channel_name"], added["role_name"], added["problem"]) == ("Race 1", "@In Race 1", None)
+    assert [(v.voice_channel_id, v.role_id) for v in await voice_roles.for_guild(VR_GUILD)] == [(10, 21)]
+    entry = await models.AuditLog.filter(action="voice_role.created").first()
+    assert (entry.guild_id, entry.target) == (VR_GUILD, "Race 1 → @In Race 1")
+
+    for channel, role, message in [(99, 21, "voice channel"), (None, 21, "voice channel"), (10, 98, "Pick a role"),
+                                   (10, 20, "can't give @Staff"), (10, 21, "already gives")]:
+        with pytest.raises(InvalidInputError, match=message):
+            await voice_roles.add(VR_GUILD, VR_ADMIN, channel, role)
+    assert len(await voice_roles.for_guild(VR_GUILD)) == 1
+
+
+async def test_remove_voice_role(db, vr_server):
+    other = await models.VoiceRole.create(guild_id=6, voice_channel_id=10, role_id=21)
+    added = await voice_roles.add(VR_GUILD, VR_ADMIN, 11, 22)
+    with pytest.raises(NotFoundError):
+        await voice_roles.remove(VR_GUILD, VR_ADMIN, other.id)  # another server's
+    await voice_roles.remove(VR_GUILD, VR_ADMIN, added["id"])
+    assert await voice_roles.for_guild(VR_GUILD) == []
+    entry = await models.AuditLog.filter(action="voice_role.deleted").first()
+    assert entry.target == "Race 2 → @In Race 2"
+    with pytest.raises(NotFoundError):
+        await voice_roles.remove(VR_GUILD, VR_ADMIN, added["id"])

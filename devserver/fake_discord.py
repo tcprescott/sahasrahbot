@@ -176,12 +176,13 @@ class FakeMember(FakeUser):
 
 
 class FakeChannel:
-    def __init__(self, guild: Optional["FakeGuild"], id: int, name: str):
+    def __init__(self, guild: Optional["FakeGuild"], id: int, name: str,
+                 type: discord.ChannelType = discord.ChannelType.text):
         self.guild = guild
         self.id = int(id)
         self.name = name
         self.mention = f"<#{self.id}>"
-        self.type = discord.ChannelType.text
+        self.type = type
         self.position = int(id)
         self.jump_url = f"https://discord.com/channels/{guild.id if guild else '@me'}/{self.id}"
 

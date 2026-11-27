@@ -58,6 +58,7 @@ import UnfoldMoreIcon from '@material-symbols/svg-400/outlined/unfold_more.svg?r
 import UploadIcon from '@material-symbols/svg-400/outlined/upload.svg?react'
 import VerifiedIcon from '@material-symbols/svg-400/outlined/verified.svg?react'
 import VisibilityIcon from '@material-symbols/svg-400/outlined/visibility.svg?react'
+import VolumeUpIcon from '@material-symbols/svg-400/outlined/volume_up.svg?react'
 import WarningIcon from '@material-symbols/svg-400/outlined/warning.svg?react'
 import WrapTextIcon from '@material-symbols/svg-400/outlined/wrap_text.svg?react'
 
@@ -114,6 +115,7 @@ export const ICONS = {
   upload: UploadIcon,
   verified: VerifiedIcon,
   visibility: VisibilityIcon,
+  volume_up: VolumeUpIcon,
   warning: WarningIcon,
   wrap_text: WrapTextIcon,
 } satisfies Record<string, Svg>

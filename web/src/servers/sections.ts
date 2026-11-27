@@ -13,6 +13,7 @@ export const SECTIONS: ServerSection[] = [
   { key: 'settings', label: 'Settings' },
   { key: 'verification', label: 'Racer verification' },
   { key: 'role-menus', label: 'Role menus' },
+  { key: 'voice-roles', label: 'Voice roles' },
   { key: 'directory', label: 'Server directory' },
 ]
 

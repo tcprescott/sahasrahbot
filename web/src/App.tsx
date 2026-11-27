@@ -31,6 +31,7 @@ import { ThemeProvider } from './theme/ThemeProvider'
 import { SubmissionScreen } from './tournament/SubmissionScreen'
 import { ModerationScreen } from './triforce/ModerationScreen'
 import { TriforcePoolScreen } from './triforce/TriforcePoolScreen'
+import { VoiceRolesSection } from './voiceroles/VoiceRolesSection'
 
 /**
  * Page URLs are the ones the old server-rendered pages had, because Discord
@@ -59,6 +60,7 @@ export function App() {
                   <Route path="role-menus" element={<RoleMenusRoute />} />
                   <Route path="role-menus/new" element={<RoleMenuEditorRoute />} />
                   <Route path="role-menus/:menuId" element={<RoleMenuEditorRoute />} />
+                  <Route path="voice-roles" element={<VoiceRolesSection />} />
                   <Route path="directory" element={<DirectoryRoute />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
