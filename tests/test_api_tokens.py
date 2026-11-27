@@ -327,3 +327,17 @@ async def test_lookup(db):
     assert "settings" not in found
     with pytest.raises(NotFoundError):
         await seeds.lookup("zzz")
+
+
+@pytest.mark.parametrize("randomizer, shipped", [("alttpr", "open"), ("alttprmystery", "weighted"),
+                                                 ("sm", "casual_full"), ("smz3", "normal")])
+async def test_builtin_presets_lists_the_shipped_files(randomizer, shipped):
+    names = await seeds.builtin_presets(randomizer)
+    assert shipped in names
+    assert names == sorted(names)
+    assert not any(n.endswith(".yaml") for n in names)
+
+
+async def test_builtin_presets_refuses_other_randomizers():
+    with pytest.raises(InvalidInputError, match="not ctjets"):
+        await seeds.builtin_presets("ctjets")

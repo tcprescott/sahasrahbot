@@ -20,6 +20,7 @@ import { HomeScreen } from './screens/HomeScreen'
 import { MeScreen } from './screens/MeScreen'
 import { NotFoundScreen } from './screens/NotFoundScreen'
 import { PurgeScreen } from './screens/PurgeScreen'
+import { SeedsScreen } from './seeds/SeedsScreen'
 import { ServerScreen } from './servers/ServerScreen'
 import { ServersScreen } from './servers/ServersScreen'
 import { DirectoryRoute } from './servers/directory/DirectorySection'
@@ -59,6 +60,8 @@ export function App() {
                   <Route path="directory" element={<DirectoryRoute />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
+                <Route path="seeds" element={<SeedsScreen />} />
+                <Route path="seeds/:hash" element={<SeedsScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />
                 <Route path="presets/me" element={<MyPresetsScreen />} />
                 <Route path="presets/manage/:namespace" element={<NamespaceScreen />} />

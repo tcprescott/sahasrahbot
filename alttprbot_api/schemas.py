@@ -437,6 +437,11 @@ class Seed(BaseModel):
     custom_instructions: Optional[str] = Field(None, description="Mystery only: anything the weightset tells runners.")
 
 
+class SeedPresets(BaseModel):
+    randomizer: str
+    presets: list[str] = Field(description="The built-in presets, by name. Someone's own preset is rolled as `namespace/name`.")
+
+
 class SeedLookup(BaseModel):
     hash: str
     randomizer: Optional[str] = None

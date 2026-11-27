@@ -775,6 +775,14 @@ async def roll_seed(data: schemas.SeedRollIn):
     return schemas.Seed(**await seeds.roll(data.randomizer, data.preset, options)), 201
 
 
+@app_api_blueprint.get('/seeds/presets/<string:randomizer>')
+@tag(['seeds'])
+@validate_response(schemas.SeedPresets)
+async def list_seed_presets(randomizer: str):
+    """The presets that ship with SahasrahBot for a randomizer, to roll by name."""
+    return schemas.SeedPresets(randomizer=randomizer, presets=await seeds.builtin_presets(randomizer))
+
+
 @app_api_blueprint.get('/seeds/<string:hash_id>')
 @tag(['seeds'])
 @validate_response(schemas.SeedLookup)
