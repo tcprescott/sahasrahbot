@@ -45,7 +45,6 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.generator")
     await discordbot.load_extension("alttprbot_discord.cogs.inquiry")
     await discordbot.load_extension("alttprbot_discord.cogs.elections")
-    await discordbot.load_extension("alttprbot_discord.cogs.doorsmw")
     await discordbot.load_extension("alttprbot_discord.cogs.racer_verification")
 
     await discordbot.load_extension('jishaku')

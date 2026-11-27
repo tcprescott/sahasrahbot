@@ -14,7 +14,7 @@ import pytest
 
 import config
 from alttprbot import models, tournaments
-from alttprbot.integrations import alttprladder, doors_multiworld, holyimage, racetime
+from alttprbot.integrations import alttprladder, holyimage, racetime
 from alttprbot.services import bots, tournament_jobs, tournament_results
 from alttprbot.services import racer_verification as verification
 
@@ -118,40 +118,8 @@ async def test_ladder_archive_count_formats_dates(ladder_site):
 
 
 # ---------------------------------------------------------------------------
-# Door Randomizer multiworld server and holy images
+# Holy images
 # ---------------------------------------------------------------------------
-
-
-async def test_doors_multiworld_calls(fake_http, monkeypatch):
-    monkeypatch.setattr(doors_multiworld, "BASE_URL", fake_http.url())
-    fake_http.add("POST", "/game", body=json.dumps({"token": "t", "port": 1}))
-    fake_http.add("GET", "/game/t", body=json.dumps({"admin": 1}))
-    fake_http.add("PUT", "/game/t/cmd", body=json.dumps({"resp": "ok"}))
-    fake_http.add("PUT", "/game/t/msg", body=json.dumps({"resp": None}))
-    fake_http.add("GET", "/autocomplete/players", body=json.dumps(["p1"]))
-    fake_http.add("GET", "/autocomplete/items", body=json.dumps(["Bow"]))
-    fake_http.add("GET", "/autocomplete/clients", body=json.dumps(["c1"]))
-
-    assert await doors_multiworld.create_game({"token": "t"}) == {"token": "t", "port": 1}
-    assert await doors_multiworld.get_game("t") == {"admin": 1}
-    assert await doors_multiworld.send_command("t", {"command": "close"}) == {"resp": "ok"}
-    assert await doors_multiworld.send_message("t", "hi") == {"resp": None}
-    assert await doors_multiworld.autocomplete_players("t", "p") == ["p1"]
-    assert await doors_multiworld.autocomplete_items("B") == ["Bow"]
-    assert await doors_multiworld.autocomplete_clients("t", "c") == ["c1"]
-
-    bodies = {(r.method, r.path): r for r in fake_http.requests}
-    assert json.loads(bodies[("PUT", "/game/t/cmd")].body) == {"command": "close"}
-    assert json.loads(bodies[("PUT", "/game/t/msg")].body) == {"msg": "hi"}
-    assert bodies[("GET", "/autocomplete/players")].query == {"player": "p", "token": "t"}
-    assert bodies[("GET", "/autocomplete/clients")].query == {"client": "c", "token": "t"}
-
-
-async def test_doors_multiworld_non_json_reply_raises(fake_http, monkeypatch):
-    monkeypatch.setattr(doors_multiworld, "BASE_URL", fake_http.url())
-    fake_http.add("POST", "/game", body="Internal Server Error", status=500, content_type="text/plain")
-    with pytest.raises(doors_multiworld.MultiworldServerError):
-        await doors_multiworld.create_game({"multidata_url": "x"})
 
 
 async def test_holy_images_index(fake_http, monkeypatch):

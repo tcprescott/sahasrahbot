@@ -1,5 +1,5 @@
 // Runs before every Vitest file (vite.config.ts `test.setupFiles`).
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
 // jsdom has no layout, so Radix's menus and dialogs need these to open.
@@ -34,6 +34,11 @@ globalThis.Request = class PageRequest extends NodeRequest {
     super(typeof input === 'string' ? new URL(input, window.location.href) : input, init)
   }
 }
+
+// findBy*/waitFor give up after 1s by default. The first screen a test file renders
+// loads its route's modules cold and makes several API calls, which can take longer
+// than that on a busy CI runner, so allow 5s.
+configure({ asyncUtilTimeout: 5000 })
 
 afterEach(() => {
   cleanup()
