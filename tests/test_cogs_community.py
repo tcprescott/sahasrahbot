@@ -505,10 +505,11 @@ def inquiry_channel(guild, user, role):
     "who, perms, message",
     [
         ("user", permissions(), "You must have manage threads permission"),
-        ("me", permissions(), "This bot needs permission to create private threads"),
-        ("everyone", permissions(send_messages=True, send_messages_in_threads=True), "should not be allowed to send"),
-        ("everyone", permissions(), "needs to be able to send messages in threads"),
-        ("role", permissions(), "<@&500> is not allowed to see this channel."),
+        ("me", permissions(), "SahasrahBot needs permission to create private threads in #general."),
+        ("everyone", permissions(send_messages=True, send_messages_in_threads=True),
+         "@everyone can send messages in #general. Turn that off"),
+        ("everyone", permissions(), "@everyone needs to be able to send messages in threads"),
+        ("role", permissions(), "@Role can't see #general, so nobody would be there to answer."),
     ],
 )
 async def test_inquiry_permission_checks(db, who, perms, message):
@@ -537,6 +538,8 @@ async def test_inquiry_posts_message_and_saves_role(db):
     assert isinstance(sent.view, inquiry_cog.ConfirmInquiryThread)
     saved = await models.InquiryMessageConfig.get(message_id=interaction.original.id)
     assert saved.role_id == 500
+    assert saved.guild_id == guild.id
+    assert saved.channel_id == interaction.channel.id  # so the website can list it
 
 
 async def test_inquiry_buttons_lead_to_the_modal(db):
@@ -549,6 +552,9 @@ async def test_inquiry_buttons_lead_to_the_modal(db):
     sent = interaction.sent()
     assert sent.content.startswith("This will open a private thread to <@&500>")
     assert sent.ephemeral is True
+    # An older message learns where it is when pressed, so the website can list it.
+    saved = await models.InquiryMessageConfig.get(message_id=700)
+    assert (saved.guild_id, saved.channel_id) == (guild.id, interaction.channel.id)
 
     yes = FakeInteraction(guild=guild)
     await sent.view.yes.callback(yes)

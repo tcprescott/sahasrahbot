@@ -3,6 +3,7 @@ import { api, unwrap, type ServerSettings } from '../api/client'
 import { Loaded } from '../api/Loaded'
 import { useQuery } from '../api/useQuery'
 import { Banner, Button, Icon, Panel } from '../components'
+import { InquiriesPanel } from './InquiriesPanel'
 import { useServer } from './ServerContext'
 
 /** /servers/:guildId/settings — the daily challenge channels and the /holyimage default game. */
@@ -167,6 +168,7 @@ function SettingsForm({ saved: initial }: Readonly<{ saved: ServerSettings }>) {
           Save settings
         </Button>
       </div>
+      <InquiriesPanel />
     </div>
   )
 }

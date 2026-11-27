@@ -7,4 +7,8 @@ export const browser = {
   assign(url: string): void {
     window.location.assign(url)
   },
+  /** Open another site (a Discord message) in a new tab. */
+  openTab(url: string): void {
+    window.open(url, '_blank', 'noopener')
+  },
 }
