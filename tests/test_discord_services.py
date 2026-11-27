@@ -11,7 +11,7 @@ import pytest
 
 from alttprbot import models
 from alttprbot.exceptions import NotFoundError, SahasrahBotException
-from alttprbot.services import discord_servers, multiworld, reaction_roles, voice_roles
+from alttprbot.services import discord_servers, multiworld, voice_roles
 
 OWNER = 111
 OTHER = 222
@@ -205,71 +205,6 @@ async def test_server_list_layout_pages_of_ten(db):
     ]
     assert layout.pages[0].channel_id == 100
     assert layout.pages[2].servers[-1].invite_id == "inv22"
-
-
-# ---------------------------------------------------------------------------
-# reaction_roles
-# ---------------------------------------------------------------------------
-
-
-async def test_reaction_groups(db):
-    group = await reaction_roles.create_group(1, 100, 200, "Pronouns", "pick one", True)
-    assert group.bot_managed == 1
-    with pytest.raises(SahasrahBotException, match="Group already exists"):
-        await reaction_roles.create_group(1, 100, 200, "dupe", "", True)
-
-    assert [g.name for g in await reaction_roles.list_groups(1)] == ["Pronouns"]
-    assert await reaction_roles.list_groups(2) == []
-    assert await reaction_roles.get_group(group.id, 2) is None
-    with pytest.raises(SahasrahBotException, match="not found"):
-        await reaction_roles.require_group(group.id, 2)
-
-    await reaction_roles.update_group(1, group.id, "Renamed", "new desc")
-    await reaction_roles.update_group(2, group.id, "Other guild", "ignored")
-    group = await reaction_roles.require_group(group.id, 1)
-    assert (group.name, group.description) == ("Renamed", "new desc")
-
-    await reaction_roles.delete_group(2, group.id)  # another guild's: no-op
-    assert await reaction_roles.get_group(group.id, 1) is not None
-    await reaction_roles.delete_group(1, group.id)
-    assert await reaction_roles.list_groups(1) == []
-
-
-async def test_reaction_roles(db):
-    group = await reaction_roles.create_group(1, 100, 200, "Pronouns", None, False)
-    role = await reaction_roles.create_role(1, group.id, 999, "they/them", "🟣", "desc", False)
-    assert (role.description, role.protect_mentions) == ("desc", 0)
-    with pytest.raises(SahasrahBotException, match="Emoji already exists"):
-        await reaction_roles.create_role(1, group.id, 998, "x", "🟣", "", False)
-
-    assert await reaction_roles.role_ids_for_reaction(1, 100, 200, "🟣") == [999]
-    assert await reaction_roles.role_ids_for_reaction(1, 100, 200, "🟢") == []
-    assert await reaction_roles.role_ids_for_reaction(2, 100, 200, "🟣") == []
-
-    await reaction_roles.update_role(1, role.id, "she/her", "new", True)
-    found = await reaction_roles.require_role(role.id, 1)
-    assert (found.name, found.description, found.protect_mentions) == ("she/her", "new", 1)
-    assert (found.reaction_group.id, found.reaction_group.message_id) == (group.id, 200)
-    with pytest.raises(SahasrahBotException, match="not found"):
-        await reaction_roles.require_role(role.id, 2)
-
-    assert [r.id for r in await reaction_roles.group_roles(group.id, 1)] == [role.id]
-    await reaction_roles.delete_role(1, role.id)
-    assert await reaction_roles.group_roles(group.id, 1) == []
-
-
-async def test_reaction_role_limit_per_group(db):
-    group = await reaction_roles.create_group(1, 100, 200, "Many", None, True)
-    for i in range(reaction_roles.MAX_ROLES_PER_GROUP):
-        await reaction_roles.create_role(1, group.id, i, f"r{i}", f"e{i}", None, False)
-    with pytest.raises(SahasrahBotException, match="No more than 20 roles"):
-        await reaction_roles.create_role(1, group.id, 99, "extra", "new", None, False)
-
-
-async def test_create_role_in_another_guilds_group_fails(db):
-    group = await reaction_roles.create_group(1, 100, 200, "g", "", True)
-    with pytest.raises(SahasrahBotException, match="not found"):
-        await reaction_roles.create_role(2, group.id, 1, "x", "🙂", "", False)
 
 
 # ---------------------------------------------------------------------------

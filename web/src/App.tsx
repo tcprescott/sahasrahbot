@@ -11,6 +11,7 @@ import { MyPresetsScreen } from './presets/MyPresetsScreen'
 import { NewPresetScreen } from './presets/NewPresetScreen'
 import { PresetScreen } from './presets/PresetScreen'
 import { ElectionFormScreen } from './elections/ElectionFormScreen'
+import { RoleMenuEditorRoute, RoleMenusRoute } from './rolemenus/routes'
 import { ElectionsScreen } from './elections/ElectionsScreen'
 import { ResultsScreen } from './elections/ResultsScreen'
 import { BallotScreen } from './ranked/BallotScreen'
@@ -52,6 +53,9 @@ export function App() {
                 <Route path="servers/:guildId" element={<ServerScreen />}>
                   <Route index element={<Navigate to="settings" replace />} />
                   <Route path="settings" element={<SettingsSection />} />
+                  <Route path="role-menus" element={<RoleMenusRoute />} />
+                  <Route path="role-menus/new" element={<RoleMenuEditorRoute />} />
+                  <Route path="role-menus/:menuId" element={<RoleMenuEditorRoute />} />
                   <Route path="directory" element={<DirectoryRoute />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />

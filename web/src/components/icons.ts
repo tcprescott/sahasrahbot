@@ -37,6 +37,7 @@ import HowToVoteFillIcon from '@material-symbols/svg-400/outlined/how_to_vote-fi
 import InfoIcon from '@material-symbols/svg-400/outlined/info.svg?react'
 import KeyIcon from '@material-symbols/svg-400/outlined/key.svg?react'
 import KeyboardArrowDownIcon from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?react'
+import LabelIcon from '@material-symbols/svg-400/outlined/label.svg?react'
 import LanguageIcon from '@material-symbols/svg-400/outlined/language.svg?react'
 import LightModeIcon from '@material-symbols/svg-400/outlined/light_mode.svg?react'
 import LinkIcon from '@material-symbols/svg-400/outlined/link.svg?react'
@@ -92,6 +93,7 @@ export const ICONS = {
   info: InfoIcon,
   key: KeyIcon,
   keyboard_arrow_down: KeyboardArrowDownIcon,
+  label: LabelIcon,
   language: LanguageIcon,
   light_mode: LightModeIcon,
   link: LinkIcon,
