@@ -150,6 +150,49 @@ class RaceTimeKONOTSegment(Model):
     updated = fields.DatetimeField(auto_now=True)
 
 
+class RoleMenu(Model):
+    """A Discord message people use to give themselves roles: reactions, buttons or a
+    dropdown (``alttprbot/services/role_menus.py``). Filled from ``reaction_group`` by
+    migration 104, keeping its ids."""
+
+    class Meta:
+        table = 'role_menu'
+
+    id = fields.IntField(primary_key=True)
+    guild_id = fields.BigIntField(db_index=True)
+    channel_id = fields.BigIntField()
+    # None until it is posted, or after its message was deleted.
+    message_id = fields.BigIntField(null=True, db_index=True)
+    title = fields.CharField(256)
+    description = fields.CharField(4000, null=True)
+    style = fields.CharField(16, default='reactions')
+    # False for a menu on someone else's message: it can only use reactions.
+    posted_by_bot = fields.BooleanField(default=True)
+    single_choice = fields.BooleanField(default=False)
+    created_at = fields.DatetimeField(auto_now_add=True)
+    updated_at = fields.DatetimeField(auto_now=True)
+
+    options: fields.ReverseRelation['RoleMenuOption']
+
+
+class RoleMenuOption(Model):
+    """One role on a role menu. Filled from ``reaction_role`` by migration 104."""
+
+    class Meta:
+        table = 'role_menu_option'
+
+    id = fields.IntField(primary_key=True)
+    menu = fields.ForeignKeyField('models.RoleMenu', related_name='options', on_delete=fields.CASCADE)
+    role_id = fields.BigIntField()
+    label = fields.CharField(80)
+    description = fields.CharField(400, null=True)
+    # A Unicode emoji or a custom one as ``<:name:id>`` / ``<a:name:id>``.
+    emoji = fields.CharField(100, null=True)
+    position = fields.IntField(default=0)
+
+
+# The old reaction role tables. Nothing reads them since role_menu replaced them
+# (migration 104 copied their rows); kept until a cleanup removes them.
 class ReactionGroup(Model):
     class Meta:
         table = 'reaction_group'

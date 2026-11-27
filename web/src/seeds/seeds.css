@@ -1,0 +1,95 @@
+/* Rolling and looking up seeds: the preset page's dialog and the Seeds page. */
+.seed-opts {
+  display: flex;
+  flex-direction: column;
+}
+.seed-opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+.seed-opt:first-child {
+  border-top: 0;
+}
+.seed-opt__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.seed-opt__text span {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+}
+.seed-opt__select {
+  width: auto;
+}
+.seed-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 16px;
+}
+.seed-result__link {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.seed-result__note {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.seed-code {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.seed-code li {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--link);
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+.seed-hint {
+  margin: 8px 16px 0;
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+}
+.seed-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 16px 16px 4px;
+}
+.seed-search {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+}
+.seed-search .input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+}
+.seed-roll {
+  padding: 4px 16px 16px;
+}
+.seed-result .t-kv {
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+/* The dialog pads its body already. */
+.dialog__body .seed-result {
+  padding: 0;
+}
+.dialog__body .seed-opt {
+  padding-inline: 0;
+}
+.dialog__body .seed-hint {
+  margin-inline: 0;
+}

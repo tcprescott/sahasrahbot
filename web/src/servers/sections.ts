@@ -12,6 +12,7 @@ export interface ServerSection {
 export const SECTIONS: ServerSection[] = [
   { key: 'settings', label: 'Settings' },
   { key: 'verification', label: 'Racer verification' },
+  { key: 'role-menus', label: 'Role menus' },
   { key: 'directory', label: 'Server directory' },
 ]
 

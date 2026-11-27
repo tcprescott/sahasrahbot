@@ -37,7 +37,7 @@ from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
 from alttprbot.observability import sentry as observability
 from alttprbot.services import (accounts, api_tokens, audit, discord_servers, elections, inquiries, mcp_auth, presets,
-                                racer_verification, seeds, servers, tournament_submissions, triforce_texts)
+                                racer_verification, role_menus, seeds, servers, tournament_submissions, triforce_texts)
 from alttprbot_api import schemas
 from alttprbot_api.api import SIGN_IN_SCOPES, discord
 
@@ -586,6 +586,117 @@ async def cast_ballot(election_id: int, data: schemas.BallotIn):
     return schemas.Election(**await elections.cast_ballot(election_id, user.id, data.ranking))
 
 
+# --- Role menus -----------------------------------------------------------------
+
+
+def role_menu_out(menu: dict) -> schemas.RoleMenu:
+    return schemas.RoleMenu(**{
+        **menu,
+        'guild_id': str(menu['guild_id']),
+        'channel_id': str(menu['channel_id']),
+        'message_id': _id(menu['message_id']),
+        'options': [{**o, 'role_id': str(o['role_id'])} for o in menu['options']],
+    })
+
+
+def role_menu_input(data: schemas.RoleMenuIn) -> role_menus.MenuInput:
+    return role_menus.MenuInput(
+        guild_id=_int_id(data.guild_id, 'server'),
+        channel_id=_int_id(data.channel_id, 'channel'),
+        title=data.title,
+        description=data.description,
+        style=data.style,
+        single_choice=data.single_choice,
+        options=[role_menus.OptionInput(role_id=_int_id(o.role_id, 'role'), label=o.label, emoji=o.emoji,
+                                        description=o.description, id=o.id) for o in data.options],
+    )
+
+
+@app_api_blueprint.get('/role-menus/servers')
+@tag(['role menus'])
+@validate_response(schemas.ServerList)
+async def role_menu_servers():
+    """Servers the viewer can make role menus in (where they're an Administrator)."""
+    user = await require_user()
+    return schemas.ServerList(servers=[schemas.ServerOption(id=str(s['id']), name=s['name'])
+                                       for s in await role_menus.servers(await admin_guild_ids(user))])
+
+
+@app_api_blueprint.get('/role-menus/servers/<int:guild_id>')
+@tag(['role menus'])
+@validate_response(schemas.RoleMenuServerOptions)
+async def role_menu_server_options(guild_id: int):
+    """The channels the bot can post in, the roles and the custom emoji, for the editor."""
+    user = await require_user()
+    options = await role_menus.server_options(guild_id, user.id)
+    return schemas.RoleMenuServerOptions(
+        channels=[schemas.ServerOption(id=str(c['id']), name=c['name']) for c in options['channels']],
+        roles=[schemas.RoleMenuRole(id=str(r['id']), name=r['name'], assignable=r['assignable'])
+               for r in options['roles']],
+        emojis=[schemas.ServerOption(id=str(e['id']), name=e['name']) for e in options['emojis']],
+    )
+
+
+@app_api_blueprint.get('/role-menus')
+@tag(['role menus'])
+@validate_querystring(schemas.RoleMenuQuery)
+@validate_response(schemas.RoleMenuList)
+async def list_role_menus(query_args: schemas.RoleMenuQuery):
+    """Role menus in the servers the viewer administers, or in one of them."""
+    user = await require_user()
+    admin = await admin_guild_ids(user)
+    guild_id = _int_id(query_args.guild_id, 'server')
+    if guild_id is not None:
+        admin = admin & {guild_id}
+    return schemas.RoleMenuList(menus=[role_menu_out(m) for m in await role_menus.list_menus(admin)])
+
+
+@app_api_blueprint.post('/role-menus')
+@tag(['role menus'])
+@validate_request(schemas.RoleMenuIn)
+@validate_response(schemas.RoleMenu, 201)
+async def create_role_menu(data: schemas.RoleMenuIn):
+    """Make a role menu and post it in its channel."""
+    user = await require_user()
+    return role_menu_out(await role_menus.create_menu(user.id, role_menu_input(data))), 201
+
+
+@app_api_blueprint.get('/role-menus/<int:menu_id>')
+@tag(['role menus'])
+@validate_response(schemas.RoleMenu)
+async def get_role_menu(menu_id: int):
+    user = await require_user()
+    return role_menu_out(await role_menus.get_menu(menu_id, user.id))
+
+
+@app_api_blueprint.put('/role-menus/<int:menu_id>')
+@tag(['role menus'])
+@validate_request(schemas.RoleMenuIn)
+@validate_response(schemas.RoleMenu)
+async def update_role_menu(menu_id: int, data: schemas.RoleMenuIn):
+    """Change a role menu and redraw it in Discord."""
+    user = await require_user()
+    return role_menu_out(await role_menus.update_menu(menu_id, user.id, role_menu_input(data)))
+
+
+@app_api_blueprint.post('/role-menus/<int:menu_id>/repost')
+@tag(['role menus'])
+@validate_response(schemas.RoleMenu)
+async def repost_role_menu(menu_id: int):
+    """Post the menu as a new message from SahasrahBot, removing the old one."""
+    user = await require_user()
+    return role_menu_out(await role_menus.repost(menu_id, user.id))
+
+
+@app_api_blueprint.delete('/role-menus/<int:menu_id>')
+@tag(['role menus'])
+async def delete_role_menu(menu_id: int):
+    """Delete the menu and its message. Roles people already have stay."""
+    user = await require_user()
+    await role_menus.delete_menu(menu_id, user.id)
+    return '', 204
+
+
 # --- Triforce texts ----------------------------------------------------------
 
 
@@ -661,6 +772,14 @@ async def roll_seed(data: schemas.SeedRollIn):
     options = seeds.RollOptions(race=data.race, hints=data.hints, allow_quickswap=data.allow_quickswap,
                                 branch=data.branch, spoiler_race=data.spoiler_race)
     return schemas.Seed(**await seeds.roll(data.randomizer, data.preset, options)), 201
+
+
+@app_api_blueprint.get('/seeds/presets/<string:randomizer>')
+@tag(['seeds'])
+@validate_response(schemas.SeedPresets)
+async def list_seed_presets(randomizer: str):
+    """The presets that ship with SahasrahBot for a randomizer, to roll by name."""
+    return schemas.SeedPresets(randomizer=randomizer, presets=await seeds.builtin_presets(randomizer))
 
 
 @app_api_blueprint.get('/seeds/<string:hash_id>')

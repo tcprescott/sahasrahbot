@@ -38,6 +38,7 @@ async def load_extensions():
     await discordbot.load_extension("alttprbot_discord.cogs.discord_servers")
     await discordbot.load_extension("alttprbot_discord.cogs.misc")
     await discordbot.load_extension("alttprbot_discord.cogs.role")
+    await discordbot.load_extension("alttprbot_discord.cogs.role_menus")
     await discordbot.load_extension("alttprbot_discord.cogs.sgdailies")
     await discordbot.load_extension("alttprbot_discord.cogs.voicerole")
     await discordbot.load_extension("alttprbot_discord.cogs.smmulti")

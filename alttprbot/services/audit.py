@@ -117,12 +117,17 @@ TRIFORCE_TEXT_APPROVED = 'triforce_text.approved'
 TRIFORCE_TEXT_REJECTED = 'triforce_text.rejected'
 SERVER_SETTING_CHANGED = 'server_setting.changed'
 SERVER_SETTING_REMOVED = 'server_setting.removed'
+# reaction_group.* / reaction_role.*: the old reaction roles, kept so old entries keep their labels.
 REACTION_GROUP_CREATED = 'reaction_group.created'
 REACTION_GROUP_UPDATED = 'reaction_group.updated'
 REACTION_GROUP_DELETED = 'reaction_group.deleted'
 REACTION_ROLE_CREATED = 'reaction_role.created'
 REACTION_ROLE_UPDATED = 'reaction_role.updated'
 REACTION_ROLE_DELETED = 'reaction_role.deleted'
+ROLE_MENU_CREATED = 'role_menu.created'
+ROLE_MENU_UPDATED = 'role_menu.updated'
+ROLE_MENU_REPOSTED = 'role_menu.reposted'
+ROLE_MENU_DELETED = 'role_menu.deleted'
 VOICE_ROLE_CREATED = 'voice_role.created'
 VOICE_ROLE_DELETED = 'voice_role.deleted'
 SERVER_LIST_CATEGORY_ADDED = 'server_list.category_added'
@@ -175,6 +180,10 @@ ACTIONS: dict[str, str] = {
     REACTION_ROLE_CREATED: 'Added a reaction role',
     REACTION_ROLE_UPDATED: 'Edited a reaction role',
     REACTION_ROLE_DELETED: 'Removed a reaction role',
+    ROLE_MENU_CREATED: 'Created a role menu',
+    ROLE_MENU_UPDATED: 'Edited a role menu',
+    ROLE_MENU_REPOSTED: 'Reposted a role menu',
+    ROLE_MENU_DELETED: 'Deleted a role menu',
     VOICE_ROLE_CREATED: 'Added a voice channel role',
     VOICE_ROLE_DELETED: 'Removed a voice channel role',
     SERVER_LIST_CATEGORY_ADDED: 'Added a server list category',
@@ -211,7 +220,7 @@ AREAS: dict[str, tuple[str, tuple[str, ...]]] = {
     'elections': ('Elections', ('election',)),
     'presets': ('Presets', ('preset',)),
     'triforce_texts': ('Triforce texts', ('triforce_text',)),
-    'server': ('Server settings and roles', ('server_setting', 'reaction_group', 'reaction_role', 'voice_role',
+    'server': ('Server settings and roles', ('server_setting', 'reaction_group', 'reaction_role', 'role_menu', 'voice_role',
                                              'server_list', 'racer_verification', 'inquiry')),
     'tokens': ('Tokens and AI clients', ('api_token', 'ai_client')),
     'accounts': ('Accounts', ('account',)),

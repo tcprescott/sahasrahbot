@@ -11,6 +11,7 @@ import { MyPresetsScreen } from './presets/MyPresetsScreen'
 import { NewPresetScreen } from './presets/NewPresetScreen'
 import { PresetScreen } from './presets/PresetScreen'
 import { ElectionFormScreen } from './elections/ElectionFormScreen'
+import { RoleMenuEditorRoute, RoleMenusRoute } from './rolemenus/routes'
 import { ElectionsScreen } from './elections/ElectionsScreen'
 import { ResultsScreen } from './elections/ResultsScreen'
 import { BallotScreen } from './ranked/BallotScreen'
@@ -19,6 +20,7 @@ import { HomeScreen } from './screens/HomeScreen'
 import { MeScreen } from './screens/MeScreen'
 import { NotFoundScreen } from './screens/NotFoundScreen'
 import { PurgeScreen } from './screens/PurgeScreen'
+import { SeedsScreen } from './seeds/SeedsScreen'
 import { ServerScreen } from './servers/ServerScreen'
 import { ServersScreen } from './servers/ServersScreen'
 import { DirectoryRoute } from './servers/directory/DirectorySection'
@@ -54,9 +56,14 @@ export function App() {
                   <Route index element={<Navigate to="settings" replace />} />
                   <Route path="settings" element={<SettingsSection />} />
                   <Route path="verification/*" element={<VerificationSection />} />
+                  <Route path="role-menus" element={<RoleMenusRoute />} />
+                  <Route path="role-menus/new" element={<RoleMenuEditorRoute />} />
+                  <Route path="role-menus/:menuId" element={<RoleMenuEditorRoute />} />
                   <Route path="directory" element={<DirectoryRoute />} />
                 </Route>
                 <Route path="purgeme" element={<PurgeScreen />} />
+                <Route path="seeds" element={<SeedsScreen />} />
+                <Route path="seeds/:hash" element={<SeedsScreen />} />
                 <Route path="presets" element={<NamespacesScreen />} />
                 <Route path="presets/me" element={<MyPresetsScreen />} />
                 <Route path="presets/manage/:namespace" element={<NamespaceScreen />} />

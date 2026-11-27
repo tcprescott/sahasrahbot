@@ -290,6 +290,72 @@ class ElectionResults(BaseModel):
 TextStatus = Literal['pending', 'approved', 'rejected']
 
 
+RoleMenuStyle = Literal['reactions', 'buttons', 'dropdown']
+
+
+class RoleMenuRole(BaseModel):
+    id: str
+    name: str
+    assignable: bool = Field(description="Whether SahasrahBot can give it (below its highest role, with Manage Roles)")
+
+
+class RoleMenuServerOptions(BaseModel):
+    channels: list[ServerOption]
+    roles: list[RoleMenuRole]
+    emojis: list[ServerOption] = Field(description="The server's custom emoji; name is the <:name:id> form")
+
+
+class RoleMenuOption(BaseModel):
+    id: int
+    role_id: str
+    role_name: Optional[str] = Field(default=None, description="Null when the role was deleted")
+    label: str
+    emoji: Optional[str] = None
+    description: Optional[str] = None
+
+
+class RoleMenu(BaseModel):
+    id: int
+    guild_id: str
+    guild_name: Optional[str] = None
+    channel_id: str
+    channel_name: Optional[str] = None
+    message_id: Optional[str] = Field(default=None, description="Null when it isn't posted")
+    title: str
+    description: Optional[str] = None
+    style: RoleMenuStyle
+    posted_by_bot: bool = Field(description="False for a menu on someone else's message: it can only use reactions")
+    single_choice: bool
+    options: list[RoleMenuOption]
+    problems: list[str] = Field(description="What will stop it working, as sentences")
+
+
+class RoleMenuQuery(BaseModel):
+    guild_id: Optional[str] = Field(None, description="Only this server's menus.")
+
+
+class RoleMenuList(BaseModel):
+    menus: list[RoleMenu]
+
+
+class RoleMenuOptionIn(BaseModel):
+    id: Optional[int] = Field(default=None, description="An existing option's id to keep it; omit to add one")
+    role_id: str
+    label: str = Field(max_length=80)
+    emoji: Optional[str] = Field(default=None, max_length=100, description="An emoji, or a custom one as <:name:id>")
+    description: Optional[str] = Field(default=None, max_length=100)
+
+
+class RoleMenuIn(BaseModel):
+    guild_id: str
+    channel_id: str
+    title: str = Field(max_length=256)
+    description: Optional[str] = Field(default=None, max_length=4000)
+    style: RoleMenuStyle = 'buttons'
+    single_choice: bool = False
+    options: list[RoleMenuOptionIn] = Field(description="The roles in the order they appear, up to 25 (20 for reactions)")
+
+
 class TriforceText(BaseModel):
     id: int
     lines: list[str]
@@ -369,6 +435,11 @@ class Seed(BaseModel):
     file_select_code: Optional[list[str]] = Field(None, description="ALTTPR only: the item names on the file select screen.")
     spoiler_url: Optional[str] = None
     custom_instructions: Optional[str] = Field(None, description="Mystery only: anything the weightset tells runners.")
+
+
+class SeedPresets(BaseModel):
+    randomizer: str
+    presets: list[str] = Field(description="The built-in presets, by name. Someone's own preset is rolled as `namespace/name`.")
 
 
 class SeedLookup(BaseModel):

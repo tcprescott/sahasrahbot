@@ -11,7 +11,7 @@ import pytest
 
 from alttprbot import models
 from alttprbot.exceptions import InvalidInputError, PermissionDeniedError
-from alttprbot.services import (accounts, api_tokens, audit, elections, guild_config, presets, reaction_roles,
+from alttprbot.services import (accounts, api_tokens, audit, elections, guild_config, presets,
                                 triforce_texts)
 from alttprbot_api import api
 from alttprbot_api.blueprints import app_api
@@ -165,26 +165,16 @@ async def test_api_tokens_and_ai_clients(db):
     assert disconnected.action == "ai_client.disconnected"
 
 
-async def test_server_settings_and_reaction_roles(db):
+async def test_server_settings(db):
     with as_(ALICE, via=audit.VIA_DISCORD, detail="/config"):
         await guild_config.set_value(GUILD, "DailyChannel", "1")
         await guild_config.set_value(GUILD, "DailyChannel", "1")  # unchanged: nothing
         await guild_config.set_value(GUILD, "DailyChannel", "2")
         await guild_config.delete_value(GUILD, "DailyChannel")
         await guild_config.delete_value(GUILD, "DailyChannel")  # nothing there: nothing
-        group = await reaction_roles.create_group(GUILD, 1, 2, "Pronouns", None, True)
-        await reaction_roles.update_group(GUILD, group.id, "Pronoun roles", None)
-        role = await reaction_roles.create_role(GUILD, group.id, 5, "they", "🙂", None, True)
-        await reaction_roles.update_role(GUILD, role.id, "they/them", None, True)
-        await reaction_roles.delete_role(GUILD, role.id)
-        await reaction_roles.delete_group(GUILD, group.id)
     log = await rows()
-    assert [r.action for r in log] == [
-        "server_setting.changed", "server_setting.changed", "server_setting.removed", "reaction_group.created",
-        "reaction_group.updated", "reaction_role.created", "reaction_role.updated", "reaction_role.deleted",
-        "reaction_group.deleted"]
+    assert [r.action for r in log] == ["server_setting.changed", "server_setting.changed", "server_setting.removed"]
     assert log[1].details == {'changes': {'DailyChannel': ['1', '2']}}
-    assert log[4].details['changes'] == {'name': ['Pronouns', 'Pronoun roles']}
     assert {r.guild_id for r in log} == {GUILD}
 
 
